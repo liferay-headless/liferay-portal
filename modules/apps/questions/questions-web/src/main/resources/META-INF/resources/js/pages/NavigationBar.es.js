@@ -65,6 +65,11 @@ export default withRouter(
 
 									<ClayNavigationBar.Item
 										active={isActive('activity')}
+										className={
+											Liferay.ThemeDisplay.isSignedIn()
+												? 'ml-md-auto'
+												: 'd-none'
+										}
 										onClick={() =>
 											historyPushParser(
 												`/activity/${context.userId}`
