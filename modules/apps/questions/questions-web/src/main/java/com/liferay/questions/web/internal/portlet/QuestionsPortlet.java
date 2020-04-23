@@ -15,9 +15,18 @@
 package com.liferay.questions.web.internal.portlet;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.questions.web.internal.constants.QuestionsPortletKeys;
 
+import java.io.IOException;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -45,4 +54,31 @@ import org.osgi.service.component.annotations.Component;
 	service = Portlet.class
 )
 public class QuestionsPortlet extends MVCPortlet {
+
+	@Override
+	public void doView(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		String[] ranks = PortalUtil.getPortalProperties(
+		).getProperty(
+			"message.boards.user.ranks"
+		).split(
+			","
+		);
+		String lowestRank = Arrays.stream(
+			ranks
+		).min(
+			Comparator.comparing(rank -> rank.split("=")[1])
+		).map(
+			rank -> rank.split("=")[0]
+		).orElse(
+			"Youngling"
+		);
+
+		renderRequest.setAttribute(
+			QuestionsPortletKeys.DEFAULT_RANK_ATTRIBUTE, lowestRank);
+		super.doView(renderRequest, renderResponse);
+	}
+
 }
