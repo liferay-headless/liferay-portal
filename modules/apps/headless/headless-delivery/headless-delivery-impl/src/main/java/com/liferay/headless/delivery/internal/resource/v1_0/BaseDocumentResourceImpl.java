@@ -674,8 +674,10 @@ public abstract class BaseDocumentResourceImpl
 		String actionName, GroupedModel groupedModel, String methodName) {
 
 		return ActionUtil.addAction(
-			actionName, getClass(), groupedModel, methodName,
-			contextScopeChecker, contextUriInfo);
+			actionName, getClass(), (Long)groupedModel.getPrimaryKeyObj(),
+			methodName, contextScopeChecker, groupedModel.getUserId(),
+			groupedModel.getModelClassName(), groupedModel.getGroupId(),
+			contextUriInfo);
 	}
 
 	protected Map<String, String> addAction(
