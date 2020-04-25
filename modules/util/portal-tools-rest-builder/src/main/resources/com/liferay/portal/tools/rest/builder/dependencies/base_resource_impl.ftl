@@ -414,7 +414,7 @@ public abstract class Base${schemaName}ResourceImpl
 	}
 
 	protected Map<String, String> addAction(String actionName, GroupedModel groupedModel, String methodName) {
-		return ActionUtil.addAction(actionName, getClass(), groupedModel, methodName, contextScopeChecker, contextUriInfo);
+		return ActionUtil.addAction(actionName, getClass(), (Long)groupedModel.getPrimaryKeyObj(), methodName, contextScopeChecker, groupedModel.getUserId(), groupedModel.getModelClassName(), groupedModel.getGroupId(), contextUriInfo);
 	}
 
 	protected Map<String, String> addAction(String actionName, Long id, String methodName, Long ownerId, String permissionName, Long siteId) {
