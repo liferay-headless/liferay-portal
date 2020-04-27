@@ -211,7 +211,6 @@ export const getThread = (
                 } 
                 creatorStatistics {
 					joinDate
-					lastPostDate
 					postsNumber
 					rank
 				}
@@ -237,7 +236,6 @@ export const getThread = (
                         }
                         creatorStatistics {
                         	joinDate
-                        	lastPostDate
                         	postsNumber
                         	rank
                         }
@@ -301,7 +299,6 @@ export const getMessages = (
                     }
                     creatorStatistics {
 						joinDate
-						lastPostDate
 						postsNumber
 						rank
 					}

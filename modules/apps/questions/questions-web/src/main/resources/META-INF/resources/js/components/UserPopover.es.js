@@ -48,10 +48,6 @@ export default ({creator, statistics}) => {
 					Join Date:{' '}
 					{dateToBriefInternationalHuman(statistics.joinDate)}
 				</p>
-				<p className="c-mb-0">
-					Last Post Date:{' '}
-					{dateToBriefInternationalHuman(statistics.lastPostDate)}
-				</p>
 			</div>
 		</ClayPopover>
 	);
