@@ -675,12 +675,6 @@ components:
                     format: date-time
                     readOnly: true
                     type: string
-                lastPostDate:
-                    description:
-                        Last post created by the author
-                    format: date-time
-                    readOnly: true
-                    type: string
                 postsNumber:
                     description:
                         Number of posts publicated by the author.
