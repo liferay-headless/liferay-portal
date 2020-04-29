@@ -76,34 +76,6 @@ public class CreatorStatistics {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date joinDate;
 
-	@Schema(description = "Last post created by the author")
-	public Date getLastPostDate() {
-		return lastPostDate;
-	}
-
-	public void setLastPostDate(Date lastPostDate) {
-		this.lastPostDate = lastPostDate;
-	}
-
-	@JsonIgnore
-	public void setLastPostDate(
-		UnsafeSupplier<Date, Exception> lastPostDateUnsafeSupplier) {
-
-		try {
-			lastPostDate = lastPostDateUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "Last post created by the author")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Date lastPostDate;
-
 	@Schema(description = "Number of posts publicated by the author.")
 	public Integer getPostsNumber() {
 		return postsNumber;
@@ -198,20 +170,6 @@ public class CreatorStatistics {
 			sb.append("\"");
 
 			sb.append(liferayToJSONDateFormat.format(joinDate));
-
-			sb.append("\"");
-		}
-
-		if (lastPostDate != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"lastPostDate\": ");
-
-			sb.append("\"");
-
-			sb.append(liferayToJSONDateFormat.format(lastPostDate));
 
 			sb.append("\"");
 		}

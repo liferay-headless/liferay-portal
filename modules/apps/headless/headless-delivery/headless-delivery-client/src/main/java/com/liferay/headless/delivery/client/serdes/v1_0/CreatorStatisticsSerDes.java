@@ -77,22 +77,6 @@ public class CreatorStatisticsSerDes {
 			sb.append("\"");
 		}
 
-		if (creatorStatistics.getLastPostDate() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"lastPostDate\": ");
-
-			sb.append("\"");
-
-			sb.append(
-				liferayToJSONDateFormat.format(
-					creatorStatistics.getLastPostDate()));
-
-			sb.append("\"");
-		}
-
 		if (creatorStatistics.getPostsNumber() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -151,16 +135,6 @@ public class CreatorStatisticsSerDes {
 					creatorStatistics.getJoinDate()));
 		}
 
-		if (creatorStatistics.getLastPostDate() == null) {
-			map.put("lastPostDate", null);
-		}
-		else {
-			map.put(
-				"lastPostDate",
-				liferayToJSONDateFormat.format(
-					creatorStatistics.getLastPostDate()));
-		}
-
 		if (creatorStatistics.getPostsNumber() == null) {
 			map.put("postsNumber", null);
 		}
@@ -201,12 +175,6 @@ public class CreatorStatisticsSerDes {
 			if (Objects.equals(jsonParserFieldName, "joinDate")) {
 				if (jsonParserFieldValue != null) {
 					creatorStatistics.setJoinDate(
-						toDate((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "lastPostDate")) {
-				if (jsonParserFieldValue != null) {
-					creatorStatistics.setLastPostDate(
 						toDate((String)jsonParserFieldValue));
 				}
 			}

@@ -50,27 +50,6 @@ public class CreatorStatistics implements Cloneable {
 
 	protected Date joinDate;
 
-	public Date getLastPostDate() {
-		return lastPostDate;
-	}
-
-	public void setLastPostDate(Date lastPostDate) {
-		this.lastPostDate = lastPostDate;
-	}
-
-	public void setLastPostDate(
-		UnsafeSupplier<Date, Exception> lastPostDateUnsafeSupplier) {
-
-		try {
-			lastPostDate = lastPostDateUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Date lastPostDate;
-
 	public Integer getPostsNumber() {
 		return postsNumber;
 	}
