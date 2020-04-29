@@ -36,8 +36,6 @@ public class CreatorStatisticsUtil {
 		return new CreatorStatistics() {
 			{
 				joinDate = user.getCreateDate();
-				lastPostDate = mbStatsUserLocalService.getLastPostDateByUserId(
-					user.getGroupId(), user.getUserId());
 				postsNumber = Math.toIntExact(
 					mbStatsUserLocalService.getMessageCountByUserId(
 						user.getUserId()));
