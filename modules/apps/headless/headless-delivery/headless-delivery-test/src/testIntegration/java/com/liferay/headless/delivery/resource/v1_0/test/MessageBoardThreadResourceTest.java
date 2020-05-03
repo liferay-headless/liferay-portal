@@ -16,25 +16,17 @@ package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardThread;
-import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardThreadSerDes;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBCategoryLocalServiceUtil;
 import com.liferay.message.boards.service.MBThreadLocalServiceUtil;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalServiceUtil;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -72,41 +64,6 @@ public class MessageBoardThreadResourceTest
 	@Override
 	@Test
 	public void testGetMessageBoardThreadsRankedPageWithSortString() {
-	}
-
-	@Test
-	public void testGraphQLGetSiteMessageBoardThreadByFriendlyUrlPath()
-		throws Exception {
-
-		MessageBoardThread messageBoardThread =
-			testPostSiteMessageBoardThread_addMessageBoardThread(
-				randomMessageBoardThread());
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"messageBoardThreadByFriendlyUrlPath",
-				(HashMap)HashMapBuilder.put(
-					"friendlyUrlPath",
-					"\"" + messageBoardThread.getFriendlyUrlPath() + "\""
-				).put(
-					"siteKey", "\"" + messageBoardThread.getSiteId() + "\""
-				).build(),
-				graphQLFields.toArray(new GraphQLField[0])));
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
-
-		Assert.assertTrue(
-			equals(
-				messageBoardThread,
-				MessageBoardThreadSerDes.toDTO(
-					dataJSONObject.getString(
-						"messageBoardThreadByFriendlyUrlPath"))));
 	}
 
 	@Override
