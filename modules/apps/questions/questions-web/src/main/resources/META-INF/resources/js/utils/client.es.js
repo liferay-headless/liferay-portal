@@ -179,6 +179,19 @@ export const getAllTags = (siteKey) =>
 		}
 	  }`);
 
+export const getTagsFilteredByName = (siteKey, name) => {
+	const filter = `contains(name,'${name}')`;
+
+	return request(gql`
+		query{
+			keywords(siteKey: ${siteKey} filter:${filter}){
+			items {
+				name
+			}
+			}
+		}`);
+};
+
 export const getMessage = (friendlyUrlPath, siteKey) =>
 	request(gql`
         query {

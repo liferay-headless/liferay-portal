@@ -17,7 +17,7 @@ import ClayMultiSelect from '@clayui/multi-select';
 import React, {useContext, useEffect, useState} from 'react';
 
 import {AppContext} from '../AppContext.es';
-import {getAllTags} from '../utils/client.es';
+import {getAllTags, getTagsFilteredByName} from '../utils/client.es';
 
 export default ({tagsChange, tagsLoaded, tags = [], ...props}) => {
 	const context = useContext(AppContext);
@@ -53,6 +53,23 @@ export default ({tagsChange, tagsLoaded, tags = [], ...props}) => {
 		}
 	}, [inputValue, tagsLoaded]);
 
+	useEffect(() => {
+		const timeout = setTimeout(
+			inputValue && !haveSuggestions(sourceItems, inputValue)
+				? () => {
+						updateSourceItems(context.siteKey, inputValue);
+				  }
+				: null,
+			400
+		);
+
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, [context.siteKey, inputValue, sourceItems]);
+
+	const haveSuggestions = (sourceItems, inputValue) =>
+		sourceItems.some((item) => inputValue && item.label.match(inputValue));
 	const maxTags = (tags) => tags.length > 5;
 	const duplicatedTags = (tags) =>
 		new Set(tags.map((tag) => tag.value)).size !== tags.length;
@@ -66,6 +83,19 @@ export default ({tagsChange, tagsLoaded, tags = [], ...props}) => {
 		else {
 			setError(true);
 		}
+	};
+
+	const updateSourceItems = (siteKey, inputValue) => {
+		getTagsFilteredByName(siteKey, inputValue).then((data) => {
+			if (data.items.length) {
+				setSourceItems(
+					data.items.map(({name}) => ({
+						label: name,
+						value: name,
+					}))
+				);
+			}
+		});
 	};
 
 	return (
