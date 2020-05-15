@@ -15,13 +15,27 @@
 package com.liferay.headless.delivery.internal.resource.v1_0;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
+import com.liferay.asset.util.AssetHelper;
 import com.liferay.headless.delivery.dto.v1_0.ContentSetElement;
+import com.liferay.headless.delivery.internal.odata.entity.v1_0.ContentSetElementEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.ContentSetElementResource;
+import com.liferay.portal.kernel.search.BooleanClause;
+import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -35,6 +49,9 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -60,6 +77,13 @@ public class ContentSetElementResourceImpl
 	}
 
 	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return _entityModel;
+	}
+
+	@Override
 	public Page<ContentSetElement> getSiteContentSetByKeyContentSetElementsPage(
 			Long siteId, String key, Pagination pagination)
 		throws Exception {
@@ -81,6 +105,30 @@ public class ContentSetElementResourceImpl
 				uuid, siteId);
 
 		return _getContentSetContentSetElementsPage(assetListEntry, pagination);
+	}
+
+	@Override
+	public Page<ContentSetElement> getSiteContentSetsElementsPage(
+			Long siteId, String search, Filter filter, Pagination pagination,
+			Sort[] sorts)
+		throws Exception {
+
+		SearchContext searchContext = _getAssetSearchContext(
+			filter, search, siteId, sorts, pagination);
+
+		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+
+		return Page.of(
+			new HashMap<>(),
+			transform(
+				_assetHelper.getAssetEntries(
+					_assetHelper.search(
+						searchContext, assetEntryQuery,
+						pagination.getStartPosition(),
+						pagination.getEndPosition())),
+				this::_toContentSetElement),
+			pagination,
+			_assetHelper.searchCount(searchContext, assetEntryQuery));
 	}
 
 	private Context _createSegmentsContext() {
@@ -121,6 +169,57 @@ public class ContentSetElementResourceImpl
 		context.put(Context.LOCAL_DATE, LocalDate.from(ZonedDateTime.now()));
 
 		return context;
+	}
+
+	private SearchContext _getAssetSearchContext(
+		Filter filter, String search, Long siteId, Sort[] sorts,
+		Pagination pagination) {
+
+		SearchContext searchContext = new SearchContext();
+
+		if (filter != null) {
+			BooleanQuery booleanQuery = new BooleanQueryImpl() {
+				{
+					BooleanFilter booleanFilter = new BooleanFilter();
+
+					booleanFilter.add(filter, BooleanClauseOccur.MUST);
+
+					setPreBooleanFilter(booleanFilter);
+				}
+			};
+
+			searchContext.setBooleanClauses(
+				new BooleanClause[] {
+					BooleanClauseFactoryUtil.create(
+						booleanQuery, BooleanClauseOccur.MUST.getName())
+				});
+		}
+
+		searchContext.setCompanyId(contextCompany.getCompanyId());
+
+		if (pagination != null) {
+			searchContext.setEnd(pagination.getEndPosition());
+		}
+
+		searchContext.setKeywords(search);
+		searchContext.setGroupIds(new long[] {siteId});
+		searchContext.setLocale(contextAcceptLanguage.getPreferredLocale());
+
+		if (sorts == null) {
+			sorts = new Sort[] {
+				new Sort(Field.ENTRY_CLASS_PK, Sort.LONG_TYPE, false)
+			};
+		}
+
+		searchContext.setSorts(sorts);
+
+		if (pagination != null) {
+			searchContext.setStart(pagination.getStartPosition());
+		}
+
+		searchContext.setUserId(contextUser.getUserId());
+
+		return searchContext;
 	}
 
 	private Page<ContentSetElement> _getContentSetContentSetElementsPage(
@@ -181,6 +280,9 @@ public class ContentSetElementResourceImpl
 	}
 
 	@Reference
+	private AssetHelper _assetHelper;
+
+	@Reference
 	private AssetListAssetEntryProvider _assetListAssetEntryProvider;
 
 	@Reference
@@ -188,6 +290,8 @@ public class ContentSetElementResourceImpl
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
+
+	private final EntityModel _entityModel = new ContentSetElementEntityModel();
 
 	@Reference
 	private SegmentsEntryProviderRegistry _segmentsEntryProviderRegistry;
