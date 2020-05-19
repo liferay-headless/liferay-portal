@@ -373,7 +373,7 @@ public class FreeMarkerTool {
 					for (String propertyName : propertySchemas.keySet()) {
 						if (_isGraphQLPropertyRelation(
 								javaMethodSignature, parameterName,
-								propertyName)) {
+								propertyName, entry.getKey())) {
 
 							javaMethodSignatureMap.put(
 								methodName,
@@ -995,13 +995,13 @@ public class FreeMarkerTool {
 
 	private boolean _isGraphQLPropertyRelation(
 		JavaMethodSignature javaMethodSignature, String parameterName,
-		String propertyName) {
+		String propertyName, String schemaName) {
 
 		String returnType = StringUtil.toLowerCase(
 			javaMethodSignature.getReturnType());
-		String schemaName = StringUtil.removeSubstring(parameterName, "Id");
 
-		if (propertyName.equals(parameterName) &&
+		if (!StringUtil.equalsIgnoreCase(propertyName, schemaName + "Id") &&
+			StringUtil.equals(propertyName, parameterName) &&
 			returnType.endsWith(StringUtil.toLowerCase(schemaName))) {
 
 			return true;
