@@ -864,6 +864,39 @@ components:
                     format: int64
                     readOnly: true
                     type: integer
+                documentType:
+                    properties:
+                        description:
+                            type: string
+                        description_i18n:
+                            additionalProperties:
+                                type: string
+                            readOnly: true
+                            type: object
+                        metadata:
+                            items:
+                                properties:
+                                    contentFields:
+                                        items:
+                                            $ref: "#/components/schemas/ContentField"
+                                        type: array
+                                    name:
+                                        type: string
+                                    name_i18n:
+                                        additionalProperties:
+                                            type: string
+                                        readOnly: true
+                                        type: object
+                                type: object
+                            type: array
+                        name:
+                            type: string
+                        name_i18n:
+                            additionalProperties:
+                                type: string
+                            readOnly: true
+                            type: object
+                    type: object
                 encodingFormat:
                     description:
                         The document's content type (e.g., `application/pdf`, etc.).
