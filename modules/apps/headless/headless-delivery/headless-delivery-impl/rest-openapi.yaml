@@ -6058,6 +6058,52 @@ paths:
                     description:
                         ""
             tags: ["BlogPosting"]
+    "/sites/{siteId}/content-sets-elements":
+        get:
+            operationId: getSiteContentSetsElementsPage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: filter
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContentSetElement"
+                                type: array
+                    description:
+                        ""
+            tags: ["ContentSetElement"]
     "/sites/{siteId}/content-sets/by-key/{key}/content-set-elements":
         get:
             description:
