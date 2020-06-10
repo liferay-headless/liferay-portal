@@ -20,7 +20,6 @@ const StyleExtHtmlWebpackPlugin = require('style-ext-html-webpack-plugin');
 const buildName = 'headless-discovery-web-min.js';
 
 const config = {
-	mode: 'production',
 	module: {
 		rules: [
 			{
@@ -38,9 +37,6 @@ const config = {
 				},
 			},
 		],
-	},
-	optimization: {
-		minimize: true,
 	},
 	output: {
 		filename: buildName,
