@@ -71,6 +71,17 @@ export default () => {
 												displayType="text"
 												truncate={false}
 											>
+												<span class="x-questions">
+													{lang.sub(
+														Liferay.Language.get(
+															'x-questions'
+														),
+														[
+															section.numberOfMessageBoardThreads,
+														]
+													)}
+												</span>
+
 												<button className="btn btn-link btn-sm d-xl-none float-right font-weight-bold p-0">
 													View Topic
 												</button>
