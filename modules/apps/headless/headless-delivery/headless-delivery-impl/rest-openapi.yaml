@@ -955,7 +955,6 @@ components:
                     description:
                         The ID of the `DocumentFolder` where this document is stored.
                     format: int64
-                    readOnly: true
                     type: integer
                 documentType:
                     properties:
