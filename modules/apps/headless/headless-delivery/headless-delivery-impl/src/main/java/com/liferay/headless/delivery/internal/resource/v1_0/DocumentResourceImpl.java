@@ -231,6 +231,9 @@ public class DocumentResourceImpl
 			multipartBody.getValueAsInstanceOptional(
 				"document", Document.class);
 
+		existingFileEntry = _moveDocument(
+			documentId, documentOptional, existingFileEntry);
+
 		return _toDocument(
 			_dlAppService.updateFileEntry(
 				documentId, binaryFile.getFileName(),
@@ -311,6 +314,9 @@ public class DocumentResourceImpl
 				existingFileEntry.getContentStream(),
 				existingFileEntry.getSize())
 		);
+
+		existingFileEntry = _moveDocument(
+			documentId, documentOptional, existingFileEntry);
 
 		return _toDocument(
 			_dlAppService.updateFileEntry(
@@ -558,6 +564,25 @@ public class DocumentResourceImpl
 					_portal, ratingsEntry, _userLocalService);
 			},
 			contextUser);
+	}
+
+	private FileEntry _moveDocument(
+			Long documentId, Optional<Document> documentOptional,
+			FileEntry existingFileEntry)
+		throws Exception {
+
+		Optional<Long> folderIdOptional = documentOptional.map(
+			Document::getDocumentFolderId
+		).filter(
+			folderId -> folderId != existingFileEntry.getFolderId()
+		);
+
+		if (folderIdOptional.isPresent()) {
+			return _dlAppService.moveFileEntry(
+				documentId, folderIdOptional.get(), new ServiceContext());
+		}
+
+		return existingFileEntry;
 	}
 
 	private Document _toDocument(FileEntry fileEntry) throws Exception {
