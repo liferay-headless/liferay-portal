@@ -15,13 +15,104 @@
 import React from 'react';
 
 import Questions from '../../../../src/main/resources/META-INF/resources/js/pages/questions/Questions.es';
-import {getThreadsQuery} from '../../../../src/main/resources/META-INF/resources/js/utils/client.es';
+import * as clientModule from '../../../../src/main/resources/META-INF/resources/js/utils/client.es';
 
 import '@testing-library/jest-dom/extend-expect';
-import {cleanup} from '@testing-library/react';
+import {act, cleanup} from '@testing-library/react';
 import {Route} from 'react-router-dom';
 
 import {renderComponent} from '../../../helpers.es';
+
+clientModule.getSections = jest.fn(() => {
+	return Promise.resolve({
+		data: {
+			__typename: 'MessageBoardSection',
+			actions: {
+				'add-subcategory': {
+					operation: 'createMessageBoardSectionMessageBoardSection',
+					type: 'mutation',
+				},
+				'add-thread': {
+					operation: 'createMessageBoardSectionMessageBoardThread',
+					type: 'mutation',
+				},
+				delete: {
+					operation: 'deleteMessageBoardSection',
+					type: 'mutation',
+				},
+				get: {
+					operation: 'messageBoardSection',
+					type: 'query',
+				},
+				replace: {
+					operation: 'updateMessageBoardSection',
+					type: 'mutation',
+				},
+				subscribe: {
+					operation: 'updateMessageBoardSectionSubscribe',
+					type: 'mutation',
+				},
+				unsubscribe: {
+					operation: 'updateMessageBoardSectionUnsubscribe',
+					type: 'mutation',
+				},
+			},
+			id: 36685,
+			messageBoardSections: {
+				__typename: 'MessageBoardSectionPage',
+				items: [],
+			},
+			numberOfMessageBoardSections: 0,
+			parentMessageBoardSectionId: null,
+			parentSection: {
+				__typename: 'MessageBoardSection',
+				actions: {
+					'add-subcategory': {
+						operation:
+							'createMessageBoardSectionMessageBoardSection',
+						type: 'mutation',
+					},
+					'add-thread': {
+						operation:
+							'createMessageBoardSectionMessageBoardThread',
+						type: 'mutation',
+					},
+					delete: {
+						operation: 'deleteMessageBoardSection',
+						type: 'mutation',
+					},
+					get: {
+						operation: 'messageBoardSection',
+						type: 'query',
+					},
+					replace: {
+						operation: 'updateMessageBoardSection',
+						type: 'mutation',
+					},
+					subscribe: {
+						operation: 'updateMessageBoardSectionSubscribe',
+						type: 'mutation',
+					},
+					unsubscribe: {
+						operation: 'updateMessageBoardSectionUnsubscribe',
+						type: 'mutation',
+					},
+				},
+				id: 36685,
+				messageBoardSections: {
+					__typename: 'MessageBoardSectionPage',
+					items: [],
+				},
+				numberOfMessageBoardSections: 0,
+				parentMessageBoardSectionId: null,
+				subscribed: false,
+				title: 'Portal',
+			},
+			subscribed: false,
+			title: 'Portal',
+		},
+	});
+});
 
 const mockSection = {
 	id: 0,
@@ -34,7 +125,7 @@ const mockSection = {
 const mocks = [
 	{
 		request: {
-			query: getThreadsQuery,
+			query: clientModule.getThreadsQuery,
 			variables: {
 				creatorId: '',
 				filter: '',
@@ -81,26 +172,106 @@ const mocks = [
 			},
 		},
 	},
+	{
+		request: {
+			query: clientModule.getSectionQuery,
+			variables: {
+				filter: '',
+				siteKey: '20020',
+			},
+		},
+		result: {
+			data: {
+				messageBoardSections: {
+					items: [
+						{
+							actions: {
+								'add-subcategory': {
+									operation:
+										'createMessageBoardSectionMessageBoardSection',
+									type: 'mutation',
+								},
+								'add-thread': {
+									operation:
+										'createMessageBoardSectionMessageBoardThread',
+									type: 'mutation',
+								},
+								delete: {
+									operation: 'deleteMessageBoardSection',
+									type: 'mutation',
+								},
+								get: {
+									operation: 'messageBoardSection',
+									type: 'query',
+								},
+								replace: {
+									operation: 'updateMessageBoardSection',
+									type: 'mutation',
+								},
+								subscribe: {
+									operation:
+										'updateMessageBoardSectionSubscribe',
+									type: 'mutation',
+								},
+								unsubscribe: {
+									operation:
+										'updateMessageBoardSectionUnsubscribe',
+									type: 'mutation',
+								},
+							},
+							id: 37201,
+							messageBoardSections: {
+								items: [
+									{
+										id: 37203,
+										numberOfMessageBoardSections: 1,
+										parentMessageBoardSectionId: 37201,
+										subscribed: false,
+										title: 'One',
+									},
+									{
+										id: 37207,
+										numberOfMessageBoardSections: 0,
+										parentMessageBoardSectionId: 37201,
+										subscribed: false,
+										title: 'One copy',
+									},
+								],
+							},
+							numberOfMessageBoardSections: 2,
+							parentMessageBoardSectionId: null,
+							subscribed: false,
+							title: 'Root',
+						},
+					],
+				},
+			},
+		},
+	},
 ];
 
 describe('Questions', () => {
 	afterEach(() => {
+		jest.clearAllMocks();
 		cleanup();
 	});
 
 	it('questions shows loading animation', async () => {
 		const path = '/questions/:sectionTitle';
 		const route = '/questions/portal';
-		const {container, findByText} = renderComponent({
-			apolloMocks: mocks,
-			contextValue: {siteKey: '20020'},
-			route,
-			ui: <Route component={Questions} path={path} />,
+		const questionText = '<p>body question end</p>';
+
+		act(() => {
+			renderComponent({
+				apolloMocks: mocks,
+				contextValue: {siteKey: '20020'},
+				route,
+				ui: <Route component={Questions} path={path} />,
+			});
 		});
 
 		// const loading = container.querySelectorAll('.loading-animation');
-
-		// expect(loading.length).toBe(1);
+		// expect(loading.length).toBe(2);
 
 		// window.fetch.mockResolvedValueOnce(() => ({
 		// 	ok: true,
@@ -117,7 +288,19 @@ describe('Questions', () => {
 		// 	})
 		// );
 
-		const text = await findByText('body question end');
-		expect(text).toBeInTheDocument();
+		// expect(test.getSections).toHaveBeenCalled();
+
+		// const text = await findByText(questionText);
+		// expect(text).toBeInTheDocument();
+
+		// let text;
+		// act(async () => {
+		// 	text = await findByText('<p>body question end</p>\n');
+
+		// 	// expect(text).toBeInTheDocument();
+		// });
+		// console.log(text)
+		// expect(text).toBeInTheDocument();
+
 	});
 });
