@@ -171,13 +171,13 @@ public class ContentElementResourceImpl extends BaseContentElementResourceImpl {
 			Sort[] sorts)
 		throws Exception {
 
-		SearchContext searchContext = _getAssetSearchContext(
-			filter, search, siteId, sorts, pagination);
-
 		AssetSearcher assetSearcher =
 			(AssetSearcher)AssetSearcher.getInstance();
 
 		assetSearcher.setAssetEntryQuery(new AssetEntryQuery());
+
+		SearchContext searchContext = _getAssetSearchContext(
+			filter, search, siteId, sorts, pagination);
 
 		return Page.of(
 			new HashMap<>(),
