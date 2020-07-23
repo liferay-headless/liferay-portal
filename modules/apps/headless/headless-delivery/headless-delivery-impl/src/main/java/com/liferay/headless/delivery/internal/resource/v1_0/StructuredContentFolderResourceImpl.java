@@ -285,7 +285,7 @@ public class StructuredContentFolderResourceImpl
 	}
 
 	private Page<StructuredContentFolder> _getStructuredContentFoldersPage(
-			Long siteId, Boolean flatten, String search, Filter filter,
+			Long groupId, Boolean flatten, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
@@ -301,15 +301,15 @@ public class StructuredContentFolderResourceImpl
 				"create",
 				addAction(
 					"UPDATE", "postSiteStructuredContentFolder",
-					"com.liferay.journal", siteId)
+					"com.liferay.journal", groupId)
 			).put(
 				"get",
 				addAction(
 					"VIEW", "getSiteStructuredContentFoldersPage",
-					"com.liferay.journal", siteId)
+					"com.liferay.journal", groupId)
 			).build(),
-			parentStructuredContentFolderId, siteId, filter, search, pagination,
-			sorts);
+			parentStructuredContentFolderId, groupId, filter, search,
+			pagination, sorts);
 	}
 
 	private StructuredContentFolder _toStructuredContentFolder(

@@ -86,8 +86,8 @@ public class ContentElementResourceImpl extends BaseContentElementResourceImpl {
 	}
 
 	private SearchContext _getAssetSearchContext(
-		Filter filter, String search, Long siteId, Sort[] sorts,
-		Pagination pagination) {
+		Long groupId, String search, Filter filter, Pagination pagination,
+		Sort[] sorts) {
 
 		SearchContext searchContext = new SearchContext();
 
@@ -145,7 +145,7 @@ public class ContentElementResourceImpl extends BaseContentElementResourceImpl {
 			searchContext.setEnd(pagination.getEndPosition());
 		}
 
-		searchContext.setGroupIds(new long[] {siteId});
+		searchContext.setGroupIds(new long[] {groupId});
 		searchContext.setKeywords(search);
 		searchContext.setLocale(contextAcceptLanguage.getPreferredLocale());
 
@@ -167,7 +167,7 @@ public class ContentElementResourceImpl extends BaseContentElementResourceImpl {
 	}
 
 	private Page<ContentElement> _getContentElementsPage(
-			Long siteId, String search, Filter filter, Pagination pagination,
+			Long groupId, String search, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
 
@@ -177,7 +177,7 @@ public class ContentElementResourceImpl extends BaseContentElementResourceImpl {
 		assetSearcher.setAssetEntryQuery(new AssetEntryQuery());
 
 		SearchContext searchContext = _getAssetSearchContext(
-			filter, search, siteId, sorts, pagination);
+			groupId, search, filter, pagination, sorts);
 
 		return Page.of(
 			new HashMap<>(),

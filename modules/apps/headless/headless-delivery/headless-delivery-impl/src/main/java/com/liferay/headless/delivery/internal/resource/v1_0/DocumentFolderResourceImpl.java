@@ -231,7 +231,7 @@ public class DocumentFolderResourceImpl
 	}
 
 	private Page<DocumentFolder> _getDocumentFoldersPage(
-			Long siteId, Boolean flatten, String search, Filter filter,
+			Long groupId, Boolean flatten, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
@@ -246,14 +246,14 @@ public class DocumentFolderResourceImpl
 				"create",
 				addAction(
 					"ADD_FOLDER", "postSiteDocumentFolder",
-					"com.liferay.document.library", siteId)
+					"com.liferay.document.library", groupId)
 			).put(
 				"get",
 				addAction(
 					"VIEW", "getSiteDocumentFoldersPage",
-					"com.liferay.document.library", siteId)
+					"com.liferay.document.library", groupId)
 			).build(),
-			documentFolderId, siteId, flatten, filter, search, pagination,
+			documentFolderId, groupId, flatten, filter, search, pagination,
 			sorts);
 	}
 

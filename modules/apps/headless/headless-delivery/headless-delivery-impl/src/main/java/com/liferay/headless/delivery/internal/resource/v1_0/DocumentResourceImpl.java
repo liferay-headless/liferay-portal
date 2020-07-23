@@ -411,7 +411,7 @@ public class DocumentResourceImpl
 	}
 
 	private Page<Document> _getDocumentsPage(
-			Long siteId, Boolean flatten, String search, Filter filter,
+			Long groupId, Boolean flatten, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
@@ -420,12 +420,12 @@ public class DocumentResourceImpl
 				"create",
 				addAction(
 					"ADD_DOCUMENT", "postSiteDocument",
-					"com.liferay.document.library", siteId)
+					"com.liferay.document.library", groupId)
 			).put(
 				"get",
 				addAction(
 					"VIEW", "getSiteDocumentsPage",
-					"com.liferay.document.library", siteId)
+					"com.liferay.document.library", groupId)
 			).build(),
 			booleanQuery -> {
 				BooleanFilter booleanFilter =
@@ -440,9 +440,9 @@ public class DocumentResourceImpl
 						BooleanClauseOccur.MUST);
 				}
 
-				if (siteId != null) {
+				if (groupId != null) {
 					booleanFilter.add(
-						new TermFilter(Field.GROUP_ID, String.valueOf(siteId)),
+						new TermFilter(Field.GROUP_ID, String.valueOf(groupId)),
 						BooleanClauseOccur.MUST);
 				}
 			},

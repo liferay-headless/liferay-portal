@@ -781,7 +781,7 @@ public class StructuredContentResourceImpl
 	}
 
 	private Page<StructuredContent> _getStructuredContentsPage(
-			Long siteId, Boolean flatten, String search, Filter filter,
+			Long groupId, Boolean flatten, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
@@ -790,12 +790,12 @@ public class StructuredContentResourceImpl
 				"create",
 				addAction(
 					"ADD_ARTICLE", "postSiteStructuredContent",
-					"com.liferay.journal", siteId)
+					"com.liferay.journal", groupId)
 			).put(
 				"get",
 				addAction(
 					"VIEW", "getSiteStructuredContentsPage",
-					"com.liferay.journal", siteId)
+					"com.liferay.journal", groupId)
 			).build(),
 			booleanQuery -> {
 				BooleanFilter booleanFilter =
@@ -811,7 +811,7 @@ public class StructuredContentResourceImpl
 						BooleanClauseOccur.MUST);
 				}
 			},
-			siteId, filter, search, pagination, sorts);
+			groupId, filter, search, pagination, sorts);
 	}
 
 	private Page<StructuredContent> _getStructuredContentsPage(

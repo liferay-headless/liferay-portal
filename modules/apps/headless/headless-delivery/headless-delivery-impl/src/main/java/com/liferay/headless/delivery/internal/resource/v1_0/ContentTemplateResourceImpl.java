@@ -95,7 +95,7 @@ public class ContentTemplateResourceImpl
 	}
 
 	private Page<ContentTemplate> _getContentTemplatesPage(
-			Long siteId, String search, Filter filter, Pagination pagination,
+			Long groupId, String search, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
 
@@ -104,7 +104,7 @@ public class ContentTemplateResourceImpl
 				"get",
 				addAction(
 					"MANAGE_LAYOUTS", "getSiteContentTemplatesPage",
-					Group.class.getName(), siteId)),
+					Group.class.getName(), groupId)),
 			booleanQuery -> {
 			},
 			filter, DDMTemplate.class, search, pagination,
@@ -118,7 +118,7 @@ public class ContentTemplateResourceImpl
 					_classNameLocalService.getClassNameId(
 						JournalArticle.class));
 				searchContext.setCompanyId(contextCompany.getCompanyId());
-				searchContext.setGroupIds(new long[] {siteId});
+				searchContext.setGroupIds(new long[] {groupId});
 			},
 			sorts,
 			document -> {

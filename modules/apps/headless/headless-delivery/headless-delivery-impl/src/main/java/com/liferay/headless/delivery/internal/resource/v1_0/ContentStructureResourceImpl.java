@@ -85,7 +85,7 @@ public class ContentStructureResourceImpl
 	}
 
 	private Page<ContentStructure> _getContentStructuresPage(
-			Long siteId, String search, Filter filter, Pagination pagination,
+			Long groupId, String search, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
 
@@ -100,7 +100,7 @@ public class ContentStructureResourceImpl
 				searchContext.setAttribute(
 					"searchPermissionContext", StringPool.BLANK);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
-				searchContext.setGroupIds(new long[] {siteId});
+				searchContext.setGroupIds(new long[] {groupId});
 			},
 			sorts,
 			document -> _toContentStructure(
