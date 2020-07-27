@@ -253,7 +253,7 @@ export default withRouter(
 								data={questions}
 								emptyState={
 									<ClayEmptyState
-										description="There are no questions inside this topic, be the first to ask something!"
+										description="There are no questions inside this topic. Be the first to ask something!"
 										imgSrc={
 											context.includeContextPath +
 											'/assets/empty_questions_list.png'
