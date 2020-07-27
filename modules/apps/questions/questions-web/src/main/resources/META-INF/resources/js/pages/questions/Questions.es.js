@@ -17,7 +17,6 @@ import ClayEmptyState from '@clayui/empty-state';
 import {ClayInput, ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
-import {ClayResultsBar} from '@clayui/management-toolbar';
 import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from 'react-router-dom';
 
@@ -66,6 +65,7 @@ export default withRouter(
 			params: {creatorId, sectionTitle, tag},
 		},
 	}) => {
+		const MAX_NUMBER_OF_SEARCH_RESULTS = 10000;
 		const [currentTag, setCurrentTag] = useState('');
 		const [error, setError] = useState({});
 		const [filter, setFilter] = useState();
@@ -206,37 +206,49 @@ export default withRouter(
 						</div>
 
 						{!!search && !loading && (
-							<div className="c-mt-5 c-mx-auto c-px-0 col-xl-12">
-								<ClayResultsBar className="c-mt-5">
-									<ClayResultsBar.Item expand>
-										<span className="component-text text-truncate-inline">
-											<span className="text-truncate">
-												{lang.sub(
-													Liferay.Language.get(
-														'x-results-for-x'
-													),
-													[
-														questions.totalCount,
-														slugToText(search),
-													]
-												)}
-											</span>
-										</span>
-									</ClayResultsBar.Item>
-									<ClayResultsBar.Item>
-										<ClayButton
-											className="component-link tbar-link"
-											displayType="unstyled"
-											onClick={() => {
-												historyPushParser(
-													`/questions/${context.section}`
-												);
-											}}
-										>
-											{Liferay.Language.get('clear')}
-										</ClayButton>
-									</ClayResultsBar.Item>
-								</ClayResultsBar>
+							<div className="c-mt-3 c-mx-auto c-pt-3 c-px-3 col-xl-10">
+								{questions.totalCount >
+								MAX_NUMBER_OF_SEARCH_RESULTS ? (
+									<span
+										dangerouslySetInnerHTML={{
+											__html: lang.sub(
+												Liferay.Language.get(
+													'there-are-more-than-x-results-for-x'
+												),
+												[
+													MAX_NUMBER_OF_SEARCH_RESULTS,
+													`<strong>"${slugToText(
+														search
+													)}"</strong>`,
+												]
+											),
+										}}
+									/>
+								) : (
+									<span
+										dangerouslySetInnerHTML={{
+											__html: lang.sub(
+												Liferay.Language.get(
+													'x-results-for-x'
+												),
+												[
+													questions.totalCount,
+													`<strong>"${slugToText(
+														search
+													)}"</strong>`,
+												]
+											),
+										}}
+									/>
+								)}
+								{questions.totalCount >
+									MAX_NUMBER_OF_SEARCH_RESULTS && (
+									<div className="text-secondary">
+										{Liferay.Language.get(
+											'try-to-refine-the-search-criteria-to-reduce-results'
+										)}
+									</div>
+								)}
 							</div>
 						)}
 
