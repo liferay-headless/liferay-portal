@@ -14,12 +14,13 @@
 
 import ClayLink from '@clayui/link';
 import ClayNavigationBar from '@clayui/navigation-bar';
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../AppContext.es';
 import useQueryParams from '../hooks/useQueryParams.es';
-import {historyPushWithSlug} from '../utils/utils.es';
+import {getSections} from '../utils/client.es';
+import {historyPushWithSlug, slugToText} from '../utils/utils.es';
 
 export default withRouter(
 	({
@@ -32,6 +33,8 @@ export default withRouter(
 		const context = useContext(AppContext);
 
 		const queryParams = useQueryParams(location);
+
+		const [section, setSection] = useState({});
 
 		sectionTitle = sectionTitle || queryParams.get('sectiontitle');
 
@@ -53,6 +56,14 @@ export default withRouter(
 
 		const historyPushParser = historyPushWithSlug(history.push);
 
+		useEffect(() => {
+			if (sectionTitle) {
+				getSections(slugToText(sectionTitle), context.siteKey).then(
+					setSection
+				);
+			}
+		}, [sectionTitle, context.siteKey]);
+
 		return (
 			<section className="border-bottom questions-section questions-section-nav">
 				<div className="questions-container">
@@ -71,7 +82,7 @@ export default withRouter(
 										}
 										onClick={() =>
 											historyPushParser(
-												sectionTitle
+												section
 													? `/questions/${sectionTitle}`
 													: '/'
 											)
@@ -89,7 +100,7 @@ export default withRouter(
 										active={isActive('tags')}
 										onClick={() =>
 											historyPushParser(
-												sectionTitle
+												section
 													? `/questions/${sectionTitle}/tags`
 													: '/'
 											)
@@ -112,7 +123,9 @@ export default withRouter(
 										}
 										onClick={() =>
 											historyPushParser(
-												`/subscriptions/${context.userId}?sectionTitle=${sectionTitle}`
+												section
+													? `/subscriptions/${context.userId}?sectionTitle=${sectionTitle}`
+													: '/'
 											)
 										}
 									>
@@ -135,7 +148,9 @@ export default withRouter(
 										}
 										onClick={() =>
 											historyPushParser(
-												`/activity/${context.userId}?sectionTitle=${sectionTitle}`
+												section
+													? `/activity/${context.userId}?sectionTitle=${sectionTitle}`
+													: '/'
 											)
 										}
 									>
