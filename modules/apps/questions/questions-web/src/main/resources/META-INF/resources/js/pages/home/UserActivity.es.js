@@ -95,7 +95,7 @@ export default withRouter(
 
 		return (
 			<>
-				<NavigationBar />
+				<NavigationBar pathname={location.pathname} />
 
 				<section className="questions-section questions-section-list">
 					<div className="questions-container">

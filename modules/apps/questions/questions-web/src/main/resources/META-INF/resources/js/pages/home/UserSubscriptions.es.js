@@ -31,7 +31,7 @@ import {
 import {historyPushWithSlug} from '../../utils/utils.es';
 import NavigationBar from '../NavigationBar.es';
 
-export default withRouter(({history}) => {
+export default withRouter(({history, location}) => {
 	const [entity, setEntity] = useState({});
 	const [info, setInfo] = useState({});
 
@@ -132,7 +132,7 @@ export default withRouter(({history}) => {
 
 	return (
 		<>
-			<NavigationBar />
+			<NavigationBar pathname={location.pathname} />
 
 			<section className="questions-section questions-section-list">
 				<div className="c-p-5 questions-container row">

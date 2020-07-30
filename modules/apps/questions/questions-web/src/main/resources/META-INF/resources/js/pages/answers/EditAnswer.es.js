@@ -24,6 +24,7 @@ import QuestionsEditor from '../../components/QuestionsEditor';
 import TextLengthValidation from '../../components/TextLengthValidation.es';
 import {getMessageQuery, updateMessageQuery} from '../../utils/client.es';
 import {getContextLink, stripHTML} from '../../utils/utils.es';
+import NavigationBar from '../NavigationBar.es';
 
 export default withRouter(
 	({
@@ -58,82 +59,90 @@ export default withRouter(
 		});
 
 		return (
-			<section className="c-mt-5 questions-section questions-sections-answer">
-				<div className="questions-container">
-					<div className="row">
-						<div className="c-mx-auto col-xl-10">
-							<h1>{Liferay.Language.get('edit-answer')}</h1>
+			<>
+				<NavigationBar
+					pathname={location.pathname}
+					sectionTitle={sectionTitle}
+				/>
+				<section className="c-mt-5 questions-section questions-sections-answer">
+					<div className="questions-container">
+						<div className="row">
+							<div className="c-mx-auto col-xl-10">
+								<h1>{Liferay.Language.get('edit-answer')}</h1>
 
-							<ClayForm>
-								<ClayForm.Group className="c-mt-4">
-									<label htmlFor="basicInput">
-										{Liferay.Language.get('answer')}
+								<ClayForm>
+									<ClayForm.Group className="c-mt-4">
+										<label htmlFor="basicInput">
+											{Liferay.Language.get('answer')}
 
-										<span className="c-ml-2 reference-mark">
-											<ClayIcon symbol="asterisk" />
-										</span>
-									</label>
+											<span className="c-ml-2 reference-mark">
+												<ClayIcon symbol="asterisk" />
+											</span>
+										</label>
 
-									<QuestionsEditor
-										contents={
-											data &&
-											data
-												.messageBoardMessageByFriendlyUrlPath
-												.articleBody
+										<QuestionsEditor
+											contents={
+												data &&
+												data
+													.messageBoardMessageByFriendlyUrlPath
+													.articleBody
+											}
+											onChange={(event) =>
+												setArticleBody(
+													event.editor.getData()
+												)
+											}
+											onInstanceReady={() => getMessage()}
+										/>
+
+										<ClayForm.FeedbackGroup>
+											<ClayForm.FeedbackItem>
+												<TextLengthValidation
+													text={articleBody}
+												/>
+											</ClayForm.FeedbackItem>
+										</ClayForm.FeedbackGroup>
+									</ClayForm.Group>
+								</ClayForm>
+
+								<div className="c-mt-4 d-flex flex-column-reverse flex-sm-row">
+									<ClayButton
+										className="c-mt-4 c-mt-sm-0"
+										disabled={
+											!articleBody ||
+											stripHTML(articleBody).length < 15
 										}
-										onChange={(event) =>
-											setArticleBody(
-												event.editor.getData()
-											)
-										}
-										onInstanceReady={() => getMessage()}
-									/>
+										displayType="primary"
+										onClick={() => {
+											addUpdateMessage({
+												variables: {
+													articleBody,
+													messageBoardMessageId:
+														data
+															.messageBoardMessageByFriendlyUrlPath
+															.id,
+												},
+											});
+										}}
+									>
+										{Liferay.Language.get(
+											'update-your-answer'
+										)}
+									</ClayButton>
 
-									<ClayForm.FeedbackGroup>
-										<ClayForm.FeedbackItem>
-											<TextLengthValidation
-												text={articleBody}
-											/>
-										</ClayForm.FeedbackItem>
-									</ClayForm.FeedbackGroup>
-								</ClayForm.Group>
-							</ClayForm>
-
-							<div className="c-mt-4 d-flex flex-column-reverse flex-sm-row">
-								<ClayButton
-									className="c-mt-4 c-mt-sm-0"
-									disabled={
-										!articleBody ||
-										stripHTML(articleBody).length < 15
-									}
-									displayType="primary"
-									onClick={() => {
-										addUpdateMessage({
-											variables: {
-												articleBody,
-												messageBoardMessageId:
-													data
-														.messageBoardMessageByFriendlyUrlPath
-														.id,
-											},
-										});
-									}}
-								>
-									{Liferay.Language.get('update-your-answer')}
-								</ClayButton>
-
-								<ClayButton
-									className="c-ml-sm-3"
-									displayType="secondary"
-									onClick={() => history.goBack()}
-								>
-									{Liferay.Language.get('cancel')}
-								</ClayButton>
+									<ClayButton
+										className="c-ml-sm-3"
+										displayType="secondary"
+										onClick={() => history.goBack()}
+									>
+										{Liferay.Language.get('cancel')}
+									</ClayButton>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</section>
+				</section>
+			</>
 		);
 	}
 );

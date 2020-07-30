@@ -31,6 +31,7 @@ import {
 	historyPushWithSlug,
 	useDebounceCallback,
 } from '../../utils/utils.es';
+import NavigationBar from '../NavigationBar.es';
 
 function getOrderByOptions() {
 	return [
@@ -104,6 +105,10 @@ export default withRouter(
 
 		return (
 			<>
+				<NavigationBar
+					pathname={location.pathname}
+					sectionTitle={sectionTitle}
+				/>
 				<div className="container">
 					<div className="d-flex flex-row">
 						<div className="d-flex flex-column flex-grow-1">

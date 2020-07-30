@@ -35,6 +35,7 @@ import {
 	slugToText,
 	useDebounceCallback,
 } from '../../utils/utils.es';
+import NavigationBar from '../NavigationBar.es';
 
 function getFilterOptions() {
 	return [
@@ -212,85 +213,93 @@ export default withRouter(
 		};
 
 		return (
-			<section className="questions-section questions-section-list">
-				<div className="questions-container">
-					<div className="row">
-						<div className="c-mt-3 col col-xl-12">
-							<Breadcrumb section={section} />
-						</div>
+			<>
+				<NavigationBar
+					pathname={location.pathname}
+					sectionTitle={sectionTitle}
+				/>
+				<section className="questions-section questions-section-list">
+					<div className="questions-container">
+						<div className="row">
+							<div className="c-mt-3 col col-xl-12">
+								<Breadcrumb section={section} />
+							</div>
 
-						<div className="c-mt-3 col col-xl-12">
-							<QuestionsNavigationBar />
-						</div>
+							<div className="c-mt-3 col col-xl-12">
+								<QuestionsNavigationBar />
+							</div>
 
-						{!!search && !loading && (
-							<ResultsMessage
-								maxNumberOfSearchResults={
-									MAX_NUMBER_OF_QUESTIONS
-								}
-								searchCriteria={search}
-								totalCount={totalCount}
-							/>
-						)}
+							{!!search && !loading && (
+								<ResultsMessage
+									maxNumberOfSearchResults={
+										MAX_NUMBER_OF_QUESTIONS
+									}
+									searchCriteria={search}
+									totalCount={totalCount}
+								/>
+							)}
 
-						<div className="c-mx-auto c-px-0 col-xl-10">
-							<PaginatedList
-								activeDelta={pageSize}
-								activePage={page}
-								changeDelta={(pageSize) =>
-									changePage(page, pageSize)
-								}
-								changePage={(page) =>
-									changePage(page, pageSize)
-								}
-								data={questions}
-								emptyState={
-									!search && !filter ? (
-										<ClayEmptyState
-											description="There are no questions inside this topic, be the first to ask something!"
-											imgSrc={
-												context.includeContextPath +
-												'/assets/empty_questions_list.png'
-											}
-											title="This topic is empty."
-										>
-											<ClayButton
-												displayType="primary"
-												onClick={navigateToNewQuestion}
+							<div className="c-mx-auto c-px-0 col-xl-10">
+								<PaginatedList
+									activeDelta={pageSize}
+									activePage={page}
+									changeDelta={(pageSize) =>
+										changePage(page, pageSize)
+									}
+									changePage={(page) =>
+										changePage(page, pageSize)
+									}
+									data={questions}
+									emptyState={
+										!search && !filter ? (
+											<ClayEmptyState
+												description="There are no questions inside this topic, be the first to ask something!"
+												imgSrc={
+													context.includeContextPath +
+													'/assets/empty_questions_list.png'
+												}
+												title="This topic is empty."
 											>
-												{Liferay.Language.get(
-													'ask-question'
+												<ClayButton
+													displayType="primary"
+													onClick={
+														navigateToNewQuestion
+													}
+												>
+													{Liferay.Language.get(
+														'ask-question'
+													)}
+												</ClayButton>
+											</ClayEmptyState>
+										) : (
+											<ClayEmptyState
+												title={Liferay.Language.get(
+													'there-are-no-results'
 												)}
-											</ClayButton>
-										</ClayEmptyState>
-									) : (
-										<ClayEmptyState
-											title={Liferay.Language.get(
-												'there-are-no-results'
-											)}
+											/>
+										)
+									}
+									loading={loading}
+									totalCount={totalCount}
+								>
+									{(question) => (
+										<QuestionRow
+											currentSection={sectionTitle}
+											key={question.id}
+											question={question}
+											showSectionLabel={
+												!!section.numberOfMessageBoardSections
+											}
 										/>
-									)
-								}
-								loading={loading}
-								totalCount={totalCount}
-							>
-								{(question) => (
-									<QuestionRow
-										currentSection={sectionTitle}
-										key={question.id}
-										question={question}
-										showSectionLabel={
-											!!section.numberOfMessageBoardSections
-										}
-									/>
-								)}
-							</PaginatedList>
+									)}
+								</PaginatedList>
 
-							<Alert info={error} />
+								<Alert info={error} />
+							</div>
 						</div>
 					</div>
-				</div>
-			</section>
+				</section>
+			</>
 		);
 
 		function QuestionsNavigationBar() {

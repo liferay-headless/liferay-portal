@@ -20,7 +20,6 @@ import {AppContextProvider} from './AppContext.es';
 import {ErrorBoundary} from './components/ErrorBoundary.es';
 import ForumsToQuestion from './components/ForumsToQuestion.es';
 import ProtectedRoute from './components/ProtectedRoute.es';
-import NavigationBar from './pages/NavigationBar.es';
 import EditAnswer from './pages/answers/EditAnswer.es';
 import Home from './pages/home/Home';
 import UserActivity from './pages/home/UserActivity.es';
@@ -64,8 +63,6 @@ export default (props) => {
 								path="/questions/:sectionTitle"
 								render={({match: {path}}) => (
 									<>
-										<NavigationBar />
-
 										<Switch>
 											<Route
 												component={Questions}
