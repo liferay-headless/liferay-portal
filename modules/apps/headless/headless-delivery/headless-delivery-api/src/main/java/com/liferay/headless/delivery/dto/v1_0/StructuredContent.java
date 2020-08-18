@@ -570,7 +570,7 @@ public class StructuredContent {
 	@GraphQLField(
 		description = "An identifier, independent of the database, that can be used to reference the structured content."
 	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String key;
 
 	@Schema(
