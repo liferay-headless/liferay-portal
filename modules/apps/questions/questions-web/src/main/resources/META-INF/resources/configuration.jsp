@@ -40,6 +40,8 @@ QuestionsConfiguration questionsConfiguration = portletDisplay.getPortletInstanc
 			>
 				<aui:input name="preferences--showSectionLanding--" type="checkbox" value="<%= questionsConfiguration.showSectionLanding() %>" />
 
+				<aui:input name="preferences--enableRedirectToLogin--" type="checkbox" value="<%= questionsConfiguration.enableRedirectToLogin() %>" />
+
 				<aui:input name="preferences--rootTopic--" type="text" value="<%= questionsConfiguration.rootTopic() %>" />
 			</liferay-frontend:fieldset>
 		</liferay-frontend:fieldset-group>

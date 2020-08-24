@@ -32,7 +32,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface QuestionsConfiguration {
 
 	@Meta.AD(
-		deflt = "false", name = "enable-redirect-to-login", required = false
+		deflt = "true", name = "enable-redirect-to-login", required = false
 	)
 	public boolean enableRedirectToLogin();
 
