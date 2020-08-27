@@ -180,9 +180,11 @@ export const deleteMessageBoardThreadQuery = gql`
 
 export const getTags = (
 	orderBy,
-	page = 1,
-	pageSize = 30,
-	search = '',
+	paginationAndSearch = {
+		page: 1,
+		pageSize: 20,
+		search: '',
+	},
 	siteKey
 ) => {
 	if (orderBy === 'latest-created') {
@@ -190,9 +192,7 @@ export const getTags = (
 			.query({
 				query: getTagsOrderByDateCreatedQuery,
 				variables: {
-					page,
-					pageSize,
-					search,
+					...paginationAndSearch,
 					siteKey,
 				},
 			})
@@ -206,9 +206,7 @@ export const getTags = (
 		.query({
 			query: getTagsOrderByNumberOfUsagesQuery,
 			variables: {
-				page,
-				pageSize,
-				search,
+				...paginationAndSearch,
 				siteKey,
 			},
 		})

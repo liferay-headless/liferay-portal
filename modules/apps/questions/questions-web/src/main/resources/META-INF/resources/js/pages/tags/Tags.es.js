@@ -51,13 +51,15 @@ export default withRouter(({history, location}) => {
 	const [error, setError] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [orderBy, setOrderBy] = useState('number-of-usages');
-	const [page, setPage] = useState(1);
-	const [pageSize, setPageSize] = useState(20);
-	const [search, setSearch] = useState('');
+	const [paginationAndSearch, setPaginationAndSearch] = useState({
+		page: 1,
+		pageSize: 20,
+		search: '',
+	});
 	const [tags, setTags] = useState([]);
 
 	useEffect(() => {
-		getTags(orderBy, page, pageSize, search, context.siteKey)
+		getTags(orderBy, paginationAndSearch, context.siteKey)
 			.then(({data, loading}) => {
 				setTags(data || []);
 				setLoading(loading);
@@ -69,17 +71,32 @@ export default withRouter(({history, location}) => {
 				setLoading(false);
 				setError({message: 'Loading Tags', title: 'Error'});
 			});
-	}, [orderBy, page, pageSize, search, context.siteKey]);
+	}, [orderBy, paginationAndSearch, context.siteKey]);
 
 	const queryParams = useQueryParams(location);
 
 	useEffect(() => {
-		setPage(+queryParams.get('page') || 1);
-	}, [queryParams]);
+		const page = +queryParams.get('page') || 1;
+		const pageSize = +queryParams.get('pagesize') || 20;
+		const search = queryParams.get('search') || '';
 
-	useEffect(() => {
-		setPageSize(+queryParams.get('pagesize') || 20);
-	}, [queryParams]);
+		if (
+			page !== paginationAndSearch.page ||
+			pageSize !== paginationAndSearch.pageSize ||
+			search !== paginationAndSearch.search
+		) {
+			setPaginationAndSearch({
+				page,
+				pageSize,
+				search,
+			});
+		}
+	}, [
+		paginationAndSearch.page,
+		paginationAndSearch.pageSize,
+		paginationAndSearch.search,
+		queryParams,
+	]);
 
 	const historyPushParser = historyPushWithSlug(history.push);
 
@@ -90,7 +107,11 @@ export default withRouter(({history, location}) => {
 	const orderByOptions = getOrderByOptions();
 
 	const [debounceCallback] = useDebounceCallback((search) => {
-		setSearch(search);
+		setPaginationAndSearch({
+			page: 1,
+			pageSize: paginationAndSearch.pageSize,
+			search,
+		});
 	}, 500);
 
 	return (
@@ -137,7 +158,7 @@ export default withRouter(({history, location}) => {
 								<ClayInput
 									className="bg-transparent form-control input-group-inset input-group-inset-after"
 									disabled={
-										!search &&
+										!paginationAndSearch.search &&
 										tags &&
 										tags.items &&
 										!tags.items.length
@@ -170,10 +191,14 @@ export default withRouter(({history, location}) => {
 
 				<div className="c-mt-3 row">
 					<PaginatedList
-						activeDelta={pageSize}
-						activePage={page}
-						changeDelta={(pageSize) => changePage(page, pageSize)}
-						changePage={(page) => changePage(page, pageSize)}
+						activeDelta={paginationAndSearch.pageSize}
+						activePage={paginationAndSearch.page}
+						changeDelta={(pageSize) =>
+							changePage(paginationAndSearch.page, pageSize)
+						}
+						changePage={(page) =>
+							changePage(page, paginationAndSearch.pageSize)
+						}
 						data={tags}
 						emptyState={
 							<ClayEmptyState
