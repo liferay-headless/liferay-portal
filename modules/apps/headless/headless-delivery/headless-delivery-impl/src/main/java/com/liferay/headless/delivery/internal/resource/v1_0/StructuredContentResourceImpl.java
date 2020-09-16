@@ -250,12 +250,12 @@ public class StructuredContentResourceImpl
 			HashMapBuilder.put(
 				"create",
 				addAction(
-					"ADD_ARTICLE", "postSiteStructuredContent",
+					"ADD_ARTICLE", "postAssetLibraryStructuredContent",
 					"com.liferay.journal", siteId)
 			).put(
 				"get",
 				addAction(
-					"VIEW", "getSiteStructuredContentsPage",
+					"VIEW", "getAssetLibraryStructuredContentsPage",
 					"com.liferay.journal", siteId)
 			).build(),
 			booleanQuery -> {
