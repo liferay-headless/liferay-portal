@@ -195,12 +195,12 @@ public class DocumentResourceImpl
 			HashMapBuilder.put(
 				"create",
 				addAction(
-					"ADD_DOCUMENT", "postSiteDocument",
+					"ADD_DOCUMENT", "postAssetLibraryDocument",
 					"com.liferay.document.library", siteId)
 			).put(
 				"get",
 				addAction(
-					"VIEW", "getSiteDocumentsPage",
+					"VIEW", "getAssetLibraryDocumentsPage",
 					"com.liferay.document.library", siteId)
 			).build(),
 			booleanQuery -> {
