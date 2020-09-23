@@ -70,7 +70,7 @@ import javax.ws.rs.core.UriInfo;
 @Generated("")
 @Path("/v2.0")
 public abstract class BaseProductGroupResourceImpl
-	implements ProductGroupResource, EntityModelResource,
+	implements EntityModelResource, ProductGroupResource,
 			   VulcanBatchEngineTaskItemDelegate<ProductGroup> {
 
 	/**
@@ -78,8 +78,8 @@ public abstract class BaseProductGroupResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discounts/{id}/product-group'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
+	@Override
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "id")})
 	@Path("/discounts/{id}/product-group")
 	@Produces({"application/json", "application/xml"})
@@ -96,8 +96,8 @@ public abstract class BaseProductGroupResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifiers/{id}/product-group'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
+	@Override
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "id")})
 	@Path("/price-modifiers/{id}/product-group")
 	@Produces({"application/json", "application/xml"})

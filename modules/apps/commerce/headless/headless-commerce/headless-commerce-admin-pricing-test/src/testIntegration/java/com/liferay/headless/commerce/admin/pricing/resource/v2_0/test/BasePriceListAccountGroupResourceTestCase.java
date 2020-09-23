@@ -266,7 +266,7 @@ public abstract class BasePriceListAccountGroupResourceTestCase {
 		String irrelevantExternalReferenceCode =
 			testGetPriceListByExternalReferenceCodePriceListAccountGroupsPage_getIrrelevantExternalReferenceCode();
 
-		if ((irrelevantExternalReferenceCode != null)) {
+		if (irrelevantExternalReferenceCode != null) {
 			PriceListAccountGroup irrelevantPriceListAccountGroup =
 				testGetPriceListByExternalReferenceCodePriceListAccountGroupsPage_addPriceListAccountGroup(
 					irrelevantExternalReferenceCode,
@@ -435,7 +435,7 @@ public abstract class BasePriceListAccountGroupResourceTestCase {
 		Long irrelevantId =
 			testGetPriceListIdPriceListAccountGroupsPage_getIrrelevantId();
 
-		if ((irrelevantId != null)) {
+		if (irrelevantId != null) {
 			PriceListAccountGroup irrelevantPriceListAccountGroup =
 				testGetPriceListIdPriceListAccountGroupsPage_addPriceListAccountGroup(
 					irrelevantId, randomIrrelevantPriceListAccountGroup());

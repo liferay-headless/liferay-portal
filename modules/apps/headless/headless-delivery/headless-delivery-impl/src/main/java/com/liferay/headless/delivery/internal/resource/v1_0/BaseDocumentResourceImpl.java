@@ -90,8 +90,8 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "assetLibraryId"),
@@ -107,12 +107,12 @@ public abstract class BaseDocumentResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Page<Document> getAssetLibraryDocumentsPage(
-			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId") Long
-				assetLibraryId,
+			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId")
+				Long assetLibraryId,
 			@Parameter(hidden = true) @QueryParam("flatten") Boolean flatten,
 			@Parameter(hidden = true) @QueryParam("search") String search,
-			@Context com.liferay.portal.vulcan.aggregation.Aggregation
-				aggregation,
+			@Context
+				com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
 			@Context Filter filter, @Context Pagination pagination,
 			@Context Sort[] sorts)
 		throws Exception {
@@ -125,18 +125,18 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("multipart/form-data")
-	@POST
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "assetLibraryId")}
 	)
 	@Path("/asset-libraries/{assetLibraryId}/documents")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Document postAssetLibraryDocument(
-			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId") Long
-				assetLibraryId,
+			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId")
+				Long assetLibraryId,
 			MultipartBody multipartBody)
 		throws Exception {
 
@@ -148,9 +148,8 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/documents/batch'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("application/json")
-	@POST
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "assetLibraryId"),
@@ -158,14 +157,15 @@ public abstract class BaseDocumentResourceImpl
 		}
 	)
 	@Path("/asset-libraries/{assetLibraryId}/documents/batch")
+	@POST
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Document")})
 	public Response postAssetLibraryDocumentBatch(
-			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId") Long
-				assetLibraryId,
+			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId")
+				Long assetLibraryId,
 			MultipartBody multipartBody,
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
+			@Parameter(hidden = true) @QueryParam("callbackURL")
+				String callbackURL,
 			Object object)
 		throws Exception {
 
@@ -190,11 +190,11 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/document-folders/{documentFolderId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
 	@Operation(
 		description = "Retrieves the folder's documents. Results can be paginated, filtered, searched, and sorted."
 	)
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "documentFolderId"),
@@ -214,8 +214,8 @@ public abstract class BaseDocumentResourceImpl
 				Long documentFolderId,
 			@Parameter(hidden = true) @QueryParam("flatten") Boolean flatten,
 			@Parameter(hidden = true) @QueryParam("search") String search,
-			@Context com.liferay.portal.vulcan.aggregation.Aggregation
-				aggregation,
+			@Context
+				com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
 			@Context Filter filter, @Context Pagination pagination,
 			@Context Sort[] sorts)
 		throws Exception {
@@ -228,16 +228,16 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/document-folders/{documentFolderId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("multipart/form-data")
 	@Operation(
 		description = "Creates a new document inside the folder identified by `documentFolderId`. The request body must be `multipart/form-data` with two parts, the file's bytes (`file`), and an optional JSON string (`document`) with the metadata."
 	)
-	@POST
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentFolderId")}
 	)
 	@Path("/document-folders/{documentFolderId}/documents")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Document postDocumentFolderDocument(
@@ -254,9 +254,8 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/document-folders/{documentFolderId}/documents/batch'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("application/json")
-	@POST
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "documentFolderId"),
@@ -264,14 +263,15 @@ public abstract class BaseDocumentResourceImpl
 		}
 	)
 	@Path("/document-folders/{documentFolderId}/documents/batch")
+	@POST
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Document")})
 	public Response postDocumentFolderDocumentBatch(
 			@NotNull @Parameter(hidden = true) @PathParam("documentFolderId")
 				Long documentFolderId,
 			MultipartBody multipartBody,
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
+			@Parameter(hidden = true) @QueryParam("callbackURL")
+				String callbackURL,
 			Object object)
 		throws Exception {
 
@@ -296,11 +296,11 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@DELETE
 	@Operation(
 		description = "Deletes the document and returns a 204 if the operation succeeds."
 	)
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
@@ -308,8 +308,8 @@ public abstract class BaseDocumentResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public void deleteDocument(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId)
 		throws Exception {
 	}
 
@@ -318,9 +318,9 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-delivery/v1.0/documents/batch'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("application/json")
 	@DELETE
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.QUERY, name = "callbackURL")}
 	)
@@ -328,8 +328,8 @@ public abstract class BaseDocumentResourceImpl
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Document")})
 	public Response deleteDocumentBatch(
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
+			@Parameter(hidden = true) @QueryParam("callbackURL")
+				String callbackURL,
 			Object object)
 		throws Exception {
 
@@ -354,9 +354,9 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
 	@Operation(description = "Retrieves the document.")
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
@@ -364,8 +364,8 @@ public abstract class BaseDocumentResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Document getDocument(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId)
 		throws Exception {
 
 		return new Document();
@@ -376,21 +376,21 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("multipart/form-data")
 	@Operation(
 		description = "Updates only the fields received in the request body, leaving any other fields untouched. The request body must be `multipart/form-data` with two parts, the file's bytes (`file`), and an optional JSON string (`document`) with the metadata."
 	)
-	@PATCH
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
+	@PATCH
 	@Path("/documents/{documentId}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Document patchDocument(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId,
 			MultipartBody multipartBody)
 		throws Exception {
 
@@ -402,21 +402,21 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("multipart/form-data")
 	@Operation(
 		description = "Replaces the document with the information sent in the request body. Any missing fields are deleted, unless they are required. The request body must be `multipart/form-data` with two parts, the file's bytes (`file`), and an optional JSON string (`document`) with the metadata."
 	)
-	@PUT
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
 	@Path("/documents/{documentId}")
 	@Produces({"application/json", "application/xml"})
+	@PUT
 	@Tags(value = {@Tag(name = "Document")})
 	public Document putDocument(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId,
 			MultipartBody multipartBody)
 		throws Exception {
 
@@ -428,19 +428,19 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/documents/batch'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("application/json")
-	@PUT
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.QUERY, name = "callbackURL")}
 	)
 	@Path("/documents/batch")
 	@Produces("application/json")
+	@PUT
 	@Tags(value = {@Tag(name = "Document")})
 	public Response putDocumentBatch(
 			MultipartBody multipartBody,
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
+			@Parameter(hidden = true) @QueryParam("callbackURL")
+				String callbackURL,
 			Object object)
 		throws Exception {
 
@@ -465,11 +465,11 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/my-rating'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@DELETE
 	@Operation(
 		description = "Deletes the document's rating and returns a 204 if the operation succeeded."
 	)
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
@@ -477,8 +477,8 @@ public abstract class BaseDocumentResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public void deleteDocumentMyRating(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId)
 		throws Exception {
 	}
 
@@ -487,9 +487,9 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/my-rating'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
 	@Operation(description = "Retrieves the document's rating.")
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
@@ -497,8 +497,8 @@ public abstract class BaseDocumentResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Rating getDocumentMyRating(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId)
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId)
 		throws Exception {
 
 		return new Rating();
@@ -509,21 +509,21 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/my-rating' -d $'{"ratingValue": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(
 		description = "Creates a new rating for the document, by the user who authenticated the request."
 	)
-	@POST
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
 	@Path("/documents/{documentId}/my-rating")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Rating postDocumentMyRating(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId,
 			Rating rating)
 		throws Exception {
 
@@ -535,21 +535,21 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/my-rating' -d $'{"ratingValue": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(
 		description = "Replaces the rating with the information sent in the request body. Any missing fields are deleted, unless they are required."
 	)
-	@PUT
+	@Override
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "documentId")}
 	)
 	@Path("/documents/{documentId}/my-rating")
 	@Produces({"application/json", "application/xml"})
+	@PUT
 	@Tags(value = {@Tag(name = "Document")})
 	public Rating putDocumentMyRating(
-			@NotNull @Parameter(hidden = true) @PathParam("documentId") Long
-				documentId,
+			@NotNull @Parameter(hidden = true) @PathParam("documentId")
+				Long documentId,
 			Rating rating)
 		throws Exception {
 
@@ -561,11 +561,11 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
 	@Operation(
 		description = "Retrieves the documents in the site's root folder. Results can be paginated, filtered, searched, flattened, and sorted."
 	)
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "siteId"),
@@ -584,8 +584,8 @@ public abstract class BaseDocumentResourceImpl
 			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			@Parameter(hidden = true) @QueryParam("flatten") Boolean flatten,
 			@Parameter(hidden = true) @QueryParam("search") String search,
-			@Context com.liferay.portal.vulcan.aggregation.Aggregation
-				aggregation,
+			@Context
+				com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
 			@Context Filter filter, @Context Pagination pagination,
 			@Context Sort[] sorts)
 		throws Exception {
@@ -598,14 +598,14 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/documents'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("multipart/form-data")
 	@Operation(
 		description = "Creates a new document. The request body must be `multipart/form-data` with two parts, the file's bytes (`file`), and an optional JSON string (`document`) with the metadata."
 	)
-	@POST
+	@Override
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/documents")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Document")})
 	public Document postSiteDocument(
@@ -621,9 +621,8 @@ public abstract class BaseDocumentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/documents/batch'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes("application/json")
-	@POST
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "siteId"),
@@ -631,13 +630,14 @@ public abstract class BaseDocumentResourceImpl
 		}
 	)
 	@Path("/sites/{siteId}/documents/batch")
+	@POST
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Document")})
 	public Response postSiteDocumentBatch(
 			@NotNull @Parameter(hidden = true) @PathParam("siteId") Long siteId,
 			MultipartBody multipartBody,
-			@Parameter(hidden = true) @QueryParam("callbackURL") String
-				callbackURL,
+			@Parameter(hidden = true) @QueryParam("callbackURL")
+				String callbackURL,
 			Object object)
 		throws Exception {
 
@@ -738,7 +738,7 @@ public abstract class BaseDocumentResourceImpl
 		for (Document document : documents) {
 			putDocument(
 				document.getId() != null ? document.getId() :
-				(Long)parameters.get("documentId"),
+					(Long)parameters.get("documentId"),
 				null);
 		}
 	}

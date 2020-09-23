@@ -71,8 +71,8 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
@@ -94,8 +94,8 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/by-name/{name}'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@GET
+	@Override
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "name")})
 	@Path("/workflow-definitions/by-name/{name}")
 	@Produces({"application/json", "application/xml"})
@@ -112,10 +112,10 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/deploy' -d $'{"active": ___, "content": ___, "name": ___, "title": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes({"application/json", "application/xml"})
-	@POST
+	@Override
 	@Path("/workflow-definitions/deploy")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition postWorkflowDefinitionDeploy(
@@ -130,10 +130,10 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/save' -d $'{"active": ___, "content": ___, "name": ___, "title": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
-	@Override
 	@Consumes({"application/json", "application/xml"})
-	@POST
+	@Override
 	@Path("/workflow-definitions/save")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition postWorkflowDefinitionSave(
@@ -148,8 +148,8 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/undeploy'  -u 'test@liferay.com:test'
 	 */
-	@Override
 	@DELETE
+	@Override
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.QUERY, name = "name"),
@@ -161,8 +161,8 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public void deleteWorkflowDefinitionUndeploy(
 			@NotNull @Parameter(hidden = true) @QueryParam("name") String name,
-			@NotNull @Parameter(hidden = true) @QueryParam("version") String
-				version)
+			@NotNull @Parameter(hidden = true) @QueryParam("version")
+				String version)
 		throws Exception {
 	}
 
@@ -172,7 +172,6 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-workflow/v1.0/workflow-definitions/update-active'  -u 'test@liferay.com:test'
 	 */
 	@Override
-	@POST
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.QUERY, name = "active"),
@@ -181,14 +180,15 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 		}
 	)
 	@Path("/workflow-definitions/update-active")
+	@POST
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WorkflowDefinition")})
 	public WorkflowDefinition postWorkflowDefinitionUpdateActive(
-			@NotNull @Parameter(hidden = true) @QueryParam("active") Boolean
-				active,
+			@NotNull @Parameter(hidden = true) @QueryParam("active")
+				Boolean active,
 			@NotNull @Parameter(hidden = true) @QueryParam("name") String name,
-			@NotNull @Parameter(hidden = true) @QueryParam("version") String
-				version)
+			@NotNull @Parameter(hidden = true) @QueryParam("version")
+				String version)
 		throws Exception {
 
 		return new WorkflowDefinition();

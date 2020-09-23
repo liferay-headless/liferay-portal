@@ -542,8 +542,8 @@ public class Query {
 	@GraphQLField
 	public DiscountAccountGroupPage
 			discountByExternalReferenceCodeDiscountAccountGroups(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -593,8 +593,8 @@ public class Query {
 	@GraphQLField
 	public DiscountCategoryPage
 			discountByExternalReferenceCodeDiscountCategories(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -739,8 +739,8 @@ public class Query {
 	@GraphQLField
 	public DiscountProductGroupPage
 			discountByExternalReferenceCodeDiscountProductGroups(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -985,8 +985,8 @@ public class Query {
 	@GraphQLField
 	public PriceListAccountPage
 			priceListByExternalReferenceCodePriceListAccounts(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1035,8 +1035,8 @@ public class Query {
 	@GraphQLField
 	public PriceListAccountGroupPage
 			priceListByExternalReferenceCodePriceListAccountGroups(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1086,8 +1086,8 @@ public class Query {
 	@GraphQLField
 	public PriceListChannelPage
 			priceListByExternalReferenceCodePriceListChannels(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1136,8 +1136,8 @@ public class Query {
 	@GraphQLField
 	public PriceListDiscountPage
 			priceListByExternalReferenceCodePriceListDiscounts(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1260,8 +1260,8 @@ public class Query {
 	@GraphQLField
 	public PriceModifierCategoryPage
 			priceModifierByExternalReferenceCodePriceModifierCategories(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1311,8 +1311,8 @@ public class Query {
 	@GraphQLField
 	public PriceModifierProductPage
 			priceModifierByExternalReferenceCodePriceModifierProducts(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {
@@ -1362,8 +1362,8 @@ public class Query {
 	@GraphQLField
 	public PriceModifierProductGroupPage
 			priceModifierByExternalReferenceCodePriceModifierProductGroups(
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode,
+				@GraphQLName("externalReferenceCode")
+					String externalReferenceCode,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 		throws Exception {

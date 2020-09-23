@@ -210,7 +210,7 @@ public abstract class BaseOptionValueResourceTestCase {
 		String irrelevantExternalReferenceCode =
 			testGetOptionByExternalReferenceCodeOptionValuesPage_getIrrelevantExternalReferenceCode();
 
-		if ((irrelevantExternalReferenceCode != null)) {
+		if (irrelevantExternalReferenceCode != null) {
 			OptionValue irrelevantOptionValue =
 				testGetOptionByExternalReferenceCodeOptionValuesPage_addOptionValue(
 					irrelevantExternalReferenceCode,
@@ -357,7 +357,7 @@ public abstract class BaseOptionValueResourceTestCase {
 		Long id = testGetOptionIdOptionValuesPage_getId();
 		Long irrelevantId = testGetOptionIdOptionValuesPage_getIrrelevantId();
 
-		if ((irrelevantId != null)) {
+		if (irrelevantId != null) {
 			OptionValue irrelevantOptionValue =
 				testGetOptionIdOptionValuesPage_addOptionValue(
 					irrelevantId, randomIrrelevantOptionValue());

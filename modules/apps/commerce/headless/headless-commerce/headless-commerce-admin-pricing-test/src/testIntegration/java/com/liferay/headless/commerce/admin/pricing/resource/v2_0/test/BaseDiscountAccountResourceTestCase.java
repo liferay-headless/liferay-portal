@@ -257,7 +257,7 @@ public abstract class BaseDiscountAccountResourceTestCase {
 		String irrelevantExternalReferenceCode =
 			testGetDiscountByExternalReferenceCodeDiscountAccountsPage_getIrrelevantExternalReferenceCode();
 
-		if ((irrelevantExternalReferenceCode != null)) {
+		if (irrelevantExternalReferenceCode != null) {
 			DiscountAccount irrelevantDiscountAccount =
 				testGetDiscountByExternalReferenceCodeDiscountAccountsPage_addDiscountAccount(
 					irrelevantExternalReferenceCode,
@@ -414,7 +414,7 @@ public abstract class BaseDiscountAccountResourceTestCase {
 		Long irrelevantId =
 			testGetDiscountIdDiscountAccountsPage_getIrrelevantId();
 
-		if ((irrelevantId != null)) {
+		if (irrelevantId != null) {
 			DiscountAccount irrelevantDiscountAccount =
 				testGetDiscountIdDiscountAccountsPage_addDiscountAccount(
 					irrelevantId, randomIrrelevantDiscountAccount());
