@@ -15,6 +15,7 @@
 package com.liferay.headless.admin.user.internal.resource.v1_0;
 
 import com.liferay.headless.admin.user.dto.v1_0.Segment;
+import com.liferay.headless.admin.user.internal.constants.SegmentsSourceConstants;
 import com.liferay.headless.admin.user.resource.v1_0.SegmentResource;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserService;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.context.Context;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.provider.SegmentsEntryProviderRegistry;
@@ -33,6 +35,7 @@ import java.time.ZonedDateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -131,14 +134,27 @@ public class SegmentResourceImpl extends BaseSegmentResourceImpl {
 		return new Segment() {
 			{
 				active = segmentsEntry.isActive();
-				criteria = segmentsEntry.getCriteria();
+				criteria = segmentsEntry.getCriteriaObj();
 				dateCreated = segmentsEntry.getCreateDate();
 				dateModified = segmentsEntry.getModifiedDate();
 				id = segmentsEntry.getSegmentsEntryId();
 				name = segmentsEntry.getName(
 					segmentsEntry.getDefaultLanguageId());
 				siteId = segmentsEntry.getGroupId();
-				source = segmentsEntry.getSource();
+
+				setSource(
+					() -> {
+						if (Objects.equals(
+								segmentsEntry.getSource(),
+								SegmentsEntryConstants.
+									SOURCE_ASAH_FARO_BACKEND)) {
+
+							return SegmentsSourceConstants.
+								SOURCE_ASAH_FARO_BACKEND;
+						}
+
+						return SegmentsSourceConstants.SOURCE_DEFAULT;
+					});
 			}
 		};
 	}
