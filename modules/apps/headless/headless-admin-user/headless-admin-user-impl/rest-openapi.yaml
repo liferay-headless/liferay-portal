@@ -459,7 +459,7 @@ components:
                     description:
                         The segment's criteria.
                     readOnly: true
-                    type: string
+                    type: object
                 dateCreated:
                     description:
                         The segment's creation date.

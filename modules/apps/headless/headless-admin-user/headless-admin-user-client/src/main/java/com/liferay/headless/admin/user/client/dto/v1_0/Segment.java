@@ -54,16 +54,16 @@ public class Segment implements Cloneable {
 
 	protected Boolean active;
 
-	public String getCriteria() {
+	public Object getCriteria() {
 		return criteria;
 	}
 
-	public void setCriteria(String criteria) {
+	public void setCriteria(Object criteria) {
 		this.criteria = criteria;
 	}
 
 	public void setCriteria(
-		UnsafeSupplier<String, Exception> criteriaUnsafeSupplier) {
+		UnsafeSupplier<Object, Exception> criteriaUnsafeSupplier) {
 
 		try {
 			criteria = criteriaUnsafeSupplier.get();
@@ -73,7 +73,7 @@ public class Segment implements Cloneable {
 		}
 	}
 
-	protected String criteria;
+	protected Object criteria;
 
 	public Date getDateCreated() {
 		return dateCreated;

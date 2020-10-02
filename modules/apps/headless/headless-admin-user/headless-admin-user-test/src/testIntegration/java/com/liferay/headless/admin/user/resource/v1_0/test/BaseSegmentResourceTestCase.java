@@ -181,7 +181,6 @@ public abstract class BaseSegmentResourceTestCase {
 
 		Segment segment = randomSegment();
 
-		segment.setCriteria(regex);
 		segment.setName(regex);
 		segment.setSource(regex);
 
@@ -191,7 +190,6 @@ public abstract class BaseSegmentResourceTestCase {
 
 		segment = SegmentSerDes.toDTO(json);
 
-		Assert.assertEquals(regex, segment.getCriteria());
 		Assert.assertEquals(regex, segment.getName());
 		Assert.assertEquals(regex, segment.getSource());
 	}
@@ -773,11 +771,8 @@ public abstract class BaseSegmentResourceTestCase {
 		}
 
 		if (entityFieldName.equals("criteria")) {
-			sb.append("'");
-			sb.append(String.valueOf(segment.getCriteria()));
-			sb.append("'");
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
@@ -913,8 +908,6 @@ public abstract class BaseSegmentResourceTestCase {
 		return new Segment() {
 			{
 				active = RandomTestUtil.randomBoolean();
-				criteria = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				id = RandomTestUtil.randomLong();

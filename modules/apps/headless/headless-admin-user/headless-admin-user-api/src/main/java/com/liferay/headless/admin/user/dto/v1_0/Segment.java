@@ -37,7 +37,9 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -92,17 +94,18 @@ public class Segment {
 	protected Boolean active;
 
 	@Schema(description = "The segment's criteria.")
-	public String getCriteria() {
+	@Valid
+	public Object getCriteria() {
 		return criteria;
 	}
 
-	public void setCriteria(String criteria) {
+	public void setCriteria(Object criteria) {
 		this.criteria = criteria;
 	}
 
 	@JsonIgnore
 	public void setCriteria(
-		UnsafeSupplier<String, Exception> criteriaUnsafeSupplier) {
+		UnsafeSupplier<Object, Exception> criteriaUnsafeSupplier) {
 
 		try {
 			criteria = criteriaUnsafeSupplier.get();
@@ -117,8 +120,8 @@ public class Segment {
 
 	@GraphQLField(description = "The segment's criteria.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	@NotEmpty
-	protected String criteria;
+	@NotNull
+	protected Object criteria;
 
 	@Schema(description = "The segment's creation date.")
 	public Date getDateCreated() {
@@ -332,11 +335,7 @@ public class Segment {
 
 			sb.append("\"criteria\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(criteria));
-
-			sb.append("\"");
+			sb.append(String.valueOf(criteria));
 		}
 
 		if (dateCreated != null) {

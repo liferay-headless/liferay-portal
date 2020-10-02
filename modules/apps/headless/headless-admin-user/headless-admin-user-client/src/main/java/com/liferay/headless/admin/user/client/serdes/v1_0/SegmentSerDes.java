@@ -268,7 +268,7 @@ public class SegmentSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "criteria")) {
 				if (jsonParserFieldValue != null) {
-					segment.setCriteria((String)jsonParserFieldValue);
+					segment.setCriteria((Object)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
