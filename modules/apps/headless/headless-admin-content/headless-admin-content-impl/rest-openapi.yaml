@@ -1,3 +1,45 @@
+components:
+    schemas:
+        Status:
+            # @review
+            description:
+                Represents the status of a resource
+            properties:
+                code:
+                    # @review
+                    description:
+                        A number which identifies a specific status
+                    format: int32
+                    readOnly: true
+                    type: integer
+                label:
+                    # @review
+                    description:
+                        Label associated to the status
+                    readOnly: true
+                    type: string
+                label_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
+        VersionInformation:
+            properties:
+                status:
+                    allOf:
+                        - $ref: "#/components/schemas/Status"
+                    # @review
+                    description:
+                        Represents the status of a resource
+                    readOnly: true
+                versionNumber:
+                    # @review
+                    description:
+                        The version of a resource
+                    format: double
+                    readOnly: true
+                    type: number
+            type: object
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
@@ -38,3 +80,29 @@ paths:
                     description:
                         ""
             tags: ["PageDefinition"]
+    "/structured-contents/{structuredContentId}":
+        get:
+            # @review
+            description:
+                Retrieves all the information of a structured content as versioning, drafts and status
+                of the structured content. Results can be paginated, filtered, searched, flattened, and
+                sorted.
+            parameters:
+                - in: path
+                  name: structuredContentId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#StructuredContent"
+                        application/xml:
+                            schema:
+                                $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#StructuredContent"
+                    description:
+                        ""
+            tags: ["StructuredContent"]
