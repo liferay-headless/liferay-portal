@@ -1,3 +1,164 @@
+components:
+    schemas:
+        ContentAssociation:
+            description:
+                ""
+            properties:
+                contentSubtype:
+                    type: string
+                contentType:
+                    type: string
+            type: object
+        Creator:
+            description:
+                Represents the user who created/authored the content. Properties follow the
+                [creator](https://schema.org/creator) specification.
+            properties:
+                additionalName:
+                    description:
+                        The user's additional name, which can be used as a middle name.
+                    readOnly: true
+                    type: string
+                contentType:
+                    # @review
+                    description:
+                        The type of the content.
+                    readOnly: true
+                    type: string
+                familyName:
+                    description:
+                        The user's surname (last name).
+                    readOnly: true
+                    type: string
+                givenName:
+                    description:
+                        The user's first name.
+                    readOnly: true
+                    type: string
+                id:
+                    description:
+                        The user's ID.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                image:
+                    description:
+                        A relative URL to the user's profile image.
+                    format: uri
+                    readOnly: true
+                    type: string
+                name:
+                    description:
+                        The user's full name.
+                    readOnly: true
+                    type: string
+                profileURL:
+                    description:
+                        A relative URL to the user's profile.
+                    format: uri
+                    readOnly: true
+                    type: string
+            type: object
+        DisplayPageTemplate:
+            description:
+                ""
+            properties:
+                actions:
+                    additionalProperties:
+                        additionalProperties:
+                            type: string
+                        type: object
+                    readOnly: true
+                    type: object
+                availableLanguages:
+                    description:
+                        The list of languages the display page template has a translation for.
+                    items:
+                        description:
+                            The list of languages the display page template has a translation for.
+                        type: string
+                    readOnly: true
+                    type: array
+                creator:
+                    $ref: "#/components/schemas/Creator"
+                customFields:
+                    items:
+                        $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#CustomField"
+                    type: array
+                dateCreated:
+                    description:
+                        The display page template's creation date.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateModified:
+                    description:
+                        The last time any field of the display page template was changed.
+                    format: date-time
+                    readOnly: true
+                    type: string
+                displayPageSettings:
+                    $ref: "#/components/schemas/DisplayPageTemplateSettings"
+                key:
+                    description:
+                        The display page template's external key.
+                    readOnly: true
+                    type: string
+                pageDefinition:
+                    $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#PageDefinition"
+                siteId:
+                    description:
+                        The ID of the site to which this content page is scoped.
+                    format: int64
+                    readOnly: true
+                    type: integer
+                title:
+                    description:
+                        the title of the display page template
+                    type: string
+                uuid:
+                    description:
+                        A valid external identifier to reference this display page template.
+                    readOnly: true
+                    type: string
+            required:
+                - title
+            type: object
+        DisplayPageTemplateSettings:
+            description:
+                ""
+            properties:
+                ContentAssociation:
+                    $ref: "#/components/schemas/ContentAssociation"
+                openGraphSettingsMapping:
+                    $ref: "#/components/schemas/OpenGraphSettingsMapping"
+                seoSettingsMapping:
+                    $ref: "#/components/schemas/SEOSettingsMapping"
+            type: object
+        OpenGraphSettingsMapping:
+            properties:
+                descriptionMappingField:
+                    type: string
+                imageAltMappingField:
+                    type: string
+                imageMappingField:
+                    type: string
+                titleMappingField:
+                    type: string
+            type: object
+        SEOSettingsMapping:
+            properties:
+                descriptionMappingField:
+                    type: string
+                htmlTitleMappingField:
+                    type: string
+                robots:
+                    type: string
+                robots_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+            type: object
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
