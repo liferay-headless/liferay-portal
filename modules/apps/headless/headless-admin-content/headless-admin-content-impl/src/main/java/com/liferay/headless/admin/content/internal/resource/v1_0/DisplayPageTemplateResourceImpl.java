@@ -23,6 +23,7 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -47,6 +48,27 @@ import org.osgi.service.component.annotations.ServiceScope;
 )
 public class DisplayPageTemplateResourceImpl
 	extends BaseDisplayPageTemplateResourceImpl {
+
+	@Override
+	public DisplayPageTemplate getSiteDisplayPageTemplate(
+			Long siteId, String displayPageTemplateKey)
+		throws Exception {
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
+				siteId, displayPageTemplateKey);
+
+		if ((layoutPageTemplateEntry == null) ||
+			(layoutPageTemplateEntry.getType() !=
+				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE)) {
+
+			throw new PortalException(
+				"Invalid Display Page Template with key: " +
+					displayPageTemplateKey);
+		}
+
+		return _toDisplayPageTemplate(layoutPageTemplateEntry);
+	}
 
 	@Override
 	public Page<DisplayPageTemplate> getSiteDisplayPageTemplatesPage(
