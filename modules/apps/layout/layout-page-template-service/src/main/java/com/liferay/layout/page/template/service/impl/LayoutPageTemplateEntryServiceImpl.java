@@ -223,6 +223,24 @@ public class LayoutPageTemplateEntryServiceImpl
 	}
 
 	@Override
+	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
+			long groupId, String layoutPageTemplateEntryKey)
+		throws PortalException {
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				groupId, layoutPageTemplateEntryKey);
+
+		if (layoutPageTemplateEntry != null) {
+			_layoutPageTemplateEntryModelResourcePermission.check(
+				getPermissionChecker(), layoutPageTemplateEntry,
+				ActionKeys.VIEW);
+		}
+
+		return layoutPageTemplateEntry;
+	}
+
+	@Override
 	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntryByUuidAndGroupId(
 		String uuid, long groupId) {
 
