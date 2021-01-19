@@ -104,6 +104,8 @@ components:
                         The display page template's external key.
                     readOnly: true
                     type: string
+                markedAsDefault:
+                    type: boolean
                 pageDefinition:
                     $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#PageDefinition"
                 siteId:
@@ -208,6 +210,40 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/DisplayPageTemplate"
                                 type: array
+                    description:
+                        ""
+            tags: ["DisplayPageTemplate"]
+    "/sites/{siteId}/display-page-templates/{displayPageTemplateKey}":
+        get:
+            # @review
+            description:
+                Retrieves a display page template of a site
+            operationId: getSiteDisplayPageTemplate
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: displayPageTemplateKey
+                  required: true
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/DisplayPageTemplate"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/DisplayPageTemplate"
                     description:
                         ""
             tags: ["DisplayPageTemplate"]
