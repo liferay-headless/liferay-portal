@@ -22,10 +22,12 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -34,6 +36,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -75,6 +78,31 @@ public class DisplayPageTemplateResourceImpl
 		Long siteId, Pagination pagination, Sort[] sorts) {
 
 		DynamicQuery dynamicQuery = _getDynamicQuery(siteId);
+
+		if (sorts != null) {
+			for (Sort sort : sorts) {
+				String fieldName = sort.getFieldName();
+
+				fieldName = StringUtil.removeSubstring(fieldName, "_sortable");
+
+				if (Objects.equals(fieldName, "dateCreated")) {
+					fieldName = "createDate";
+				}
+				else if (Objects.equals(fieldName, "dateModified")) {
+					fieldName = "modifiedDate";
+				}
+				else if (Objects.equals(fieldName, "title")) {
+					fieldName = "name";
+				}
+
+				if (sort.isReverse()) {
+					dynamicQuery.addOrder(OrderFactoryUtil.desc(fieldName));
+				}
+				else {
+					dynamicQuery.addOrder(OrderFactoryUtil.asc(fieldName));
+				}
+			}
+		}
 
 		return Page.of(
 			HashMapBuilder.put(
