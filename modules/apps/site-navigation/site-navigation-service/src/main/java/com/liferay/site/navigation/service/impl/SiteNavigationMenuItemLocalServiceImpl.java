@@ -75,6 +75,18 @@ public class SiteNavigationMenuItemLocalServiceImpl
 
 		User user = userLocalService.getUser(userId);
 
+		int siteNavigationMenuItemCountByCompany =
+			siteNavigationMenuItemPersistence.countByCompanyId(
+				user.getCompanyId());
+
+		if ((PropsValues.DATA_LIMIT_MAX_SITE_NAVIGATION_MENU_ITEM_COUNT > 0) &&
+			(siteNavigationMenuItemCountByCompany >=
+				PropsValues.DATA_LIMIT_MAX_SITE_NAVIGATION_MENU_ITEM_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed site navigation menu items");
+		}
+
 		long siteNavigationMenuItemId = counterLocalService.increment();
 
 		SiteNavigationMenuItem siteNavigationMenuItem =
