@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Date;
 import java.util.List;
@@ -60,6 +61,15 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 		// KB folder
 
 		User user = userLocalService.getUser(userId);
+
+		if ((PropsValues.DATA_LIMIT_MAX_KB_FOLDER_COUNT > 0) &&
+			(kbFolderPersistence.countByCompanyId(user.getCompanyId()) >=
+				PropsValues.DATA_LIMIT_MAX_KB_FOLDER_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed knowledge base folders");
+		}
+
 		Date now = new Date();
 
 		validateName(groupId, parentResourcePrimKey, name);
