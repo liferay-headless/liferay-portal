@@ -283,6 +283,14 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		// Entry
 
 		User user = userLocalService.getUser(userId);
+
+		if ((PropsValues.DATA_LIMIT_MAX_BLOG_ENTRY_COUNT > 0) &&
+			(blogsEntryPersistence.countByCompanyId(user.getCompanyId()) >=
+				PropsValues.DATA_LIMIT_MAX_BLOG_ENTRY_COUNT)) {
+
+			throw new PortalException("Exceed maximum allowed blogs");
+		}
+
 		long groupId = serviceContext.getScopeGroupId();
 
 		int status = WorkflowConstants.STATUS_DRAFT;
