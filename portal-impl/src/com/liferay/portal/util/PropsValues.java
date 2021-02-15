@@ -623,6 +623,10 @@ public class PropsValues {
 		GetterUtil.getLong(
 			PropsUtil.get(PropsKeys.DATA_LIMIT_MAX_ARTICLE_COUNT));
 
+	public static final long DATA_LIMIT_MAX_ARTICLE_FOLDER_COUNT =
+		GetterUtil.getLong(
+			PropsUtil.get(PropsKeys.DATA_LIMIT_MAX_ARTICLE_FOLDER_COUNT));
+
 	public static final long DATA_LIMIT_MAX_DL_STORAGE_SIZE =
 		GetterUtil.getLong(
 			PropsUtil.get(PropsKeys.DATA_LIMIT_MAX_DL_STORAGE_SIZE));
