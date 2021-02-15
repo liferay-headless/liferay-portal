@@ -271,6 +271,14 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		Group group = groupLocalService.getGroup(groupId);
 
+		if ((PropsValues.DATA_LIMIT_MAX_MB_MESSAGE_COUNT > 0) &&
+			(mbMessagePersistence.countByCompanyId(group.getCompanyId()) >=
+				PropsValues.DATA_LIMIT_MAX_MB_MESSAGE_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed message board messages");
+		}
+
 		User user = userLocalService.fetchUser(
 			_portal.getValidUserId(group.getCompanyId(), userId));
 
