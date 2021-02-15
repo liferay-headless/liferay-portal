@@ -69,6 +69,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.RepositoryUtil;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
@@ -100,6 +101,15 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		// Folder
 
 		User user = userPersistence.findByPrimaryKey(userId);
+
+		if ((PropsValues.DATA_LIMIT_MAX_DL_FOLDER_COUNT > 0) &&
+			(dlFolderPersistence.countByCompanyId(user.getCompanyId()) >=
+				PropsValues.DATA_LIMIT_MAX_DL_FOLDER_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed document folders");
+		}
+
 		parentFolderId = getParentFolderId(
 			groupId, repositoryId, parentFolderId);
 		Date now = new Date();
