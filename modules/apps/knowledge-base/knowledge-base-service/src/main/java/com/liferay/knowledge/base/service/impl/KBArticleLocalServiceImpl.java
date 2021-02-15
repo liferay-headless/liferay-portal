@@ -99,6 +99,7 @@ import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
@@ -154,6 +155,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		// KB article
 
 		User user = userLocalService.getUser(userId);
+
+		if ((PropsValues.DATA_LIMIT_MAX_KB_ARTICLE_COUNT > 0) &&
+			(kbArticlePersistence.countByC_L(user.getCompanyId(), true) >=
+				PropsValues.DATA_LIMIT_MAX_KB_ARTICLE_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed knowledge base articles");
+		}
 
 		long groupId = serviceContext.getScopeGroupId();
 		urlTitle = normalizeUrlTitle(urlTitle);
