@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.exception.DuplicateSiteNavigationMenuException;
 import com.liferay.site.navigation.exception.SiteNavigationMenuNameException;
@@ -62,6 +63,17 @@ public class SiteNavigationMenuLocalServiceImpl
 		validate(groupId, name);
 
 		User user = userLocalService.getUser(userId);
+
+		int siteNavigationMenuCountByCompany =
+			siteNavigationMenuPersistence.countByCompanyId(user.getCompanyId());
+
+		if ((PropsValues.DATA_LIMIT_MAX_SITE_NAVIGATION_MENU_COUNT > 0) &&
+			(siteNavigationMenuCountByCompany >=
+				PropsValues.DATA_LIMIT_MAX_SITE_NAVIGATION_MENU_COUNT)) {
+
+			throw new PortalException(
+				"Exceed maximum allowed site navigation menus");
+		}
 
 		long siteNavigationMenuId = counterLocalService.increment();
 
