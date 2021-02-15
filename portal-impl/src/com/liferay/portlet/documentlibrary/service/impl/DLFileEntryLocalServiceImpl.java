@@ -176,6 +176,13 @@ public class DLFileEntryLocalServiceImpl
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
+		if ((PropsValues.DATA_LIMIT_MAX_DL_FILE_ENTRY_COUNT > 0) &&
+			(dlFolderPersistence.countByCompanyId(user.getCompanyId()) >=
+				PropsValues.DATA_LIMIT_MAX_DL_FILE_ENTRY_COUNT)) {
+
+			throw new PortalException("Exceed maximum allowed documents");
+		}
+
 		folderId = DLFolderLocalServiceImpl.getFolderId(
 			dlFolderPersistence, user.getCompanyId(), folderId);
 
