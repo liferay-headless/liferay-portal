@@ -247,7 +247,7 @@ public interface AccountRoleResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/account-rest/v1.0/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}");
+						"/o/account-rest/v1.0/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}");
 
 			httpInvoker.path(
 				"accountExternalReferenceCode", accountExternalReferenceCode);
@@ -326,7 +326,7 @@ public interface AccountRoleResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/account-rest/v1.0/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}");
+						"/o/account-rest/v1.0/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}");
 
 			httpInvoker.path(
 				"accountExternalReferenceCode", accountExternalReferenceCode);
@@ -415,7 +415,7 @@ public interface AccountRoleResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}/account-roles");
+						"/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 
@@ -484,7 +484,7 @@ public interface AccountRoleResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}/account-roles");
+						"/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 

@@ -175,7 +175,7 @@ paths:
                     description:
                         "Account successfully created"
             tags: ["Account"]
-    "/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}":
+    "/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}":
         delete:
             # @review
             description:
@@ -236,7 +236,7 @@ paths:
                     description:
                         ""
             tags: ["AccountRole"]
-    "/accounts/by-external-reference-code/{externalReferenceCode}":
+    "/accounts/by-externalReferenceCode/{externalReferenceCode}":
         delete:
             # @review
             description:
@@ -343,7 +343,7 @@ paths:
                     description:
                         "Account successfully replaced"
             tags: ["Account"]
-    "/accounts/by-external-reference-code/{externalReferenceCode}/account-roles":
+    "/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles":
         get:
             # @review
             description:
@@ -420,7 +420,7 @@ paths:
                     description:
                         ""
             tags: ["AccountRole"]
-    "/accounts/by-external-reference-code/{externalReferenceCode}/account-users":
+    "/accounts/by-externalReferenceCode/{externalReferenceCode}/account-users":
         get:
             # @review
             description:

@@ -83,7 +83,7 @@ public abstract class BaseAccountRoleResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'DELETE' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@DELETE
@@ -100,7 +100,7 @@ public abstract class BaseAccountRoleResourceImpl
 		}
 	)
 	@Path(
-		"/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}"
+		"/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}"
 	)
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "AccountRole")})
@@ -119,7 +119,7 @@ public abstract class BaseAccountRoleResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Operation(description = "Assigns account users to the account role")
@@ -136,7 +136,7 @@ public abstract class BaseAccountRoleResourceImpl
 		}
 	)
 	@Path(
-		"/accounts/by-external-reference-code/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}"
+		"/accounts/by-externalReferenceCode/{accountExternalReferenceCode}/account-roles/{accountRoleId}/account-users/{accountUserExternalReferenceCode}"
 	)
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "AccountRole")})
@@ -155,7 +155,7 @@ public abstract class BaseAccountRoleResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}/account-roles'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@GET
@@ -170,7 +170,7 @@ public abstract class BaseAccountRoleResourceImpl
 		}
 	)
 	@Path(
-		"/accounts/by-external-reference-code/{externalReferenceCode}/account-roles"
+		"/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles"
 	)
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "AccountRole")})
@@ -187,7 +187,7 @@ public abstract class BaseAccountRoleResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}/account-roles' -d $'{"description": ___, "displayName": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles' -d $'{"description": ___, "displayName": ___, "name": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -199,7 +199,7 @@ public abstract class BaseAccountRoleResourceImpl
 		}
 	)
 	@Path(
-		"/accounts/by-external-reference-code/{externalReferenceCode}/account-roles"
+		"/accounts/by-externalReferenceCode/{externalReferenceCode}/account-roles"
 	)
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "AccountRole")})

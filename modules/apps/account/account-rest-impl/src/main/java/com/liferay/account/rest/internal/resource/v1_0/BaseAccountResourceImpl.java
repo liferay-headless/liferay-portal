@@ -169,7 +169,7 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'DELETE' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@DELETE
@@ -179,7 +179,7 @@ public abstract class BaseAccountResourceImpl
 			@Parameter(in = ParameterIn.PATH, name = "externalReferenceCode")
 		}
 	)
-	@Path("/accounts/by-external-reference-code/{externalReferenceCode}")
+	@Path("/accounts/by-externalReferenceCode/{externalReferenceCode}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Account")})
 	public void deleteAccountByExternalReferenceCode(
@@ -191,7 +191,7 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@GET
@@ -201,7 +201,7 @@ public abstract class BaseAccountResourceImpl
 			@Parameter(in = ParameterIn.PATH, name = "externalReferenceCode")
 		}
 	)
-	@Path("/accounts/by-external-reference-code/{externalReferenceCode}")
+	@Path("/accounts/by-externalReferenceCode/{externalReferenceCode}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Account")})
 	public Account getAccountByExternalReferenceCode(
@@ -215,7 +215,7 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}' -d $'{"description": ___, "domains": ___, "externalReferenceCode": ___, "name": ___, "organizationIds": ___, "parentAccountId": ___, "status": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}' -d $'{"description": ___, "domains": ___, "externalReferenceCode": ___, "name": ___, "organizationIds": ___, "parentAccountId": ___, "status": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -228,7 +228,7 @@ public abstract class BaseAccountResourceImpl
 			@Parameter(in = ParameterIn.PATH, name = "externalReferenceCode")
 		}
 	)
-	@Path("/accounts/by-external-reference-code/{externalReferenceCode}")
+	@Path("/accounts/by-externalReferenceCode/{externalReferenceCode}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Account")})
 	public Account patchAccountByExternalReferenceCode(
@@ -278,7 +278,7 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-external-reference-code/{externalReferenceCode}' -d $'{"description": ___, "domains": ___, "externalReferenceCode": ___, "name": ___, "organizationIds": ___, "parentAccountId": ___, "status": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/account-rest/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}' -d $'{"description": ___, "domains": ___, "externalReferenceCode": ___, "name": ___, "organizationIds": ___, "parentAccountId": ___, "status": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -291,7 +291,7 @@ public abstract class BaseAccountResourceImpl
 			@Parameter(in = ParameterIn.PATH, name = "externalReferenceCode")
 		}
 	)
-	@Path("/accounts/by-external-reference-code/{externalReferenceCode}")
+	@Path("/accounts/by-externalReferenceCode/{externalReferenceCode}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Account")})
 	public Account putAccountByExternalReferenceCode(
