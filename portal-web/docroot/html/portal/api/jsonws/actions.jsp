@@ -131,7 +131,7 @@ Set<String> contextNames = JSONWebServiceActionsManagerUtil.getContextNames();
 	<liferay-ui:message key="there-are-no-services-matching-that-phrase" />
 </div>
 
-<aui:script use="aui-base,autocomplete-base,autocomplete-filters,autocomplete-highlighters">
+<aui:script use="aui-base,aui-component,autocomplete-base,autocomplete-filters,autocomplete-highlighters">
 	var Lang = A.Lang;
 
 	var AArray = A.Array;
