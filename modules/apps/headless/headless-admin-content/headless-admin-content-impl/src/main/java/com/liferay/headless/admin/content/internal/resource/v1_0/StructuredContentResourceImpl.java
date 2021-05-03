@@ -262,7 +262,7 @@ public class StructuredContentResourceImpl
 
 	@Override
 	public StructuredContent postSiteStructuredContentDraft(
-			@NotNull Long siteId, StructuredContent structuredContent)
+			Long siteId, StructuredContent structuredContent)
 		throws Exception {
 
 		DDMStructure ddmStructure = _ddmStructureService.getStructure(
