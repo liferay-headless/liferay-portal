@@ -14,32 +14,38 @@
 
 package com.liferay.portal.vulcan.internal.graphql.data.fetcher;
 
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOContributor;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOProperty;
+import com.liferay.portal.vulcan.graphql.validation.GraphQLRequestContext;
+import com.liferay.portal.vulcan.graphql.validation.GraphQLRequestContextValidator;
 import com.liferay.portal.vulcan.internal.graphql.data.processor.GraphQLDTOContributorDataFetchingProcessor;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-
-import graphql.servlet.GraphQLContext;
 
 import java.io.Serializable;
 
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Carlos Correa
  */
-public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
+public class GraphQLDTOContributorDataFetcher extends BaseDataFetcher {
 
 	public GraphQLDTOContributorDataFetcher(
 		GraphQLDTOContributor graphQLDTOContributor,
 		GraphQLDTOContributorDataFetchingProcessor
 			graphQLDTOContributorDataFetchingProcessor,
-		GraphQLDTOProperty graphQLDTOProperty, Operation operation) {
+		GraphQLDTOProperty graphQLDTOProperty,
+		GraphQLRequestContext graphQLRequestContext,
+		ServiceTrackerList<GraphQLRequestContextValidator>
+			graphQLRequestContextValidators,
+		Operation operation) {
+
+		super(graphQLRequestContext, graphQLRequestContextValidators);
 
 		_graphQLDTOContributor = graphQLDTOContributor;
 		_graphQLDTOContributorDataFetchingProcessor =
@@ -52,23 +58,29 @@ public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
 		GraphQLDTOContributor graphQLDTOContributor,
 		GraphQLDTOContributorDataFetchingProcessor
 			graphQLDTOContributorDataFetchingProcessor,
+		GraphQLRequestContext graphQLRequestContext,
+		ServiceTrackerList<GraphQLRequestContextValidator>
+			graphQLRequestContextValidators,
 		Operation operation) {
 
 		this(
 			graphQLDTOContributor, graphQLDTOContributorDataFetchingProcessor,
-			null, operation);
+			null, graphQLRequestContext, graphQLRequestContextValidators,
+			operation);
 	}
 
 	@Override
-	public Object get(DataFetchingEnvironment dataFetchingEnvironment)
+	public Object get(
+			DataFetchingEnvironment dataFetchingEnvironment,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
 		if (_operation == Operation.CREATE) {
 			return _graphQLDTOContributorDataFetchingProcessor.create(
 				dataFetchingEnvironment.getArgument(
 					_graphQLDTOContributor.getResourceName()),
-				_graphQLDTOContributor,
-				_getHttpServletRequest(dataFetchingEnvironment),
+				_graphQLDTOContributor, httpServletRequest,
 				(String)dataFetchingEnvironment.getArgument("scopeKey"));
 		}
 		else if (_operation == Operation.DELETE) {
@@ -79,8 +91,7 @@ public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
 		}
 		else if (_operation == Operation.GET) {
 			return _graphQLDTOContributorDataFetchingProcessor.get(
-				_graphQLDTOContributor,
-				_getHttpServletRequest(dataFetchingEnvironment),
+				_graphQLDTOContributor, httpServletRequest,
 				dataFetchingEnvironment.getArgument(
 					_graphQLDTOContributor.getIdName()));
 		}
@@ -94,15 +105,14 @@ public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
 			}
 
 			return _graphQLDTOContributorDataFetchingProcessor.getRelationship(
-				_graphQLDTOContributor, _graphQLDTOProperty,
-				_getHttpServletRequest(dataFetchingEnvironment), (long)id);
+				_graphQLDTOContributor, _graphQLDTOProperty, httpServletRequest,
+				(long)id);
 		}
 		else if (_operation == Operation.LIST) {
 			return _graphQLDTOContributorDataFetchingProcessor.list(
 				dataFetchingEnvironment.getArgument("aggregation"),
 				(String)dataFetchingEnvironment.getArgument("filter"),
-				_graphQLDTOContributor,
-				_getHttpServletRequest(dataFetchingEnvironment),
+				_graphQLDTOContributor, httpServletRequest,
 				dataFetchingEnvironment.getArgument("page"),
 				dataFetchingEnvironment.getArgument("pageSize"),
 				dataFetchingEnvironment.getArgument("scopeKey"),
@@ -113,8 +123,7 @@ public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
 			return _graphQLDTOContributorDataFetchingProcessor.update(
 				dataFetchingEnvironment.<Map<String, Serializable>>getArgument(
 					_graphQLDTOContributor.getResourceName()),
-				_graphQLDTOContributor,
-				_getHttpServletRequest(dataFetchingEnvironment),
+				_graphQLDTOContributor, httpServletRequest,
 				dataFetchingEnvironment.getArgument(
 					_graphQLDTOContributor.getIdName()));
 		}
@@ -127,17 +136,6 @@ public class GraphQLDTOContributorDataFetcher implements DataFetcher<Object> {
 
 		CREATE, DELETE, GET, GET_RELATIONSHIP, LIST, UPDATE
 
-	}
-
-	private HttpServletRequest _getHttpServletRequest(
-		DataFetchingEnvironment dataFetchingEnvironment) {
-
-		GraphQLContext graphQLContext = dataFetchingEnvironment.getContext();
-
-		Optional<HttpServletRequest> httpServletRequestOptional =
-			graphQLContext.getHttpServletRequest();
-
-		return httpServletRequestOptional.orElse(null);
 	}
 
 	private final GraphQLDTOContributor _graphQLDTOContributor;
