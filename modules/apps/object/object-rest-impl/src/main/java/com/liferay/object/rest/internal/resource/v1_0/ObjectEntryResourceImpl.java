@@ -401,6 +401,19 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		super.update(objectEntries, parameters);
 	}
 
+	@Override
+	protected Long getPermissionCheckerGroupId(Object id) throws Exception {
+		return contextCompany.getCompanyId();
+	}
+
+	@Override
+	protected String getPermissionCheckerResourceName(Object id)
+		throws Exception {
+
+		return ObjectDefinition.class.getName() + "#" +
+			_objectDefinition.getObjectDefinitionId(); // ObjectDefinition#44002
+	}
+
 	private DefaultDTOConverterContext _getDTOConverterContext(
 		Long objectEntryId) {
 
