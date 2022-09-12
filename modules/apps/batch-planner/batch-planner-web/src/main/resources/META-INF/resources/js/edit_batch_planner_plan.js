@@ -116,7 +116,7 @@ export default function ({
 
 		const schemaName = selectedOption.getAttribute('schemaName');
 
-		taskItemDelegateNameInput.value = schemaName || 'DEFAULT';
+		taskItemDelegateNameInput.value = schemaName || 'BATCH';
 
 		const internalClassNameValue = trimPackage(
 			schemaName || selectedOption.value
