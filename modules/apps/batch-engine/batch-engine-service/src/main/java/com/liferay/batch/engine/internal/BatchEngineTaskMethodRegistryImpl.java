@@ -28,6 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
@@ -61,6 +62,13 @@ public class BatchEngineTaskMethodRegistryImpl
 			batchEngineTaskItemDelegateExecutorCreatorMap =
 				_batchEngineTaskItemDelegateExecutorCreators.get(
 					_itemClasses.get(itemClassName));
+
+		if (!batchEngineTaskItemDelegateExecutorCreatorMap.containsKey(
+				taskItemDelegateName) &&
+			!Objects.equals(taskItemDelegateName, "DEFAULT")) {
+
+			taskItemDelegateName = "DEFAULT";
+		}
 
 		return batchEngineTaskItemDelegateExecutorCreatorMap.get(
 			taskItemDelegateName);
