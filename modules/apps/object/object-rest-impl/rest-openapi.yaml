@@ -206,6 +206,28 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectEntry"
             tags: ["ObjectEntry"]
+    "/permissions":
+        get:
+            operationId: getPermissionsPage
+            parameters:
+                - in: query
+                  name: roleNames
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ObjectEntry"]
+        put:
+            operationId: putPermissionsPage
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ObjectEntry"]
     "/scopes/{scopeKey}/by-external-reference-code/{externalReferenceCode}":
         delete:
             operationId: deleteScopeScopeKeyByExternalReferenceCode
@@ -279,6 +301,37 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/ObjectEntry"
+            tags: ["ObjectEntry"]
+    "/scopes/{scopeKey}/permissions":
+        get:
+            operationId: getScopeScopeKeyPermissionsPage
+            parameters:
+                - in: path
+                  name: scopeKey
+                  schema:
+                      type: string
+                - in: query
+                  name: roleNames
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ObjectEntry"]
+        put:
+            operationId: putScopeScopeKeyPermissionsPage
+            parameters:
+                - in: path
+                  name: scopeKey
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
             tags: ["ObjectEntry"]
     "/{currentObjectEntryId}/{objectRelationshipName}":
         get:
