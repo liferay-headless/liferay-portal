@@ -698,7 +698,7 @@ definition {
 			ObjectDefinitionAPI.assertStatusInResponse(
 				expectedValue = "NOT_FOUND",
 				responseToParse = "${response}");
-				
+
 			HeadlessWebcontentFolderAPI.assertProperTotalCountOfStructuredContentFoldersInAssetLibrary(
 				assetLibraryId = "${assetLibraryId}",
 				expectedStructuredContentFolderTotalCount = "0",

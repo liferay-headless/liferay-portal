@@ -1108,12 +1108,10 @@ definition {
 		}
 	}
 
-	
 	@disable-webdriver = "true"
 	@priority = "5"
 	test RelationshipEnpointGetsDeletedWhenObjectDefinitionDeleted {
 		property portal.acceptance = "true";
-		
 
 		task ("Given manyToMany relationship universitySubjects created") {
 			var relationshipName = ObjectDefinitionAPI.createRelationship(
@@ -1158,7 +1156,7 @@ definition {
 				relationshipName = "universitiesSubjects");
 		}
 
-		task ("Then I receive an error message of relationship not present") {			
+		task ("Then I receive an error message of relationship not present") {
 			ObjectDefinitionAPI.assertStatusInResponse(
 				expectedValue = "NOT_FOUND",
 				responseToParse = "${responseToParse}");

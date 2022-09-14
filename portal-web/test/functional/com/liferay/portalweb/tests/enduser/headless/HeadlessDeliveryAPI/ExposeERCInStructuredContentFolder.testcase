@@ -86,8 +86,7 @@ definition {
 		}
 
 		task ("Then the folder is deleted successfully") {
-			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(
-				expectedValue = "NOT_FOUND");
+			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND");
 		}
 	}
 
@@ -100,14 +99,14 @@ definition {
 			var responseFromCreate = HeadlessWebcontentFolderAPI.createStructuredContentFolder(
 				groupName = "Site Name",
 				name = "Test Folder");
-			
+
 			echo("MY RESPONSE");
-			echo("${responseFromCreate}");	
+
+			echo("${responseFromCreate}");
 		}
 
 		task ("When I use deleteSiteStructuredContentFolderByExternalReferenceCode") {
 			var structuredContentUUId = HeadlessWebcontentFolderAPI.getUuidOfCreatedStructuredContentFolder(responseToParse = "${responseFromCreate}");
-
 			var structuredContentFolderId = HeadlessWebcontentFolderAPI.getElementOfCreatedStructuredContentFolder(
 				element = "$.id",
 				responseToParse = "${responseFromCreate}");
@@ -117,8 +116,7 @@ definition {
 		}
 
 		task ("Then the folder is deleted successfully") {
-			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(
-				expectedValue = "NOT_FOUND");
+			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND");
 		}
 	}
 

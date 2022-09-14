@@ -494,14 +494,6 @@ definition {
 			expected = "${managerId2}");
 	}
 
-	macro assertStatusInResponse {
-		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.status");
-
-		TestUtils.assertEquals(
-			actual = "${actual}",
-			expected = "${expectedValue}");
-	}
-
 	macro assertResponseNotIncludeDetailsOfDeletedObject {
 		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$..universitiesSubjects");
 
@@ -528,6 +520,14 @@ definition {
 			employeeId2 = "${employeeId2}",
 			managerId2 = "${managerId2}",
 			responseToParse = "${responseToParse}");
+	}
+
+	macro assertStatusInResponse {
+		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.status");
+
+		TestUtils.assertEquals(
+			actual = "${actual}",
+			expected = "${expectedValue}");
 	}
 
 	macro createAndPublishObjectDefinition {
