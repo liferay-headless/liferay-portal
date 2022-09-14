@@ -86,8 +86,8 @@ definition {
 		}
 
 		task ("Then the folder is deleted successfully") {
-			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND");
-		}
+			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND", structuredContentFolderId = "${structuredContentFolderId}");		
+			}
 	}
 
 	@description = "Structured Content Folder Is Deleted With Default ERC"
@@ -99,10 +99,6 @@ definition {
 			var responseFromCreate = HeadlessWebcontentFolderAPI.createStructuredContentFolder(
 				groupName = "Site Name",
 				name = "Test Folder");
-
-			echo("MY RESPONSE");
-
-			echo("${responseFromCreate}");
 		}
 
 		task ("When I use deleteSiteStructuredContentFolderByExternalReferenceCode") {
@@ -116,7 +112,7 @@ definition {
 		}
 
 		task ("Then the folder is deleted successfully") {
-			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND");
+			HeadlessWebcontentFolderAPI.assertStructuredContentFolderDeleted(expectedValue = "NOT_FOUND", structuredContentFolderId = "${structuredContentFolderId}");
 		}
 	}
 
