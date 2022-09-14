@@ -77,6 +77,15 @@ public interface ObjectEntryResource {
 			String externalReferenceCode, ObjectEntry objectEntry)
 		throws Exception;
 
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getPermissionsPage(String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putPermissionsPage(
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception;
+
 	public void deleteScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode)
 		throws Exception;
@@ -88,6 +97,16 @@ public interface ObjectEntryResource {
 	public ObjectEntry putScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode,
 			ObjectEntry objectEntry)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getScopeScopeKeyPermissionsPage(String scopeKey, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putScopeScopeKeyPermissionsPage(
+				String scopeKey,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public Page<ObjectEntry> getCurrentObjectEntriesObjectRelationshipNamePage(
