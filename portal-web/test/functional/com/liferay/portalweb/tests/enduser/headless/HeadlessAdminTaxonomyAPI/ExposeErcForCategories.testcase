@@ -154,11 +154,11 @@ definition {
 			var siteId = TaxonomyCategoryAPI.getElementOfCreatedCategory(
 				element = "$.siteId",
 				responseToParse = "${responseOfCategory}");
-			var actualValue = JSONUtil.getWithJSONPath("${response}", "$.title");
+			var actualValue = JSONUtil.getWithJSONPath("${response}", "$.status");
 
 			TestUtils.assertEquals(
 				actual = "${actualValue}",
-				expected = "No AssetCategory exists with the key {groupId=${siteId}, externalReferenceCode=liferay}");
+				expected = "NOT_FOUND");
 		}
 	}
 

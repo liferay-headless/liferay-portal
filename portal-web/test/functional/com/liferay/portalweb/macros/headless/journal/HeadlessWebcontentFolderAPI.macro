@@ -284,7 +284,7 @@ definition {
 
 		var responseToParse = HeadlessWebcontentFolderAPI._getStructuredContentFolderById(structuredContentFolderId = "${structuredContentFolderId}");
 
-		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.title");
+		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.status");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",

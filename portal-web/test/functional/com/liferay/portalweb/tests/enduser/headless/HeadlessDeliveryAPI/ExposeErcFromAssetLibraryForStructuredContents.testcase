@@ -267,9 +267,9 @@ definition {
 				assetLibraryId = "${assetLibraryId}",
 				externalReferenceCode = "erc-update");
 
-			TestUtils.assertPartialEquals(
-				actual = "${response}",
-				expected = "No JournalArticle exists with the key");
+			ObjectDefinitionAPI.assertStatusInResponse(
+				expectedValue = "NOT_FOUND",
+				responseToParse = "${response}");
 		}
 	}
 
@@ -309,9 +309,9 @@ definition {
 		}
 
 		task ("Then I receive error message in response") {
-			TestUtils.assertPartialEquals(
-				actual = "${response}",
-				expected = "No JournalArticle exists with the key");
+			ObjectDefinitionAPI.assertStatusInResponse(
+				expectedValue = "NOT_FOUND",
+				responseToParse = "${response}");
 		}
 	}
 

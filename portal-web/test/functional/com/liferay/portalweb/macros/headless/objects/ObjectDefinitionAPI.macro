@@ -494,15 +494,7 @@ definition {
 			expected = "${managerId2}");
 	}
 
-	macro assertResponseIncludesErrorMessage {
-		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.title");
-
-		TestUtils.assertEquals(
-			actual = "${actual}",
-			expected = "${expectedValue}");
-	}
-
-	macro assertResponseMessageAfterDeletingObjectEntry {
+	macro assertStatusInResponse {
 		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.status");
 
 		TestUtils.assertEquals(
