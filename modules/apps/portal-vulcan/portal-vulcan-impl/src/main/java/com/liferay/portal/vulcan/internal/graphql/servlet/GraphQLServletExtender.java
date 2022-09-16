@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.oauth2.provider.scope.liferay.ScopeContext;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
@@ -27,11 +26,8 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
@@ -40,7 +36,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLTypeExtension;
@@ -1960,12 +1955,6 @@ public class GraphQLServletExtender {
 	private DefaultTypeFunction _defaultTypeFunction;
 
 	@Reference
-	private DepotEntryLocalService _depotEntryLocalService;
-
-	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
-
-	@Reference
 	private GraphQLDTOContributorDataFetchingProcessor
 		_graphQLDTOContributorDataFetchingProcessor;
 
@@ -1974,14 +1963,7 @@ public class GraphQLServletExtender {
 	private GraphQLFieldRetriever _graphQLFieldRetriever;
 	private ServiceTrackerList<GraphQLRequestContextValidator>
 		_graphQLRequestContextValidators;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
 	private String _httpMethod;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LiferayMethodDataFetchingProcessor
@@ -1992,9 +1974,6 @@ public class GraphQLServletExtender {
 
 	private final Map<String, String> _registeredClassNames = new HashMap<>();
 	private Class<?> _resourceClass;
-
-	@Reference
-	private RoleLocalService _roleLocalService;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,
