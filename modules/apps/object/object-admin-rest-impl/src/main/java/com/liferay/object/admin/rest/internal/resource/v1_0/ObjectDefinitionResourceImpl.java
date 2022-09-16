@@ -469,13 +469,14 @@ public class ObjectDefinitionResourceImpl
 		}
 	}
 
-	private boolean _isApplyWorkflowStatus() {
+	private Boolean _isApplyWorkflowStatus() {
 		MultivaluedMap<String, String> queryParameters =
 			contextUriInfo.getQueryParameters();
 
-		return GetterUtil.getBoolean(
-			queryParameters.getOrDefault(
-				"applyWorkflowStatus", Arrays.asList("false")));
+		List<String> values = queryParameters.getOrDefault(
+			"applyWorkflowStatus", Arrays.asList("false"));
+
+		return GetterUtil.getBoolean(values.get(0));
 	}
 
 	private ObjectDefinition _toObjectDefinition(
