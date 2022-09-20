@@ -615,7 +615,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			testDeleteAccountByExternalReferenceCodeOrganization_addOrganization();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			organizationResource.
 				deleteAccountByExternalReferenceCodeOrganizationHttpResponse(
 					organization.getExternalReferenceCode(),

@@ -647,7 +647,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testDeleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode_addTaxonomyVocabulary();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			taxonomyVocabularyResource.
 				deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCodeHttpResponse(
 					testDeleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode_getAssetLibraryId(),
