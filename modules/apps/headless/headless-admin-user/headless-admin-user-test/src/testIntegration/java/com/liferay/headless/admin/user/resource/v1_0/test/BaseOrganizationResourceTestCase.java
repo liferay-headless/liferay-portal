@@ -1032,7 +1032,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			testDeleteAccountOrganization_addOrganization();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			organizationResource.deleteAccountOrganizationHttpResponse(
 				testDeleteAccountOrganization_getAccountId(),
 				organization.getId()));
