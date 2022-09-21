@@ -802,7 +802,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_addAccountRole();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			accountRoleResource.
 				deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddressHttpResponse(
 					testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_getExternalReferenceCode(),

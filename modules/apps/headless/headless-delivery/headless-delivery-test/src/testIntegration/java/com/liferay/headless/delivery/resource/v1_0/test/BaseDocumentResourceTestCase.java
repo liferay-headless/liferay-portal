@@ -613,7 +613,7 @@ public abstract class BaseDocumentResourceTestCase {
 			testDeleteAssetLibraryDocumentByExternalReferenceCode_addDocument();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			documentResource.
 				deleteAssetLibraryDocumentByExternalReferenceCodeHttpResponse(
 					testDeleteAssetLibraryDocumentByExternalReferenceCode_getAssetLibraryId(),

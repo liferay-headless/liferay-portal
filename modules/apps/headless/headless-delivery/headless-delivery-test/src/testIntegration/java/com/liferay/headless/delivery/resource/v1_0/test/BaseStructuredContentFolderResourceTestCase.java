@@ -682,7 +682,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 			testDeleteAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder();
 
 		assertHttpResponseStatusCode(
-			204,
+			404,
 			structuredContentFolderResource.
 				deleteAssetLibraryStructuredContentFolderByExternalReferenceCodeHttpResponse(
 					testDeleteAssetLibraryStructuredContentFolderByExternalReferenceCode_getAssetLibraryId(),
