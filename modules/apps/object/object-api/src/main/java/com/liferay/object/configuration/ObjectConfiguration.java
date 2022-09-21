@@ -36,6 +36,9 @@ public interface ObjectConfiguration {
 		name = "maximum-number-of-guest-user-object-entries-per-object-definition",
 		required = false
 	)
+
+	String newString = "something";
+	
 	public int maximumNumberOfGuestUserObjectEntriesPerObjectDefinition();
 
 	@Meta.AD(
