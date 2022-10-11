@@ -64,6 +64,8 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -187,6 +189,31 @@ public class DefaultObjectEntryManagerImpl
 					0L, objectEntry.getProperties(),
 					dtoConverterContext.getLocale()),
 				serviceContext));
+	}
+
+	@Override
+	public Object addSystemObjectRelationshipMappingTableValues(
+			ObjectDefinition objectDefinition,
+			ObjectRelationship objectRelationship, long primaryKey1,
+			long primaryKey2)
+		throws Exception {
+
+		_objectRelationshipService.addObjectRelationshipMappingTableValues(
+			objectRelationship.getObjectRelationshipId(), primaryKey1,
+			primaryKey2, new ServiceContext());
+
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+			_systemObjectDefinitionMetadataTracker.
+				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				systemObjectDefinitionMetadata.getModelClassName());
+
+		return _toDTO(
+			(BaseModel<?>)persistedModelLocalService.getPersistedModel(
+				primaryKey2),
+			_objectEntryService.getObjectEntry(primaryKey1));
 	}
 
 	@Override
@@ -1045,6 +1072,10 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private ObjectRelationshipService _objectRelationshipService;
+
+	@Reference
+	private PersistedModelLocalServiceRegistry
+		_persistedModelLocalServiceRegistry;
 
 	@Reference
 	private Queries _queries;
