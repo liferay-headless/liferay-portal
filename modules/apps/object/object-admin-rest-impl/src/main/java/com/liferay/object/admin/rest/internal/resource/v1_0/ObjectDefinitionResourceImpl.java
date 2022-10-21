@@ -548,12 +548,6 @@ public class ObjectDefinitionResourceImpl
 						ActionKeys.VIEW, "getObjectDefinition", permissionName,
 						objectDefinition.getObjectDefinitionId())
 				).put(
-					"permissions",
-					addAction(
-						ActionKeys.PERMISSIONS, "patchObjectDefinition",
-						permissionName,
-						objectDefinition.getObjectDefinitionId())
-				).put(
 					"publish",
 					() -> {
 						if (objectDefinition.isApproved()) {
@@ -566,7 +560,7 @@ public class ObjectDefinitionResourceImpl
 							objectDefinition.getObjectDefinitionId());
 					}
 				).put(
-					"update",
+					"replace",
 					() -> {
 						if (objectDefinition.isSystem()) {
 							return null;
@@ -577,6 +571,12 @@ public class ObjectDefinitionResourceImpl
 							permissionName,
 							objectDefinition.getObjectDefinitionId());
 					}
+				).put(
+					"update",
+					addAction(
+						ActionKeys.UPDATE, "patchObjectDefinition",
+						permissionName,
+						objectDefinition.getObjectDefinitionId())
 				).build();
 				active = objectDefinition.isActive();
 				dateCreated = objectDefinition.getCreateDate();
