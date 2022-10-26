@@ -15,7 +15,6 @@
 package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
@@ -178,39 +177,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public Page<ObjectEntry> getCurrentObjectEntriesObjectRelationshipNamePage(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Pagination pagination)
-		throws Exception {
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		Page<ObjectEntry> page =
-			objectEntryManager.getObjectEntryRelatedObjectEntries(
-				_getDTOConverterContext(currentObjectEntryId),
-				_objectDefinition, currentObjectEntryId, objectRelationshipName,
-				pagination);
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipService.getObjectRelationship(
-				_objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
-
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2());
-
-		return Page.of(
-			page.getActions(),
-			transform(
-				page.getItems(),
-				objectEntry -> _getRelatedObjectEntry(
-					objectDefinition2, objectEntry)));
-	}
-
-	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
 		return new ObjectEntryEntityModel(
 			_objectFieldLocalService.getObjectFields(
@@ -323,30 +289,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public ObjectEntry putCurrentObjectEntry(
-			Long currentObjectEntryId, String objectRelationshipName,
-			Long relatedObjectEntryId)
-		throws Exception {
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipService.getObjectRelationship(
-				_objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return _getRelatedObjectEntry(
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2()),
-			objectEntryManager.addObjectRelationshipMappingTableValues(
-				_getDTOConverterContext(currentObjectEntryId),
-				_objectDefinition, objectRelationshipName, currentObjectEntryId,
-				relatedObjectEntryId));
-	}
-
-	@Override
 	public ObjectEntry putObjectEntry(
 			Long objectEntryId, ObjectEntry objectEntry)
 		throws Exception {
@@ -438,33 +380,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			contextHttpServletRequest, objectEntryId,
 			contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 			contextUser);
-	}
-
-	private ObjectEntry _getRelatedObjectEntry(
-		ObjectDefinition objectDefinition, ObjectEntry objectEntry) {
-
-		Map<String, Map<String, String>> actions = objectEntry.getActions();
-
-		for (Map.Entry<String, Map<String, String>> entry :
-				actions.entrySet()) {
-
-			Map<String, String> map = entry.getValue();
-
-			String href = map.get("href");
-
-			map.put(
-				"href",
-				StringUtil.replace(
-					href,
-					StringUtil.lowerCaseFirstLetter(
-						_objectDefinition.getPluralLabel(
-							contextAcceptLanguage.getPreferredLocale())),
-					StringUtil.lowerCaseFirstLetter(
-						objectDefinition.getPluralLabel(
-							contextAcceptLanguage.getPreferredLocale()))));
-		}
-
-		return objectEntry;
 	}
 
 	private void _loadObjectDefinition(Map<String, Serializable> parameters)
