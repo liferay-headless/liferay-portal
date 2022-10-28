@@ -20,7 +20,6 @@ import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SelectOption;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
@@ -198,9 +197,7 @@ public class EditBatchPlannerPlanDisplayContext {
 			return internalClassName;
 		}
 
-		return StringUtil.replaceLast(
-			internalClassName.substring(index + 1),
-			String.valueOf(CompanyThreadLocal.getCompanyId()), "");
+		return internalClassName.substring(index + 1);
 	}
 
 	private final List<SelectOption> _internalClassNameSelectOptions;

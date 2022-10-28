@@ -354,7 +354,7 @@ public class BatchPlannerPlanHelper {
 			return taskItemDelegateName;
 		}
 
-		return internalClassName.substring(index + 1);
+		return internalClassName.substring(index + 3);
 	}
 
 	private BatchPlannerPlan _updateBatchPlannerPlan(
