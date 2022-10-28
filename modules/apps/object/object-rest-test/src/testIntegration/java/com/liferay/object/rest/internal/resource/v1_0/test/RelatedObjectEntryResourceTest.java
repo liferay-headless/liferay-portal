@@ -26,6 +26,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.util.JaxRsApplicationDescriptorUtil;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringBundler;
@@ -138,7 +139,9 @@ public class RelatedObjectEntryResourceTest {
 		JSONObject jsonObject = HTTPTestUtil.invoke(
 			null,
 			StringBundler.concat(
-				_userSystemObjectDefinitionMetadata.getRESTContextPath(),
+				JaxRsApplicationDescriptorUtil.getRestContextPath(
+					_userSystemObjectDefinitionMetadata.
+						getJaxRsApplicationDescriptor()),
 				StringPool.SLASH, _user.getUserId(), StringPool.SLASH,
 				_objectRelationship.getName()),
 			Http.Method.GET);
@@ -163,7 +166,9 @@ public class RelatedObjectEntryResourceTest {
 		JSONObject jsonObject = HTTPTestUtil.invoke(
 			null,
 			StringBundler.concat(
-				_userSystemObjectDefinitionMetadata.getRESTContextPath(),
+				JaxRsApplicationDescriptorUtil.getRestContextPath(
+					_userSystemObjectDefinitionMetadata.
+						getJaxRsApplicationDescriptor()),
 				StringPool.SLASH, _user.getUserId(), StringPool.SLASH,
 				_objectRelationship.getName(), StringPool.SLASH,
 				objectEntry.getPrimaryKey()),
@@ -175,7 +180,9 @@ public class RelatedObjectEntryResourceTest {
 		jsonObject = HTTPTestUtil.invoke(
 			null,
 			StringBundler.concat(
-				_userSystemObjectDefinitionMetadata.getRESTContextPath(),
+				JaxRsApplicationDescriptorUtil.getRestContextPath(
+					_userSystemObjectDefinitionMetadata.
+						getJaxRsApplicationDescriptor()),
 				StringPool.SLASH, _user.getUserId(), StringPool.SLASH,
 				_objectRelationship.getName()),
 			Http.Method.GET);

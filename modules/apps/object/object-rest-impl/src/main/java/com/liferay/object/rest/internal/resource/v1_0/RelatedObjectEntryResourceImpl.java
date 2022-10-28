@@ -24,6 +24,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.util.JaxRsApplicationDescriptorUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -233,7 +234,9 @@ public class RelatedObjectEntryResourceImpl
 						systemObjectDefinition.getName());
 
 			if (StringUtil.equals(
-					systemObjectDefinitionMetadata.getRESTContextPath(),
+					JaxRsApplicationDescriptorUtil.getRestContextPath(
+						systemObjectDefinitionMetadata.
+							getJaxRsApplicationDescriptor()),
 					restContextPath)) {
 
 				return systemObjectDefinitionMetadata;

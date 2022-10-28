@@ -39,6 +39,7 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.util.JaxRsApplicationDescriptorUtil;
 import com.liferay.object.util.ObjectRelationshipUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
@@ -811,7 +812,9 @@ public class ObjectRelationshipLocalServiceImpl
 
 			if (systemObjectDefinitionMetadata != null) {
 				restContextPath =
-					systemObjectDefinitionMetadata.getRESTContextPath();
+					JaxRsApplicationDescriptorUtil.getRestContextPath(
+						systemObjectDefinitionMetadata.
+							getJaxRsApplicationDescriptor());
 			}
 		}
 
