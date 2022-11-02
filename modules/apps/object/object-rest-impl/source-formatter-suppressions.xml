@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<suppressions>
+	<source-check>
+		<suppress checks="JavaModuleIllegalImportsCheck" files="src/main/java/com/liferay/object/rest/internal/resource/v1_0/BaseObjectEntryRelatedObjectsResourceImpl\.java" />
+	</source-check>
+</suppressions>
