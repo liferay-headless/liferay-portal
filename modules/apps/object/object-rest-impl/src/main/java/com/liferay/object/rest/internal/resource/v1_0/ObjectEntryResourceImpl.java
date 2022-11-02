@@ -28,6 +28,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -227,13 +228,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectEntryManagerTracker.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
+		Predicate predicate = null;
+
+		if (contextHttpServletRequest != null) {
+			predicate = _filterPredicateFactory.create(
+				ParamUtil.getString(contextHttpServletRequest, "filter"),
+				_objectDefinition.getObjectDefinitionId());
+		}
+
 		return objectEntryManager.getObjectEntries(
 			contextCompany.getCompanyId(), _objectDefinition, null, aggregation,
-			_getDTOConverterContext(null), pagination,
-			_filterPredicateFactory.create(
-				ParamUtil.getString(contextHttpServletRequest, "filter"),
-				_objectDefinition.getObjectDefinitionId()),
-			search, sorts);
+			_getDTOConverterContext(null), pagination, predicate, search,
+			sorts);
 	}
 
 	@Override
@@ -476,7 +482,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		if (taskItemDelegateName != null) {
 			_objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinition(
-					contextCompany.getCompanyId(), "C_" + taskItemDelegateName);
+					contextCompany.getCompanyId(), taskItemDelegateName);
 
 			if (_objectDefinition != null) {
 				return;
