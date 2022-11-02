@@ -404,7 +404,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					).put(
 						"batch.engine.task.item.delegate", "true"
 					).put(
-						"batch.engine.task.item.delegate.name", osgiJaxRsName
+						"batch.engine.task.item.delegate.name", objectDefinition.getName()
 					).put(
 						"batch.planner.export.enabled", "true"
 					).put(
