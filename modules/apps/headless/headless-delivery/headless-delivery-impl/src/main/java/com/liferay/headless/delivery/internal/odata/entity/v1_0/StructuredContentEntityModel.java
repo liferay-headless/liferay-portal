@@ -75,6 +75,7 @@ public class StructuredContentEntityModel implements EntityModel {
 					StringBundler.concat(
 						"urlTitle_", LocaleUtil.toLanguageId(locale),
 						"_String"))),
+			new StringEntityField("key", locale -> Field.ARTICLE_ID),
 			new StringEntityField(
 				"title",
 				locale -> Field.getSortableFieldName(
