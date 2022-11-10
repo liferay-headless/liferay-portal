@@ -310,6 +310,15 @@ public class ObjectActionLocalServiceWrapper
 		return _objectActionLocalService.getObjectAction(objectActionId);
 	}
 
+	@Override
+	public com.liferay.object.model.ObjectAction getObjectAction(
+			long objectDefinitionId, String name, String objectActionTriggerKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectActionLocalService.getObjectAction(
+			objectDefinitionId, name, objectActionTriggerKey);
+	}
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *

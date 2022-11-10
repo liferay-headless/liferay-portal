@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -243,6 +245,18 @@ public class ObjectActionPersistenceTest {
 
 		_persistence.countByO_A_OATK(
 			0L, RandomTestUtil.randomBoolean(), (String)null);
+	}
+
+	@Test
+	public void testCountByODI_A_N_OATK() throws Exception {
+		_persistence.countByODI_A_N_OATK(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(), "", "");
+
+		_persistence.countByODI_A_N_OATK(
+			0L, RandomTestUtil.randomBoolean(), "null", "null");
+
+		_persistence.countByODI_A_N_OATK(
+			0L, RandomTestUtil.randomBoolean(), (String)null, (String)null);
 	}
 
 	@Test
@@ -489,6 +503,79 @@ public class ObjectActionPersistenceTest {
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
+	}
+
+	@Test
+	public void testResetOriginalValues() throws Exception {
+		ObjectAction newObjectAction = addObjectAction();
+
+		_persistence.clearCache();
+
+		_assertOriginalValues(
+			_persistence.findByPrimaryKey(newObjectAction.getPrimaryKey()));
+	}
+
+	@Test
+	public void testResetOriginalValuesWithDynamicQueryLoadFromDatabase()
+		throws Exception {
+
+		_testResetOriginalValuesWithDynamicQuery(true);
+	}
+
+	@Test
+	public void testResetOriginalValuesWithDynamicQueryLoadFromSession()
+		throws Exception {
+
+		_testResetOriginalValuesWithDynamicQuery(false);
+	}
+
+	private void _testResetOriginalValuesWithDynamicQuery(boolean clearSession)
+		throws Exception {
+
+		ObjectAction newObjectAction = addObjectAction();
+
+		if (clearSession) {
+			Session session = _persistence.openSession();
+
+			session.flush();
+
+			session.clear();
+		}
+
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			ObjectAction.class, _dynamicQueryClassLoader);
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"objectActionId", newObjectAction.getObjectActionId()));
+
+		List<ObjectAction> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
+
+		_assertOriginalValues(result.get(0));
+	}
+
+	private void _assertOriginalValues(ObjectAction objectAction) {
+		Assert.assertEquals(
+			Long.valueOf(objectAction.getObjectDefinitionId()),
+			ReflectionTestUtil.<Long>invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "objectDefinitionId"));
+		Assert.assertEquals(
+			Boolean.valueOf(objectAction.getActive()),
+			ReflectionTestUtil.<Boolean>invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "active_"));
+		Assert.assertEquals(
+			objectAction.getName(),
+			ReflectionTestUtil.invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "name"));
+		Assert.assertEquals(
+			objectAction.getObjectActionTriggerKey(),
+			ReflectionTestUtil.invoke(
+				objectAction, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "objectActionTriggerKey"));
 	}
 
 	protected ObjectAction addObjectAction() throws Exception {

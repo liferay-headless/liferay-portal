@@ -248,6 +248,11 @@ public interface ObjectActionLocalService
 	public ObjectAction getObjectAction(long objectActionId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectAction getObjectAction(
+			long objectDefinitionId, String name, String objectActionTriggerKey)
+		throws PortalException;
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *

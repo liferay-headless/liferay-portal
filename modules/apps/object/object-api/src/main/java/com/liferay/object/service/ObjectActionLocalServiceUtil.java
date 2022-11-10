@@ -276,6 +276,14 @@ public class ObjectActionLocalServiceUtil {
 		return getService().getObjectAction(objectActionId);
 	}
 
+	public static ObjectAction getObjectAction(
+			long objectDefinitionId, String name, String objectActionTriggerKey)
+		throws PortalException {
+
+		return getService().getObjectAction(
+			objectDefinitionId, name, objectActionTriggerKey);
+	}
+
 	/**
 	 * Returns the object action with the matching UUID and company.
 	 *
