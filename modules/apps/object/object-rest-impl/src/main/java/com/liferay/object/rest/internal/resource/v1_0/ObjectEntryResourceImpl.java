@@ -14,6 +14,8 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.object.action.engine.ObjectActionEngine;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.entry.util.ObjectEntryNameUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
@@ -32,10 +34,14 @@ import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -60,7 +66,8 @@ import javax.ws.rs.core.MultivaluedMap;
 public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 	public ObjectEntryResourceImpl(
-		FilterPredicateFactory filterPredicateFactory,
+		FilterPredicateFactory filterPredicateFactory, JSONFactory jsonFactory,
+		ObjectActionEngine objectActionEngine,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
@@ -71,6 +78,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			systemObjectDefinitionMetadataRegistry) {
 
 		_filterPredicateFactory = filterPredicateFactory;
+		_jsonFactory = jsonFactory;
+		_objectActionEngine = objectActionEngine;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
@@ -407,6 +416,40 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
+	public void putObjectEntryObjectActionObjectActionName(
+			Long objectEntryId, String objectActionName)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.getObjectEntry(objectEntryId);
+
+		_objectActionEngine.executeObjectAction(
+			objectActionName,
+			ObjectActionTriggerConstants.KEY_STAND_ALONE_ACTION,
+			_objectDefinition.getObjectDefinitionId(),
+			JSONUtil.put(
+				"classPK", serviceBuilderObjectEntry.getObjectEntryId()
+			).put(
+				"objectEntry",
+				HashMapBuilder.putAll(
+					serviceBuilderObjectEntry.getModelAttributes()
+				).put(
+					"values", serviceBuilderObjectEntry.getValues()
+				).build()
+			).put(
+				"objectEntryDTO" + _objectDefinition.getShortName(),
+				() -> {
+					JSONObject jsonObject = _jsonFactory.createJSONObject(
+						_jsonFactory.looseSerializeDeep(
+							getObjectEntry(objectEntryId)));
+
+					return jsonObject.toMap();
+				}
+			),
+			contextUser.getUserId());
+	}
+
+	@Override
 	public ObjectEntry putScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode,
 			ObjectEntry objectEntry)
@@ -581,6 +624,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	private final FilterPredicateFactory _filterPredicateFactory;
+	private final JSONFactory _jsonFactory;
+	private final ObjectActionEngine _objectActionEngine;
 
 	@Context
 	private ObjectDefinition _objectDefinition;
