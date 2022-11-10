@@ -23,7 +23,9 @@ import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResource;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.openapi.contributor.OpenAPIContributor;
@@ -80,10 +82,14 @@ public class ObjectEntryOpenAPIContributor implements OpenAPIContributor {
 
 		for (String key : new ArrayList<>(paths.keySet())) {
 			if (key.contains("objectActionName")) {
-				ListUtil.isNotEmptyForEach(
-					objectActions,
-					objectAction -> _addObjectActionPathItem(
-						key, objectAction, paths));
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-166918"))) {
+
+					ListUtil.isNotEmptyForEach(
+						objectActions,
+						objectAction -> _addObjectActionPathItem(
+							key, objectAction, paths));
+				}
 
 				paths.remove(key);
 
