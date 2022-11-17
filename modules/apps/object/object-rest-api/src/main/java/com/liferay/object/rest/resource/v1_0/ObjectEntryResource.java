@@ -122,6 +122,10 @@ public interface ObjectEntryResource {
 	public Response putObjectEntryBatch(String callbackURL, Object object)
 		throws Exception;
 
+	public void putObjectEntryObjectActionObjectActionName(
+			Long objectEntryId, String objectActionName)
+		throws Exception;
+
 	public Page<com.liferay.portal.vulcan.permission.Permission>
 			getObjectEntryPermissionsPage(Long objectEntryId, String roleNames)
 		throws Exception;
