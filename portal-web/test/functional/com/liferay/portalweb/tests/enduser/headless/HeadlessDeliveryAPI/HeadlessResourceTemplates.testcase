@@ -131,6 +131,8 @@ definition {
 				locator1 = "Fragment#FRAGMENT_ANY_TEXT",
 				value1 = "Liferay University");
 		}
+
+		echo("test");
 	}
 
 	@priority = "4"
