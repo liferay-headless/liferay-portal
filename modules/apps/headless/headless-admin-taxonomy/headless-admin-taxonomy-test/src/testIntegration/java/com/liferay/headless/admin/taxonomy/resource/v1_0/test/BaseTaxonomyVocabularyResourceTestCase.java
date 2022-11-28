@@ -254,7 +254,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantTaxonomyVocabulary),
 				(List<TaxonomyVocabulary>)page.getItems());
-			assertValid(page);
+			assertValid(page, irrelevantAssetLibraryId);
 		}
 
 		TaxonomyVocabulary taxonomyVocabulary1 =
@@ -274,7 +274,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(taxonomyVocabulary1, taxonomyVocabulary2),
 			(List<TaxonomyVocabulary>)page.getItems());
-		assertValid(page);
+		assertValid(page,assetLibraryId);
 
 		taxonomyVocabularyResource.deleteTaxonomyVocabulary(
 			taxonomyVocabulary1.getId());
@@ -969,7 +969,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantTaxonomyVocabulary),
 				(List<TaxonomyVocabulary>)page.getItems());
-			assertValid(page);
+			assertValid(page, irrelevantSiteId);
 		}
 
 		TaxonomyVocabulary taxonomyVocabulary1 =
@@ -988,7 +988,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(taxonomyVocabulary1, taxonomyVocabulary2),
 			(List<TaxonomyVocabulary>)page.getItems());
-		assertValid(page);
+		assertValid(page, siteId);
 
 		taxonomyVocabularyResource.deleteTaxonomyVocabulary(
 			taxonomyVocabulary1.getId());
@@ -2285,7 +2285,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<TaxonomyVocabulary> page) {
+	protected void assertValid(Page<TaxonomyVocabulary> page, long groupId) throws Exception {
 		boolean valid = false;
 
 		java.util.Collection<TaxonomyVocabulary> taxonomyVocabularies =

@@ -17,9 +17,15 @@ package com.liferay.headless.admin.taxonomy.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.AssetType;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyVocabulary;
+import com.liferay.headless.admin.taxonomy.client.pagination.Page;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.Map;
+
+import org.hamcrest.CoreMatchers;
+
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 /**
@@ -28,6 +34,46 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class TaxonomyVocabularyResourceTest
 	extends BaseTaxonomyVocabularyResourceTestCase {
+
+	@Override
+	protected void assertValid(Page<TaxonomyVocabulary> page, long groupId)
+		throws Exception {
+
+		super.assertValid(page, groupId);
+
+		Map<String, Map> actions = page.getActions();
+
+		Map updateBatchAction = actions.get("updateBatch");
+
+		Assert.assertNotNull(updateBatchAction);
+		Assert.assertEquals("PUT", updateBatchAction.get("method"));
+		Assert.assertThat(
+			"updateBatch does not contain valid href",
+			String.valueOf(updateBatchAction.get("href")),
+			CoreMatchers.endsWith(
+				"/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/batch"));
+
+		Map createBatchAction = actions.get("createBatch");
+
+		Assert.assertNotNull(createBatchAction);
+		Assert.assertEquals("POST", createBatchAction.get("method"));
+		Assert.assertThat(
+			"createBatch does not contain valid href",
+			String.valueOf(createBatchAction.get("href")),
+			CoreMatchers.endsWith(
+				"/o/headless-admin-taxonomy/v1.0/sites/" + groupId +
+					"/taxonomy-vocabularies/batch"));
+
+		Map deleteBatchAction = actions.get("deleteBatch");
+
+		Assert.assertNotNull(deleteBatchAction);
+		Assert.assertEquals("DELETE", deleteBatchAction.get("method"));
+		Assert.assertThat(
+			"deleteBatch does not contain valid href",
+			String.valueOf(deleteBatchAction.get("href")),
+			CoreMatchers.endsWith(
+				"/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/batch"));
+	}
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
