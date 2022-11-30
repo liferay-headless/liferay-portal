@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -37,8 +35,6 @@ import com.liferay.search.experiences.service.SXPBlueprintLocalService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.persistence.PersistenceException;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -129,28 +125,6 @@ public class SXPBlueprintLocalServiceTest {
 	public void testUpdateSXPBlueprint() throws Exception {
 		SXPBlueprint sxpBlueprint1 = _addSXPBlueprint(
 			RandomTestUtil.randomString());
-		SXPBlueprint sxpBlueprint2 = _addSXPBlueprint(
-			RandomTestUtil.randomString());
-
-		sxpBlueprint2.setExternalReferenceCode(
-			sxpBlueprint1.getExternalReferenceCode());
-
-		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
-				"org.hibernate.engine.jdbc.batch.internal.BatchingBatch",
-				LoggerTestUtil.ERROR);
-			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
-				"org.hibernate.engine.jdbc.spi.SqlExceptionHelper",
-				LoggerTestUtil.ERROR)) {
-
-			try {
-				_sxpBlueprintLocalService.updateSXPBlueprint(sxpBlueprint2);
-
-				Assert.fail();
-			}
-			catch (PersistenceException persistenceException) {
-				Assert.assertNotNull(persistenceException);
-			}
-		}
 
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -185,6 +159,21 @@ public class SXPBlueprintLocalServiceTest {
 		Assert.assertEquals(
 			externalReferenceCode, sxpBlueprint1.getExternalReferenceCode());
 		Assert.assertEquals("1.2", sxpBlueprint1.getVersion());
+	}
+
+	@Test(expected = DuplicateSXPBlueprintExternalReferenceCodeException.class)
+	public void testUpdateSXPBlueprintWithSameExternalReferenceCode()
+		throws Exception {
+
+		SXPBlueprint sxpBlueprint1 = _addSXPBlueprint(
+			RandomTestUtil.randomString());
+		SXPBlueprint sxpBlueprint2 = _addSXPBlueprint(
+			RandomTestUtil.randomString());
+
+		sxpBlueprint2.setExternalReferenceCode(
+			sxpBlueprint1.getExternalReferenceCode());
+
+		_sxpBlueprintLocalService.updateSXPBlueprint(sxpBlueprint2);
 	}
 
 	private SXPBlueprint _addSXPBlueprint(String externalReferenceCode)
