@@ -547,16 +547,16 @@ public class ObjectEntryDTOConverter
 					map.put(objectRelationship.getName() + "Id", objectEntryId);
 				}
 
-				String objectRelationshipERCFieldName =
+				String objectRelationshipERCObjectFieldName =
 					ObjectFieldSettingUtil.getValue(
 						ObjectFieldSettingConstants.
-							NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+							NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
 						objectField);
 
 				map.put(
-					objectRelationshipERCFieldName,
+					objectRelationshipERCObjectFieldName,
 					GetterUtil.getString(
-						values.get(objectRelationshipERCFieldName)));
+						values.get(objectRelationshipERCObjectFieldName)));
 			}
 			else {
 				map.put(objectFieldName, serializable);

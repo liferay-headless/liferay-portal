@@ -105,16 +105,17 @@ public class ObjectEntryEntityModel implements EntityModel {
 					objectFieldName, locale -> objectFieldName,
 					String::valueOf));
 
-			String objectRelationshipERCFieldName =
+			String objectRelationshipERCObjectFieldName =
 				ObjectFieldSettingUtil.getValue(
 					ObjectFieldSettingConstants.
-						NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
 					objectField);
 
 			_entityFieldsMap.put(
-				objectRelationshipERCFieldName,
+				objectRelationshipERCObjectFieldName,
 				new StringEntityField(
-					objectRelationshipERCFieldName, locale -> objectFieldName));
+					objectRelationshipERCObjectFieldName,
+					locale -> objectFieldName));
 
 			String relationshipIdName = objectFieldName.substring(
 				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);
