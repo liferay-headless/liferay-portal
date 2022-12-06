@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hamcrest.CoreMatchers;
 
@@ -41,38 +43,26 @@ public class TaxonomyVocabularyResourceTest
 
 		super.assertValid(page, groupId);
 
+		assertBatchAction(page,"updateBatch","PUT","http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
+		assertBatchAction(page,"createBatch","POST","http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{groupId}/taxonomy-vocabularies");
+		assertBatchAction(page,"deleteBatch","DELETE","http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
+	}
+
+	private void assertBatchAction(Page<TaxonomyVocabulary> page, String action, String method, String path) {
 		Map<String, Map> actions = page.getActions();
 
-		Map updateBatchAction = actions.get("updateBatch");
+		Map batchAction = actions.get(action);
 
-		Assert.assertNotNull(updateBatchAction);
-		Assert.assertEquals("PUT", updateBatchAction.get("method"));
-		Assert.assertThat(
-			"updateBatch does not contain valid href",
-			String.valueOf(updateBatchAction.get("href")),
-			CoreMatchers.endsWith(
-				"/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/batch"));
+		Assert.assertNotNull(batchAction);
+		Assert.assertEquals(method, batchAction.get("method"));
+		assertHrefMatchesPath(path,batchAction.get("href").toString());
+	}
 
-		Map createBatchAction = actions.get("createBatch");
-
-		Assert.assertNotNull(createBatchAction);
-		Assert.assertEquals("POST", createBatchAction.get("method"));
-		Assert.assertThat(
-			"createBatch does not contain valid href",
-			String.valueOf(createBatchAction.get("href")),
-			CoreMatchers.endsWith(
-				"/o/headless-admin-taxonomy/v1.0/sites/" + groupId +
-					"/taxonomy-vocabularies/batch"));
-
-		Map deleteBatchAction = actions.get("deleteBatch");
-
-		Assert.assertNotNull(deleteBatchAction);
-		Assert.assertEquals("DELETE", deleteBatchAction.get("method"));
-		Assert.assertThat(
-			"deleteBatch does not contain valid href",
-			String.valueOf(deleteBatchAction.get("href")),
-			CoreMatchers.endsWith(
-				"/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/batch"));
+	private void assertHrefMatchesPath(String path, String href) {
+		String pathReplaced = path.replaceAll("(\\Q{\\E.*?\\Q}\\E)","(.*)");
+		Pattern p = Pattern.compile(pathReplaced+"/batch");
+		Matcher m = p.matcher(href);
+		Assert.assertTrue("The " + href +" does not match "+pathReplaced+"/batch",m.matches());
 	}
 
 	@Override
