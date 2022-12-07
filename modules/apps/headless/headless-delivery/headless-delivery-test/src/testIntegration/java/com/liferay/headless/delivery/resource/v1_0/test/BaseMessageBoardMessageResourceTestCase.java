@@ -71,6 +71,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -611,7 +613,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantMessageBoardMessage),
 				(List<MessageBoardMessage>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages");
 		}
 
 		MessageBoardMessage messageBoardMessage1 =
@@ -633,7 +637,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardMessage1, messageBoardMessage2),
 			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages");
 
 		messageBoardMessageResource.deleteMessageBoardMessage(
 			messageBoardMessage1.getId());
@@ -1046,7 +1052,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantMessageBoardMessage),
 				(List<MessageBoardMessage>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				"/message-board-threads/{messageBoardThreadId}/message-board-messages");
 		}
 
 		MessageBoardMessage messageBoardMessage1 =
@@ -1068,7 +1076,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardMessage1, messageBoardMessage2),
 			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			"/message-board-threads/{messageBoardThreadId}/message-board-messages");
 
 		messageBoardMessageResource.deleteMessageBoardMessage(
 			messageBoardMessage1.getId());
@@ -1473,7 +1483,7 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantMessageBoardMessage),
 				(List<MessageBoardMessage>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/sites/{siteId}/message-board-messages");
 		}
 
 		MessageBoardMessage messageBoardMessage1 =
@@ -1492,7 +1502,7 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardMessage1, messageBoardMessage2),
 			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/message-board-messages");
 
 		messageBoardMessageResource.deleteMessageBoardMessage(
 			messageBoardMessage1.getId());
@@ -2639,7 +2649,7 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<MessageBoardMessage> page) {
+	protected void assertValid(Page<MessageBoardMessage> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<MessageBoardMessage> messageBoardMessages =
@@ -2655,6 +2665,105 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
+		//this List is temporary and can help us detecting
+		//cases that should match the acceptance criteria, but are not covered with the current approach
+
+		List<String> pathsNotCovered = new ArrayList<>();
+
+		if (path.equals(
+				"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages")) {
+
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/message-board-messages/{parentMessageBoardMessageId}/message-board-messages",
+				path);
+		}
+		else {
+			pathsNotCovered.add(
+				"/message-board-messages/{parentMessageBoardMessageId}/message-board-messages");
+		}
+
+		if (path.equals(
+				"/message-board-threads/{messageBoardThreadId}/message-board-messages")) {
+
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/message-board-threads/{messageBoardThreadId}/message-board-messages",
+				path);
+		}
+		else {
+			pathsNotCovered.add(
+				"/message-board-threads/{messageBoardThreadId}/message-board-messages");
+		}
+
+		if (path.equals("/sites/{siteId}/message-board-messages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/sites/{siteId}/message-board-messages",
+				path);
+		}
+		else {
+			pathsNotCovered.add("/sites/{siteId}/message-board-messages");
+		}
+
+		if (!pathsNotCovered.isEmpty()) {
+			Assert.fail(
+				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
+					pathsNotCovered.toString());
+		}
+	}
+
+	private void assertBatchAction(
+		Page<MessageBoardMessage> page, String action, String method,
+		String expectedPath, String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(
+			"No Actions for " + action + " in path " + path, batchAction);
+		Assert.assertEquals(
+			"The batch action method value is not correct", method,
+			batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(
+			expectedPath,
+			batchAction.get(
+				"href"
+			).toString(),
+			action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if (action.equals("createBatch")) {
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if (action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+		}
 	}
 
 	protected void assertValid(Rating rating) {

@@ -72,6 +72,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -617,7 +619,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles");
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -639,7 +643,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles");
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
@@ -1057,7 +1063,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles");
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -1079,7 +1087,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles");
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
@@ -1490,7 +1500,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseArticle),
 				(List<KnowledgeBaseArticle>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/sites/{siteId}/knowledge-base-articles");
 		}
 
 		KnowledgeBaseArticle knowledgeBaseArticle1 =
@@ -1509,7 +1519,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseArticle1, knowledgeBaseArticle2),
 			(List<KnowledgeBaseArticle>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/knowledge-base-articles");
 
 		knowledgeBaseArticleResource.deleteKnowledgeBaseArticle(
 			knowledgeBaseArticle1.getId());
@@ -2738,7 +2748,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<KnowledgeBaseArticle> page) {
+	protected void assertValid(Page<KnowledgeBaseArticle> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<KnowledgeBaseArticle> knowledgeBaseArticles =
@@ -2754,6 +2764,105 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
+		//this List is temporary and can help us detecting
+		//cases that should match the acceptance criteria, but are not covered with the current approach
+
+		List<String> pathsNotCovered = new ArrayList<>();
+
+		if (path.equals(
+				"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles")) {
+
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles",
+				path);
+		}
+		else {
+			pathsNotCovered.add(
+				"/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles");
+		}
+
+		if (path.equals(
+				"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles")) {
+
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles",
+				path);
+		}
+		else {
+			pathsNotCovered.add(
+				"/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles");
+		}
+
+		if (path.equals("/sites/{siteId}/knowledge-base-articles")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles",
+				path);
+		}
+		else {
+			pathsNotCovered.add("/sites/{siteId}/knowledge-base-articles");
+		}
+
+		if (!pathsNotCovered.isEmpty()) {
+			Assert.fail(
+				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
+					pathsNotCovered.toString());
+		}
+	}
+
+	private void assertBatchAction(
+		Page<KnowledgeBaseArticle> page, String action, String method,
+		String expectedPath, String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(
+			"No Actions for " + action + " in path " + path, batchAction);
+		Assert.assertEquals(
+			"The batch action method value is not correct", method,
+			batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(
+			expectedPath,
+			batchAction.get(
+				"href"
+			).toString(),
+			action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if (action.equals("createBatch")) {
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if (action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+		}
 	}
 
 	protected void assertValid(Rating rating) {

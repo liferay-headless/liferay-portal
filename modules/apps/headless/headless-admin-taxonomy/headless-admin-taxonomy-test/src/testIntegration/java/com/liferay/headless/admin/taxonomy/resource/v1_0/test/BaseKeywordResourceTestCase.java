@@ -75,6 +75,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -244,7 +246,7 @@ public abstract class BaseKeywordResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKeyword),
 				(List<Keyword>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/asset-libraries/{assetLibraryId}/keywords");
 		}
 
 		Keyword keyword1 = testGetAssetLibraryKeywordsPage_addKeyword(
@@ -260,7 +262,7 @@ public abstract class BaseKeywordResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(keyword1, keyword2), (List<Keyword>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/asset-libraries/{assetLibraryId}/keywords");
 
 		keywordResource.deleteKeyword(keyword1.getId());
 
@@ -658,7 +660,7 @@ public abstract class BaseKeywordResourceTestCase {
 
 		assertContains(keyword1, (List<Keyword>)page.getItems());
 		assertContains(keyword2, (List<Keyword>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/keywords/ranked");
 
 		keywordResource.deleteKeyword(keyword1.getId());
 
@@ -908,7 +910,7 @@ public abstract class BaseKeywordResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKeyword),
 				(List<Keyword>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/sites/{siteId}/keywords");
 		}
 
 		Keyword keyword1 = testGetSiteKeywordsPage_addKeyword(
@@ -924,7 +926,7 @@ public abstract class BaseKeywordResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(keyword1, keyword2), (List<Keyword>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/keywords");
 
 		keywordResource.deleteKeyword(keyword1.getId());
 
@@ -1579,7 +1581,7 @@ public abstract class BaseKeywordResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<Keyword> page) {
+	protected void assertValid(Page<Keyword> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<Keyword> keywords = page.getItems();
@@ -1594,6 +1596,97 @@ public abstract class BaseKeywordResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
+		//this List is temporary and can help us detecting
+		//cases that should match the acceptance criteria, but are not covered with the current approach
+
+		List<String> pathsNotCovered = new ArrayList<>();
+
+		if (path.equals("/asset-libraries/{assetLibraryId}/keywords")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/keywords",
+				path);
+		}
+		else {
+			pathsNotCovered.add("/asset-libraries/{assetLibraryId}/keywords");
+		}
+
+		if (path.equals("/keywords/ranked")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/keywords/ranked", path);
+		}
+		else {
+			pathsNotCovered.add("/keywords/ranked");
+		}
+
+		if (path.equals("/sites/{siteId}/keywords")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords", path);
+		}
+		else {
+			pathsNotCovered.add("/sites/{siteId}/keywords");
+		}
+
+		if (!pathsNotCovered.isEmpty()) {
+			Assert.fail(
+				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
+					pathsNotCovered.toString());
+		}
+	}
+
+	private void assertBatchAction(
+		Page<Keyword> page, String action, String method, String expectedPath,
+		String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(
+			"No Actions for " + action + " in path " + path, batchAction);
+		Assert.assertEquals(
+			"The batch action method value is not correct", method,
+			batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(
+			expectedPath,
+			batchAction.get(
+				"href"
+			).toString(),
+			action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if (action.equals("createBatch")) {
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if (action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {

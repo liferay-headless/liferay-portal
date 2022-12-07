@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hamcrest.CoreMatchers;
-
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 
@@ -43,26 +41,15 @@ public class TaxonomyVocabularyResourceTest
 
 		super.assertValid(page, groupId);
 
-		assertBatchAction(page,"updateBatch","PUT","http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
-		assertBatchAction(page,"createBatch","POST","http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{groupId}/taxonomy-vocabularies");
-		assertBatchAction(page,"deleteBatch","DELETE","http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
-	}
-
-	private void assertBatchAction(Page<TaxonomyVocabulary> page, String action, String method, String path) {
-		Map<String, Map> actions = page.getActions();
-
-		Map batchAction = actions.get(action);
-
-		Assert.assertNotNull(batchAction);
-		Assert.assertEquals(method, batchAction.get("method"));
-		assertHrefMatchesPath(path,batchAction.get("href").toString());
-	}
-
-	private void assertHrefMatchesPath(String path, String href) {
-		String pathReplaced = path.replaceAll("(\\Q{\\E.*?\\Q}\\E)","(.*)");
-		Pattern p = Pattern.compile(pathReplaced+"/batch");
-		Matcher m = p.matcher(href);
-		Assert.assertTrue("The " + href +" does not match "+pathReplaced+"/batch",m.matches());
+		assertBatchAction(
+			page, "updateBatch", "PUT",
+			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
+		assertBatchAction(
+			page, "createBatch", "POST",
+			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{groupId}/taxonomy-vocabularies");
+		assertBatchAction(
+			page, "deleteBatch", "DELETE",
+			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
 	}
 
 	@Override
@@ -153,6 +140,35 @@ public class TaxonomyVocabularyResourceTest
 		throws Exception {
 
 		return testDepotEntry.getDepotEntryId();
+	}
+
+	private void assertBatchAction(
+		Page<TaxonomyVocabulary> page, String action, String method,
+		String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(batchAction);
+		Assert.assertEquals(method, batchAction.get("method"));
+		assertHrefMatchesPath(
+			path,
+			batchAction.get(
+				"href"
+			).toString());
+	}
+
+	private void assertHrefMatchesPath(String path, String href) {
+		String pathReplaced = path.replaceAll("(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+
+		Pattern p = Pattern.compile(pathReplaced + "/batch");
+
+		Matcher m = p.matcher(href);
+
+		Assert.assertTrue(
+			"The " + href + " does not match " + pathReplaced + "/batch",
+			m.matches());
 	}
 
 }
