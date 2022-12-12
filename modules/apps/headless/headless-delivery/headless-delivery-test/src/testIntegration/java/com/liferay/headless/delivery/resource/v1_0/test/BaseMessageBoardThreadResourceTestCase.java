@@ -2417,12 +2417,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/message-board-sections/{messageBoardSectionId}/message-board-threads")) {
 
@@ -2431,18 +2425,11 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				"/headless-delivery/v1.0/message-board-sections/{messageBoardSectionId}/message-board-threads",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/message-board-sections/{messageBoardSectionId}/message-board-threads");
-		}
 
 		if (path.equals("/message-board-threads/ranked")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/message-board-threads/ranked", path);
-		}
-		else {
-			pathsNotCovered.add("/message-board-threads/ranked");
 		}
 
 		if (path.equals("/sites/{siteId}/message-board-threads")) {
@@ -2450,15 +2437,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/message-board-threads",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/message-board-threads");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

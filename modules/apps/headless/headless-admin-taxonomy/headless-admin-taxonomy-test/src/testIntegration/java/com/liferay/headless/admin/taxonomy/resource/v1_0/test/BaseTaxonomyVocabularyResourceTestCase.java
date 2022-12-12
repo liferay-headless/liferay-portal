@@ -2307,12 +2307,6 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/asset-libraries/{assetLibraryId}/taxonomy-vocabularies")) {
 
@@ -2321,25 +2315,12 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/taxonomy-vocabularies",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/asset-libraries/{assetLibraryId}/taxonomy-vocabularies");
-		}
 
 		if (path.equals("/sites/{siteId}/taxonomy-vocabularies")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/sites/{siteId}/taxonomy-vocabularies",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/taxonomy-vocabularies");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

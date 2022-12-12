@@ -2168,27 +2168,13 @@ public abstract class Base${schemaName}ResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		<#list javaMethodSignatures as javaMethodSignature>
 		<#if javaMethodSignature.methodName?ends_with("Page") && !javaMethodSignature.path?contains("permissions")>
 			if(path.equals("${javaMethodSignature.path}")){
 				assertBatchAction(page,"createBatch","POST","${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}",path);
 			}
-			else{
-				pathsNotCovered.add("${javaMethodSignature.path}");
-			}
 		</#if>
 		</#list>
-
-		if(!pathsNotCovered.isEmpty()) {
-				Assert.fail("LIST OF PATHS THAT HAVE NOT BEEN CHECKED: "+pathsNotCovered.toString());
-			}
-
 	}
 
 	private void assertBatchAction(Page<${schemaClientJavaType}> page, String action, String method, String expectedPath, String path) {

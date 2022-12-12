@@ -1491,12 +1491,6 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders")) {
 
@@ -1505,25 +1499,12 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				"/headless-delivery/v1.0/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/knowledge-base-folders/{parentKnowledgeBaseFolderId}/knowledge-base-folders");
-		}
 
 		if (path.equals("/sites/{siteId}/knowledge-base-folders")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/knowledge-base-folders",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/knowledge-base-folders");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

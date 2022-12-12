@@ -3042,20 +3042,11 @@ public abstract class BaseCommentResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/blog-postings/{blogPostingId}/comments")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/blog-postings/{blogPostingId}/comments");
 		}
 
 		if (path.equals("/comments/{parentCommentId}/comments")) {
@@ -3064,18 +3055,12 @@ public abstract class BaseCommentResourceTestCase {
 				"/headless-delivery/v1.0/comments/{parentCommentId}/comments",
 				path);
 		}
-		else {
-			pathsNotCovered.add("/comments/{parentCommentId}/comments");
-		}
 
 		if (path.equals("/documents/{documentId}/comments")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/documents/{documentId}/comments",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/documents/{documentId}/comments");
 		}
 
 		if (path.equals(
@@ -3085,16 +3070,6 @@ public abstract class BaseCommentResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/structured-contents/{structuredContentId}/comments");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -1913,20 +1913,11 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/taxonomy-categories/ranked")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/taxonomy-categories/ranked",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/taxonomy-categories/ranked");
 		}
 
 		if (path.equals(
@@ -1937,10 +1928,6 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				"/headless-admin-taxonomy/v1.0/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories");
-		}
 
 		if (path.equals(
 				"/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories")) {
@@ -1949,16 +1936,6 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -1343,20 +1343,11 @@ public abstract class BaseWikiPageResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/wiki-nodes/{wikiNodeId}/wiki-pages")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/wiki-pages",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/wiki-nodes/{wikiNodeId}/wiki-pages");
 		}
 
 		if (path.equals("/wiki-nodes/{wikiNodeId}/wiki-pages")) {
@@ -1365,8 +1356,12 @@ public abstract class BaseWikiPageResourceTestCase {
 				"/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/wiki-pages",
 				path);
 		}
-		else {
-			pathsNotCovered.add("/wiki-nodes/{wikiNodeId}/wiki-pages");
+
+		if (path.equals("/wiki-pages/{parentWikiPageId}/wiki-pages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{parentWikiPageId}/wiki-pages",
+				path);
 		}
 
 		if (path.equals("/wiki-pages/{parentWikiPageId}/wiki-pages")) {
@@ -1375,18 +1370,11 @@ public abstract class BaseWikiPageResourceTestCase {
 				"/headless-delivery/v1.0/wiki-pages/{parentWikiPageId}/wiki-pages",
 				path);
 		}
-		else {
-			pathsNotCovered.add("/wiki-pages/{parentWikiPageId}/wiki-pages");
-		}
 
-		if (path.equals("/wiki-pages/{parentWikiPageId}/wiki-pages")) {
+		if (path.equals("/wiki-pages/{wikiPageId}")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
-				"/headless-delivery/v1.0/wiki-pages/{parentWikiPageId}/wiki-pages",
-				path);
-		}
-		else {
-			pathsNotCovered.add("/wiki-pages/{parentWikiPageId}/wiki-pages");
+				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
 		}
 
 		if (path.equals("/wiki-pages/{wikiPageId}")) {
@@ -1394,32 +1382,11 @@ public abstract class BaseWikiPageResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
 		}
-		else {
-			pathsNotCovered.add("/wiki-pages/{wikiPageId}");
-		}
 
 		if (path.equals("/wiki-pages/{wikiPageId}")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
-		}
-		else {
-			pathsNotCovered.add("/wiki-pages/{wikiPageId}");
-		}
-
-		if (path.equals("/wiki-pages/{wikiPageId}")) {
-			assertBatchAction(
-				page, "createBatch", "POST",
-				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
-		}
-		else {
-			pathsNotCovered.add("/wiki-pages/{wikiPageId}");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

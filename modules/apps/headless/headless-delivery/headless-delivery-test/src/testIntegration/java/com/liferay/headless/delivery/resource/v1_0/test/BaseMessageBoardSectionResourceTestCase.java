@@ -1841,12 +1841,6 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/message-board-sections/{parentMessageBoardSectionId}/message-board-sections")) {
 
@@ -1855,25 +1849,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				"/headless-delivery/v1.0/message-board-sections/{parentMessageBoardSectionId}/message-board-sections",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/message-board-sections/{parentMessageBoardSectionId}/message-board-sections");
-		}
 
 		if (path.equals("/sites/{siteId}/message-board-sections")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/message-board-sections",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/message-board-sections");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -36,23 +36,6 @@ public class TaxonomyVocabularyResourceTest
 	extends BaseTaxonomyVocabularyResourceTestCase {
 
 	@Override
-	protected void assertValid(Page<TaxonomyVocabulary> page, long groupId)
-		throws Exception {
-
-		super.assertValid(page, groupId);
-
-		assertBatchAction(
-			page, "updateBatch", "PUT",
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
-		assertBatchAction(
-			page, "createBatch", "POST",
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{groupId}/taxonomy-vocabularies");
-		assertBatchAction(
-			page, "deleteBatch", "DELETE",
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies");
-	}
-
-	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"assetTypes", "description", "name"};
 	}

@@ -3585,12 +3585,6 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/asset-libraries/{assetLibraryId}/structured-contents")) {
 
@@ -3598,10 +3592,6 @@ public abstract class BaseStructuredContentResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/structured-contents",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/asset-libraries/{assetLibraryId}/structured-contents");
 		}
 
 		if (path.equals(
@@ -3612,19 +3602,12 @@ public abstract class BaseStructuredContentResourceTestCase {
 				"/headless-delivery/v1.0/content-structures/{contentStructureId}/structured-contents",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/content-structures/{contentStructureId}/structured-contents");
-		}
 
 		if (path.equals("/sites/{siteId}/structured-contents")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/structured-contents",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/structured-contents");
 		}
 
 		if (path.equals(
@@ -3634,16 +3617,6 @@ public abstract class BaseStructuredContentResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}/structured-contents",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/structured-content-folders/{structuredContentFolderId}/structured-contents");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

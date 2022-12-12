@@ -847,27 +847,11 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/wiki-pages/{wikiPageId}/wiki-page-attachments")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}/wiki-page-attachments",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/wiki-pages/{wikiPageId}/wiki-page-attachments");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -1120,12 +1120,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals(
 				"/asset-libraries/{assetLibraryId}/content-sets/by-key/{key}/content-set-elements")) {
 
@@ -1133,10 +1127,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/content-sets/by-key/{key}/content-set-elements",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/asset-libraries/{assetLibraryId}/content-sets/by-key/{key}/content-set-elements");
 		}
 
 		if (path.equals(
@@ -1147,20 +1137,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				"/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/content-sets/by-uuid/{uuid}/content-set-elements",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/asset-libraries/{assetLibraryId}/content-sets/by-uuid/{uuid}/content-set-elements");
-		}
 
 		if (path.equals("/content-sets/{contentSetId}/content-set-elements")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/content-sets/{contentSetId}/content-set-elements",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/content-sets/{contentSetId}/content-set-elements");
 		}
 
 		if (path.equals(
@@ -1171,10 +1153,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 				"/headless-delivery/v1.0/sites/{siteId}/content-sets/by-key/{key}/content-set-elements",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/sites/{siteId}/content-sets/by-key/{key}/content-set-elements");
-		}
 
 		if (path.equals(
 				"/sites/{siteId}/content-sets/by-uuid/{uuid}/content-set-elements")) {
@@ -1183,16 +1161,6 @@ public abstract class BaseContentSetElementResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/content-sets/by-uuid/{uuid}/content-set-elements",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/sites/{siteId}/content-sets/by-uuid/{uuid}/content-set-elements");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -933,19 +933,10 @@ public abstract class BaseSitePageResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/sites/{siteId}/site-pages")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/site-pages", path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/site-pages");
 		}
 
 		if (path.equals("/sites/{siteId}/site-pages/{friendlyUrlPath}")) {
@@ -953,9 +944,6 @@ public abstract class BaseSitePageResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/site-pages/{friendlyUrlPath}",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/site-pages/{friendlyUrlPath}");
 		}
 
 		if (path.equals(
@@ -966,10 +954,6 @@ public abstract class BaseSitePageResourceTestCase {
 				"/headless-delivery/v1.0/sites/{siteId}/site-pages/{friendlyUrlPath}/experiences",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/sites/{siteId}/site-pages/{friendlyUrlPath}/experiences");
-		}
 
 		if (path.equals(
 				"/sites/{siteId}/site-pages/{friendlyUrlPath}/experiences/{experienceKey}/rendered-page")) {
@@ -979,10 +963,6 @@ public abstract class BaseSitePageResourceTestCase {
 				"/headless-delivery/v1.0/sites/{siteId}/site-pages/{friendlyUrlPath}/experiences/{experienceKey}/rendered-page",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/sites/{siteId}/site-pages/{friendlyUrlPath}/experiences/{experienceKey}/rendered-page");
-		}
 
 		if (path.equals(
 				"/sites/{siteId}/site-pages/{friendlyUrlPath}/rendered-page")) {
@@ -991,16 +971,6 @@ public abstract class BaseSitePageResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/site-pages/{friendlyUrlPath}/rendered-page",
 				path);
-		}
-		else {
-			pathsNotCovered.add(
-				"/sites/{siteId}/site-pages/{friendlyUrlPath}/rendered-page");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

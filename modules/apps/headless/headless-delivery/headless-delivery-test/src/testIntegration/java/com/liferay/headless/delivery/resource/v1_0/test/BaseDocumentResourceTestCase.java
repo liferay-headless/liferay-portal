@@ -2649,20 +2649,11 @@ public abstract class BaseDocumentResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/asset-libraries/{assetLibraryId}/documents")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/documents",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/asset-libraries/{assetLibraryId}/documents");
 		}
 
 		if (path.equals("/document-folders/{documentFolderId}/documents")) {
@@ -2671,24 +2662,11 @@ public abstract class BaseDocumentResourceTestCase {
 				"/headless-delivery/v1.0/document-folders/{documentFolderId}/documents",
 				path);
 		}
-		else {
-			pathsNotCovered.add(
-				"/document-folders/{documentFolderId}/documents");
-		}
 
 		if (path.equals("/sites/{siteId}/documents")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-delivery/v1.0/sites/{siteId}/documents", path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/documents");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

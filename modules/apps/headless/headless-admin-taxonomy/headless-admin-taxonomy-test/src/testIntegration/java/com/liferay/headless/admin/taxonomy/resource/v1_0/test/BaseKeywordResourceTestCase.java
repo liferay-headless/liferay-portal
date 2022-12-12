@@ -1597,20 +1597,11 @@ public abstract class BaseKeywordResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		//The method we're trying to update seem to only have in mind enpdoints with siteId parameter,
-		//this List is temporary and can help us detecting
-		//cases that should match the acceptance criteria, but are not covered with the current approach
-
-		List<String> pathsNotCovered = new ArrayList<>();
-
 		if (path.equals("/asset-libraries/{assetLibraryId}/keywords")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/keywords",
 				path);
-		}
-		else {
-			pathsNotCovered.add("/asset-libraries/{assetLibraryId}/keywords");
 		}
 
 		if (path.equals("/keywords/ranked")) {
@@ -1618,23 +1609,11 @@ public abstract class BaseKeywordResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/keywords/ranked", path);
 		}
-		else {
-			pathsNotCovered.add("/keywords/ranked");
-		}
 
 		if (path.equals("/sites/{siteId}/keywords")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords", path);
-		}
-		else {
-			pathsNotCovered.add("/sites/{siteId}/keywords");
-		}
-
-		if (!pathsNotCovered.isEmpty()) {
-			Assert.fail(
-				"LIST OF PATHS THAT HAVE NOT BEEN CHECKED: " +
-					pathsNotCovered.toString());
 		}
 	}
 

@@ -57,7 +57,7 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
-			Arrays.asList(keyword1, keyword2), (List<Keyword>)page.getItems());
+			Arrays.asList(keyword1, keyword2), (List<Keyword>) page.getItems());
 		assertValid(page, "/keywords/ranked");
 
 		keywordResource.deleteKeyword(keyword1.getId());
@@ -77,7 +77,7 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 		Page<Keyword> page1 = keywordResource.getKeywordsRankedPage(
 			testGroup.getGroupId(), null, Pagination.of(1, 2));
 
-		List<Keyword> keywords1 = (List<Keyword>)page1.getItems();
+		List<Keyword> keywords1 = (List<Keyword>) page1.getItems();
 
 		Assert.assertEquals(keywords1.toString(), 2, keywords1.size());
 
@@ -86,7 +86,7 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
-		List<Keyword> keywords2 = (List<Keyword>)page2.getItems();
+		List<Keyword> keywords2 = (List<Keyword>) page2.getItems();
 
 		Assert.assertEquals(keywords2.toString(), 1, keywords2.size());
 
@@ -95,12 +95,12 @@ public class KeywordResourceTest extends BaseKeywordResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(keyword1, keyword2, keyword3),
-			(List<Keyword>)page3.getItems());
+			(List<Keyword>) page3.getItems());
 	}
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"name"};
+		return new String[]{"name"};
 	}
 
 	@Override
