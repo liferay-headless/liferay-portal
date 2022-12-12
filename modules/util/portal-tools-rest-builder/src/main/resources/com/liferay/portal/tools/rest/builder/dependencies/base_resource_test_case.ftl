@@ -2172,6 +2172,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 		<#if javaMethodSignature.methodName?ends_with("Page") && !javaMethodSignature.path?contains("permissions")>
 			if(path.equals("${javaMethodSignature.path}")){
 				assertBatchAction(page,"createBatch","POST","${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}",path);
+				assertBatchAction(page,"deleteBatch","DELETE","${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}",path);
 			}
 		</#if>
 		</#list>
@@ -2212,6 +2213,18 @@ public abstract class Base${schemaName}ResourceTestCase {
 			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
 			(that is, no siteId, no assetLibraryId, etc., needed)
 			*/
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(/v.1.0/(.*?)/\\Q{\\E.*?\\Q}\\E)", "/v.1.0");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+				expectedPathReplaced + "/batch for " + action +
+				" in the path " + path,
+				actualPathMatcher.matches());
 		}
 	}
 

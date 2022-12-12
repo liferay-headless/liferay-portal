@@ -1918,6 +1918,10 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/taxonomy-categories/ranked",
 				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
+				"/headless-admin-taxonomy/v1.0/taxonomy-categories/ranked",
+				path);
 		}
 
 		if (path.equals(
@@ -1927,6 +1931,10 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories",
 				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
+				"/headless-admin-taxonomy/v1.0/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories",
+				path);
 		}
 
 		if (path.equals(
@@ -1934,6 +1942,10 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 
 			assertBatchAction(
 				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories",
+				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
 				"/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories",
 				path);
 		}
@@ -1987,6 +1999,18 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
 			(that is, no siteId, no assetLibraryId, etc., needed)
 			*/
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(/v.1.0/(.*?)/\\Q{\\E.*?\\Q}\\E)", "/v.1.0");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
 		}
 	}
 

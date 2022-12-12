@@ -1602,17 +1602,27 @@ public abstract class BaseKeywordResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/keywords",
 				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
+				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/keywords",
+				path);
 		}
 
 		if (path.equals("/keywords/ranked")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/keywords/ranked", path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
+				"/headless-admin-taxonomy/v1.0/keywords/ranked", path);
 		}
 
 		if (path.equals("/sites/{siteId}/keywords")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords", path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
 				"/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords", path);
 		}
 	}
@@ -1665,6 +1675,18 @@ public abstract class BaseKeywordResourceTestCase {
 			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
 			(that is, no siteId, no assetLibraryId, etc., needed)
 			*/
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(/v.1.0/(.*?)/\\Q{\\E.*?\\Q}\\E)", "/v.1.0");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
 		}
 	}
 

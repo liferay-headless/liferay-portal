@@ -2314,11 +2314,19 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				page, "createBatch", "POST",
 				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/taxonomy-vocabularies",
 				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
+				"/headless-admin-taxonomy/v1.0/asset-libraries/{assetLibraryId}/taxonomy-vocabularies",
+				path);
 		}
 
 		if (path.equals("/sites/{siteId}/taxonomy-vocabularies")) {
 			assertBatchAction(
 				page, "createBatch", "POST",
+				"/headless-admin-taxonomy/v1.0/sites/{siteId}/taxonomy-vocabularies",
+				path);
+			assertBatchAction(
+				page, "deleteBatch", "DELETE",
 				"/headless-admin-taxonomy/v1.0/sites/{siteId}/taxonomy-vocabularies",
 				path);
 		}
@@ -2372,6 +2380,19 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
 			(that is, no siteId, no assetLibraryId, etc., needed)
 			*/
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"\\Q/\\Ev\\Q.\\E1\\Q.\\E0\\Q/\\E(.*?)\\Q/\\E\\Q{\\E.*?\\Q}\\E", "/v.1.0");
+			Assert.fail(expectedPathReplaced);
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
 		}
 	}
 
