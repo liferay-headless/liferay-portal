@@ -161,7 +161,7 @@ definition {
 
 		var responseStatus = JSONUtil.getWithJSONPath("${response}", "$.status");
 
-		while (("${responseStatus}" == "NOT_FOUND") && (maxIterations = "300")) {
+		while (("${responseStatus}" == "NOT_FOUND") && (maxIterations = "1000")) {
 			echo("Repeating the call...");
 
 			var response = JSONCurlUtil.put("${curl}");
