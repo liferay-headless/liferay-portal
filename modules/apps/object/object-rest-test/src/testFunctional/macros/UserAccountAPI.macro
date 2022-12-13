@@ -161,12 +161,6 @@ definition {
 
 		var responseStatus = JSONUtil.getWithJSONPath("${response}", "$.status");
 
-		while (("${responseStatus}" == "NOT_FOUND") && (maxIterations = "1000")) {
-			echo("Repeating the call...");
-
-			var response = JSONCurlUtil.put("${curl}");
-		}
-
 		if ("${responseStatus}" == "NOT_FOUND") {
 			fail("No ObjectRelationship exists with the name requested");
 		}

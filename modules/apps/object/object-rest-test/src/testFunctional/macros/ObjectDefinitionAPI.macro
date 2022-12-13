@@ -534,7 +534,13 @@ definition {
 	macro assertNoItemsInResponse {
 		Variables.assertDefined(parameterList = "${responseToParse}");
 
+		echo("RESPONSE WHOLE");
+		echo("${responseToParse}");
+
 		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$.items");
+
+		echo("ACTUAL");
+		echo("${actual}");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
