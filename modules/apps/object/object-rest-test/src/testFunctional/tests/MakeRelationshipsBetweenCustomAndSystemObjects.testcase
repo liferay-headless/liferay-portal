@@ -114,6 +114,7 @@ definition {
 
 		task ("Then Account entry is not associated to the Subject entry in GET /o/c/subjects/{subjectId}/subjectAccounts") {
 			echo("THIS STEP");
+
 			var response = ObjectDefinitionAPI.getObjectEntryRelation(
 				en_US_plural_label = "subjects",
 				objectId = "${subjectId}",
