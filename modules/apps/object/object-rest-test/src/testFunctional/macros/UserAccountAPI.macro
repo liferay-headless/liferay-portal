@@ -159,12 +159,6 @@ definition {
 
 		var response = JSONCurlUtil.put("${curl}");
 
-		var responseStatus = JSONUtil.getWithJSONPath("${response}", "$.status");
-
-		if ("${responseStatus}" == "NOT_FOUND") {
-			fail("No ObjectRelationship exists with the name requested");
-		}
-
 		return "${response}";
 	}
 
