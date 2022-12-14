@@ -24,21 +24,17 @@ import com.liferay.object.rest.internal.util.HTTPTestUtil;
 import com.liferay.object.rest.internal.util.ObjectDefinitionTestUtil;
 import com.liferay.object.rest.internal.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.internal.util.ObjectRelationshipTestUtil;
-import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
-import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsUtil;
@@ -101,10 +97,7 @@ public class ObjectEntryResourceTest {
 	public void testDeleteManyToManyCustomObjectDefinition1WithCustomObjectDefinition2()
 		throws Exception {
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -145,10 +138,7 @@ public class ObjectEntryResourceTest {
 	public void testDeleteManyToManyCustomObjectDefinition2WithCustomObjectDefinition1()
 		throws Exception {
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -191,10 +181,7 @@ public class ObjectEntryResourceTest {
 
 		Long irrelevantCurrentObjectId = RandomTestUtil.randomLong();
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -238,10 +225,7 @@ public class ObjectEntryResourceTest {
 
 		Long irrelevantCurrentObjectId = RandomTestUtil.randomLong();
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -283,10 +267,7 @@ public class ObjectEntryResourceTest {
 	public void testDeleteOneToManyCustomObjectDefinition1WithCustomObjectDefinition2()
 		throws Exception {
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -329,10 +310,7 @@ public class ObjectEntryResourceTest {
 
 		Long irrelevantCurrentObjectId = RandomTestUtil.randomLong();
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -376,10 +354,7 @@ public class ObjectEntryResourceTest {
 
 		Long irrelevantCurrentObjectId = RandomTestUtil.randomLong();
 
-		String name = StringUtil.randomId();
-
-		_objectRelationship = _addObjectRelationship(
-			name, _objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
@@ -537,27 +512,6 @@ public class ObjectEntryResourceTest {
 			CoreMatchers.containsString("No ObjectEntry exists with the key"));
 	}
 
-	private ObjectRelationship _addObjectRelationship(
-			String name, long primaryKey1, long primaryKey2, String type)
-		throws Exception {
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipLocalService.addObjectRelationship(
-				TestPropsValues.getUserId(),
-				_objectDefinition1.getObjectDefinitionId(),
-				_objectDefinition2.getObjectDefinitionId(), 0,
-				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				name, type);
-
-		_objectRelationshipLocalService.addObjectRelationshipMappingTableValues(
-			TestPropsValues.getUserId(),
-			objectRelationship.getObjectRelationshipId(), primaryKey1,
-			primaryKey2, ServiceContextTestUtil.getServiceContext());
-
-		return objectRelationship;
-	}
-
 	private ObjectRelationship _addObjectRelationshipAndRelateObjectsEntries(
 			String type)
 		throws Exception {
@@ -625,8 +579,5 @@ public class ObjectEntryResourceTest {
 
 	@DeleteAfterTestRun
 	private ObjectRelationship _objectRelationship;
-
-	@Inject
-	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 }
