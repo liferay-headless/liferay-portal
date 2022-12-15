@@ -88,7 +88,7 @@ public class MessageBoardMessageResourceTest
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardMessage1),
 			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/message-board-messages");
 
 		flatten = true;
 
@@ -103,7 +103,7 @@ public class MessageBoardMessageResourceTest
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardMessage1, messageBoardMessage2),
 			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/message-board-messages");
 	}
 
 	@Test

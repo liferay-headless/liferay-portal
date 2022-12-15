@@ -70,6 +70,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -412,7 +414,7 @@ public abstract class BaseWikiPageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantWikiPage),
 				(List<WikiPage>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/wiki-nodes/{wikiNodeId}/wiki-pages");
 		}
 
 		WikiPage wikiPage1 = testGetWikiNodeWikiPagesPage_addWikiPage(
@@ -429,7 +431,7 @@ public abstract class BaseWikiPageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(wikiPage1, wikiPage2),
 			(List<WikiPage>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/wiki-nodes/{wikiNodeId}/wiki-pages");
 
 		wikiPageResource.deleteWikiPage(wikiPage1.getId());
 
@@ -760,7 +762,7 @@ public abstract class BaseWikiPageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantWikiPage),
 				(List<WikiPage>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/wiki-pages/{parentWikiPageId}/wiki-pages");
 		}
 
 		WikiPage wikiPage1 = testGetWikiPageWikiPagesPage_addWikiPage(
@@ -776,7 +778,7 @@ public abstract class BaseWikiPageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(wikiPage1, wikiPage2),
 			(List<WikiPage>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/wiki-pages/{parentWikiPageId}/wiki-pages");
 
 		wikiPageResource.deleteWikiPage(wikiPage1.getId());
 
@@ -1325,7 +1327,7 @@ public abstract class BaseWikiPageResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<WikiPage> page) {
+	protected void assertValid(Page<WikiPage> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<WikiPage> wikiPages = page.getItems();
@@ -1340,6 +1342,103 @@ public abstract class BaseWikiPageResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		if (path.equals("/wiki-nodes/{wikiNodeId}/wiki-pages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/wiki-pages",
+				path);
+		}
+
+		if (path.equals("/wiki-nodes/{wikiNodeId}/wiki-pages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/wiki-pages",
+				path);
+		}
+
+		if (path.equals("/wiki-pages/{parentWikiPageId}/wiki-pages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{parentWikiPageId}/wiki-pages",
+				path);
+		}
+
+		if (path.equals("/wiki-pages/{parentWikiPageId}/wiki-pages")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{parentWikiPageId}/wiki-pages",
+				path);
+		}
+
+		if (path.equals("/wiki-pages/{wikiPageId}")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
+		}
+
+		if (path.equals("/wiki-pages/{wikiPageId}")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
+		}
+
+		if (path.equals("/wiki-pages/{wikiPageId}")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/wiki-pages/{wikiPageId}", path);
+		}
+	}
+
+	private void assertBatchAction(
+		Page<WikiPage> page, String action, String method, String expectedPath,
+		String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(
+			"No Actions for " + action + " in path " + path, batchAction);
+		Assert.assertEquals(
+			"The batch action method value is not correct", method,
+			batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(
+			expectedPath,
+			batchAction.get(
+				"href"
+			).toString(),
+			action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if (action.equals("createBatch")) {
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if (action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {

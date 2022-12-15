@@ -17,9 +17,15 @@ package com.liferay.headless.admin.taxonomy.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.AssetType;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyVocabulary;
+import com.liferay.headless.admin.taxonomy.client.pagination.Page;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 /**
@@ -117,6 +123,35 @@ public class TaxonomyVocabularyResourceTest
 		throws Exception {
 
 		return testDepotEntry.getDepotEntryId();
+	}
+
+	private void assertBatchAction(
+		Page<TaxonomyVocabulary> page, String action, String method,
+		String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(batchAction);
+		Assert.assertEquals(method, batchAction.get("method"));
+		assertHrefMatchesPath(
+			path,
+			batchAction.get(
+				"href"
+			).toString());
+	}
+
+	private void assertHrefMatchesPath(String path, String href) {
+		String pathReplaced = path.replaceAll("(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+
+		Pattern p = Pattern.compile(pathReplaced + "/batch");
+
+		Matcher m = p.matcher(href);
+
+		Assert.assertTrue(
+			"The " + href + " does not match " + pathReplaced + "/batch",
+			m.matches());
 	}
 
 }

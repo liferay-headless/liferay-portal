@@ -70,6 +70,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -250,7 +252,8 @@ public abstract class BaseContentTemplateResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantContentTemplate),
 				(List<ContentTemplate>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page, "/asset-libraries/{assetLibraryId}/content-templates");
 		}
 
 		ContentTemplate contentTemplate1 =
@@ -269,7 +272,8 @@ public abstract class BaseContentTemplateResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(contentTemplate1, contentTemplate2),
 			(List<ContentTemplate>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page, "/asset-libraries/{assetLibraryId}/content-templates");
 	}
 
 	@Test
@@ -621,7 +625,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantContentTemplate),
 				(List<ContentTemplate>)page.getItems());
-			assertValid(page);
+			assertValid(page, "/sites/{siteId}/content-templates");
 		}
 
 		ContentTemplate contentTemplate1 =
@@ -640,7 +644,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(contentTemplate1, contentTemplate2),
 			(List<ContentTemplate>)page.getItems());
-		assertValid(page);
+		assertValid(page, "/sites/{siteId}/content-templates");
 	}
 
 	@Test
@@ -1303,7 +1307,7 @@ public abstract class BaseContentTemplateResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
-	protected void assertValid(Page<ContentTemplate> page) {
+	protected void assertValid(Page<ContentTemplate> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<ContentTemplate> contentTemplates =
@@ -1319,6 +1323,73 @@ public abstract class BaseContentTemplateResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		if (path.equals(
+				"/asset-libraries/{assetLibraryId}/content-templates")) {
+
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/content-templates",
+				path);
+		}
+
+		if (path.equals("/sites/{siteId}/content-templates")) {
+			assertBatchAction(
+				page, "createBatch", "POST",
+				"/headless-delivery/v1.0/sites/{siteId}/content-templates",
+				path);
+		}
+	}
+
+	private void assertBatchAction(
+		Page<ContentTemplate> page, String action, String method,
+		String expectedPath, String path) {
+
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull(
+			"No Actions for " + action + " in path " + path, batchAction);
+		Assert.assertEquals(
+			"The batch action method value is not correct", method,
+			batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(
+			expectedPath,
+			batchAction.get(
+				"href"
+			).toString(),
+			action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if (action.equals("createBatch")) {
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if (action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {

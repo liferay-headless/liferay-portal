@@ -29,6 +29,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 <#assign
 	javaMethodSignatures = freeMarkerTool.getResourceTestCaseJavaMethodSignatures(configYAML, openAPIYAML, schemaName)
 
@@ -490,7 +493,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 							Assert.assertEquals(1, page.getTotalCount());
 
 							assertEquals(Arrays.asList(irrelevant${schemaName}), (List<${schemaName}>)page.getItems());
-							assertValid(page);
+							assertValid(page, "${javaMethodSignature.path}");
 						}
 					</#if>
 
@@ -533,10 +536,10 @@ public abstract class Base${schemaName}ResourceTestCase {
 					<#if topLevel>
 						assertContains(${schemaVarName}1, (List<${schemaName}>)page.getItems());
 						assertContains(${schemaVarName}2, (List<${schemaName}>)page.getItems());
-						assertValid(page);
+						assertValid(page, "${javaMethodSignature.path}");
 					<#else>
 						assertEqualsIgnoringOrder(Arrays.asList(${schemaVarName}1, ${schemaVarName}2), (List<${schemaName}>)page.getItems());
-						assertValid(page);
+						assertValid(page, "${javaMethodSignature.path}");
 					</#if>
 
 					<#if freeMarkerTool.hasJavaMethodSignature(javaMethodSignatures, "delete" + schemaName)>
@@ -2152,7 +2155,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 		}
 	</#if>
 
-	protected void assertValid(Page<${schemaClientJavaType}> page) {
+	protected void assertValid(Page<${schemaClientJavaType}> page, String path) {
 		boolean valid = false;
 
 		java.util.Collection<${schemaClientJavaType}> ${schemaVarNames} = page.getItems();
@@ -2164,6 +2167,65 @@ public abstract class Base${schemaName}ResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		<#list javaMethodSignatures as javaMethodSignature>
+		<#if javaMethodSignature.methodName?ends_with("Page") && !javaMethodSignature.path?contains("permissions")>
+			if(path.equals("${javaMethodSignature.path}")){
+				assertBatchAction(page,"createBatch","POST","${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}",path);
+				assertBatchAction(page,"deleteBatch","DELETE","${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}",path);
+			}
+		</#if>
+		</#list>
+	}
+
+	private void assertBatchAction(Page<${schemaClientJavaType}> page, String action, String method, String expectedPath, String path) {
+		Map<String, Map> actions = page.getActions();
+
+		Map batchAction = actions.get(action);
+
+		Assert.assertNotNull("No Actions for "+action+" in path "+path,batchAction);
+		Assert.assertEquals("The batch action method value is not correct",method, batchAction.get("method"));
+		assertHrefInBatchActionMatchesPath(expectedPath,batchAction.get("href").toString(),action, path);
+	}
+
+	private void assertHrefInBatchActionMatchesPath(
+		String expectedPath, String href, String action, String path) {
+
+		//only paths with POST operation available will have createBatch
+		//we need a freeMarker "if" to check whether the path we're checking has it
+		//and then check the createBatch details
+
+		if(action.equals("createBatch")){
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(\\Q{\\E.*?\\Q}\\E)", "(.*)");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher("/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+					expectedPathReplaced + "/batch for " + action +
+						" in the path " + path,
+				actualPathMatcher.matches());
+		}
+
+		if(action.equals("deleteBatch") || action.equals("updateBatch")) {
+			/*TO DO
+			updateBacth and deleteBatch inherit the href from the "simplest" method in the group
+			(that is, no siteId, no assetLibraryId, etc., needed)
+			*/
+			String expectedPathReplaced = expectedPath.replaceAll(
+				"(/v.1.0/(.*?)/\\Q{\\E.*?\\Q}\\E)", "/v.1.0");
+			String[] detachActualPathFromServer = href.split("/o/");
+			Pattern expectedPathPattern = Pattern.compile(
+				expectedPathReplaced + "/batch");
+			Matcher actualPathMatcher = expectedPathPattern.matcher(
+				"/" + detachActualPathFromServer[1]);
+			Assert.assertTrue(
+				"The /" + detachActualPathFromServer[1] + " does not match " +
+				expectedPathReplaced + "/batch for " + action +
+				" in the path " + path,
+				actualPathMatcher.matches());
+		}
 	}
 
 	<#list relatedSchemaNames as relatedSchemaName>
