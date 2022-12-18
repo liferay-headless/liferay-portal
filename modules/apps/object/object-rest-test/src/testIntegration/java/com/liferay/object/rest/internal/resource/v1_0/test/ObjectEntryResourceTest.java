@@ -15,6 +15,7 @@
 package com.liferay.object.rest.internal.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -43,7 +44,6 @@ import java.util.Collections;
 
 import org.hamcrest.CoreMatchers;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -66,31 +66,16 @@ public class ObjectEntryResourceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			Collections.singletonList(
-				ObjectFieldUtil.createObjectField(
-					"Text", "String", true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_1,
-					false)));
+		_objectDefinition1 = _publishObjectDefinition(_OBJECT_FIELD_NAME_1);
+		_objectDefinition2 = _publishObjectDefinition(_OBJECT_FIELD_NAME_2);
 
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition1, _OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1);
-
-		_objectDefinition2 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			Collections.singletonList(
-				ObjectFieldUtil.createObjectField(
-					"Text", "String", true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_2,
-					false)));
+			_objectDefinition1, _OBJECT_FIELD_NAME_1,
+			String.valueOf(_OBJECT_FIELD_VALUE_1));
 
 		_objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
-			_objectDefinition2, _OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		_objectRelationshipLocalService.deleteObjectRelationship(
-			_objectRelationship);
+			_objectDefinition2, _OBJECT_FIELD_NAME_2,
+			String.valueOf(_OBJECT_FIELD_VALUE_2));
 	}
 
 	@Test
@@ -479,7 +464,7 @@ public class ObjectEntryResourceTest {
 			_objectEntry2.getExternalReferenceCode(),
 			jsonObject.getString("externalReferenceCode"));
 		Assert.assertEquals(
-			_OBJECT_FIELD_VALUE_2, jsonObject.getString(_OBJECT_FIELD_NAME_2));
+			_OBJECT_FIELD_VALUE_2, jsonObject.getInt(_OBJECT_FIELD_NAME_2));
 
 		jsonObject = HTTPTestUtil.invoke(
 			null,
@@ -495,7 +480,7 @@ public class ObjectEntryResourceTest {
 			_objectEntry1.getExternalReferenceCode(),
 			jsonObject.getString("externalReferenceCode"));
 		Assert.assertEquals(
-			_OBJECT_FIELD_VALUE_1, jsonObject.getString(_OBJECT_FIELD_NAME_1));
+			_OBJECT_FIELD_VALUE_1, jsonObject.getInt(_OBJECT_FIELD_NAME_1));
 
 		jsonObject = HTTPTestUtil.invoke(
 			null,
@@ -528,6 +513,17 @@ public class ObjectEntryResourceTest {
 		return objectRelationship;
 	}
 
+	private ObjectDefinition _publishObjectDefinition(String objectFieldName)
+		throws Exception {
+
+		return ObjectDefinitionTestUtil.publishObjectDefinition(
+			Collections.singletonList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
+					ObjectFieldConstants.DB_TYPE_INTEGER, true, true, null,
+					RandomTestUtil.randomString(), objectFieldName, false)));
+	}
+
 	private void _testGetNestedFieldDetailsInOneToManyRelationships(
 			String endpoint, String expectedFieldName)
 		throws Exception {
@@ -542,15 +538,14 @@ public class ObjectEntryResourceTest {
 		JSONObject itemJSONObject = itemsJSONArray.getJSONObject(0);
 
 		Assert.assertEquals(
-			_OBJECT_FIELD_VALUE_2,
-			itemJSONObject.getString(_OBJECT_FIELD_NAME_2));
+			_OBJECT_FIELD_VALUE_2, itemJSONObject.getInt(_OBJECT_FIELD_NAME_2));
 
 		JSONObject relatedObjectJSONObject = itemJSONObject.getJSONObject(
 			expectedFieldName);
 
 		Assert.assertEquals(
 			_OBJECT_FIELD_VALUE_1,
-			relatedObjectJSONObject.getString(_OBJECT_FIELD_NAME_1));
+			relatedObjectJSONObject.getInt(_OBJECT_FIELD_NAME_1));
 	}
 
 	private static final String _OBJECT_FIELD_NAME_1 =
@@ -559,11 +554,9 @@ public class ObjectEntryResourceTest {
 	private static final String _OBJECT_FIELD_NAME_2 =
 		"x" + RandomTestUtil.randomString();
 
-	private static final String _OBJECT_FIELD_VALUE_1 =
-		RandomTestUtil.randomString();
+	private static final int _OBJECT_FIELD_VALUE_1 = RandomTestUtil.randomInt();
 
-	private static final String _OBJECT_FIELD_VALUE_2 =
-		RandomTestUtil.randomString();
+	private static final int _OBJECT_FIELD_VALUE_2 = RandomTestUtil.randomInt();
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition1;
