@@ -378,6 +378,66 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testGetFilteredObjectEntriesByRelatedObjectEntries()
+		throws Exception {
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-154672", "true"
+			).build());
+
+		_objectRelationship = _addObjectRelationshipAndRelateObjectsEntries(
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20eq%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2)));
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20gt%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2 - 1)));
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20ge%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2 - 1)));
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20le%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2 + 1)));
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20lt%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2 + 1)));
+
+		_testGetFilteredObjectEntriesByRelatedObjectEntries(
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?filter=",
+				_objectRelationship.getName(), StringPool.SLASH,
+				_OBJECT_FIELD_NAME_2, "%20ne%20",
+				String.valueOf(_OBJECT_FIELD_VALUE_2 - 1)));
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-154672", "false"
+			).build());
+	}
+
+	@Test
 	public void testGetNestedFieldDetailsInOneToManyRelationships()
 		throws Exception {
 
@@ -522,6 +582,23 @@ public class ObjectEntryResourceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
 					ObjectFieldConstants.DB_TYPE_INTEGER, true, true, null,
 					RandomTestUtil.randomString(), objectFieldName, false)));
+	}
+
+	private void _testGetFilteredObjectEntriesByRelatedObjectEntries(
+			String endpoint)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			null, endpoint, Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(1, itemsJSONArray.length());
+
+		JSONObject itemJSONObject = itemsJSONArray.getJSONObject(0);
+
+		Assert.assertEquals(
+			_OBJECT_FIELD_VALUE_1, itemJSONObject.getInt(_OBJECT_FIELD_NAME_1));
 	}
 
 	private void _testGetNestedFieldDetailsInOneToManyRelationships(
