@@ -71,10 +71,20 @@ public class Operation {
 		_tags = tags;
 	}
 
+	public MappingsDefinition getMappingsDefinition() {
+		return _mappingsDefinition;
+	}
+
+	public void setMappingsDefinition(
+		MappingsDefinition mappingsDefinition) {
+		_mappingsDefinition = mappingsDefinition;
+	}
+
 	private String _description;
 	private String _operationId;
 	private List<Parameter> _parameters = new ArrayList<>();
 	private RequestBody _requestBody;
+	private MappingsDefinition _mappingsDefinition;
 	private Map<ResponseCode, Response> _responses;
 	private List<String> _tags = new ArrayList<>();
 
