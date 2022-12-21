@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	configurationPid = "com.liferay.dispatch.configuration.DispatchConfiguration",
+	immediate = true,
 	property = "dispatch.file.validator.type=" + DispatchConstants.FILE_VALIDATOR_TYPE_DEFAULT,
 	service = DispatchFileValidator.class
 )

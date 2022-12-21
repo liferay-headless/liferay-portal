@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Matija Petanjek
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DispatchPortletKeys.DISPATCH,
 	service = ControlPanelEntry.class
 )

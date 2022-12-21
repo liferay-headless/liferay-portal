@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Beslic
  */
 @Component(
+	immediate = true,
 	property = {
 		"dispatch.task.executor.name=" + TalendDispatchTaskExecutor.TALEND,
 		"dispatch.task.executor.type=" + TalendDispatchTaskExecutor.TALEND
