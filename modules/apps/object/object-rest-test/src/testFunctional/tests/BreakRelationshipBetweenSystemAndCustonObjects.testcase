@@ -19,8 +19,8 @@ definition {
 		}
 		else {
 			for (var objectName : list "Foundation,SecondFoundation") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
-		}
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			}
 		}
 	}
 
@@ -69,27 +69,27 @@ definition {
 
 		task ("Given object entries created") {
 			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation First");
+				en_US_plural_label = "foundations",
+				name = "Foundation First");
 			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation Second");
+				en_US_plural_label = "foundations",
+				name = "Foundation Second");
 			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation First-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation First-1");
 			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation Second-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation Second-1");
 		}
 
 		task ("Given userAccount entry created") {
 			var response = UserAccountAPI.createUserAccount(
-			alternateName = "user",
-			emailAddress = "user@liferay.com",
-			familyName = "userfn",
-			fieldName = "${fieldName}",
-			fieldValue = "${fieldValue}",
-			givenName = "usergn");
+				alternateName = "user",
+				emailAddress = "user@liferay.com",
+				familyName = "userfn",
+				fieldName = "${fieldName}",
+				fieldValue = "${fieldValue}",
+				givenName = "usergn");
 
 			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
 		}
@@ -123,7 +123,7 @@ definition {
 	test CanBreakOneToManyRelationship {
 		property portal.acceptance = "true";
 
-				task ("Given a foundation object") {
+		task ("Given a foundation object") {
 			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 				en_US_label = "foundation",
 				en_US_plural_label = "foundations",
@@ -163,27 +163,27 @@ definition {
 
 		task ("Given object entries created") {
 			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation First");
+				en_US_plural_label = "foundations",
+				name = "Foundation First");
 			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation Second");
+				en_US_plural_label = "foundations",
+				name = "Foundation Second");
 			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation First-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation First-1");
 			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation Second-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation Second-1");
 		}
 
 		task ("Given userAccount entry created") {
 			var response = UserAccountAPI.createUserAccount(
-			alternateName = "user",
-			emailAddress = "user@liferay.com",
-			familyName = "userfn",
-			fieldName = "${fieldName}",
-			fieldValue = "${fieldValue}",
-			givenName = "usergn");
+				alternateName = "user",
+				emailAddress = "user@liferay.com",
+				familyName = "userfn",
+				fieldName = "${fieldName}",
+				fieldValue = "${fieldValue}",
+				givenName = "usergn");
 
 			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
 		}
@@ -217,7 +217,7 @@ definition {
 	test CanBreakOneToManyRelationshipKeepingOtherEntriesRelated {
 		property portal.acceptance = "true";
 
-				task ("Given a foundation object") {
+		task ("Given a foundation object") {
 			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 				en_US_label = "foundation",
 				en_US_plural_label = "foundations",
@@ -257,27 +257,27 @@ definition {
 
 		task ("Given object entries created") {
 			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation First");
+				en_US_plural_label = "foundations",
+				name = "Foundation First");
 			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation Second");
+				en_US_plural_label = "foundations",
+				name = "Foundation Second");
 			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation First-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation First-1");
 			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "secondFoundations",
-			name = "Foundation Second-1");
+				en_US_plural_label = "secondFoundations",
+				name = "Foundation Second-1");
 		}
 
 		task ("Given userAccount entry created") {
 			var response = UserAccountAPI.createUserAccount(
-			alternateName = "user",
-			emailAddress = "user@liferay.com",
-			familyName = "userfn",
-			fieldName = "${fieldName}",
-			fieldValue = "${fieldValue}",
-			givenName = "usergn");
+				alternateName = "user",
+				emailAddress = "user@liferay.com",
+				familyName = "userfn",
+				fieldName = "${fieldName}",
+				fieldValue = "${fieldValue}",
+				givenName = "usergn");
 
 			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
 		}
@@ -311,4 +311,5 @@ definition {
 
 		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
 	}
+
 }
