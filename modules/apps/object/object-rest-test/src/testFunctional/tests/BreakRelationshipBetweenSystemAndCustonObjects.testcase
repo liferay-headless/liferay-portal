@@ -9,6 +9,18 @@ definition {
 
 	setUp {
 		TestCase.setUpPortalInstanceNoSelenium();
+	}
+
+	tearDown {
+		for (var objectName : list "Foundation,SecondFoundation") {
+			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+		}
+	}
+
+	@disable-webdriver = "true"
+	@priority = "4"
+	test CanBreakManyToManyRelationship {
+		property portal.acceptance = "true";
 
 		task ("Given a foundation object") {
 			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
@@ -49,26 +61,31 @@ definition {
 		}
 
 		task ("Given object entries created") {
-			ObjectDefinitionAPI.setUpGlobalObjectEntryId();
+			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation First");
+			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation Second");
+			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation First-1");
+			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation Second-1");
 		}
 
 		task ("Given userAccount entry created") {
-			UserAccountAPI.setUpGlobalUserAccountId();
+			var response = UserAccountAPI.createUserAccount(
+			alternateName = "user",
+			emailAddress = "user@liferay.com",
+			familyName = "userfn",
+			fieldName = "${fieldName}",
+			fieldValue = "${fieldValue}",
+			givenName = "usergn");
+
+			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
 		}
-	}
-
-	tearDown {
-		for (var objectName : list "Foundation,SecondFoundation") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
-		}
-
-		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
-	}
-
-	@disable-webdriver = "true"
-	@priority = "4"
-	test CanBreakManyToManyRelationship {
-		property portal.acceptance = "true";
 
 		task ("Given I relate the custom object entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
@@ -90,12 +107,79 @@ definition {
 				relationshipName = "usersSecondFoundations",
 				userAccountId = "${staticUserAccountId}");
 		}
+
+		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
 	}
 
 	@disable-webdriver = "true"
 	@priority = "4"
 	test CanBreakOneToManyRelationship {
 		property portal.acceptance = "true";
+
+				task ("Given a foundation object") {
+			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "foundation",
+				en_US_plural_label = "foundations",
+				name = "Foundation",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given a secondFoundation object") {
+			var customObjectDefinitionId2 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "secondFoundation",
+				en_US_plural_label = "secondFoundations",
+				name = "SecondFoundation",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given oneToMany relationship userFoundations created") {
+			ObjectDefinitionAPI.setUpGlobalObjectDefinitionIdWithName(objectName = "User");
+
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "UserFoundations",
+				name = "userFoundations",
+				objectDefinitionId1 = "${staticObjectId}",
+				objectDefinitionId2 = "${customObjectDefinitionId1}",
+				type = "oneToMany");
+		}
+
+		task ("Given manyToMany relationship userSecondFoundations created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "UsersSecondFoundations",
+				name = "usersSecondFoundations",
+				objectDefinitionId1 = "${staticObjectId}",
+				objectDefinitionId2 = "${customObjectDefinitionId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given object entries created") {
+			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation First");
+			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation Second");
+			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation First-1");
+			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation Second-1");
+		}
+
+		task ("Given userAccount entry created") {
+			var response = UserAccountAPI.createUserAccount(
+			alternateName = "user",
+			emailAddress = "user@liferay.com",
+			familyName = "userfn",
+			fieldName = "${fieldName}",
+			fieldValue = "${fieldValue}",
+			givenName = "usergn");
+
+			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
+		}
 
 		task ("Given I relate foundation entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
@@ -117,12 +201,79 @@ definition {
 				relationshipName = "userFoundations",
 				userAccountId = "${staticUserAccountId}");
 		}
+
+		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
 	}
 
 	@disable-webdriver = "true"
 	@priority = "4"
 	test CanBreakOneToManyRelationshipKeepingOtherEntriesRelated {
 		property portal.acceptance = "true";
+
+				task ("Given a foundation object") {
+			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "foundation",
+				en_US_plural_label = "foundations",
+				name = "Foundation",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given a secondFoundation object") {
+			var customObjectDefinitionId2 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "secondFoundation",
+				en_US_plural_label = "secondFoundations",
+				name = "SecondFoundation",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given oneToMany relationship userFoundations created") {
+			ObjectDefinitionAPI.setUpGlobalObjectDefinitionIdWithName(objectName = "User");
+
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "UserFoundations",
+				name = "userFoundations",
+				objectDefinitionId1 = "${staticObjectId}",
+				objectDefinitionId2 = "${customObjectDefinitionId1}",
+				type = "oneToMany");
+		}
+
+		task ("Given manyToMany relationship userSecondFoundations created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "UsersSecondFoundations",
+				name = "usersSecondFoundations",
+				objectDefinitionId1 = "${staticObjectId}",
+				objectDefinitionId2 = "${customObjectDefinitionId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given object entries created") {
+			var staticObjectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation First");
+			var staticObjectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation Second");
+			var staticObjectEntryId3 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation First-1");
+			var staticObjectEntryId4 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "secondFoundations",
+			name = "Foundation Second-1");
+		}
+
+		task ("Given userAccount entry created") {
+			var response = UserAccountAPI.createUserAccount(
+			alternateName = "user",
+			emailAddress = "user@liferay.com",
+			familyName = "userfn",
+			fieldName = "${fieldName}",
+			fieldValue = "${fieldValue}",
+			givenName = "usergn");
+
+			var staticUserAccountId = JSONUtil.getWithJSONPath("${response}", "$.id");
+		}
 
 		task ("Given all foundation is related to userAccount through userAccounts PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
@@ -150,6 +301,7 @@ definition {
 				relationshipName = "userFoundations",
 				userAccountId = "${staticUserAccountId}");
 		}
-	}
 
+		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
+	}
 }
