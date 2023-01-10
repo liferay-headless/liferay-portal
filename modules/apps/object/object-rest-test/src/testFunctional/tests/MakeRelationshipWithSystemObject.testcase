@@ -163,6 +163,7 @@ definition {
 				relationshipName = "${relationshipName}");
 
 			echo("THIS IS MY RELATIONSHIP ID:");
+
 			echo("${staticObjectEntryId1}");
 
 			UserAccountAPI.relateObjectEntries(
