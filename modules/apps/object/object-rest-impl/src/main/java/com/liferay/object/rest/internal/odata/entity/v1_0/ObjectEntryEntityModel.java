@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.odata.entity.BooleanEntityField;
 import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.ComplexEntityField;
-import com.liferay.portal.odata.entity.DateEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.DoubleEntityField;
 import com.liferay.portal.odata.entity.EntityField;
@@ -146,7 +145,7 @@ public class ObjectEntryEntityModel implements EntityModel {
 					objectField.getDBType(),
 					ObjectFieldConstants.DB_TYPE_DATE)) {
 
-			return new DateEntityField(
+			return new DateTimeEntityField(
 				objectField.getName(), locale -> objectField.getName(),
 				locale -> objectField.getName());
 		}
