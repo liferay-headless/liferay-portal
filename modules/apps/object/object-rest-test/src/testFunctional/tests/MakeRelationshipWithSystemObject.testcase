@@ -156,6 +156,15 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("When I relate each foundation entry with the userAccount entry through the userAccount PUT endpoint with different relationships") {
+			var userDefinitionId = ObjectDefinitionAPI.getObjectDefinitionIdByName(name = "User");
+
+			var response = ObjectDefinitionAPI._getRelationshipId(
+				objectDefinitionId = "${userDefinitionId}",
+				relationshipName = "${relationshipName}");
+
+			echo("THIS IS MY RELATIONSHIP ID:")
+			echo("${staticObjectEntryId1}");
+
 			UserAccountAPI.relateObjectEntries(
 				customObjectId = "${staticObjectEntryId1}",
 				relationshipName = "usersFoundations",
