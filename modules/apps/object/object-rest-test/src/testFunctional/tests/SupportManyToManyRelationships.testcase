@@ -1041,7 +1041,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test ObjectEntryDeletionImpossibleWithPreventDeletionTypeRelationshipCreated {
 		property portal.acceptance = "true";

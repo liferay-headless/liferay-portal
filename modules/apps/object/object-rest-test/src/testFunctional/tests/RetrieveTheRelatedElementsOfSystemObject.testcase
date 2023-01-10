@@ -76,7 +76,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "3"
 	test CanGetRelationshipDetailsThroughRelationshipEndpointWithoutRelatedEntries {
 		property portal.acceptance = "true";
@@ -97,7 +96,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "3"
 	test CanNotGetDetailsAfterRelationshipIsDeleted {
 		property portal.acceptance = "true";
@@ -127,7 +125,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test CanReturnDetailsInManyToManyRelationship {
 		property portal.acceptance = "true";
@@ -149,7 +146,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test CanReturnDetailsInManyToManyRelationshipAfterObjectEntryDeletion {
 		property portal.acceptance = "true";
@@ -187,7 +183,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test CanReturnDetailsInOneToManyRelationship {
 		property portal.acceptance = "true";
@@ -209,7 +204,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test CanReturnDetailsInOneToManyRelationshipAfterObjectEntryDeletion {
 		property portal.acceptance = "true";
