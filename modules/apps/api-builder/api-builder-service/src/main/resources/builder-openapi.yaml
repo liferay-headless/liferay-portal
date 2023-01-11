@@ -25,6 +25,6 @@ paths:
             x-mappings-definition:
                 entity: "com.liferay.blogs.model.BlogsEntry"
                 mappings:
-                    headline: title
-                    id: entryId
+                    headline: _title
+                    id: _entryId
                 primaryKey: entryId
