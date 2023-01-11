@@ -17,26 +17,24 @@ package com.liferay.api.builder.internal.jaxrs.application;
 import com.liferay.api.builder.constants.APIBuilderConstants;
 import com.liferay.api.builder.internal.handler.GETHttpServletRequestHandler;
 import com.liferay.api.builder.registry.APIBuilderOpenAPIRegistry;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.vulcan.yaml.openapi.PathItem;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
@@ -47,11 +45,57 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = {
-		"liferay.jackson=false",
 		"osgi.jaxrs.application.base=" + APIBuilderConstants.BASE_PATH,
 		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan)",
 		"osgi.jaxrs.name=Liferay.API.Builder"
 	},
 	service = Application.class
 )
-public class APIBuilderApplication extends Application {}
+public class APIBuilderApplication extends Application {
+
+	@GET
+	@Path("{any: .*}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response get(
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
+
+		return Response.ok(
+			_getHttpServletRequestHandler.handle(
+				filter, _httpServletRequest, pagination,
+				_apiBuilderOpenAPIRegistry.getPathItemEntry(
+					_httpServletRequest.getRequestURI()),
+				search, sorts)
+		).build();
+	}
+
+	@Override
+	public Set<Object> getSingletons() {
+		Set<Object> singletons = new HashSet<>();
+
+		singletons.add(this);
+
+		return singletons;
+	}
+
+	@Path("{any: .*}")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response post() {
+		return null;
+	}
+
+	@Reference
+	private APIBuilderOpenAPIRegistry _apiBuilderOpenAPIRegistry;
+
+	@Context
+	private Company _company;
+
+	@Reference
+	private GETHttpServletRequestHandler _getHttpServletRequestHandler;
+
+	@Context
+	private HttpServletRequest _httpServletRequest;
+
+}
