@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,14 +39,14 @@ import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Matija Petanjek
- *
- * This should be a REST service where user will be able to submit an openAPI spec.
  */
 @Component(immediate = true, service = APIBuilderOpenAPIRegistry.class)
 public class APIBuilderOpenAPIRegistryImpl
 	implements APIBuilderOpenAPIRegistry {
 
-	public Map.Entry<Pattern, Map.Entry<String, PathItem>> getPathItem(String path) {
+	public Map.Entry<Pattern, Map.Entry<String, PathItem>> getPathItemEntry(
+		String path) {
+
 		for (Map.Entry<Pattern, Map.Entry<String, PathItem>> entry :
 				_pathItemsMap.entrySet()) {
 
@@ -64,7 +65,9 @@ public class APIBuilderOpenAPIRegistryImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) throws Exception {
-		OpenAPIYAML openAPIYAML = null;
+
+		// TODO This should be a REST service where user will be able to submit
+		//  an openAPI spec.
 
 		try (InputStream inputStream = getClass().getResourceAsStream(
 				"/builder-openapi.yaml");
@@ -73,16 +76,14 @@ public class APIBuilderOpenAPIRegistryImpl
 
 			Stream<String> stream = reader.lines();
 
-			openAPIYAML = YAMLUtil.loadOpenAPIYAML(
+			OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(
 				stream.collect(Collectors.joining(System.lineSeparator())));
-		}
 
-		_registerPathItems(openAPIYAML.getPathItems(), openAPIYAML);
+			_registerPathItems(openAPIYAML.getPathItems());
+		}
 	}
 
-	private void _registerPathItems(
-		Map<String, PathItem> pathItems, OpenAPIYAML openAPIYAML) {
-
+	private void _registerPathItems(Map<String, PathItem> pathItems) {
 		for (Map.Entry<String, PathItem> entry : pathItems.entrySet()) {
 			String path = entry.getKey();
 
@@ -90,10 +91,13 @@ public class APIBuilderOpenAPIRegistryImpl
 
 			String pathRegex = path.replaceAll("\\{.+\\}", "(.+)");
 
-			_pathItemsMap.put(Pattern.compile(pathRegex), entry);
+			_pathItemsMap.put(
+				Pattern.compile(pathRegex),
+				new AbstractMap.SimpleEntry<>(path, entry.getValue()));
 		}
 	}
 
-	private final Map<Pattern, Map.Entry<String, PathItem>> _pathItemsMap = new HashMap<>();
+	private final Map<Pattern, Map.Entry<String, PathItem>> _pathItemsMap =
+		new HashMap<>();
 
 }
