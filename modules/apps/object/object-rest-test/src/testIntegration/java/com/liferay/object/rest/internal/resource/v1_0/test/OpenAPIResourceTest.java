@@ -74,15 +74,34 @@ public class OpenAPIResourceTest {
 	}
 
 	@Test
-	public void testGetNestedEntitiesInObjectRelationship() throws Exception {
+	public void testGetNestedEntityInManyToManyObjectRelationship()
+		throws Exception {
+
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
 				"feature.flag.LPS-168462", "true"
 			).build());
 
-		_testGetNestedEntityInManyToManyObjectRelationship();
+		_testGetNestedEntityInObjectRelationship(
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
 
-		_testGetNestedEntityInOneToManyObjectRelationship();
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-168462", "false"
+			).build());
+	}
+
+	@Test
+	public void testGetNestedEntityInOneToManyObjectRelationship()
+		throws Exception {
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-168462", "true"
+			).build());
+
+		_testGetNestedEntityInObjectRelationship(
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
@@ -134,42 +153,34 @@ public class OpenAPIResourceTest {
 
 		String nestedEntitySchema;
 
+		JSONObject nestedEntitySchemaJSONObject = jsonObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			objectDefinition.getShortName()
+		).getJSONObject(
+			"properties"
+		).getJSONObject(
+			objectRelationship.getName()
+		);
+
 		if (Objects.equals(
 				objectRelationship.getType(),
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
 			(objectDefinition.getObjectDefinitionId() ==
 				_objectDefinition2.getObjectDefinitionId())) {
 
-			nestedEntitySchema = (String)jsonObject.getJSONObject(
-				"components"
-			).getJSONObject(
-				"schemas"
-			).getJSONObject(
-				objectDefinition.getShortName()
-			).getJSONObject(
-				"properties"
-			).getJSONObject(
-				objectRelationship.getName()
-			).get(
-				"$ref"
-			);
+			nestedEntitySchema = (String)nestedEntitySchemaJSONObject.get(
+				"$ref");
 		}
 		else {
-			nestedEntitySchema = (String)jsonObject.getJSONObject(
-				"components"
-			).getJSONObject(
-				"schemas"
-			).getJSONObject(
-				objectDefinition.getShortName()
-			).getJSONObject(
-				"properties"
-			).getJSONObject(
-				objectRelationship.getName()
-			).getJSONObject(
-				"items"
-			).get(
-				"$ref"
-			);
+			nestedEntitySchema =
+				(String)nestedEntitySchemaJSONObject.getJSONObject(
+					"items"
+				).get(
+					"$ref"
+				);
 		}
 
 		String[] nestedEntitySchemaSplit = nestedEntitySchema.split("/");
@@ -177,7 +188,8 @@ public class OpenAPIResourceTest {
 		return nestedEntitySchemaSplit[nestedEntitySchemaSplit.length - 1];
 	}
 
-	private void _testGetNestedEntityInManyToManyObjectRelationship()
+	private void _testGetNestedEntityInObjectRelationship(
+			String objectRelationshipType)
 		throws Exception {
 
 		_objectDefinition2 = ObjectDefinitionTestUtil.publishObjectDefinition(
@@ -189,61 +201,7 @@ public class OpenAPIResourceTest {
 		ObjectRelationship objectRelationship =
 			ObjectRelationshipTestUtil.addObjectRelationship(
 				_objectDefinition1, _objectDefinition2,
-				TestPropsValues.getUserId(),
-				ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
-
-		JSONObject jsonObject = HTTPTestUtil.invoke(
-			null, "/openapi", Http.Method.GET);
-
-		JSONArray jsonArray = jsonObject.getJSONArray(
-			_objectDefinition1.getRESTContextPath());
-
-		Assert.assertEquals(1, jsonArray.length());
-		Assert.assertEquals(
-			"http://localhost:8080/o" +
-				_objectDefinition1.getRESTContextPath() + "/openapi.yaml",
-			jsonArray.get(0));
-
-		jsonObject = HTTPTestUtil.invoke(
-			null, _objectDefinition1.getRESTContextPath() + "/openapi.json",
-			Http.Method.GET);
-
-		Assert.assertNotNull(jsonObject.getString("openapi"));
-
-		Assert.assertEquals(
-			_getNestedEntitySchema(
-				jsonObject, objectRelationship, _objectDefinition1),
-			_objectDefinition2.getShortName());
-
-		Assert.assertNull(
-			jsonObject.getJSONArray(_objectDefinition2.getRESTContextPath()));
-
-		jsonObject = HTTPTestUtil.invoke(
-			null, _objectDefinition2.getRESTContextPath() + "/openapi.json",
-			Http.Method.GET);
-
-		Assert.assertNotNull(jsonObject.getString("openapi"));
-
-		Assert.assertEquals(
-			_getNestedEntitySchema(
-				jsonObject, objectRelationship, _objectDefinition2),
-			_objectDefinition1.getShortName());
-	}
-
-	private void _testGetNestedEntityInOneToManyObjectRelationship()
-		throws Exception {
-
-		_objectDefinition2 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			Collections.singletonList(
-				ObjectFieldUtil.createObjectField(
-					"Text", "String", true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME, false)));
-
-		ObjectRelationship objectRelationship =
-			ObjectRelationshipTestUtil.addObjectRelationship(
-				_objectDefinition1, _objectDefinition2,
-				TestPropsValues.getUserId(),
-				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+				TestPropsValues.getUserId(), objectRelationshipType);
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
 			null, "/openapi", Http.Method.GET);
