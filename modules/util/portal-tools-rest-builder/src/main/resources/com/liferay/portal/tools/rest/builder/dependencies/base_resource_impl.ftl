@@ -872,7 +872,7 @@ public abstract class Base${schemaName}ResourceImpl
 	}
 
 	protected Map<String, String> addAction(String actionName, Long id, String methodName, Long ownerId, String permissionName, Long siteId) {
-		return ActionUtil.addAction(actionName, getClass(), id, methodName, contextScopeChecker, ownerId, permissionName, siteId, contextUriInfo);
+		return ActionUtil.addAction(actionName, getClass(), contextHttpServletRequest, id, methodName, contextScopeChecker, ownerId, permissionName, siteId, contextUriInfo);
 	}
 
 	protected Map<String, String> addAction(String actionName, Long id, String methodName, ModelResourcePermission modelResourcePermission) {
