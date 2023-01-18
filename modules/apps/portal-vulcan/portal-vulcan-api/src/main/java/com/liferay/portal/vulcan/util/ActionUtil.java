@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.graphql.util.GraphQLNamingUtil;
 
@@ -39,6 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
@@ -79,6 +83,22 @@ public class ActionUtil {
 			uriInfo);
 	}
 
+	public static Map<String, String> addAction(
+		String actionName, Class<?> clazz,
+		HttpServletRequest httpServletRequest, Long id, String methodName,
+		Object object, Long ownerId, String permissionName, Long siteId,
+		UriInfo uriInfo) {
+
+		try {
+			return _addAction(
+				actionName, clazz, httpServletRequest, id, methodName, null,
+				object, ownerId, permissionName, siteId, uriInfo);
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #addAction(String, Class, Long, String, Object,
@@ -92,7 +112,7 @@ public class ActionUtil {
 
 		try {
 			return _addAction(
-				actionName, clazz, id, methodName, null, object, ownerId,
+				actionName, clazz, null, id, methodName, null, object, ownerId,
 				permissionName, siteId, uriInfo);
 		}
 		catch (Exception exception) {
@@ -107,8 +127,8 @@ public class ActionUtil {
 
 		try {
 			return _addAction(
-				actionName, clazz, id, methodName, modelResourcePermission,
-				object, null, null, null, uriInfo);
+				actionName, clazz, null, id, methodName,
+				modelResourcePermission, object, null, null, null, uriInfo);
 		}
 		catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -146,7 +166,8 @@ public class ActionUtil {
 	}
 
 	private static Map<String, String> _addAction(
-			String actionName, Class<?> clazz, Long id, String methodName,
+			String actionName, Class<?> clazz,
+			HttpServletRequest httpServletRequest, Long id, String methodName,
 			ModelResourcePermission<?> modelResourcePermission, Object object,
 			Long ownerId, String permissionName, Long siteId, UriInfo uriInfo)
 		throws Exception {
@@ -239,7 +260,17 @@ public class ActionUtil {
 			() -> {
 				UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(uriInfo);
 
-				return uriBuilder.path(
+				String scheme = Http.HTTP;
+
+				if (PortalUtil.isSecure(httpServletRequest)) {
+					scheme = Http.HTTPS;
+				}
+
+				return uriBuilder.scheme(
+					scheme
+				).host(
+					PortalUtil.getHost(httpServletRequest)
+				).path(
 					_getVersion(uriInfo)
 				).path(
 					clazz.getSuperclass(), methodName
