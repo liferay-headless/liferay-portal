@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.vulcan.util.UriInfoUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,9 +80,9 @@ public class HeadlessDiscoveryOpenAPIApplication extends Application {
 
 		Map<String, List<String>> pathsMap = new TreeMap<>();
 
-		String serverURL =
-			_portal.getPortalURL(_httpServletRequest) + _portal.getPathProxy() +
-				Portal.PATH_MODULE;
+		String serverURL = StringUtil.removeSubstring(
+			UriInfoUtil.getBasePath(_uriInfo, _httpServletRequest),
+			"/openapi/");
 
 		RuntimeDTO runtimeDTO = _jaxrsServiceRuntime.getRuntimeDTO();
 
