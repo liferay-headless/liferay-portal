@@ -621,8 +621,9 @@ public abstract class BaseDiscountCategoryResourceImpl
 		String permissionName, Long siteId) {
 
 		return ActionUtil.addAction(
-			actionName, getClass(), id, methodName, contextScopeChecker,
-			ownerId, permissionName, siteId, contextUriInfo);
+			actionName, getClass(), contextHttpServletRequest, id, methodName,
+			contextScopeChecker, ownerId, permissionName, siteId,
+			contextUriInfo);
 	}
 
 	protected Map<String, String> addAction(
