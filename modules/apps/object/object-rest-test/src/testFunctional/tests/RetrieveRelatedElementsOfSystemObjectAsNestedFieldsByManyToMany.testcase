@@ -71,17 +71,16 @@ definition {
 		}
 		else {
 			for (var objectName : list "Foundation,SecondFoundation") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
-		for (var userId : list "${staticUserAccountId1},${staticUserAccountId2}") {
-			JSONUser.deleteUserByUserId(userId = "${userId}");
+			for (var userId : list "${staticUserAccountId1},${staticUserAccountId2}") {
+				JSONUser.deleteUserByUserId(userId = "${userId}");
 			}
 		}
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "3"
 	test CanGetRelationshipDetailsInNestedFieldsWithoutRelatedEntries {
 		property portal.acceptance = "true";
@@ -103,7 +102,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "3"
 	test CanNotGetRelationshipDetailsInNestedFieldsAfterRelationshipIsDeleted {
 		property portal.acceptance = "true";
@@ -136,7 +134,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanReturnMultipleNestedFieldsDetailsInManyToManyRelationship {
 		property portal.acceptance = "true";
@@ -169,7 +166,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanReturnNestedFieldsDetailsInManyToManyRelationship {
 		property portal.acceptance = "true";
@@ -196,7 +192,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanReturnNestedFieldsDetailsInManyToManyRelationshipAfterObjectEntryDeletion {
 		property portal.acceptance = "true";

@@ -65,7 +65,7 @@ definition {
 		}
 		else {
 			for (var objectName : list "Foundation,SecondFoundation") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
 			JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");

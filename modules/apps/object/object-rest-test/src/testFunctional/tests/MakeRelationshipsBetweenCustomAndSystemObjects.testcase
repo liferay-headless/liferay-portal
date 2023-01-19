@@ -53,6 +53,7 @@ definition {
 			for (var objectName : list "University,Subject") {
 				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
+
 			AccountAPI.deleteAccount(accountId = "${staticAccountId}");
 		}
 	}
