@@ -26,12 +26,14 @@ definition {
 	}
 
 	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			for (var objectName : list "University,Subject") {
-				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
 			ObjectFieldAPI.deleteObjectField();
