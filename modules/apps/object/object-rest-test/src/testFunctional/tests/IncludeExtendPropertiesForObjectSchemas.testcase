@@ -26,11 +26,16 @@ definition {
 	}
 
 	tearDown {
-		for (var objectName : list "University,Subject") {
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			for (var objectName : list "University,Subject") {
 			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 		}
 
 		ObjectFieldAPI.deleteObjectField();
+		}
 	}
 
 	@priority = "4"

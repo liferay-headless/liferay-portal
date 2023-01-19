@@ -26,9 +26,16 @@ definition {
 	}
 
 	tearDown {
-		JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		ObjectFieldAPI.deleteObjectField();
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONUser.deleteUserByUserId(userId = "${staticUserAccountId}");
+
+			ObjectFieldAPI.deleteObjectField();
+		}
 	}
 
 	@disable-webdriver = "true"

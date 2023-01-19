@@ -46,15 +46,18 @@ definition {
 	}
 
 	tearDown {
-		for (var objectName : list "University,Subject") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
 		}
-
-		AccountAPI.deleteAccount(accountId = "${staticAccountId}");
+		else {
+			for (var objectName : list "University,Subject") {
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			}
+			AccountAPI.deleteAccount(accountId = "${staticAccountId}");
+		}
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "5"
 	test CanCreateMultipleManyToManyRelationshipsBetweenTwoObjects {
 		property portal.acceptance = "true";
@@ -87,7 +90,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "5"
 	test CanCreateMultipleOneToManyRelationshipsBetweenTwoObjects {
 		property portal.acceptance = "true";
@@ -126,7 +128,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
 	@priority = "4"
 	test CanGetEmptyPageWithNoEntriesRelated {
 		property portal.acceptance = "true";
