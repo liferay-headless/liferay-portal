@@ -33,7 +33,7 @@ definition {
 		}
 		else {
 			for (var objectName : list "University,Subject") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
 			ObjectFieldAPI.deleteObjectField();
