@@ -189,6 +189,38 @@ definition {
 		return "${staticUserAccountId}";
 	}
 
+	macro setUpGlobalUserAccountOneId {
+		var response = UserAccountAPI.createUserAccount(
+			alternateName = "${alternateName}",
+			emailAddress = "${emailAddress}",
+			familyName = "${familyName}",
+			givenName = "${givenName}");
+
+		static var staticUserAccountOneId = JSONUtil.getWithJSONPath("${response}", "$.id");
+
+		return "${staticUserAccountOneId}";
+	}
+
+	macro setUpGlobalUserAccountTwoId {
+		var response = UserAccountAPI.createUserAccount(
+			alternateName = "${alternateName}",
+			emailAddress = "${emailAddress}",
+			familyName = "${familyName}",
+			givenName = "${givenName}");
+
+		static var staticUserAccountTwoId = JSONUtil.getWithJSONPath("${response}", "$.id");
+
+		return "${staticUserAccountTwoId}";
+	}
+
+	macro setUpGlobalObjectUserAccountId {
+		var objectDefinitionId = ObjectDefinitionAPI.getObjectDefinitionIdByName(name = "User");
+
+		static var staticObjectUserAccountId = "${objectDefinitionId}";
+
+		return "${staticObjectUserAccountId}";
+	}
+
 	macro setUpGlobalUserAccountIds {
 		var response1 = UserAccountAPI.createUserAccount(
 			alternateName = "${alternateName1}",
