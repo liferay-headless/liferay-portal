@@ -868,6 +868,33 @@ definition {
 		return "${response}";
 	}
 
+	macro setUpGlobalFoundationEntriesIds {
+		var objectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation Abc");
+		var objectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "foundations",
+			name = "Foundation Efg");
+		static var staticFoundationAbcId = "${objectEntryId1}";
+		static var staticFoundationEfgId = "${objectEntryId2}";
+
+		return "${staticFoundationAbcId}";
+
+		return "${staticFoundationEfgId}";
+	}
+
+	macro setUpGlobalFoundationId {
+		var objectDefinitionId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "foundation",
+			en_US_plural_label = "foundations",
+			name = "Foundation",
+			requiredStringFieldName = "name");
+
+		static var staticFoundationId = "${objectDefinitionId}";
+
+		return "${staticFoundationId}";
+	}
+
 	macro setUpGlobalobjectDefinitionId {
 		var objectId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 			en_US_label = "university",
@@ -897,60 +924,6 @@ definition {
 		return "${staticObjectId}";
 	}
 
-	macro setUpGlobalFoundationId {
-		var objectDefinitionId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-				en_US_label = "foundation",
-				en_US_plural_label = "foundations",
-				name = "Foundation",
-				requiredStringFieldName = "name");
-		
-		static var staticFoundationId = "${objectDefinitionId}";
-
-		return "${staticFoundationId}";		
-	}
-
-	macro setUpGlobalOrganizationId {
-		var objectDefinitionId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-				en_US_label = "organization",
-				en_US_plural_label = "organizations",
-				name = "Organization",
-				requiredStringFieldName = "name");
-		
-		static var staticOrganizationId = "${objectDefinitionId}";
-
-		return "${staticOrganizationId}";		
-	}
-
-	macro setUpGlobalFoundationEntriesIds {
-		var objectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation Abc");
-		var objectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "foundations",
-			name = "Foundation Efg");
-		
-		static var staticFoundationAbcId = "${objectEntryId1}";
-		static var staticFoundationEfgId = "${objectEntryId2}";
-
-		return "${staticFoundationAbcId}";
-		return "${staticFoundationEfgId}";
-	}
-
-	macro setUpGlobalOrganizationEntriesIds {
-		var objectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "organizations",
-			name = "Organization Ijk");
-		var objectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
-			en_US_plural_label = "organizations",
-			name = "Organization Lmn");
-		
-		static var staticOrganizationIjkId = "${objectEntryId1}";
-		static var staticOrganizationLmnId = "${objectEntryId2}";
-
-		return "${staticOrganizationIjkId}";
-		return "${staticOrganizationLmnId}";
-	}
-
 	macro setUpGlobalObjectEntryId {
 		var objectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
 			en_US_plural_label = "foundations",
@@ -976,6 +949,33 @@ definition {
 		return "${staticObjectEntryId3}";
 
 		return "${staticObjectEntryId4}";
+	}
+
+	macro setUpGlobalOrganizationEntriesIds {
+		var objectEntryId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "organizations",
+			name = "Organization Ijk");
+		var objectEntryId2 = ObjectDefinitionAPI.createObjectEntryWithName(
+			en_US_plural_label = "organizations",
+			name = "Organization Lmn");
+		static var staticOrganizationIjkId = "${objectEntryId1}";
+		static var staticOrganizationLmnId = "${objectEntryId2}";
+
+		return "${staticOrganizationIjkId}";
+
+		return "${staticOrganizationLmnId}";
+	}
+
+	macro setUpGlobalOrganizationId {
+		var objectDefinitionId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "organization",
+			en_US_plural_label = "organizations",
+			name = "Organization",
+			requiredStringFieldName = "name");
+
+		static var staticOrganizationId = "${objectDefinitionId}";
+
+		return "${staticOrganizationId}";
 	}
 
 	macro setUpGlobalUniversityId {

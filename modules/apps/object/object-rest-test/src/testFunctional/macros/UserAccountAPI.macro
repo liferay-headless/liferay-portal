@@ -171,6 +171,14 @@ definition {
 		return "${response}";
 	}
 
+	macro setUpGlobalObjectUserAccountId {
+		var objectDefinitionId = ObjectDefinitionAPI.getObjectDefinitionIdByName(name = "User");
+
+		static var staticObjectUserAccountId = "${objectDefinitionId}";
+
+		return "${staticObjectUserAccountId}";
+	}
+
 	macro setUpGlobalUserAccountId {
 		var response = UserAccountAPI.createUserAccount(
 			alternateName = "user",
@@ -187,6 +195,25 @@ definition {
 		return "${staticResponse}";
 
 		return "${staticUserAccountId}";
+	}
+
+	macro setUpGlobalUserAccountIds {
+		var response1 = UserAccountAPI.createUserAccount(
+			alternateName = "${alternateName1}",
+			emailAddress = "${emailAddress1}",
+			familyName = "${familyName1}",
+			givenName = "${givenName1}");
+		var response2 = UserAccountAPI.createUserAccount(
+			alternateName = "${alternateName2}",
+			emailAddress = "${emailAddress2}",
+			familyName = "${familyName2}",
+			givenName = "${givenName2}");
+		static var staticUserAccountId1 = JSONUtil.getWithJSONPath("${response1}", "$.id");
+		static var staticUserAccountId2 = JSONUtil.getWithJSONPath("${response2}", "$.id");
+
+		return "${staticUserAccountId1}";
+
+		return "${staticUserAccountId2}";
 	}
 
 	macro setUpGlobalUserAccountOneId {
@@ -211,33 +238,6 @@ definition {
 		static var staticUserAccountTwoId = JSONUtil.getWithJSONPath("${response}", "$.id");
 
 		return "${staticUserAccountTwoId}";
-	}
-
-	macro setUpGlobalObjectUserAccountId {
-		var objectDefinitionId = ObjectDefinitionAPI.getObjectDefinitionIdByName(name = "User");
-
-		static var staticObjectUserAccountId = "${objectDefinitionId}";
-
-		return "${staticObjectUserAccountId}";
-	}
-
-	macro setUpGlobalUserAccountIds {
-		var response1 = UserAccountAPI.createUserAccount(
-			alternateName = "${alternateName1}",
-			emailAddress = "${emailAddress1}",
-			familyName = "${familyName1}",
-			givenName = "${givenName1}");
-		var response2 = UserAccountAPI.createUserAccount(
-			alternateName = "${alternateName2}",
-			emailAddress = "${emailAddress2}",
-			familyName = "${familyName2}",
-			givenName = "${givenName2}");
-		static var staticUserAccountId1 = JSONUtil.getWithJSONPath("${response1}", "$.id");
-		static var staticUserAccountId2 = JSONUtil.getWithJSONPath("${response2}", "$.id");
-
-		return "${staticUserAccountId1}";
-
-		return "${staticUserAccountId2}";
 	}
 
 }

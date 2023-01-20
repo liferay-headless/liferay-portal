@@ -42,6 +42,7 @@ definition {
 
 		task ("Given object entries created") {
 			ObjectDefinitionAPI.setUpGlobalFoundationEntriesIds();
+
 			ObjectDefinitionAPI.setUpGlobalOrganizationEntriesIds();
 		}
 
@@ -56,7 +57,7 @@ definition {
 				alternateName = "user2",
 				emailAddress = "user2@liferay.com",
 				familyName = "userfn2",
-				givenName = "usergn2");	
+				givenName = "usergn2");
 		}
 	}
 
