@@ -890,9 +890,33 @@ definition {
 			name = "Foundation",
 			requiredStringFieldName = "name");
 
-		static var staticFoundationId = "${objectDefinitionId}";
+		static var staticFoundationObjectId = "${objectDefinitionId}";
 
-		return "${staticFoundationId}";
+		return "${staticFoundationObjectId}";
+	}
+
+	macro setUpGlobalSubjectObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "subject",
+			en_US_plural_label = "subjects",
+			name = "Subject",
+			requiredStringFieldName = "name");
+
+		static var staticSubjectObjectId = "${objectId}";
+
+		return "${staticSubjectObjectId}";
+	}
+
+	macro setUpGlobalUniversityObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "university",
+			en_US_plural_label = "universities",
+			name = "University",
+			requiredStringFieldName = "name");
+		
+		static var staticUniversityObjectId = "${objectId}";
+
+		return "${staticUniversityObjectId}";
 	}
 
 	macro setUpGlobalobjectDefinitionId {
