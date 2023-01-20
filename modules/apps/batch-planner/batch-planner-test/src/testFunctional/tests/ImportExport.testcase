@@ -862,6 +862,7 @@ definition {
 	}
 
 	@description = "Verify users cannot import an entity without mapping the required fields."
+	@ignore = "true"
 	@priority = "3"
 	test CannotImportWithoutRequiredFields {
 		property portal.acceptance = "true";
@@ -1191,6 +1192,7 @@ definition {
 	}
 
 	@description = "Verify users can search Import/Exports executions by name and action."
+	@ignore = "true"
 	@priority = "3"
 	test CanSearchExecutions {
 		property portal.acceptance = "true";

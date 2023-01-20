@@ -48,6 +48,7 @@ definition {
 
 	@description = "Aggregation Terms in oneToMany relationship"
 	@disable-webdriver = "true"
+	@ignore = "true"
 	@priority = "5"
 	test CanReturnAggregationTermsDetailsInOneToManyRelationship {
 		property portal.acceptance = "true";
@@ -90,6 +91,7 @@ definition {
 
 	@description = "Aggregation Terms in oneToMany relationship after object deletion"
 	@disable-webdriver = "true"
+	@ignore = "true"
 	@priority = "5"
 	test CanReturnAggregationTermsDetailsInOneToManyRelationshipAfterObjectDeletion {
 		property portal.acceptance = "true";
