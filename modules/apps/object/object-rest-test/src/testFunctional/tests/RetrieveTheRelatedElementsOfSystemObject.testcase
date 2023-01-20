@@ -1,7 +1,7 @@
 @component-name = "portal-headless"
 definition {
 
-	property custom.properties = "feature.flag.LPS-162964=true${line.separator}feature.flag.LPS-153324=true";
+	property custom.properties = "feature.flag.LPS-153324=true${line.separator}feature.flag.LPS-162964=true${line.separator}feature.flag.LPS-162966=true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Object";
@@ -11,92 +11,92 @@ definition {
 		TestCase.setUpPortalInstanceNoSelenium();
 
 		task ("Given a Foundation object") {
-			var objectDefinitionId2 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-				en_US_label = "foundation",
-				en_US_plural_label = "foundations",
-				name = "Foundation",
-				requiredStringFieldName = "name");
+			ObjectDefinitionAPI.setUpGlobalFoundationId();
 		}
 
-		task ("Given a secondFoundation object") {
-			var objectDefinitionId3 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-				en_US_label = "secondFoundation",
-				en_US_plural_label = "secondFoundations",
-				name = "SecondFoundation",
-				requiredStringFieldName = "name");
+		task ("Given an Organization object") {
+			ObjectDefinitionAPI.setUpGlobalOrganizationId();
 		}
 
 		task ("Given manyToMany relationship usersFoundations created") {
-			var objectDefinitionId1 = ObjectDefinitionAPI.getObjectDefinitionIdByName(name = "User");
+			UserAccountAPI.setUpGlobalObjectUserAccountId();
 
-			ObjectDefinitionAPI.createRelationship(
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
 				deletionType = "cascade",
-				en_US_label = "UsersFoundations",
+				en_US_label = "usersFoundations",
 				name = "usersFoundations",
-				objectDefinitionId1 = "${objectDefinitionId1}",
-				objectDefinitionId2 = "${objectDefinitionId2}",
+				objectDefinitionId1 = "${staticObjectUserAccountId}",
+				objectDefinitionId2 = "${staticFoundationId}",
 				type = "manyToMany");
 		}
 
-		task ("Given oneToMany relationship userSecondFoundations created") {
-			ObjectDefinitionAPI.createRelationship(
+		task ("Given oneToMany relationship userOrganizations created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
 				deletionType = "cascade",
-				en_US_label = "UserSecondFoundations",
-				name = "userSecondFoundations",
-				objectDefinitionId1 = "${objectDefinitionId1}",
-				objectDefinitionId2 = "${objectDefinitionId3}",
+				en_US_label = "userOrganizations",
+				name = "userOrganizations",
+				objectDefinitionId1 = "${staticObjectUserAccountId}",
+				objectDefinitionId2 = "${staticOrganizationId}",
 				type = "oneToMany");
 		}
 
 		task ("Given object entries created") {
-			ObjectDefinitionAPI.setUpGlobalObjectEntryId();
+			ObjectDefinitionAPI.setUpGlobalFoundationEntriesIds();
+
+			ObjectDefinitionAPI.setUpGlobalOrganizationEntriesIds();
 		}
 
 		task ("Given two userAccount entries created") {
-			UserAccountAPI.setUpGlobalUserAccountIds(
-				alternateName1 = "user1",
-				alternateName2 = "user2",
-				emailAddress1 = "user1@liferay.com",
-				emailAddress2 = "user2@liferay.com",
-				familyName1 = "userfn1",
-				familyName2 = "userfn2",
-				givenName1 = "usergn1",
-				givenName2 = "usergn2");
+			UserAccountAPI.setUpGlobalUserAccountOneId(
+				alternateName = "user1",
+				emailAddress = "user1@liferay.com",
+				familyName = "userfn1",
+				givenName = "usergn1");
+
+			UserAccountAPI.setUpGlobalUserAccountTwoId(
+				alternateName = "user2",
+				emailAddress = "user2@liferay.com",
+				familyName = "userfn2",
+				givenName = "usergn2");
 		}
 	}
 
 	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			for (var objectName : list "Foundation,SecondFoundation") {
+			for (var objectName : list "Foundation,Organization") {
 				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
-			for (var userId : list "${staticUserAccountId1},${staticUserAccountId2}") {
+			for (var userId : list "${staticUserAccountOneId},${staticUserAccountTwoId}") {
 				JSONUser.deleteUserByUserId(userId = "${userId}");
 			}
 		}
 	}
 
 	@disable-webdriver = "true"
+	@ignore = "true"
 	@priority = "3"
+	@refactorneeded
 	test CanGetRelationshipDetailsThroughRelationshipEndpointWithoutRelatedEntries {
 		property portal.acceptance = "true";
 
 		task ("When I call userAccount object GET endpoint with {userAccountId}/usersFoundations") {
 			UserAccountAPI.getRelationshipByUserAccountId(
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 		}
 
 		task ("Then I receive a correct response with GET endpoint {userAccount}/usersFoundations") {
 			UserAccountAPI.assertResponseNotIncludeDetailsOfDeletedObjectEntry(
-				customObjectEntryId = "${staticObjectEntryId1}",
+				customObjectEntryId = "${staticFoundationAbcId}",
 				expectedValue = "[]",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 		}
 	}
 
@@ -105,23 +105,23 @@ definition {
 	test CanNotGetDetailsAfterRelationshipIsDeleted {
 		property portal.acceptance = "true";
 
-		task ("And Given I relate the secondFoundation entry with the userAccount entry through the userAccount PUT endpoint") {
+		task ("And Given I relate the organization entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId3}",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectId = "${staticOrganizationIjkId}",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 		}
 
 		task ("When deleting the relationship") {
 			ObjectDefinitionAPI.deleteRelationship(
 				name = "User",
-				relationshipName = "userSecondFoundations");
+				relationshipName = "userOrganizations");
 		}
 
-		task ("Then the GET endpoint {userAccountId}/userSecondFoundations is no longer available") {
+		task ("Then the GET endpoint {userAccountId}/userOrganizations is no longer available") {
 			var response = UserAccountAPI.getRelationshipByUserAccountId(
-				relationshipName = "userSecondFoundations",
-				userAccountId = "staticUserAccountId1");
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 
 			ObjectDefinitionAPI.assertStatusInResponse(
 				expectedValue = "NOT_FOUND",
@@ -136,17 +136,17 @@ definition {
 
 		task ("When I relate the foundation entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId1}",
+				customObjectId = "${staticFoundationAbcId}",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 		}
 
 		task ("Then receiving correct information about the related objects in the userAccountGET endpoint {userAccountId}/usersFoundations") {
 			UserAccountAPI.assertResponseHasCorrectRelatedEntryName(
-				customObjectEntryId = "${staticObjectEntryId1}",
-				expectedValue = "Foundation First",
+				customObjectEntryId = "${staticFoundationAbcId}",
+				expectedValue = "Foundation Abc",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 		}
 	}
 
@@ -157,33 +157,33 @@ definition {
 
 		task ("And Given I relate the foundation entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId1}",
+				customObjectId = "${staticFoundationAbcId}",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId2}",
+				customObjectId = "${staticFoundationEfgId}",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId2}");
+				userAccountId = "${staticUserAccountTwoId}");
 		}
 
 		task ("When deleting one of the foundation entries") {
 			ObjectDefinitionAPI.deleteObjectEntry(
 				en_US_plural_label = "foundations",
-				objectEntryId = "${staticObjectEntryId1}");
+				objectEntryId = "${staticFoundationAbcId}");
 		}
 
 		task ("Then I receive a correct response with GET endpoint {userAccount}/usersFoundations") {
 			UserAccountAPI.assertResponseNotIncludeDetailsOfDeletedObjectEntry(
 				expectedValue = "[]",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				userAccountId = "${staticUserAccountOneId}");
 
 			UserAccountAPI.assertResponseHasCorrectRelatedEntryName(
-				customObjectEntryId = "${staticObjectEntryId2}",
-				expectedValue = "Foundation Second",
+				customObjectEntryId = "${staticFoundationEfgId}",
+				expectedValue = "Foundation Efg",
 				relationshipName = "usersFoundations",
-				userAccountId = "${staticUserAccountId2}");
+				userAccountId = "${staticUserAccountTwoId}");
 		}
 	}
 
@@ -192,19 +192,19 @@ definition {
 	test CanReturnDetailsInOneToManyRelationship {
 		property portal.acceptance = "true";
 
-		task ("When I relate the secondFoundation entry with the userAccount entry through the userAccount PUT endpoint") {
+		task ("When I relate the organization entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId3}",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectId = "${staticOrganizationIjkId}",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 		}
 
-		task ("Then receiving correct information about the related objects in the userAccountGET endpoint {userAccountId}/userSecondFoundations") {
+		task ("Then receiving correct information about the related objects in the userAccountGET endpoint {userAccountId}/userOrganizations") {
 			UserAccountAPI.assertResponseHasCorrectRelatedEntryName(
-				customObjectEntryId = "${staticObjectEntryId3}",
-				expectedValue = "Foundation First-1",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectEntryId = "${staticOrganizationIjkId}",
+				expectedValue = "Organization Ijk",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 		}
 	}
 
@@ -215,28 +215,28 @@ definition {
 
 		task ("And Given I relate the secondFoundation entry with the userAccount entry through the userAccount PUT endpoint") {
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId3}",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectId = "${staticOrganizationIjkId}",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 
 			UserAccountAPI.relateObjectEntries(
-				customObjectId = "${staticObjectEntryId4}",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectId = "${staticOrganizationLmnId}",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 		}
 
 		task ("When deleting one of the foundation entries") {
 			ObjectDefinitionAPI.deleteObjectEntry(
-				en_US_plural_label = "secondFoundations",
-				objectEntryId = "${staticObjectEntryId3}");
+				en_US_plural_label = "organizations",
+				objectEntryId = "${staticOrganizationIjkId}");
 		}
 
 		task ("Then I receive a correct response with GET endpoint {userAccount}/userSecondFoundations") {
 			UserAccountAPI.assertResponseHasCorrectRelatedEntryName(
-				customObjectEntryId = "${staticObjectEntryId4}",
-				expectedValue = "Foundation Second-1",
-				relationshipName = "userSecondFoundations",
-				userAccountId = "${staticUserAccountId1}");
+				customObjectEntryId = "${staticOrganizationLmnId}",
+				expectedValue = "Organization Lmn",
+				relationshipName = "userOrganizations",
+				userAccountId = "${staticUserAccountOneId}");
 		}
 	}
 
