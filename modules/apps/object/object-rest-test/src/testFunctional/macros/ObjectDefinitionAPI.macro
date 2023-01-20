@@ -895,30 +895,6 @@ definition {
 		return "${staticFoundationObjectId}";
 	}
 
-	macro setUpGlobalSubjectObjectId {
-		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-			en_US_label = "subject",
-			en_US_plural_label = "subjects",
-			name = "Subject",
-			requiredStringFieldName = "name");
-
-		static var staticSubjectObjectId = "${objectId}";
-
-		return "${staticSubjectObjectId}";
-	}
-
-	macro setUpGlobalUniversityObjectId {
-		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
-			en_US_label = "university",
-			en_US_plural_label = "universities",
-			name = "University",
-			requiredStringFieldName = "name");
-		
-		static var staticUniversityObjectId = "${objectId}";
-
-		return "${staticUniversityObjectId}";
-	}
-
 	macro setUpGlobalobjectDefinitionId {
 		var objectId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 			en_US_label = "university",
@@ -1002,6 +978,18 @@ definition {
 		return "${staticOrganizationId}";
 	}
 
+	macro setUpGlobalSubjectObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "subject",
+			en_US_plural_label = "subjects",
+			name = "Subject",
+			requiredStringFieldName = "name");
+
+		static var staticSubjectObjectId = "${objectId}";
+
+		return "${staticSubjectObjectId}";
+	}
+
 	macro setUpGlobalUniversityId {
 		var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
 			en_US_plural_label = "universities",
@@ -1010,6 +998,18 @@ definition {
 		static var staticUniversityId = "${universityId}";
 
 		return "${staticUniversityId}";
+	}
+
+	macro setUpGlobalUniversityObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "university",
+			en_US_plural_label = "universities",
+			name = "University",
+			requiredStringFieldName = "name");
+
+		static var staticUniversityObjectId = "${objectId}";
+
+		return "${staticUniversityObjectId}";
 	}
 
 	macro updateEmployee {

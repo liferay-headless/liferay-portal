@@ -10,6 +10,7 @@ definition {
 		TestCase.setUpPortalInstanceNoSelenium();
 
 		ObjectDefinitionAPI.setUpGlobalSubjectObjectId();
+
 		ObjectDefinitionAPI.setUpGlobalUniversityObjectId();
 	}
 
@@ -792,7 +793,7 @@ definition {
 				en_US_label = "subjectsStudents",
 				name = "subjectsStudents",
 				objectDefinitionId1 = "${staticSubjectObjectId}",
-				objectDefinitionId2 = "${objectDefinitionId2}",
+				objectDefinitionId2 = "${staticUniversityObjectId}",
 				type = "oneToMany");
 		}
 
