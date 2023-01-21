@@ -973,9 +973,9 @@ definition {
 			name = "Organization",
 			requiredStringFieldName = "name");
 
-		static var staticOrganizationId = "${objectDefinitionId}";
+		static var staticOrganizationObjectId = "${objectDefinitionId}";
 
-		return "${staticOrganizationId}";
+		return "${staticOrganizationObjectId}";
 	}
 
 	macro setUpGlobalSubjectObjectId {

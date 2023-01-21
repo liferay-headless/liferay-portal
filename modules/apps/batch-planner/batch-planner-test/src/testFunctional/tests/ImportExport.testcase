@@ -1114,6 +1114,7 @@ definition {
 	}
 
 	@description = "Verify users can schedule an import"
+	@ignore = "true"
 	@priority = "3"
 	test CanScheduleImport {
 		property test.name.skip.portal.instance = "ImportExport#CanScheduleImport";

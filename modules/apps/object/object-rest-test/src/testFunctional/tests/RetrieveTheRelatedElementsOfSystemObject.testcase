@@ -26,7 +26,7 @@ definition {
 				en_US_label = "usersFoundations",
 				name = "usersFoundations",
 				objectDefinitionId1 = "${staticObjectUserAccountId}",
-				objectDefinitionId2 = "${staticFoundationId}",
+				objectDefinitionId2 = "${staticFoundationObjectId}",
 				type = "manyToMany");
 		}
 
@@ -36,7 +36,7 @@ definition {
 				en_US_label = "userOrganizations",
 				name = "userOrganizations",
 				objectDefinitionId1 = "${staticObjectUserAccountId}",
-				objectDefinitionId2 = "${staticOrganizationId}",
+				objectDefinitionId2 = "${staticOrganizationObjectId}",
 				type = "oneToMany");
 		}
 
