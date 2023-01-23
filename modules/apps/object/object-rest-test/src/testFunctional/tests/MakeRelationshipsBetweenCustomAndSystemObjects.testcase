@@ -54,9 +54,7 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			for (var objectName : list "University,Subject") {
-				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
-			}
+			ObjectAdmin.deleteAllCustomObjectsViaAPI();
 
 			AccountAPI.deleteAccount(accountId = "${staticObjectId}");
 		}

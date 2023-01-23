@@ -68,9 +68,13 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			for (var objectName : list "Foundation,Organization") {
-				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			for (var relationshipName : list "usersFoundations,userOrganizations") {
+				ObjectDefinitionAPI.deleteRelationship(
+					name = "User",
+					relationshipName = "${relationshipName}");
 			}
+
+			ObjectAdmin.deleteAllCustomObjectsViaAPI();
 
 			for (var userId : list "${staticUserAccountOneId},${staticUserAccountTwoId}") {
 				JSONUser.deleteUserByUserId(userId = "${userId}");
