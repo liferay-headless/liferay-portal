@@ -768,7 +768,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Given active student object definition created") {
-			var objectDefinitionId3 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			var studentObjectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 				en_US_label = "student",
 				en_US_plural_label = "students",
 				name = "Student",
@@ -793,7 +793,7 @@ definition {
 				en_US_label = "subjectsStudents",
 				name = "subjectsStudents",
 				objectDefinitionId1 = "${staticSubjectObjectId}",
-				objectDefinitionId2 = "${staticUniversityObjectId}",
+				objectDefinitionId2 = "${studentObjectId}",
 				type = "oneToMany");
 		}
 
