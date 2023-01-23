@@ -1,0 +1,26 @@
+definition {
+    
+    macro setUpGlobalLecturerObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "Lecturer",
+			en_US_plural_label = "lecturers",
+			name = "Lecturer",
+			requiredStringFieldName = "name");
+
+		static var staticLecturerObjectId = "${objectId}";
+
+		return "${staticLecturerObjectId}";
+	}
+
+	macro setUpGlobalCampusObjectId {
+		var objectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			en_US_label = "campus",
+			en_US_plural_label = "campuses",
+			name = "Campus",
+			requiredStringFieldName = "name");
+
+		static var staticCampusObjectId = "${objectId}";
+
+		return "${staticCampusObjectId}";
+	}
+}

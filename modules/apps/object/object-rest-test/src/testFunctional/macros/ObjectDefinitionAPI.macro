@@ -618,7 +618,7 @@ definition {
 	}
 
 	macro assertResponseNotIncludeDetailsOfDeletedObject {
-		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$..universitiesSubjects");
+		var actual = JSONUtil.getWithJSONPath("${responseToParse}", "$..campusesLecturers");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
