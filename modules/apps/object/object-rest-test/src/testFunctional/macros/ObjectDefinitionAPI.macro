@@ -728,7 +728,7 @@ definition {
 			name = "${name}",
 			objectDefinitionId1 = "${objectDefinitionId1}",
 			objectDefinitionId2 = "${objectDefinitionId2}",
-			type = "${type}");
+			type = "${type}");	
 
 		var relationshipName = ObjectDefinitionAPI._getRelationshipNameById(relationshipId = "${relationshipId}");
 
@@ -990,14 +990,14 @@ definition {
 		return "${staticSubjectObjectId}";
 	}
 
-	macro setUpGlobalUniversityId {
+	macro setUpGlobalUniversityEntryId {
 		var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
 			en_US_plural_label = "universities",
 			name = "University Name");
 
-		static var staticUniversityObjectId = "${universityId}";
+		static var staticUniversityEntryId = "${universityId}";
 
-		return "${staticUniversityObjectId}";
+		return "${staticUniversityEntryId}";
 	}
 
 	macro setUpGlobalUniversityObjectId {

@@ -11,7 +11,7 @@ definition {
 		TestCase.setUpPortalInstanceNoSelenium();
 
 		task ("Given a foundation object") {
-			var customObjectDefinitionId1 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			var foundationObjectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 				en_US_label = "foundation",
 				en_US_plural_label = "foundations",
 				name = "Foundation",
@@ -19,7 +19,7 @@ definition {
 		}
 
 		task ("Given a secondFoundation object") {
-			var customObjectDefinitionId2 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+			var secoundFoundationObjectId = ObjectDefinitionAPI.createAndPublishObjectDefinition(
 				en_US_label = "secondFoundation",
 				en_US_plural_label = "secondFoundations",
 				name = "SecondFoundation",
@@ -34,7 +34,7 @@ definition {
 				en_US_label = "UserFoundations",
 				name = "userFoundations",
 				objectDefinitionId1 = "${staticObjectId}",
-				objectDefinitionId2 = "${customObjectDefinitionId1}",
+				objectDefinitionId2 = "${foundationObjectId}",
 				type = "oneToMany");
 		}
 
@@ -44,7 +44,7 @@ definition {
 				en_US_label = "UsersSecondFoundations",
 				name = "usersSecondFoundations",
 				objectDefinitionId1 = "${staticObjectId}",
-				objectDefinitionId2 = "${customObjectDefinitionId2}",
+				objectDefinitionId2 = "${secoundFoundationObjectId}",
 				type = "manyToMany");
 		}
 

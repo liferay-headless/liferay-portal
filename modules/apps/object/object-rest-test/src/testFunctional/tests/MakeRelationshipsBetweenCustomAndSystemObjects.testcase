@@ -18,11 +18,6 @@ definition {
 		task ("And Given manyToMany universitiesAccounts relationship created") {
 			ObjectDefinitionAPI.setUpGlobalObjectDefinitionIdWithName(objectName = "AccountEntry");
 
-			echo("THIS UNIVERSITY");
-			echo("${staticUniversityObjectId}");
-			echo("THIS AccountEntry");
-			echo("${staticObjectId}");
-
 			ObjectDefinitionAPI.createRelationship(
 				deletionType = "cascade",
 				en_US_label = "UniversitiesAccounts",
@@ -43,11 +38,11 @@ definition {
 		}
 
 		task ("And Given University entry created") {
-			ObjectDefinitionAPI.setUpGlobalUniversityId();
+			ObjectDefinitionAPI.setUpGlobalUniversityEntryId();
 		}
 
 		task ("And Given Account entry created") {
-			AccountAPI.setUpGlobalAccountId();
+			AccountAPI.setUpGlobalAccountEntryId();
 		}
 	}
 
@@ -62,7 +57,7 @@ definition {
 				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
 			}
 
-			AccountAPI.deleteAccount(accountId = "${staticAccountId}");
+			AccountAPI.deleteAccount(accountId = "${staticObjectId}");
 		}
 	}
 
@@ -84,14 +79,14 @@ definition {
 		task ("When I request PUT to relate University entry to the Account entry with /o/c/universities/{universityId}/accountsUniversities/{accountId}") {
 			ObjectDefinitionAPI.relateObjectEntries(
 				en_US_plural_label = "universities",
-				objectEntry1 = "${staticUniversityId}",
-				objectEntry2 = "${staticAccountId}",
+				objectEntry1 = "${staticUniversityEntryId}",
+				objectEntry2 = "${staticAccountEntryId}",
 				relationshipName = "accountsUniversities");
 		}
 
 		task ("Then university is not associated to the account in GET /o/headless-admin-user/v1.0/accounts/{accountId}/universitiesAccounts") {
 			var response = AccountAPI.getRelationshipByAccountId(
-				accountId = "${staticAccountId}",
+				accountId = "${staticAccountEntryId}",
 				relationshipName = "universitiesAccounts");
 
 			ObjectDefinitionAPI.assertNoItemsInResponse(responseToParse = "${response}");
@@ -123,13 +118,13 @@ definition {
 			ObjectDefinitionAPI.relateObjectEntries(
 				en_US_plural_label = "subjects",
 				objectEntry1 = "${subjectId}",
-				objectEntry2 = "${staticAccountId}",
+				objectEntry2 = "${staticAccountEntryId}",
 				relationshipName = "subjectAccounts");
 		}
 
 		task ("Then subject is not associated to the account in GET /o/headless-admin-user/v1.0/accounts/{accountId}/accountSubjects") {
 			var response = AccountAPI.getRelationshipByAccountId(
-				accountId = "${staticAccountId}",
+				accountId = "${staticAccountEntryId}",
 				relationshipName = "accountSubjects");
 
 			ObjectDefinitionAPI.assertNoItemsInResponse(responseToParse = "${response}");
@@ -144,19 +139,19 @@ definition {
 		task ("And Given I request PUT to relate University entry to the Account entry with /o/c/universities/{universityId}/universitiesAccounts/{accountId}") {
 			ObjectDefinitionAPI.relateObjectEntries(
 				en_US_plural_label = "universities",
-				objectEntry1 = "${staticUniversityObjectId}",
-				objectEntry2 = "${staticAccountId}",
+				objectEntry1 = "${staticUniversityEntryId}",
+				objectEntry2 = "${staticAccountEntryId}",
 				relationshipName = "universitiesAccounts");
 		}
 
 		task ("When I delete the Account entry") {
-			AccountAPI.deleteAccount(accountId = "${staticAccountId}");
+			AccountAPI.deleteAccount(accountId = "${staticAccountEntryId}");
 		}
 
 		task ("Then GET /o/c/universities/{universityId}/universitiesAccounts returns an empty Page") {
 			var response = ObjectDefinitionAPI.getObjectEntryRelation(
 				en_US_plural_label = "universities",
-				objectId = "${staticUniversityObjectId}",
+				objectId = "${staticUniversityEntryId}",
 				relationshipName = "universitiesAccounts");
 
 			ObjectDefinitionAPI.assertNoItemsInResponse(responseToParse = "${response}");

@@ -84,14 +84,11 @@ definition {
 		return "${response}";
 	}
 
-	macro setUpGlobalAccountId {
-		Variables.assertDefined(parameterList = "${accountId}");
+	macro setUpGlobalAccountEntryId {
+		var accountEntryId = AccountAPI.createAccount(name = "user1");
 
-		var accountId = AccountAPI.createAccount(name = "user1");
+		static var staticAccountEntryId = "${accountEntryId}";
 
-		static var staticAccountId = "${accountId}";
-
-		return "${staticAccountId}";
+		return "${staticAccountEntryId}";
 	}
-
 }
