@@ -787,7 +787,6 @@ definition {
 
 		task ("Given oneToMany relationship subjectStudents created") {
 			var objectDefinitionId2 = JSONObject.getObjectId(objectName = "Student");
-
 			var relationshipName = ObjectDefinitionAPI.createRelationship(
 				deletionType = "cascade",
 				en_US_label = "subjectsStudents",

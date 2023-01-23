@@ -12,8 +12,9 @@ definition {
 
 		task ("Given University and Subject object definitions created") {
 			ObjectDefinitionAPI.setUpGlobalSubjectObjectId();
+
 			ObjectDefinitionAPI.setUpGlobalUniversityObjectId();
-			}
+		}
 
 		task ("And Given manyToMany universitiesAccounts relationship created") {
 			ObjectDefinitionAPI.setUpGlobalObjectDefinitionIdWithName(objectName = "AccountEntry");

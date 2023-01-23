@@ -728,7 +728,7 @@ definition {
 			name = "${name}",
 			objectDefinitionId1 = "${objectDefinitionId1}",
 			objectDefinitionId2 = "${objectDefinitionId2}",
-			type = "${type}");	
+			type = "${type}");
 
 		var relationshipName = ObjectDefinitionAPI._getRelationshipNameById(relationshipId = "${relationshipId}");
 
