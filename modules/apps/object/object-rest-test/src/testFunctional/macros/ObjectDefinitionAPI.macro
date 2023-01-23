@@ -995,9 +995,9 @@ definition {
 			en_US_plural_label = "universities",
 			name = "University Name");
 
-		static var staticUniversityId = "${universityId}";
+		static var staticUniversityObjectId = "${universityId}";
 
-		return "${staticUniversityId}";
+		return "${staticUniversityObjectId}";
 	}
 
 	macro setUpGlobalUniversityObjectId {

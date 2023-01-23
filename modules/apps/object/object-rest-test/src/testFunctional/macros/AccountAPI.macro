@@ -48,6 +48,8 @@ definition {
 	}
 
 	macro getRelationshipByAccountId {
+		Variables.assertDefined(parameterList = "${accountId}");
+
 		var curl = AccountAPI._curlAccount(
 			accountId = "${accountId}",
 			relationshipName = "${relationshipName}");
@@ -58,6 +60,8 @@ definition {
 	}
 
 	macro putAccountRelationship {
+		Variables.assertDefined(parameterList = "${accountId}");
+
 		var curl = AccountAPI._curlAccount(
 			accountId = "${accountId}",
 			relationshipName = "${relationshipName}");
@@ -81,6 +85,8 @@ definition {
 	}
 
 	macro setUpGlobalAccountId {
+		Variables.assertDefined(parameterList = "${accountId}");
+
 		var accountId = AccountAPI.createAccount(name = "user1");
 
 		static var staticAccountId = "${accountId}";
