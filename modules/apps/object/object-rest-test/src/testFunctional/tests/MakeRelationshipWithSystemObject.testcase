@@ -71,7 +71,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCPNoSelenium();
 		}
-
 		else {
 			for (var relationshipName : list "usersFoundations,userSecondFoundations") {
 				ObjectDefinitionAPI.deleteRelationship(
@@ -90,7 +89,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanDeleteCustomObjectEntryRelaatedToSystemObjectByManyToMany {
 		property portal.acceptance = "true";
@@ -128,7 +126,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanDeleteCustomObjectEntryRelatedToSystemObjectByOneToMany {
 		property portal.acceptance = "true";
@@ -161,7 +158,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanRelateCustomObjectEntriesToSystemObjectEntries {
 		property portal.acceptance = "true";
@@ -194,7 +190,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test CanRelateCustomObjectEntriesToSystemObjectEntriesByManyToMany {
 		property portal.acceptance = "true";
@@ -227,7 +222,6 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	
 	@priority = "4"
 	test DeletedObjectEntriesDoNotAppearInManyToManyRelationshipDetails {
 		property portal.acceptance = "true";

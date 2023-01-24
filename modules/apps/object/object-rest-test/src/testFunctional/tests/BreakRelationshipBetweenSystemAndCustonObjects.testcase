@@ -63,7 +63,6 @@ definition {
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCPNoSelenium();
 		}
-
 		else {
 			for (var objectName : list "Foundation,SecondFoundation") {
 				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
