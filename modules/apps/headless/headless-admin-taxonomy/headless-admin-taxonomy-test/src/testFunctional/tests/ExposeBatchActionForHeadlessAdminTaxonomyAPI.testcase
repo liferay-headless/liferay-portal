@@ -10,9 +10,16 @@ definition {
 	}
 
 	tearDown {
-		JSONDepot.deleteDepot(
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCPNoSelenium();
+		}
+		else {
+			JSONDepot.deleteDepot(
 			depotName = "Test Depot Name",
 			noSelenium = "true");
+		}
 	}
 
 	@disable-webdriver = "true"

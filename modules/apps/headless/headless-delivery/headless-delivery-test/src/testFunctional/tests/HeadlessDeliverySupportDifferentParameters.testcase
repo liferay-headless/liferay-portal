@@ -15,10 +15,12 @@ definition {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
 		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
+			PortalInstances.tearDownCPNoSelenium();
 		}
 
-		JSONDepot.deleteDepot(depotName = "Test Depot Name");
+		else {
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
+		}
 	}
 
 	@priority = "4"

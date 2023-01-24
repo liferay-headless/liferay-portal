@@ -15,7 +15,7 @@ definition {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
 		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
+			PortalInstances.tearDownCPNoSelenium();
 		}
 		else {
 			BlogPostingAPI.deleteAllBlogPostings();

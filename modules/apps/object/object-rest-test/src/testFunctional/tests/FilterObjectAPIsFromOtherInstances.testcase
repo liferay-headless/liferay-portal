@@ -42,7 +42,7 @@ definition {
 
 	tearDown {
 		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
+			PortalInstances.tearDownCPNoSelenium();
 		}
 		else {
 			ObjectAdmin.deleteObjectViaAPI(objectName = "Subject");

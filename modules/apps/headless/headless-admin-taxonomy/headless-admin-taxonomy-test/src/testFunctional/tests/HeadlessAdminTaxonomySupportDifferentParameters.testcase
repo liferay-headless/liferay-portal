@@ -13,14 +13,16 @@ definition {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
 		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
+			PortalInstances.tearDownCPNoSelenium();
 		}
 
-		TaxonomyVocabularyAPI.deleteTaxonomyVocabularyByErc(
-			externalReferenceCode = "erc",
-			groupName = "Guest");
+		else {
+			TaxonomyVocabularyAPI.deleteTaxonomyVocabularyByErc(
+				externalReferenceCode = "erc",
+				groupName = "Guest");
 
-		JSONDepot.deleteDepot(depotName = "Test Depot Name");
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
+		}
 	}
 
 	@priority = "4"
