@@ -291,7 +291,7 @@ definition {
 	}
 
 	macro _getUserIds {
-		var companyId = JSONCompany.getCompanyId(authenticationMethod = "${authenticationMethod}");
+		var companyId = JSONCompany.getCompanyIdNoSelenium(authenticationMethod = "${authenticationMethod}");
 
 		if (isSet(specificURL)) {
 			var portalURL = "${specificURL}";
