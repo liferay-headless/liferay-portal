@@ -1,7 +1,7 @@
 @component-name = "portal-headless"
 definition {
 
-	property custom.properties = "feature.flag.LPS-162964=true${line.separator}feature.flag.LPS-153324=true";
+	property custom.properties = "feature.flag.LPS-153324=true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Object";
@@ -66,23 +66,31 @@ definition {
 	}
 
 	tearDown {
-		for (var relationshipName : list "usersFoundations,userSecondFoundations") {
-			ObjectDefinitionAPI.deleteRelationship(
-				name = "User",
-				relationshipName = "${relationshipName}");
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCPNoSelenium();
 		}
 
-		for (var objectName : list "Foundation,SecondFoundation") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
-		}
+		else {
+			for (var relationshipName : list "usersFoundations,userSecondFoundations") {
+				ObjectDefinitionAPI.deleteRelationship(
+					name = "User",
+					relationshipName = "${relationshipName}");
+			}
 
-		for (var userId : list "${staticUserAccountId1},${staticUserAccountId2}") {
-			JSONUser.deleteUserByUserId(userId = "${userId}");
+			for (var objectName : list "Foundation,SecondFoundation") {
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			}
+
+			for (var userId : list "${staticUserAccountId1},${staticUserAccountId2}") {
+				JSONUser.deleteUserByUserId(userId = "${userId}");
+			}
 		}
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
+	
 	@priority = "4"
 	test CanDeleteCustomObjectEntryRelaatedToSystemObjectByManyToMany {
 		property portal.acceptance = "true";
@@ -120,7 +128,7 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
+	
 	@priority = "4"
 	test CanDeleteCustomObjectEntryRelatedToSystemObjectByOneToMany {
 		property portal.acceptance = "true";
@@ -153,7 +161,7 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
+	
 	@priority = "4"
 	test CanRelateCustomObjectEntriesToSystemObjectEntries {
 		property portal.acceptance = "true";
@@ -186,7 +194,7 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
+	
 	@priority = "4"
 	test CanRelateCustomObjectEntriesToSystemObjectEntriesByManyToMany {
 		property portal.acceptance = "true";
@@ -219,7 +227,7 @@ definition {
 	}
 
 	@disable-webdriver = "true"
-	@ignore = "true"
+	
 	@priority = "4"
 	test DeletedObjectEntriesDoNotAppearInManyToManyRelationshipDetails {
 		property portal.acceptance = "true";

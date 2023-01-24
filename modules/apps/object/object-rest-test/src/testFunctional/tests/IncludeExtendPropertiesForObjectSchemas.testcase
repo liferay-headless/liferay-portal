@@ -26,11 +26,18 @@ definition {
 	}
 
 	tearDown {
-		for (var objectName : list "University,Subject") {
-			ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
-		}
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		ObjectFieldAPI.deleteObjectField();
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCPNoSelenium();
+		}
+		else {
+			for (var objectName : list "University,Subject") {
+				ObjectAdmin.deleteObjectViaAPI(objectName = "${objectName}");
+			}
+
+			ObjectFieldAPI.deleteObjectField();
+		}
 	}
 
 	@priority = "4"
