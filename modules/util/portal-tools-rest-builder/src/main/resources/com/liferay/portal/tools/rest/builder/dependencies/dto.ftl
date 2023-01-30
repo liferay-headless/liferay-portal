@@ -49,6 +49,8 @@ import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -138,11 +140,19 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 		/>
 
 		<#if propertySchema.maximum??>
-			@DecimalMax("${propertySchema.maximum}")
+			<#if stringUtil.equals(propertyType, "Integer") || stringUtil.equals(propertyType, "Long")>
+				@Max(${propertySchema.maximum})
+			<#else>
+				@DecimalMax("${propertySchema.maximum}")
+			</#if>
 		</#if>
 
 		<#if propertySchema.minimum??>
-			@DecimalMin("${propertySchema.minimum}")
+			<#if stringUtil.equals(propertyType, "Integer") || stringUtil.equals(propertyType, "Long")>
+				@Min(${propertySchema.minimum})
+			<#else>
+				@DecimalMin("${propertySchema.minimum}")
+			</#if>
 		</#if>
 
 		<#if propertySchema.jsonMap>
