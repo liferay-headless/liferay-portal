@@ -32,6 +32,7 @@ import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTa
 import com.liferay.portal.vulcan.internal.accept.language.AcceptLanguageImpl;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
 import com.liferay.portal.vulcan.internal.jaxrs.context.provider.ContextProviderUtil;
+import com.liferay.portal.vulcan.servlet.http.HttpServletRequestThreadLocal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -147,6 +148,8 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 
 		HttpServletRequest httpServletRequest =
 			ContextProviderUtil.getHttpServletRequest(message);
+
+		HttpServletRequestThreadLocal.setHttpServletRequest(httpServletRequest);
 
 		_filterExcludedOperationIds(
 			containerRequestContext, httpServletRequest, message);
