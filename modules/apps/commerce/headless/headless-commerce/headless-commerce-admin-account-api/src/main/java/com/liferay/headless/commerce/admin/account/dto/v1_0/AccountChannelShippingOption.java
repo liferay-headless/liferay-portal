@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -93,7 +93,7 @@ public class AccountChannelShippingOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String accountExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getAccountId() {
 		return accountId;
@@ -212,7 +212,7 @@ public class AccountChannelShippingOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long channelId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getId() {
 		return id;
@@ -239,7 +239,7 @@ public class AccountChannelShippingOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getShippingMethodId() {
 		return shippingMethodId;
@@ -296,7 +296,7 @@ public class AccountChannelShippingOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String shippingMethodKey;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getShippingOptionId() {
 		return shippingOptionId;

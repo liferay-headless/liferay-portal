@@ -36,7 +36,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -61,7 +61,7 @@ public class ProductAccountGroup implements Serializable {
 			ProductAccountGroup.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getAccountGroupId() {
 		return accountGroupId;
@@ -118,7 +118,7 @@ public class ProductAccountGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getId() {
 		return id;

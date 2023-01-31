@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -143,7 +143,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String fieldType;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -222,7 +222,7 @@ public class ProductOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30080")
 	public Long getOptionId() {
 		return optionId;

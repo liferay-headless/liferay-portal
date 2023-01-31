@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -117,7 +117,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String color;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getId() {
 		return id;
@@ -144,7 +144,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33132")
 	public Long getImageId() {
 		return imageId;
@@ -233,7 +233,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String productExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33131")
 	public Long getProductId() {
 		return productId;

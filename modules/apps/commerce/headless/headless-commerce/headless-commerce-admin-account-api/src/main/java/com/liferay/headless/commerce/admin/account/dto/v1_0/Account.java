@@ -41,8 +41,8 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -277,7 +277,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "10130")
 	public Long getDefaultBillingAccountAddressId() {
 		return defaultBillingAccountAddressId;
@@ -310,7 +310,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long defaultBillingAccountAddressId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "10131")
 	public Long getDefaultShippingAccountAddressId() {
 		return defaultShippingAccountAddressId;
@@ -402,7 +402,7 @@ public class Account implements Serializable {
 	@NotEmpty
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -429,7 +429,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "20078")
 	public Long getLogoId() {
 		return logoId;
@@ -567,8 +567,8 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String taxId;
 
-	@DecimalMax("2")
-	@DecimalMin("0")
+	@Max(2)
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getType() {
 		return type;

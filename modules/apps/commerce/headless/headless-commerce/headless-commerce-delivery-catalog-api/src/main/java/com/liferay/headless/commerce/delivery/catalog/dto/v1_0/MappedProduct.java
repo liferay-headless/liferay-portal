@@ -39,7 +39,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -154,7 +154,7 @@ public class MappedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected MappedProduct firstAvailableReplacementMappedProduct;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33130")
 	public Long getId() {
 		return id;
@@ -272,7 +272,7 @@ public class MappedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String productExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33131")
 	public Long getProductId() {
 		return productId;
@@ -391,7 +391,7 @@ public class MappedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean purchasable;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getQuantity() {
 		return quantity;
@@ -565,7 +565,7 @@ public class MappedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String skuExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33135")
 	public Long getSkuId() {
 		return skuId;

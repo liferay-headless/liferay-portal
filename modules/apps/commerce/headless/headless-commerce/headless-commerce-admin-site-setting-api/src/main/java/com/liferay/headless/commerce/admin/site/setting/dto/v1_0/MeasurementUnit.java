@@ -38,6 +38,7 @@ import javax.annotation.Generated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -62,7 +63,7 @@ public class MeasurementUnit implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(MeasurementUnit.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getCompanyId() {
 		return companyId;
@@ -119,7 +120,7 @@ public class MeasurementUnit implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;

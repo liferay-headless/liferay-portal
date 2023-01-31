@@ -44,6 +44,7 @@ import javax.annotation.Generated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -129,7 +130,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String accountExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getAccountId() {
 		return accountId;
@@ -246,7 +247,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BillingAddress billingAddress;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getBillingAddressId() {
 		return billingAddressId;
@@ -336,7 +337,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String channelExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getChannelId() {
 		return channelId;
@@ -510,7 +511,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String deliveryTermDescription;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getDeliveryTermId() {
 		return deliveryTermId;
@@ -595,7 +596,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -735,7 +736,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected OrderItem[] orderItems;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "0")
 	public Integer getOrderStatus() {
 		return orderStatus;
@@ -825,7 +826,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String orderTypeExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getOrderTypeId() {
 		return orderTypeId;
@@ -882,7 +883,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String paymentMethod;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "0")
 	public Integer getPaymentStatus() {
 		return paymentStatus;
@@ -969,7 +970,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String paymentTermDescription;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getPaymentTermId() {
 		return paymentTermId;
@@ -1140,7 +1141,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ShippingAddress shippingAddress;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getShippingAddressId() {
 		return shippingAddressId;

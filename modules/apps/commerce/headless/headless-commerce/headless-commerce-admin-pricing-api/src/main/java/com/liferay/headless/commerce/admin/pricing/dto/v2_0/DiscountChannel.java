@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -152,7 +152,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String channelExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getChannelId() {
 		return channelId;
@@ -182,7 +182,7 @@ public class DiscountChannel implements Serializable {
 	@NotNull
 	protected Long channelId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30643")
 	public Long getDiscountChannelId() {
 		return discountChannelId;
@@ -243,7 +243,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String discountExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getDiscountId() {
 		return discountId;

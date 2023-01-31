@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -92,7 +92,7 @@ public class GroupedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String entryProductExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33131")
 	public Long getEntryProductId() {
 		return entryProductId;
@@ -153,7 +153,7 @@ public class GroupedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, String> entryProductName;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33130")
 	public Long getId() {
 		return id;
@@ -240,7 +240,7 @@ public class GroupedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String productExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "33131")
 	public Long getProductId() {
 		return productId;
@@ -301,7 +301,7 @@ public class GroupedProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, String> productName;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getQuantity() {
 		return quantity;

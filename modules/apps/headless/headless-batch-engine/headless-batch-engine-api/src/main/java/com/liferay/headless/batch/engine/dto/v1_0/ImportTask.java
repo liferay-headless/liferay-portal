@@ -43,7 +43,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -288,7 +288,7 @@ public class ImportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FailedItem[] failedItems;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(description = "The task's ID.", example = "30130")
 	public Long getId() {
 		return id;
@@ -396,7 +396,7 @@ public class ImportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Operation operation;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(
 		description = "Number of items processed by import task opeartion.",
 		example = "100"
@@ -461,7 +461,7 @@ public class ImportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date startTime;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(
 		description = "Total number of items that will be processed by import task operation.",
 		example = "1000"

@@ -40,7 +40,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -90,7 +90,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -145,7 +145,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date modifiedDate;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getQuantity() {
 		return quantity;
@@ -174,7 +174,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer quantity;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "2")
 	public Integer getReservedQuantity() {
 		return reservedQuantity;
@@ -261,7 +261,7 @@ public class WarehouseItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String warehouseExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30030")
 	public Long getWarehouseId() {
 		return warehouseId;

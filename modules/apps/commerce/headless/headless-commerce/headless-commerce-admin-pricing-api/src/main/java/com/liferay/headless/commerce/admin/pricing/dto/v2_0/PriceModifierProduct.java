@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -125,7 +125,7 @@ public class PriceModifierProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String priceModifierExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getPriceModifierId() {
 		return priceModifierId;
@@ -155,7 +155,7 @@ public class PriceModifierProduct implements Serializable {
 	@NotNull
 	protected Long priceModifierId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30643")
 	public Long getPriceModifierProductId() {
 		return priceModifierProductId;
@@ -245,7 +245,7 @@ public class PriceModifierProduct implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String productExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getProductId() {
 		return productId;

@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -152,7 +152,7 @@ public class PriceListOrderType implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String orderTypeExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30324")
 	public Long getOrderTypeId() {
 		return orderTypeId;
@@ -214,7 +214,7 @@ public class PriceListOrderType implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String priceListExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getPriceListId() {
 		return priceListId;
@@ -244,7 +244,7 @@ public class PriceListOrderType implements Serializable {
 	@NotNull
 	protected Long priceListId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30643")
 	public Long getPriceListOrderTypeId() {
 		return priceListOrderTypeId;
@@ -273,7 +273,7 @@ public class PriceListOrderType implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long priceListOrderTypeId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getPriority() {
 		return priority;

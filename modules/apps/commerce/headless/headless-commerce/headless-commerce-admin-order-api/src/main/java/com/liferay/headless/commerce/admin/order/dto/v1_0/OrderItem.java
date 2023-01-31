@@ -44,6 +44,7 @@ import javax.annotation.Generated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -65,7 +66,7 @@ public class OrderItem implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(OrderItem.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "32144")
 	public Long getBookedQuantityId() {
 		return bookedQuantityId;
@@ -666,7 +667,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String formattedQuantity;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -784,7 +785,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String orderExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30128")
 	public Long getOrderId() {
 		return orderId;
@@ -932,7 +933,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal promoPriceWithTaxAmount;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "2")
 	public Integer getQuantity() {
 		return quantity;
@@ -989,7 +990,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date requestedDeliveryDate;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "1")
 	public Integer getShippedQuantity() {
 		return shippedQuantity;
@@ -1048,7 +1049,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ShippingAddress shippingAddress;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getShippingAddressId() {
 		return shippingAddressId;
@@ -1133,7 +1134,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String skuExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30128")
 	public Long getSkuId() {
 		return skuId;

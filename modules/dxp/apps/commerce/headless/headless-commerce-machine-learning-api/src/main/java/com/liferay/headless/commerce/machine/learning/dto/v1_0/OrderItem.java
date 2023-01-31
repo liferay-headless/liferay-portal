@@ -44,6 +44,7 @@ import javax.annotation.Generated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -208,7 +209,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal finalPrice;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -322,7 +323,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String options;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30128")
 	public Long getOrderId() {
 		return orderId;
@@ -351,7 +352,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long orderId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30128")
 	public Long getParentOrderItemId() {
 		return parentOrderItemId;
@@ -380,7 +381,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long parentOrderItemId;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "2")
 	public Integer getQuantity() {
 		return quantity;

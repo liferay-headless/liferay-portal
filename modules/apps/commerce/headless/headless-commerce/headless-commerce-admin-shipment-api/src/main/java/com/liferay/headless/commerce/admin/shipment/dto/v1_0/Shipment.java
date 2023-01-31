@@ -41,7 +41,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -63,7 +63,7 @@ public class Shipment implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Shipment.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getAccountId() {
 		return accountId;
@@ -263,7 +263,7 @@ public class Shipment implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -318,7 +318,7 @@ public class Shipment implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date modifiedDate;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getOrderId() {
 		return orderId;
@@ -406,7 +406,7 @@ public class Shipment implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ShippingAddress shippingAddress;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getShippingAddressId() {
 		return shippingAddressId;
@@ -463,7 +463,7 @@ public class Shipment implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date shippingDate;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getShippingMethodId() {
 		return shippingMethodId;

@@ -36,7 +36,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -59,7 +59,7 @@ public class AccountOrganization implements Serializable {
 			AccountOrganization.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getAccountId() {
 		return accountId;
@@ -147,7 +147,7 @@ public class AccountOrganization implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String organizationExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30002")
 	public Long getOrganizationId() {
 		return organizationId;

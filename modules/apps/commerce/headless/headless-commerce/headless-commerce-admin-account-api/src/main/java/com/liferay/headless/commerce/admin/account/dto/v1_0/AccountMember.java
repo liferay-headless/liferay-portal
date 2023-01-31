@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -61,7 +61,7 @@ public class AccountMember implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(AccountMember.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getAccountId() {
 		return accountId;
@@ -234,7 +234,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String userExternalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30002")
 	public Long getUserId() {
 		return userId;

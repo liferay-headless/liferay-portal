@@ -36,7 +36,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -58,7 +58,7 @@ public class SkuOption implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(SkuOption.class, json);
 	}
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getKey() {
 		return key;
@@ -85,7 +85,7 @@ public class SkuOption implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long key;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getValue() {
 		return value;

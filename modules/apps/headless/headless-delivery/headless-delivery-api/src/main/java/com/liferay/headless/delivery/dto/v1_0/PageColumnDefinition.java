@@ -37,8 +37,8 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -136,8 +136,8 @@ public class PageColumnDefinition implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ColumnViewport[] columnViewports;
 
-	@DecimalMax("12")
-	@DecimalMin("1")
+	@Max(12)
+	@Min(1)
 	@Schema(description = "The page column's size.")
 	public Integer getSize() {
 		return size;

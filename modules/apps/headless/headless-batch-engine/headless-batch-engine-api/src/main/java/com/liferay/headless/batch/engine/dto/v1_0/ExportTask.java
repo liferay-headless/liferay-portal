@@ -43,7 +43,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -259,7 +259,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(description = "The task's ID.", example = "30130")
 	public Long getId() {
 		return id;
@@ -286,7 +286,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(
 		description = "Number of items processed by export task opeartion.",
 		example = "100"
@@ -351,7 +351,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date startTime;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(
 		description = "Total number of items that will be processed by export task operation.",
 		example = "1000"

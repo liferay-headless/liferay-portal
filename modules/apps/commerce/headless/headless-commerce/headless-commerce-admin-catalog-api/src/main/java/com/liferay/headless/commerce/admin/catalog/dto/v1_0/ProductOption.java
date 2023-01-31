@@ -37,7 +37,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -181,7 +181,7 @@ public class ProductOption implements Serializable {
 	@NotEmpty
 	protected String fieldType;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30130")
 	public Long getId() {
 		return id;
@@ -265,7 +265,7 @@ public class ProductOption implements Serializable {
 	@NotNull
 	protected Map<String, String> name;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "30080")
 	public Long getOptionId() {
 		return optionId;

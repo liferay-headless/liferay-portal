@@ -36,8 +36,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -60,8 +60,8 @@ public class ColumnViewportDefinition implements Serializable {
 			ColumnViewportDefinition.class, json);
 	}
 
-	@DecimalMax("12")
-	@DecimalMin("1")
+	@Max(12)
+	@Min(1)
 	@Schema
 	public Integer getSize() {
 		return size;

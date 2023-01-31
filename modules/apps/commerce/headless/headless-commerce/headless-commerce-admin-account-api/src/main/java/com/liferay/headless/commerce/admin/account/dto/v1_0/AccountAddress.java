@@ -36,8 +36,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -229,7 +229,7 @@ public class AccountAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@DecimalMin("0")
+	@Min(0)
 	@Schema(example = "31130")
 	public Long getId() {
 		return id;
@@ -480,8 +480,8 @@ public class AccountAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street3;
 
-	@DecimalMax("3")
-	@DecimalMin("1")
+	@Max(3)
+	@Min(1)
 	@Schema(example = "1")
 	public Integer getType() {
 		return type;
