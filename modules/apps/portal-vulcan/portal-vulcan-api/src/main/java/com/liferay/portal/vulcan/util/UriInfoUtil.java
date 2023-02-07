@@ -64,7 +64,7 @@ public class UriInfoUtil {
 		return uriBuilder.scheme(
 			_getScheme(httpServletRequest)
 		).host(
-			PortalUtil.getHost(httpServletRequest)
+			PortalUtil.getForwardedHost(httpServletRequest)
 		);
 	}
 
