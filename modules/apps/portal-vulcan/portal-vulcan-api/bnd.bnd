@@ -26,6 +26,7 @@ Export-Package:\
 	com.liferay.portal.vulcan.permission,\
 	com.liferay.portal.vulcan.resource,\
 	com.liferay.portal.vulcan.resource.locator,\
+	com.liferay.portal.vulcan.servlet.http,\
 	com.liferay.portal.vulcan.status,\
 	com.liferay.portal.vulcan.util,\
 	com.liferay.portal.vulcan.yaml,\
