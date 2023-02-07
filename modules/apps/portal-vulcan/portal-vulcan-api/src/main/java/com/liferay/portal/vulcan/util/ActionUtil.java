@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.graphql.util.GraphQLNamingUtil;
 import com.liferay.portal.vulcan.servlet.http.HttpServletRequestThreadLocal;
@@ -42,8 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
@@ -258,22 +254,11 @@ public class ActionUtil {
 		return HashMapBuilder.put(
 			"href",
 			() -> {
-				UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(uriInfo);
+				UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(
+					uriInfo,
+					HttpServletRequestThreadLocal.getHttpServletRequest());
 
-				HttpServletRequest httpServletRequest =
-					HttpServletRequestThreadLocal.getHttpServletRequest();
-
-				String scheme = Http.HTTP;
-
-				if (PortalUtil.isSecure(httpServletRequest)) {
-					scheme = Http.HTTPS;
-				}
-
-				return uriBuilder.scheme(
-					scheme
-				).host(
-					PortalUtil.getHost(httpServletRequest)
-				).path(
+				return uriBuilder.path(
 					_getVersion(uriInfo)
 				).path(
 					clazz.getSuperclass(), methodName
