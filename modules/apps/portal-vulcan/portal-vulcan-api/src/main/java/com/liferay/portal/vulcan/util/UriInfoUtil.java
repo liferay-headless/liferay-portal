@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
-
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -39,43 +37,8 @@ public class UriInfoUtil {
 			).build());
 	}
 
-	public static String getBasePath(
-		UriInfo uriInfo, HttpServletRequest httpServletRequest) {
-
-		return String.valueOf(
-			getBaseUriBuilder(
-				uriInfo, httpServletRequest
-			).build());
-	}
-
 	public static UriBuilder getBaseUriBuilder(UriInfo uriInfo) {
 		return _updateUriBuilder(uriInfo.getBaseUriBuilder());
-	}
-
-	public static UriBuilder getBaseUriBuilder(
-		UriInfo uriInfo, HttpServletRequest httpServletRequest) {
-
-		UriBuilder uriBuilder = getBaseUriBuilder(uriInfo);
-
-		if (httpServletRequest == null) {
-			return uriBuilder;
-		}
-
-		return uriBuilder.scheme(
-			_getScheme(httpServletRequest)
-		).host(
-			PortalUtil.getForwardedHost(httpServletRequest)
-		);
-	}
-
-	private static String _getScheme(HttpServletRequest httpServletRequest) {
-		String scheme = Http.HTTP;
-
-		if (PortalUtil.isSecure(httpServletRequest)) {
-			scheme = Http.HTTPS;
-		}
-
-		return scheme;
 	}
 
 	private static boolean _isHttpsEnabled() {

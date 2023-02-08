@@ -120,8 +120,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
 		throws Exception {
 
-		return _getOpenAPI(
-			httpServletRequest, null, null, resourceClasses, type, uriInfo);
+		return _getOpenAPI(null, null, resourceClasses, type, uriInfo);
 	}
 
 	@Override
@@ -132,8 +131,8 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		throws Exception {
 
 		return _getOpenAPI(
-			null, openAPIContributor, openAPISchemaFilter, resourceClasses,
-			type, uriInfo);
+			openAPIContributor, openAPISchemaFilter, resourceClasses, type,
+			uriInfo);
 	}
 
 	@Override
@@ -156,7 +155,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		throws Exception {
 
 		Response response = _getOpenAPI(
-			null, null, null, resourceClasses, "json", null);
+			null, null, resourceClasses, "json", null);
 
 		OpenAPI openAPI = (OpenAPI)response.getEntity();
 
@@ -504,14 +503,12 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			_getUpdatedSchemaReference(schema.get$ref(), schemaPrefix));
 	}
 
-	private String _getBasePath(
-		HttpServletRequest httpServletRequest, UriInfo uriInfo) {
-
+	private String _getBasePath(UriInfo uriInfo) {
 		if (uriInfo == null) {
 			return null;
 		}
 
-		return UriInfoUtil.getBasePath(uriInfo, httpServletRequest);
+		return UriInfoUtil.getBasePath(uriInfo);
 	}
 
 	private Set<String> _getDTOClassNames(Set<Class<?>> resourceClasses) {
@@ -636,7 +633,6 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 	}
 
 	private Response _getOpenAPI(
-			HttpServletRequest httpServletRequest,
 			OpenAPIContributor openAPIContributor,
 			OpenAPISchemaFilter openAPISchemaFilter,
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
@@ -678,7 +674,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			_mergeOpenAPISchemaFilters(
 				openAPISchemaFilter,
 				_getOpenAPISchemaFilter(
-					_getBasePath(null, uriInfo), _extensionProviderRegistry,
+					_getBasePath(uriInfo), _extensionProviderRegistry,
 					resourceClasses));
 
 		if (mergedOpenAPISchemaFilter != null) {
@@ -706,7 +702,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		if (uriInfo != null) {
 			Server server = new Server();
 
-			server.setUrl(_getBasePath(httpServletRequest, uriInfo));
+			server.setUrl(_getBasePath(uriInfo));
 
 			openAPI.setServers(Collections.singletonList(server));
 

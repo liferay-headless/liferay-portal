@@ -254,8 +254,7 @@ public class HeadlessDiscoveryOpenAPIResourceImpl {
 		Map<String, List<String>> openAPIMap = new TreeMap<>();
 
 		String serverURL = StringUtil.removeSubstring(
-			UriInfoUtil.getBasePath(_uriInfo, _httpServletRequest),
-			"/openapi/");
+			UriInfoUtil.getBasePath(_uriInfo), "/openapi/");
 
 		RuntimeDTO runtimeDTO = _jaxrsServiceRuntime.getRuntimeDTO();
 

@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -32,12 +33,14 @@ import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTa
 import com.liferay.portal.vulcan.internal.accept.language.AcceptLanguageImpl;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
 import com.liferay.portal.vulcan.internal.jaxrs.context.provider.ContextProviderUtil;
-import com.liferay.portal.vulcan.servlet.http.HttpServletRequestThreadLocal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import java.net.URI;
+
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,7 +49,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -149,8 +155,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		HttpServletRequest httpServletRequest =
 			ContextProviderUtil.getHttpServletRequest(message);
 
-		HttpServletRequestThreadLocal.setHttpServletRequest(httpServletRequest);
-
 		_filterExcludedOperationIds(
 			containerRequestContext, httpServletRequest, message);
 
@@ -252,7 +256,129 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 			else if (fieldClass.isAssignableFrom(UriInfo.class)) {
 				field.setAccessible(true);
 
-				field.set(instance, new UriInfoImpl(message));
+				UriInfoImpl uriInfoImpl = new UriInfoImpl(message);
+
+				field.set(
+					instance,
+					new UriInfo() {
+
+						@Override
+						public URI getAbsolutePath() {
+							return null;
+						}
+
+						@Override
+						public UriBuilder getAbsolutePathBuilder() {
+							return null;
+						}
+
+						@Override
+						public URI getBaseUri() {
+							return getBaseUriBuilder().build();
+						}
+
+						@Override
+						public UriBuilder getBaseUriBuilder() {
+							String scheme = Http.HTTP;
+
+							if (_portal.isSecure(httpServletRequest)) {
+								scheme = Http.HTTPS;
+							}
+
+							return uriInfoImpl.getBaseUriBuilder(
+							).scheme(
+								scheme
+							).host(
+								_portal.getForwardedHost(httpServletRequest)
+							);
+						}
+
+						@Override
+						public List<Object> getMatchedResources() {
+							return uriInfoImpl.getMatchedResources();
+						}
+
+						@Override
+						public List<String> getMatchedURIs() {
+							return uriInfoImpl.getMatchedURIs();
+						}
+
+						@Override
+						public List<String> getMatchedURIs(boolean decode) {
+							return uriInfoImpl.getMatchedURIs(decode);
+						}
+
+						@Override
+						public String getPath() {
+							return uriInfoImpl.getPath();
+						}
+
+						@Override
+						public String getPath(boolean decode) {
+							return uriInfoImpl.getPath(decode);
+						}
+
+						@Override
+						public MultivaluedMap<String, String>
+							getPathParameters() {
+
+							return uriInfoImpl.getPathParameters();
+						}
+
+						@Override
+						public MultivaluedMap<String, String> getPathParameters(
+							boolean decode) {
+
+							return uriInfoImpl.getPathParameters(decode);
+						}
+
+						@Override
+						public List<PathSegment> getPathSegments() {
+							return uriInfoImpl.getPathSegments();
+						}
+
+						@Override
+						public List<PathSegment> getPathSegments(
+							boolean decode) {
+
+							return uriInfoImpl.getPathSegments(decode);
+						}
+
+						@Override
+						public MultivaluedMap<String, String>
+							getQueryParameters() {
+
+							return uriInfoImpl.getQueryParameters();
+						}
+
+						@Override
+						public MultivaluedMap<String, String>
+							getQueryParameters(boolean decode) {
+
+							return uriInfoImpl.getQueryParameters(decode);
+						}
+
+						@Override
+						public URI getRequestUri() {
+							return uriInfoImpl.getRequestUri();
+						}
+
+						@Override
+						public UriBuilder getRequestUriBuilder() {
+							return uriInfoImpl.getRequestUriBuilder();
+						}
+
+						@Override
+						public URI relativize(URI uri) {
+							return uriInfoImpl.relativize(uri);
+						}
+
+						@Override
+						public URI resolve(URI uri) {
+							return uriInfoImpl.resolve(uri);
+						}
+
+					});
 			}
 			else if (fieldClass.isAssignableFrom(User.class)) {
 				field.setAccessible(true);
