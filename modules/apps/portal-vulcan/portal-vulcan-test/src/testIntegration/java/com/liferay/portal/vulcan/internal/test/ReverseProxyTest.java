@@ -19,9 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.lang.SafeCloseable;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 
@@ -48,13 +47,11 @@ public class ReverseProxyTest {
 
 	@Test
 	public void testActionsHrefValues() throws Exception {
-		User user = UserTestUtil.addUser();
-
 		URLConnection urlConnection = URLConnectionUtil.createURLConnection(
 			String.format(
 				"http://localhost:8080/o/headless-delivery/v1.0/sites/%s" +
 					"/blog-postings",
-				user.getCompanyId()));
+				TestPropsValues.getGroupId()));
 
 		try (SafeCloseable safeCloseable1 =
 				PropsValuesTestUtil.swapWithSafeCloseable(
