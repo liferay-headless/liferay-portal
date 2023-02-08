@@ -27,6 +27,8 @@ import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 
 import java.net.URLConnection;
 
+import org.hamcrest.CoreMatchers;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -64,9 +66,9 @@ public class ReverseProxyTest {
 			urlConnection.addRequestProperty("X-Forwarded-Host", "myHost");
 			urlConnection.addRequestProperty("X-Forwarded-Proto", "https");
 
-			String href = _getHref(urlConnection);
-
-			Assert.assertTrue(href.startsWith("https://myHost:8080"));
+			Assert.assertThat(
+				_getHref(urlConnection),
+				CoreMatchers.startsWith("https://myHost:8080"));
 		}
 	}
 
