@@ -1,0 +1,6 @@
+Bundle-Name: Liferay API Builder API
+Bundle-SymbolicName: com.liferay.api.builder.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.api.builder.constants,\
+	com.liferay.api.builder.registry
