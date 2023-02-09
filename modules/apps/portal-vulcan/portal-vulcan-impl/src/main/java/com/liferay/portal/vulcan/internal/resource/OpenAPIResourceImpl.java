@@ -22,10 +22,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -95,7 +93,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.BundleContext;
@@ -514,25 +511,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			return null;
 		}
 
-		if (httpServletRequest == null) {
-			return UriInfoUtil.getBasePath(uriInfo);
-		}
-
-		String scheme = Http.HTTP;
-
-		if (_portal.isSecure(httpServletRequest)) {
-			scheme = Http.HTTPS;
-		}
-
-		UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(uriInfo);
-
-		uriBuilder.host(
-			_portal.getForwardedHost(httpServletRequest)
-		).scheme(
-			scheme
-		);
-
-		return String.valueOf(uriBuilder.build());
+		return UriInfoUtil.getBasePath(uriInfo, httpServletRequest);
 	}
 
 	private Set<String> _getDTOClassNames(Set<Class<?>> resourceClasses) {
@@ -1408,9 +1387,6 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 	@Reference
 	private ExtensionProviderRegistry _extensionProviderRegistry;
-
-	@Reference
-	private Portal _portal;
 
 	private ServiceTracker<?, ?> _serviceTracker;
 	private ServiceTrackerList<OpenAPIContributor> _trackedOpenAPIContributors;

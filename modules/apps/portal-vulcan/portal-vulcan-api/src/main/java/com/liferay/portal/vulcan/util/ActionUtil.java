@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.graphql.util.GraphQLNamingUtil;
+import com.liferay.portal.vulcan.servlet.http.HttpServletRequestThreadLocal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -253,7 +254,9 @@ public class ActionUtil {
 		return HashMapBuilder.put(
 			"href",
 			() -> {
-				UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(uriInfo);
+				UriBuilder uriBuilder = UriInfoUtil.getBaseUriBuilder(
+					uriInfo,
+					HttpServletRequestThreadLocal.getHttpServletRequest());
 
 				return uriBuilder.path(
 					_getVersion(uriInfo)

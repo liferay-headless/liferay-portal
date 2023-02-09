@@ -32,6 +32,7 @@ import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTa
 import com.liferay.portal.vulcan.internal.accept.language.AcceptLanguageImpl;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
 import com.liferay.portal.vulcan.internal.jaxrs.context.provider.ContextProviderUtil;
+import com.liferay.portal.vulcan.servlet.http.HttpServletRequestThreadLocal;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -148,14 +149,25 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		HttpServletRequest httpServletRequest =
 			ContextProviderUtil.getHttpServletRequest(message);
 
+		HttpServletRequestThreadLocal.setHttpServletRequest(httpServletRequest);
+
 		_filterExcludedOperationIds(
 			containerRequestContext, httpServletRequest, message);
 
-		Class<?> clazz = instance.getClass();
+		_setInstanceFields(
+			instance.getClass(), httpServletRequest, message, instance);
+	}
 
-		Class<?> superClass = clazz.getSuperclass();
+	private void _setInstanceFields(
+			Class<?> clazz, HttpServletRequest httpServletRequest,
+			Message message, Object instance)
+		throws Exception {
 
-		for (Field field : superClass.getDeclaredFields()) {
+		if (clazz == Object.class) {
+			return;
+		}
+
+		for (Field field : clazz.getDeclaredFields()) {
 			if (Modifier.isFinal(field.getModifiers()) ||
 				Modifier.isStatic(field.getModifiers())) {
 
@@ -255,6 +267,9 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 				field.set(instance, _vulcanBatchEngineImportTaskResource);
 			}
 		}
+
+		_setInstanceFields(
+			clazz.getSuperclass(), httpServletRequest, message, instance);
 	}
 
 	private final ConfigurationAdmin _configurationAdmin;
