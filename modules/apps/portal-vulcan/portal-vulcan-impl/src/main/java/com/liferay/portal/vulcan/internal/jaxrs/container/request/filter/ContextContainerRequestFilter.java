@@ -264,12 +264,17 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 
 						@Override
 						public URI getAbsolutePath() {
-							return null;
+							return getAbsolutePathBuilder().build();
 						}
 
 						@Override
 						public UriBuilder getAbsolutePathBuilder() {
-							return null;
+							return uriInfoImpl.getAbsolutePathBuilder(
+							).scheme(
+								_getScheme()
+							).host(
+								_portal.getForwardedHost(httpServletRequest)
+							);
 						}
 
 						@Override
@@ -279,15 +284,9 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 
 						@Override
 						public UriBuilder getBaseUriBuilder() {
-							String scheme = Http.HTTP;
-
-							if (_portal.isSecure(httpServletRequest)) {
-								scheme = Http.HTTPS;
-							}
-
 							return uriInfoImpl.getBaseUriBuilder(
 							).scheme(
-								scheme
+								_getScheme()
 							).host(
 								_portal.getForwardedHost(httpServletRequest)
 							);
@@ -376,6 +375,16 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 						@Override
 						public URI resolve(URI uri) {
 							return uriInfoImpl.resolve(uri);
+						}
+
+						private String _getScheme() {
+							String scheme = Http.HTTP;
+
+							if (_portal.isSecure(httpServletRequest)) {
+								scheme = Http.HTTPS;
+							}
+
+							return scheme;
 						}
 
 					});
