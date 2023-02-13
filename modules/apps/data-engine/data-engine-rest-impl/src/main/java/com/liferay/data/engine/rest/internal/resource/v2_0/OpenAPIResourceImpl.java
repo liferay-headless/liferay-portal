@@ -51,17 +51,13 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Generated("")
 @OpenAPIDefinition(
-	info = @Info(description = "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.data.engine.rest.client', and version '3.0.17'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Data Engine", version = "v2.0")
+	info = @Info(description = "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.data.engine.rest.client', and version '3.0.18'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Data Engine", version = "v2.0")
 )
 @Path("/v2.0")
 public class OpenAPIResourceImpl {
 
-	@GET
-	@Path("/openapi.{type:json|yaml}")
-	@Produces({MediaType.APPLICATION_JSON, "application/yaml"})
 	public Response getOpenAPI(
-			@Context HttpServletRequest httpServletRequest,
-			@PathParam("type") String type, @Context UriInfo uriInfo)
+			HttpServletRequest httpServletRequest, String type, UriInfo uriInfo)
 		throws Exception {
 
 		Class<? extends OpenAPIResource> clazz = _openAPIResource.getClass();
@@ -72,8 +68,8 @@ public class OpenAPIResourceImpl {
 				UriInfo.class);
 
 			return (Response)method.invoke(
-				_openAPIResource, httpServletRequest, _resourceClasses, type,
-				uriInfo);
+				_openAPIResource, _httpServletRequest, _resourceClasses, type,
+				_uriInfo);
 		}
 		catch (NoSuchMethodException noSuchMethodException1) {
 			try {
@@ -81,7 +77,7 @@ public class OpenAPIResourceImpl {
 					"getOpenAPI", Set.class, String.class, UriInfo.class);
 
 				return (Response)method.invoke(
-					_openAPIResource, _resourceClasses, type, uriInfo);
+					_openAPIResource, _resourceClasses, type, _uriInfo);
 			}
 			catch (NoSuchMethodException noSuchMethodException2) {
 				return _openAPIResource.getOpenAPI(_resourceClasses, type);
@@ -89,8 +85,23 @@ public class OpenAPIResourceImpl {
 		}
 	}
 
+	@GET
+	@Path("/openapi.{type:json|yaml}")
+	@Produces({MediaType.APPLICATION_JSON, "application/yaml"})
+	public Response getOpenAPI(@PathParam("type") String type)
+		throws Exception {
+
+		return getOpenAPI(_httpServletRequest, type, _uriInfo);
+	}
+
+	@Context
+	private HttpServletRequest _httpServletRequest;
+
 	@Reference
 	private OpenAPIResource _openAPIResource;
+
+	@Context
+	private UriInfo _uriInfo;
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
