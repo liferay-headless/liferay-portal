@@ -41,26 +41,11 @@ public class UriInfoUtil {
 		return _updateUriBuilder(uriInfo.getBaseUriBuilder());
 	}
 
-	private static boolean _isHttpsEnabled() {
-		if (Http.HTTPS.equals(
-				PropsUtil.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL)) ||
-			Http.HTTPS.equals(PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private static UriBuilder _updateUriBuilder(UriBuilder uriBuilder) {
 		if (!Validator.isBlank(PortalUtil.getPathContext())) {
 			URI uri = uriBuilder.build();
 
 			uriBuilder.replacePath(PortalUtil.getPathContext(uri.getPath()));
-		}
-
-		if (_isHttpsEnabled()) {
-			uriBuilder.scheme(Http.HTTPS);
 		}
 
 		return uriBuilder;

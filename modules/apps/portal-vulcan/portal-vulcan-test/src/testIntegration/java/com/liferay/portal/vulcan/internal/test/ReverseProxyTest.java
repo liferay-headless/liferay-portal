@@ -18,10 +18,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.petra.lang.SafeCloseable;
-import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
 
 import java.net.URLConnection;
@@ -53,12 +53,18 @@ public class ReverseProxyTest {
 					"/blog-postings",
 				TestPropsValues.getGroupId()));
 
-		try (SafeCloseable safeCloseable1 =
-				PropsValuesTestUtil.swapWithSafeCloseable(
-					"WEB_SERVER_FORWARDED_HOST_ENABLED", true);
-			SafeCloseable safeCloseable2 =
-				PropsValuesTestUtil.swapWithSafeCloseable(
-					"WEB_SERVER_FORWARDED_PROTOCOL_ENABLED", true)) {
+		boolean webServerForwardedHostEnabled =
+			PropsValues.WEB_SERVER_FORWARDED_HOST_ENABLED;
+		boolean webServerForwardedProtocolEnabled =
+			PropsValues.WEB_SERVER_FORWARDED_PROTOCOL_ENABLED;
+
+		try {
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, "WEB_SERVER_FORWARDED_HOST_ENABLED", true);
+
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, "WEB_SERVER_FORWARDED_PROTOCOL_ENABLED",
+				true);
 
 			urlConnection.addRequestProperty("X-Forwarded-Host", "myHost");
 			urlConnection.addRequestProperty("X-Forwarded-Proto", "https");
@@ -66,6 +72,15 @@ public class ReverseProxyTest {
 			Assert.assertThat(
 				_getHref(urlConnection),
 				CoreMatchers.startsWith("https://myHost:8080"));
+		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, "WEB_SERVER_FORWARDED_HOST_ENABLED",
+				webServerForwardedHostEnabled);
+
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, "WEB_SERVER_FORWARDED_PROTOCOL_ENABLED",
+				webServerForwardedProtocolEnabled);
 		}
 	}
 
@@ -75,9 +90,7 @@ public class ReverseProxyTest {
 		JsonNode jsonNode = _objectMapper.readTree(
 			urlConnection.getInputStream());
 
-		jsonNode = jsonNode.path("actions");
-		jsonNode = jsonNode.path("create");
-		jsonNode = jsonNode.path("href");
+		jsonNode = jsonNode.at("/actions/create/href");
 
 		return jsonNode.asText();
 	}
