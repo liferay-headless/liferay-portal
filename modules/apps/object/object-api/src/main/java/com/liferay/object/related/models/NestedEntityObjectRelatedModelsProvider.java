@@ -14,20 +14,18 @@
 
 package com.liferay.object.related.models;
 
-import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
 
 /**
  * @author Sergio Jiménez del Coso
  */
-public interface NestedEntityRelatedModelsProvider {
+public interface NestedEntityObjectRelatedModelsProvider {
 
 	public String getClassName();
 
 	public String getObjectRelationshipType();
 
 	public void validate(
-		Object propertyValue, ObjectEntry serviceBuilderObjectEntry,
-		ObjectRelationship objectRelationship);
+		Object propertyValue, ObjectRelationship objectRelationship);
 
 }

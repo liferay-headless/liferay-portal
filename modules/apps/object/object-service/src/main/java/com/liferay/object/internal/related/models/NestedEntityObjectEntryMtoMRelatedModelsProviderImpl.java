@@ -16,10 +16,7 @@ package com.liferay.object.internal.related.models;
 
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.related.models.NestedEntityRelatedModelsProvider;
-import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.List;
@@ -30,19 +27,12 @@ import javax.ws.rs.BadRequestException;
  * @author Sergio Jiménez del Coso
  */
 public class NestedEntityObjectEntryMtoMRelatedModelsProviderImpl
-	implements NestedEntityRelatedModelsProvider {
+	extends BaseNestedEntityObjectEntryRelatedModelProviderImpl {
 
 	public NestedEntityObjectEntryMtoMRelatedModelsProviderImpl(
-		ObjectDefinition objectDefinition,
-		ObjectFieldLocalService objectFieldLocalService) {
+		ObjectDefinition objectDefinition) {
 
-		_objectDefinition = objectDefinition;
-		_objectFieldLocalService = objectFieldLocalService;
-	}
-
-	@Override
-	public String getClassName() {
-		return _objectDefinition.getClassName();
+		super(objectDefinition);
 	}
 
 	@Override
@@ -50,21 +40,18 @@ public class NestedEntityObjectEntryMtoMRelatedModelsProviderImpl
 		return ObjectRelationshipConstants.TYPE_MANY_TO_MANY;
 	}
 
+	@Override
 	public void validate(
-		Object propertyValue, ObjectEntry serviceBuilderObjectEntry,
-		ObjectRelationship objectRelationship) {
+		Object propertyValue, ObjectRelationship objectRelationship) {
 
-		if (!(propertyValue instanceof List) ||
+		if (!(propertyValue instanceof List) &&
 			!StringUtil.equals(
-				objectRelationship.getType(), getObjectRelationshipType())) {
+				objectRelationship.getType(), getObjectRelationshipType()) &&
+			!isMap((List)propertyValue)) {
 
 			throw new BadRequestException(
-				"Unable to create nested object entries for object entry " +
-					serviceBuilderObjectEntry.getObjectEntryId());
+				"Unable to create nested object entries for object entry");
 		}
 	}
-
-	private final ObjectDefinition _objectDefinition;
-	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }

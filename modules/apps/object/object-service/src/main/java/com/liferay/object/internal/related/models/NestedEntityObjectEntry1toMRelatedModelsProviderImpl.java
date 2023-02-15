@@ -16,31 +16,23 @@ package com.liferay.object.internal.related.models;
 
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.related.models.NestedEntityRelatedModelsProvider;
-import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Map;
+
+import javax.ws.rs.BadRequestException;
 
 /**
  * @author Sergio Jiménez del Coso
  */
 public class NestedEntityObjectEntry1toMRelatedModelsProviderImpl
-	implements NestedEntityRelatedModelsProvider {
+	extends BaseNestedEntityObjectEntryRelatedModelProviderImpl {
 
 	public NestedEntityObjectEntry1toMRelatedModelsProviderImpl(
-		ObjectDefinition objectDefinition,
-		ObjectFieldLocalService objectFieldLocalService) {
+		ObjectDefinition objectDefinition) {
 
-		_objectDefinition = objectDefinition;
-		_objectFieldLocalService = objectFieldLocalService;
-	}
-
-	@Override
-	public String getClassName() {
-		return _objectDefinition.getClassName();
+		super(objectDefinition);
 	}
 
 	@Override
@@ -48,22 +40,19 @@ public class NestedEntityObjectEntry1toMRelatedModelsProviderImpl
 		return ObjectRelationshipConstants.TYPE_ONE_TO_MANY;
 	}
 
+	@Override
 	public void validate(
-		Object propertyValue, ObjectEntry serviceBuilderObjectEntry,
-		ObjectRelationship objectRelationship) {
+		Object propertyValue, ObjectRelationship objectRelationship) {
 
-		if (!(propertyValue instanceof Map) ||
-			StringUtil.equals(
-				objectRelationship.getType(),
-				getObjectRelationshipType()) &&
-			(objectRelationship.getObjectDefinitionId2() ==
-			 _objectDefinition.getObjectDefinitionId())) {
+		if (!(propertyValue instanceof Map) &&
+			!(StringUtil.equals(
+				objectRelationship.getType(), getObjectRelationshipType()) &&
+			  (objectRelationship.getObjectDefinitionId2() !=
+				  objectDefinition.getObjectDefinitionId()))) {
+
+			throw new BadRequestException(
+				"Unable to create nested object entries for object entry");
 		}
-
-
 	}
-
-	private final ObjectDefinition _objectDefinition;
-	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }
