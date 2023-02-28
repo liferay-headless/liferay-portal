@@ -1,0 +1,45 @@
+# SQL TABLES
+
+BatchPlannerPlan: {
+  shape: sql_table
+  batchPlannerPlanId: int {constraint: primary_key}
+  export: boolean
+  externalType: string
+  internalClassName: string
+  template: boolean
+}
+
+BatchPlannerMapping: {
+  shape: sql_table
+  batchPlannerMappingId: int {constraint: primary_key}
+  batchPlannerPlanId: int {constraint: foreign_key}
+  externalFieldName: string
+  externalFieldType: string
+  internalFieldName: string
+  internalFieldType: string
+}
+
+BatchPlannerPolicy: {
+  shape: sql_table
+  batchPlannerPolicyId: int {constraint: primary_key}
+  batchPlannerPlanId: int {constraint: foreign_key}
+  name: string
+  value: string
+}
+
+BatchPlannerMapping.batchPlannerPlanId <- BatchPlannerPlan.batchPlannerPlanId: "belongs_to" {
+  source-arrowhead: N {
+    shape: cf-many
+  }
+  target-arrowhead: {
+    shape: cf-one
+  }
+}
+BatchPlannerPolicy.batchPlannerPlanId <- BatchPlannerPlan.batchPlannerPlanId: "belongs_to" {
+  source-arrowhead: N {
+    shape: cf-many
+  }
+  target-arrowhead: {
+    shape: cf-one
+  }
+}

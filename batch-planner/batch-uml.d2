@@ -1,0 +1,113 @@
+description: |md
+  # Class Relationship Between Modules 
+  - Batch Engine
+  - Headless Batch Engine
+  - Batch Planner
+| {near: top-center}
+
+headless-delivery: {
+  BlogPostingResourceImpl: {
+    shape: class
+
+    +delete(): void
+    +get(): Page
+    +patch(): void
+    +post(): void
+    +put(): void
+  }
+
+  CategoryResourceImpl: {
+    shape: class
+
+    +delete(): void
+    +get(): Page
+    +patch(): void
+    +post(): void
+    +put(): void
+  }
+}
+
+batch-engine: {
+  BatchEngineTaskItemDelegate: {
+    shape: class
+
+    +create(): void
+    +read(): Page
+    +update(): void
+    +delete(): void
+  }
+
+  BatchEngineExportTaskLocalService: {
+    shape: class
+
+    +add(): BatchEngineExportTask
+  }
+}
+
+batch-engine-headless: {
+  ExportTaskResource: {
+    shape: class
+
+    +postExportTask(): ExportTask
+
+    -batchEngineExportTaskLocalService: "@Reference"
+  }
+}
+
+batch-planner: {
+  BatchEngineTaskItemDelegateRegistry: {
+    shape: class
+
+    +get(type String): BatchEngineTaskItemDelegate
+
+    -taskItemDelegateMap: BatchEngineTaskItemDelegate
+  }
+
+  BatchEngineBroker: {
+    shape: class
+
+    +submit(type BatchPlannerPlan): void
+
+    -exportTaskResource: ExportTaskResource
+  }
+}
+
+headless-delivery.BlogPostingResourceImpl -> batch-engine.BatchEngineTaskItemDelegate: {
+  target-arrowhead: {
+    shape: arrow
+    style.filled: false
+  }
+}
+
+headless-delivery.CategoryResourceImpl -> batch-engine.BatchEngineTaskItemDelegate: {
+  target-arrowhead: {
+    shape: arrow
+    style.filled: false
+  }
+}
+
+batch-planner.BatchEngineTaskItemDelegateRegistry <- batch-engine.BatchEngineTaskItemDelegate: {
+  source-arrowhead: 1 {
+    shape: diamond
+    style.filled: true
+  }
+  target-arrowhead: {
+    shape: none
+  }
+}
+
+batch-planner.BatchEngineBroker <- batch-engine-headless.ExportTaskResource: {
+  source-arrowhead: 1 {
+    shape: diamond
+    style.filled: true
+  }
+  target-arrowhead: N
+}
+
+batch-engine-headless.ExportTaskResource <- batch-engine.batchEngineExportTaskLocalService: {
+  source-arrowhead: 1 {
+    shape: diamond
+    style.filled: true
+  }
+  target-arrowhead: N
+}

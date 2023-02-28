@@ -1,0 +1,23 @@
+Export Flow Interactions: Batch Planner Interaction With Batch Engine {
+  shape: sequence_diagram
+  gui: Batch Planner React UI
+  beBroker: Batch Engine Broker
+  beETR: Export Task Resource
+  beETLS: Batch Engine Export Task Local Service
+
+  gui -> beBroker.ack: submit
+
+  POST to batch engine: {
+    beBroker -> beETR: POST
+    beETR -> beETLS.ack: create record
+    beETLS.ack -> beETR: created
+    beETR -> beBroker: 203 CREATED
+  }
+
+  beBroker.ack -> gui: done
+
+  GET from batch engine: {
+    gui -> beETR: GET CONTENT
+    beETR -> gui: content
+  }
+}

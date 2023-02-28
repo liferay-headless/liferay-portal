@@ -1,0 +1,10 @@
+Model Listener Interactions: Batch Engine Updates Update Batch Planner {
+  shape: sequence_diagram
+
+  dxpModelListener: DXP Model Listener
+  beETML: Batch Engine Export Task Listener
+
+  Async batch engine: {
+    dxpModelListener -> beETML: something changed
+  }
+}
