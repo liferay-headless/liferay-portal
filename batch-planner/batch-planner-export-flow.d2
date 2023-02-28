@@ -7,16 +7,18 @@ Export Flow Interactions: Batch Planner Interaction With Batch Engine {
 
   gui -> beBroker.ack: submit
 
-  POST to batch engine: {
-    beBroker -> beETR: POST
-    beETR -> beETLS.ack: create record
-    beETLS.ack -> beETR: created
+  programmaticaly POST to batch engine: {
+    beBroker -> beETR: POST \nusing ERC
+    headless module processes call: {
+      beETR -> beETLS.ack: create\ntask record
+      beETLS.ack -> beETR: created\ntask waits for executor
+    }
     beETR -> beBroker: 203 CREATED
   }
 
   beBroker.ack -> gui: done
 
-  GET from batch engine: {
+  GET using ERC from headless batch engine: {
     gui -> beETR: GET CONTENT
     beETR -> gui: content
   }
