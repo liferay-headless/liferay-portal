@@ -51,6 +51,17 @@ public interface CommentResource {
 			String filterString, Pagination pagination, String sortString)
 		throws Exception;
 
+	public void postBlogPostingCommentsPageExportBatch(
+			Long blogPostingId, String search, String filterString,
+			String sortString, String callbackURL, String fieldNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postBlogPostingCommentsPageExportBatchHttpResponse(
+				Long blogPostingId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
+		throws Exception;
+
 	public Comment postBlogPostingComment(Long blogPostingId, Comment comment)
 		throws Exception;
 
@@ -121,6 +132,17 @@ public interface CommentResource {
 	public HttpInvoker.HttpResponse getDocumentCommentsPageHttpResponse(
 			Long documentId, String search, List<String> aggregations,
 			String filterString, Pagination pagination, String sortString)
+		throws Exception;
+
+	public void postDocumentCommentsPageExportBatch(
+			Long documentId, String search, String filterString,
+			String sortString, String callbackURL, String fieldNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postDocumentCommentsPageExportBatchHttpResponse(
+				Long documentId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
 		throws Exception;
 
 	public Comment postDocumentComment(Long documentId, Comment comment)
@@ -292,6 +314,17 @@ public interface CommentResource {
 				Long structuredContentId, String search,
 				List<String> aggregations, String filterString,
 				Pagination pagination, String sortString)
+		throws Exception;
+
+	public void postStructuredContentCommentsPageExportBatch(
+			Long structuredContentId, String search, String filterString,
+			String sortString, String callbackURL, String fieldNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postStructuredContentCommentsPageExportBatchHttpResponse(
+				Long structuredContentId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
 		throws Exception;
 
 	public Comment postStructuredContentComment(
@@ -485,6 +518,103 @@ public interface CommentResource {
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
 						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments");
+
+			httpInvoker.path("blogPostingId", blogPostingId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void postBlogPostingCommentsPageExportBatch(
+				Long blogPostingId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postBlogPostingCommentsPageExportBatchHttpResponse(
+					blogPostingId, search, filterString, sortString,
+					callbackURL, fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postBlogPostingCommentsPageExportBatchHttpResponse(
+					Long blogPostingId, String search, String filterString,
+					String sortString, String callbackURL, String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments/export-batch");
 
 			httpInvoker.path("blogPostingId", blogPostingId);
 
@@ -1331,6 +1461,103 @@ public interface CommentResource {
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
 						"/o/headless-delivery/v1.0/documents/{documentId}/comments");
+
+			httpInvoker.path("documentId", documentId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void postDocumentCommentsPageExportBatch(
+				Long documentId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postDocumentCommentsPageExportBatchHttpResponse(
+					documentId, search, filterString, sortString, callbackURL,
+					fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postDocumentCommentsPageExportBatchHttpResponse(
+					Long documentId, String search, String filterString,
+					String sortString, String callbackURL, String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-delivery/v1.0/documents/{documentId}/comments/export-batch");
 
 			httpInvoker.path("documentId", documentId);
 
@@ -2710,6 +2937,104 @@ public interface CommentResource {
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port + _builder._contextPath +
 						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments");
+
+			httpInvoker.path("structuredContentId", structuredContentId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void postStructuredContentCommentsPageExportBatch(
+				Long structuredContentId, String search, String filterString,
+				String sortString, String callbackURL, String fieldNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postStructuredContentCommentsPageExportBatchHttpResponse(
+					structuredContentId, search, filterString, sortString,
+					callbackURL, fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postStructuredContentCommentsPageExportBatchHttpResponse(
+					Long structuredContentId, String search,
+					String filterString, String sortString, String callbackURL,
+					String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments/export-batch");
 
 			httpInvoker.path("structuredContentId", structuredContentId);
 

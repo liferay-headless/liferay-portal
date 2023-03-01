@@ -21,9 +21,11 @@ import com.liferay.headless.admin.address.resource.v1_0.RegionResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
@@ -150,6 +152,25 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public Response createCountryRegionsPageExportBatch(
+			@GraphQLName("countryId") Long countryId,
+			@GraphQLName("active") Boolean active,
+			@GraphQLName("search") String search,
+			@GraphQLName("sort") String sortsString,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("fieldNames") String fieldNames)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_regionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			regionResource -> regionResource.postCountryRegionsPageExportBatch(
+				countryId, active, search,
+				_sortsBiFunction.apply(regionResource, sortsString),
+				callbackURL, fieldNames));
+	}
+
+	@GraphQLField
 	public Region createCountryRegion(
 			@GraphQLName("countryId") Long countryId,
 			@GraphQLName("region") Region region)
@@ -174,6 +195,24 @@ public class Mutation {
 			this::_populateResourceContext,
 			regionResource -> regionResource.postCountryRegionBatch(
 				countryId, callbackURL, object));
+	}
+
+	@GraphQLField
+	public Response createRegionsPageExportBatch(
+			@GraphQLName("active") Boolean active,
+			@GraphQLName("search") String search,
+			@GraphQLName("sort") String sortsString,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("fieldNames") String fieldNames)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_regionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			regionResource -> regionResource.postRegionsPageExportBatch(
+				active, search,
+				_sortsBiFunction.apply(regionResource, sortsString),
+				callbackURL, fieldNames));
 	}
 
 	@GraphQLField
@@ -288,6 +327,8 @@ public class Mutation {
 		countryResource.setGroupLocalService(_groupLocalService);
 		countryResource.setRoleLocalService(_roleLocalService);
 
+		countryResource.setVulcanBatchEngineExportTaskResource(
+			_vulcanBatchEngineExportTaskResource);
 		countryResource.setVulcanBatchEngineImportTaskResource(
 			_vulcanBatchEngineImportTaskResource);
 	}
@@ -304,6 +345,8 @@ public class Mutation {
 		regionResource.setGroupLocalService(_groupLocalService);
 		regionResource.setRoleLocalService(_roleLocalService);
 
+		regionResource.setVulcanBatchEngineExportTaskResource(
+			_vulcanBatchEngineExportTaskResource);
 		regionResource.setVulcanBatchEngineImportTaskResource(
 			_vulcanBatchEngineImportTaskResource);
 	}
@@ -315,6 +358,7 @@ public class Mutation {
 
 	private AcceptLanguage _acceptLanguage;
 	private com.liferay.portal.kernel.model.Company _company;
+	private BiFunction<Object, String, Filter> _filterBiFunction;
 	private GroupLocalService _groupLocalService;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
@@ -322,6 +366,8 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
+	private VulcanBatchEngineExportTaskResource
+		_vulcanBatchEngineExportTaskResource;
 	private VulcanBatchEngineImportTaskResource
 		_vulcanBatchEngineImportTaskResource;
 
