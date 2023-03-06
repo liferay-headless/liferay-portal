@@ -112,6 +112,18 @@ public interface BlogPostingResource {
 			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
+	public void deleteSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public BlogPosting getSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public BlogPosting putSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode, BlogPosting blogPosting)
+		throws Exception;
+
 	public void deleteSiteBlogPostingByExternalReferenceCode(
 			Long siteId, String externalReferenceCode)
 		throws Exception;

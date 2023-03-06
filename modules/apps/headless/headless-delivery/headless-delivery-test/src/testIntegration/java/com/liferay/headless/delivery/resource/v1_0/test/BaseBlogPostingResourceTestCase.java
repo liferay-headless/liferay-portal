@@ -922,6 +922,217 @@ public abstract class BaseBlogPostingResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		BlogPosting blogPosting =
+			testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting();
+
+		assertHttpResponseStatusCode(
+			204,
+			blogPostingResource.
+				deleteSiteBlogPostingByExternalReferenceCodeQueryParamHttpResponse(
+					testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						blogPosting),
+					null));
+
+		assertHttpResponseStatusCode(
+			404,
+			blogPostingResource.
+				getSiteBlogPostingByExternalReferenceCodeQueryParamHttpResponse(
+					testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						blogPosting),
+					testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getExternalReferenceCode()));
+
+		assertHttpResponseStatusCode(
+			404,
+			blogPostingResource.
+				getSiteBlogPostingByExternalReferenceCodeQueryParamHttpResponse(
+					testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						blogPosting),
+					testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getExternalReferenceCode()));
+	}
+
+	protected Long
+			testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getSiteId();
+	}
+
+	protected String
+			testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_getExternalReferenceCode(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getExternalReferenceCode();
+	}
+
+	protected BlogPosting
+			testDeleteSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting()
+		throws Exception {
+
+		return blogPostingResource.postSiteBlogPosting(
+			testGroup.getGroupId(), randomBlogPosting());
+	}
+
+	@Test
+	public void testGetSiteBlogPostingByExternalReferenceCodeQueryParam()
+		throws Exception {
+
+		BlogPosting postBlogPosting =
+			testGetSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting();
+
+		BlogPosting getBlogPosting =
+			blogPostingResource.
+				getSiteBlogPostingByExternalReferenceCodeQueryParam(
+					testGetSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						postBlogPosting),
+					null);
+
+		assertEquals(postBlogPosting, getBlogPosting);
+		assertValid(getBlogPosting);
+	}
+
+	protected Long
+			testGetSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getSiteId();
+	}
+
+	protected BlogPosting
+			testGetSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting()
+		throws Exception {
+
+		return blogPostingResource.postSiteBlogPosting(
+			testGroup.getGroupId(), randomBlogPosting());
+	}
+
+	@Test
+	public void testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParam()
+		throws Exception {
+
+		BlogPosting blogPosting =
+			testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting();
+
+		Assert.assertTrue(
+			equals(
+				blogPosting,
+				BlogPostingSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"blogPostingByExternalReferenceCodeQueryParam",
+								new HashMap<String, Object>() {
+									{
+										put(
+											"siteKey",
+											"\"" +
+												testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+													blogPosting) + "\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/blogPostingByExternalReferenceCodeQueryParam"))));
+	}
+
+	protected Long
+			testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getSiteId();
+	}
+
+	@Test
+	public void testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParamNotFound()
+		throws Exception {
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"blogPostingByExternalReferenceCodeQueryParam",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + irrelevantGroup.getGroupId() + "\"");
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected BlogPosting
+			testGraphQLGetSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting()
+		throws Exception {
+
+		return testGraphQLBlogPosting_addBlogPosting();
+	}
+
+	@Test
+	public void testPutSiteBlogPostingByExternalReferenceCodeQueryParam()
+		throws Exception {
+
+		BlogPosting postBlogPosting =
+			testPutSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting();
+
+		BlogPosting randomBlogPosting = randomBlogPosting();
+
+		BlogPosting putBlogPosting =
+			blogPostingResource.
+				putSiteBlogPostingByExternalReferenceCodeQueryParam(
+					testPutSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						postBlogPosting),
+					testPutSiteBlogPostingByExternalReferenceCodeQueryParam_getExternalReferenceCode(),
+					randomBlogPosting);
+
+		assertEquals(randomBlogPosting, putBlogPosting);
+		assertValid(putBlogPosting);
+
+		BlogPosting getBlogPosting =
+			blogPostingResource.
+				getSiteBlogPostingByExternalReferenceCodeQueryParam(
+					testPutSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+						putBlogPosting));
+
+		assertEquals(randomBlogPosting, getBlogPosting);
+		assertValid(getBlogPosting);
+	}
+
+	protected Long
+			testPutSiteBlogPostingByExternalReferenceCodeQueryParam_getSiteId(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getSiteId();
+	}
+
+	protected String
+			testPutSiteBlogPostingByExternalReferenceCodeQueryParam_getExternalReferenceCode(
+				BlogPosting blogPosting)
+		throws Exception {
+
+		return blogPosting.getExternalReferenceCode();
+	}
+
+	protected BlogPosting
+			testPutSiteBlogPostingByExternalReferenceCodeQueryParam_addBlogPosting()
+		throws Exception {
+
+		return blogPostingResource.postSiteBlogPosting(
+			testGroup.getGroupId(), randomBlogPosting());
+	}
+
+	@Test
 	public void testDeleteSiteBlogPostingByExternalReferenceCode()
 		throws Exception {
 

@@ -408,6 +408,44 @@ public class Mutation {
 	@GraphQLField(
 		description = "Deletes the blog post by external reference code."
 	)
+	public boolean deleteSiteBlogPostingByExternalReferenceCodeQueryParam(
+			@GraphQLName("siteKey") @NotEmpty String siteKey,
+			@GraphQLName("externalReferenceCode") String externalReferenceCode)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_blogPostingResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			blogPostingResource ->
+				blogPostingResource.
+					deleteSiteBlogPostingByExternalReferenceCodeQueryParam(
+						Long.valueOf(siteKey), externalReferenceCode));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Updates the site's blog post with the given external reference code, or creates it if it not exists."
+	)
+	public BlogPosting updateSiteBlogPostingByExternalReferenceCodeQueryParam(
+			@GraphQLName("siteKey") @NotEmpty String siteKey,
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("blogPosting") BlogPosting blogPosting)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_blogPostingResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			blogPostingResource ->
+				blogPostingResource.
+					putSiteBlogPostingByExternalReferenceCodeQueryParam(
+						Long.valueOf(siteKey), externalReferenceCode,
+						blogPosting));
+	}
+
+	@GraphQLField(
+		description = "Deletes the blog post by external reference code."
+	)
 	public boolean deleteSiteBlogPostingByExternalReferenceCode(
 			@GraphQLName("siteKey") @NotEmpty String siteKey,
 			@GraphQLName("externalReferenceCode") String externalReferenceCode)

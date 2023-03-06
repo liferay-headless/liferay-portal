@@ -266,6 +266,16 @@ public class ServletDataImpl implements ServletData {
 							BlogPostingResourceImpl.class,
 							"postSiteBlogPostingBatch"));
 					put(
+						"mutation#deleteSiteBlogPostingByExternalReferenceCodeQueryParam",
+						new ObjectValuePair<>(
+							BlogPostingResourceImpl.class,
+							"deleteSiteBlogPostingByExternalReferenceCodeQueryParam"));
+					put(
+						"mutation#updateSiteBlogPostingByExternalReferenceCodeQueryParam",
+						new ObjectValuePair<>(
+							BlogPostingResourceImpl.class,
+							"putSiteBlogPostingByExternalReferenceCodeQueryParam"));
+					put(
 						"mutation#deleteSiteBlogPostingByExternalReferenceCode",
 						new ObjectValuePair<>(
 							BlogPostingResourceImpl.class,
@@ -1453,6 +1463,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							BlogPostingResourceImpl.class,
 							"getSiteBlogPostingsPage"));
+					put(
+						"query#blogPostingByExternalReferenceCodeQueryParam",
+						new ObjectValuePair<>(
+							BlogPostingResourceImpl.class,
+							"getSiteBlogPostingByExternalReferenceCodeQueryParam"));
 					put(
 						"query#blogPostingByExternalReferenceCode",
 						new ObjectValuePair<>(
