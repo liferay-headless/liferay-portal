@@ -10809,6 +10809,104 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/BlogPosting"
             tags: ["BlogPosting"]
+    "/sites/{siteId}/blog-postings/by-external-reference-code-query-param":
+        delete:
+            # @review
+            description:
+                Deletes the blog post by external reference code.
+            operationId: deleteSiteBlogPostingByExternalReferenceCodeQueryParam
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["BlogPosting"]
+        get:
+            # @review
+            description:
+                Retrieves the site's blog post by external reference code.
+            operationId: getSiteBlogPostingByExternalReferenceCodeQueryParam
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+            tags: ["BlogPosting"]
+        put:
+            # @review
+            description:
+                Updates the site's blog post with the given external reference code, or creates it if it not exists.
+            operationId: putSiteBlogPostingByExternalReferenceCodeQueryParam
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/BlogPosting"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/BlogPosting"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/BlogPosting"
+            tags: ["BlogPosting"]
     "/sites/{siteId}/blog-postings/by-external-reference-code/{blogPostingExternalReferenceCode}/comments/by-external-reference-code/{externalReferenceCode}":
         delete:
             # @review
