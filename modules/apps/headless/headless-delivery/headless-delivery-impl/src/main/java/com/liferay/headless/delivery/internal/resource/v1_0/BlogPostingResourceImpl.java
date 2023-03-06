@@ -110,6 +110,15 @@ public class BlogPostingResourceImpl extends BaseBlogPostingResourceImpl {
 	}
 
 	@Override
+	public void deleteSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode)
+		throws Exception {
+
+		deleteSiteBlogPostingByExternalReferenceCode(
+			siteId, externalReferenceCode);
+	}
+
+	@Override
 	public BlogPosting getBlogPosting(Long blogPostingId) throws Exception {
 		BlogsEntry blogsEntry = _blogsEntryService.getEntry(blogPostingId);
 
@@ -155,6 +164,15 @@ public class BlogPostingResourceImpl extends BaseBlogPostingResourceImpl {
 		return _toBlogPosting(
 			_blogsEntryService.getBlogsEntryByExternalReferenceCode(
 				siteId, externalReferenceCode));
+	}
+
+	@Override
+	public BlogPosting getSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode)
+		throws Exception {
+
+		return getSiteBlogPostingByExternalReferenceCode(
+			siteId, externalReferenceCode);
 	}
 
 	@Override
@@ -265,6 +283,15 @@ public class BlogPostingResourceImpl extends BaseBlogPostingResourceImpl {
 		}
 
 		return _addBlogPosting(externalReferenceCode, siteId, blogPosting);
+	}
+
+	@Override
+	public BlogPosting putSiteBlogPostingByExternalReferenceCodeQueryParam(
+			Long siteId, String externalReferenceCode, BlogPosting blogPosting)
+		throws Exception {
+
+		return putSiteBlogPostingByExternalReferenceCode(
+			siteId, externalReferenceCode, blogPosting);
 	}
 
 	@Override
