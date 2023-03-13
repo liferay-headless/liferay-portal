@@ -18,6 +18,8 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.batch.engine.unit.BatchEngineUnit;
 import com.liferay.batch.engine.unit.BatchEngineUnitProcessor;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.BooleanWrapper;
@@ -105,6 +107,8 @@ public class BatchEngineBundleTrackerTest {
 				).build());
 
 		try {
+			_log.info("TEST Thread ID: " + Thread.currentThread().getId());
+
 			bundle.start();
 
 			Thread.sleep(2000);
@@ -161,6 +165,9 @@ public class BatchEngineBundleTrackerTest {
 
 		return new FileInputStream(zipWriter.getFile());
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BatchEngineBundleTrackerTest.class);
 
 	private Bundle _bundle;
 	private BundleContext _bundleContext;

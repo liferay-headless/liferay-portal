@@ -18,6 +18,8 @@ import com.liferay.batch.engine.unit.BatchEngineUnit;
 import com.liferay.batch.engine.unit.BatchEngineUnitProcessor;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
@@ -171,7 +173,13 @@ public class BatchEngineBundleTracker {
 		String batchPath = headers.get("Liferay-Client-Extension-Batch");
 
 		if (batchPath != null) {
+			_log.info(
+				"Thread ID: " +
+					Thread.currentThread(
+					).getId());
+
 			if (_isAlreadyProcessed(bundle)) {
+				_log.info("Bundle is already processed " + bundle.getSymbolicName());
 				return;
 			}
 
@@ -191,6 +199,9 @@ public class BatchEngineBundleTracker {
 				_getBatchEngineUnits(bundle, batchPath));
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BatchEngineBundleTracker.class);
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private BatchEngineUnitProcessor _batchEngineUnitProcessor;
