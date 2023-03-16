@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -70,7 +71,9 @@ public class BatchEngineFileInstaller implements FileInstaller {
 	public boolean canTransformURL(File file) {
 		String fileName = file.getName();
 
-		if (!StringUtil.endsWith(fileName, ".zip")) {
+		if (!StringUtil.endsWith(fileName, ".zip") ||
+			_isClientExtension(file)) {
+
 			return false;
 		}
 
@@ -355,6 +358,35 @@ public class BatchEngineFileInstaller implements FileInstaller {
 		}
 
 		return batchEngineZipUnits.values();
+	}
+
+	private boolean _isClientExtension(File file) {
+		try (ZipFile zipFile = new ZipFile(file)) {
+			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+
+			while (enumeration.hasMoreElements()) {
+				ZipEntry zipEntry = enumeration.nextElement();
+
+				String name = zipEntry.getName();
+
+				if (Objects.equals(
+						name, "WEB-INF/liferay-plugin-package.properties") ||
+					(name.endsWith(".client-extension-config.json") &&
+					 (name.indexOf("/") == -1))) {
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+		catch (IOException ioException) {
+			_log.error(
+				"Unable to check if " + file + " is a client extension",
+				ioException);
+		}
+
+		return false;
 	}
 
 	private void _processBatchEngineZipUnit(
