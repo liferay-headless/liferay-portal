@@ -1158,4 +1158,46 @@ definition {
 		}
 	}
 
+		@disable-webdriver = "true"
+	@priority = 4
+	test CanGraphQL {
+		property portal.acceptance = "true";
+
+		task ("Given manyToMany relationship universitySubjects with deletionType Disassociate created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				en_US_label = "universityStudents",
+				deletionType = "cascade",
+				name = "universityStudents",
+				objectDefinitionId1 = ${staticUniversityObjectId},
+				objectDefinitionId2 = ${staticStudentObjectId},
+				type = "oneToMany");
+		}
+
+		task ("Given three university entries created") {
+			var studentId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "students",
+				name = "Liferay Student");
+			var universityId1 = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "universities",
+				name = "Liferay University");
+
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "universities",
+				objectEntry1 = ${universityId1},
+				objectEntry2 = ${studentId1},
+				relationshipName = "universityStudents");
+		}
+
+		task ("Then") {
+			var responseToParse = ObjectDefinitionAPI.graphQL();
+
+			echo(${responseToParse});
+
+			var value = JSONUtil.getWithJSONPath(${responseToParse}, "$..universityStudents.name");
+
+			TestUtils.assertEquals(
+				actual = ${value},
+				expected = "Liferay University");
+		}
+	}
 }
