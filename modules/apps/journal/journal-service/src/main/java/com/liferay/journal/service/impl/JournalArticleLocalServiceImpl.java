@@ -5741,7 +5741,12 @@ public class JournalArticleLocalServiceImpl
 			(_classNameLocalService.getClassNameId(DDMStructure.class) !=
 				article.getClassNameId())) {
 
-			throw new ArticleFriendlyURLException();
+			urlTitle = urlTitleMap.get(
+				LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+
+			if (Validator.isNull(urlTitle)) {
+				throw new ArticleFriendlyURLException();
+			}
 		}
 
 		article.setFolderId(folderId);
