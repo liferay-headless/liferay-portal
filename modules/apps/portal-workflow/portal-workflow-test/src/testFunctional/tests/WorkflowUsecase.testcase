@@ -813,6 +813,8 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.diagramSourceSwitchView();
 
+		Button.clickSave();
+
 		Button.clickPublish();
 
 		Navigator.gotoBack();
