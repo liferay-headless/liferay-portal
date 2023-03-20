@@ -89,7 +89,7 @@ definition {
 		}
 
 		task ("Then Picklist is exported successfully") {
-			Picklist.assertDownloadedPicklist(downloadedFile = "ListType_*");
+			ImportExport.assertDownloadedFileName(downloadedFile = "ListType_Export*");
 		}
 	}
 
