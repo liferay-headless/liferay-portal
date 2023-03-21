@@ -50,17 +50,17 @@ public abstract class BaseMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+			portal.getSiteGroupId(themeDisplay.getScopeGroupId()),
+			portal.getClassNameId(JournalArticle.class.getName()),
+			"BASIC-WEB-CONTENT", true);
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalArticle.class.getName(), actionRequest);
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 		serviceContext.setAssetTagNames(assetTagNames);
-
-		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
-			portal.getSiteGroupId(themeDisplay.getScopeGroupId()),
-			portal.getClassNameId(JournalArticle.class.getName()),
-			"BASIC-WEB-CONTENT", true);
 
 		return journalArticleLocalService.addArticle(
 			null, themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), 0,
