@@ -1702,7 +1702,7 @@ public class BundleSiteInitializerTest {
 		Assert.assertNotNull(resourcePermission);
 
 		_assertResourceAction(
-			new String[] {"VIEW", "UPDATE"}, resourcePermission);
+			new String[] {"UPDATE", "VIEW"}, resourcePermission);
 	}
 
 	private void _assertResourcePermission2() throws Exception {
@@ -1772,7 +1772,7 @@ public class BundleSiteInitializerTest {
 		Assert.assertNotNull(resourcePermission);
 
 		_assertResourceAction(
-			new String[] {"VIEW", "UPDATE"}, resourcePermission);
+			new String[] {"UPDATE", "VIEW"}, resourcePermission);
 
 		layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
@@ -1789,7 +1789,7 @@ public class BundleSiteInitializerTest {
 		Assert.assertNotNull(resourcePermission);
 
 		_assertResourceAction(
-			new String[] {"VIEW", "UPDATE"}, resourcePermission);
+			new String[] {"UPDATE", "VIEW"}, resourcePermission);
 	}
 
 	private void _assertRoles() {

@@ -1167,17 +1167,21 @@ public class BundleSiteInitializer implements SiteInitializer {
 		Map<String, String> objectDefinitionIdsStringUtilReplaceValues =
 			new HashMap<>();
 
-		List<com.liferay.object.model.ObjectDefinition> objectDefinitions =
-			_objectDefinitionLocalService.getObjectDefinitions(
-				serviceContext.getCompanyId(), true,
-				WorkflowConstants.STATUS_APPROVED);
+		List<com.liferay.object.model.ObjectDefinition>
+			serviceBuilderObjectDefinitions =
+				_objectDefinitionLocalService.getObjectDefinitions(
+					serviceContext.getCompanyId(), true,
+					WorkflowConstants.STATUS_APPROVED);
 
-		for (com.liferay.object.model.ObjectDefinition objectDefinition :
-				objectDefinitions) {
+		for (com.liferay.object.model.ObjectDefinition
+				serviceBuilderObjectDefinition :
+					serviceBuilderObjectDefinitions) {
 
 			objectDefinitionIdsStringUtilReplaceValues.put(
-				"OBJECT_DEFINITION_ID:" + objectDefinition.getShortName(),
-				String.valueOf(objectDefinition.getObjectDefinitionId()));
+				"OBJECT_DEFINITION_ID:" +
+					serviceBuilderObjectDefinition.getShortName(),
+				String.valueOf(
+					serviceBuilderObjectDefinition.getObjectDefinitionId()));
 		}
 
 		Set<String> resourcePaths = _servletContext.getResourcePaths(
@@ -2929,28 +2933,28 @@ public class BundleSiteInitializer implements SiteInitializer {
 			ServiceContext serviceContext)
 		throws Exception {
 
+		String json = SiteInitializerUtil.read(
+			"/site-initializer/resource-permissions.json", _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
 		Map<String, String> layoutPageTemplateEntryReplaceValues =
 			new HashMap<>();
 
-		List<LayoutPageTemplateEntry> layoutPageTemplateEntrys =
+		List<LayoutPageTemplateEntry> layoutPageTemplateEntries =
 			_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntries(
 				serviceContext.getScopeGroupId());
 
 		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
-				layoutPageTemplateEntrys) {
+				layoutPageTemplateEntries) {
 
 			layoutPageTemplateEntryReplaceValues.put(
 				"LAYOUT_PAGE_TEMPLATE_ENTRY_ID:" +
 					layoutPageTemplateEntry.getName(),
 				String.valueOf(
 					layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
-		}
-
-		String json = SiteInitializerUtil.read(
-			"/site-initializer/resource-permissions.json", _servletContext);
-
-		if (json == null) {
-			return;
 		}
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray(
