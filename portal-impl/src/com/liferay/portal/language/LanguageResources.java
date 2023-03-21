@@ -68,7 +68,7 @@ public class LanguageResources {
 			return overrideValue;
 		}
 
-		MapHolder mapHolder = _mapHolderMaps.computeIfAbsent(
+		MapHolder mapHolder = _mapHolders.computeIfAbsent(
 			locale, MapHolder::new);
 
 		Map<String, String> languageMap = mapHolder.getMap();
@@ -115,11 +115,11 @@ public class LanguageResources {
 	}
 
 	public void destroy() {
-		for (MapHolder mapHolder : _mapHolderMaps.values()) {
+		for (MapHolder mapHolder : _mapHolders.values()) {
 			mapHolder.close();
 		}
 
-		_mapHolderMaps.clear();
+		_mapHolders.clear();
 	}
 
 	private static String _getOverrideValue(String key, Locale locale) {
@@ -205,7 +205,7 @@ public class LanguageResources {
 		ServiceProxyFactory.newServiceTrackedInstance(
 			LanguageOverrideProvider.class, LanguageResources.class,
 			"_languageOverrideProvider", false, true);
-	private static final Map<Locale, MapHolder> _mapHolderMaps =
+	private static final Map<Locale, MapHolder> _mapHolders =
 		new ConcurrentHashMap<>();
 	private static final Locale _nullLocale = new Locale(StringPool.BLANK);
 	private static final Map<Locale, Locale> _superLocales =
@@ -215,7 +215,7 @@ public class LanguageResources {
 
 		@Override
 		public Enumeration<String> getKeys() {
-			MapHolder mapHolder = _mapHolderMaps.computeIfAbsent(
+			MapHolder mapHolder = _mapHolders.computeIfAbsent(
 				_locale, MapHolder::new);
 
 			Map<String, String> languageMap = mapHolder.getMap();
@@ -244,7 +244,7 @@ public class LanguageResources {
 				return overrideValue;
 			}
 
-			MapHolder mapHolder = _mapHolderMaps.computeIfAbsent(
+			MapHolder mapHolder = _mapHolders.computeIfAbsent(
 				_locale, MapHolder::new);
 
 			Map<String, String> languageMap = mapHolder.getMap();
@@ -254,7 +254,7 @@ public class LanguageResources {
 
 		@Override
 		protected Set<String> handleKeySet() {
-			MapHolder mapHolder = _mapHolderMaps.computeIfAbsent(
+			MapHolder mapHolder = _mapHolders.computeIfAbsent(
 				_locale, MapHolder::new);
 
 			Map<String, String> languageMap = mapHolder.getMap();
@@ -334,7 +334,7 @@ public class LanguageResources {
 							ServiceReference<?> serviceReference =
 								serviceEvent.getServiceReference();
 
-							MapHolder mapHolder = _mapHolderMaps.remove(
+							MapHolder mapHolder = _mapHolders.remove(
 								LocaleUtil.fromLanguageId(
 									String.valueOf(
 										serviceReference.getProperty(
