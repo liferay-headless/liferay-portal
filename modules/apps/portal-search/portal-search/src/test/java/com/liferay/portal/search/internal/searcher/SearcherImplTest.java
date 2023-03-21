@@ -112,8 +112,6 @@ public class SearcherImplTest {
 		List<Document> searchDocuments = searchResponse.getDocuments71();
 
 		Assert.assertEquals(
-			"Search ignored keywords and/or " +
-				"SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH attribute",
 			expected, searchDocuments.size());
 	}
 
