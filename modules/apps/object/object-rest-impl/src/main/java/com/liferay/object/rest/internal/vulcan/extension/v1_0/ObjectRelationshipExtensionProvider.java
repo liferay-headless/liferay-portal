@@ -157,11 +157,6 @@ public class ObjectRelationshipExtensionProvider
 	}
 
 	@Override
-	public boolean isApplicableExtension(long companyId, String className) {
-		return super.isApplicableExtension(companyId, className);
-	}
-
-	@Override
 	public void setExtendedProperties(
 		long companyId, long userId, String className, Object entity,
 		Map<String, Serializable> extendedProperties) {
