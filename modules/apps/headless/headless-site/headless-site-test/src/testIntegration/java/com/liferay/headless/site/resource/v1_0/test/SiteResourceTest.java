@@ -77,7 +77,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 	public void testPostSite() throws Exception {
 		super.testPostSite();
 
-		_testPostSiteFailureDuplicatedName();
+		_testPostSiteFailureDuplicateName();
 		_testPostSiteFailureNoName();
 		_testPostSiteFailureSiteTemplateInactive();
 		_testPostSiteSuccessChild();
@@ -104,7 +104,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		return postSite;
 	}
 
-	private void _testPostSiteFailureDuplicatedName() throws Exception {
+	private void _testPostSiteFailureDuplicateName() throws Exception {
 		Site randomSite = randomSite();
 
 		testPostSite_addSite(randomSite);
