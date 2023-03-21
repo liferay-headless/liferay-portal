@@ -5742,7 +5742,7 @@ public class JournalArticleLocalServiceImpl
 				article.getClassNameId())) {
 
 			urlTitle = urlTitleMap.get(
-				LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+				LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 
 			if (Validator.isNull(urlTitle)) {
 				throw new ArticleFriendlyURLException();
