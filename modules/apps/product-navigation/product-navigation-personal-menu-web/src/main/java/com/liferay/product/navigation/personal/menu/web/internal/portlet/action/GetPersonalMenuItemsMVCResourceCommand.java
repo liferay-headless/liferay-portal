@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.portlet.PortletRequest;
@@ -292,10 +291,9 @@ public class GetPersonalMenuItemsMVCResourceCommand
 
 		JSONObject dividerJSONObject = JSONUtil.put("type", "divider");
 
-		SortedSet<String> personalMenuGroups = new TreeSet<>(
-			_serviceTrackerMap.keySet());
+		for (String personalMenuGroup :
+				new TreeSet<>(_serviceTrackerMap.keySet())) {
 
-		for (String personalMenuGroup : personalMenuGroups) {
 			JSONArray personalMenuEntriesJSONArray =
 				_getPersonalMenuEntriesJSONArray(
 					portletRequest,
