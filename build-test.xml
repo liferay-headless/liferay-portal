@@ -14976,7 +14976,7 @@ mail.send.blacklist=</echo>
 		<if>
 			<equals arg1="${cas.enabled}" arg2="true" />
 			<then>
-				<ant antfile="build-test-authentication.xml" target="setup-cas" />
+				<ant antfile="build-test-cas.xml" target="setup-cas" />
 			</then>
 		</if>
 
@@ -14994,9 +14994,9 @@ mail.send.blacklist=</echo>
 		<if>
 			<equals arg1="${openam.enabled}" arg2="true" />
 			<then>
-				<ant antfile="build-test-authentication.xml" target="delete-openam-config" />
+				<ant antfile="build-test-openam.xml" target="delete-openam-config" />
 
-				<ant antfile="build-test-authentication.xml" target="setup-openam" />
+				<ant antfile="build-test-openam.xml" target="setup-openam" />
 			</then>
 		</if>
 
@@ -15515,7 +15515,7 @@ mail.send.blacklist=</echo>
 		<if>
 			<equals arg1="${openam.enabled}" arg2="true" />
 			<then>
-				<ant antfile="build-test-authentication.xml" target="delete-openam-config" />
+				<ant antfile="build-test-openam.xml" target="delete-openam-config" />
 			</then>
 		</if>
 
