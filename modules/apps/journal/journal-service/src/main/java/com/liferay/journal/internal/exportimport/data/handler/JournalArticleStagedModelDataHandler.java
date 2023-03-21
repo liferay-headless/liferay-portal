@@ -743,11 +743,11 @@ public class JournalArticleStagedModelDataHandler
 			}
 		}
 
+		long classPK = 0;
+
 		Map<Long, Long> ddmStructureIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DDMStructure.class);
-
-		long classPK = 0;
 
 		if (article.getClassNameId() !=
 				JournalArticleConstants.CLASS_NAME_ID_DEFAULT) {
