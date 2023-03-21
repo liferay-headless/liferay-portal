@@ -63,7 +63,7 @@ public class NPMRegistryUpdateImpl implements NPMRegistryUpdate {
 	}
 
 	public boolean isUnregistered(String id) {
-		return _jsModuleUnregistrations.contains(id);
+		return _jsModuleUnregisteredIds.contains(id);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class NPMRegistryUpdateImpl implements NPMRegistryUpdate {
 	public void unregisterJSModule(JSModule jsModule) {
 		_failIfFinished();
 
-		_jsModuleUnregistrations.add(jsModule.getId());
+		_jsModuleUnregisteredIds.add(jsModule.getId());
 	}
 
 	@Override
@@ -193,7 +193,7 @@ public class NPMRegistryUpdateImpl implements NPMRegistryUpdate {
 	private boolean _finished;
 	private final Map<String, Collection<JSModuleRegistration>>
 		_jsModuleRegistrationsMap = new HashMap<>();
-	private final Set<String> _jsModuleUnregistrations = new HashSet<>();
+	private final Set<String> _jsModuleUnregisteredIds = new HashSet<>();
 	private final Map<String, JSModuleUpdate> _jsModuleUpdates =
 		new HashMap<>();
 	private final NPMRegistryImpl _npmRegistryImpl;
