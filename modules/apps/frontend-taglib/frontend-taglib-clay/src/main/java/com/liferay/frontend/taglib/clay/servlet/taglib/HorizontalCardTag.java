@@ -73,6 +73,7 @@ public class HorizontalCardTag extends BaseCardTag {
 
 	public String getTitle() {
 		String title = _title;
+
 		HorizontalCard horizontalCard = getHorizontalCard();
 
 		if ((_title == null) && (horizontalCard != null)) {
