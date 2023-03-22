@@ -708,17 +708,17 @@ public class DLAdminManagementToolbarDisplayContext
 	}
 
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
-		long fileEntryTypeId = _getFileEntryTypeId();
 		boolean extensionsIsEmpty = ArrayUtil.isEmpty(
 			_getExtensions(_httpServletRequest));
+		long fileEntryTypeId = _getFileEntryTypeId();
 		String navigation = ParamUtil.getString(
 			_httpServletRequest, "navigation", "home");
 
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.setActive(
-					navigation.equals("home") && (fileEntryTypeId == -1) &&
-					extensionsIsEmpty);
+					extensionsIsEmpty && (fileEntryTypeId == -1) &&
+					navigation.equals("home"));
 				dropdownItem.setHref(
 					PortletURLBuilder.create(
 						PortletURLUtil.clone(
