@@ -187,12 +187,17 @@ public class CommerceOrderSystemObjectDefinitionMetadata
 					values.get("externalReferenceCode"));
 				orderStatus = GetterUtil.getInteger(values.get("orderStatus"));
 
-				String shippingAmountString = GetterUtil.getString(
-					values.get("shippingAmount"));
+				setShippingAmount(
+					() -> {
+						String shippingAmountString = GetterUtil.getString(
+							values.get("shippingAmount"));
 
-				if (Validator.isNotNull(shippingAmountString)) {
-					shippingAmount = new BigDecimal(shippingAmountString);
-				}
+						if (Validator.isNull(shippingAmountString)) {
+							return null;
+						}
+
+						return new BigDecimal(shippingAmountString);
+					});
 			}
 		};
 	}
