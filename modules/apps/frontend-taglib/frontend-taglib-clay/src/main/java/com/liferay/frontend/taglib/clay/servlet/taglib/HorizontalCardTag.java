@@ -87,20 +87,6 @@ public class HorizontalCardTag extends BaseCardTag {
 		return title;
 	}
 
-	private boolean _isTranslated() {
-		if (_translated != null) {
-			return _translated;
-		}
-
-		HorizontalCard horizontalCard = getHorizontalCard();
-
-		if (horizontalCard == null) {
-			return true;
-		}
-
-		return horizontalCard.isTranslated();
-	}
-
 	public void setHorizontalCard(HorizontalCard horizontalCard) {
 		setCardModel(horizontalCard);
 	}
@@ -194,6 +180,20 @@ public class HorizontalCardTag extends BaseCardTag {
 		}
 
 		return SKIP_BODY;
+	}
+
+	private boolean _isTranslated() {
+		if (_translated != null) {
+			return _translated;
+		}
+
+		HorizontalCard horizontalCard = getHorizontalCard();
+
+		if (horizontalCard == null) {
+			return true;
+		}
+
+		return horizontalCard.isTranslated();
 	}
 
 	private void _writeBody(JspWriter jspWriter) throws Exception {
