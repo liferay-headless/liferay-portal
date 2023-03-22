@@ -465,11 +465,11 @@ EOF
 
 function write_react_client_extension {
 	echo "assemble:" > client-extension.yaml
-	echo "    - from: build" >> client-extension.yaml
+	echo "    - from: build/static" >> client-extension.yaml
 	echo "      into: static" >> client-extension.yaml
 	echo "${CUSTOM_ELEMENT_NAME}:" >> client-extension.yaml
 	echo "    cssURLs:" >> client-extension.yaml
-	echo "        - static/css/main.*.css" >> client-extension.yaml
+	echo "        - css/main.*.css" >> client-extension.yaml
 	echo "    friendlyURLMapping: ${CUSTOM_ELEMENT_NAME}" >> client-extension.yaml
 	echo "    htmlElementName: ${CUSTOM_ELEMENT_NAME}" >> client-extension.yaml
 	echo "    instanceable: false" >> client-extension.yaml
@@ -477,7 +477,7 @@ function write_react_client_extension {
 	echo "    portletCategoryName: category.client-extensions" >> client-extension.yaml
 	echo "    type: customElement" >> client-extension.yaml
 	echo "    urls:" >> client-extension.yaml
-	echo "        - static/js/main.*.js" >> client-extension.yaml
+	echo "        - js/main.*.js" >> client-extension.yaml
 	echo -n "    useESM: true" >> client-extension.yaml
 }
 
