@@ -87,7 +87,7 @@ public class HorizontalCardTag extends BaseCardTag {
 		return title;
 	}
 
-	private Boolean _isTranslated() {
+	private boolean _isTranslated() {
 		if (_translated != null) {
 			return _translated;
 		}
