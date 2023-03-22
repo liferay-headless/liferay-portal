@@ -17,10 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-portletDisplay.setShowBackIcon(true);
-
 String fdsViewsURL = fdsViewsDisplayContext.getFDSViewsURL(ParamUtil.getString(request, "fdsEntryId"), ParamUtil.getString(request, "fdsEntryLabel"));
 
+portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(fdsViewsURL);
 
 renderResponse.setTitle(ParamUtil.getString(request, "fdsViewLabel"));
