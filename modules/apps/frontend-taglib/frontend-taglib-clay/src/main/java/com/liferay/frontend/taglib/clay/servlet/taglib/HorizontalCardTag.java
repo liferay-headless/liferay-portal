@@ -98,7 +98,7 @@ public class HorizontalCardTag extends BaseCardTag {
 			return true;
 		}
 
-		return horizontalCard._isTranslated();
+		return horizontalCard.isTranslated();
 	}
 
 	public void setHorizontalCard(HorizontalCard horizontalCard) {
