@@ -88,17 +88,17 @@ public class HorizontalCardTag extends BaseCardTag {
 	}
 
 	private Boolean _isTranslated() {
-		if (_translated == null) {
-			HorizontalCard horizontalCard = getHorizontalCard();
+		if (_translated != null) {
+			return _translated;
+		}
 
-			if (horizontalCard != null) {
-				return horizontalCard._isTranslated();
-			}
+		HorizontalCard horizontalCard = getHorizontalCard();
 
+		if (horizontalCard == null) {
 			return true;
 		}
 
-		return _translated;
+		return horizontalCard._isTranslated();
 	}
 
 	public void setHorizontalCard(HorizontalCard horizontalCard) {
