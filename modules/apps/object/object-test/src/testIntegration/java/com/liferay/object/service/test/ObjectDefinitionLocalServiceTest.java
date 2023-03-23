@@ -474,6 +474,12 @@ public class ObjectDefinitionLocalServiceTest {
 						return null;
 					}
 
+					public BaseModel<?> fetchBaseModelByExternalReferenceCode(
+						String externalReferenceCode, long companyId) {
+
+						return null;
+					}
+
 					@Override
 					public BaseModel<?> getBaseModelByExternalReferenceCode(
 							String externalReferenceCode, long companyId)
@@ -559,6 +565,14 @@ public class ObjectDefinitionLocalServiceTest {
 						throws Exception {
 					}
 
+					@Override
+					public long upsertBaseModel(
+						String externalReferenceCode, long companyId, User user,
+						Map<String, Object> values) {
+
+						return 0;
+					}
+
 				});
 
 		Assert.assertEquals(
@@ -605,6 +619,12 @@ public class ObjectDefinitionLocalServiceTest {
 					@Override
 					public BaseModel<?> deleteBaseModel(BaseModel<?> baseModel)
 						throws PortalException {
+
+						return null;
+					}
+
+					public BaseModel<?> fetchBaseModelByExternalReferenceCode(
+						String externalReferenceCode, long companyId) {
 
 						return null;
 					}
@@ -691,6 +711,14 @@ public class ObjectDefinitionLocalServiceTest {
 							long primaryKey, User user,
 							Map<String, Object> values)
 						throws Exception {
+					}
+
+					@Override
+					public long upsertBaseModel(
+						String externalReferenceCode, long companyId, User user,
+						Map<String, Object> values) {
+
+						return 0;
 					}
 
 				});
