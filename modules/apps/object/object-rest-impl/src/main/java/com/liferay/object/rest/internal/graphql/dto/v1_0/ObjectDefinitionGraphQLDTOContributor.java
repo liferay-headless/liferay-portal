@@ -57,6 +57,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Javier de Arcos
@@ -255,22 +257,12 @@ public class ObjectDefinitionGraphQLDTOContributor
 			return null;
 		}
 
-		String relationshipIdName = null;
-
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
-		Map<String, Object> properties = objectEntry.getProperties();
+		long relationshipId = _getRelationshipId(objectEntry.getProperties());
 
-		for (String key : properties.keySet()) {
-			if (key.contains(relationshipName)) {
-				relationshipIdName = key;
-
-				break;
-			}
-		}
-
-		if (relationshipIdName == null) {
+		if (relationshipId <= 0) {
 			Page<ObjectEntry> page =
 				_objectEntryManager.getObjectEntryRelatedObjectEntries(
 					dtoConverterContext, _objectDefinition, id,
@@ -281,16 +273,10 @@ public class ObjectDefinitionGraphQLDTOContributor
 				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
 		}
 
-		Object relationshipId = properties.get(relationshipIdName);
-
-		if (!(relationshipId instanceof Long)) {
-			return null;
-		}
-
 		return (T)_toMap(
 			_objectEntryManager.fetchObjectEntry(
-				dtoConverterContext, null, (long)relationshipId),
-			relationshipIdName);
+				dtoConverterContext, null, relationshipId),
+			relationshipName);
 	}
 
 	@Override
@@ -361,6 +347,23 @@ public class ObjectDefinitionGraphQLDTOContributor
 		_typeName = typeName;
 	}
 
+	private long _getRelationshipId(Map<String, Object> properties) {
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			Matcher matcher = _relationshipIdNamePattern.matcher(
+				entry.getKey());
+
+			if (matcher.matches()) {
+				if (entry.getValue() instanceof Long) {
+					return (long)entry.getValue();
+				}
+
+				return 0;
+			}
+		}
+
+		return 0;
+	}
+
 	private Map<String, Object> _toMap(ObjectEntry objectEntry) {
 		return _toMap(objectEntry, getIdName());
 	}
@@ -408,6 +411,8 @@ public class ObjectDefinitionGraphQLDTOContributor
 		return objectEntry;
 	}
 
+	private static final Pattern _relationshipIdNamePattern = Pattern.compile(
+		"r_.+_c_.+Id");
 	private static final Map<Operation, String> _resourceMethods =
 		HashMapBuilder.<Operation, String>put(
 			Operation.CREATE, "postObjectEntry"
