@@ -16,6 +16,7 @@ package com.liferay.object.rest.internal.util;
 
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -27,19 +28,27 @@ import java.util.Locale;
 
 import javax.ws.rs.InternalServerErrorException;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * @author Carolina Barbosa
  */
+@Component(service = {})
 public class DTOConverterUtil {
 
-	public static Object toDTO(
-			BaseModel<?> baseModel, DTOConverterRegistry dtoConverterRegistry,
-			SystemObjectDefinitionManager systemObjectDefinitionManager,
-			User user)
+	public static DTOConverter<BaseModel<?>, ?> getDTOConverter(
+			SystemObjectDefinitionManager systemObjectDefinitionManager)
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
 			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
+
+		DTOConverterRegistry dtoConverterRegistry =
+			_serviceTracker.getService();
 
 		DTOConverter<BaseModel<?>, ?> dtoConverter =
 			(DTOConverter<BaseModel<?>, ?>)dtoConverterRegistry.getDTOConverter(
@@ -53,11 +62,26 @@ public class DTOConverterUtil {
 					systemObjectDefinitionManager.getModelClassName());
 		}
 
+		return dtoConverter;
+	}
+
+	public static Object toDTO(
+			BaseModel<?> baseModel,
+			SystemObjectDefinitionManager systemObjectDefinitionManager,
+			User user)
+		throws Exception {
+
+		DTOConverter<BaseModel<?>, ?> dtoConverter = getDTOConverter(
+			systemObjectDefinitionManager);
+
 		Locale locale = null;
 
 		if (user != null) {
 			locale = user.getLocale();
 		}
+
+		DTOConverterRegistry dtoConverterRegistry =
+			_serviceTracker.getService();
 
 		DefaultDTOConverterContext defaultDTOConverterContext =
 			new DefaultDTOConverterContext(
@@ -66,5 +90,23 @@ public class DTOConverterUtil {
 
 		return dtoConverter.toDTO(defaultDTOConverterContext);
 	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTracker = ServiceTrackerFactory.open(
+			bundleContext.getBundle(), DTOConverterRegistry.class);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (_serviceTracker != null) {
+			_serviceTracker.close();
+
+			_serviceTracker = null;
+		}
+	}
+
+	private static ServiceTracker<DTOConverterRegistry, DTOConverterRegistry>
+		_serviceTracker;
 
 }
