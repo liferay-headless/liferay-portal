@@ -45,6 +45,7 @@ import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
 import com.liferay.object.rest.dto.v1_0.util.LinkUtil;
 import com.liferay.object.rest.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
 import com.liferay.object.rest.internal.util.DTOConverterUtil;
+import com.liferay.object.rest.internal.vulcan.extension.v1_0.ObjectEntryExtensionProvider;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -77,6 +78,7 @@ import com.liferay.portal.security.audit.storage.service.AuditEventLocalService;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.extension.ExtensionProviderRegistry;
 import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 import com.liferay.portal.vulcan.jaxrs.extension.ExtendedEntity;
@@ -305,25 +307,11 @@ public class ObjectEntryDTOConverter
 						objectRelationship.getName(),
 						TransformUtil.transformToArray(
 							relatedModels,
-							relatedModel -> {
-								BaseModel<?> baseModel =
-									(BaseModel<?>)relatedModel;
-
-								Map<String, Serializable>
-									nestedFieldsRelatedProperties =
-										_getNestedFieldsRelatedProperties(
-											dtoConverterContext, groupId,
-											nestedFieldsContext,
-											relatedObjectDefinition,
-											(Long)baseModel.getPrimaryKeyObj());
-
-								return ExtendedEntity.extend(
-									DTOConverterUtil.toDTO(
-										baseModel,
-										systemObjectDefinitionManager,
-										dtoConverterContext.getUser()),
-									nestedFieldsRelatedProperties, null);
-							},
+							relatedModel -> _toExtendedEntity(
+								(BaseModel<?>)relatedModel, dtoConverterContext,
+								groupId, nestedFieldsContext,
+								relatedObjectDefinition,
+								systemObjectDefinitionManager),
 							Object.class));
 				}
 				else {
@@ -552,6 +540,38 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
+	private ExtendedEntity _toExtendedEntity(
+			BaseModel<?> baseModel, DTOConverterContext dtoConverterContext,
+			long groupId, NestedFieldsContext nestedFieldsContext,
+			ObjectDefinition objectDefinition,
+			SystemObjectDefinitionManager systemObjectDefinitionManager)
+		throws Exception {
+
+		Map<String, Serializable> nestedFieldsRelatedProperties =
+			_getNestedFieldsRelatedProperties(
+				dtoConverterContext, groupId, nestedFieldsContext,
+				objectDefinition, (Long)baseModel.getPrimaryKeyObj());
+
+		DTOConverter<BaseModel<?>, ?> dtoConverter =
+			DTOConverterUtil.getDTOConverter(systemObjectDefinitionManager);
+
+		Object dto = DTOConverterUtil.toDTO(
+			baseModel, systemObjectDefinitionManager,
+			dtoConverterContext.getUser());
+
+		if (_objectEntryExtensionProvider.isApplicableExtension(
+				objectDefinition.getCompanyId(),
+				dtoConverter.getExternalDTOClassName())) {
+
+			nestedFieldsRelatedProperties.putAll(
+				_objectEntryExtensionProvider.getExtendedProperties(
+					objectDefinition.getCompanyId(),
+					dtoConverter.getExternalDTOClassName(), dto));
+		}
+
+		return ExtendedEntity.extend(dto, nestedFieldsRelatedProperties, null);
+	}
+
 	private Map<String, Object> _toProperties(
 			DTOConverterContext dtoConverterContext,
 			NestedFieldsContext nestedFieldsContext,
@@ -698,6 +718,9 @@ public class ObjectEntryDTOConverter
 	private DLURLHelper _dlURLHelper;
 
 	@Reference
+	private ExtensionProviderRegistry _extensionProviderRegistry;
+
+	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
@@ -711,6 +734,9 @@ public class ObjectEntryDTOConverter
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryExtensionProvider _objectEntryExtensionProvider;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
