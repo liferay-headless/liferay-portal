@@ -76,7 +76,6 @@ import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
 import com.liferay.portal.security.audit.storage.service.AuditEventLocalService;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
@@ -148,7 +147,7 @@ public class ObjectEntryDTOConverter
 							systemObjectDefinitionManager.
 								getExternalReferenceCode(primaryKey),
 							objectDefinition.getCompanyId()),
-					_dtoConverterRegistry, systemObjectDefinitionManager,
+					systemObjectDefinitionManager,
 					dtoConverterContext.getUser());
 			}
 			else {
@@ -320,7 +319,7 @@ public class ObjectEntryDTOConverter
 
 								return ExtendedEntity.extend(
 									DTOConverterUtil.toDTO(
-										baseModel, _dtoConverterRegistry,
+										baseModel,
 										systemObjectDefinitionManager,
 										dtoConverterContext.getUser()),
 									nestedFieldsRelatedProperties, null);
@@ -697,9 +696,6 @@ public class ObjectEntryDTOConverter
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
-
-	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

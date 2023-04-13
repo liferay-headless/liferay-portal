@@ -99,7 +99,6 @@ import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.aggregation.Facet;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -1149,7 +1148,7 @@ public class DefaultObjectEntryManagerImpl
 		throws Exception {
 
 		return DTOConverterUtil.toDTO(
-			baseModel, _dtoConverterRegistry, systemObjectDefinitionManager,
+			baseModel, systemObjectDefinitionManager,
 			_userLocalService.getUser(serviceBuilderObjectEntry.getUserId()));
 	}
 
@@ -1341,9 +1340,6 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private FilterPredicateFactory _filterPredicateFactory;
