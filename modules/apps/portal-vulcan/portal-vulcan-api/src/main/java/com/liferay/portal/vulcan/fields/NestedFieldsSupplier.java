@@ -27,11 +27,6 @@ import java.util.Map;
  */
 public class NestedFieldsSupplier<T> {
 
-	public NestedFieldsSupplier() {
-		_nestedFieldsContext =
-			NestedFieldsContextThreadLocal.getNestedFieldsContext();
-	}
-
 	public List<String> getNestedFieldNames() {
 		if (_nestedFieldsContext == null) {
 			return new ArrayList<>();
@@ -88,6 +83,11 @@ public class NestedFieldsSupplier<T> {
 		_nestedFieldsContext.decrementCurrentDepth();
 
 		return nestedFields;
+	}
+
+	protected NestedFieldsSupplier(NestedFieldsContext nestedFieldsContext) {
+		_nestedFieldsContext =
+			NestedFieldsContextThreadLocal.getNestedFieldsContext();
 	}
 
 	private boolean _mustProcessNestedFields(
