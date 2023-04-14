@@ -827,8 +827,8 @@ definition {
 		var objectDefinitionId = JSONCurlUtil.get(${curl}, "$.items[?(@['name'] == '${name}')]['id']");
 
 		TestUtils.assertNotEquals(
-				actual = ${objectDefinitionId},
-				expected = "");
+			actual = ${objectDefinitionId},
+			expected = "");
 
 		return ${objectDefinitionId};
 	}
@@ -959,8 +959,8 @@ definition {
 		var objectsTotalCount = JSONUtil.getWithJSONPath(${response}, "$..totalCount");
 
 		TestUtils.assertNotEquals(
-				actual = ${objectsTotalCount},
-				expected = 0);
+			actual = ${objectsTotalCount},
+			expected = 0);
 
 		var objectId = ObjectDefinitionAPI.getObjectDefinitionIdByName(
 			name = ${objectName},
