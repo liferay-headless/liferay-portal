@@ -22,6 +22,7 @@ dependencies {
 	compileOnly group: "org.apache.xmlbeans", name: "xmlbeans", version: "5.0.3"
 	compileOnly group: "org.osgi", name: "org.osgi.annotation", version: "6.0.0"
 	compileOnly group: "org.osgi", name: "org.osgi.service.cm", version: "1.6.0"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:batch-engine:batch-engine-api")
@@ -30,6 +31,7 @@ dependencies {
 	compileOnly project(":apps:portal-odata:portal-odata-api")
 	compileOnly project(":apps:portal-vulcan:portal-vulcan-api")
 	compileOnly project(":apps:portal:portal-aop-api")
+	compileOnly project(":apps:portal-vulcan:portal-vulcan-api")
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
 	compileOnly project(":apps:static:portal-file-install:portal-file-install-api")
 	compileOnly project(":apps:static:portal:portal-upgrade-api")
