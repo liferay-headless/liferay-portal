@@ -4,6 +4,7 @@ import ${configYAML.apiPackagePath}.resource.${escapedVersion}.${schemaName}Reso
 
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.vulcan.resource.EntityModelResource
 
 import java.util.Date;
 
@@ -17,7 +18,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 	<#if configYAML.liferayEnterpriseApp>enabled = false,</#if>
 	properties = "OSGI-INF/liferay/rest/${escapedVersion}/${stringUtil.toLowerCase(schemaPath)}.properties",
 	scope = ServiceScope.PROTOTYPE,
-	service = ${schemaName}Resource.class
+	service = {EntityModelResource.class, ${schemaName}Resource.class}
 )
 public class ${schemaName}ResourceImpl extends Base${schemaName}ResourceImpl {
 }
