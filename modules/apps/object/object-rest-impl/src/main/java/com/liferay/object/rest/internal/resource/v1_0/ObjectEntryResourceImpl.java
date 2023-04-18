@@ -456,25 +456,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectDefinition.getObjectDefinitionId();
 	}
 
-	@Override
-	protected void preparePatch(
-		ObjectEntry objectEntry, ObjectEntry existingObjectEntry) {
-
-		if (objectEntry.getProperties() == null) {
-			return;
-		}
-
-		existingObjectEntry.setProperties(
-			() -> {
-				Map<String, Object> properties =
-					existingObjectEntry.getProperties();
-
-				properties.putAll(objectEntry.getProperties());
-
-				return properties;
-			});
-	}
-
 	private DefaultDTOConverterContext _getDTOConverterContext(
 		Long objectEntryId) {
 
