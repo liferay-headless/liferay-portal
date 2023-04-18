@@ -366,7 +366,11 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {
@@ -585,7 +589,11 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {
@@ -828,7 +836,11 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {
