@@ -23,12 +23,12 @@ import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.batch.engine.unit.BatchEngineUnit;
 import com.liferay.batch.engine.unit.BatchEngineUnitConfiguration;
 import com.liferay.batch.engine.unit.BatchEngineUnitProcessor;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -39,17 +39,22 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 
 import java.io.InputStream;
-import java.io.Serializable;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Matija Petanjek
@@ -79,6 +84,13 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 				}
 			}
 		}
+	}
+
+	@Activate
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_bundleContext = bundleContext;
 	}
 
 	private void _processBatchEngineUnit(BatchEngineUnit batchEngineUnit)
@@ -119,17 +131,14 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 					" ", batchEngineUnit.getDataFileName()));
 		}
 
-		ExecutorService executorService =
-			_portalExecutorManager.getPortalExecutor(
-				BatchEngineUnitProcessorImpl.class.getName());
+		String className = batchEngineUnitConfiguration.getClassName();
 
 		BatchEngineImportTask batchEngineImportTask =
 			_batchEngineImportTaskLocalService.addBatchEngineImportTask(
 				null, batchEngineUnitConfiguration.getCompanyId(),
 				batchEngineUnitConfiguration.getUserId(), 100,
-				batchEngineUnitConfiguration.getCallbackURL(),
-				batchEngineUnitConfiguration.getClassName(), content,
-				StringUtil.toUpperCase(contentType),
+				batchEngineUnitConfiguration.getCallbackURL(), className,
+				content, StringUtil.toUpperCase(contentType),
 				BatchEngineTaskExecuteStatus.INITIAL.name(),
 				batchEngineUnitConfiguration.getFieldNameMappingMap(),
 				BatchEngineImportTaskConstants.IMPORT_STRATEGY_ON_ERROR_FAIL,
@@ -137,17 +146,35 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 				batchEngineUnitConfiguration.getParameters(),
 				batchEngineUnitConfiguration.getTaskItemDelegateName());
 
+		ExecutorService executorService =
+			_portalExecutorManager.getPortalExecutor(
+				BatchEngineUnitProcessorImpl.class.getName());
+
 		executorService.submit(
 			() -> {
-				_batchEngineImportTaskExecutor.execute(batchEngineImportTask);
+				AwaitTaskItemDelegateServiceTrackerCustomizer
+					awaitTaskItemDelegateServiceTrackerCustomizer =
+						new AwaitTaskItemDelegateServiceTrackerCustomizer();
 
-				if (_log.isInfoEnabled()) {
-					_log.info(
+				ServiceTracker<VulcanBatchEngineTaskItemDelegate, Void>
+					serviceTracker = ServiceTrackerFactory.create(
+						_bundleContext,
 						StringBundler.concat(
-							"Successfully deployed batch engine file ",
-							batchEngineUnit.getFileName(), " ",
-							batchEngineUnit.getDataFileName()));
-				}
+							"(&(objectClass=",
+							VulcanBatchEngineTaskItemDelegate.class.getName(),
+							")(batch.engine.entity.class.name=", className,
+							"))"),
+						awaitTaskItemDelegateServiceTrackerCustomizer);
+
+				awaitTaskItemDelegateServiceTrackerCustomizer.setServiceTracker(
+					serviceTracker);
+
+				awaitTaskItemDelegateServiceTrackerCustomizer.
+					setBatchEngineImportTask(batchEngineImportTask);
+				awaitTaskItemDelegateServiceTrackerCustomizer.
+					setBatchEngineUnit(batchEngineUnit);
+
+				serviceTracker.open();
 			});
 	}
 
@@ -200,6 +227,8 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 	private BatchEngineImportTaskLocalService
 		_batchEngineImportTaskLocalService;
 
+	private BundleContext _bundleContext;
+
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
@@ -211,5 +240,67 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	private class AwaitTaskItemDelegateServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<VulcanBatchEngineTaskItemDelegate, Void> {
+
+		@Override
+		public Void addingService(
+			ServiceReference<VulcanBatchEngineTaskItemDelegate>
+				serviceReference) {
+
+			_batchEngineImportTaskExecutor.execute(_batchEngineImportTask);
+
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					StringBundler.concat(
+						"Successfully deployed batch engine file ",
+						_batchEngineUnit.getFileName(), " ",
+						_batchEngineUnit.getDataFileName()));
+			}
+
+			_serviceTracker.close();
+
+			return null;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<VulcanBatchEngineTaskItemDelegate>
+				serviceReference,
+			Void unused) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<VulcanBatchEngineTaskItemDelegate>
+				serviceReference,
+			Void unused) {
+		}
+
+		public void setBatchEngineImportTask(
+			BatchEngineImportTask batchEngineImportTask) {
+
+			_batchEngineImportTask = batchEngineImportTask;
+		}
+
+		public void setBatchEngineUnit(BatchEngineUnit batchEngineUnit) {
+			_batchEngineUnit = batchEngineUnit;
+		}
+
+		public void setServiceTracker(
+			ServiceTracker<VulcanBatchEngineTaskItemDelegate, Void>
+				serviceTracker) {
+
+			_serviceTracker = serviceTracker;
+		}
+
+		private BatchEngineImportTask _batchEngineImportTask;
+		private BatchEngineUnit _batchEngineUnit;
+		private ServiceTracker<VulcanBatchEngineTaskItemDelegate, Void>
+			_serviceTracker;
+
+	}
 
 }
