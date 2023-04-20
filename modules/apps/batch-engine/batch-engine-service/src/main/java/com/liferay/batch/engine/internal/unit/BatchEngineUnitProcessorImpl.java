@@ -119,17 +119,6 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 					" ", batchEngineUnit.getDataFileName()));
 		}
 
-		Map<String, Serializable> parameters =
-			batchEngineUnitConfiguration.getParameters();
-
-		String featureFlag = (String)parameters.get("featureFlag");
-
-		if (Validator.isNotNull(featureFlag) &&
-			!FeatureFlagManagerUtil.isEnabled(featureFlag)) {
-
-			return;
-		}
-
 		ExecutorService executorService =
 			_portalExecutorManager.getPortalExecutor(
 				BatchEngineUnitProcessorImpl.class.getName());
