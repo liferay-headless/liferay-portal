@@ -37,17 +37,24 @@ definition {
 
 		var curlWithoutBody = StringUtil.add(${api}, " \ ${headers}", "");
 		var body = CustomObjectAPI._setNObjectEntriesBody(
+			alternateName = ${alternateName},
+			emailDomain = ${emailDomain},
 			externalReferenceCode = ${externalReferenceCode},
+			familyName = ${familyName},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			givenName = ${givenName},
 			keywords = ${keywords},
 			nestedField = ${nestedField},
 			numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
 			objectEntryId = ${objectEntryId},
+			oneToManyChild = ${oneToManyChild},
 			relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
 			relatedEntryFieldName = ${relatedEntryFieldName},
+			relatedSystemUser = ${relatedSystemUser},
 			secondFieldValue = ${secondFieldValue},
-			taxonomyCategoryIds = ${taxonomyCategoryIds});
+			taxonomyCategoryIds = ${taxonomyCategoryIds},
+			userExternalReferenceCodes = ${userExternalReferenceCodes});
 
 		var curl = StringUtil.add(${curlWithoutBody}, "-d {${body}}", " ");
 
@@ -102,13 +109,39 @@ definition {
 		}
 
 		if (isSet(nestedField)) {
-			var body = CustomObjectAPI.nObjectEntryBodyAsNestedField(
-				body = ${body},
-				nestedField = ${nestedField},
-				numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
-				objectEntryId = ${objectEntryId},
-				relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
-				relatedEntryFieldName = ${relatedEntryFieldName});
+			if (${relatedSystemUser} == "true") {
+				if (isSet(userExternalReferenceCodes)) {
+					var body = UserAccountAPI._nUsersBodyAsNestedFieldToUpdate(
+						alternateName = ${alternateName},
+						body = ${body},
+						emailDomain = ${emailDomain},
+						familyName = ${familyName},
+						givenName = ${givenName},
+						nestedField = ${nestedField},
+						oneToManyChild = ${oneToManyChild},
+						userExternalReferenceCodes = ${userExternalReferenceCodes});
+				}
+				else {
+					var body = UserAccountAPI._nUsersBodyAsNestedFieldToCreate(
+						alternateName = ${alternateName},
+						body = ${body},
+						emailDomain = ${emailDomain},
+						familyName = ${familyName},
+						givenName = ${givenName},
+						nestedField = ${nestedField},
+						numberOfRelatedUsers = ${numberOfRelatedObjectEntries},
+						oneToManyChild = ${oneToManyChild});
+				}
+			}
+			else {
+				var body = CustomObjectAPI.nObjectEntryBodyAsNestedField(
+					body = ${body},
+					nestedField = ${nestedField},
+					numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
+					objectEntryId = ${objectEntryId},
+					relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
+					relatedEntryFieldName = ${relatedEntryFieldName});
+			}
 		}
 
 		return ${body};
@@ -127,17 +160,23 @@ definition {
 	}
 
 	macro createObjectEntryAndRelatedObjects {
-		Variables.assertDefined(parameterList = "${en_US_plural_label},${fieldName},${fieldValue},${nestedField},${numberOfRelatedObjectEntries},${relatedEntryFieldName}");
+		Variables.assertDefined(parameterList = "${en_US_plural_label},${fieldName},${fieldValue},${nestedField},${numberOfRelatedObjectEntries}");
 
 		var curl = CustomObjectAPI._curlObjectEntries(
+			alternateName = ${alternateName},
+			emailDomain = ${emailDomain},
 			en_US_plural_label = ${en_US_plural_label},
 			externalReferenceCode = ${externalReferenceCode},
+			familyName = ${familyName},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			givenName = ${givenName},
 			nestedField = ${nestedField},
 			numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
+			oneToManyChild = ${oneToManyChild},
 			relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
-			relatedEntryFieldName = ${relatedEntryFieldName});
+			relatedEntryFieldName = ${relatedEntryFieldName},
+			relatedSystemUser = ${relatedSystemUser});
 
 		var response = JSONCurlUtil.post(${curl});
 
@@ -322,17 +361,24 @@ definition {
 	}
 
 	macro updateObjectEntryAndRelatedObjectsByPatch {
-		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntryId},${fieldName},${fieldValue},${nestedField},${numberOfRelatedObjectEntries},${objectEntryId},${relatedEntryFieldName}");
+		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntryId},${fieldName},${fieldValue},${nestedField},${objectEntryId}");
 
 		var curl = CustomObjectAPI._curlObjectEntries(
+			alternateName = ${alternateName},
+			emailDomain = ${emailDomain},
 			en_US_plural_label = ${en_US_plural_label},
+			familyName = ${familyName},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			givenName = ${givenName},
 			nestedField = ${nestedField},
 			numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
 			objectEntryId = ${objectEntryId},
+			oneToManyChild = ${oneToManyChild},
 			relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
-			relatedEntryFieldName = ${relatedEntryFieldName});
+			relatedEntryFieldName = ${relatedEntryFieldName},
+			relatedSystemUser = ${relatedSystemUser},
+			userExternalReferenceCodes = ${userExternalReferenceCodes});
 
 		var response = JSONCurlUtil.patch(${curl});
 
@@ -340,18 +386,25 @@ definition {
 	}
 
 	macro updateObjectEntryAndRelatedObjectsByPut {
-		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntryId},${fieldName},${fieldValue},${nestedField},${numberOfRelatedObjectEntries},${objectEntryId},${relatedEntryFieldName}");
+		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntryId},${fieldName},${fieldValue},${nestedField},${objectEntryId}");
 
 		var curl = CustomObjectAPI._curlObjectEntries(
+			alternateName = ${alternateName},
+			emailDomain = ${emailDomain},
 			en_US_plural_label = ${en_US_plural_label},
 			externalReferenceCode = ${externalReferenceCode},
+			familyName = ${familyName},
 			fieldName = ${fieldName},
 			fieldValue = ${fieldValue},
+			givenName = ${givenName},
 			nestedField = ${nestedField},
 			numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
 			objectEntryId = ${objectEntryId},
+			oneToManyChild = ${oneToManyChild},
 			relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
-			relatedEntryFieldName = ${relatedEntryFieldName});
+			relatedEntryFieldName = ${relatedEntryFieldName},
+			relatedSystemUser = ${relatedSystemUser},
+			userExternalReferenceCodes = ${userExternalReferenceCodes});
 
 		var response = JSONCurlUtil.put(${curl});
 
