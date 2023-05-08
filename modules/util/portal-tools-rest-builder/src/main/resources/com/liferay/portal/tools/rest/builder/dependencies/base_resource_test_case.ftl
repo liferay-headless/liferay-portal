@@ -672,6 +672,24 @@ public abstract class Base${schemaName}ResourceTestCase {
 						expectedActions.put("createBatch", createBatchAction);
 					</#if>
 
+					<#list javaMethodSignatures as javaMethodSignature>
+							<#if (javaMethodSignature.pathJavaMethodParameters?size == 0) && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "delete") && javaMethodSignature.path?ends_with("batch")>
+							<#assign
+							pathBatchWithoutParams = javaMethodSignature.path
+							/>
+							</#if>
+					</#list>
+
+					<#if pathBatchWithoutParams??>
+
+						Map deleteBatchAction = new HashMap<>();
+						deleteBatchAction.put("method", "DELETE");
+						deleteBatchAction.put("href", "http://localhost:8080/o${configYAML.application.baseURI}/${openAPIYAML.info.version}${pathBatchWithoutParams}");
+
+						expectedActions.put("deleteBatch", deleteBatchAction);
+
+					</#if>
+
 					return expectedActions;
 				}
 
