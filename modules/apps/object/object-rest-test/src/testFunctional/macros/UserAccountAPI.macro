@@ -468,6 +468,7 @@ definition {
 				nestedField = ${nestedField},
 				numberOfRelatedObjectEntries = ${numberOfRelatedObjectEntries},
 				oneToManyChild = ${oneToManyChild},
+				relatedEntryExternalReferenceCode = ${relatedEntryExternalReferenceCode},
 				relatedEntryFieldName = ${relatedEntryFieldName},
 				userAccountId = ${userAccountId});
 		}
