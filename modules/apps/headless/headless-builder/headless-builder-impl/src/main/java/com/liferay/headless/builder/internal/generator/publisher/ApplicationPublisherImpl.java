@@ -18,7 +18,6 @@ import com.liferay.headless.builder.internal.generator.application.ApiApplicatio
 import com.liferay.headless.builder.internal.generator.jaxrs.application.HeadlessBuilderApplication;
 import com.liferay.headless.builder.internal.generator.resource.BaseHeadlessBuilderResource;
 import com.liferay.headless.builder.internal.generator.resource.HeadlessBuilderResource;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
 import javax.ws.rs.core.Application;
@@ -39,37 +38,24 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 
 	@Override
 	public void publish(ApiApplication application) throws Exception {
-
-		// TODO implement the application publication
-
 		if ((_applicationServiceRegistration != null) ||
 			(_resourceServiceRegistration != null)) {
 
 			return;
 		}
 
-		// TODO Extract restContextPath info from Application
-
-		String restContextPath = "/my-path";
-
-		// TODO Extract companyId info from Application
-
-		long companyId = CompanyThreadLocal.getCompanyId();
-
-		// TODO Extract osgiJaxRsName info from Application
-
-		String osgiJaxRsName = "myOSGiJaxRsName";
+		String osgiJaxRsName = application.getOsgiJaxRsName();
 
 		_applicationServiceRegistration = _bundleContext.registerService(
 			Application.class, new HeadlessBuilderApplication(),
 			HashMapDictionaryBuilder.<String, Object>put(
-				"companyId", companyId
+				"companyId", application.getCompanyId()
 			).put(
 				"liferay.filter.disabled", true
 			).put(
 				"liferay.jackson", false
 			).put(
-				"osgi.jaxrs.application.base", restContextPath
+				"osgi.jaxrs.application.base", application.getBaseURL()
 			).put(
 				"osgi.jaxrs.extension.select",
 				"(osgi.jaxrs.name=Liferay.Vulcan)"

@@ -15,7 +15,9 @@
 package com.liferay.headless.builder.internal.application;
 
 import com.liferay.headless.builder.application.HeadlessBuilderApplicationManager;
+import com.liferay.headless.builder.internal.generator.application.ApiApplication;
 import com.liferay.headless.builder.internal.generator.publisher.ApplicationPublisher;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -36,7 +38,16 @@ public class HeadlessBuilderApplicationManagerImpl
 		// TODO Implement the publication of the REST Application
 		//  with the @Publisher
 
-		_applicationPublisher.publish(null);
+		ApiApplication.Builder builder = new ApiApplication.Builder();
+
+		_applicationPublisher.publish(
+			builder.setBaseURL(
+				"/my-path"
+			).setCompanyId(
+				CompanyThreadLocal.getCompanyId()
+			).setOsgiJaxRsName(
+				"myOSGiJaxRsName"
+			).build());
 	}
 
 	@Override

@@ -28,6 +28,10 @@ public class HeadlessBuilderResource extends BaseHeadlessBuilderResource {
 	@Path("{any: .*}")
 	@Produces({"application/json", "application/xml"})
 	public Response get() throws Exception {
+
+		// TODO Implements using the current POC but replacing InfoAPI
+		//  by Objects Framework
+
 		return Response.ok(
 		).build();
 	}

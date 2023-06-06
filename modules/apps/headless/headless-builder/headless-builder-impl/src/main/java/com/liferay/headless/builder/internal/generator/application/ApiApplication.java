@@ -18,4 +18,55 @@ package com.liferay.headless.builder.internal.generator.application;
  * @author Luis Miguel Barcos
  */
 public class ApiApplication {
+
+	public String getBaseURL() {
+		return _builder._baseURL;
+	}
+
+	public long getCompanyId() {
+		return _builder._companyId;
+	}
+
+	public String getOsgiJaxRsName() {
+		return _builder._osgiJaxRsName;
+	}
+
+	// TODO Implements a Builder that requires required fields.
+
+	public static class Builder {
+
+		public ApiApplication build() {
+			return new ApiApplication(this);
+		}
+
+		public Builder setBaseURL(String baseURL) {
+			_baseURL = baseURL;
+
+			return this;
+		}
+
+		public Builder setCompanyId(long companyId) {
+			_companyId = companyId;
+
+			return this;
+		}
+
+		public Builder setOsgiJaxRsName(String osgiJaxRsName) {
+			_osgiJaxRsName = osgiJaxRsName;
+
+			return this;
+		}
+
+		private String _baseURL;
+		private long _companyId;
+		private String _osgiJaxRsName;
+
+	}
+
+	private ApiApplication(Builder builder) {
+		_builder = builder;
+	}
+
+	private final Builder _builder;
+
 }
