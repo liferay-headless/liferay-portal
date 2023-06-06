@@ -17,6 +17,7 @@ package com.liferay.headless.builder.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.builder.application.HeadlessBuilderApplication;
 import com.liferay.headless.builder.application.HeadlessBuilderApplicationFactory;
+import com.liferay.headless.builder.application.HeadlessBuilderApplicationManager;
 import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemFieldValuesProvider;
 import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemFormProvider;
 import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemObjectProvider;
@@ -52,6 +53,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.Application;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -64,7 +69,9 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -178,6 +185,56 @@ public class HeadlessBuilderTest {
 			jsonObject.toString(), true);
 	}
 
+	@Test
+	public void testPublishApiApplication() throws Exception {
+		CountDownLatch addedCountLatch = new CountDownLatch(1);
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		ServiceTracker<?, ?> serviceTracker =
+			new ServiceTracker<Application, Application>(
+				bundleContext, Application.class, null) {
+
+				@Override
+				public Application addingService(
+					ServiceReference<Application> serviceReference) {
+
+					String property = (String)serviceReference.getProperty(
+						"osgi.jaxrs.application.base");
+
+					if (property.contains("/my-path")) {
+						addedCountLatch.countDown();
+
+						return super.addingService(serviceReference);
+					}
+
+					return null;
+				}
+
+			};
+
+		try {
+			serviceTracker.open();
+
+			_headlessBuilderApplicationManager.publishApplication("");
+
+			addedCountLatch.await(1, TimeUnit.MINUTES);
+
+			HttpURLConnection httpURLConnection = _createHttpURLConnection(
+				"my-path", Http.Method.GET);
+
+			httpURLConnection.connect();
+
+			Assert.assertEquals(200, httpURLConnection.getResponseCode());
+		}
+		finally {
+			serviceTracker.close();
+			_headlessBuilderApplicationManager.unpublishApplication();
+		}
+	}
+
 	private HttpURLConnection _createHttpURLConnection(
 			String endpoint, Http.Method method)
 		throws Exception {
@@ -258,6 +315,10 @@ public class HeadlessBuilderTest {
 	@Inject
 	private HeadlessBuilderApplicationFactory
 		_headlessBuilderApplicationFactory;
+
+	@Inject
+	private HeadlessBuilderApplicationManager
+		_headlessBuilderApplicationManager;
 
 	private ServiceRegistration<?>
 		_infoItemFieldValuesProviderServiceRegistration;

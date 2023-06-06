@@ -12,18 +12,24 @@
  * details.
  */
 
-package com.liferay.headless.builder.application;
+package com.liferay.headless.builder.internal.generator.resource;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 /**
- * @author Luis Miguel Barcos
+ * @author Carlos Correa
  */
-public interface HeadlessBuilderApplicationManager {
+public class HeadlessBuilderResource extends BaseHeadlessBuilderResource {
 
-	public void publishApplication(String externalReferenceCode)
-		throws Exception;
-
-	// TODO Delete this method
-
-	public void unpublishApplication() throws Exception;
+	@GET
+	@Path("{any: .*}")
+	@Produces({"application/json", "application/xml"})
+	public Response get() throws Exception {
+		return Response.ok(
+		).build();
+	}
 
 }

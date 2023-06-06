@@ -14,11 +14,17 @@
 
 package com.liferay.headless.builder.internal.generator.publisher;
 
+import com.liferay.headless.builder.internal.generator.application.ApiApplication;
+
 /**
  * @author Luis Miguel Barcos
  */
 public interface ApplicationPublisher {
 
-	public void publish(Object application) throws Exception;
+	public void publish(ApiApplication application) throws Exception;
+
+	// TODO Remove this method
+
+	public void undeploy() throws Exception;
 
 }

@@ -12,18 +12,10 @@
  * details.
  */
 
-package com.liferay.headless.builder.application;
+package com.liferay.headless.builder.internal.generator.application;
 
 /**
  * @author Luis Miguel Barcos
  */
-public interface HeadlessBuilderApplicationManager {
-
-	public void publishApplication(String externalReferenceCode)
-		throws Exception;
-
-	// TODO Delete this method
-
-	public void unpublishApplication() throws Exception;
-
+public class ApiApplication {
 }

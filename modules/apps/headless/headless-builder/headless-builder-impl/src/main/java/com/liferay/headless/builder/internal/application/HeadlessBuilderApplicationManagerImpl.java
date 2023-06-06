@@ -15,10 +15,15 @@
 package com.liferay.headless.builder.internal.application;
 
 import com.liferay.headless.builder.application.HeadlessBuilderApplicationManager;
+import com.liferay.headless.builder.internal.generator.publisher.ApplicationPublisher;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luis Miguel Barcos
  */
+@Component(service = HeadlessBuilderApplicationManager.class)
 public class HeadlessBuilderApplicationManagerImpl
 	implements HeadlessBuilderApplicationManager {
 
@@ -31,6 +36,15 @@ public class HeadlessBuilderApplicationManagerImpl
 		// TODO Implement the publication of the REST Application
 		//  with the @Publisher
 
+		_applicationPublisher.publish(null);
 	}
+
+	@Override
+	public void unpublishApplication() throws Exception {
+		_applicationPublisher.undeploy();
+	}
+
+	@Reference
+	private ApplicationPublisher _applicationPublisher;
 
 }
