@@ -14,6 +14,10 @@
 
 package com.liferay.headless.builder.internal.generator.application;
 
+import com.liferay.headless.builder.internal.generator.operation.Operation;
+
+import java.util.List;
+
 /**
  * @author Luis Miguel Barcos
  */
@@ -25,6 +29,10 @@ public class ApiApplication {
 
 	public long getCompanyId() {
 		return _builder._companyId;
+	}
+
+	public List<Operation> getOperations() {
+		return _builder._operations;
 	}
 
 	public String getOsgiJaxRsName() {
@@ -51,6 +59,12 @@ public class ApiApplication {
 			return this;
 		}
 
+		public Builder setOperations(List<Operation> operations) {
+			_operations = operations;
+
+			return this;
+		}
+
 		public Builder setOsgiJaxRsName(String osgiJaxRsName) {
 			_osgiJaxRsName = osgiJaxRsName;
 
@@ -59,6 +73,7 @@ public class ApiApplication {
 
 		private String _baseURL;
 		private long _companyId;
+		private List<Operation> _operations;
 		private String _osgiJaxRsName;
 
 	}
