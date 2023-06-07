@@ -14,12 +14,14 @@
 
 package com.liferay.headless.builder.internal.generator.consumer;
 
+import com.liferay.headless.builder.internal.generator.application.ApiApplication;
+
 /**
  * @author Luis Miguel Barcos
  */
 public interface Consumer<T> {
 
-	public void getApplicationInformation(T apiApplicationIdentifier)
+	public ApiApplication getApplicationInformation(T apiApplicationIdentifier)
 		throws Exception;
 
 }

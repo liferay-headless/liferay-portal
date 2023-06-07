@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ObjectsConsumerImpl implements Consumer<String> {
 
 	@Override
-	public void getApplicationInformation(String apiApplicationERC)
+	public ApiApplication getApplicationInformation(String apiApplicationERC)
 		throws Exception {
 
 		ObjectEntry apiApplicationObjectEntry =
@@ -48,7 +48,7 @@ public class ObjectsConsumerImpl implements Consumer<String> {
 
 		ApiApplication.Builder builder = new ApiApplication.Builder();
 
-		ApiApplication apiApplication = builder.setBaseURL(
+		return builder.setBaseURL(
 			_getBaseURL(apiApplicationObjectEntryProperties)
 		).setCompanyId(
 			apiApplicationObjectEntry.getCompanyId()
@@ -57,8 +57,6 @@ public class ObjectsConsumerImpl implements Consumer<String> {
 				apiApplicationObjectEntryProperties,
 				apiApplicationObjectEntry.getCompanyId())
 		).build();
-
-		System.out.println(apiApplication);
 	}
 
 	private String _buildOsgiJaxRsName(
