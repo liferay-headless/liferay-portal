@@ -35,13 +35,13 @@ public class HeadlessBuilderApplicationManagerImpl
 
 		// TODO Implement the extraction of the information from the @Consumer
 
-		ApiApplication applicationInformation =
-			_consumer.getApplicationInformation(externalReferenceCode);
+		ApiApplication apiApplication = _consumer.getApiApplication(
+			applicationIdentifier);
 
 		// TODO Implement the publication of the REST Application
 		//  with the @Publisher
 
-		_applicationPublisher.publish(applicationInformation);
+		_applicationPublisher.publish(apiApplication);
 	}
 
 	@Override

@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ObjectsConsumerImpl implements Consumer<String> {
 
 	@Override
-	public ApiApplication getApplicationInformation(String apiApplicationERC)
+	public ApiApplication getApiApplication(String apiApplicationERC)
 		throws Exception {
 
 		ObjectEntry apiApplicationObjectEntry =
