@@ -17,9 +17,9 @@ package com.liferay.headless.builder.application;
 /**
  * @author Luis Miguel Barcos
  */
-public interface HeadlessBuilderApplicationManager {
+public interface HeadlessBuilderApplicationManager<T> {
 
-	public void publishApplication(String externalReferenceCode)
+	public void publishApplication(T applicationIdentifier)
 		throws Exception;
 
 	// TODO Delete this method
