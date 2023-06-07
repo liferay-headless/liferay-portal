@@ -12,20 +12,23 @@
  * details.
  */
 
-package com.liferay.headless.builder.internal.generator.consumer;
+package com.liferay.headless.builder.internal.generator.consumer.object;
 
 /**
  * @author Luis Miguel Barcos
  */
-public class ObjectsConsumerImpl implements Consumer<String> {
+public enum ApiApplicationObjectProperties {
 
-	@Override
-	public void getApplicationInformation(String apiApplicationERC)
-		throws Exception {
+	BASE_URL("baseURL"), TITLE("title");
 
-		// TODO get all the necessary information from the Objects
-		//  framework to create an REST API Application
-
+	public String getPropertyName() {
+		return _propertyName;
 	}
+
+	private ApiApplicationObjectProperties(String propertyName) {
+		_propertyName = propertyName;
+	}
+
+	private final String _propertyName;
 
 }
