@@ -22,18 +22,27 @@ import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemFie
 import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemFormProvider;
 import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemObjectProvider;
 import com.liferay.headless.builder.test.model.TestEntry;
+import com.liferay.headless.builder.test.object.util.ObjectDefinitionTestUtil;
+import com.liferay.headless.builder.test.object.util.ObjectEntryTestUtil;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
+import com.liferay.object.field.util.ObjectFieldUtil;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
@@ -44,6 +53,7 @@ import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,6 +62,7 @@ import java.nio.charset.StandardCharsets;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -87,7 +98,32 @@ public class HeadlessBuilderTest {
 		new LiferayIntegrationTestRule();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		_apiApplicationObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				new ArrayList<ObjectField>() {
+					{
+						add(
+							ObjectFieldUtil.createObjectField(
+								"Text", "String", true, true, null,
+								RandomTestUtil.randomString(),
+								_API_APPLICATION_TITLE, false));
+						add(
+							ObjectFieldUtil.createObjectField(
+								"Text", "String", true, true, null,
+								RandomTestUtil.randomString(),
+								_API_APPLICATION_BASE_URL, false));
+					}
+				});
+
+		_apiApplicationObjectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_apiApplicationObjectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				_API_APPLICATION_BASE_URL, _API_APPLICATION_BASE_URL_VALUE
+			).put(
+				_API_APPLICATION_TITLE, "apiApplication"
+			).build());
+
 		Bundle bundle = FrameworkUtil.getBundle(HeadlessBuilderTest.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
@@ -204,7 +240,7 @@ public class HeadlessBuilderTest {
 					String property = (String)serviceReference.getProperty(
 						"osgi.jaxrs.application.base");
 
-					if (property.contains("/my-path")) {
+					if (property.contains(_API_APPLICATION_BASE_URL_VALUE)) {
 						addedCountLatch.countDown();
 
 						return super.addingService(serviceReference);
@@ -218,12 +254,13 @@ public class HeadlessBuilderTest {
 		try {
 			serviceTracker.open();
 
-			_headlessBuilderApplicationManager.publishApplication("");
+			_headlessBuilderApplicationManager.publishApplication(
+				_apiApplicationObjectEntry.getExternalReferenceCode());
 
 			addedCountLatch.await(1, TimeUnit.MINUTES);
 
 			HttpURLConnection httpURLConnection = _createHttpURLConnection(
-				"my-path", Http.Method.GET);
+				_API_APPLICATION_BASE_URL_VALUE, Http.Method.GET);
 
 			httpURLConnection.connect();
 
@@ -311,6 +348,17 @@ public class HeadlessBuilderTest {
 			handle.undeploy();
 		}
 	}
+
+	private static final String _API_APPLICATION_BASE_URL = "baseURL";
+
+	private static final String _API_APPLICATION_BASE_URL_VALUE = "base-url";
+
+	private static final String _API_APPLICATION_TITLE = "title";
+
+	@DeleteAfterTestRun
+	private ObjectDefinition _apiApplicationObjectDefinition;
+
+	private ObjectEntry _apiApplicationObjectEntry;
 
 	@Inject
 	private HeadlessBuilderApplicationFactory
