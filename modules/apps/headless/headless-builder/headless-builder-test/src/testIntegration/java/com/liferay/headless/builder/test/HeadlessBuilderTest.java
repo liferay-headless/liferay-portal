@@ -24,20 +24,24 @@ import com.liferay.headless.builder.test.info.item.provider.TestEntryInfoItemObj
 import com.liferay.headless.builder.test.model.TestEntry;
 import com.liferay.headless.builder.test.object.util.ObjectDefinitionTestUtil;
 import com.liferay.headless.builder.test.object.util.ObjectEntryTestUtil;
+import com.liferay.headless.builder.test.object.util.ObjectRelationshipTestUtil;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Base64;
@@ -125,6 +129,51 @@ public class HeadlessBuilderTest {
 				_API_APPLICATION_TITLE, "apiApplication"
 			).build());
 
+		_apiEndpointObjectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				"MSOD_API_ENDPOINT",
+				new ArrayList<ObjectField>() {
+					{
+						add(
+							ObjectFieldUtil.createObjectField(
+								"Text", "String", true, true, null,
+								RandomTestUtil.randomString(),
+								_API_ENDPOINT_HTTP_METHOD, false));
+						add(
+							ObjectFieldUtil.createObjectField(
+								"Text", "String", true, true, null,
+								RandomTestUtil.randomString(),
+								_API_ENDPOINT_PATH, false));
+						add(
+							ObjectFieldUtil.createObjectField(
+								"Text", "String", true, true, null,
+								RandomTestUtil.randomString(),
+								_API_ENDPOINT_SCOPE, false));
+					}
+				});
+
+		_apiEndpointObjectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_apiEndpointObjectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				_API_ENDPOINT_HTTP_METHOD, "GET"
+			).put(
+				_API_ENDPOINT_PATH, "/new-path"
+			).put(
+				_API_ENDPOINT_SCOPE, "Instance"
+			).build());
+
+		_applicationEndpointsObjectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_apiApplicationObjectDefinition, "applicationEndpoints",
+				_apiEndpointObjectDefinition, TestPropsValues.getUserId(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			_apiApplicationObjectEntry.getObjectEntryId(),
+			_apiEndpointObjectEntry.getObjectEntryId(),
+			_applicationEndpointsObjectRelationship,
+			TestPropsValues.getUserId());
+
 		Bundle bundle = FrameworkUtil.getBundle(HeadlessBuilderTest.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
@@ -144,10 +193,17 @@ public class HeadlessBuilderTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		_infoItemFieldValuesProviderServiceRegistration.unregister();
 		_infoItemFormProviderServiceRegistration.unregister();
 		_infoItemObjectProviderServiceRegistration.unregister();
+
+		_objectRelationshipLocalService.deleteObjectRelationship(
+			_applicationEndpointsObjectRelationship);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_apiApplicationObjectDefinition);
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_apiEndpointObjectDefinition);
 	}
 
 	@FeatureFlags("LPS-171047")
@@ -356,10 +412,17 @@ public class HeadlessBuilderTest {
 
 	private static final String _API_APPLICATION_TITLE = "title";
 
-	@DeleteAfterTestRun
-	private ObjectDefinition _apiApplicationObjectDefinition;
+	private static final String _API_ENDPOINT_HTTP_METHOD = "hTTPMethod";
 
+	private static final String _API_ENDPOINT_PATH = "path";
+
+	private static final String _API_ENDPOINT_SCOPE = "scope";
+
+	private ObjectDefinition _apiApplicationObjectDefinition;
 	private ObjectEntry _apiApplicationObjectEntry;
+	private ObjectDefinition _apiEndpointObjectDefinition;
+	private ObjectEntry _apiEndpointObjectEntry;
+	private ObjectRelationship _applicationEndpointsObjectRelationship;
 
 	@Inject
 	private HeadlessBuilderApplicationFactory
@@ -373,6 +436,13 @@ public class HeadlessBuilderTest {
 		_infoItemFieldValuesProviderServiceRegistration;
 	private ServiceRegistration<?> _infoItemFormProviderServiceRegistration;
 	private ServiceRegistration<?> _infoItemObjectProviderServiceRegistration;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
 	private final TestEntry _testEntry = TestEntry.INSTANCE;
 
 }
