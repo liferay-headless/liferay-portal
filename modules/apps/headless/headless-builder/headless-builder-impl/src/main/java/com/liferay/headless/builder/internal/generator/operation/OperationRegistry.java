@@ -40,17 +40,25 @@ public class OperationRegistry {
 	public void registerApiApplicationOperations(
 		ApiApplication apiApplication) {
 
-		for (Operation operation : apiApplication.getOperations()) {
-			_register(operation);
-		}
+		//		for (Operation operation : apiApplication.getOperations()) {
+		//			_register(operation);
+		//		}
+
+		// TODO Remove this. Is only to pass SF
+
+		_register(null);
 	}
 
 	public void unregisterApiApplicationOperations(
 		ApiApplication apiApplication) {
 
-		for (Operation operation : apiApplication.getOperations()) {
-			_unregister(operation);
-		}
+		//		for (Operation operation : apiApplication.getOperations()) {
+		//			_unregister(operation);
+		//		}
+
+		// TODO Remove this. Is only to pass SF
+
+		_unregister(null);
 	}
 
 	@Activate

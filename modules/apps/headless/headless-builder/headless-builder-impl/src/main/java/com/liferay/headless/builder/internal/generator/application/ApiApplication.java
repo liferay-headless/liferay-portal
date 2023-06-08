@@ -14,8 +14,6 @@
 
 package com.liferay.headless.builder.internal.generator.application;
 
-import com.liferay.headless.builder.internal.generator.operation.Operation;
-
 import java.util.List;
 
 /**

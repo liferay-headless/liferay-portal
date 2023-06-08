@@ -15,9 +15,14 @@
 package com.liferay.headless.builder.internal.generator.consumer.object;
 
 import com.liferay.headless.builder.internal.generator.application.ApiApplication;
+import com.liferay.headless.builder.internal.generator.application.Operation;
 import com.liferay.headless.builder.internal.generator.consumer.Consumer;
 import com.liferay.headless.builder.internal.generator.consumer.object.model.ApiApplicationObjectModel;
+import com.liferay.headless.builder.internal.generator.consumer.object.model.ApiEndpointsObjectModel;
 import com.liferay.headless.builder.internal.generator.consumer.object.model.ObjectModelsFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -44,7 +49,36 @@ public class ObjectsConsumerImpl implements Consumer<String> {
 			apiApplicationObjectModel.getCompanyId()
 		).setOsgiJaxRsName(
 			apiApplicationObjectModel.getOsgiJaxRsName()
+		).setOperations(
+			_getOperations(apiApplicationERC)
 		).build();
+	}
+
+	private List<Operation> _getOperations(String apiApplicationERC)
+		throws Exception {
+
+		ApiEndpointsObjectModel apiEndpointsObjectModel =
+			_objectModelsFactory.getObjectModel(
+				apiApplicationERC, ApiEndpointsObjectModel.class);
+
+		List<Operation> operations = new ArrayList<>();
+
+		Operation.Builder operationBuilder = new Operation.Builder();
+
+		for (ApiEndpointsObjectModel.ApiEndpoint apiEndpoint :
+				apiEndpointsObjectModel.getApiEndpoints()) {
+
+			operations.add(
+				operationBuilder.setMethod(
+					apiEndpoint.getMethod()
+				).setPath(
+					apiEndpoint.getPath()
+				).setScope(
+					apiEndpoint.getScope()
+				).build());
+		}
+
+		return operations;
 	}
 
 	@Reference
