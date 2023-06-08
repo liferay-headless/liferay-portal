@@ -101,6 +101,7 @@ public class HeadlessBuilderTest {
 	public void setUp() throws Exception {
 		_apiApplicationObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
+				"MSOD_API_APPLICATION",
 				new ArrayList<ObjectField>() {
 					{
 						add(

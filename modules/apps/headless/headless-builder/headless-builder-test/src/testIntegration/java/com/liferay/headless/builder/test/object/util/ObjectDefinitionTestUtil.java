@@ -30,7 +30,7 @@ import java.util.List;
 public class ObjectDefinitionTestUtil {
 
 	public static ObjectDefinition publishObjectDefinition(
-			List<ObjectField> objectFields)
+			String externalReferenceCode, List<ObjectField> objectFields)
 		throws Exception {
 
 		ObjectDefinition objectDefinition =
@@ -41,6 +41,9 @@ public class ObjectDefinitionTestUtil {
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT, objectFields);
+
+		ObjectDefinitionLocalServiceUtil.updateExternalReferenceCode(
+			objectDefinition.getObjectDefinitionId(), externalReferenceCode);
 
 		return ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(
 			TestPropsValues.getUserId(),
