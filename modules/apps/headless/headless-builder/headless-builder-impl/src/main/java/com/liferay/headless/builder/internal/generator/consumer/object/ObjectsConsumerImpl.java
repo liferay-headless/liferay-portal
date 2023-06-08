@@ -16,14 +16,8 @@ package com.liferay.headless.builder.internal.generator.consumer.object;
 
 import com.liferay.headless.builder.internal.generator.application.ApiApplication;
 import com.liferay.headless.builder.internal.generator.consumer.Consumer;
-import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.util.GroupThreadLocal;
-
-import java.io.Serializable;
-
-import java.util.Map;
+import com.liferay.headless.builder.internal.generator.consumer.object.model.ApiApplicationObjectModel;
+import com.liferay.headless.builder.internal.generator.consumer.object.model.ObjectModelsFactory;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,59 +32,22 @@ public class ObjectsConsumerImpl implements Consumer<String> {
 	public ApiApplication getApiApplication(String apiApplicationERC)
 		throws Exception {
 
-		ObjectEntry apiApplicationObjectEntry =
-			_objectEntryLocalService.getObjectEntry(
-				apiApplicationERC, CompanyThreadLocal.getCompanyId(),
-				GroupThreadLocal.getGroupId());
-
-		Map<String, Serializable> apiApplicationObjectEntryProperties =
-			apiApplicationObjectEntry.getValues();
+		ApiApplicationObjectModel apiApplicationObjectModel =
+			_objectModelsFactory.getObjectModel(
+				apiApplicationERC, ApiApplicationObjectModel.class);
 
 		ApiApplication.Builder builder = new ApiApplication.Builder();
 
 		return builder.setBaseURL(
-			_getBaseURL(apiApplicationObjectEntryProperties)
+			apiApplicationObjectModel.getBaseURL()
 		).setCompanyId(
-			apiApplicationObjectEntry.getCompanyId()
+			apiApplicationObjectModel.getCompanyId()
 		).setOsgiJaxRsName(
-			_buildOsgiJaxRsName(
-				apiApplicationObjectEntryProperties,
-				apiApplicationObjectEntry.getCompanyId())
+			apiApplicationObjectModel.getOsgiJaxRsName()
 		).build();
 	}
 
-	private String _buildOsgiJaxRsName(
-		Map<String, Serializable> apiApplicationObjectEntryProperties,
-		long companyId) {
-
-		return _getTitle(apiApplicationObjectEntryProperties) + companyId;
-	}
-
-	private String _getBaseURL(
-		Map<String, Serializable> apiApplicationObjectEntryProperties) {
-
-		return (String)_getPropertyValue(
-			ApiApplicationObjectProperties.BASE_URL,
-			apiApplicationObjectEntryProperties);
-	}
-
-	private Object _getPropertyValue(
-		ApiApplicationObjectProperties apiApplicationObjectProperty,
-		Map<String, Serializable> apiApplicationObjectEntryProperties) {
-
-		return apiApplicationObjectEntryProperties.get(
-			apiApplicationObjectProperty.getPropertyName());
-	}
-
-	private String _getTitle(
-		Map<String, Serializable> apiApplicationObjectEntryProperties) {
-
-		return (String)_getPropertyValue(
-			ApiApplicationObjectProperties.TITLE,
-			apiApplicationObjectEntryProperties);
-	}
-
 	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
+	private ObjectModelsFactory _objectModelsFactory;
 
 }
