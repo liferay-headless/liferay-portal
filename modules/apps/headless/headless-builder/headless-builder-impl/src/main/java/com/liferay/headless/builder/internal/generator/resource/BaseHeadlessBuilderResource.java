@@ -14,9 +14,12 @@
 
 package com.liferay.headless.builder.internal.generator.resource;
 
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -28,5 +31,8 @@ public abstract class BaseHeadlessBuilderResource {
 	@Path("{any: .*}")
 	@Produces({"application/json", "application/xml"})
 	public abstract Response get() throws Exception;
+
+	@Context
+	protected HttpServletRequest contextHttpServletRequest;
 
 }

@@ -19,16 +19,20 @@ import com.liferay.headless.builder.internal.generator.jaxrs.application.Headles
 import com.liferay.headless.builder.internal.generator.resource.BaseHeadlessBuilderResource;
 import com.liferay.headless.builder.internal.generator.resource.HeadlessBuilderResource;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.Portal;
 
 import javax.ws.rs.core.Application;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.PrototypeServiceFactory;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Luis Miguel Barcos
@@ -37,25 +41,27 @@ import org.osgi.service.component.annotations.Deactivate;
 public class ApplicationPublisherImpl implements ApplicationPublisher {
 
 	@Override
-	public void publish(ApiApplication application) throws Exception {
+	public void publish(ApiApplication apiApplication) throws Exception {
 		if ((_applicationServiceRegistration != null) ||
 			(_resourceServiceRegistration != null)) {
 
 			return;
 		}
 
-		String osgiJaxRsName = application.getOsgiJaxRsName();
+		String osgiJaxRsName = apiApplication.getOsgiJaxRsName();
 
 		_applicationServiceRegistration = _bundleContext.registerService(
-			Application.class, new HeadlessBuilderApplication(),
+			Application.class, new HeadlessBuilderApplication(apiApplication),
 			HashMapDictionaryBuilder.<String, Object>put(
-				"companyId", application.getCompanyId()
+				"companyId", apiApplication.getCompanyId()
 			).put(
 				"liferay.filter.disabled", true
 			).put(
+				"liferay.headless.builder.application", true
+			).put(
 				"liferay.jackson", false
 			).put(
-				"osgi.jaxrs.application.base", application.getBaseURL()
+				"osgi.jaxrs.application.base", apiApplication.getBaseURL()
 			).put(
 				"osgi.jaxrs.extension.select",
 				"(osgi.jaxrs.name=Liferay.Vulcan)"
@@ -73,7 +79,8 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 					ServiceRegistration<BaseHeadlessBuilderResource>
 						serviceRegistration) {
 
-					return new HeadlessBuilderResource();
+					return new HeadlessBuilderResource(
+						_portal, _serviceTracker);
 				}
 
 				@Override
@@ -103,11 +110,37 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
+
+		_serviceTracker = new ServiceTracker<Application, ApiApplication>(
+			bundleContext, Application.class, null) {
+
+			@Override
+			public ApiApplication addingService(
+				ServiceReference<Application> serviceReference) {
+
+				Object property = serviceReference.getProperty(
+					"liferay.headless.builder.application");
+
+				if ((property != null) && (Boolean)property) {
+					HeadlessBuilderApplication headlessBuilderApplication =
+						(HeadlessBuilderApplication)bundleContext.getService(
+							serviceReference);
+
+					return headlessBuilderApplication.getApiApplication();
+				}
+
+				return null;
+			}
+
+		};
+
+		_serviceTracker.open();
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		_undeploy();
+		_serviceTracker.close();
 	}
 
 	private void _undeploy() {
@@ -128,5 +161,10 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 	private static BundleContext _bundleContext;
 	private static ServiceRegistration<BaseHeadlessBuilderResource>
 		_resourceServiceRegistration;
+
+	@Reference
+	private Portal _portal;
+
+	private ServiceTracker<Application, ApiApplication> _serviceTracker;
 
 }

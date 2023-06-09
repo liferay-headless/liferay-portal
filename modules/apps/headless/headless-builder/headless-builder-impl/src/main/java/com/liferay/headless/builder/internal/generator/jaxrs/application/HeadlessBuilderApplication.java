@@ -14,10 +14,23 @@
 
 package com.liferay.headless.builder.internal.generator.jaxrs.application;
 
+import com.liferay.headless.builder.internal.generator.application.ApiApplication;
+
 import javax.ws.rs.core.Application;
 
 /**
  * @author Luis Miguel Barcos
  */
 public class HeadlessBuilderApplication extends Application {
+
+	public HeadlessBuilderApplication(ApiApplication apiApplication) {
+		_apiApplication = apiApplication;
+	}
+
+	public ApiApplication getApiApplication() {
+		return _apiApplication;
+	}
+
+	private final ApiApplication _apiApplication;
+
 }

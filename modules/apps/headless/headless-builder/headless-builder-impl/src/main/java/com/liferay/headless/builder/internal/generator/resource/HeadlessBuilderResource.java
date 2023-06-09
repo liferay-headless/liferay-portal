@@ -14,26 +14,110 @@
 
 package com.liferay.headless.builder.internal.generator.resource;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import com.liferay.headless.builder.internal.generator.application.ApiApplication;
+import com.liferay.headless.builder.internal.generator.application.Operation;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
+
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
+
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Carlos Correa
+ * @author Luis Miguel Barcos
  */
 public class HeadlessBuilderResource extends BaseHeadlessBuilderResource {
 
-	@GET
-	@Path("{any: .*}")
-	@Produces({"application/json", "application/xml"})
-	public Response get() throws Exception {
+	public HeadlessBuilderResource(
+		Portal portal,
+		ServiceTracker<Application, ApiApplication> serviceTracker) {
 
-		// TODO Implements using the current POC but replacing InfoAPI
-		//  by Objects Framework
+		_portal = portal;
+		_serviceTracker = serviceTracker;
+	}
+
+	@Override
+	public Response get() throws Exception {
+		Operation operation = _getOperation(
+			_getCurrentApiApplication(contextHttpServletRequest),
+			contextHttpServletRequest);
+
+		// TODO At this point we find a operation that correspond with the
+		//  proper request. Now it is necessary to extract the
+		//  information from the Operation to handle the request and return
+		//  the proper Entity.
+
+		// TODO Delete this println. It is only to pass source formatter
+
+		System.out.println(operation);
 
 		return Response.ok(
 		).build();
 	}
+
+	private ApiApplication _getCurrentApiApplication(
+		HttpServletRequest httpServletRequest) {
+
+		String currentApiApplicationBaseURL = _sanitizeURL(
+			httpServletRequest.getContextPath());
+		long currentCompanyId = _portal.getCompanyId(httpServletRequest);
+
+		for (Object service : _serviceTracker.getServices()) {
+			ApiApplication apiApplication = (ApiApplication)service;
+
+			if (_isCurrentApiApplication(
+					apiApplication, currentApiApplicationBaseURL,
+					currentCompanyId)) {
+
+				return apiApplication;
+			}
+		}
+
+		throw new NotFoundException();
+	}
+
+	private Operation _getOperation(
+		ApiApplication apiApplication, HttpServletRequest httpServletRequest) {
+
+		String currentEndpoint = _sanitizeURL(
+			httpServletRequest.getRequestURI());
+
+		String currentEndpointPath = StringUtil.removeSubstring(
+			currentEndpoint, apiApplication.getBaseURL());
+
+		for (Operation operation : apiApplication.getOperations()) {
+			if (Objects.equals(operation.getPath(), currentEndpointPath)) {
+				return operation;
+			}
+		}
+
+		throw new NotFoundException();
+	}
+
+	private boolean _isCurrentApiApplication(
+		ApiApplication apiApplication, String baseURL, long companyId) {
+
+		if (Objects.equals(apiApplication.getBaseURL(), baseURL) &&
+			Objects.equals(apiApplication.getCompanyId(), companyId)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private String _sanitizeURL(String url) {
+		return StringUtil.removeSubstring(url, "/o/");
+	}
+
+	private final Portal _portal;
+	private final ServiceTracker<Application, ApiApplication> _serviceTracker;
 
 }
