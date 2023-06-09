@@ -326,7 +326,163 @@ public class HeadlessBuilderTest {
 		}
 		finally {
 			serviceTracker.close();
-			_headlessBuilderApplicationManager.unpublishApplication();
+			_headlessBuilderApplicationManager.unpublishApplication(
+				_apiApplicationObjectEntry.getExternalReferenceCode());
+		}
+	}
+
+	@Test
+	public void testPublishMultipleApiApplications() throws Exception {
+		String application1baseUrl = "base-url-one";
+		String endpoint = "/endpoint";
+
+		ObjectEntry headlessBuilderApplication1ObjectEntry =
+			ObjectEntryTestUtil.addObjectEntry(
+				_apiApplicationObjectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					_API_APPLICATION_BASE_URL, application1baseUrl
+				).put(
+					_API_APPLICATION_TITLE, "apiApplication1"
+				).build());
+
+		ObjectEntry headlessBuilderApplication1EndpointObjectEntry =
+			ObjectEntryTestUtil.addObjectEntry(
+				_apiEndpointObjectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					_API_ENDPOINT_HTTP_METHOD, "GET"
+				).put(
+					_API_ENDPOINT_PATH, endpoint
+				).put(
+					_API_ENDPOINT_SCOPE, "Instance"
+				).build());
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			headlessBuilderApplication1ObjectEntry.getObjectEntryId(),
+			headlessBuilderApplication1EndpointObjectEntry.getObjectEntryId(),
+			_applicationEndpointsObjectRelationship,
+			TestPropsValues.getUserId());
+
+		String application2baseUrl = "base-url-two";
+
+		ObjectEntry headlessBuilderApplication2ObjectEntry =
+			ObjectEntryTestUtil.addObjectEntry(
+				_apiApplicationObjectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					_API_APPLICATION_BASE_URL, application2baseUrl
+				).put(
+					_API_APPLICATION_TITLE, "apiApplication2"
+				).build());
+
+		ObjectEntry headlessBuilderApplication2EndpointObjectEntry =
+			ObjectEntryTestUtil.addObjectEntry(
+				_apiEndpointObjectDefinition,
+				HashMapBuilder.<String, Serializable>put(
+					_API_ENDPOINT_HTTP_METHOD, "GET"
+				).put(
+					_API_ENDPOINT_PATH, endpoint
+				).put(
+					_API_ENDPOINT_SCOPE, "Instance"
+				).build());
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			headlessBuilderApplication2ObjectEntry.getObjectEntryId(),
+			headlessBuilderApplication2EndpointObjectEntry.getObjectEntryId(),
+			_applicationEndpointsObjectRelationship,
+			TestPropsValues.getUserId());
+
+		CountDownLatch addedCountLatch = new CountDownLatch(2);
+		CountDownLatch removedCountLatch = new CountDownLatch(1);
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		ServiceTracker<?, ?> serviceTracker =
+			new ServiceTracker<Application, Application>(
+				bundleContext, Application.class, null) {
+
+				@Override
+				public Application addingService(
+					ServiceReference<Application> serviceReference) {
+
+					Object property = serviceReference.getProperty(
+						"liferay.headless.builder.application");
+
+					if ((property != null) && (Boolean)property) {
+						addedCountLatch.countDown();
+
+						return super.addingService(serviceReference);
+					}
+
+					return null;
+				}
+
+				@Override
+				public void removedService(
+					ServiceReference<Application> serviceReference,
+					Application service) {
+
+					removedCountLatch.countDown();
+					super.removedService(serviceReference, service);
+				}
+
+			};
+
+		try {
+			serviceTracker.open();
+
+			_headlessBuilderApplicationManager.publishApplication(
+				headlessBuilderApplication1ObjectEntry.
+					getExternalReferenceCode());
+
+			_headlessBuilderApplicationManager.publishApplication(
+				headlessBuilderApplication2ObjectEntry.
+					getExternalReferenceCode());
+
+			addedCountLatch.await(1, TimeUnit.MINUTES);
+
+			HttpURLConnection httpURLConnection = _createHttpURLConnection(
+				application1baseUrl + endpoint, Http.Method.GET);
+
+			httpURLConnection.connect();
+
+			Assert.assertEquals(200, httpURLConnection.getResponseCode());
+
+			httpURLConnection = _createHttpURLConnection(
+				application2baseUrl + endpoint, Http.Method.GET);
+
+			httpURLConnection.connect();
+
+			Assert.assertEquals(200, httpURLConnection.getResponseCode());
+
+			_headlessBuilderApplicationManager.unpublishApplication(
+				headlessBuilderApplication1ObjectEntry.
+					getExternalReferenceCode());
+
+			removedCountLatch.await(1, TimeUnit.MINUTES);
+
+			httpURLConnection = _createHttpURLConnection(
+				application1baseUrl + endpoint, Http.Method.GET);
+
+			httpURLConnection.connect();
+
+			Assert.assertEquals(404, httpURLConnection.getResponseCode());
+
+			httpURLConnection = _createHttpURLConnection(
+				application2baseUrl + endpoint, Http.Method.GET);
+
+			httpURLConnection.connect();
+
+			Assert.assertEquals(200, httpURLConnection.getResponseCode());
+		}
+		finally {
+			serviceTracker.close();
+			_headlessBuilderApplicationManager.unpublishApplication(
+				headlessBuilderApplication1ObjectEntry.
+					getExternalReferenceCode());
+			_headlessBuilderApplicationManager.unpublishApplication(
+				headlessBuilderApplication2ObjectEntry.
+					getExternalReferenceCode());
 		}
 	}
 
