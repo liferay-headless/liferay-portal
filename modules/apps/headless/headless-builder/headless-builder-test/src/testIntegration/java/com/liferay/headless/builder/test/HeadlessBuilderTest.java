@@ -157,7 +157,7 @@ public class HeadlessBuilderTest {
 			HashMapBuilder.<String, Serializable>put(
 				_API_ENDPOINT_HTTP_METHOD, "GET"
 			).put(
-				_API_ENDPOINT_PATH, "/new-path"
+				_API_ENDPOINT_PATH, _API_ENDPOINT_PATH_VALUE
 			).put(
 				_API_ENDPOINT_SCOPE, "Instance"
 			).build());
@@ -317,7 +317,8 @@ public class HeadlessBuilderTest {
 			addedCountLatch.await(1, TimeUnit.MINUTES);
 
 			HttpURLConnection httpURLConnection = _createHttpURLConnection(
-				_API_APPLICATION_BASE_URL_VALUE, Http.Method.GET);
+				_API_APPLICATION_BASE_URL_VALUE + _API_ENDPOINT_PATH_VALUE,
+				Http.Method.GET);
 
 			httpURLConnection.connect();
 
@@ -415,6 +416,8 @@ public class HeadlessBuilderTest {
 	private static final String _API_ENDPOINT_HTTP_METHOD = "hTTPMethod";
 
 	private static final String _API_ENDPOINT_PATH = "path";
+
+	private static final String _API_ENDPOINT_PATH_VALUE = "/new-path";
 
 	private static final String _API_ENDPOINT_SCOPE = "scope";
 
