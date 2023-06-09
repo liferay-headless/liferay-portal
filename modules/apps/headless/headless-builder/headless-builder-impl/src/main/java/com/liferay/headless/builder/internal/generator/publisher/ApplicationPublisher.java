@@ -25,6 +25,6 @@ public interface ApplicationPublisher {
 
 	// TODO Remove this method
 
-	public void undeploy() throws Exception;
+	public void undeploy(ApiApplication apiApplication) throws Exception;
 
 }

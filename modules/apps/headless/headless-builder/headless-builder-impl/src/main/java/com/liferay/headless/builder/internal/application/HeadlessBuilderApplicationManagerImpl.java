@@ -44,8 +44,9 @@ public class HeadlessBuilderApplicationManagerImpl<T>
 	}
 
 	@Override
-	public void unpublishApplication() throws Exception {
-		_applicationPublisher.undeploy();
+	public void unpublishApplication(T applicationIdentifier) throws Exception {
+		_applicationPublisher.undeploy(
+			_consumer.getApiApplication(applicationIdentifier));
 	}
 
 	@Reference

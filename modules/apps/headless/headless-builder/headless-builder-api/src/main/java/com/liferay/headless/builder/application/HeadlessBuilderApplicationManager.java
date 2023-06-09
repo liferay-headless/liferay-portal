@@ -24,6 +24,6 @@ public interface HeadlessBuilderApplicationManager<T> {
 
 	// TODO Delete this method
 
-	public void unpublishApplication() throws Exception;
+	public void unpublishApplication(T applicationIdentifier) throws Exception;
 
 }

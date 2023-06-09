@@ -19,7 +19,13 @@ import com.liferay.headless.builder.internal.generator.jaxrs.application.Headles
 import com.liferay.headless.builder.internal.generator.resource.BaseHeadlessBuilderResource;
 import com.liferay.headless.builder.internal.generator.resource.HeadlessBuilderResource;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Application;
 
@@ -42,69 +48,14 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 
 	@Override
 	public void publish(ApiApplication apiApplication) throws Exception {
-		if ((_applicationServiceRegistration != null) ||
-			(_resourceServiceRegistration != null)) {
-
-			return;
-		}
-
-		String osgiJaxRsName = apiApplication.getOsgiJaxRsName();
-
-		_applicationServiceRegistration = _bundleContext.registerService(
-			Application.class, new HeadlessBuilderApplication(apiApplication),
-			HashMapDictionaryBuilder.<String, Object>put(
-				"companyId", apiApplication.getCompanyId()
-			).put(
-				"liferay.filter.disabled", true
-			).put(
-				"liferay.headless.builder.application", true
-			).put(
-				"liferay.jackson", false
-			).put(
-				"osgi.jaxrs.application.base", apiApplication.getBaseURL()
-			).put(
-				"osgi.jaxrs.extension.select",
-				"(osgi.jaxrs.name=Liferay.Vulcan)"
-			).put(
-				"osgi.jaxrs.name", osgiJaxRsName
-			).build());
-
-		_resourceServiceRegistration = _bundleContext.registerService(
-			BaseHeadlessBuilderResource.class,
-			new PrototypeServiceFactory<BaseHeadlessBuilderResource>() {
-
-				@Override
-				public BaseHeadlessBuilderResource getService(
-					Bundle bundle,
-					ServiceRegistration<BaseHeadlessBuilderResource>
-						serviceRegistration) {
-
-					return new HeadlessBuilderResource(
-						_portal, _serviceTracker);
-				}
-
-				@Override
-				public void ungetService(
-					Bundle bundle,
-					ServiceRegistration<BaseHeadlessBuilderResource>
-						serviceRegistration,
-					BaseHeadlessBuilderResource objectEntryResource) {
-				}
-
-			},
-			HashMapDictionaryBuilder.<String, Object>put(
-				"api.version", "v1.0"
-			).put(
-				"osgi.jaxrs.application.select",
-				"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
-			).put(
-				"osgi.jaxrs.resource", "true"
-			).build());
+		_headlessBuilderApplicationServiceRegistrationMap.put(
+			apiApplication.getOsgiJaxRsName(),
+			_createHeadlessBuilderApplication(apiApplication));
 	}
 
 	@Override
-	public void undeploy() throws Exception {
-		_undeploy();
+	public void undeploy(ApiApplication apiApplication) throws Exception {
+		_undeploy(apiApplication);
 	}
 
 	@Activate
@@ -139,28 +90,129 @@ public class ApplicationPublisherImpl implements ApplicationPublisher {
 
 	@Deactivate
 	protected void deactivate() {
-		_undeploy();
+		_undeployAll();
 		_serviceTracker.close();
 	}
 
-	private void _undeploy() {
-		if (_applicationServiceRegistration != null) {
-			_applicationServiceRegistration.unregister();
-		}
+	private ObjectValuePair
+		<ServiceRegistration<Application>, List<ServiceRegistration<?>>>
+			_createHeadlessBuilderApplication(ApiApplication apiApplication) {
 
-		if (_resourceServiceRegistration != null) {
-			_resourceServiceRegistration.unregister();
-		}
-
-		_applicationServiceRegistration = null;
-		_resourceServiceRegistration = null;
+		return new ObjectValuePair<>(
+			_registerHeadlessBuilderApplication(apiApplication),
+			_registerHeadlessBuilderApplicationServices(apiApplication));
 	}
 
-	private static ServiceRegistration<Application>
-		_applicationServiceRegistration;
+	private ServiceRegistration<Application>
+		_registerHeadlessBuilderApplication(ApiApplication apiApplication) {
+
+		return _bundleContext.registerService(
+			Application.class, new HeadlessBuilderApplication(apiApplication),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"companyId", apiApplication.getCompanyId()
+			).put(
+				"liferay.filter.disabled", true
+			).put(
+				"liferay.headless.builder.application", true
+			).put(
+				"liferay.jackson", false
+			).put(
+				"osgi.jaxrs.application.base", apiApplication.getBaseURL()
+			).put(
+				"osgi.jaxrs.extension.select",
+				"(osgi.jaxrs.name=Liferay.Vulcan)"
+			).put(
+				"osgi.jaxrs.name", apiApplication.getOsgiJaxRsName()
+			).build());
+	}
+
+	private List<ServiceRegistration<?>>
+		_registerHeadlessBuilderApplicationServices(
+			ApiApplication apiApplication) {
+
+		return Collections.singletonList(
+			_bundleContext.registerService(
+				BaseHeadlessBuilderResource.class,
+				new PrototypeServiceFactory<BaseHeadlessBuilderResource>() {
+
+					@Override
+					public BaseHeadlessBuilderResource getService(
+						Bundle bundle,
+						ServiceRegistration<BaseHeadlessBuilderResource>
+							serviceRegistration) {
+
+						return new HeadlessBuilderResource(
+							_portal, _serviceTracker);
+					}
+
+					@Override
+					public void ungetService(
+						Bundle bundle,
+						ServiceRegistration<BaseHeadlessBuilderResource>
+							serviceRegistration,
+						BaseHeadlessBuilderResource objectEntryResource) {
+					}
+
+				},
+				HashMapDictionaryBuilder.<String, Object>put(
+					"api.version", "v1.0"
+				).put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=" + apiApplication.getOsgiJaxRsName() +
+						")"
+				).put(
+					"osgi.jaxrs.resource", "true"
+				).build()));
+	}
+
+	private void _undeploy(ApiApplication apiApplication) {
+		ObjectValuePair
+			<ServiceRegistration<Application>, List<ServiceRegistration<?>>>
+				headlessBuilderApplicationServiceRegistrations =
+					_headlessBuilderApplicationServiceRegistrationMap.remove(
+						apiApplication.getOsgiJaxRsName());
+
+		if (headlessBuilderApplicationServiceRegistrations != null) {
+			_unregisterServiceRegistration(
+				headlessBuilderApplicationServiceRegistrations.getKey());
+
+			_unregisterHeadlessBuilderApplicationServices(
+				headlessBuilderApplicationServiceRegistrations.getValue());
+		}
+	}
+
+	private void _undeployAll() {
+		for (Object service : _serviceTracker.getServices()) {
+			_undeploy((ApiApplication)service);
+		}
+	}
+
+	private void _unregisterHeadlessBuilderApplicationServices(
+		List<ServiceRegistration<?>> headlessBuilderApplicationServices) {
+
+		for (ServiceRegistration<?> serviceRegistration :
+				headlessBuilderApplicationServices) {
+
+			_unregisterServiceRegistration(serviceRegistration);
+		}
+	}
+
+	private void _unregisterServiceRegistration(
+		ServiceRegistration<?> serviceRegistration) {
+
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+	}
+
 	private static BundleContext _bundleContext;
-	private static ServiceRegistration<BaseHeadlessBuilderResource>
-		_resourceServiceRegistration;
+
+	private final Map
+		<String,
+		 ObjectValuePair
+			 <ServiceRegistration<Application>, List<ServiceRegistration<?>>>>
+				_headlessBuilderApplicationServiceRegistrationMap =
+					new HashMap<>();
 
 	@Reference
 	private Portal _portal;
