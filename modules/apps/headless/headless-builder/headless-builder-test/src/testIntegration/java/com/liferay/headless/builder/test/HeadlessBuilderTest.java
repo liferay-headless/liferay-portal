@@ -121,14 +121,6 @@ public class HeadlessBuilderTest {
 					}
 				});
 
-		_apiApplicationObjectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_apiApplicationObjectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				_API_APPLICATION_BASE_URL, _API_APPLICATION_BASE_URL_VALUE
-			).put(
-				_API_APPLICATION_TITLE, "apiApplication"
-			).build());
-
 		_apiEndpointObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
 				"MSOD_API_ENDPOINT",
@@ -152,27 +144,11 @@ public class HeadlessBuilderTest {
 					}
 				});
 
-		_apiEndpointObjectEntry = ObjectEntryTestUtil.addObjectEntry(
-			_apiEndpointObjectDefinition,
-			HashMapBuilder.<String, Serializable>put(
-				_API_ENDPOINT_HTTP_METHOD, "GET"
-			).put(
-				_API_ENDPOINT_PATH, _API_ENDPOINT_PATH_VALUE
-			).put(
-				_API_ENDPOINT_SCOPE, "Instance"
-			).build());
-
 		_applicationEndpointsObjectRelationship =
 			ObjectRelationshipTestUtil.addObjectRelationship(
 				_apiApplicationObjectDefinition, "applicationEndpoints",
 				_apiEndpointObjectDefinition, TestPropsValues.getUserId(),
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
-
-		ObjectRelationshipTestUtil.relateObjectEntries(
-			_apiApplicationObjectEntry.getObjectEntryId(),
-			_apiEndpointObjectEntry.getObjectEntryId(),
-			_applicationEndpointsObjectRelationship,
-			TestPropsValues.getUserId());
 
 		Bundle bundle = FrameworkUtil.getBundle(HeadlessBuilderTest.class);
 
@@ -205,6 +181,12 @@ public class HeadlessBuilderTest {
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			_apiEndpointObjectDefinition);
 	}
+
+	// TODO Missing tests:
+	//  Create multiple api applications with multiple endpoints
+	//  that should be accessible but not others
+	//  Create same endpoints in different applications with
+	//  different responses and ensure that the responses are ok
 
 	@FeatureFlags("LPS-171047")
 	@Test
@@ -280,6 +262,19 @@ public class HeadlessBuilderTest {
 
 	@Test
 	public void testPublishApiApplication() throws Exception {
+		String apiApplicationBaseURL = "base-url";
+		String apiEndpointPath = "/new-path";
+		ObjectEntry apiApplication = _createApiApplicationObjectEntry(
+			apiApplicationBaseURL, "ApiApplication");
+
+		ObjectEntry apiEndpoint = _createApiEndpointObjectEntry(
+			"GET", apiEndpointPath, "Instance");
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			apiApplication.getObjectEntryId(), apiEndpoint.getObjectEntryId(),
+			_applicationEndpointsObjectRelationship,
+			TestPropsValues.getUserId());
+
 		CountDownLatch addedCountLatch = new CountDownLatch(1);
 
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
@@ -312,13 +307,12 @@ public class HeadlessBuilderTest {
 			serviceTracker.open();
 
 			_headlessBuilderApplicationManager.publishApplication(
-				_apiApplicationObjectEntry.getExternalReferenceCode());
+				apiApplication.getExternalReferenceCode());
 
 			addedCountLatch.await(1, TimeUnit.MINUTES);
 
 			HttpURLConnection httpURLConnection = _createHttpURLConnection(
-				_API_APPLICATION_BASE_URL_VALUE + _API_ENDPOINT_PATH_VALUE,
-				Http.Method.GET);
+				apiApplicationBaseURL + apiEndpointPath, Http.Method.GET);
 
 			httpURLConnection.connect();
 
@@ -327,66 +321,37 @@ public class HeadlessBuilderTest {
 		finally {
 			serviceTracker.close();
 			_headlessBuilderApplicationManager.unpublishApplication(
-				_apiApplicationObjectEntry.getExternalReferenceCode());
+				apiApplication.getExternalReferenceCode());
 		}
 	}
 
 	@Test
 	public void testPublishMultipleApiApplications() throws Exception {
-		String application1baseUrl = "base-url-one";
-		String endpoint = "/endpoint";
+		String apiApplication1baseURL = "base-url-one";
+		String apiEndpoint1Path = "/endpoint-one";
 
-		ObjectEntry headlessBuilderApplication1ObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				_apiApplicationObjectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					_API_APPLICATION_BASE_URL, application1baseUrl
-				).put(
-					_API_APPLICATION_TITLE, "apiApplication1"
-				).build());
+		ObjectEntry apiApplication1 = _createApiApplicationObjectEntry(
+			apiApplication1baseURL, "ApiApplication1");
 
-		ObjectEntry headlessBuilderApplication1EndpointObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				_apiEndpointObjectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					_API_ENDPOINT_HTTP_METHOD, "GET"
-				).put(
-					_API_ENDPOINT_PATH, endpoint
-				).put(
-					_API_ENDPOINT_SCOPE, "Instance"
-				).build());
+		ObjectEntry apiEndpoint1 = _createApiEndpointObjectEntry(
+			"GET", apiEndpoint1Path, "Instance");
 
 		ObjectRelationshipTestUtil.relateObjectEntries(
-			headlessBuilderApplication1ObjectEntry.getObjectEntryId(),
-			headlessBuilderApplication1EndpointObjectEntry.getObjectEntryId(),
+			apiApplication1.getObjectEntryId(), apiEndpoint1.getObjectEntryId(),
 			_applicationEndpointsObjectRelationship,
 			TestPropsValues.getUserId());
 
-		String application2baseUrl = "base-url-two";
+		String apiApplication2baseURL = "base-url-two";
+		String apiEndpoint2Path = "/endpoint-two";
 
-		ObjectEntry headlessBuilderApplication2ObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				_apiApplicationObjectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					_API_APPLICATION_BASE_URL, application2baseUrl
-				).put(
-					_API_APPLICATION_TITLE, "apiApplication2"
-				).build());
+		ObjectEntry apiApplication2 = _createApiApplicationObjectEntry(
+			apiApplication2baseURL, "ApiApplication2");
 
-		ObjectEntry headlessBuilderApplication2EndpointObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				_apiEndpointObjectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					_API_ENDPOINT_HTTP_METHOD, "GET"
-				).put(
-					_API_ENDPOINT_PATH, endpoint
-				).put(
-					_API_ENDPOINT_SCOPE, "Instance"
-				).build());
+		ObjectEntry apiEndpoint2 = _createApiEndpointObjectEntry(
+			"GET", apiEndpoint2Path, "Instance");
 
 		ObjectRelationshipTestUtil.relateObjectEntries(
-			headlessBuilderApplication2ObjectEntry.getObjectEntryId(),
-			headlessBuilderApplication2EndpointObjectEntry.getObjectEntryId(),
+			apiApplication2.getObjectEntryId(), apiEndpoint2.getObjectEntryId(),
 			_applicationEndpointsObjectRelationship,
 			TestPropsValues.getUserId());
 
@@ -432,44 +397,41 @@ public class HeadlessBuilderTest {
 			serviceTracker.open();
 
 			_headlessBuilderApplicationManager.publishApplication(
-				headlessBuilderApplication1ObjectEntry.
-					getExternalReferenceCode());
+				apiApplication1.getExternalReferenceCode());
 
 			_headlessBuilderApplicationManager.publishApplication(
-				headlessBuilderApplication2ObjectEntry.
-					getExternalReferenceCode());
+				apiApplication2.getExternalReferenceCode());
 
 			addedCountLatch.await(1, TimeUnit.MINUTES);
 
 			HttpURLConnection httpURLConnection = _createHttpURLConnection(
-				application1baseUrl + endpoint, Http.Method.GET);
+				apiApplication1baseURL + apiEndpoint1Path, Http.Method.GET);
 
 			httpURLConnection.connect();
 
 			Assert.assertEquals(200, httpURLConnection.getResponseCode());
 
 			httpURLConnection = _createHttpURLConnection(
-				application2baseUrl + endpoint, Http.Method.GET);
+				apiApplication2baseURL + apiEndpoint2Path, Http.Method.GET);
 
 			httpURLConnection.connect();
 
 			Assert.assertEquals(200, httpURLConnection.getResponseCode());
 
 			_headlessBuilderApplicationManager.unpublishApplication(
-				headlessBuilderApplication1ObjectEntry.
-					getExternalReferenceCode());
+				apiApplication1.getExternalReferenceCode());
 
 			removedCountLatch.await(1, TimeUnit.MINUTES);
 
 			httpURLConnection = _createHttpURLConnection(
-				application1baseUrl + endpoint, Http.Method.GET);
+				apiApplication1baseURL + apiEndpoint1Path, Http.Method.GET);
 
 			httpURLConnection.connect();
 
 			Assert.assertEquals(404, httpURLConnection.getResponseCode());
 
 			httpURLConnection = _createHttpURLConnection(
-				application2baseUrl + endpoint, Http.Method.GET);
+				apiApplication2baseURL + apiEndpoint2Path, Http.Method.GET);
 
 			httpURLConnection.connect();
 
@@ -478,12 +440,38 @@ public class HeadlessBuilderTest {
 		finally {
 			serviceTracker.close();
 			_headlessBuilderApplicationManager.unpublishApplication(
-				headlessBuilderApplication1ObjectEntry.
-					getExternalReferenceCode());
+				apiApplication1.getExternalReferenceCode());
 			_headlessBuilderApplicationManager.unpublishApplication(
-				headlessBuilderApplication2ObjectEntry.
-					getExternalReferenceCode());
+				apiApplication2.getExternalReferenceCode());
 		}
+	}
+
+	private ObjectEntry _createApiApplicationObjectEntry(
+			String baseURL, String title)
+		throws Exception {
+
+		return ObjectEntryTestUtil.addObjectEntry(
+			_apiApplicationObjectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				_API_APPLICATION_BASE_URL, baseURL
+			).put(
+				_API_APPLICATION_TITLE, title
+			).build());
+	}
+
+	private ObjectEntry _createApiEndpointObjectEntry(
+			String httpMethod, String path, String scope)
+		throws Exception {
+
+		return ObjectEntryTestUtil.addObjectEntry(
+			_apiEndpointObjectDefinition,
+			HashMapBuilder.<String, Serializable>put(
+				_API_ENDPOINT_HTTP_METHOD, httpMethod
+			).put(
+				_API_ENDPOINT_PATH, path
+			).put(
+				_API_ENDPOINT_SCOPE, scope
+			).build());
 	}
 
 	private HttpURLConnection _createHttpURLConnection(
@@ -573,14 +561,10 @@ public class HeadlessBuilderTest {
 
 	private static final String _API_ENDPOINT_PATH = "path";
 
-	private static final String _API_ENDPOINT_PATH_VALUE = "/new-path";
-
 	private static final String _API_ENDPOINT_SCOPE = "scope";
 
 	private ObjectDefinition _apiApplicationObjectDefinition;
-	private ObjectEntry _apiApplicationObjectEntry;
 	private ObjectDefinition _apiEndpointObjectDefinition;
-	private ObjectEntry _apiEndpointObjectEntry;
 	private ObjectRelationship _applicationEndpointsObjectRelationship;
 
 	@Inject
