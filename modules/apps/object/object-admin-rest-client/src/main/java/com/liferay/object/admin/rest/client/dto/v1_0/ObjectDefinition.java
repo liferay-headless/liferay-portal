@@ -572,6 +572,29 @@ public class ObjectDefinition implements Cloneable, Serializable {
 
 	protected Boolean parameterRequired;
 
+	public String getPersistedRESTContextPath() {
+		return persistedRESTContextPath;
+	}
+
+	public void setPersistedRESTContextPath(String persistedRESTContextPath) {
+		this.persistedRESTContextPath = persistedRESTContextPath;
+	}
+
+	public void setPersistedRESTContextPath(
+		UnsafeSupplier<String, Exception>
+			persistedRESTContextPathUnsafeSupplier) {
+
+		try {
+			persistedRESTContextPath =
+				persistedRESTContextPathUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String persistedRESTContextPath;
+
 	public Map<String, String> getPluralLabel() {
 		return pluralLabel;
 	}

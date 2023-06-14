@@ -192,6 +192,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		objectDefinition.setName(regex);
 		objectDefinition.setPanelAppOrder(regex);
 		objectDefinition.setPanelCategoryKey(regex);
+		objectDefinition.setPersistedRESTContextPath(regex);
 		objectDefinition.setRestContextPath(regex);
 		objectDefinition.setScope(regex);
 		objectDefinition.setStorageType(regex);
@@ -210,6 +211,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		Assert.assertEquals(regex, objectDefinition.getName());
 		Assert.assertEquals(regex, objectDefinition.getPanelAppOrder());
 		Assert.assertEquals(regex, objectDefinition.getPanelCategoryKey());
+		Assert.assertEquals(
+			regex, objectDefinition.getPersistedRESTContextPath());
 		Assert.assertEquals(regex, objectDefinition.getRestContextPath());
 		Assert.assertEquals(regex, objectDefinition.getScope());
 		Assert.assertEquals(regex, objectDefinition.getStorageType());
@@ -1301,6 +1304,16 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"persistedRESTContextPath", additionalAssertFieldName)) {
+
+				if (objectDefinition.getPersistedRESTContextPath() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("pluralLabel", additionalAssertFieldName)) {
 				if (objectDefinition.getPluralLabel() == null) {
 					valid = false;
@@ -1780,6 +1793,19 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"persistedRESTContextPath", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectDefinition1.getPersistedRESTContextPath(),
+						objectDefinition2.getPersistedRESTContextPath())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("pluralLabel", additionalAssertFieldName)) {
 				if (!equals(
 						(Map)objectDefinition1.getPluralLabel(),
@@ -2179,6 +2205,15 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("persistedRESTContextPath")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(objectDefinition.getPersistedRESTContextPath()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("pluralLabel")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2298,6 +2333,8 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				panelCategoryKey = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				parameterRequired = RandomTestUtil.randomBoolean();
+				persistedRESTContextPath = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				portlet = RandomTestUtil.randomBoolean();
 				restContextPath = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());

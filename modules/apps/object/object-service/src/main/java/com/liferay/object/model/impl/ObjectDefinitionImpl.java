@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Objects;
@@ -111,7 +112,13 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return "/c/" +
+		String restContextPath = "/c/";
+
+		if (Validator.isNotNull(getPersistedRESTContextPath())) {
+			return restContextPath + getPersistedRESTContextPath();
+		}
+
+		return restContextPath +
 			TextFormatter.formatPlural(StringUtil.toLowerCase(getShortName()));
 	}
 

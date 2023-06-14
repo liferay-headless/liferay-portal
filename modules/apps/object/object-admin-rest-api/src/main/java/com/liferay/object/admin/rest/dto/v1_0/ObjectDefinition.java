@@ -782,6 +782,36 @@ public class ObjectDefinition implements Serializable {
 	protected Boolean parameterRequired;
 
 	@Schema
+	public String getPersistedRESTContextPath() {
+		return persistedRESTContextPath;
+	}
+
+	public void setPersistedRESTContextPath(String persistedRESTContextPath) {
+		this.persistedRESTContextPath = persistedRESTContextPath;
+	}
+
+	@JsonIgnore
+	public void setPersistedRESTContextPath(
+		UnsafeSupplier<String, Exception>
+			persistedRESTContextPathUnsafeSupplier) {
+
+		try {
+			persistedRESTContextPath =
+				persistedRESTContextPathUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String persistedRESTContextPath;
+
+	@Schema
 	@Valid
 	public Map<String, String> getPluralLabel() {
 		return pluralLabel;
@@ -1378,6 +1408,20 @@ public class ObjectDefinition implements Serializable {
 			sb.append("\"parameterRequired\": ");
 
 			sb.append(parameterRequired);
+		}
+
+		if (persistedRESTContextPath != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"persistedRESTContextPath\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(persistedRESTContextPath));
+
+			sb.append("\"");
 		}
 
 		if (pluralLabel != null) {

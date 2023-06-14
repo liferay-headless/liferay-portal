@@ -755,6 +755,21 @@ public interface ObjectDefinitionModel
 	public void setScope(String scope);
 
 	/**
+	 * Returns the persisted rest context path of this object definition.
+	 *
+	 * @return the persisted rest context path of this object definition
+	 */
+	@AutoEscape
+	public String getPersistedRESTContextPath();
+
+	/**
+	 * Sets the persisted rest context path of this object definition.
+	 *
+	 * @param persistedRESTContextPath the persisted rest context path of this object definition
+	 */
+	public void setPersistedRESTContextPath(String persistedRESTContextPath);
+
+	/**
 	 * Returns the storage type of this object definition.
 	 *
 	 * @return the storage type of this object definition

@@ -66,6 +66,7 @@
 		</field>
 		<field name="portlet" type="boolean" />
 		<field name="scope" type="String" />
+		<field name="persistedRESTContextPath" type="String" />
 		<field name="storageType" type="String" />
 		<field name="system" type="boolean" />
 		<field name="version" type="int" />

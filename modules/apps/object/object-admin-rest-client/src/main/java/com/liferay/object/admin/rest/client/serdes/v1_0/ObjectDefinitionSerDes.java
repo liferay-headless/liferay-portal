@@ -439,6 +439,20 @@ public class ObjectDefinitionSerDes {
 			sb.append(objectDefinition.getParameterRequired());
 		}
 
+		if (objectDefinition.getPersistedRESTContextPath() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"persistedRESTContextPath\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectDefinition.getPersistedRESTContextPath()));
+
+			sb.append("\"");
+		}
+
 		if (objectDefinition.getPluralLabel() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -777,6 +791,15 @@ public class ObjectDefinitionSerDes {
 				String.valueOf(objectDefinition.getParameterRequired()));
 		}
 
+		if (objectDefinition.getPersistedRESTContextPath() == null) {
+			map.put("persistedRESTContextPath", null);
+		}
+		else {
+			map.put(
+				"persistedRESTContextPath",
+				String.valueOf(objectDefinition.getPersistedRESTContextPath()));
+		}
+
 		if (objectDefinition.getPluralLabel() == null) {
 			map.put("pluralLabel", null);
 		}
@@ -1091,6 +1114,14 @@ public class ObjectDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					objectDefinition.setParameterRequired(
 						(Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "persistedRESTContextPath")) {
+
+				if (jsonParserFieldValue != null) {
+					objectDefinition.setPersistedRESTContextPath(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "pluralLabel")) {

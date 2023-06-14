@@ -191,6 +191,9 @@ public class ObjectDefinitionPersistenceTest {
 
 		newObjectDefinition.setScope(RandomTestUtil.randomString());
 
+		newObjectDefinition.setPersistedRESTContextPath(
+			RandomTestUtil.randomString());
+
 		newObjectDefinition.setStorageType(RandomTestUtil.randomString());
 
 		newObjectDefinition.setSystem(RandomTestUtil.randomBoolean());
@@ -292,6 +295,9 @@ public class ObjectDefinitionPersistenceTest {
 		Assert.assertEquals(
 			existingObjectDefinition.getScope(),
 			newObjectDefinition.getScope());
+		Assert.assertEquals(
+			existingObjectDefinition.getPersistedRESTContextPath(),
+			newObjectDefinition.getPersistedRESTContextPath());
 		Assert.assertEquals(
 			existingObjectDefinition.getStorageType(),
 			newObjectDefinition.getStorageType());
@@ -462,8 +468,9 @@ public class ObjectDefinitionPersistenceTest {
 			"enableObjectEntryHistory", true, "modifiable", true, "name", true,
 			"panelAppOrder", true, "panelCategoryKey", true,
 			"pkObjectFieldDBColumnName", true, "pkObjectFieldName", true,
-			"pluralLabel", true, "portlet", true, "scope", true, "storageType",
-			true, "system", true, "version", true, "status", true);
+			"pluralLabel", true, "portlet", true, "scope", true,
+			"persistedRESTContextPath", true, "storageType", true, "system",
+			true, "version", true, "status", true);
 	}
 
 	@Test
@@ -837,6 +844,9 @@ public class ObjectDefinitionPersistenceTest {
 		objectDefinition.setPortlet(RandomTestUtil.randomBoolean());
 
 		objectDefinition.setScope(RandomTestUtil.randomString());
+
+		objectDefinition.setPersistedRESTContextPath(
+			RandomTestUtil.randomString());
 
 		objectDefinition.setStorageType(RandomTestUtil.randomString());
 

@@ -78,6 +78,8 @@ public class ObjectDefinitionWrapper
 		attributes.put("pluralLabel", getPluralLabel());
 		attributes.put("portlet", isPortlet());
 		attributes.put("scope", getScope());
+		attributes.put(
+			"persistedRESTContextPath", getPersistedRESTContextPath());
 		attributes.put("storageType", getStorageType());
 		attributes.put("system", isSystem());
 		attributes.put("version", getVersion());
@@ -275,6 +277,13 @@ public class ObjectDefinitionWrapper
 
 		if (scope != null) {
 			setScope(scope);
+		}
+
+		String persistedRESTContextPath = (String)attributes.get(
+			"persistedRESTContextPath");
+
+		if (persistedRESTContextPath != null) {
+			setPersistedRESTContextPath(persistedRESTContextPath);
 		}
 
 		String storageType = (String)attributes.get("storageType");
@@ -616,6 +625,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public String getPanelCategoryKey() {
 		return model.getPanelCategoryKey();
+	}
+
+	/**
+	 * Returns the persisted rest context path of this object definition.
+	 *
+	 * @return the persisted rest context path of this object definition
+	 */
+	@Override
+	public String getPersistedRESTContextPath() {
+		return model.getPersistedRESTContextPath();
 	}
 
 	/**
@@ -1244,6 +1263,16 @@ public class ObjectDefinitionWrapper
 	@Override
 	public void setPanelCategoryKey(String panelCategoryKey) {
 		model.setPanelCategoryKey(panelCategoryKey);
+	}
+
+	/**
+	 * Sets the persisted rest context path of this object definition.
+	 *
+	 * @param persistedRESTContextPath the persisted rest context path of this object definition
+	 */
+	@Override
+	public void setPersistedRESTContextPath(String persistedRESTContextPath) {
+		model.setPersistedRESTContextPath(persistedRESTContextPath);
 	}
 
 	/**

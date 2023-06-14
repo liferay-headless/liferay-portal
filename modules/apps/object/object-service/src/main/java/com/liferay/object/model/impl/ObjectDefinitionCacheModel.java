@@ -78,7 +78,7 @@ public class ObjectDefinitionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(69);
+		StringBundler sb = new StringBundler(71);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -140,6 +140,8 @@ public class ObjectDefinitionCacheModel
 		sb.append(portlet);
 		sb.append(", scope=");
 		sb.append(scope);
+		sb.append(", persistedRESTContextPath=");
+		sb.append(persistedRESTContextPath);
 		sb.append(", storageType=");
 		sb.append(storageType);
 		sb.append(", system=");
@@ -287,6 +289,14 @@ public class ObjectDefinitionCacheModel
 			objectDefinitionImpl.setScope(scope);
 		}
 
+		if (persistedRESTContextPath == null) {
+			objectDefinitionImpl.setPersistedRESTContextPath("");
+		}
+		else {
+			objectDefinitionImpl.setPersistedRESTContextPath(
+				persistedRESTContextPath);
+		}
+
 		if (storageType == null) {
 			objectDefinitionImpl.setStorageType("");
 		}
@@ -349,6 +359,7 @@ public class ObjectDefinitionCacheModel
 
 		portlet = objectInput.readBoolean();
 		scope = objectInput.readUTF();
+		persistedRESTContextPath = objectInput.readUTF();
 		storageType = objectInput.readUTF();
 
 		system = objectInput.readBoolean();
@@ -484,6 +495,13 @@ public class ObjectDefinitionCacheModel
 			objectOutput.writeUTF(scope);
 		}
 
+		if (persistedRESTContextPath == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(persistedRESTContextPath);
+		}
+
 		if (storageType == null) {
 			objectOutput.writeUTF("");
 		}
@@ -528,6 +546,7 @@ public class ObjectDefinitionCacheModel
 	public String pluralLabel;
 	public boolean portlet;
 	public String scope;
+	public String persistedRESTContextPath;
 	public String storageType;
 	public boolean system;
 	public int version;

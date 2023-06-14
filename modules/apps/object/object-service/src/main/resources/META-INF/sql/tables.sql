@@ -52,6 +52,7 @@ create table ObjectDefinition (
 	pluralLabel STRING null,
 	portlet BOOLEAN,
 	scope VARCHAR(75) null,
+	persistedRESTContextPath VARCHAR(75) null,
 	storageType VARCHAR(75) null,
 	system_ BOOLEAN,
 	version INTEGER,

@@ -332,6 +332,14 @@ public class ObjectDefinitionResourceImpl
 					serviceBuilderObjectField.getObjectFieldId());
 		}
 
+		if (objectDefinition.getPersistedRESTContextPath() != null) {
+			serviceBuilderObjectDefinition.setPersistedRESTContextPath(
+				objectDefinition.getPersistedRESTContextPath());
+			serviceBuilderObjectDefinition =
+				_objectDefinitionLocalService.updateObjectDefinition(
+					serviceBuilderObjectDefinition);
+		}
+
 		_addObjectDefinitionResources(
 			Collections.emptySet(), objectDefinition.getObjectActions(),
 			serviceBuilderObjectDefinition.getObjectDefinitionId(),
@@ -505,6 +513,14 @@ public class ObjectDefinitionResourceImpl
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition.getPluralLabel()),
 					objectDefinition.getScope());
+		}
+
+		if (objectDefinition.getPersistedRESTContextPath() != null) {
+			serviceBuilderObjectDefinition.setPersistedRESTContextPath(
+				objectDefinition.getPersistedRESTContextPath());
+			serviceBuilderObjectDefinition =
+				_objectDefinitionLocalService.updateObjectDefinition(
+					serviceBuilderObjectDefinition);
 		}
 
 		List<com.liferay.object.model.ObjectField> serviceBuilderObjectFields =

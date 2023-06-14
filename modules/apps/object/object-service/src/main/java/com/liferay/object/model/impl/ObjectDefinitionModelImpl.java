@@ -99,6 +99,7 @@ public class ObjectDefinitionModelImpl
 		{"pkObjectFieldDBColumnName", Types.VARCHAR},
 		{"pkObjectFieldName", Types.VARCHAR}, {"pluralLabel", Types.VARCHAR},
 		{"portlet", Types.BOOLEAN}, {"scope", Types.VARCHAR},
+		{"persistedRESTContextPath", Types.VARCHAR},
 		{"storageType", Types.VARCHAR}, {"system_", Types.BOOLEAN},
 		{"version", Types.INTEGER}, {"status", Types.INTEGER}
 	};
@@ -137,6 +138,7 @@ public class ObjectDefinitionModelImpl
 		TABLE_COLUMNS_MAP.put("pluralLabel", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("portlet", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("scope", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("persistedRESTContextPath", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("storageType", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("system_", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("version", Types.INTEGER);
@@ -144,7 +146,7 @@ public class ObjectDefinitionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ObjectDefinition (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectDefinitionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,accountERObjectFieldId LONG,descriptionObjectFieldId LONG,titleObjectFieldId LONG,accountEntryRestricted BOOLEAN,active_ BOOLEAN,dbTableName VARCHAR(75) null,label STRING null,className VARCHAR(255) null,enableCategorization BOOLEAN,enableComments BOOLEAN,enableLocalization BOOLEAN,enableObjectEntryHistory BOOLEAN,modifiable BOOLEAN,name VARCHAR(75) null,panelAppOrder VARCHAR(75) null,panelCategoryKey VARCHAR(75) null,pkObjectFieldDBColumnName VARCHAR(75) null,pkObjectFieldName VARCHAR(75) null,pluralLabel STRING null,portlet BOOLEAN,scope VARCHAR(75) null,storageType VARCHAR(75) null,system_ BOOLEAN,version INTEGER,status INTEGER)";
+		"create table ObjectDefinition (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,objectDefinitionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,accountERObjectFieldId LONG,descriptionObjectFieldId LONG,titleObjectFieldId LONG,accountEntryRestricted BOOLEAN,active_ BOOLEAN,dbTableName VARCHAR(75) null,label STRING null,className VARCHAR(255) null,enableCategorization BOOLEAN,enableComments BOOLEAN,enableLocalization BOOLEAN,enableObjectEntryHistory BOOLEAN,modifiable BOOLEAN,name VARCHAR(75) null,panelAppOrder VARCHAR(75) null,panelCategoryKey VARCHAR(75) null,pkObjectFieldDBColumnName VARCHAR(75) null,pkObjectFieldName VARCHAR(75) null,pluralLabel STRING null,portlet BOOLEAN,scope VARCHAR(75) null,persistedRESTContextPath VARCHAR(75) null,storageType VARCHAR(75) null,system_ BOOLEAN,version INTEGER,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table ObjectDefinition";
 
@@ -386,6 +388,9 @@ public class ObjectDefinitionModelImpl
 				"portlet", ObjectDefinition::getPortlet);
 			attributeGetterFunctions.put("scope", ObjectDefinition::getScope);
 			attributeGetterFunctions.put(
+				"persistedRESTContextPath",
+				ObjectDefinition::getPersistedRESTContextPath);
+			attributeGetterFunctions.put(
 				"storageType", ObjectDefinition::getStorageType);
 			attributeGetterFunctions.put("system", ObjectDefinition::getSystem);
 			attributeGetterFunctions.put(
@@ -529,6 +534,10 @@ public class ObjectDefinitionModelImpl
 				"scope",
 				(BiConsumer<ObjectDefinition, String>)
 					ObjectDefinition::setScope);
+			attributeSetterBiConsumers.put(
+				"persistedRESTContextPath",
+				(BiConsumer<ObjectDefinition, String>)
+					ObjectDefinition::setPersistedRESTContextPath);
 			attributeSetterBiConsumers.put(
 				"storageType",
 				(BiConsumer<ObjectDefinition, String>)
@@ -1389,6 +1398,26 @@ public class ObjectDefinitionModelImpl
 
 	@JSON
 	@Override
+	public String getPersistedRESTContextPath() {
+		if (_persistedRESTContextPath == null) {
+			return "";
+		}
+		else {
+			return _persistedRESTContextPath;
+		}
+	}
+
+	@Override
+	public void setPersistedRESTContextPath(String persistedRESTContextPath) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_persistedRESTContextPath = persistedRESTContextPath;
+	}
+
+	@JSON
+	@Override
 	public String getStorageType() {
 		if (_storageType == null) {
 			return "";
@@ -1664,6 +1693,8 @@ public class ObjectDefinitionModelImpl
 		objectDefinitionImpl.setPluralLabel(getPluralLabel());
 		objectDefinitionImpl.setPortlet(isPortlet());
 		objectDefinitionImpl.setScope(getScope());
+		objectDefinitionImpl.setPersistedRESTContextPath(
+			getPersistedRESTContextPath());
 		objectDefinitionImpl.setStorageType(getStorageType());
 		objectDefinitionImpl.setSystem(isSystem());
 		objectDefinitionImpl.setVersion(getVersion());
@@ -1738,6 +1769,8 @@ public class ObjectDefinitionModelImpl
 			this.<Boolean>getColumnOriginalValue("portlet"));
 		objectDefinitionImpl.setScope(
 			this.<String>getColumnOriginalValue("scope"));
+		objectDefinitionImpl.setPersistedRESTContextPath(
+			this.<String>getColumnOriginalValue("persistedRESTContextPath"));
 		objectDefinitionImpl.setStorageType(
 			this.<String>getColumnOriginalValue("storageType"));
 		objectDefinitionImpl.setSystem(
@@ -1987,6 +2020,18 @@ public class ObjectDefinitionModelImpl
 			objectDefinitionCacheModel.scope = null;
 		}
 
+		objectDefinitionCacheModel.persistedRESTContextPath =
+			getPersistedRESTContextPath();
+
+		String persistedRESTContextPath =
+			objectDefinitionCacheModel.persistedRESTContextPath;
+
+		if ((persistedRESTContextPath != null) &&
+			(persistedRESTContextPath.length() == 0)) {
+
+			objectDefinitionCacheModel.persistedRESTContextPath = null;
+		}
+
 		objectDefinitionCacheModel.storageType = getStorageType();
 
 		String storageType = objectDefinitionCacheModel.storageType;
@@ -2096,6 +2141,7 @@ public class ObjectDefinitionModelImpl
 	private String _pluralLabelCurrentLanguageId;
 	private boolean _portlet;
 	private String _scope;
+	private String _persistedRESTContextPath;
 	private String _storageType;
 	private boolean _system;
 	private int _version;
@@ -2168,6 +2214,8 @@ public class ObjectDefinitionModelImpl
 		_columnOriginalValues.put("pluralLabel", _pluralLabel);
 		_columnOriginalValues.put("portlet", _portlet);
 		_columnOriginalValues.put("scope", _scope);
+		_columnOriginalValues.put(
+			"persistedRESTContextPath", _persistedRESTContextPath);
 		_columnOriginalValues.put("storageType", _storageType);
 		_columnOriginalValues.put("system_", _system);
 		_columnOriginalValues.put("version", _version);
@@ -2259,13 +2307,15 @@ public class ObjectDefinitionModelImpl
 
 		columnBitmasks.put("scope", 536870912L);
 
-		columnBitmasks.put("storageType", 1073741824L);
+		columnBitmasks.put("persistedRESTContextPath", 1073741824L);
 
-		columnBitmasks.put("system_", 2147483648L);
+		columnBitmasks.put("storageType", 2147483648L);
 
-		columnBitmasks.put("version", 4294967296L);
+		columnBitmasks.put("system_", 4294967296L);
 
-		columnBitmasks.put("status", 8589934592L);
+		columnBitmasks.put("version", 8589934592L);
+
+		columnBitmasks.put("status", 17179869184L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

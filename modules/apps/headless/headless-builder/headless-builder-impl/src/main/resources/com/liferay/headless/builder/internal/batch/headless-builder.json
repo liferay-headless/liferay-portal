@@ -81,6 +81,7 @@
 					"type": "String"
 				}
 			],
+			"persistedRESTContextPath": "headless-builder/sorts",
 			"pluralLabel": {
 				"en_US": "API Sorts"
 			},
@@ -131,6 +132,7 @@
 					"type": "String"
 				}
 			],
+			"persistedRESTContextPath": "headless-builder/filters",
 			"pluralLabel": {
 				"en_US": "API Filters"
 			},
@@ -301,6 +303,7 @@
 			],
 			"panelCategoryKey": "",
 			"parameterRequired": false,
+			"persistedRESTContextPath": "headless-builder/endpoints",
 			"pluralLabel": {
 				"en_US": "API Endpoints"
 			},
@@ -415,6 +418,7 @@
 			],
 			"panelCategoryKey": "",
 			"parameterRequired": false,
+			"persistedRESTContextPath": "headless-builder/properties",
 			"pluralLabel": {
 				"en_US": "API Properties"
 			},
@@ -526,6 +530,7 @@
 			],
 			"panelCategoryKey": "",
 			"parameterRequired": false,
+			"persistedRESTContextPath": "headless-builder/schemas",
 			"pluralLabel": {
 				"en_US": "API Schemas"
 			},
@@ -690,6 +695,7 @@
 			],
 			"panelCategoryKey": "",
 			"parameterRequired": false,
+			"persistedRESTContextPath": "headless-builder/applications",
 			"pluralLabel": {
 				"en_US": "API Applications"
 			},
