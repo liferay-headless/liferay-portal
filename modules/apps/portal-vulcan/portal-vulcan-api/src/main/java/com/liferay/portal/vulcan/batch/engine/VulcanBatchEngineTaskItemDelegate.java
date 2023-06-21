@@ -15,7 +15,7 @@
 package com.liferay.portal.vulcan.batch.engine;
 
 import com.liferay.petra.function.UnsafeBiConsumer;
-import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
@@ -75,8 +75,9 @@ public interface VulcanBatchEngineTaskItemDelegate<T> {
 		throws Exception;
 
 	public void setContextBatchUnsafeConsumer(
-		UnsafeBiConsumer<Collection<T>, UnsafeConsumer<T, Exception>, Exception>
-			contextBatchUnsafeConsumer);
+		UnsafeBiConsumer
+			<Collection<T>, UnsafeFunction<T, T, Exception>, Exception>
+				contextBatchUnsafeConsumer);
 
 	public void setContextCompany(Company contextCompany);
 

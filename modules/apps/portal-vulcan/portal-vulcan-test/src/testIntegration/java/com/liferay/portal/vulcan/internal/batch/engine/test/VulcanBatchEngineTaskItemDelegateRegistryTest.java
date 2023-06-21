@@ -17,6 +17,7 @@ package com.liferay.portal.vulcan.internal.batch.engine.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
@@ -406,8 +407,9 @@ public class VulcanBatchEngineTaskItemDelegateRegistryTest {
 		@Override
 		public void setContextBatchUnsafeConsumer(
 			UnsafeBiConsumer
-				<Collection<Object>, UnsafeConsumer<Object, Exception>,
-				 Exception> contextBatchUnsafeConsumer) {
+				<Collection<Object>, UnsafeFunction<Object, Object, Exception>, Exception>
+				contextBatchUnsafeConsumer) {
+
 		}
 
 		@Override
