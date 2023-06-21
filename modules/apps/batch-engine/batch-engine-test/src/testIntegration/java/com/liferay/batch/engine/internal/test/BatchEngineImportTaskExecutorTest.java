@@ -434,6 +434,68 @@ public class BatchEngineImportTaskExecutorTest
 	}
 
 	@Test
+	public void testImportAccountJSONWithObjectExtendedFields()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				TestPropsValues.getCompanyId(), "AccountEntry");
+
+		_objectFieldLocalService.addCustomObjectField(
+			null, user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
+			"Text", "String", true, false, "en_US",
+			HashMapBuilder.put(
+				LocaleUtil.fromLanguageId("en_US"), "ExtendedFieldText"
+			).build(),
+			false, "extendedFieldText", null, null, false, false,
+			Collections.emptyList());
+
+		_objectFieldLocalService.addCustomObjectField(
+			null, user.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
+			"Integer", "Integer", true, false, null,
+			HashMapBuilder.put(
+				LocaleUtil.fromLanguageId("en_US"), "ExtendedFieldInteger"
+			).build(),
+			false, "extendedFieldInteger", null, null, false, false,
+			Collections.emptyList());
+
+		UUID externalReferenceCode = UUID.randomUUID();
+
+		String accounts = StringBundler.concat(
+			"[{\"name\":\"Test Account\", \"type\":\"person\", ",
+			"\"externalReferenceCode\":\"", externalReferenceCode,
+			"\", \"extendedFieldInteger\":1234,",
+			"\"extendedFieldText\":\"extendedFieldTextValue\"}]");
+
+		_batchEngineImportTask =
+			_batchEngineImportTaskLocalService.addBatchEngineImportTask(
+				null, TestPropsValues.getCompanyId(), user.getUserId(),
+				_BATCH_SIZE, null,
+				"com.liferay.headless.admin.user.dto.v1_0.Account",
+				_compressContent(accounts.getBytes(), "JSON"), "JSON",
+				BatchEngineTaskExecuteStatus.INITIAL.name(), null,
+				BatchEngineImportTaskConstants.IMPORT_STRATEGY_ON_ERROR_FAIL,
+				BatchEngineTaskOperation.CREATE.toString(), new HashMap<>(),
+				null);
+
+		_batchEngineImportTaskExecutor.execute(_batchEngineImportTask);
+
+		AccountEntry accountEntry =
+			_accountEntryLocalService.getAccountEntryByExternalReferenceCode(
+				externalReferenceCode.toString(),
+				TestPropsValues.getCompanyId());
+
+		Map<String, Serializable> map =
+			_objectEntryLocalService.
+				getExtensionDynamicObjectDefinitionTableValues(
+					objectDefinition, accountEntry.getPrimaryKey());
+
+		Assert.assertEquals(1234, map.get("extendedFieldInteger"));
+		Assert.assertEquals(
+			"extendedFieldTextValue", map.get("extendedFieldText"));
+	}
+
+	@Test
 	public void testImportTaskInvalidCreateAndUpdateStrategies() {
 		BatchEngineTaskOperation batchEngineTaskOperation =
 			BatchEngineTaskOperation.CREATE;
