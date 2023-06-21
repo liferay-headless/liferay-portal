@@ -14,6 +14,7 @@
 
 package com.liferay.headless.admin.user.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -680,6 +682,14 @@ public class Account implements Serializable {
 		name = "x-class-name"
 	)
 	public String xClassName;
+
+	public Map<String, Object> getExtendedProperties() {
+		return extendedProperties;
+	}
+
+	@JsonAnySetter
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, Object> extendedProperties = new HashMap<>();
 
 	@GraphQLName("Type")
 	public static enum Type {

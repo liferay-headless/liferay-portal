@@ -96,33 +96,33 @@ public class OpenAPIResourceImpl {
 		{
 			add(AccountResourceImpl.class);
 
-			add(AccountRoleResourceImpl.class);
-
-			add(EmailAddressResourceImpl.class);
-
-			add(OrganizationResourceImpl.class);
-
-			add(PhoneResourceImpl.class);
-
-			add(PostalAddressResourceImpl.class);
-
-			add(RoleResourceImpl.class);
-
-			add(SegmentResourceImpl.class);
-
-			add(SegmentUserResourceImpl.class);
-
-			add(SiteResourceImpl.class);
-
-			add(SubscriptionResourceImpl.class);
-
-			add(TicketResourceImpl.class);
-
-			add(UserAccountResourceImpl.class);
-
-			add(UserGroupResourceImpl.class);
-
-			add(WebUrlResourceImpl.class);
+//			add(AccountRoleResourceImpl.class);
+//
+//			add(EmailAddressResourceImpl.class);
+//
+//			add(OrganizationResourceImpl.class);
+//
+//			add(PhoneResourceImpl.class);
+//
+//			add(PostalAddressResourceImpl.class);
+//
+//			add(RoleResourceImpl.class);
+//
+//			add(SegmentResourceImpl.class);
+//
+//			add(SegmentUserResourceImpl.class);
+//
+//			add(SiteResourceImpl.class);
+//
+//			add(SubscriptionResourceImpl.class);
+//
+//			add(TicketResourceImpl.class);
+//
+//			add(UserAccountResourceImpl.class);
+//
+//			add(UserGroupResourceImpl.class);
+//
+//			add(WebUrlResourceImpl.class);
 
 			add(OpenAPIResourceImpl.class);
 		}
