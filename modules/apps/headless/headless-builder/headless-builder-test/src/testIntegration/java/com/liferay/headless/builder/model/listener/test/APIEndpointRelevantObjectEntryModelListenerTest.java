@@ -43,7 +43,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			).put(
 				"name", RandomTestUtil.randomString()
 			).put(
-				"path", RandomTestUtil.randomString()
+				"path", StringPool.FORWARD_SLASH + RandomTestUtil.randomString()
 			).put(
 				"scope", "company"
 			).toString(),
@@ -60,7 +60,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			).put(
 				"name", RandomTestUtil.randomString()
 			).put(
-				"path", RandomTestUtil.randomString()
+				"path", StringPool.FORWARD_SLASH + RandomTestUtil.randomString()
 			).put(
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
 				RandomTestUtil.randomLong()
@@ -80,7 +80,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			).put(
 				"name", RandomTestUtil.randomString()
 			).put(
-				"path", RandomTestUtil.randomString()
+				"path", StringPool.FORWARD_SLASH + RandomTestUtil.randomString()
 			).put(
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
 				TestPropsValues.getUserId()
@@ -110,7 +110,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			).put(
 				"name", RandomTestUtil.randomString()
 			).put(
-				"path", RandomTestUtil.randomString()
+				"path", StringPool.FORWARD_SLASH + RandomTestUtil.randomString()
 			).put(
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
 				apiApplicationJSONObject.getLong("id")
@@ -167,7 +167,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			).put(
 				"name", RandomTestUtil.randomString()
 			).put(
-				"path", RandomTestUtil.randomString()
+				"path", StringPool.FORWARD_SLASH + RandomTestUtil.randomString()
 			).put(
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
 				apiApplicationJSONObject.getLong("id")
@@ -194,7 +194,7 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 			jsonObject.get(
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId"));
 
-		String path = RandomTestUtil.randomString();
+		String path = StringPool.FORWARD_SLASH + RandomTestUtil.randomString();
 
 		jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
