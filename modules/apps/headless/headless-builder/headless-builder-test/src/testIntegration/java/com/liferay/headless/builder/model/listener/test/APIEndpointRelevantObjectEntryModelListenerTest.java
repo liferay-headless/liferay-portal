@@ -207,6 +207,9 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
 				apiApplicationJSONObject.getLong("id")
 			).put(
+				"r_responseAPISchemaToAPIEndpoints_c_apiSchemaId",
+				apiSchemaJSONObject.getLong("id")
+			).put(
 				"scope", "company"
 			).toString(),
 			"headless-builder/endpoints", Http.Method.POST);
@@ -233,6 +236,28 @@ public class APIEndpointRelevantObjectEntryModelListenerTest
 		Assert.assertEquals("BAD_REQUEST", jsonObject.get("status"));
 		Assert.assertEquals(
 			"There is an API endpoint with the same HTTP method and path.",
+			jsonObject.get("title"));
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"httpMethod", "get"
+			).put(
+				"name", RandomTestUtil.randomString()
+			).put(
+				"path", RandomTestUtil.randomString()
+			).put(
+				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
+				apiApplicationJSONObject.getLong("id")
+			).put(
+				"r_responseAPISchemaToAPIEndpoints_c_apiSchemaId", 0
+			).put(
+				"scope", "company"
+			).toString(),
+			"headless-builder/endpoints", Http.Method.POST);
+
+		Assert.assertEquals("BAD_REQUEST", jsonObject.get("status"));
+		Assert.assertEquals(
+			"GET API endpoint must have related response API schema.",
 			jsonObject.get("title"));
 	}
 

@@ -220,6 +220,15 @@ public class APIEndpointRelevantObjectEntryModelListener
 					"An API endpoint must be related to an API schema",
 					"an-api-endpoint-must-be-related-to-an-api-schema", null);
 			}
+
+			String httpMethod = (String)values.get("httpMethod");
+
+			if (httpMethod.equals("get") && (responseAPISchemaId == 0)) {
+				throw new ObjectEntryValuesException.InvalidObjectField(
+					"GET API endpoint must have related response API schema",
+					"get-api-endpoint-must-have-related-response-api-schema",
+					null);
+			}
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
