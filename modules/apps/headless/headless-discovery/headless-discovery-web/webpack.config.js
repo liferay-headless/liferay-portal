@@ -47,6 +47,12 @@ const config = {
 			inject: true,
 			template: './src/index.html',
 		}),
+		new HtmlWebpackPlugin({
+			cache: false,
+			filename: 'error.html',
+			inject: true,
+			template: './src/error.html',
+		}),
 	],
 };
 

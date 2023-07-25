@@ -82,9 +82,44 @@ public class HeadlessDiscoveryAPIApplication extends Application {
 			@Context HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		if ((accept != null) && accept.contains(MediaType.TEXT_HTML) &&
-			_headlessDiscoveryConfiguration.enableAPIExplorer()) {
+		if (!_headlessDiscoveryConfiguration.enableAPIExplorer()) {
+			URL url = _getURL("error.html");
 
+			InputStream urlInputStream = url.openStream();
+
+			Scanner scanner = new Scanner(urlInputStream, "UTF-8");
+
+			scanner.useDelimiter("\\A");
+
+			String html = StringUtil.replace(
+				scanner.next(), "%CSRF-TOKEN%",
+				AuthTokenUtil.getToken(httpServletRequest));
+
+			html = StringUtil.replace(
+				html, "%error-message%", "API Explorer not enabled");
+
+			html = StringUtil.replace(
+				html, "href=\"main.css\"",
+				"href=\"" + _portal.getPathContext() + "/o/api/main.css\"");
+
+			String finalHtml = html;
+
+			return Response.ok(
+				(StreamingOutput)streamingOutput -> {
+					InputStream htmlInputStream = new ByteArrayInputStream(
+						finalHtml.getBytes());
+
+					byte[] buffer = new byte[1024];
+					int read = 0;
+
+					while ((read = htmlInputStream.read(buffer)) != -1) {
+						streamingOutput.write(buffer, 0, read);
+					}
+				}
+			).build();
+		}
+
+		if ((accept != null) && accept.contains(MediaType.TEXT_HTML)) {
 			URL url = _getURL("index.html");
 
 			if (url == null) {
