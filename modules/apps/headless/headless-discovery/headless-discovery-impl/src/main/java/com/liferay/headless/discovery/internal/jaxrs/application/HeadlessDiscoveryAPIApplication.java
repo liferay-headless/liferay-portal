@@ -13,6 +13,7 @@ import com.liferay.headless.discovery.internal.dto.Resource;
 import com.liferay.headless.discovery.internal.dto.Resources;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.module.util.BundleUtil;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -118,7 +119,9 @@ public class HeadlessDiscoveryAPIApplication extends Application {
 			}
 			else {
 				html = StringUtil.replace(
-					html, "%error-message%", "API Explorer not enabled");
+					html, "%error-message%",
+					_language.get(
+						httpServletRequest, "enable-api-explorer-error"));
 			}
 
 			String finalHtml = html;
@@ -310,6 +313,9 @@ public class HeadlessDiscoveryAPIApplication extends Application {
 
 	@Reference
 	private JaxrsServiceRuntime _jaxrsServiceRuntime;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private Portal _portal;
