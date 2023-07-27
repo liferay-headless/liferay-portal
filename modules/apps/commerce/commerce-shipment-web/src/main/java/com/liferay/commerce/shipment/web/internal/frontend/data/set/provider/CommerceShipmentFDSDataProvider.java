@@ -189,7 +189,7 @@ public class CommerceShipmentFDSDataProvider
 			long[] accountEntriesIds = ListUtil.toLongArray(
 				accountEntries, AccountEntryModel::getAccountEntryId);
 
-			if (accountEntriesIdsArray.length != 0) {
+			if (accountEntriesIds.length != 0) {
 				return accountEntriesIds;
 			}
 		}
