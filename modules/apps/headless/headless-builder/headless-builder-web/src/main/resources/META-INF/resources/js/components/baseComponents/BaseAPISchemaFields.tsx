@@ -18,9 +18,10 @@ type DataError = {
 };
 
 interface BaseAPIApplicationFieldsProps {
+	data: Partial<APISchemaUIData>;
 	disableObjectSelect?: boolean;
 	displayError: DataError;
-	setData: Dispatch<SetStateAction<Partial<APIApplicationSchemaItem>>>;
+	setData: Dispatch<SetStateAction<APISchemaUIData>>;
 }
 
 export default function BaseAPISchemaFields({
@@ -94,13 +95,7 @@ export default function BaseAPISchemaFields({
 					'has-error': displayError.description,
 				})}
 			>
-				<label>
-					{Liferay.Language.get('description')}
-
-					<span className="ml-1 reference-mark text-warning">
-						<ClayIcon symbol="asterisk" />
-					</span>
-				</label>
+				<label>{Liferay.Language.get('description')}</label>
 
 				<textarea
 					className="form-control"
