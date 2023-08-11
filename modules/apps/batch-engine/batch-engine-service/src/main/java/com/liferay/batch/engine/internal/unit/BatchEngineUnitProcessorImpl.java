@@ -282,13 +282,6 @@ public class BatchEngineUnitProcessorImpl implements BatchEngineUnitProcessor {
 	private BatchEngineUnitConfiguration _updateBatchEngineUnitConfiguration(
 		BatchEngineUnitConfiguration batchEngineUnitConfiguration) {
 
-		if ((batchEngineUnitConfiguration.getUserId() == 0) &&
-			batchEngineUnitConfiguration.isCheckPermissions() &&
-			batchEngineUnitConfiguration.isMultiCompany()) {
-
-			batchEngineUnitConfiguration.setCheckPermissions(false);
-		}
-
 		if (batchEngineUnitConfiguration.getCompanyId() == 0) {
 			if (_log.isInfoEnabled()) {
 				_log.info("Using default company ID for this batch process");
