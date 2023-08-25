@@ -9,7 +9,9 @@ import com.liferay.headless.builder.application.APIApplication;
 import com.liferay.headless.builder.application.publisher.APIApplicationPublisher;
 import com.liferay.headless.builder.constants.HeadlessBuilderConstants;
 import com.liferay.headless.builder.internal.application.endpoint.EndpointMatcher;
+import com.liferay.headless.builder.internal.application.registry.ApiApplicationRegistry;
 import com.liferay.headless.builder.internal.helper.EndpointHelper;
+import com.liferay.headless.builder.internal.jaxrs.application.ApiApplicationJaxrsApplication;
 import com.liferay.headless.builder.internal.resource.HeadlessBuilderResourceImpl;
 import com.liferay.headless.builder.internal.resource.OpenAPIResourceImpl;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -46,6 +48,10 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 				"APIApplicationPublisher not available");
 		}
 
+		if (_existsApplication(apiApplication)) {
+			return;
+		}
+
 		String osgiJaxRsName = _getOSGiJaxRsName(apiApplication);
 
 		_serviceRegistrationsMap.computeIfAbsent(
@@ -62,7 +68,6 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 							osgiJaxRsName, HeadlessBuilderResourceImpl.class,
 							() -> new HeadlessBuilderResourceImpl(
 								_endpointHelper, endpointMatcher)));
-
 					add(
 						_registerResource(
 							osgiJaxRsName, OpenAPIResourceImpl.class,
@@ -103,6 +108,18 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 		_serviceRegistrationsMap.clear();
 	}
 
+	private boolean _existsApplication(APIApplication apiApplication) {
+		APIApplication currentAPIApplication =
+			_apiApplicationRegistry.fetchApiApplication(
+				apiApplication.getBaseURL(), apiApplication.getCompanyId());
+
+		if (currentAPIApplication != null) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private String _getOSGiJaxRsName(APIApplication apiApplication) {
 		return _getOSGiJaxRsName(
 			apiApplication.getBaseURL(), apiApplication.getCompanyId());
@@ -116,7 +133,8 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 		APIApplication apiApplication, String osgiJaxRsName) {
 
 		return _bundleContext.registerService(
-			Application.class, new Application(),
+			Application.class,
+			new ApiApplicationJaxrsApplication(apiApplication),
 			HashMapDictionaryBuilder.<String, Object>put(
 				"companyId", apiApplication.getCompanyId()
 			).put(
@@ -182,6 +200,9 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 	}
 
 	private static BundleContext _bundleContext;
+
+	@Reference
+	private ApiApplicationRegistry _apiApplicationRegistry;
 
 	@Reference
 	private EndpointHelper _endpointHelper;
