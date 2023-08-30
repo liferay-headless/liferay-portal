@@ -22,4 +22,12 @@ public class PathUtil {
 		return StringPool.BLANK;
 	}
 
+	public static String removeBasePath(String path) {
+		if (path.startsWith(HeadlessBuilderConstants.BASE_PATH)) {
+			path = path.substring(HeadlessBuilderConstants.BASE_PATH.length());
+		}
+
+		return path;
+	}
+
 }
