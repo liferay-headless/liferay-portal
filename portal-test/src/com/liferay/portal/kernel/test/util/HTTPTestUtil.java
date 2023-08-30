@@ -7,8 +7,11 @@ package com.liferay.portal.kernel.test.util;
 
 import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -62,8 +65,40 @@ public class HTTPTestUtil {
 		}
 	}
 
+	public static class Customizer {
+		public Customizer credentials(String emailAddress, String password) {
+			_newCredentials = emailAddress + StringPool.COLON + password;
+
+			return this;
+		}
+
+		public Customizer company(Company company){
+			_newCompany = company;
+
+			return this;
+		}
+
+		public <T extends Throwable> void apply(UnsafeRunnable<T> unsafeRunnable) throws T {
+			Company defaultCompany = _company;
+			_company = _newCompany;
+
+			String defaultCredentials = _credentials;
+			_credentials = _newCredentials;
+
+			try {
+				unsafeRunnable.run();
+			} finally {
+				_company = defaultCompany;
+				_credentials = defaultCredentials;
+			}
+		}
+
+		private Company _newCompany = _company;
+		private String _newCredentials = _credentials;
+	}
+
 	private static Http.Options _getHttpOptions(
-		String body, String endpoint, Http.Method httpMethod) {
+		String body, String endpoint, Http.Method httpMethod) throws Exception {
 
 		Http.Options options = new Http.Options();
 
@@ -71,7 +106,7 @@ public class HTTPTestUtil {
 			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 		options.addHeader(
 			"Authorization", "Basic " + Base64.encode(_credentials.getBytes()));
-		options.setLocation("http://localhost:8080/o/" + endpoint);
+		options.setLocation(_company.getPortalURL(_company.getGroupId())+"/o/" + endpoint);
 		options.setMethod(httpMethod);
 
 		if (body != null) {
@@ -84,5 +119,17 @@ public class HTTPTestUtil {
 	}
 
 	private static String _credentials = "test@liferay.com:test";
+
+	private static Company _company;
+
+	static {
+		try {
+			_company =
+				CompanyLocalServiceUtil.getCompanyById(TestPropsValues.getCompanyId());
+		}
+		catch (PortalException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }
