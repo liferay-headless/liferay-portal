@@ -112,6 +112,9 @@ public class HeadlessBuilderResourceImpl {
 	private AcceptLanguage _acceptLanguage;
 
 	@Context
+	private APIApplication _apiApplication;
+
+	@Context
 	private Company _company;
 
 	private final EndpointHelper _endpointHelper;
