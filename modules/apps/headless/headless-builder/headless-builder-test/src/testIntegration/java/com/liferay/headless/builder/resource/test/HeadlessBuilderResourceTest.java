@@ -45,11 +45,14 @@ import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
@@ -65,6 +68,8 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -199,6 +204,89 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 				Http.Method.GET
 			).toString(),
 			JSONCompareMode.LENIENT);
+	}
+
+	@Test
+	public void testGetSameApplicationInDifferentInstances() throws Exception {
+		_addAPIApplication(
+			_API_APPLICATION_ERC_1, _API_ENDPOINT_ERC_1, _BASE_URL_1,
+			_objectDefinition1.getExternalReferenceCode(),
+			_objectRelationship1.getName(), _objectRelationship2.getName(),
+			_API_APPLICATION_PATH_1, null, "collection",
+			APIApplication.Endpoint.Scope.COMPANY);
+
+		_addCustomObjectEntry(1, null, _objectDefinition1, "value1");
+		_addCustomObjectEntry(2, null, _objectDefinition1, "value2");
+		_addCustomObjectEntry(3, null, _objectDefinition1, "value3");
+
+		_publishAPIApplication(_API_APPLICATION_ERC_1);
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"items",
+				JSONUtil.putAll(
+					JSONUtil.put("textProperty", "value1"),
+					JSONUtil.put("textProperty", "value2"),
+					JSONUtil.put("textProperty", "value3"))
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				null, "c/" + _BASE_URL_1 + _API_APPLICATION_PATH_1,
+				Http.Method.GET
+			).toString(),
+			JSONCompareMode.LENIENT);
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+			"com.liferay.batch.engine.internal.BatchEngineImportTaskExecutorImpl",
+			LoggerTestUtil.ERROR)) {
+
+			String webId = "www.able.com";
+
+			Company company =
+				_companyLocalService.addCompany(null, webId, webId, webId, 0,
+					true, null, null, null, null, null, null);
+
+			HTTPTestUtil.Customizer
+				httpUtilCustomizer = new HTTPTestUtil.Customizer();
+			httpUtilCustomizer
+				.company(company)
+				.credentials("test@" + company.getMx(), "test")
+				.apply(() -> {
+					ObjectDefinition companyObjectDefinition1 = _addObjectDefinition(
+						1, ObjectDefinitionConstants.SCOPE_COMPANY);
+					ObjectDefinition companyObjectDefinition2 = _addObjectDefinition(
+						2, ObjectDefinitionConstants.SCOPE_COMPANY);
+
+					ObjectRelationship objectRelationship =
+						_addObjectRelationship(companyObjectDefinition1,
+							companyObjectDefinition2);
+
+					_addAPIApplication(
+						_API_APPLICATION_ERC_1, _API_ENDPOINT_ERC_1, _BASE_URL_1,
+						companyObjectDefinition1.getExternalReferenceCode(),
+						objectRelationship.getName(), companyObjectDefinition2.getName(),
+						_API_APPLICATION_PATH_1, null, "collection", APIApplication.Endpoint.Scope.COMPANY);
+
+					_addCustomObjectEntry(1, null, companyObjectDefinition1, "newCompanyValue1");
+					_addCustomObjectEntry(2, null, companyObjectDefinition1, "newCompanyValue2");
+					_addCustomObjectEntry(3, null, companyObjectDefinition1, "newCompanyValue3");
+
+					_publishAPIApplication(_API_APPLICATION_ERC_1);
+
+					JSONAssert.assertEquals(
+						JSONUtil.put(
+							"items",
+							JSONUtil.putAll(
+								JSONUtil.put("textProperty", "newCompanyValue1"),
+								JSONUtil.put("textProperty", "newCompanyValue2"),
+								JSONUtil.put("textProperty", "newCompanyValue3"))
+						).toString(),
+						HTTPTestUtil.invokeToJSONObject(
+							null, "c/" + _BASE_URL_1 + _API_APPLICATION_PATH_1,
+							Http.Method.GET
+						).toString(),
+						JSONCompareMode.LENIENT);
+				});
+		}
 	}
 
 	@Test
@@ -1711,5 +1799,11 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 		VALUE1, VALUE2, VALUE3
 
 	}
+
+	@Inject
+	private CompanyLocalService _companyLocalService;
+
+	@Inject
+	private PortalInstancesLocalService _portalInstancesLocalService;
 
 }
