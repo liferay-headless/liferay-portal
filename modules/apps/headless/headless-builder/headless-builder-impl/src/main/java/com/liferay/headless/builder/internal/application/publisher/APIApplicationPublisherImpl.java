@@ -12,6 +12,7 @@ import com.liferay.headless.builder.internal.application.endpoint.EndpointMatche
 import com.liferay.headless.builder.internal.application.registry.ApiApplicationRegistry;
 import com.liferay.headless.builder.internal.helper.EndpointHelper;
 import com.liferay.headless.builder.internal.jaxrs.application.ApiApplicationJaxrsApplication;
+import com.liferay.headless.builder.internal.jaxrs.context.provider.APIApplicationContextProvider;
 import com.liferay.headless.builder.internal.resource.HeadlessBuilderResourceImpl;
 import com.liferay.headless.builder.internal.resource.OpenAPIResourceImpl;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -25,6 +26,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.ws.rs.core.Application;
+
+import org.apache.cxf.jaxrs.ext.ContextProvider;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -59,15 +62,14 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 			key -> new ArrayList<ServiceRegistration<?>>() {
 				{
 					add(_registerApplication(apiApplication, osgiJaxRsName));
-
-					EndpointMatcher endpointMatcher = new EndpointMatcher(
-						apiApplication.getEndpoints());
-
+					add(_registerContextProvider(osgiJaxRsName));
 					add(
 						_registerResource(
 							osgiJaxRsName, HeadlessBuilderResourceImpl.class,
 							() -> new HeadlessBuilderResourceImpl(
-								_endpointHelper, endpointMatcher)));
+								_endpointHelper,
+								new EndpointMatcher(
+									apiApplication.getEndpoints()))));
 					add(
 						_registerResource(
 							osgiJaxRsName, OpenAPIResourceImpl.class,
@@ -152,6 +154,23 @@ public class APIApplicationPublisherImpl implements APIApplicationPublisher {
 				"(osgi.jaxrs.name=Liferay.Vulcan)"
 			).put(
 				"osgi.jaxrs.name", osgiJaxRsName
+			).build());
+	}
+
+	private ServiceRegistration<?> _registerContextProvider(
+		String osgiJaxRsName) {
+
+		return _bundleContext.registerService(
+			ContextProvider.class,
+			new APIApplicationContextProvider(_apiApplicationRegistry),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"osgi.jaxrs.application.select",
+				"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
+			).put(
+				"osgi.jaxrs.extension", "true"
+			).put(
+				"osgi.jaxrs.name",
+				osgiJaxRsName + "APIApplicationContextProvider"
 			).build());
 	}
 
