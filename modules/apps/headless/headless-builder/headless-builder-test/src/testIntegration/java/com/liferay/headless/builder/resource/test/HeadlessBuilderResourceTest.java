@@ -236,39 +236,51 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 			JSONCompareMode.LENIENT);
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-			"com.liferay.batch.engine.internal.BatchEngineImportTaskExecutorImpl",
-			LoggerTestUtil.ERROR)) {
+				"com.liferay.batch.engine.internal." +
+					"BatchEngineImportTaskExecutorImpl",
+				LoggerTestUtil.ERROR)) {
 
 			String webId = "www.able.com";
 
-			Company company =
-				_companyLocalService.addCompany(null, webId, webId, webId, 0,
-					true, null, null, null, null, null, null);
+			Company company = _companyLocalService.addCompany(
+				null, webId, webId, webId, 0, true, null, null, null, null,
+				null, null);
 
-			HTTPTestUtil.Customizer
-				httpUtilCustomizer = new HTTPTestUtil.Customizer();
-			httpUtilCustomizer
-				.company(company)
-				.credentials("test@" + company.getMx(), "test")
-				.apply(() -> {
-					ObjectDefinition companyObjectDefinition1 = _addObjectDefinition(
-						1, ObjectDefinitionConstants.SCOPE_COMPANY);
-					ObjectDefinition companyObjectDefinition2 = _addObjectDefinition(
-						2, ObjectDefinitionConstants.SCOPE_COMPANY);
+			HTTPTestUtil.Customizer httpUtilCustomizer =
+				new HTTPTestUtil.Customizer();
+
+			httpUtilCustomizer.company(
+				company
+			).credentials(
+				"test@" + company.getMx(), "test"
+			).apply(
+				() -> {
+					ObjectDefinition companyObjectDefinition1 =
+						_addObjectDefinition(
+							1, ObjectDefinitionConstants.SCOPE_COMPANY);
+					ObjectDefinition companyObjectDefinition2 =
+						_addObjectDefinition(
+							2, ObjectDefinitionConstants.SCOPE_COMPANY);
 
 					ObjectRelationship objectRelationship =
-						_addObjectRelationship(companyObjectDefinition1,
-							companyObjectDefinition2);
+						_addObjectRelationship(
+							companyObjectDefinition1, companyObjectDefinition2);
 
 					_addAPIApplication(
-						_API_APPLICATION_ERC_1, _API_ENDPOINT_ERC_1, _BASE_URL_1,
+						_API_APPLICATION_ERC_1, _API_ENDPOINT_ERC_1,
+						_BASE_URL_1,
 						companyObjectDefinition1.getExternalReferenceCode(),
-						objectRelationship.getName(), companyObjectDefinition2.getName(),
-						_API_APPLICATION_PATH_1, null, "collection", APIApplication.Endpoint.Scope.COMPANY);
+						objectRelationship.getName(),
+						companyObjectDefinition2.getName(),
+						_API_APPLICATION_PATH_1, null, "collection",
+						APIApplication.Endpoint.Scope.COMPANY);
 
-					_addCustomObjectEntry(1, null, companyObjectDefinition1, "newCompanyValue1");
-					_addCustomObjectEntry(2, null, companyObjectDefinition1, "newCompanyValue2");
-					_addCustomObjectEntry(3, null, companyObjectDefinition1, "newCompanyValue3");
+					_addCustomObjectEntry(
+						1, null, companyObjectDefinition1, "newCompanyValue1");
+					_addCustomObjectEntry(
+						2, null, companyObjectDefinition1, "newCompanyValue2");
+					_addCustomObjectEntry(
+						3, null, companyObjectDefinition1, "newCompanyValue3");
 
 					_publishAPIApplication(_API_APPLICATION_ERC_1);
 
@@ -276,16 +288,20 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 						JSONUtil.put(
 							"items",
 							JSONUtil.putAll(
-								JSONUtil.put("textProperty", "newCompanyValue1"),
-								JSONUtil.put("textProperty", "newCompanyValue2"),
-								JSONUtil.put("textProperty", "newCompanyValue3"))
+								JSONUtil.put(
+									"textProperty", "newCompanyValue1"),
+								JSONUtil.put(
+									"textProperty", "newCompanyValue2"),
+								JSONUtil.put(
+									"textProperty", "newCompanyValue3"))
 						).toString(),
 						HTTPTestUtil.invokeToJSONObject(
 							null, "c/" + _BASE_URL_1 + _API_APPLICATION_PATH_1,
 							Http.Method.GET
 						).toString(),
 						JSONCompareMode.LENIENT);
-				});
+				}
+			);
 		}
 	}
 
@@ -1758,6 +1774,9 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 	private static DateFormat _dateTimeFormat;
 
 	@Inject
+	private CompanyLocalService _companyLocalService;
+
+	@Inject
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	private DocumentResource _documentResource;
@@ -1782,6 +1801,9 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 	private ObjectRelationship _objectRelationship1;
 	private ObjectRelationship _objectRelationship2;
 
+	@Inject
+	private PortalInstancesLocalService _portalInstancesLocalService;
+
 	@DeleteAfterTestRun
 	private ObjectDefinition _siteScopedObjectDefinition1;
 
@@ -1799,11 +1821,5 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 		VALUE1, VALUE2, VALUE3
 
 	}
-
-	@Inject
-	private CompanyLocalService _companyLocalService;
-
-	@Inject
-	private PortalInstancesLocalService _portalInstancesLocalService;
 
 }

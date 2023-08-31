@@ -66,19 +66,11 @@ public class HTTPTestUtil {
 	}
 
 	public static class Customizer {
-		public Customizer credentials(String emailAddress, String password) {
-			_newCredentials = emailAddress + StringPool.COLON + password;
 
-			return this;
-		}
+		public <T extends Throwable> void apply(
+				UnsafeRunnable<T> unsafeRunnable)
+			throws T {
 
-		public Customizer company(Company company){
-			_newCompany = company;
-
-			return this;
-		}
-
-		public <T extends Throwable> void apply(UnsafeRunnable<T> unsafeRunnable) throws T {
 			Company defaultCompany = _company;
 			_company = _newCompany;
 
@@ -87,18 +79,33 @@ public class HTTPTestUtil {
 
 			try {
 				unsafeRunnable.run();
-			} finally {
+			}
+			finally {
 				_company = defaultCompany;
 				_credentials = defaultCredentials;
 			}
 		}
 
+		public Customizer company(Company company) {
+			_newCompany = company;
+
+			return this;
+		}
+
+		public Customizer credentials(String emailAddress, String password) {
+			_newCredentials = emailAddress + StringPool.COLON + password;
+
+			return this;
+		}
+
 		private Company _newCompany = _company;
 		private String _newCredentials = _credentials;
+
 	}
 
 	private static Http.Options _getHttpOptions(
-		String body, String endpoint, Http.Method httpMethod) throws Exception {
+			String body, String endpoint, Http.Method httpMethod)
+		throws Exception {
 
 		Http.Options options = new Http.Options();
 
@@ -106,7 +113,8 @@ public class HTTPTestUtil {
 			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 		options.addHeader(
 			"Authorization", "Basic " + Base64.encode(_credentials.getBytes()));
-		options.setLocation(_company.getPortalURL(_company.getGroupId())+"/o/" + endpoint);
+		options.setLocation(
+			_company.getPortalURL(_company.getGroupId()) + "/o/" + endpoint);
 		options.setMethod(httpMethod);
 
 		if (body != null) {
@@ -118,17 +126,16 @@ public class HTTPTestUtil {
 		return options;
 	}
 
-	private static String _credentials = "test@liferay.com:test";
-
 	private static Company _company;
+	private static String _credentials = "test@liferay.com:test";
 
 	static {
 		try {
-			_company =
-				CompanyLocalServiceUtil.getCompanyById(TestPropsValues.getCompanyId());
+			_company = CompanyLocalServiceUtil.getCompanyById(
+				TestPropsValues.getCompanyId());
 		}
-		catch (PortalException e) {
-			throw new RuntimeException(e);
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
 		}
 	}
 
