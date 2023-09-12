@@ -551,6 +551,14 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/knowledge-base-folders/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -733,6 +741,14 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 				replace("{siteId}", String.valueOf(siteId)));
 
 		expectedActions.put("createBatch", createBatchAction);
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/knowledge-base-folders/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}

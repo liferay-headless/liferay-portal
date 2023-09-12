@@ -268,6 +268,14 @@ public abstract class BasePriceModifierResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifiers/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -431,6 +439,14 @@ public abstract class BasePriceModifierResourceTestCase {
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifiers/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}

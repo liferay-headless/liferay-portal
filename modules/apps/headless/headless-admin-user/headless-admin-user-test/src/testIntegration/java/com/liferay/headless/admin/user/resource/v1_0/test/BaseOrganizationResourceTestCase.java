@@ -274,6 +274,14 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -859,6 +867,14 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -1356,6 +1372,14 @@ public abstract class BaseOrganizationResourceTestCase {
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}
@@ -2166,6 +2190,14 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -2608,6 +2640,14 @@ public abstract class BaseOrganizationResourceTestCase {
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}

@@ -268,6 +268,14 @@ public abstract class BaseListTypeEntryResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-list-type/v1.0/list-type-entries/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -708,6 +716,14 @@ public abstract class BaseListTypeEntryResourceTestCase {
 					String.valueOf(listTypeDefinitionId)));
 
 		expectedActions.put("createBatch", createBatchAction);
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-list-type/v1.0/list-type-entries/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}

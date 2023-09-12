@@ -413,6 +413,14 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 
 		expectedActions.put("createBatch", createBatchAction);
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/blog-posting-images/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 

@@ -645,6 +645,14 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/message-board-messages/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -1100,6 +1108,14 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 
 		expectedActions.put("createBatch", createBatchAction);
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/message-board-messages/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -1530,6 +1546,14 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/message-board-messages/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}
@@ -2409,6 +2433,14 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-delivery/v1.0/message-board-messages/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}

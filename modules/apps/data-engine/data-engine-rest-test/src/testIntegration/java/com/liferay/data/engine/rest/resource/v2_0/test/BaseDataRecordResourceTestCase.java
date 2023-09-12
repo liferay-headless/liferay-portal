@@ -258,6 +258,14 @@ public abstract class BaseDataRecordResourceTestCase {
 
 		expectedActions.put("createBatch", createBatchAction);
 
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/data-engine/v2.0/data-records/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
+
 		return expectedActions;
 	}
 
@@ -568,6 +576,14 @@ public abstract class BaseDataRecordResourceTestCase {
 					String.valueOf(dataRecordCollectionId)));
 
 		expectedActions.put("createBatch", createBatchAction);
+
+		Map deleteBatchAction = new HashMap<>();
+		deleteBatchAction.put("method", "DELETE");
+		deleteBatchAction.put(
+			"href",
+			"http://localhost:8080/o/data-engine/v2.0/data-records/batch");
+
+		expectedActions.put("deleteBatch", deleteBatchAction);
 
 		return expectedActions;
 	}
