@@ -16,7 +16,6 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -24,8 +23,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.io.Serializable;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,6 +38,26 @@ public class APIPropertyRelevantObjectEntryModelListener
 	@Override
 	public String getObjectDefinitionExternalReferenceCode() {
 		return "L_API_PROPERTY";
+	}
+
+	@Override
+	public void onAfterUpdate(
+			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
+		throws ModelListenerException {
+
+		long apiSchemaId = MapUtil.getLong(
+			objectEntry.getValues(),
+			"r_apiSchemaToAPIProperties_c_apiSchemaId");
+
+		if (apiSchemaId == 0) {
+			try {
+				_objectEntryLocalService.deleteObjectEntry(
+					objectEntry.getObjectEntryId());
+			}
+			catch (Exception exception) {
+				throw new ModelListenerException(exception);
+			}
+		}
 	}
 
 	@Override
@@ -66,9 +83,6 @@ public class APIPropertyRelevantObjectEntryModelListener
 
 		if (apiSchemaId != 0) {
 			_validate(apiSchemaId, values);
-		}
-		else {
-			_scheduleOrphanAPIPropertyDeletion(objectEntry.getObjectEntryId());
 		}
 	}
 
@@ -115,34 +129,6 @@ public class APIPropertyRelevantObjectEntryModelListener
 		return true;
 	}
 
-	private void _scheduleOrphanAPIPropertyDeletion(long apiPropertyId) {
-		_pendingAPIProperties.add(apiPropertyId);
-
-		TransactionCommitCallbackUtil.registerCallback(
-			() -> {
-				if (_pendingAPIProperties.remove(apiPropertyId)) {
-					ObjectEntry apiPropertyObjectEntry =
-						_objectEntryLocalService.fetchObjectEntry(
-							apiPropertyId);
-
-					if (apiPropertyObjectEntry == null) {
-						return null;
-					}
-
-					long apiSchemaId = MapUtil.getLong(
-						apiPropertyObjectEntry.getValues(),
-						"r_apiSchemaToAPIProperties_c_apiSchemaId");
-
-					if (apiSchemaId == 0) {
-						_objectEntryLocalService.deleteObjectEntry(
-							apiPropertyId);
-					}
-				}
-
-				return null;
-			});
-	}
-
 	private void _validate(long apiSchemaId, Map<String, Serializable> values) {
 		try {
 			if (!_objectEntryHelper.isValidObjectEntry(
@@ -181,7 +167,5 @@ public class APIPropertyRelevantObjectEntryModelListener
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
-
-	private final Set<Long> _pendingAPIProperties = new CopyOnWriteArraySet<>();
 
 }
