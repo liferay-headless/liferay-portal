@@ -160,8 +160,7 @@ export function hasPropertiesDataChanged({
 }) {
 	if (propertiesUIData.length !== fetchedPropertiesData.length) {
 		return true;
-	}
-	else {
+	} else {
 		for (const property of propertiesUIData) {
 			const matchedFetchedProperty = fetchedPropertiesData.find(
 				({objectFieldERC, objectRelationshipNames}) =>

@@ -71,8 +71,7 @@ export function CreateAPIEndpointModalContent({
 			.then((response) => {
 				if (response.ok) {
 					return response.json();
-				}
-				else {
+				} else {
 					throw response.json();
 				}
 			})
@@ -111,16 +110,14 @@ export function CreateAPIEndpointModalContent({
 			setDisplayError(errors as EndpointDataError);
 
 			isDataValid = false;
-		}
-		else {
+		} else {
 			mandatoryFields.forEach((field) => {
 				if (localUIData[field as keyof APIEndpointUIData]) {
 					setDisplayError((previousErrors) => ({
 						...previousErrors,
 						[field]: false,
 					}));
-				}
-				else {
+				} else {
 					setDisplayError((previousErrors) => ({
 						...previousErrors,
 						[field]: true,
@@ -138,8 +135,7 @@ export function CreateAPIEndpointModalContent({
 
 		if (isDataValid) {
 			postData();
-		}
-		else {
+		} else {
 			return;
 		}
 	};

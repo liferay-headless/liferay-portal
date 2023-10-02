@@ -58,6 +58,39 @@ export async function getItems<T>({url}: {url: string}) {
 	return items;
 }
 
+export async function postData<T>({
+	data,
+	onError,
+	onSuccess,
+	url,
+}: {
+	data: Partial<T>;
+	onError: (error: string) => void;
+	onSuccess: (responseJSON: T) => void;
+	url: string;
+}) {
+	fetch(url, {
+		body: JSON.stringify(data),
+		headers,
+		method: 'POST',
+	})
+		.then((response) => {
+			if (response.ok) {
+				return response.json();
+			} else {
+				throw response.json();
+			}
+		})
+		.then((responseJSON) => {
+			onSuccess(responseJSON);
+		})
+		.catch((error) => {
+			error.then((response: {message: string; title: string}) => {
+				onError(response.title ?? response.message);
+			});
+		});
+}
+
 export async function updateData<T>({
 	dataToUpdate,
 	method,
@@ -79,13 +112,39 @@ export async function updateData<T>({
 		.then((response) => {
 			if (response.ok) {
 				return response.json();
-			}
-			else {
+			} else {
 				throw response.json();
 			}
 		})
 		.then((responseJSON) => {
 			onSuccess(responseJSON);
+		})
+		.catch((error) => {
+			error.then((response: {message: string; title: string}) => {
+				onError(response.title ?? response.message);
+			});
+		});
+}
+
+export async function deleteData({
+	onError,
+	onSuccess,
+	url,
+}: {
+	onError: (error: string) => void;
+	onSuccess: voidReturn;
+	url: string;
+}) {
+	fetch(url, {
+		headers,
+		method: 'DELETE',
+	})
+		.then((response) => {
+			if (response.ok) {
+				onSuccess();
+			} else {
+				throw response.json();
+			}
 		})
 		.catch((error) => {
 			error.then((response: {message: string; title: string}) => {
