@@ -295,7 +295,6 @@ public class BatchEngineBrokerTest {
 			"a" + RandomTestUtil.randomString(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
-
 		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
 			new TextObjectFieldBuilder(
 			).userId(
@@ -319,7 +318,8 @@ public class BatchEngineBrokerTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectValidationRuleConstants.OUTPUT_TYPE_PARTIAL_VALIDATION,
-			"isEmailAddress(textObjectField)", false, Collections.singletonList(
+			"isEmailAddress(textObjectField)", false,
+			Collections.singletonList(
 				new ObjectValidationRuleSettingBuilder(
 				).name(
 					ObjectValidationRuleSettingConstants.
@@ -1164,6 +1164,9 @@ public class BatchEngineBrokerTest {
 	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Inject
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Inject
@@ -1187,9 +1190,6 @@ public class BatchEngineBrokerTest {
 	@Inject
 	private ObjectViewFilterColumnPersistence
 		_objectViewFilterColumnPersistence;
-
-	@Inject
-	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private ObjectViewLocalService _objectViewLocalService;
