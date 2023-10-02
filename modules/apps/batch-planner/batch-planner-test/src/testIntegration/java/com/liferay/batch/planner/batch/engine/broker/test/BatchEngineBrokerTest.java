@@ -43,6 +43,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
+import com.liferay.object.constants.ObjectValidationRuleSettingConstants;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
 import com.liferay.object.field.builder.BooleanObjectFieldBuilder;
 import com.liferay.object.field.builder.DateObjectFieldBuilder;
@@ -56,8 +57,10 @@ import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PrecisionDecimalObjectFieldBuilder;
 import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectViewColumn;
@@ -71,6 +74,7 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFolderItemLocalService;
 import com.liferay.object.service.ObjectFolderLocalService;
@@ -81,6 +85,7 @@ import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
 import com.liferay.object.service.persistence.ObjectViewFilterColumnPersistence;
 import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
+import com.liferay.object.validation.rule.setting.builder.ObjectValidationRuleSettingBuilder;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
@@ -290,6 +295,23 @@ public class BatchEngineBrokerTest {
 			"a" + RandomTestUtil.randomString(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
+
+		ObjectField objectField = ObjectFieldUtil.addCustomObjectField(
+			new TextObjectFieldBuilder(
+			).userId(
+				TestPropsValues.getUserId()
+			).indexed(
+				true
+			).indexedAsKeyword(
+				true
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"myText"
+			).objectDefinitionId(
+				_objectDefinition1.getObjectDefinitionId()
+			).build());
+
 		_objectValidationRuleLocalService.addObjectValidationRule(
 			StringPool.BLANK, TestPropsValues.getUserId(),
 			_objectDefinition1.getObjectDefinitionId(), true,
@@ -297,7 +319,14 @@ public class BatchEngineBrokerTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			ObjectValidationRuleConstants.OUTPUT_TYPE_PARTIAL_VALIDATION,
-			"isEmailAddress(textObjectField)", false, Collections.emptyList());
+			"isEmailAddress(textObjectField)", false, Collections.singletonList(
+				new ObjectValidationRuleSettingBuilder(
+				).name(
+					ObjectValidationRuleSettingConstants.
+						NAME_OUTPUT_OBJECT_FIELD_ID
+				).value(
+					String.valueOf(objectField.getObjectFieldId())
+				).build()));
 
 		_objectViewLocalService.addObjectView(
 			TestPropsValues.getUserId(),
@@ -1158,6 +1187,9 @@ public class BatchEngineBrokerTest {
 	@Inject
 	private ObjectViewFilterColumnPersistence
 		_objectViewFilterColumnPersistence;
+
+	@Inject
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Inject
 	private ObjectViewLocalService _objectViewLocalService;
