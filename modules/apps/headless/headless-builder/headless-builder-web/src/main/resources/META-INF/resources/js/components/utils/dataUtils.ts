@@ -125,6 +125,17 @@ export function hasEndpointDataChanged({
 		scope: uiScope,
 	} = localUIData;
 
+	console.log('////////////////////////////');
+
+	console.log(
+		'fetchedEndpointData',
+		fetchedEndpointData.apiEndpointToAPIFilters
+	);
+	console.log(
+		'localUIData.apiEndpointToAPIFilters',
+		localUIData.apiEndpointToAPIFilters
+	);
+
 	const pathChanged = path !== beginStringWithForwardSlash(uiPath);
 	const scopeKeyChanged = scope.key !== uiScope?.key;
 	const descriptionChanged = description !== uiDescription;
@@ -139,11 +150,35 @@ export function hasEndpointDataChanged({
 			!uiR_responseAPISchemaToAPIEndpoints_c_apiSchemaId
 		);
 
+	const filtersArrayLengthChanged = !!(
+		localUIData.apiEndpointToAPIFilters &&
+		fetchedEndpointData.apiEndpointToAPIFilters &&
+		fetchedEndpointData.apiEndpointToAPIFilters.length !==
+			localUIData.apiEndpointToAPIFilters.length
+	);
+
+	const filtersContentChanged = !!(
+		localUIData.apiEndpointToAPIFilters?.length &&
+		fetchedEndpointData.apiEndpointToAPIFilters?.length &&
+		fetchedEndpointData.apiEndpointToAPIFilters[0].oDataFilter !==
+			localUIData.apiEndpointToAPIFilters[0].oDataFilter
+	);
+
+	console.log('--------------------------');
+	console.log('pathChanged', pathChanged);
+	console.log('scopeKeyChanged', scopeKeyChanged);
+	console.log('descriptionChanged', descriptionChanged);
+	console.log('schemaIdChanged', schemaIdChanged);
+	console.log('filtersArrayLengthChanged', filtersArrayLengthChanged);
+	console.log('filtersContentChanged', filtersContentChanged);
+
 	if (
 		pathChanged ||
 		scopeKeyChanged ||
 		descriptionChanged ||
-		schemaIdChanged
+		schemaIdChanged ||
+		filtersArrayLengthChanged ||
+		filtersContentChanged
 	) {
 		return true;
 	}

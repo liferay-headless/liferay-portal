@@ -195,104 +195,106 @@ export default function EditAPIEndpoint({
 	);
 
 	async function handleModifyEndpointFilters() {
-		if (localUIData.apiEndpointToAPIFilters) {
-			if (
-				fetchedData.apiEndpoint?.apiEndpointToAPIFilters &&
-				!fetchedData.apiEndpoint.apiEndpointToAPIFilters.length &&
-				localUIData.apiEndpointToAPIFilters[0].oDataFilter
-			) {
-				postData<APIEndpointFilter>({
-					data: {
-						oDataFilter:
-							localUIData.apiEndpointToAPIFilters[0].oDataFilter,
-						r_apiEndpointToAPIFilters_c_apiEndpointId:
-							fetchedData.apiEndpoint.id,
-					},
-					onError: (error: string) => {
-						openToast({
-							message: error,
-							type: 'danger',
-						});
-					},
-					onSuccess: (responseJSON) => {
-						setFetchedData((previous) => ({
-							...previous,
-							apiEndpoint: {
-								...previous.apiEndpoint!,
-								apiEndpointToAPIFilters: [responseJSON],
-							},
-						}));
-						openToast({
-							message: 'The filter was created.',
-							type: 'success',
-						});
-					},
-					url: apiURLPaths.filters,
-				});
-			} else if (
-				fetchedData.apiEndpoint?.apiEndpointToAPIFilters?.[0]
-					.oDataFilter &&
-				localUIData.apiEndpointToAPIFilters[0].oDataFilter
-			) {
-				updateData<APIEndpointFilter>({
-					dataToUpdate: {
-						oDataFilter:
-							localUIData.apiEndpointToAPIFilters[0].oDataFilter,
-					},
-					method: 'PATCH',
-					onError: (error: string) => {
-						openToast({
-							message: error,
-							type: 'danger',
-						});
-					},
-					onSuccess: (responseJSON) => {
-						setFetchedData((previous) => ({
-							...previous,
-							apiEndpoint: {
-								...previous.apiEndpoint!,
-								apiEndpointToAPIFilters: [responseJSON],
-							},
-						}));
-						openToast({
-							message: 'The filter was updated',
-							type: 'success',
-						});
-					},
-					url:
-						apiURLPaths.filters +
-						fetchedData.apiEndpoint.apiEndpointToAPIFilters[0].id,
-				});
-			} else if (
-				fetchedData.apiEndpoint?.apiEndpointToAPIFilters?.[0]
-					.oDataFilter &&
-				!localUIData.apiEndpointToAPIFilters[0].oDataFilter
-			) {
-				deleteData({
-					onError: (error: string) => {
-						openToast({
-							message: error,
-							type: 'danger',
-						});
-					},
-					onSuccess: () => {
-						setFetchedData((previous) => ({
-							...previous,
-							apiEndpoint: {
-								...previous.apiEndpoint!,
-								apiEndpointToAPIFilters: [],
-							},
-						}));
-						openToast({
-							message: 'The filter was deleted',
-							type: 'success',
-						});
-					},
-					url:
-						apiURLPaths.filters +
-						fetchedData.apiEndpoint.apiEndpointToAPIFilters[0].id,
-				});
-			}
+		
+		if (
+			fetchedData.apiEndpoint?.apiEndpointToAPIFilters &&
+			!fetchedData.apiEndpoint.apiEndpointToAPIFilters.length &&
+			localUIData.apiEndpointToAPIFilters?.[0]?.oDataFilter
+		) {
+			console.log('case 1');
+			postData<APIEndpointFilter>({
+				data: {
+					oDataFilter:
+						localUIData.apiEndpointToAPIFilters[0].oDataFilter,
+					r_apiEndpointToAPIFilters_c_apiEndpointId:
+						fetchedData.apiEndpoint.id,
+				},
+				onError: (error: string) => {
+					openToast({
+						message: error,
+						type: 'danger',
+					});
+				},
+				onSuccess: (responseJSON) => {
+					setFetchedData((previous) => ({
+						...previous,
+						apiEndpoint: {
+							...previous.apiEndpoint!,
+							apiEndpointToAPIFilters: [responseJSON],
+						},
+					}));
+					openToast({
+						message: 'The filter was created.',
+						type: 'success',
+					});
+				},
+				url: apiURLPaths.filters,
+			});
+		} else if (
+			fetchedData.apiEndpoint?.apiEndpointToAPIFilters?.[0]?.oDataFilter &&
+			localUIData.apiEndpointToAPIFilters?.[0]?.oDataFilter
+		) {
+			console.log('case 2');
+			updateData<APIEndpointFilter>({
+				dataToUpdate: {
+					oDataFilter:
+						localUIData.apiEndpointToAPIFilters[0].oDataFilter,
+				},
+				method: 'PATCH',
+				onError: (error: string) => {
+					openToast({
+						message: error,
+						type: 'danger',
+					});
+				},
+				onSuccess: (responseJSON) => {
+					setFetchedData((previous) => ({
+						...previous,
+						apiEndpoint: {
+							...previous.apiEndpoint!,
+							apiEndpointToAPIFilters: [responseJSON],
+						},
+					}));
+					openToast({
+						message: 'The filter was updated',
+						type: 'success',
+					});
+				},
+				url:
+					apiURLPaths.filters +
+					fetchedData.apiEndpoint.apiEndpointToAPIFilters[0].id,
+			});
+		} else if (
+			localUIData.apiEndpointToAPIFilters &&
+			fetchedData.apiEndpoint?.apiEndpointToAPIFilters &&
+			fetchedData.apiEndpoint.apiEndpointToAPIFilters.length !==
+				localUIData.apiEndpointToAPIFilters.length
+		) {
+			console.log('case 3');
+			deleteData({
+				onError: (error: string) => {
+					openToast({
+						message: error,
+						type: 'danger',
+					});
+				},
+				onSuccess: () => {
+					setFetchedData((previous) => ({
+						...previous,
+						apiEndpoint: {
+							...previous.apiEndpoint!,
+							apiEndpointToAPIFilters: [],
+						},
+					}));
+					openToast({
+						message: 'The filter was deleted',
+						type: 'success',
+					});
+				},
+				url:
+					apiURLPaths.filters +
+					fetchedData.apiEndpoint.apiEndpointToAPIFilters[0].id,
+			});
 		}
 	}
 

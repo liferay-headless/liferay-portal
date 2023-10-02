@@ -17,8 +17,8 @@ interface APIEndpointFilter {
 }
 
 interface APIEndpointItem extends BaseItem {
-	apiEndpointToAPIFilters?: APIEndpointFilter[];
-	apiEndpointToAPISorts?: APIEndpointSort[];
+	apiEndpointToAPIFilters: APIEndpointFilter[];
+	apiEndpointToAPISorts: APIEndpointSort[];
 	httpMethod: APIListType;
 	path: string;
 	r_apiApplicationToAPIEndpoints_c_apiApplicationId: string;
