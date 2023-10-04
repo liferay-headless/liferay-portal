@@ -12,6 +12,7 @@ import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
 import com.liferay.batch.engine.BatchEngineTaskItemDelegateRegistry;
 import com.liferay.batch.engine.BatchEngineTaskOperation;
 import com.liferay.batch.engine.ItemClassRegistry;
+import com.liferay.batch.engine.action.EntityExtensionItemParser;
 import com.liferay.batch.engine.action.ItemReaderPostAction;
 import com.liferay.batch.engine.configuration.BatchEngineTaskCompanyConfiguration;
 import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
@@ -352,6 +353,7 @@ public class BatchEngineImportTaskExecutorImpl
 			batchEngineImportTask, itemClass,
 			BatchEngineImportTaskItemReaderUtil.mapFieldNames(
 				fieldNameMapping, fieldNameValueMap),
+			(EntityExtensionItemParser) _entityExtensionItemParser,
 			_itemReaderPostActions.toList());
 	}
 
@@ -407,6 +409,9 @@ public class BatchEngineImportTaskExecutorImpl
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private EntityExtensionItemParser<?> _entityExtensionItemParser;
 
 	@Reference
 	private ItemClassRegistry _itemClassRegistry;

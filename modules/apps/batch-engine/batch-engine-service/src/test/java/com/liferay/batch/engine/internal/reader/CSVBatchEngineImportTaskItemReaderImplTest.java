@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.reader;
 
+import com.liferay.batch.engine.action.EntityExtensionItemParser;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
@@ -24,6 +25,8 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import javax.inject.Inject;
 
 /**
  * @author Ivica Cardic
@@ -55,6 +58,7 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 
 			validate(
 				createDateString, "sample description", 1L,
+				_itemParser,
 				HashMapBuilder.put(
 					"createDate1", "createDate"
 				).put(
@@ -74,6 +78,9 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 				).build());
 		}
 	}
+
+	@Inject
+	private EntityExtensionItemParser<?> _itemParser;
 
 	@Test
 	public void testColumnMappingWithoutHeaders() throws Exception {

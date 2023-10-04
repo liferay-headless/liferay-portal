@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.reader;
 
+import com.liferay.batch.engine.action.EntityExtensionItemParser;
 import com.liferay.batch.engine.model.impl.BatchEngineImportTaskImpl;
 import com.liferay.portal.kernel.util.MapUtil;
 
@@ -73,6 +74,7 @@ public abstract class BaseBatchEngineImportTaskItemReaderImplTestCase {
 
 	protected void validate(
 			String createDateString, String description, Long id,
+			EntityExtensionItemParser<?> entityExtensionItemParser,
 			Map<String, String> fieldNameMappingMap,
 			Map<String, Object> fieldNameValueMap, Map<String, String> nameMap)
 		throws Exception {
@@ -81,6 +83,7 @@ public abstract class BaseBatchEngineImportTaskItemReaderImplTestCase {
 			new BatchEngineImportTaskImpl(), Item.class,
 			BatchEngineImportTaskItemReaderUtil.mapFieldNames(
 				fieldNameMappingMap, fieldNameValueMap),
+			(EntityExtensionItemParser) entityExtensionItemParser,
 			Arrays.asList(
 				(batchEngineImportTask, extendedProperties, item1) -> {
 					if (MapUtil.isNotEmpty(extendedProperties)) {
