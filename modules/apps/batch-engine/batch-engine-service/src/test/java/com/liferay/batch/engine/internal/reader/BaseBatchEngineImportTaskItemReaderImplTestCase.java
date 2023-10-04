@@ -75,7 +75,7 @@ public abstract class BaseBatchEngineImportTaskItemReaderImplTestCase {
 			String createDateString, String description, Long id,
 			Map<String, String> fieldNameMappingMap,
 			Map<String, Object> fieldNameValueMap, Map<String, String> nameMap)
-		throws ReflectiveOperationException {
+		throws Exception {
 
 		Item item = BatchEngineImportTaskItemReaderUtil.convertValue(
 			new BatchEngineImportTaskImpl(), Item.class,

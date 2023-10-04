@@ -5,10 +5,12 @@
 
 package com.liferay.batch.engine.internal.reader;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -17,6 +19,7 @@ import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -24,11 +27,12 @@ import java.io.Serializable;
 
 import java.lang.reflect.Field;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -39,61 +43,20 @@ public class BatchEngineImportTaskItemReaderUtil {
 			BatchEngineImportTask batchEngineImportTask, Class<T> itemClass,
 			Map<String, Object> fieldNameValueMap,
 			List<ItemReaderPostAction> itemReaderPostActions)
-		throws ReflectiveOperationException {
+		throws Exception {
 
-		Map<String, Serializable> extendedProperties = new HashMap<>();
-		T item = itemClass.newInstance();
+		ObjectReader objectReader = _objectMapper.readerFor(itemClass);
 
-		for (Map.Entry<String, Object> entry : fieldNameValueMap.entrySet()) {
-			String name = entry.getKey();
+		objectReader = objectReader.without(
+			DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-			Field field = null;
+		JsonNode jsonNode = objectReader.readTree(
+			_objectMapper.writeValueAsString(fieldNameValueMap));
 
-			for (Field declaredField : itemClass.getDeclaredFields()) {
-				if (name.equals(declaredField.getName()) ||
-					Objects.equals(
-						StringPool.UNDERLINE + name, declaredField.getName())) {
+		T item = objectReader.readValue(jsonNode);
 
-					field = declaredField;
-
-					break;
-				}
-			}
-
-			if (field != null) {
-				field.setAccessible(true);
-
-				field.set(
-					item,
-					_objectMapper.convertValue(
-						entry.getValue(), field.getType()));
-
-				continue;
-			}
-
-			for (Field declaredField : itemClass.getDeclaredFields()) {
-				JsonAnySetter[] jsonAnySetters =
-					declaredField.getAnnotationsByType(JsonAnySetter.class);
-
-				if (jsonAnySetters.length > 0) {
-					field = declaredField;
-
-					break;
-				}
-			}
-
-			if (field == null) {
-				extendedProperties.put(
-					entry.getKey(), (Serializable)entry.getValue());
-			}
-			else {
-				field.setAccessible(true);
-
-				Map<String, Object> map = (Map)field.get(item);
-
-				map.put(entry.getKey(), entry.getValue());
-			}
-		}
+		Map<String, Serializable> extendedProperties = _getExtendedProperties(
+			itemClass, jsonNode, _objectMapper);
 
 		for (ItemReaderPostAction itemReaderPostAction :
 				itemReaderPostActions) {
@@ -137,16 +100,79 @@ public class BatchEngineImportTaskItemReaderUtil {
 		return targetFieldNameValueMap;
 	}
 
+	private static Map<String, Serializable> _getExtendedProperties(
+			Class<?> clazz, JsonNode jsonNode, ObjectMapper objectMapper)
+		throws Exception {
+
+		Map<String, Serializable> extendedProperties = new HashMap<>();
+
+		List<String> fieldNames = new ArrayList<>();
+
+		for (Field field : clazz.getDeclaredFields()) {
+			if (StringUtil.equals("_extendedProperties", field.getName())) {
+				continue;
+			}
+
+			fieldNames.add(field.getName());
+		}
+
+		Iterator<String> iterator = jsonNode.fieldNames();
+
+		while (iterator.hasNext()) {
+			String fieldName = iterator.next();
+
+			if (!fieldNames.contains(fieldName)) {
+				extendedProperties.put(
+					fieldName,
+					_getJsonNodeValue(jsonNode.get(fieldName), objectMapper));
+			}
+		}
+
+		return extendedProperties;
+	}
+
+	private static Serializable _getJsonNodeValue(
+			JsonNode jsonNode, ObjectMapper objectMapper)
+		throws Exception {
+
+		if (jsonNode.isArray()) {
+			return (Serializable)objectMapper.readValue(
+				jsonNode.traverse(), Object[].class);
+		}
+		else if (jsonNode.isBoolean()) {
+			return jsonNode.asBoolean();
+		}
+		else if (jsonNode.isDouble()) {
+			return jsonNode.asDouble();
+		}
+		else if (jsonNode.isInt()) {
+			return jsonNode.asInt();
+		}
+		else if (jsonNode.isLong()) {
+			return jsonNode.asLong();
+		}
+		else if (jsonNode.isTextual()) {
+			return jsonNode.asText();
+		}
+		else if (jsonNode.isObject()) {
+			return (Serializable)objectMapper.readValue(
+				jsonNode.traverse(), Object.class);
+		}
+
+		return null;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BatchEngineImportTaskItemReaderUtil.class);
 
 	private static final ObjectMapper _objectMapper = new ObjectMapper() {
 		{
-			SimpleModule simpleModule = new SimpleModule();
-
-			simpleModule.addDeserializer(Map.class, new MapStdDeserializer());
-
-			registerModule(simpleModule);
+			registerModule(
+				new SimpleModule() {
+					{
+						addDeserializer(Map.class, new MapStdDeserializer());
+					}
+				});
 		}
 	};
 
