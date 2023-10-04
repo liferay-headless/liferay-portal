@@ -353,7 +353,7 @@ public class BatchEngineImportTaskExecutorImpl
 			batchEngineImportTask, itemClass,
 			BatchEngineImportTaskItemReaderUtil.mapFieldNames(
 				fieldNameMapping, fieldNameValueMap),
-			(EntityExtensionItemParser) _entityExtensionItemParser,
+			(EntityExtensionItemParser)_entityExtensionItemParser,
 			_itemReaderPostActions.toList());
 	}
 

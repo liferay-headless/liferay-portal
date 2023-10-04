@@ -21,12 +21,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import javax.inject.Inject;
 
 /**
  * @author Ivica Cardic
@@ -57,8 +57,7 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 						})) {
 
 			validate(
-				createDateString, "sample description", 1L,
-				_itemParser,
+				createDateString, "sample description", 1L, _itemParser,
 				HashMapBuilder.put(
 					"createDate1", "createDate"
 				).put(
@@ -78,9 +77,6 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 				).build());
 		}
 	}
-
-	@Inject
-	private EntityExtensionItemParser<?> _itemParser;
 
 	@Test
 	public void testColumnMappingWithoutHeaders() throws Exception {
@@ -488,5 +484,8 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 	private static final String[] _CSV_ENCLOSING_CHARACTERS = {
 		StringPool.QUOTE, StringPool.APOSTROPHE
 	};
+
+	@Inject
+	private EntityExtensionItemParser<?> _itemParser;
 
 }

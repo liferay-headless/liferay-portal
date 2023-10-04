@@ -83,7 +83,7 @@ public abstract class BaseBatchEngineImportTaskItemReaderImplTestCase {
 			new BatchEngineImportTaskImpl(), Item.class,
 			BatchEngineImportTaskItemReaderUtil.mapFieldNames(
 				fieldNameMappingMap, fieldNameValueMap),
-			(EntityExtensionItemParser) entityExtensionItemParser,
+			(EntityExtensionItemParser)entityExtensionItemParser,
 			Arrays.asList(
 				(batchEngineImportTask, extendedProperties, item1) -> {
 					if (MapUtil.isNotEmpty(extendedProperties)) {

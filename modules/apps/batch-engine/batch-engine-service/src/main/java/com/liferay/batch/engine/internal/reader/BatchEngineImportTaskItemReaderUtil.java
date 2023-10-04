@@ -41,7 +41,8 @@ public class BatchEngineImportTaskItemReaderUtil {
 		throws Exception {
 
 		EntityExtensionItem<T> entityExtensionItem =
-			entityExtensionItemParser.parse(itemClass, fieldNameValueMap, _objectMapper);
+			entityExtensionItemParser.parse(
+				itemClass, fieldNameValueMap, _objectMapper);
 
 		for (ItemReaderPostAction itemReaderPostAction :
 				itemReaderPostActions) {
@@ -86,8 +87,6 @@ public class BatchEngineImportTaskItemReaderUtil {
 
 		return targetFieldNameValueMap;
 	}
-
-
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BatchEngineImportTaskItemReaderUtil.class);

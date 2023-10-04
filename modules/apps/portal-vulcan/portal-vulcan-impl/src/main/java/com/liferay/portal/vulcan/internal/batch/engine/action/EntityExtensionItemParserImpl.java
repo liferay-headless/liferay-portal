@@ -9,28 +9,36 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+
 import com.liferay.batch.engine.action.EntityExtensionItem;
 import com.liferay.batch.engine.action.EntityExtensionItemParser;
 import com.liferay.portal.kernel.util.StringUtil;
-import org.osgi.service.component.annotations.Component;
 
 import java.io.Serializable;
+
 import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Carlos Correa
  */
 @Component(service = EntityExtensionItemParser.class)
-public class EntityExtensionItemParserImpl<T> implements
-	EntityExtensionItemParser<T> {
+public class EntityExtensionItemParserImpl<T>
+	implements EntityExtensionItemParser<T> {
 
 	@Override
-	public EntityExtensionItem<T> parse(Class<T> clazz, Map<String, Object> fieldNameValueMap, ObjectMapper objectMapper) throws Exception {
+	public EntityExtensionItem<T> parse(
+			Class<T> clazz, Map<String, Object> fieldNameValueMap,
+			ObjectMapper objectMapper)
+		throws Exception {
+
 		ObjectReader objectReader = objectMapper.readerFor(clazz);
 
 		objectReader = objectReader.without(
@@ -43,14 +51,14 @@ public class EntityExtensionItemParserImpl<T> implements
 
 		entityExtensionItem.setItem(objectReader.readValue(jsonNode));
 
-		entityExtensionItem.setExtendedProperties(_getExtendedProperties(
-			clazz, jsonNode, objectMapper));
+		entityExtensionItem.setExtendedProperties(
+			_getExtendedProperties(clazz, jsonNode, objectMapper));
 
 		return entityExtensionItem;
 	}
 
-	private static Map<String, Serializable> _getExtendedProperties(
-		Class<?> clazz, JsonNode jsonNode, ObjectMapper objectMapper)
+	private Map<String, Serializable> _getExtendedProperties(
+			Class<?> clazz, JsonNode jsonNode, ObjectMapper objectMapper)
 		throws Exception {
 
 		Map<String, Serializable> extendedProperties = new HashMap<>();
@@ -80,8 +88,8 @@ public class EntityExtensionItemParserImpl<T> implements
 		return extendedProperties;
 	}
 
-	private static Serializable _getJsonNodeValue(
-		JsonNode jsonNode, ObjectMapper objectMapper)
+	private Serializable _getJsonNodeValue(
+			JsonNode jsonNode, ObjectMapper objectMapper)
 		throws Exception {
 
 		if (jsonNode.isArray()) {
@@ -110,4 +118,5 @@ public class EntityExtensionItemParserImpl<T> implements
 
 		return null;
 	}
+
 }

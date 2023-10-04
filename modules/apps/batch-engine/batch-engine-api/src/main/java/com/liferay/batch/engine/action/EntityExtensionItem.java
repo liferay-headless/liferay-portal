@@ -6,6 +6,7 @@
 package com.liferay.batch.engine.action;
 
 import java.io.Serializable;
+
 import java.util.Map;
 
 /**
@@ -13,23 +14,25 @@ import java.util.Map;
  */
 public class EntityExtensionItem<T> {
 
+	public Map<String, Serializable> getExtendedProperties() {
+		return _extendedProperties;
+	}
+
 	public T getItem() {
 		return _item;
+	}
+
+	public void setExtendedProperties(
+		Map<String, Serializable> extendedProperties) {
+
+		_extendedProperties = extendedProperties;
 	}
 
 	public void setItem(T item) {
 		_item = item;
 	}
 
-	public Map<String, Serializable> getExtendedProperties() {
-		return _extendedProperties;
-	}
-
-	public void setExtendedProperties(
-		Map<String, Serializable> extendedProperties) {
-		_extendedProperties = extendedProperties;
-	}
-
-	private T _item;
 	private Map<String, Serializable> _extendedProperties;
+	private T _item;
+
 }
