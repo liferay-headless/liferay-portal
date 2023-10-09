@@ -9,21 +9,26 @@ import com.liferay.commerce.currency.configuration.CommerceCurrencyConfiguration
 import com.liferay.commerce.currency.configuration.RoundingTypeConfiguration;
 import com.liferay.commerce.currency.constants.CommerceCurrencyConstants;
 import com.liferay.commerce.currency.constants.CommerceCurrencyExchangeRateConstants;
+import com.liferay.commerce.currency.constants.CurrencyRepositoryConstants;
 import com.liferay.commerce.currency.constants.RoundingTypeConstants;
 import com.liferay.commerce.currency.exception.CommerceCurrencyCodeException;
 import com.liferay.commerce.currency.exception.CommerceCurrencyNameException;
 import com.liferay.commerce.currency.exception.NoSuchCurrencyException;
 import com.liferay.commerce.currency.internal.model.listener.PortalInstanceLifecycleListenerImpl;
 import com.liferay.commerce.currency.model.CommerceCurrency;
+import com.liferay.commerce.currency.model.impl.CommerceCurrencyImpl;
+import com.liferay.commerce.currency.object.entity.CurrencyObjectEntity;
 import com.liferay.commerce.currency.service.base.CommerceCurrencyLocalServiceBaseImpl;
 import com.liferay.commerce.currency.util.ExchangeRateProvider;
 import com.liferay.commerce.currency.util.ExchangeRateProviderRegistry;
-import com.liferay.commerce.currency.util.comparator.CommerceCurrencyPriorityComparator;
+import com.liferay.object.repository.ObjectRepository;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -38,7 +43,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -108,32 +112,48 @@ public class CommerceCurrencyLocalServiceImpl
 			roundingMode = roundingModeEnum.name();
 		}
 
-		long commerceCurrencyId = counterLocalService.increment();
+		CurrencyObjectEntity currencyObjectEntity = new CurrencyObjectEntity();
 
-		CommerceCurrency commerceCurrency = commerceCurrencyPersistence.create(
-			commerceCurrencyId);
+		currencyObjectEntity.setCompanyId(user.getCompanyId());
+		currencyObjectEntity.setUserId(user.getUserId());
+		currencyObjectEntity.setUserName(user.getFullName());
+		currencyObjectEntity.setCode(code);
+		currencyObjectEntity.setNameMap(nameMap);
+		currencyObjectEntity.setSymbol(symbol);
+		currencyObjectEntity.setExchangeRate(rate);
+		currencyObjectEntity.setFormatPatternMap(formatPatternMap);
+		currencyObjectEntity.setMaximumDecimalPlaces(maxFractionDigits);
+		currencyObjectEntity.setMinimumDecimalPlaces(minFractionDigits);
+		currencyObjectEntity.setRoundingMode(
+			StringUtil.toLowerCase(roundingMode));
+		currencyObjectEntity.setPrimary(primary);
+		currencyObjectEntity.setPriority(priority);
+		currencyObjectEntity.setActive(active);
 
-		commerceCurrency.setCompanyId(user.getCompanyId());
-		commerceCurrency.setUserId(user.getUserId());
-		commerceCurrency.setUserName(user.getFullName());
-		commerceCurrency.setCode(code);
-		commerceCurrency.setNameMap(nameMap);
-		commerceCurrency.setSymbol(symbol);
-		commerceCurrency.setRate(rate);
-		commerceCurrency.setFormatPatternMap(formatPatternMap);
-		commerceCurrency.setMaxFractionDigits(maxFractionDigits);
-		commerceCurrency.setMinFractionDigits(minFractionDigits);
-		commerceCurrency.setRoundingMode(roundingMode);
-		commerceCurrency.setPrimary(primary);
-		commerceCurrency.setPriority(priority);
-		commerceCurrency.setActive(active);
-
-		return commerceCurrencyPersistence.update(commerceCurrency);
+		return _toCommerceCurrency(
+			_currencyObjectRepository.saveObjectEntity(
+				0, user.getCompanyId(), userId, currencyObjectEntity,
+				new ServiceContext()));
 	}
 
 	@Override
 	public void deleteCommerceCurrencies(long companyId) {
-		commerceCurrencyPersistence.removeByCompanyId(companyId);
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null);
+
+			for (CurrencyObjectEntity currencyObjectEntity :
+					currencyObjectEntities) {
+
+				_currencyObjectRepository.deleteObjectEntity(
+					currencyObjectEntity.getId());
+			}
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
@@ -141,31 +161,72 @@ public class CommerceCurrencyLocalServiceImpl
 	public CommerceCurrency deleteCommerceCurrency(
 		CommerceCurrency commerceCurrency) {
 
-		return commerceCurrencyPersistence.remove(commerceCurrency);
+		try {
+			return _toCommerceCurrency(
+				_currencyObjectRepository.deleteObjectEntity(
+					commerceCurrency.getCommerceCurrencyId()));
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
 	public CommerceCurrency deleteCommerceCurrency(long commerceCurrencyId)
 		throws PortalException {
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		try {
+			return _toCommerceCurrency(
+				_currencyObjectRepository.deleteObjectEntity(
+					commerceCurrencyId));
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
+	}
 
-		return commerceCurrencyLocalService.deleteCommerceCurrency(
-			commerceCurrency);
+	@Override
+	public CommerceCurrency fetchCommerceCurrency(long commerceCurrencyId)
+		throws PortalException {
+
+		return _toCommerceCurrency(
+			_currencyObjectRepository.fetchObjectEntity(commerceCurrencyId));
 	}
 
 	@Override
 	public CommerceCurrency fetchPrimaryCommerceCurrency(long companyId) {
-		return commerceCurrencyPersistence.fetchByC_P_A_First(
-			companyId, true, true, new CommerceCurrencyPriorityComparator());
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					CurrencyRepositoryConstants.FIND_BY_PRIMARY, true);
+
+			if (currencyObjectEntities.isEmpty()) {
+				return null;
+			}
+
+			return _toCommerceCurrency(currencyObjectEntities.get(0));
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
 	public List<CommerceCurrency> getCommerceCurrencies(
 		long companyId, boolean active) {
 
-		return commerceCurrencyPersistence.findByC_A(companyId, active);
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					CurrencyRepositoryConstants.FIND_BY_ACTIVE, active);
+
+			return _toCommerceCurrencies(currencyObjectEntities);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
@@ -173,8 +234,17 @@ public class CommerceCurrencyLocalServiceImpl
 		long companyId, boolean active, int start, int end,
 		OrderByComparator<CommerceCurrency> orderByComparator) {
 
-		return commerceCurrencyPersistence.findByC_A(
-			companyId, active, start, end, orderByComparator);
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, start, end,
+					CurrencyRepositoryConstants.FIND_BY_ACTIVE, active);
+
+			return _toCommerceCurrencies(currencyObjectEntities);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
@@ -182,25 +252,68 @@ public class CommerceCurrencyLocalServiceImpl
 		long companyId, int start, int end,
 		OrderByComparator<CommerceCurrency> orderByComparator) {
 
-		return commerceCurrencyPersistence.findByCompanyId(
-			companyId, start, end, orderByComparator);
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, start, end, null);
+
+			return _toCommerceCurrencies(currencyObjectEntities);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
 	public int getCommerceCurrenciesCount(long companyId) {
-		return commerceCurrencyPersistence.countByCompanyId(companyId);
+		try {
+			return _currencyObjectRepository.getObjectEntitiesCount(
+				0, companyId, 0, null, null);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	@Override
 	public int getCommerceCurrenciesCount(long companyId, boolean active) {
-		return commerceCurrencyPersistence.countByC_A(companyId, active);
+		try {
+			return _currencyObjectRepository.getObjectEntitiesCount(
+				0, companyId, 0, null,
+				CurrencyRepositoryConstants.FIND_BY_ACTIVE, active);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
+	}
+
+	@Override
+	public CommerceCurrency getCommerceCurrency(long commerceCurrencyId)
+		throws PortalException {
+
+		return _toCommerceCurrency(
+			_currencyObjectRepository.getObjectEntity(commerceCurrencyId));
 	}
 
 	@Override
 	public CommerceCurrency getCommerceCurrency(long companyId, String code)
 		throws NoSuchCurrencyException {
 
-		return commerceCurrencyPersistence.findByC_C(companyId, code);
+		try {
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					CurrencyRepositoryConstants.FIND_BY_CODE, code);
+
+			if (currencyObjectEntities.isEmpty()) {
+				throw new NoSuchCurrencyException();
+			}
+
+			return _toCommerceCurrency(currencyObjectEntities.get(0));
+		}
+		catch (PortalException portalException) {
+			throw new NoSuchCurrencyException(portalException);
+		}
 	}
 
 	@Override
@@ -224,9 +337,18 @@ public class CommerceCurrencyLocalServiceImpl
 
 			String code = jsonObject.getString("code");
 
-			CommerceCurrency commerceCurrency =
-				commerceCurrencyPersistence.fetchByC_C(
-					serviceContext.getCompanyId(), code);
+			List<CurrencyObjectEntity> currencyObjectEntities =
+				_currencyObjectRepository.getObjectEntities(
+					0, serviceContext.getCompanyId(), 0, null,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					CurrencyRepositoryConstants.FIND_BY_CODE, code);
+
+			CommerceCurrency commerceCurrency = null;
+
+			if (!currencyObjectEntities.isEmpty()) {
+				commerceCurrency = _toCommerceCurrency(
+					currencyObjectEntities.get(0));
+			}
 
 			if (commerceCurrency == null) {
 				boolean primary = jsonObject.getBoolean("primary");
@@ -259,7 +381,8 @@ public class CommerceCurrencyLocalServiceImpl
 					BigDecimal.valueOf(rate), formatPatternMap,
 					roundingTypeConfiguration.maximumFractionDigits(),
 					roundingTypeConfiguration.minimumFractionDigits(),
-					roundingMode.name(), primary, priority, true);
+					StringUtil.toLowerCase(roundingMode.name()), primary,
+					priority, true);
 			}
 		}
 
@@ -280,12 +403,15 @@ public class CommerceCurrencyLocalServiceImpl
 	public CommerceCurrency setActive(long commerceCurrencyId, boolean active)
 		throws PortalException {
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		CurrencyObjectEntity currencyObjectEntity =
+			_currencyObjectRepository.getObjectEntity(commerceCurrencyId);
 
-		commerceCurrency.setActive(active);
+		currencyObjectEntity.setActive(active);
 
-		return commerceCurrencyPersistence.update(commerceCurrency);
+		return _toCommerceCurrency(
+			_currencyObjectRepository.updateObjectEntity(
+				currencyObjectEntity.getUserId(), currencyObjectEntity.getId(),
+				currencyObjectEntity, new ServiceContext()));
 	}
 
 	@Override
@@ -307,16 +433,20 @@ public class CommerceCurrencyLocalServiceImpl
 	public CommerceCurrency setPrimary(long commerceCurrencyId, boolean primary)
 		throws PortalException {
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		CurrencyObjectEntity currencyObjectEntity =
+			_currencyObjectRepository.getObjectEntity(commerceCurrencyId);
 
 		_validate(
-			commerceCurrencyId, commerceCurrency.getCompanyId(),
-			commerceCurrency.getCode(), commerceCurrency.getNameMap(), primary);
+			commerceCurrencyId, currencyObjectEntity.getCompanyId(),
+			currencyObjectEntity.getCode(), currencyObjectEntity.getNameMap(),
+			primary);
 
-		commerceCurrency.setPrimary(primary);
+		currencyObjectEntity.setPrimary(primary);
 
-		return commerceCurrencyPersistence.update(commerceCurrency);
+		return _toCommerceCurrency(
+			_currencyObjectRepository.updateObjectEntity(
+				currencyObjectEntity.getUserId(), currencyObjectEntity.getId(),
+				currencyObjectEntity, new ServiceContext()));
 	}
 
 	@Override
@@ -328,16 +458,16 @@ public class CommerceCurrencyLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		CurrencyObjectEntity currencyObjectEntity =
+			_currencyObjectRepository.getObjectEntity(commerceCurrencyId);
 
 		if (primary) {
 			rate = BigDecimal.ONE;
 		}
 
 		_validate(
-			commerceCurrency.getCommerceCurrencyId(),
-			serviceContext.getCompanyId(), commerceCurrency.getCode(), nameMap,
+			currencyObjectEntity.getId(), serviceContext.getCompanyId(),
+			currencyObjectEntity.getCode(), currencyObjectEntity.getNameMap(),
 			primary);
 
 		if (formatPatternMap.isEmpty()) {
@@ -359,18 +489,22 @@ public class CommerceCurrencyLocalServiceImpl
 			roundingMode = roundingModeEnum.name();
 		}
 
-		commerceCurrency.setNameMap(nameMap);
-		commerceCurrency.setSymbol(symbol);
-		commerceCurrency.setRate(rate);
-		commerceCurrency.setFormatPatternMap(formatPatternMap);
-		commerceCurrency.setMaxFractionDigits(maxFractionDigits);
-		commerceCurrency.setMinFractionDigits(minFractionDigits);
-		commerceCurrency.setRoundingMode(roundingMode);
-		commerceCurrency.setPrimary(primary);
-		commerceCurrency.setPriority(priority);
-		commerceCurrency.setActive(active);
+		currencyObjectEntity.setNameMap(nameMap);
+		currencyObjectEntity.setSymbol(symbol);
+		currencyObjectEntity.setExchangeRate(rate);
+		currencyObjectEntity.setFormatPatternMap(formatPatternMap);
+		currencyObjectEntity.setMaximumDecimalPlaces(maxFractionDigits);
+		currencyObjectEntity.setMinimumDecimalPlaces(minFractionDigits);
+		currencyObjectEntity.setRoundingMode(
+			StringUtil.toLowerCase(roundingMode));
+		currencyObjectEntity.setPrimary(primary);
+		currencyObjectEntity.setPriority(priority);
+		currencyObjectEntity.setActive(active);
 
-		return commerceCurrencyPersistence.update(commerceCurrency);
+		return _toCommerceCurrency(
+			_currencyObjectRepository.updateObjectEntity(
+				currencyObjectEntity.getUserId(), currencyObjectEntity.getId(),
+				currencyObjectEntity, new ServiceContext()));
 	}
 
 	@Override
@@ -378,12 +512,15 @@ public class CommerceCurrencyLocalServiceImpl
 			long commerceCurrencyId, BigDecimal rate)
 		throws PortalException {
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		CurrencyObjectEntity currencyObjectEntity =
+			_currencyObjectRepository.getObjectEntity(commerceCurrencyId);
 
-		commerceCurrency.setRate(rate);
+		currencyObjectEntity.setExchangeRate(rate);
 
-		return commerceCurrencyPersistence.update(commerceCurrency);
+		return _toCommerceCurrency(
+			_currencyObjectRepository.updateObjectEntity(
+				currencyObjectEntity.getUserId(), currencyObjectEntity.getId(),
+				currencyObjectEntity, new ServiceContext()));
 	}
 
 	@Override
@@ -399,8 +536,8 @@ public class CommerceCurrencyLocalServiceImpl
 			return;
 		}
 
-		CommerceCurrency commerceCurrency =
-			commerceCurrencyPersistence.findByPrimaryKey(commerceCurrencyId);
+		CommerceCurrency commerceCurrency = _toCommerceCurrency(
+			_currencyObjectRepository.fetchObjectEntity(commerceCurrencyId));
 
 		CommerceCurrency primaryCommerceCurrency =
 			commerceCurrencyLocalService.fetchPrimaryCommerceCurrency(
@@ -424,9 +561,8 @@ public class CommerceCurrencyLocalServiceImpl
 			return;
 		}
 
-		commerceCurrency.setRate(exchangeRate);
-
-		commerceCurrencyLocalService.updateCommerceCurrency(commerceCurrency);
+		commerceCurrencyLocalService.updateCommerceCurrencyRate(
+			commerceCurrency.getCommerceCurrencyId(), exchangeRate);
 	}
 
 	@Override
@@ -449,8 +585,7 @@ public class CommerceCurrencyLocalServiceImpl
 					_updateExchangeRates(
 						companyId, defaultExchangeRateProviderKey);
 				}
-			},
-			ArrayUtil.toLongArray(commerceCurrencyFinder.getCompanyIds()));
+			});
 	}
 
 	@Deactivate
@@ -461,6 +596,47 @@ public class CommerceCurrencyLocalServiceImpl
 		if (_serviceRegistration != null) {
 			_serviceRegistration.unregister();
 		}
+	}
+
+	private List<CommerceCurrency> _toCommerceCurrencies(
+		List<CurrencyObjectEntity> currencyObjectEntities) {
+
+		return TransformUtil.transform(
+			currencyObjectEntities, this::_toCommerceCurrency);
+	}
+
+	private CommerceCurrency _toCommerceCurrency(
+			CurrencyObjectEntity currencyObjectEntity)
+		throws PortalException {
+
+		if (currencyObjectEntity == null) {
+			return null;
+		}
+
+		CommerceCurrency commerceCurrency = new CommerceCurrencyImpl();
+
+		commerceCurrency.setCommerceCurrencyId(currencyObjectEntity.getId());
+
+		commerceCurrency.setCompanyId(currencyObjectEntity.getCompanyId());
+		commerceCurrency.setUserId(currencyObjectEntity.getUserId());
+		commerceCurrency.setUserName(currencyObjectEntity.getUserName());
+		commerceCurrency.setCode(currencyObjectEntity.getCode());
+		commerceCurrency.setNameMap(currencyObjectEntity.getNameMap());
+		commerceCurrency.setFormatPatternMap(
+			currencyObjectEntity.getFormatPatternMap());
+		commerceCurrency.setSymbol(currencyObjectEntity.getSymbol());
+		commerceCurrency.setRate(currencyObjectEntity.getExchangeRate());
+		commerceCurrency.setMaxFractionDigits(
+			currencyObjectEntity.getMaximumDecimalPlaces());
+		commerceCurrency.setMinFractionDigits(
+			currencyObjectEntity.getMinimumDecimalPlaces());
+		commerceCurrency.setRoundingMode(
+			currencyObjectEntity.getRoundingMode());
+		commerceCurrency.setPrimary(currencyObjectEntity.isPrimary());
+		commerceCurrency.setPriority(currencyObjectEntity.getPriority());
+		commerceCurrency.setActive(currencyObjectEntity.isActive());
+
+		return commerceCurrency;
 	}
 
 	private void _updateExchangeRates(
@@ -493,8 +669,10 @@ public class CommerceCurrencyLocalServiceImpl
 		}
 
 		if (primary) {
-			List<CommerceCurrency> commerceCurrencies =
-				commerceCurrencyPersistence.findByC_P(companyId, primary);
+			List<CommerceCurrency> commerceCurrencies = _toCommerceCurrencies(
+				_currencyObjectRepository.getObjectEntities(
+					0, companyId, 0, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					CurrencyRepositoryConstants.FIND_BY_PRIMARY, true));
 
 			for (CommerceCurrency commerceCurrency : commerceCurrencies) {
 				if (commerceCurrency.getCommerceCurrencyId() !=
@@ -502,7 +680,17 @@ public class CommerceCurrencyLocalServiceImpl
 
 					commerceCurrency.setPrimary(false);
 
-					commerceCurrencyPersistence.update(commerceCurrency);
+					commerceCurrencyLocalService.updateCommerceCurrency(
+						commerceCurrencyId, commerceCurrency.getNameMap(),
+						commerceCurrency.getSymbol(),
+						commerceCurrency.getRate(),
+						commerceCurrency.getFormatPatternMap(),
+						commerceCurrency.getMaxFractionDigits(),
+						commerceCurrency.getMinFractionDigits(),
+						commerceCurrency.getRoundingMode(),
+						commerceCurrency.isPrimary(),
+						commerceCurrency.getPriority(),
+						commerceCurrency.isActive(), new ServiceContext());
 				}
 			}
 		}
@@ -516,6 +704,9 @@ public class CommerceCurrencyLocalServiceImpl
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private ObjectRepository<CurrencyObjectEntity> _currencyObjectRepository;
 
 	@Reference
 	private ExchangeRateProviderRegistry _exchangeRateProviderRegistry;

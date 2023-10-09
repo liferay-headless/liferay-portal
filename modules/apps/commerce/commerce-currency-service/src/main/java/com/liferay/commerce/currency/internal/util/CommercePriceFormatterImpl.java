@@ -15,6 +15,7 @@ import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.math.BigDecimal;
@@ -114,7 +115,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 			maxFractionDigits = commerceCurrency.getMaxFractionDigits();
 			minFractionDigits = commerceCurrency.getMinFractionDigits();
 			roundingMode = RoundingMode.valueOf(
-				commerceCurrency.getRoundingMode());
+				StringUtil.toUpperCase(commerceCurrency.getRoundingMode()));
 		}
 
 		DecimalFormat decimalFormat = new DecimalFormat(

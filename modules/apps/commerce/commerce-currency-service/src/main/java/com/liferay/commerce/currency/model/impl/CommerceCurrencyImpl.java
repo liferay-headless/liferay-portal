@@ -7,6 +7,7 @@ package com.liferay.commerce.currency.model.impl;
 
 import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.model.CommerceMoneyFactoryUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,7 +26,8 @@ public class CommerceCurrencyImpl extends CommerceCurrencyBaseImpl {
 	@Override
 	public BigDecimal round(BigDecimal value) {
 		return value.setScale(
-			getMaxFractionDigits(), RoundingMode.valueOf(getRoundingMode()));
+			getMaxFractionDigits(),
+			RoundingMode.valueOf(StringUtil.toUpperCase(getRoundingMode())));
 	}
 
 }

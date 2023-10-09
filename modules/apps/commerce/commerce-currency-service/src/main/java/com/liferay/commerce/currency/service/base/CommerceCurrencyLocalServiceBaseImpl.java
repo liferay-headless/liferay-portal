@@ -243,7 +243,9 @@ public abstract class CommerceCurrencyLocalServiceBaseImpl
 	}
 
 	@Override
-	public CommerceCurrency fetchCommerceCurrency(long commerceCurrencyId) {
+	public CommerceCurrency fetchCommerceCurrency(long commerceCurrencyId)
+		throws PortalException {
+
 		return commerceCurrencyPersistence.fetchByPrimaryKey(
 			commerceCurrencyId);
 	}
@@ -254,10 +256,12 @@ public abstract class CommerceCurrencyLocalServiceBaseImpl
 	 * @param uuid the commerce currency's UUID
 	 * @param companyId the primary key of the company
 	 * @return the matching commerce currency, or <code>null</code> if a matching commerce currency could not be found
+	 * @throws PortalException
 	 */
 	@Override
 	public CommerceCurrency fetchCommerceCurrencyByUuidAndCompanyId(
-		String uuid, long companyId) {
+			String uuid, long companyId)
+		throws PortalException {
 
 		return commerceCurrencyPersistence.fetchByUuid_C_First(
 			uuid, companyId, null);
