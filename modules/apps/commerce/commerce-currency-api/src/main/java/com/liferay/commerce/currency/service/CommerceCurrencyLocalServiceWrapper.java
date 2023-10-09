@@ -255,7 +255,8 @@ public class CommerceCurrencyLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.currency.model.CommerceCurrency
-		fetchCommerceCurrency(long commerceCurrencyId) {
+			fetchCommerceCurrency(long commerceCurrencyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceCurrencyLocalService.fetchCommerceCurrency(
 			commerceCurrencyId);
@@ -267,10 +268,12 @@ public class CommerceCurrencyLocalServiceWrapper
 	 * @param uuid the commerce currency's UUID
 	 * @param companyId the primary key of the company
 	 * @return the matching commerce currency, or <code>null</code> if a matching commerce currency could not be found
+	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.commerce.currency.model.CommerceCurrency
-		fetchCommerceCurrencyByUuidAndCompanyId(String uuid, long companyId) {
+			fetchCommerceCurrencyByUuidAndCompanyId(String uuid, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceCurrencyLocalService.
 			fetchCommerceCurrencyByUuidAndCompanyId(uuid, companyId);

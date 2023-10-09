@@ -223,7 +223,8 @@ public class CommerceCurrencyLocalServiceUtil {
 	}
 
 	public static CommerceCurrency fetchCommerceCurrency(
-		long commerceCurrencyId) {
+			long commerceCurrencyId)
+		throws PortalException {
 
 		return getService().fetchCommerceCurrency(commerceCurrencyId);
 	}
@@ -234,9 +235,11 @@ public class CommerceCurrencyLocalServiceUtil {
 	 * @param uuid the commerce currency's UUID
 	 * @param companyId the primary key of the company
 	 * @return the matching commerce currency, or <code>null</code> if a matching commerce currency could not be found
+	 * @throws PortalException
 	 */
 	public static CommerceCurrency fetchCommerceCurrencyByUuidAndCompanyId(
-		String uuid, long companyId) {
+			String uuid, long companyId)
+		throws PortalException {
 
 		return getService().fetchCommerceCurrencyByUuidAndCompanyId(
 			uuid, companyId);

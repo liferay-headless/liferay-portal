@@ -212,7 +212,8 @@ public interface CommerceCurrencyLocalService
 		DynamicQuery dynamicQuery, Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceCurrency fetchCommerceCurrency(long commerceCurrencyId);
+	public CommerceCurrency fetchCommerceCurrency(long commerceCurrencyId)
+		throws PortalException;
 
 	/**
 	 * Returns the commerce currency with the matching UUID and company.
@@ -220,10 +221,12 @@ public interface CommerceCurrencyLocalService
 	 * @param uuid the commerce currency's UUID
 	 * @param companyId the primary key of the company
 	 * @return the matching commerce currency, or <code>null</code> if a matching commerce currency could not be found
+	 * @throws PortalException
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceCurrency fetchCommerceCurrencyByUuidAndCompanyId(
-		String uuid, long companyId);
+			String uuid, long companyId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceCurrency fetchPrimaryCommerceCurrency(long companyId);
