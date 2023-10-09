@@ -1039,7 +1039,8 @@ public class ObjectEntryLocalServiceImpl
 			_getSelectExpressions(dynamicObjectDefinitionTable),
 			ArrayUtil.remove(
 				_getSelectExpressions(extensionDynamicObjectDefinitionTable),
-				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()));
+				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
+			_EXPRESSIONS);
 
 		List<Object[]> rows = _list(
 			DSLQueryFactoryUtil.select(
@@ -1052,6 +1053,10 @@ public class ObjectEntryLocalServiceImpl
 				).eq(
 					extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()
 				)
+			).leftJoinOn(
+				ObjectEntryTable.INSTANCE,
+				ObjectEntryTable.INSTANCE.objectEntryId.eq(
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
 			).leftJoinOn(
 				dynamicObjectDefinitionLocalizationTable,
 				_getLeftJoinLocalizationTablePredicate(
@@ -1152,8 +1157,15 @@ public class ObjectEntryLocalServiceImpl
 			rows.size());
 
 		for (Object[] objects : rows) {
-			valuesList.add(
-				_getValues(objectDefinitionId, objects, selectExpressions));
+			Map<String, Serializable> values = _getValues(
+				objectDefinitionId, objects, selectExpressions);
+
+			_addLocalizedObjectFieldValues(
+				dynamicObjectDefinitionLocalizationTable, (Long)objects[2],
+				values);
+			_addObjectRelationshipERCFieldValue(objectDefinitionId, values);
+
+			valuesList.add(values);
 		}
 
 		return valuesList;
@@ -4434,6 +4446,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private static final Expression<?>[] _EXPRESSIONS = {
 		ObjectEntryTable.INSTANCE.objectEntryId,
+		ObjectEntryTable.INSTANCE.companyId, ObjectEntryTable.INSTANCE.userId,
 		ObjectEntryTable.INSTANCE.userName,
 		ObjectEntryTable.INSTANCE.createDate,
 		ObjectEntryTable.INSTANCE.modifiedDate,
