@@ -106,6 +106,8 @@ public class ObjectDefinitionUtil {
 		).put(
 			"Bookmark", "/bookmarks"
 		).put(
+			"Currency", "/currencies"
+		).put(
 			"FDSAction", "/data-set-manager/actions"
 		).put(
 			"FDSClientExtensionFilter",

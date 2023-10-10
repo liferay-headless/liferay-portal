@@ -1,6 +1,7 @@
 Bundle-Name: Liferay Commerce Currency Service
 Bundle-SymbolicName: com.liferay.commerce.currency.service
 Bundle-Version: 4.0.46
+Liferay-Client-Extension-Batch: com/liferay/commerce/currency/internal/batch/currencies.batch-engine-data.json
 Liferay-Require-SchemaVersion: 1.3.0
 Liferay-Service: true
 -dsannotations-options: inherit
