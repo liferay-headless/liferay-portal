@@ -129,6 +129,8 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 	<#assign
 		enumSchemas = freeMarkerTool.getDTOEnumSchemas(openAPIYAML, schema)
+		generateGetValues = []
+		hasJsonMap = false
 		properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema)
 	/>
 
@@ -138,6 +140,10 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 			propertyType = properties[propertyName]
 			sizeParameters = []
 		/>
+
+		<#if !stringUtil.equals(propertyName, "properties")>
+
+		</#if>
 
 		<#if propertySchema.maximum??>
 			@DecimalMax("${propertySchema.maximum}")
@@ -149,6 +155,9 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 		<#if propertySchema.jsonMap>
 			@JsonAnyGetter
+			<#assign hasJsonMap = true />
+		<#else>
+			<#assign generateGetValues = generateGetValues + [propertyName] />
 		</#if>
 
 		<#if propertySchema.maxLength??>
@@ -280,6 +289,27 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 		return Objects.equals(toString(), ${schemaVarName}.toString());
 	}
+
+	<#if generateGetValues?has_content>
+		<#assign firstPropertyName = generateGetValues[0]>
+			public Object getValue(String propertyName) {
+				if (Objects.equals(propertyName, "${firstPropertyName}")) {
+					return ${firstPropertyName};
+		<#assign reducedProperties = generateGetValues[0..generateGetValues?size - 1]>
+		<#list reducedProperties as propertyName>
+				} else if (Objects.equals(propertyName, "${propertyName}")) {
+					return ${propertyName};
+		</#list>
+		<#if hasJsonMap>
+ 				} else {
+					return properties.get(propertyName);
+		<#else>
+				} else {
+					return null;
+		</#if>
+				}
+			}
+	</#if>
 
 	@Override
 	public int hashCode() {
