@@ -522,6 +522,63 @@ public class ObjectAction implements Serializable {
 		return Objects.equals(toString(), objectAction.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "conditionExpression")) {
+			return conditionExpression;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "objectActionExecutorKey")) {
+			return objectActionExecutorKey;
+		}
+		else if (Objects.equals(propertyName, "objectActionTriggerKey")) {
+			return objectActionTriggerKey;
+		}
+		else if (Objects.equals(propertyName, "parameters")) {
+			return parameters;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

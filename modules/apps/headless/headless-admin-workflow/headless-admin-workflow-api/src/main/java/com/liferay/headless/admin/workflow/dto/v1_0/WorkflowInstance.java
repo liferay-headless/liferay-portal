@@ -338,6 +338,42 @@ public class WorkflowInstance implements Serializable {
 		return Objects.equals(toString(), workflowInstance.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "currentNodeNames")) {
+			return currentNodeNames;
+		}
+		else if (Objects.equals(propertyName, "dateCompletion")) {
+			return dateCompletion;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "objectReviewed")) {
+			return objectReviewed;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionName")) {
+			return workflowDefinitionName;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionVersion")) {
+			return workflowDefinitionVersion;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -170,6 +170,27 @@ public class CommerceChannel implements Serializable {
 		return Objects.equals(toString(), commerceChannel.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "channelName")) {
+			return channelName;
+		}
+		else if (Objects.equals(propertyName, "channelName")) {
+			return channelName;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "siteName")) {
+			return siteName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -233,6 +233,33 @@ public class FacetConfiguration implements Serializable {
 		return Objects.equals(toString(), facetConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "aggregationName")) {
+			return aggregationName;
+		}
+		else if (Objects.equals(propertyName, "aggregationName")) {
+			return aggregationName;
+		}
+		else if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "frequencyThreshold")) {
+			return frequencyThreshold;
+		}
+		else if (Objects.equals(propertyName, "maxTerms")) {
+			return maxTerms;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "values")) {
+			return values;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

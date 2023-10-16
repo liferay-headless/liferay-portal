@@ -150,6 +150,24 @@ public class FailedItem implements Serializable {
 		return Objects.equals(toString(), failedItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "item")) {
+			return item;
+		}
+		else if (Objects.equals(propertyName, "item")) {
+			return item;
+		}
+		else if (Objects.equals(propertyName, "itemIndex")) {
+			return itemIndex;
+		}
+		else if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

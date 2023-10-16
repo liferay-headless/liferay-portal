@@ -282,6 +282,38 @@ public class PriceModifierProduct implements Serializable {
 		return Objects.equals(toString(), priceModifierProduct.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(
+					propertyName, "priceModifierExternalReferenceCode")) {
+
+			return priceModifierExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "priceModifierId")) {
+			return priceModifierId;
+		}
+		else if (Objects.equals(propertyName, "priceModifierProductId")) {
+			return priceModifierProductId;
+		}
+		else if (Objects.equals(propertyName, "product")) {
+			return product;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

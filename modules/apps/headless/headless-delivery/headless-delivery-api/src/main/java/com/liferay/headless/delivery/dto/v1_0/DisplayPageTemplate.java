@@ -211,6 +211,30 @@ public class DisplayPageTemplate implements Serializable {
 		return Objects.equals(toString(), displayPageTemplate.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentSubtype")) {
+			return contentSubtype;
+		}
+		else if (Objects.equals(propertyName, "contentSubtype")) {
+			return contentSubtype;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "defaultTemplate")) {
+			return defaultTemplate;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

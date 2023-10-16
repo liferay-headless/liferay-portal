@@ -121,6 +121,21 @@ public class QueryConfiguration implements Serializable {
 		return Objects.equals(toString(), queryConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "applyIndexerClauses")) {
+			return applyIndexerClauses;
+		}
+		else if (Objects.equals(propertyName, "applyIndexerClauses")) {
+			return applyIndexerClauses;
+		}
+		else if (Objects.equals(propertyName, "queryEntries")) {
+			return queryEntries;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

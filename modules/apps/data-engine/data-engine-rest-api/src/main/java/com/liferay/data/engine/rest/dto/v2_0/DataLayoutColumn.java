@@ -118,6 +118,21 @@ public class DataLayoutColumn implements Serializable {
 		return Objects.equals(toString(), dataLayoutColumn.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "columnSize")) {
+			return columnSize;
+		}
+		else if (Objects.equals(propertyName, "columnSize")) {
+			return columnSize;
+		}
+		else if (Objects.equals(propertyName, "fieldNames")) {
+			return fieldNames;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

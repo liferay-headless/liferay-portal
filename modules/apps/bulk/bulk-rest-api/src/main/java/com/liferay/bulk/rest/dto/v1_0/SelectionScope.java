@@ -146,6 +146,24 @@ public class SelectionScope implements Serializable {
 		return Objects.equals(toString(), selectionScope.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "folderId")) {
+			return folderId;
+		}
+		else if (Objects.equals(propertyName, "folderId")) {
+			return folderId;
+		}
+		else if (Objects.equals(propertyName, "repositoryId")) {
+			return repositoryId;
+		}
+		else if (Objects.equals(propertyName, "selectAll")) {
+			return selectAll;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -361,6 +361,47 @@ public class DiscountSku implements Serializable {
 		return Objects.equals(toString(), discountSku.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(
+					propertyName, "discountExternalReferenceCode")) {
+
+			return discountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "discountId")) {
+			return discountId;
+		}
+		else if (Objects.equals(propertyName, "discountSkuId")) {
+			return discountSkuId;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productName")) {
+			return productName;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuExternalReferenceCode")) {
+			return skuExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

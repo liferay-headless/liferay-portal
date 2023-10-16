@@ -131,6 +131,21 @@ public class Service implements Serializable {
 		return Objects.equals(toString(), service.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "hoursAvailable")) {
+			return hoursAvailable;
+		}
+		else if (Objects.equals(propertyName, "hoursAvailable")) {
+			return hoursAvailable;
+		}
+		else if (Objects.equals(propertyName, "serviceType")) {
+			return serviceType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

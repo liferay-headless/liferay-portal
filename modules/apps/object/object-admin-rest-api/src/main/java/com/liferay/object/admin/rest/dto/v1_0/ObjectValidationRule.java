@@ -543,6 +543,65 @@ public class ObjectValidationRule implements Serializable {
 		return Objects.equals(toString(), objectValidationRule.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "engine")) {
+			return engine;
+		}
+		else if (Objects.equals(propertyName, "engineLabel")) {
+			return engineLabel;
+		}
+		else if (Objects.equals(propertyName, "errorLabel")) {
+			return errorLabel;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode")) {
+
+			return objectDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionId")) {
+			return objectDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "objectValidationRuleSettings")) {
+			return objectValidationRuleSettings;
+		}
+		else if (Objects.equals(propertyName, "outputType")) {
+			return outputType;
+		}
+		else if (Objects.equals(propertyName, "script")) {
+			return script;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

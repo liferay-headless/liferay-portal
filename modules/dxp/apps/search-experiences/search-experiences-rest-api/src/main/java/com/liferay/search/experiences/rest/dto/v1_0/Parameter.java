@@ -214,6 +214,30 @@ public class Parameter implements Serializable {
 		return Objects.equals(toString(), parameter.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "format")) {
+			return format;
+		}
+		else if (Objects.equals(propertyName, "max")) {
+			return max;
+		}
+		else if (Objects.equals(propertyName, "min")) {
+			return min;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

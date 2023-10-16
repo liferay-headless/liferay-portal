@@ -239,6 +239,33 @@ public class Language implements Serializable {
 		return Objects.equals(toString(), language.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "countryName")) {
+			return countryName;
+		}
+		else if (Objects.equals(propertyName, "countryName")) {
+			return countryName;
+		}
+		else if (Objects.equals(propertyName, "countryName_i18n")) {
+			return countryName_i18n;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "markedAsDefault")) {
+			return markedAsDefault;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

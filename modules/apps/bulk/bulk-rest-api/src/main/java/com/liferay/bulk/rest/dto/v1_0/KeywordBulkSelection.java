@@ -154,6 +154,24 @@ public class KeywordBulkSelection implements Serializable {
 		return Objects.equals(toString(), keywordBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "documentBulkSelection")) {
+			return documentBulkSelection;
+		}
+		else if (Objects.equals(propertyName, "documentBulkSelection")) {
+			return documentBulkSelection;
+		}
+		else if (Objects.equals(propertyName, "keywordsToAdd")) {
+			return keywordsToAdd;
+		}
+		else if (Objects.equals(propertyName, "keywordsToRemove")) {
+			return keywordsToRemove;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

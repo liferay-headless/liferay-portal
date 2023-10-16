@@ -467,6 +467,57 @@ public class SXPBlueprint implements Serializable {
 		return Objects.equals(toString(), sxpBlueprint.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "configuration")) {
+			return configuration;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "elementInstances")) {
+			return elementInstances;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "schemaVersion")) {
+			return schemaVersion;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "title_i18n")) {
+			return title_i18n;
+		}
+		else if (Objects.equals(propertyName, "userName")) {
+			return userName;
+		}
+		else if (Objects.equals(propertyName, "version")) {
+			return version;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -118,6 +118,21 @@ public class TaxonomyCategory implements Serializable {
 		return Objects.equals(toString(), taxonomyCategory.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "taxonomyCategoryId")) {
+			return taxonomyCategoryId;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryId")) {
+			return taxonomyCategoryId;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryName")) {
+			return taxonomyCategoryName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

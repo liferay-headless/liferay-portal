@@ -206,6 +206,30 @@ public class ContactConfiguration implements Serializable {
 		return Objects.equals(toString(), contactConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "syncAllAccounts")) {
+			return syncAllAccounts;
+		}
+		else if (Objects.equals(propertyName, "syncAllAccounts")) {
+			return syncAllAccounts;
+		}
+		else if (Objects.equals(propertyName, "syncAllContacts")) {
+			return syncAllContacts;
+		}
+		else if (Objects.equals(propertyName, "syncedAccountGroupIds")) {
+			return syncedAccountGroupIds;
+		}
+		else if (Objects.equals(propertyName, "syncedOrganizationIds")) {
+			return syncedOrganizationIds;
+		}
+		else if (Objects.equals(propertyName, "syncedUserGroupIds")) {
+			return syncedUserGroupIds;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

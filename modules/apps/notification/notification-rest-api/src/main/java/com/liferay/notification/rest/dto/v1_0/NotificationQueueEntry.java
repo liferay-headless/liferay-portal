@@ -403,6 +403,51 @@ public class NotificationQueueEntry implements Serializable {
 		return Objects.equals(toString(), notificationQueueEntry.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "body")) {
+			return body;
+		}
+		else if (Objects.equals(propertyName, "fromName")) {
+			return fromName;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "recipients")) {
+			return recipients;
+		}
+		else if (Objects.equals(propertyName, "recipientsSummary")) {
+			return recipientsSummary;
+		}
+		else if (Objects.equals(propertyName, "sentDate")) {
+			return sentDate;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "subject")) {
+			return subject;
+		}
+		else if (Objects.equals(propertyName, "triggerBy")) {
+			return triggerBy;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "typeLabel")) {
+			return typeLabel;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -96,6 +96,18 @@ public class ParameterConfiguration implements Serializable {
 		return Objects.equals(toString(), parameterConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "parameters")) {
+			return parameters;
+		}
+		else if (Objects.equals(propertyName, "parameters")) {
+			return parameters;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

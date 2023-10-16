@@ -303,6 +303,39 @@ public class SamlProvider implements Serializable {
 		return Objects.equals(toString(), samlProvider.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "enabled")) {
+			return enabled;
+		}
+		else if (Objects.equals(propertyName, "enabled")) {
+			return enabled;
+		}
+		else if (Objects.equals(propertyName, "entityId")) {
+			return entityId;
+		}
+		else if (Objects.equals(propertyName, "idp")) {
+			return idp;
+		}
+		else if (Objects.equals(propertyName, "keyStoreCredentialPassword")) {
+			return keyStoreCredentialPassword;
+		}
+		else if (Objects.equals(propertyName, "role")) {
+			return role;
+		}
+		else if (Objects.equals(propertyName, "signMetadata")) {
+			return signMetadata;
+		}
+		else if (Objects.equals(propertyName, "sp")) {
+			return sp;
+		}
+		else if (Objects.equals(propertyName, "sslRequired")) {
+			return sslRequired;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

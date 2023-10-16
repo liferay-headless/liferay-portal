@@ -182,6 +182,27 @@ public class WidgetInstance implements Serializable {
 		return Objects.equals(toString(), widgetInstance.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "widgetConfig")) {
+			return widgetConfig;
+		}
+		else if (Objects.equals(propertyName, "widgetConfig")) {
+			return widgetConfig;
+		}
+		else if (Objects.equals(propertyName, "widgetInstanceId")) {
+			return widgetInstanceId;
+		}
+		else if (Objects.equals(propertyName, "widgetName")) {
+			return widgetName;
+		}
+		else if (Objects.equals(propertyName, "widgetPermissions")) {
+			return widgetPermissions;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

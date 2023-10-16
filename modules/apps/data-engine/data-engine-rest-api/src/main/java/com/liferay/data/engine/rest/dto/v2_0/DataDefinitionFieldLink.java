@@ -154,6 +154,24 @@ public class DataDefinitionFieldLink implements Serializable {
 		return Objects.equals(toString(), dataDefinitionFieldLink.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataDefinition")) {
+			return dataDefinition;
+		}
+		else if (Objects.equals(propertyName, "dataDefinition")) {
+			return dataDefinition;
+		}
+		else if (Objects.equals(propertyName, "dataLayouts")) {
+			return dataLayouts;
+		}
+		else if (Objects.equals(propertyName, "dataListViews")) {
+			return dataListViews;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

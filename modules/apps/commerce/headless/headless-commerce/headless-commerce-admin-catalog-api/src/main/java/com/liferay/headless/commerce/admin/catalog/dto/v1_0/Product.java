@@ -1551,6 +1551,165 @@ public class Product implements Serializable {
 		return Objects.equals(toString(), product.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "attachments")) {
+			return attachments;
+		}
+		else if (Objects.equals(propertyName, "catalog")) {
+			return catalog;
+		}
+		else if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "categories")) {
+			return categories;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "defaultSku")) {
+			return defaultSku;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "diagram")) {
+			return diagram;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expando")) {
+			return expando;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "images")) {
+			return images;
+		}
+		else if (Objects.equals(propertyName, "linkedProducts")) {
+			return linkedProducts;
+		}
+		else if (Objects.equals(propertyName, "mappedProducts")) {
+			return mappedProducts;
+		}
+		else if (Objects.equals(propertyName, "metaDescription")) {
+			return metaDescription;
+		}
+		else if (Objects.equals(propertyName, "metaKeyword")) {
+			return metaKeyword;
+		}
+		else if (Objects.equals(propertyName, "metaTitle")) {
+			return metaTitle;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "pins")) {
+			return pins;
+		}
+		else if (Objects.equals(propertyName, "productAccountGroupFilter")) {
+			return productAccountGroupFilter;
+		}
+		else if (Objects.equals(propertyName, "productAccountGroups")) {
+			return productAccountGroups;
+		}
+		else if (Objects.equals(propertyName, "productChannelFilter")) {
+			return productChannelFilter;
+		}
+		else if (Objects.equals(propertyName, "productChannels")) {
+			return productChannels;
+		}
+		else if (Objects.equals(propertyName, "productConfiguration")) {
+			return productConfiguration;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productOptions")) {
+			return productOptions;
+		}
+		else if (Objects.equals(propertyName, "productSpecifications")) {
+			return productSpecifications;
+		}
+		else if (Objects.equals(propertyName, "productStatus")) {
+			return productStatus;
+		}
+		else if (Objects.equals(propertyName, "productType")) {
+			return productType;
+		}
+		else if (Objects.equals(propertyName, "productTypeI18n")) {
+			return productTypeI18n;
+		}
+		else if (Objects.equals(propertyName, "productVirtualSettings")) {
+			return productVirtualSettings;
+		}
+		else if (Objects.equals(propertyName, "relatedProducts")) {
+			return relatedProducts;
+		}
+		else if (Objects.equals(propertyName, "shippingConfiguration")) {
+			return shippingConfiguration;
+		}
+		else if (Objects.equals(propertyName, "shortDescription")) {
+			return shortDescription;
+		}
+		else if (Objects.equals(propertyName, "skuFormatted")) {
+			return skuFormatted;
+		}
+		else if (Objects.equals(propertyName, "skus")) {
+			return skus;
+		}
+		else if (Objects.equals(propertyName, "subscriptionConfiguration")) {
+			return subscriptionConfiguration;
+		}
+		else if (Objects.equals(propertyName, "tags")) {
+			return tags;
+		}
+		else if (Objects.equals(propertyName, "taxConfiguration")) {
+			return taxConfiguration;
+		}
+		else if (Objects.equals(propertyName, "thumbnail")) {
+			return thumbnail;
+		}
+		else if (Objects.equals(propertyName, "urls")) {
+			return urls;
+		}
+		else if (Objects.equals(propertyName, "version")) {
+			return version;
+		}
+		else if (Objects.equals(propertyName, "workflowStatusInfo")) {
+			return workflowStatusInfo;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

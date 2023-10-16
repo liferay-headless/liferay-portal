@@ -205,6 +205,30 @@ public class DSRecipientViewDefinition implements Serializable {
 		return Objects.equals(toString(), dsRecipientViewDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "authenticationMethod")) {
+			return authenticationMethod;
+		}
+		else if (Objects.equals(propertyName, "authenticationMethod")) {
+			return authenticationMethod;
+		}
+		else if (Objects.equals(propertyName, "dsClientUserId")) {
+			return dsClientUserId;
+		}
+		else if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "returnURL")) {
+			return returnURL;
+		}
+		else if (Objects.equals(propertyName, "userName")) {
+			return userName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

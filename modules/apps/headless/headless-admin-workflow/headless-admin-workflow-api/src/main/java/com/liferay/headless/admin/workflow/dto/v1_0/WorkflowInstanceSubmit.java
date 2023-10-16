@@ -210,6 +210,30 @@ public class WorkflowInstanceSubmit implements Serializable {
 		return Objects.equals(toString(), workflowInstanceSubmit.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "context")) {
+			return context;
+		}
+		else if (Objects.equals(propertyName, "context")) {
+			return context;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "transitionName")) {
+			return transitionName;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionName")) {
+			return workflowDefinitionName;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionVersion")) {
+			return workflowDefinitionVersion;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

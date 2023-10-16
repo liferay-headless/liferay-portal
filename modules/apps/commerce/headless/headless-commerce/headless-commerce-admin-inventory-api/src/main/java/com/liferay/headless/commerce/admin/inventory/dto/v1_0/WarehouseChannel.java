@@ -279,6 +279,38 @@ public class WarehouseChannel implements Serializable {
 		return Objects.equals(toString(), warehouseChannel.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "channel")) {
+			return channel;
+		}
+		else if (Objects.equals(propertyName, "channelExternalReferenceCode")) {
+			return channelExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "warehouseChannelId")) {
+			return warehouseChannelId;
+		}
+		else if (Objects.equals(
+					propertyName, "warehouseExternalReferenceCode")) {
+
+			return warehouseExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "warehouseId")) {
+			return warehouseId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

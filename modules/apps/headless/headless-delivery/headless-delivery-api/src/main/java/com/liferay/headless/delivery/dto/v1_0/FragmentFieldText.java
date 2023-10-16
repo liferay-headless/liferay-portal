@@ -124,6 +124,21 @@ public class FragmentFieldText implements Serializable {
 		return Objects.equals(toString(), fragmentFieldText.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fragmentLink")) {
+			return fragmentLink;
+		}
+		else if (Objects.equals(propertyName, "fragmentLink")) {
+			return fragmentLink;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

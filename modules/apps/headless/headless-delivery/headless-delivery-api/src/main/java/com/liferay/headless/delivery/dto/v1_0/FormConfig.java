@@ -131,6 +131,21 @@ public class FormConfig implements Serializable {
 		return Objects.equals(toString(), formConfig.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "formReference")) {
+			return formReference;
+		}
+		else if (Objects.equals(propertyName, "formReference")) {
+			return formReference;
+		}
+		else if (Objects.equals(propertyName, "formSuccessSubmissionResult")) {
+			return formSuccessSubmissionResult;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

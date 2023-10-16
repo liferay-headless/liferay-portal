@@ -170,6 +170,24 @@ public class MessageFormSubmissionResult implements Serializable {
 			toString(), messageFormSubmissionResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else if (Objects.equals(propertyName, "messageType")) {
+			return messageType;
+		}
+		else if (Objects.equals(propertyName, "showNotification")) {
+			return showNotification;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

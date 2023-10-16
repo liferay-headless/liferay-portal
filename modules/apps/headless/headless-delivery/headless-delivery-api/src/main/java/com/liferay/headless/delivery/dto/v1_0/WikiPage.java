@@ -783,6 +783,84 @@ public class WikiPage implements Serializable {
 		return Objects.equals(toString(), wikiPage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "aggregateRating")) {
+			return aggregateRating;
+		}
+		else if (Objects.equals(propertyName, "content")) {
+			return content;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "encodingFormat")) {
+			return encodingFormat;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "headline")) {
+			return headline;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "numberOfAttachments")) {
+			return numberOfAttachments;
+		}
+		else if (Objects.equals(propertyName, "numberOfWikiPages")) {
+			return numberOfWikiPages;
+		}
+		else if (Objects.equals(propertyName, "parentWikiPageId")) {
+			return parentWikiPageId;
+		}
+		else if (Objects.equals(propertyName, "relatedContents")) {
+			return relatedContents;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "subscribed")) {
+			return subscribed;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryBriefs")) {
+			return taxonomyCategoryBriefs;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryIds")) {
+			return taxonomyCategoryIds;
+		}
+		else if (Objects.equals(propertyName, "viewableBy")) {
+			return viewableBy;
+		}
+		else if (Objects.equals(propertyName, "wikiNodeId")) {
+			return wikiNodeId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

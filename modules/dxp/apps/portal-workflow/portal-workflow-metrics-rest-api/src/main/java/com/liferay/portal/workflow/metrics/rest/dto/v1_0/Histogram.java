@@ -118,6 +118,21 @@ public class Histogram implements Serializable {
 		return Objects.equals(toString(), histogram.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

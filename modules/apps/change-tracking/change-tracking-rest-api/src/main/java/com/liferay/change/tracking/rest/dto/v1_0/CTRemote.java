@@ -351,6 +351,45 @@ public class CTRemote implements Serializable {
 		return Objects.equals(toString(), ctRemote.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "clientId")) {
+			return clientId;
+		}
+		else if (Objects.equals(propertyName, "clientSecret")) {
+			return clientSecret;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "ownerName")) {
+			return ownerName;
+		}
+		else if (Objects.equals(propertyName, "url")) {
+			return url;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

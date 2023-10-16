@@ -450,6 +450,56 @@ public class ShipmentItem implements Serializable {
 		return Objects.equals(toString(), shipmentItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "orderItemId")) {
+			return orderItemId;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(
+					propertyName, "shipmentExternalReferenceCode")) {
+
+			return shipmentExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "shipmentId")) {
+			return shipmentId;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else if (Objects.equals(propertyName, "userName")) {
+			return userName;
+		}
+		else if (Objects.equals(propertyName, "validateInventory")) {
+			return validateInventory;
+		}
+		else if (Objects.equals(propertyName, "warehouseId")) {
+			return warehouseId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

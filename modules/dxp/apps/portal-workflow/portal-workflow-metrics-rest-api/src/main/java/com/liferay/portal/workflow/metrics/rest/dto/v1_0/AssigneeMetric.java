@@ -207,6 +207,30 @@ public class AssigneeMetric implements Serializable {
 		return Objects.equals(toString(), assigneeMetric.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "assignee")) {
+			return assignee;
+		}
+		else if (Objects.equals(propertyName, "assignee")) {
+			return assignee;
+		}
+		else if (Objects.equals(propertyName, "durationTaskAvg")) {
+			return durationTaskAvg;
+		}
+		else if (Objects.equals(propertyName, "onTimeTaskCount")) {
+			return onTimeTaskCount;
+		}
+		else if (Objects.equals(propertyName, "overdueTaskCount")) {
+			return overdueTaskCount;
+		}
+		else if (Objects.equals(propertyName, "taskCount")) {
+			return taskCount;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

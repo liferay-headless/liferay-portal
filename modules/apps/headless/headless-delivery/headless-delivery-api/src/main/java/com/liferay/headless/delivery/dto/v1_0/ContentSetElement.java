@@ -209,6 +209,30 @@ public class ContentSetElement implements Serializable {
 		return Objects.equals(toString(), contentSetElement.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "content")) {
+			return content;
+		}
+		else if (Objects.equals(propertyName, "content")) {
+			return content;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "title_i18n")) {
+			return title_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

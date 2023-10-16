@@ -349,6 +349,45 @@ public class DataListView implements Serializable {
 		return Objects.equals(toString(), dataListView.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "appliedFilters")) {
+			return appliedFilters;
+		}
+		else if (Objects.equals(propertyName, "appliedFilters")) {
+			return appliedFilters;
+		}
+		else if (Objects.equals(propertyName, "dataDefinitionId")) {
+			return dataDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "fieldNames")) {
+			return fieldNames;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "sortField")) {
+			return sortField;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -162,6 +162,24 @@ public class TaxonomyCategoryBulkSelection implements Serializable {
 			toString(), taxonomyCategoryBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "documentBulkSelection")) {
+			return documentBulkSelection;
+		}
+		else if (Objects.equals(propertyName, "documentBulkSelection")) {
+			return documentBulkSelection;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryIdsToAdd")) {
+			return taxonomyCategoryIdsToAdd;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryIdsToRemove")) {
+			return taxonomyCategoryIdsToRemove;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

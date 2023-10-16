@@ -369,6 +369,48 @@ public class Clause implements Serializable {
 		return Objects.equals(toString(), clause.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "additive")) {
+			return additive;
+		}
+		else if (Objects.equals(propertyName, "additive")) {
+			return additive;
+		}
+		else if (Objects.equals(propertyName, "boost")) {
+			return boost;
+		}
+		else if (Objects.equals(propertyName, "context")) {
+			return context;
+		}
+		else if (Objects.equals(propertyName, "disabled")) {
+			return disabled;
+		}
+		else if (Objects.equals(propertyName, "field")) {
+			return field;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "occur")) {
+			return occur;
+		}
+		else if (Objects.equals(propertyName, "parent")) {
+			return parent;
+		}
+		else if (Objects.equals(propertyName, "query")) {
+			return query;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -121,6 +121,21 @@ public class ContentSubtype implements Serializable {
 		return Objects.equals(toString(), contentSubtype.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "subtypeId")) {
+			return subtypeId;
+		}
+		else if (Objects.equals(propertyName, "subtypeId")) {
+			return subtypeId;
+		}
+		else if (Objects.equals(propertyName, "subtypeKey")) {
+			return subtypeKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -380,6 +380,48 @@ public class Sku implements Serializable {
 		return Objects.equals(toString(), sku.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "cost")) {
+			return cost;
+		}
+		else if (Objects.equals(propertyName, "cost")) {
+			return cost;
+		}
+		else if (Objects.equals(propertyName, "discontinued")) {
+			return discontinued;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "gtin")) {
+			return gtin;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "manufacturerPartNumber")) {
+			return manufacturerPartNumber;
+		}
+		else if (Objects.equals(propertyName, "published")) {
+			return published;
+		}
+		else if (Objects.equals(propertyName, "purchasable")) {
+			return purchasable;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

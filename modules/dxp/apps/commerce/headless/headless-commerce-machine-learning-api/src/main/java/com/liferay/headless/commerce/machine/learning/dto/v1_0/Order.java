@@ -592,6 +592,71 @@ public class Order implements Serializable {
 		return Objects.equals(toString(), order.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "currencyCode")) {
+			return currencyCode;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "orderDate")) {
+			return orderDate;
+		}
+		else if (Objects.equals(propertyName, "orderItems")) {
+			return orderItems;
+		}
+		else if (Objects.equals(propertyName, "orderStatus")) {
+			return orderStatus;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "paymentMethod")) {
+			return paymentMethod;
+		}
+		else if (Objects.equals(propertyName, "paymentStatus")) {
+			return paymentStatus;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "total")) {
+			return total;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

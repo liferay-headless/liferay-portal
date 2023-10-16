@@ -490,6 +490,60 @@ public class Price implements Serializable {
 		return Objects.equals(toString(), price.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "discount")) {
+			return discount;
+		}
+		else if (Objects.equals(propertyName, "discountFormatted")) {
+			return discountFormatted;
+		}
+		else if (Objects.equals(propertyName, "discountPercentage")) {
+			return discountPercentage;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel1")) {
+			return discountPercentageLevel1;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel2")) {
+			return discountPercentageLevel2;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel3")) {
+			return discountPercentageLevel3;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel4")) {
+			return discountPercentageLevel4;
+		}
+		else if (Objects.equals(propertyName, "finalPrice")) {
+			return finalPrice;
+		}
+		else if (Objects.equals(propertyName, "finalPriceFormatted")) {
+			return finalPriceFormatted;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "priceFormatted")) {
+			return priceFormatted;
+		}
+		else if (Objects.equals(propertyName, "priceOnApplication")) {
+			return priceOnApplication;
+		}
+		else if (Objects.equals(propertyName, "promoPrice")) {
+			return promoPrice;
+		}
+		else if (Objects.equals(propertyName, "promoPriceFormatted")) {
+			return promoPriceFormatted;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

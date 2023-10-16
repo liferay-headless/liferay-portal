@@ -340,6 +340,45 @@ public class SkuOption implements Serializable {
 		return Objects.equals(toString(), skuOption.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "priceType")) {
+			return priceType;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "skuOptionId")) {
+			return skuOptionId;
+		}
+		else if (Objects.equals(propertyName, "skuOptionKey")) {
+			return skuOptionKey;
+		}
+		else if (Objects.equals(propertyName, "skuOptionValueId")) {
+			return skuOptionValueId;
+		}
+		else if (Objects.equals(propertyName, "skuOptionValueKey")) {
+			return skuOptionValueKey;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

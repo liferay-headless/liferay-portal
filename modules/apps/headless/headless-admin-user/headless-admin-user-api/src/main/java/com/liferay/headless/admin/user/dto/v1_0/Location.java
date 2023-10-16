@@ -189,6 +189,27 @@ public class Location implements Serializable {
 		return Objects.equals(toString(), location.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "addressCountry")) {
+			return addressCountry;
+		}
+		else if (Objects.equals(propertyName, "addressCountry")) {
+			return addressCountry;
+		}
+		else if (Objects.equals(propertyName, "addressCountry_i18n")) {
+			return addressCountry_i18n;
+		}
+		else if (Objects.equals(propertyName, "addressRegion")) {
+			return addressRegion;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

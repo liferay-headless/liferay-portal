@@ -208,6 +208,30 @@ public class QueryEntry implements Serializable {
 		return Objects.equals(toString(), queryEntry.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "clauses")) {
+			return clauses;
+		}
+		else if (Objects.equals(propertyName, "clauses")) {
+			return clauses;
+		}
+		else if (Objects.equals(propertyName, "condition")) {
+			return condition;
+		}
+		else if (Objects.equals(propertyName, "enabled")) {
+			return enabled;
+		}
+		else if (Objects.equals(propertyName, "postFilterClauses")) {
+			return postFilterClauses;
+		}
+		else if (Objects.equals(propertyName, "rescores")) {
+			return rescores;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

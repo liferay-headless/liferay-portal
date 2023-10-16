@@ -121,6 +121,21 @@ public class StartNodeKeys implements Serializable {
 		return Objects.equals(toString(), startNodeKeys.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "nodeKeys")) {
+			return nodeKeys;
+		}
+		else if (Objects.equals(propertyName, "nodeKeys")) {
+			return nodeKeys;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

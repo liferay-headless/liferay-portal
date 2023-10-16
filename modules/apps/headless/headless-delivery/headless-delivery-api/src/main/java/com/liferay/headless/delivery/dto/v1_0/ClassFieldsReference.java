@@ -128,6 +128,21 @@ public class ClassFieldsReference implements Serializable {
 		return Objects.equals(toString(), classFieldsReference.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "fields")) {
+			return fields;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

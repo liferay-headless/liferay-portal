@@ -434,6 +434,54 @@ public class WorkflowTasksBulkSelection implements Serializable {
 			toString(), workflowTasksBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "andOperator")) {
+			return andOperator;
+		}
+		else if (Objects.equals(propertyName, "andOperator")) {
+			return andOperator;
+		}
+		else if (Objects.equals(propertyName, "assetPrimaryKeys")) {
+			return assetPrimaryKeys;
+		}
+		else if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetTypes")) {
+			return assetTypes;
+		}
+		else if (Objects.equals(propertyName, "assigneeIds")) {
+			return assigneeIds;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "dateDueEnd")) {
+			return dateDueEnd;
+		}
+		else if (Objects.equals(propertyName, "dateDueStart")) {
+			return dateDueStart;
+		}
+		else if (Objects.equals(propertyName, "searchByRoles")) {
+			return searchByRoles;
+		}
+		else if (Objects.equals(propertyName, "searchByUserRoles")) {
+			return searchByUserRoles;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionId")) {
+			return workflowDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "workflowInstanceIds")) {
+			return workflowInstanceIds;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskNames")) {
+			return workflowTaskNames;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

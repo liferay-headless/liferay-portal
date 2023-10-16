@@ -170,6 +170,27 @@ public class Policy implements Serializable {
 		return Objects.equals(toString(), policy.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "planId")) {
+			return planId;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

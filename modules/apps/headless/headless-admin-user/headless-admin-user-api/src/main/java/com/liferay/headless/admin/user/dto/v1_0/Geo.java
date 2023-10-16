@@ -120,6 +120,21 @@ public class Geo implements Serializable {
 		return Objects.equals(toString(), geo.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "latitude")) {
+			return latitude;
+		}
+		else if (Objects.equals(propertyName, "latitude")) {
+			return latitude;
+		}
+		else if (Objects.equals(propertyName, "longitude")) {
+			return longitude;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

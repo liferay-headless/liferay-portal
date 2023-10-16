@@ -267,6 +267,36 @@ public class ReplacementSku implements Serializable {
 		return Objects.equals(toString(), replacementSku.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "productConfiguration")) {
+			return productConfiguration;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "skuOptions")) {
+			return skuOptions;
+		}
+		else if (Objects.equals(propertyName, "skuUnitOfMeasures")) {
+			return skuUnitOfMeasures;
+		}
+		else if (Objects.equals(propertyName, "urls")) {
+			return urls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

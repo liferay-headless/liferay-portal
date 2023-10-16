@@ -1109,6 +1109,130 @@ public class ObjectDefinition implements Serializable {
 		return Objects.equals(toString(), objectDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountEntryRestricted")) {
+			return accountEntryRestricted;
+		}
+		else if (Objects.equals(propertyName, "accountEntryRestricted")) {
+			return accountEntryRestricted;
+		}
+		else if (Objects.equals(
+					propertyName, "accountEntryRestrictedObjectFieldName")) {
+
+			return accountEntryRestrictedObjectFieldName;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "defaultLanguageId")) {
+			return defaultLanguageId;
+		}
+		else if (Objects.equals(propertyName, "enableCategorization")) {
+			return enableCategorization;
+		}
+		else if (Objects.equals(propertyName, "enableComments")) {
+			return enableComments;
+		}
+		else if (Objects.equals(propertyName, "enableLocalization")) {
+			return enableLocalization;
+		}
+		else if (Objects.equals(propertyName, "enableObjectEntryDraft")) {
+			return enableObjectEntryDraft;
+		}
+		else if (Objects.equals(propertyName, "enableObjectEntryHistory")) {
+			return enableObjectEntryHistory;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "modifiable")) {
+			return modifiable;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "objectActions")) {
+			return objectActions;
+		}
+		else if (Objects.equals(propertyName, "objectFields")) {
+			return objectFields;
+		}
+		else if (Objects.equals(
+					propertyName, "objectFolderExternalReferenceCode")) {
+
+			return objectFolderExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "objectLayouts")) {
+			return objectLayouts;
+		}
+		else if (Objects.equals(propertyName, "objectRelationships")) {
+			return objectRelationships;
+		}
+		else if (Objects.equals(propertyName, "objectValidationRules")) {
+			return objectValidationRules;
+		}
+		else if (Objects.equals(propertyName, "objectViews")) {
+			return objectViews;
+		}
+		else if (Objects.equals(propertyName, "panelAppOrder")) {
+			return panelAppOrder;
+		}
+		else if (Objects.equals(propertyName, "panelCategoryKey")) {
+			return panelCategoryKey;
+		}
+		else if (Objects.equals(propertyName, "parameterRequired")) {
+			return parameterRequired;
+		}
+		else if (Objects.equals(propertyName, "pluralLabel")) {
+			return pluralLabel;
+		}
+		else if (Objects.equals(propertyName, "portlet")) {
+			return portlet;
+		}
+		else if (Objects.equals(propertyName, "restContextPath")) {
+			return restContextPath;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"rootObjectDefinitionExternalReferenceCode")) {
+
+			return rootObjectDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "scope")) {
+			return scope;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "storageType")) {
+			return storageType;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else if (Objects.equals(propertyName, "titleObjectFieldName")) {
+			return titleObjectFieldName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

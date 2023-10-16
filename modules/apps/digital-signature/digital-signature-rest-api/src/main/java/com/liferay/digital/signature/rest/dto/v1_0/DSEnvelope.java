@@ -374,6 +374,48 @@ public class DSEnvelope implements Serializable {
 		return Objects.equals(toString(), dsEnvelope.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "dsDocument")) {
+			return dsDocument;
+		}
+		else if (Objects.equals(propertyName, "dsRecipient")) {
+			return dsRecipient;
+		}
+		else if (Objects.equals(propertyName, "emailBlurb")) {
+			return emailBlurb;
+		}
+		else if (Objects.equals(propertyName, "emailSubject")) {
+			return emailSubject;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "senderEmailAddress")) {
+			return senderEmailAddress;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

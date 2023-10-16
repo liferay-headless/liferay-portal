@@ -357,6 +357,45 @@ public class AccountChannelEntry implements Serializable {
 		return Objects.equals(toString(), accountChannelEntry.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountExternalReferenceCode")) {
+			return accountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountExternalReferenceCode")) {
+			return accountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "channelExternalReferenceCode")) {
+			return channelExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "classExternalReferenceCode")) {
+			return classExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "classPK")) {
+			return classPK;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "overrideEligibility")) {
+			return overrideEligibility;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

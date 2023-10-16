@@ -148,6 +148,24 @@ public class SearchHits implements Serializable {
 		return Objects.equals(toString(), searchHits.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "hits")) {
+			return hits;
+		}
+		else if (Objects.equals(propertyName, "hits")) {
+			return hits;
+		}
+		else if (Objects.equals(propertyName, "maxScore")) {
+			return maxScore;
+		}
+		else if (Objects.equals(propertyName, "totalHits")) {
+			return totalHits;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

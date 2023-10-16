@@ -306,6 +306,39 @@ public class ProductShippingConfiguration implements Serializable {
 			toString(), productShippingConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "depth")) {
+			return depth;
+		}
+		else if (Objects.equals(propertyName, "depth")) {
+			return depth;
+		}
+		else if (Objects.equals(propertyName, "freeShipping")) {
+			return freeShipping;
+		}
+		else if (Objects.equals(propertyName, "height")) {
+			return height;
+		}
+		else if (Objects.equals(propertyName, "shippable")) {
+			return shippable;
+		}
+		else if (Objects.equals(propertyName, "shippingExtraPrice")) {
+			return shippingExtraPrice;
+		}
+		else if (Objects.equals(propertyName, "shippingSeparately")) {
+			return shippingSeparately;
+		}
+		else if (Objects.equals(propertyName, "weight")) {
+			return weight;
+		}
+		else if (Objects.equals(propertyName, "width")) {
+			return width;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

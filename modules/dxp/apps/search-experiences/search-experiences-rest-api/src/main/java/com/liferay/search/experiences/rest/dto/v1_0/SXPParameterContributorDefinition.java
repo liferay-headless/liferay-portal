@@ -150,6 +150,24 @@ public class SXPParameterContributorDefinition implements Serializable {
 			toString(), sxpParameterContributorDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "templateVariable")) {
+			return templateVariable;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -722,6 +722,83 @@ public class MappedProduct implements Serializable {
 		return Objects.equals(toString(), mappedProduct.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "availability")) {
+			return availability;
+		}
+		else if (Objects.equals(
+					propertyName, "firstAvailableReplacementMappedProduct")) {
+
+			return firstAvailableReplacementMappedProduct;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "productConfiguration")) {
+			return productConfiguration;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productName")) {
+			return productName;
+		}
+		else if (Objects.equals(propertyName, "productOptions")) {
+			return productOptions;
+		}
+		else if (Objects.equals(propertyName, "purchasable")) {
+			return purchasable;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "replacementMappedProduct")) {
+			return replacementMappedProduct;
+		}
+		else if (Objects.equals(propertyName, "replacementMessage")) {
+			return replacementMessage;
+		}
+		else if (Objects.equals(propertyName, "sequence")) {
+			return sequence;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuExternalReferenceCode")) {
+			return skuExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "skuOptions")) {
+			return skuOptions;
+		}
+		else if (Objects.equals(propertyName, "thumbnail")) {
+			return thumbnail;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "urls")) {
+			return urls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

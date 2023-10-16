@@ -100,6 +100,18 @@ public class NoneActionExecutionResult implements Serializable {
 		return Objects.equals(toString(), noneActionExecutionResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "reload")) {
+			return reload;
+		}
+		else if (Objects.equals(propertyName, "reload")) {
+			return reload;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

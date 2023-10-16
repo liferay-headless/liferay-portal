@@ -323,6 +323,42 @@ public class Creator implements Serializable {
 		return Objects.equals(toString(), creator.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "additionalName")) {
+			return additionalName;
+		}
+		else if (Objects.equals(propertyName, "additionalName")) {
+			return additionalName;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "familyName")) {
+			return familyName;
+		}
+		else if (Objects.equals(propertyName, "givenName")) {
+			return givenName;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "image")) {
+			return image;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "profileURL")) {
+			return profileURL;
+		}
+		else if (Objects.equals(propertyName, "userGroupBriefs")) {
+			return userGroupBriefs;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

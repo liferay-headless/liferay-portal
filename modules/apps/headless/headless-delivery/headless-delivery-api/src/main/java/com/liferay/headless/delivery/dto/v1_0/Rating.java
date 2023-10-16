@@ -308,6 +308,39 @@ public class Rating implements Serializable {
 		return Objects.equals(toString(), rating.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "bestRating")) {
+			return bestRating;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "ratingValue")) {
+			return ratingValue;
+		}
+		else if (Objects.equals(propertyName, "worstRating")) {
+			return worstRating;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

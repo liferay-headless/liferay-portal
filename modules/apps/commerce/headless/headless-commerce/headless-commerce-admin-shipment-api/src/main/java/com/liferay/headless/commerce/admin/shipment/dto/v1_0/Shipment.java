@@ -639,6 +639,75 @@ public class Shipment implements Serializable {
 		return Objects.equals(toString(), shipment.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "carrier")) {
+			return carrier;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "expectedDate")) {
+			return expectedDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "orderId")) {
+			return orderId;
+		}
+		else if (Objects.equals(propertyName, "shipmentItems")) {
+			return shipmentItems;
+		}
+		else if (Objects.equals(propertyName, "shippingAddress")) {
+			return shippingAddress;
+		}
+		else if (Objects.equals(propertyName, "shippingAddressId")) {
+			return shippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "shippingDate")) {
+			return shippingDate;
+		}
+		else if (Objects.equals(propertyName, "shippingMethodId")) {
+			return shippingMethodId;
+		}
+		else if (Objects.equals(propertyName, "shippingOptionName")) {
+			return shippingOptionName;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "trackingNumber")) {
+			return trackingNumber;
+		}
+		else if (Objects.equals(propertyName, "trackingURL")) {
+			return trackingURL;
+		}
+		else if (Objects.equals(propertyName, "userName")) {
+			return userName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

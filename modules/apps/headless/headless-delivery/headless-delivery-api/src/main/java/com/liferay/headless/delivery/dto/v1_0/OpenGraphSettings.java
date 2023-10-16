@@ -270,6 +270,36 @@ public class OpenGraphSettings implements Serializable {
 		return Objects.equals(toString(), openGraphSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "image")) {
+			return image;
+		}
+		else if (Objects.equals(propertyName, "imageAlt")) {
+			return imageAlt;
+		}
+		else if (Objects.equals(propertyName, "imageAlt_i18n")) {
+			return imageAlt_i18n;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "title_i18n")) {
+			return title_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -934,6 +934,101 @@ public class MessageBoardMessage implements Serializable {
 		return Objects.equals(toString(), messageBoardMessage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "aggregateRating")) {
+			return aggregateRating;
+		}
+		else if (Objects.equals(propertyName, "anonymous")) {
+			return anonymous;
+		}
+		else if (Objects.equals(propertyName, "articleBody")) {
+			return articleBody;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "creatorStatistics")) {
+			return creatorStatistics;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "encodingFormat")) {
+			return encodingFormat;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "friendlyUrlPath")) {
+			return friendlyUrlPath;
+		}
+		else if (Objects.equals(propertyName, "hasCompanyMx")) {
+			return hasCompanyMx;
+		}
+		else if (Objects.equals(propertyName, "headline")) {
+			return headline;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "messageBoardSectionId")) {
+			return messageBoardSectionId;
+		}
+		else if (Objects.equals(propertyName, "messageBoardThreadId")) {
+			return messageBoardThreadId;
+		}
+		else if (Objects.equals(propertyName, "modified")) {
+			return modified;
+		}
+		else if (Objects.equals(
+					propertyName, "numberOfMessageBoardAttachments")) {
+
+			return numberOfMessageBoardAttachments;
+		}
+		else if (Objects.equals(propertyName, "numberOfMessageBoardMessages")) {
+			return numberOfMessageBoardMessages;
+		}
+		else if (Objects.equals(propertyName, "parentMessageBoardMessageId")) {
+			return parentMessageBoardMessageId;
+		}
+		else if (Objects.equals(propertyName, "relatedContents")) {
+			return relatedContents;
+		}
+		else if (Objects.equals(propertyName, "showAsAnswer")) {
+			return showAsAnswer;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "subscribed")) {
+			return subscribed;
+		}
+		else if (Objects.equals(propertyName, "viewableBy")) {
+			return viewableBy;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

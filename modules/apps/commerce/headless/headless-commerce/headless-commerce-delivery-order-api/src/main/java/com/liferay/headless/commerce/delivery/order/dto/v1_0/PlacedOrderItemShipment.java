@@ -582,6 +582,69 @@ public class PlacedOrderItemShipment implements Serializable {
 		return Objects.equals(toString(), placedOrderItemShipment.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "author")) {
+			return author;
+		}
+		else if (Objects.equals(propertyName, "carrier")) {
+			return carrier;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "estimatedDeliveryDate")) {
+			return estimatedDeliveryDate;
+		}
+		else if (Objects.equals(propertyName, "estimatedShippingDate")) {
+			return estimatedShippingDate;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "orderId")) {
+			return orderId;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "shippingAddressId")) {
+			return shippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "shippingMethodId")) {
+			return shippingMethodId;
+		}
+		else if (Objects.equals(propertyName, "shippingOptionName")) {
+			return shippingOptionName;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "supplierShipment")) {
+			return supplierShipment;
+		}
+		else if (Objects.equals(propertyName, "trackingNumber")) {
+			return trackingNumber;
+		}
+		else if (Objects.equals(propertyName, "trackingURL")) {
+			return trackingURL;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

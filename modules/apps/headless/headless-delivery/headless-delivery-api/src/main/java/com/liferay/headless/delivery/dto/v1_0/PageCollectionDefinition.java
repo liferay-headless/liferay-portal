@@ -630,6 +630,69 @@ public class PageCollectionDefinition implements Serializable {
 		return Objects.equals(toString(), pageCollectionDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "collectionConfig")) {
+			return collectionConfig;
+		}
+		else if (Objects.equals(propertyName, "collectionConfig")) {
+			return collectionConfig;
+		}
+		else if (Objects.equals(propertyName, "collectionViewports")) {
+			return collectionViewports;
+		}
+		else if (Objects.equals(propertyName, "displayAllItems")) {
+			return displayAllItems;
+		}
+		else if (Objects.equals(propertyName, "displayAllPages")) {
+			return displayAllPages;
+		}
+		else if (Objects.equals(propertyName, "emptyCollectionConfig")) {
+			return emptyCollectionConfig;
+		}
+		else if (Objects.equals(propertyName, "fragmentStyle")) {
+			return fragmentStyle;
+		}
+		else if (Objects.equals(propertyName, "fragmentViewports")) {
+			return fragmentViewports;
+		}
+		else if (Objects.equals(propertyName, "layout")) {
+			return layout;
+		}
+		else if (Objects.equals(propertyName, "listItemStyle")) {
+			return listItemStyle;
+		}
+		else if (Objects.equals(propertyName, "listStyle")) {
+			return listStyle;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "numberOfColumns")) {
+			return numberOfColumns;
+		}
+		else if (Objects.equals(propertyName, "numberOfItems")) {
+			return numberOfItems;
+		}
+		else if (Objects.equals(propertyName, "numberOfItemsPerPage")) {
+			return numberOfItemsPerPage;
+		}
+		else if (Objects.equals(propertyName, "numberOfPages")) {
+			return numberOfPages;
+		}
+		else if (Objects.equals(propertyName, "paginationType")) {
+			return paginationType;
+		}
+		else if (Objects.equals(propertyName, "showAllItems")) {
+			return showAllItems;
+		}
+		else if (Objects.equals(propertyName, "templateKey")) {
+			return templateKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

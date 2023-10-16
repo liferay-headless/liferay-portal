@@ -162,6 +162,24 @@ public class HistogramMetric implements Serializable {
 		return Objects.equals(toString(), histogramMetric.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "histograms")) {
+			return histograms;
+		}
+		else if (Objects.equals(propertyName, "histograms")) {
+			return histograms;
+		}
+		else if (Objects.equals(propertyName, "unit")) {
+			return unit;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -262,6 +262,36 @@ public class HighlightConfiguration implements Serializable {
 		return Objects.equals(toString(), highlightConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fields")) {
+			return fields;
+		}
+		else if (Objects.equals(propertyName, "fields")) {
+			return fields;
+		}
+		else if (Objects.equals(propertyName, "fragment_size")) {
+			return fragment_size;
+		}
+		else if (Objects.equals(propertyName, "number_of_fragments")) {
+			return number_of_fragments;
+		}
+		else if (Objects.equals(propertyName, "post_tags")) {
+			return post_tags;
+		}
+		else if (Objects.equals(propertyName, "pre_tags")) {
+			return pre_tags;
+		}
+		else if (Objects.equals(propertyName, "require_field_match")) {
+			return require_field_match;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

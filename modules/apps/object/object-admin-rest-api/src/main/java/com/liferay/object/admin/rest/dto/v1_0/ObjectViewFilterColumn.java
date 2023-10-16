@@ -214,6 +214,30 @@ public class ObjectViewFilterColumn implements Serializable {
 		return Objects.equals(toString(), objectViewFilterColumn.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "filterType")) {
+			return filterType;
+		}
+		else if (Objects.equals(propertyName, "filterType")) {
+			return filterType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "json")) {
+			return json;
+		}
+		else if (Objects.equals(propertyName, "objectFieldName")) {
+			return objectFieldName;
+		}
+		else if (Objects.equals(propertyName, "valueSummary")) {
+			return valueSummary;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

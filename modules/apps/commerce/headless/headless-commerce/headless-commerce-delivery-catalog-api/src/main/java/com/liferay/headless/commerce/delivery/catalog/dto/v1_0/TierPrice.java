@@ -181,6 +181,27 @@ public class TierPrice implements Serializable {
 		return Objects.equals(toString(), tierPrice.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "priceFormatted")) {
+			return priceFormatted;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

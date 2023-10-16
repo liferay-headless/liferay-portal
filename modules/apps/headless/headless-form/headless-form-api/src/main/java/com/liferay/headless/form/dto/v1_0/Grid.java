@@ -148,6 +148,24 @@ public class Grid implements Serializable {
 		return Objects.equals(toString(), grid.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "columns")) {
+			return columns;
+		}
+		else if (Objects.equals(propertyName, "columns")) {
+			return columns;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "rows")) {
+			return rows;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

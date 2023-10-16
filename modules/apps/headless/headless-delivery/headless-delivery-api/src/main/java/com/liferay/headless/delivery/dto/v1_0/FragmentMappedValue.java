@@ -167,6 +167,24 @@ public class FragmentMappedValue implements Serializable {
 		return Objects.equals(toString(), fragmentMappedValue.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "defaultFragmentInlineValue")) {
+			return defaultFragmentInlineValue;
+		}
+		else if (Objects.equals(propertyName, "defaultFragmentInlineValue")) {
+			return defaultFragmentInlineValue;
+		}
+		else if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "mapping")) {
+			return mapping;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

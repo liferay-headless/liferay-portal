@@ -770,6 +770,87 @@ public class Discount implements Serializable {
 		return Objects.equals(toString(), discount.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "couponCode")) {
+			return couponCode;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "discountAccountGroups")) {
+			return discountAccountGroups;
+		}
+		else if (Objects.equals(propertyName, "discountCategories")) {
+			return discountCategories;
+		}
+		else if (Objects.equals(propertyName, "discountProducts")) {
+			return discountProducts;
+		}
+		else if (Objects.equals(propertyName, "discountRules")) {
+			return discountRules;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "limitationTimes")) {
+			return limitationTimes;
+		}
+		else if (Objects.equals(propertyName, "limitationType")) {
+			return limitationType;
+		}
+		else if (Objects.equals(propertyName, "maximumDiscountAmount")) {
+			return maximumDiscountAmount;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "numberOfUse")) {
+			return numberOfUse;
+		}
+		else if (Objects.equals(propertyName, "percentageLevel1")) {
+			return percentageLevel1;
+		}
+		else if (Objects.equals(propertyName, "percentageLevel2")) {
+			return percentageLevel2;
+		}
+		else if (Objects.equals(propertyName, "percentageLevel3")) {
+			return percentageLevel3;
+		}
+		else if (Objects.equals(propertyName, "percentageLevel4")) {
+			return percentageLevel4;
+		}
+		else if (Objects.equals(propertyName, "target")) {
+			return target;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "useCouponCode")) {
+			return useCouponCode;
+		}
+		else if (Objects.equals(propertyName, "usePercentage")) {
+			return usePercentage;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

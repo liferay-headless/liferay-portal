@@ -122,6 +122,21 @@ public class In implements Serializable {
 		return Objects.equals(toString(), in.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "parameterName")) {
+			return parameterName;
+		}
+		else if (Objects.equals(propertyName, "parameterName")) {
+			return parameterName;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

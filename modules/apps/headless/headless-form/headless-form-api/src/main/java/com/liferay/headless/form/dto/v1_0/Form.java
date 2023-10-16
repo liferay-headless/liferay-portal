@@ -519,6 +519,63 @@ public class Form implements Serializable {
 		return Objects.equals(toString(), form.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "datePublished")) {
+			return datePublished;
+		}
+		else if (Objects.equals(propertyName, "defaultLanguage")) {
+			return defaultLanguage;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "formRecords")) {
+			return formRecords;
+		}
+		else if (Objects.equals(propertyName, "formRecordsIds")) {
+			return formRecordsIds;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "structure")) {
+			return structure;
+		}
+		else if (Objects.equals(propertyName, "structureId")) {
+			return structureId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

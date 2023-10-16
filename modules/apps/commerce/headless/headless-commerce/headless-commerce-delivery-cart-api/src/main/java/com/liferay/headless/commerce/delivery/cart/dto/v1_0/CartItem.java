@@ -660,6 +660,78 @@ public class CartItem implements Serializable {
 		return Objects.equals(toString(), cartItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "adaptiveMediaImageHTMLTag")) {
+			return adaptiveMediaImageHTMLTag;
+		}
+		else if (Objects.equals(propertyName, "adaptiveMediaImageHTMLTag")) {
+			return adaptiveMediaImageHTMLTag;
+		}
+		else if (Objects.equals(propertyName, "cartItems")) {
+			return cartItems;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "errorMessages")) {
+			return errorMessages;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "parentCartItemId")) {
+			return parentCartItemId;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productURLs")) {
+			return productURLs;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "replacedSku")) {
+			return replacedSku;
+		}
+		else if (Objects.equals(propertyName, "replacedSkuId")) {
+			return replacedSkuId;
+		}
+		else if (Objects.equals(propertyName, "settings")) {
+			return settings;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "skuUnitOfMeasure")) {
+			return skuUnitOfMeasure;
+		}
+		else if (Objects.equals(propertyName, "subscription")) {
+			return subscription;
+		}
+		else if (Objects.equals(propertyName, "thumbnail")) {
+			return thumbnail;
+		}
+		else if (Objects.equals(propertyName, "valid")) {
+			return valid;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -3274,6 +3274,406 @@ public class Order implements Serializable {
 		return Objects.equals(toString(), order.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "accountExternalReferenceCode")) {
+			return accountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "advanceStatus")) {
+			return advanceStatus;
+		}
+		else if (Objects.equals(propertyName, "billingAddress")) {
+			return billingAddress;
+		}
+		else if (Objects.equals(propertyName, "billingAddressId")) {
+			return billingAddressId;
+		}
+		else if (Objects.equals(propertyName, "channel")) {
+			return channel;
+		}
+		else if (Objects.equals(propertyName, "channelExternalReferenceCode")) {
+			return channelExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "couponCode")) {
+			return couponCode;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "creatorEmailAddress")) {
+			return creatorEmailAddress;
+		}
+		else if (Objects.equals(propertyName, "currencyCode")) {
+			return currencyCode;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "deliveryTermDescription")) {
+			return deliveryTermDescription;
+		}
+		else if (Objects.equals(propertyName, "deliveryTermId")) {
+			return deliveryTermId;
+		}
+		else if (Objects.equals(propertyName, "deliveryTermName")) {
+			return deliveryTermName;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "lastPriceUpdateDate")) {
+			return lastPriceUpdateDate;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "orderDate")) {
+			return orderDate;
+		}
+		else if (Objects.equals(propertyName, "orderItems")) {
+			return orderItems;
+		}
+		else if (Objects.equals(propertyName, "orderStatus")) {
+			return orderStatus;
+		}
+		else if (Objects.equals(propertyName, "orderStatusInfo")) {
+			return orderStatusInfo;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "paymentMethod")) {
+			return paymentMethod;
+		}
+		else if (Objects.equals(propertyName, "paymentStatus")) {
+			return paymentStatus;
+		}
+		else if (Objects.equals(propertyName, "paymentStatusInfo")) {
+			return paymentStatusInfo;
+		}
+		else if (Objects.equals(propertyName, "paymentTermDescription")) {
+			return paymentTermDescription;
+		}
+		else if (Objects.equals(propertyName, "paymentTermId")) {
+			return paymentTermId;
+		}
+		else if (Objects.equals(propertyName, "paymentTermName")) {
+			return paymentTermName;
+		}
+		else if (Objects.equals(propertyName, "printedNote")) {
+			return printedNote;
+		}
+		else if (Objects.equals(propertyName, "purchaseOrderNumber")) {
+			return purchaseOrderNumber;
+		}
+		else if (Objects.equals(propertyName, "requestedDeliveryDate")) {
+			return requestedDeliveryDate;
+		}
+		else if (Objects.equals(propertyName, "shippingAddress")) {
+			return shippingAddress;
+		}
+		else if (Objects.equals(propertyName, "shippingAddressId")) {
+			return shippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "shippingAmount")) {
+			return shippingAmount;
+		}
+		else if (Objects.equals(propertyName, "shippingAmountFormatted")) {
+			return shippingAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "shippingAmountValue")) {
+			return shippingAmountValue;
+		}
+		else if (Objects.equals(propertyName, "shippingDiscountAmount")) {
+			return shippingDiscountAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountAmountFormatted")) {
+
+			return shippingDiscountAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "shippingDiscountAmountValue")) {
+			return shippingDiscountAmountValue;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountPercentageLevel1")) {
+
+			return shippingDiscountPercentageLevel1;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"shippingDiscountPercentageLevel1WithTaxAmount")) {
+
+			return shippingDiscountPercentageLevel1WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountPercentageLevel2")) {
+
+			return shippingDiscountPercentageLevel2;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"shippingDiscountPercentageLevel2WithTaxAmount")) {
+
+			return shippingDiscountPercentageLevel2WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountPercentageLevel3")) {
+
+			return shippingDiscountPercentageLevel3;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"shippingDiscountPercentageLevel3WithTaxAmount")) {
+
+			return shippingDiscountPercentageLevel3WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountPercentageLevel4")) {
+
+			return shippingDiscountPercentageLevel4;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"shippingDiscountPercentageLevel4WithTaxAmount")) {
+
+			return shippingDiscountPercentageLevel4WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountWithTaxAmount")) {
+
+			return shippingDiscountWithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingDiscountWithTaxAmountFormatted")) {
+
+			return shippingDiscountWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "shippingMethod")) {
+			return shippingMethod;
+		}
+		else if (Objects.equals(propertyName, "shippingOption")) {
+			return shippingOption;
+		}
+		else if (Objects.equals(propertyName, "shippingWithTaxAmount")) {
+			return shippingWithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "shippingWithTaxAmountFormatted")) {
+
+			return shippingWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "shippingWithTaxAmountValue")) {
+			return shippingWithTaxAmountValue;
+		}
+		else if (Objects.equals(propertyName, "subtotal")) {
+			return subtotal;
+		}
+		else if (Objects.equals(propertyName, "subtotalAmount")) {
+			return subtotalAmount;
+		}
+		else if (Objects.equals(propertyName, "subtotalDiscountAmount")) {
+			return subtotalDiscountAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountAmountFormatted")) {
+
+			return subtotalDiscountAmountFormatted;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountPercentageLevel1")) {
+
+			return subtotalDiscountPercentageLevel1;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"subtotalDiscountPercentageLevel1WithTaxAmount")) {
+
+			return subtotalDiscountPercentageLevel1WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountPercentageLevel2")) {
+
+			return subtotalDiscountPercentageLevel2;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"subtotalDiscountPercentageLevel2WithTaxAmount")) {
+
+			return subtotalDiscountPercentageLevel2WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountPercentageLevel3")) {
+
+			return subtotalDiscountPercentageLevel3;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"subtotalDiscountPercentageLevel3WithTaxAmount")) {
+
+			return subtotalDiscountPercentageLevel3WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountPercentageLevel4")) {
+
+			return subtotalDiscountPercentageLevel4;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"subtotalDiscountPercentageLevel4WithTaxAmount")) {
+
+			return subtotalDiscountPercentageLevel4WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountWithTaxAmount")) {
+
+			return subtotalDiscountWithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalDiscountWithTaxAmountFormatted")) {
+
+			return subtotalDiscountWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "subtotalFormatted")) {
+			return subtotalFormatted;
+		}
+		else if (Objects.equals(propertyName, "subtotalWithTaxAmount")) {
+			return subtotalWithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "subtotalWithTaxAmountFormatted")) {
+
+			return subtotalWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "subtotalWithTaxAmountValue")) {
+			return subtotalWithTaxAmountValue;
+		}
+		else if (Objects.equals(propertyName, "taxAmount")) {
+			return taxAmount;
+		}
+		else if (Objects.equals(propertyName, "taxAmountFormatted")) {
+			return taxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "taxAmountValue")) {
+			return taxAmountValue;
+		}
+		else if (Objects.equals(propertyName, "total")) {
+			return total;
+		}
+		else if (Objects.equals(propertyName, "totalAmount")) {
+			return totalAmount;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountAmount")) {
+			return totalDiscountAmount;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountAmountFormatted")) {
+			return totalDiscountAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountAmountValue")) {
+			return totalDiscountAmountValue;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountPercentageLevel1")) {
+
+			return totalDiscountPercentageLevel1;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"totalDiscountPercentageLevel1WithTaxAmount")) {
+
+			return totalDiscountPercentageLevel1WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountPercentageLevel2")) {
+
+			return totalDiscountPercentageLevel2;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"totalDiscountPercentageLevel2WithTaxAmount")) {
+
+			return totalDiscountPercentageLevel2WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountPercentageLevel3")) {
+
+			return totalDiscountPercentageLevel3;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"totalDiscountPercentageLevel3WithTaxAmount")) {
+
+			return totalDiscountPercentageLevel3WithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountPercentageLevel4")) {
+
+			return totalDiscountPercentageLevel4;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"totalDiscountPercentageLevel4WithTaxAmount")) {
+
+			return totalDiscountPercentageLevel4WithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountWithTaxAmount")) {
+			return totalDiscountWithTaxAmount;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountWithTaxAmountFormatted")) {
+
+			return totalDiscountWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(
+					propertyName, "totalDiscountWithTaxAmountValue")) {
+
+			return totalDiscountWithTaxAmountValue;
+		}
+		else if (Objects.equals(propertyName, "totalFormatted")) {
+			return totalFormatted;
+		}
+		else if (Objects.equals(propertyName, "totalWithTaxAmount")) {
+			return totalWithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "totalWithTaxAmountFormatted")) {
+			return totalWithTaxAmountFormatted;
+		}
+		else if (Objects.equals(propertyName, "totalWithTaxAmountValue")) {
+			return totalWithTaxAmountValue;
+		}
+		else if (Objects.equals(propertyName, "transactionId")) {
+			return transactionId;
+		}
+		else if (Objects.equals(propertyName, "workflowStatusInfo")) {
+			return workflowStatusInfo;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

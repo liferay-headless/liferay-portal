@@ -101,6 +101,18 @@ public class WorkflowTaskAssignableUsers implements Serializable {
 			toString(), workflowTaskAssignableUsers.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "workflowTaskAssignableUsers")) {
+			return workflowTaskAssignableUsers;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskAssignableUsers")) {
+			return workflowTaskAssignableUsers;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

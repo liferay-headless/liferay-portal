@@ -121,6 +121,21 @@ public class Version implements Serializable {
 		return Objects.equals(toString(), version.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "number")) {
+			return number;
+		}
+		else if (Objects.equals(propertyName, "number")) {
+			return number;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

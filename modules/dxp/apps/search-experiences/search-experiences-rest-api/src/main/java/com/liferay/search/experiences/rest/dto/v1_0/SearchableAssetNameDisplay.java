@@ -122,6 +122,21 @@ public class SearchableAssetNameDisplay implements Serializable {
 			toString(), searchableAssetNameDisplay.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "displayName")) {
+			return displayName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

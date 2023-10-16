@@ -200,6 +200,30 @@ public class CartComment implements Serializable {
 		return Objects.equals(toString(), cartComment.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "author")) {
+			return author;
+		}
+		else if (Objects.equals(propertyName, "author")) {
+			return author;
+		}
+		else if (Objects.equals(propertyName, "content")) {
+			return content;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "orderId")) {
+			return orderId;
+		}
+		else if (Objects.equals(propertyName, "restricted")) {
+			return restricted;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -405,6 +405,51 @@ public class AttachmentUrl implements Serializable {
 		return Objects.equals(toString(), attachmentUrl.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "src")) {
+			return src;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

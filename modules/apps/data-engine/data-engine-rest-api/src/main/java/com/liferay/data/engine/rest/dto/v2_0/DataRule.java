@@ -179,6 +179,27 @@ public class DataRule implements Serializable {
 		return Objects.equals(toString(), dataRule.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "conditions")) {
+			return conditions;
+		}
+		else if (Objects.equals(propertyName, "logicalOperator")) {
+			return logicalOperator;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

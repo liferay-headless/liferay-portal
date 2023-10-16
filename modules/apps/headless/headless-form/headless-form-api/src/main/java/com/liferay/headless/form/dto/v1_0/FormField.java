@@ -882,6 +882,102 @@ public class FormField implements Serializable {
 		return Objects.equals(toString(), formField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "autocomplete")) {
+			return autocomplete;
+		}
+		else if (Objects.equals(propertyName, "autocomplete")) {
+			return autocomplete;
+		}
+		else if (Objects.equals(propertyName, "dataSourceType")) {
+			return dataSourceType;
+		}
+		else if (Objects.equals(propertyName, "dataType")) {
+			return dataType;
+		}
+		else if (Objects.equals(propertyName, "displayStyle")) {
+			return displayStyle;
+		}
+		else if (Objects.equals(propertyName, "formFieldOptions")) {
+			return formFieldOptions;
+		}
+		else if (Objects.equals(propertyName, "grid")) {
+			return grid;
+		}
+		else if (Objects.equals(propertyName, "hasFormRules")) {
+			return hasFormRules;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "immutable")) {
+			return immutable;
+		}
+		else if (Objects.equals(propertyName, "inline")) {
+			return inline;
+		}
+		else if (Objects.equals(propertyName, "inputControl")) {
+			return inputControl;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label_i18n")) {
+			return label_i18n;
+		}
+		else if (Objects.equals(propertyName, "localizable")) {
+			return localizable;
+		}
+		else if (Objects.equals(propertyName, "multiple")) {
+			return multiple;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "placeholder")) {
+			return placeholder;
+		}
+		else if (Objects.equals(propertyName, "predefinedValue")) {
+			return predefinedValue;
+		}
+		else if (Objects.equals(propertyName, "predefinedValue_i18n")) {
+			return predefinedValue_i18n;
+		}
+		else if (Objects.equals(propertyName, "readOnly")) {
+			return readOnly;
+		}
+		else if (Objects.equals(propertyName, "repeatable")) {
+			return repeatable;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "showAsSwitcher")) {
+			return showAsSwitcher;
+		}
+		else if (Objects.equals(propertyName, "showLabel")) {
+			return showLabel;
+		}
+		else if (Objects.equals(propertyName, "style")) {
+			return style;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else if (Objects.equals(propertyName, "text_i18n")) {
+			return text_i18n;
+		}
+		else if (Objects.equals(propertyName, "tooltip")) {
+			return tooltip;
+		}
+		else if (Objects.equals(propertyName, "validation")) {
+			return validation;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -213,6 +213,30 @@ public class AggregateRating implements Serializable {
 		return Objects.equals(toString(), aggregateRating.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "bestRating")) {
+			return bestRating;
+		}
+		else if (Objects.equals(propertyName, "bestRating")) {
+			return bestRating;
+		}
+		else if (Objects.equals(propertyName, "ratingAverage")) {
+			return ratingAverage;
+		}
+		else if (Objects.equals(propertyName, "ratingCount")) {
+			return ratingCount;
+		}
+		else if (Objects.equals(propertyName, "ratingValue")) {
+			return ratingValue;
+		}
+		else if (Objects.equals(propertyName, "worstRating")) {
+			return worstRating;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

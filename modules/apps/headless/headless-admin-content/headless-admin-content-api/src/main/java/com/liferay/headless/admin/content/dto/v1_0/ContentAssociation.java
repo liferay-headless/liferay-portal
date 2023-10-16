@@ -129,6 +129,21 @@ public class ContentAssociation implements Serializable {
 		return Objects.equals(toString(), contentAssociation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentSubtype")) {
+			return contentSubtype;
+		}
+		else if (Objects.equals(propertyName, "contentSubtype")) {
+			return contentSubtype;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

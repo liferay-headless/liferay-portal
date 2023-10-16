@@ -235,6 +235,33 @@ public class FormPage implements Serializable {
 		return Objects.equals(toString(), formPage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "formFields")) {
+			return formFields;
+		}
+		else if (Objects.equals(propertyName, "formFields")) {
+			return formFields;
+		}
+		else if (Objects.equals(propertyName, "headline")) {
+			return headline;
+		}
+		else if (Objects.equals(propertyName, "headline_i18n")) {
+			return headline_i18n;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else if (Objects.equals(propertyName, "text_i18n")) {
+			return text_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

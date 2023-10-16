@@ -195,6 +195,27 @@ public class TaxonomyCategoryBrief implements Serializable {
 		return Objects.equals(toString(), taxonomyCategoryBrief.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "embeddedTaxonomyCategory")) {
+			return embeddedTaxonomyCategory;
+		}
+		else if (Objects.equals(propertyName, "embeddedTaxonomyCategory")) {
+			return embeddedTaxonomyCategory;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryId")) {
+			return taxonomyCategoryId;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryName")) {
+			return taxonomyCategoryName;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryName_i18n")) {
+			return taxonomyCategoryName_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

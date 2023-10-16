@@ -263,6 +263,36 @@ public class ReplenishmentItem implements Serializable {
 		return Objects.equals(toString(), replenishmentItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "availabilityDate")) {
+			return availabilityDate;
+		}
+		else if (Objects.equals(propertyName, "availabilityDate")) {
+			return availabilityDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else if (Objects.equals(propertyName, "warehouseId")) {
+			return warehouseId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

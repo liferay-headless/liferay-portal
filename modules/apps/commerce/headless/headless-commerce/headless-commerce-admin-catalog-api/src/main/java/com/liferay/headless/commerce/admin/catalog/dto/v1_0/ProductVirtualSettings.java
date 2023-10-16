@@ -464,6 +464,57 @@ public class ProductVirtualSettings implements Serializable {
 		return Objects.equals(toString(), productVirtualSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "activationStatus")) {
+			return activationStatus;
+		}
+		else if (Objects.equals(propertyName, "activationStatus")) {
+			return activationStatus;
+		}
+		else if (Objects.equals(propertyName, "activationStatusInfo")) {
+			return activationStatusInfo;
+		}
+		else if (Objects.equals(propertyName, "attachment")) {
+			return attachment;
+		}
+		else if (Objects.equals(propertyName, "duration")) {
+			return duration;
+		}
+		else if (Objects.equals(propertyName, "maxUsages")) {
+			return maxUsages;
+		}
+		else if (Objects.equals(propertyName, "sampleAttachment")) {
+			return sampleAttachment;
+		}
+		else if (Objects.equals(propertyName, "sampleSrc")) {
+			return sampleSrc;
+		}
+		else if (Objects.equals(propertyName, "sampleURL")) {
+			return sampleURL;
+		}
+		else if (Objects.equals(propertyName, "src")) {
+			return src;
+		}
+		else if (Objects.equals(propertyName, "termsOfUseContent")) {
+			return termsOfUseContent;
+		}
+		else if (Objects.equals(propertyName, "termsOfUseJournalArticleId")) {
+			return termsOfUseJournalArticleId;
+		}
+		else if (Objects.equals(propertyName, "termsOfUseRequired")) {
+			return termsOfUseRequired;
+		}
+		else if (Objects.equals(propertyName, "url")) {
+			return url;
+		}
+		else if (Objects.equals(propertyName, "useSample")) {
+			return useSample;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

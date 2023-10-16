@@ -184,6 +184,27 @@ public class AuditEvent implements Serializable {
 		return Objects.equals(toString(), auditEvent.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "auditFieldChanges")) {
+			return auditFieldChanges;
+		}
+		else if (Objects.equals(propertyName, "auditFieldChanges")) {
+			return auditFieldChanges;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "eventType")) {
+			return eventType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

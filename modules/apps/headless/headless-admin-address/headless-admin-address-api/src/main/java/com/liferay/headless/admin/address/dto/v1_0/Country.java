@@ -484,6 +484,60 @@ public class Country implements Serializable {
 		return Objects.equals(toString(), country.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "a2")) {
+			return a2;
+		}
+		else if (Objects.equals(propertyName, "a2")) {
+			return a2;
+		}
+		else if (Objects.equals(propertyName, "a3")) {
+			return a3;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "billingAllowed")) {
+			return billingAllowed;
+		}
+		else if (Objects.equals(propertyName, "groupFilterEnabled")) {
+			return groupFilterEnabled;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "idd")) {
+			return idd;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "number")) {
+			return number;
+		}
+		else if (Objects.equals(propertyName, "position")) {
+			return position;
+		}
+		else if (Objects.equals(propertyName, "regions")) {
+			return regions;
+		}
+		else if (Objects.equals(propertyName, "shippingAllowed")) {
+			return shippingAllowed;
+		}
+		else if (Objects.equals(propertyName, "subjectToVAT")) {
+			return subjectToVAT;
+		}
+		else if (Objects.equals(propertyName, "title_i18n")) {
+			return title_i18n;
+		}
+		else if (Objects.equals(propertyName, "zipRequired")) {
+			return zipRequired;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

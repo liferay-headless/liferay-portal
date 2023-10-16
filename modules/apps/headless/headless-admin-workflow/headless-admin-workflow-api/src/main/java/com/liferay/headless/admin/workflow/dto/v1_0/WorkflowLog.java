@@ -506,6 +506,60 @@ public class WorkflowLog implements Serializable {
 		return Objects.equals(toString(), workflowLog.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "auditPerson")) {
+			return auditPerson;
+		}
+		else if (Objects.equals(propertyName, "auditPerson")) {
+			return auditPerson;
+		}
+		else if (Objects.equals(propertyName, "commentLog")) {
+			return commentLog;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "person")) {
+			return person;
+		}
+		else if (Objects.equals(propertyName, "previousPerson")) {
+			return previousPerson;
+		}
+		else if (Objects.equals(propertyName, "previousRole")) {
+			return previousRole;
+		}
+		else if (Objects.equals(propertyName, "previousState")) {
+			return previousState;
+		}
+		else if (Objects.equals(propertyName, "previousStateLabel")) {
+			return previousStateLabel;
+		}
+		else if (Objects.equals(propertyName, "role")) {
+			return role;
+		}
+		else if (Objects.equals(propertyName, "state")) {
+			return state;
+		}
+		else if (Objects.equals(propertyName, "stateLabel")) {
+			return stateLabel;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskId")) {
+			return workflowTaskId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

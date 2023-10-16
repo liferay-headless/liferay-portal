@@ -219,6 +219,30 @@ public class RenderedPage implements Serializable {
 		return Objects.equals(toString(), renderedPage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "masterPageId")) {
+			return masterPageId;
+		}
+		else if (Objects.equals(propertyName, "masterPageId")) {
+			return masterPageId;
+		}
+		else if (Objects.equals(propertyName, "masterPageName")) {
+			return masterPageName;
+		}
+		else if (Objects.equals(propertyName, "pageTemplateId")) {
+			return pageTemplateId;
+		}
+		else if (Objects.equals(propertyName, "pageTemplateName")) {
+			return pageTemplateName;
+		}
+		else if (Objects.equals(propertyName, "renderedPageURL")) {
+			return renderedPageURL;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

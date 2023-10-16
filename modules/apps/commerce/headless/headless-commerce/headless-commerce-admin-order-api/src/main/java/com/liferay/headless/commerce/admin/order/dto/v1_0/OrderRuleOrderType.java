@@ -279,6 +279,40 @@ public class OrderRuleOrderType implements Serializable {
 		return Objects.equals(toString(), orderRuleOrderType.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(
+					propertyName, "orderRuleExternalReferenceCode")) {
+
+			return orderRuleExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderRuleId")) {
+			return orderRuleId;
+		}
+		else if (Objects.equals(propertyName, "orderRuleOrderTypeId")) {
+			return orderRuleOrderTypeId;
+		}
+		else if (Objects.equals(propertyName, "orderType")) {
+			return orderType;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

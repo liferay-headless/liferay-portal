@@ -205,6 +205,30 @@ public class Pin implements Serializable {
 		return Objects.equals(toString(), pin.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "mappedProduct")) {
+			return mappedProduct;
+		}
+		else if (Objects.equals(propertyName, "positionX")) {
+			return positionX;
+		}
+		else if (Objects.equals(propertyName, "positionY")) {
+			return positionY;
+		}
+		else if (Objects.equals(propertyName, "sequence")) {
+			return sequence;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

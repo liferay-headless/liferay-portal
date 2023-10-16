@@ -532,6 +532,63 @@ public class NavigationMenuItem implements Serializable {
 		return Objects.equals(toString(), navigationMenuItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "contentURL")) {
+			return contentURL;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "link")) {
+			return link;
+		}
+		else if (Objects.equals(propertyName, "link_i18n")) {
+			return link_i18n;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else if (Objects.equals(propertyName, "navigationMenuItems")) {
+			return navigationMenuItems;
+		}
+		else if (Objects.equals(propertyName, "parentNavigationMenuId")) {
+			return parentNavigationMenuId;
+		}
+		else if (Objects.equals(propertyName, "sitePageURL")) {
+			return sitePageURL;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "url")) {
+			return url;
+		}
+		else if (Objects.equals(propertyName, "useCustomName")) {
+			return useCustomName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

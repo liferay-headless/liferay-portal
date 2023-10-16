@@ -269,6 +269,36 @@ public class AssigneeMetricBulkSelection implements Serializable {
 			toString(), assigneeMetricBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "dateEnd")) {
+			return dateEnd;
+		}
+		else if (Objects.equals(propertyName, "dateStart")) {
+			return dateStart;
+		}
+		else if (Objects.equals(propertyName, "instanceIds")) {
+			return instanceIds;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "roleIds")) {
+			return roleIds;
+		}
+		else if (Objects.equals(propertyName, "taskNames")) {
+			return taskNames;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

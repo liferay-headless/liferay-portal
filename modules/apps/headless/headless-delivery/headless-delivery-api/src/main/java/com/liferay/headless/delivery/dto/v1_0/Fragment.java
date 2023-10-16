@@ -177,6 +177,27 @@ public class Fragment implements Serializable {
 		return Objects.equals(toString(), fragment.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "collectionName")) {
+			return collectionName;
+		}
+		else if (Objects.equals(propertyName, "collectionName")) {
+			return collectionName;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "siteKey")) {
+			return siteKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

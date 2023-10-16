@@ -422,6 +422,51 @@ public class MappedProduct implements Serializable {
 		return Objects.equals(toString(), mappedProduct.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productName")) {
+			return productName;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "sequence")) {
+			return sequence;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuExternalReferenceCode")) {
+			return skuExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

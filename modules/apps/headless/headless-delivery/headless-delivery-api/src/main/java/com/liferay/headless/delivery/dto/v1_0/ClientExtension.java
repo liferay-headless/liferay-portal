@@ -154,6 +154,24 @@ public class ClientExtension implements Serializable {
 		return Objects.equals(toString(), clientExtension.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "clientExtensionConfig")) {
+			return clientExtensionConfig;
+		}
+		else if (Objects.equals(propertyName, "clientExtensionConfig")) {
+			return clientExtensionConfig;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

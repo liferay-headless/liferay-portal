@@ -149,6 +149,24 @@ public class ChangeTransition implements Serializable {
 		return Objects.equals(toString(), changeTransition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "comment")) {
+			return comment;
+		}
+		else if (Objects.equals(propertyName, "comment")) {
+			return comment;
+		}
+		else if (Objects.equals(propertyName, "transitionName")) {
+			return transitionName;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskId")) {
+			return workflowTaskId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

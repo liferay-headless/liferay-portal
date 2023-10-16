@@ -146,6 +146,24 @@ public class Admin implements Serializable {
 		return Objects.equals(toString(), admin.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "familyName")) {
+			return familyName;
+		}
+		else if (Objects.equals(propertyName, "givenName")) {
+			return givenName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

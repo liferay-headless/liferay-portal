@@ -229,6 +229,33 @@ public class Range implements Serializable {
 		return Objects.equals(toString(), range.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "format")) {
+			return format;
+		}
+		else if (Objects.equals(propertyName, "format")) {
+			return format;
+		}
+		else if (Objects.equals(propertyName, "gt")) {
+			return gt;
+		}
+		else if (Objects.equals(propertyName, "gte")) {
+			return gte;
+		}
+		else if (Objects.equals(propertyName, "lt")) {
+			return lt;
+		}
+		else if (Objects.equals(propertyName, "lte")) {
+			return lte;
+		}
+		else if (Objects.equals(propertyName, "parameterName")) {
+			return parameterName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

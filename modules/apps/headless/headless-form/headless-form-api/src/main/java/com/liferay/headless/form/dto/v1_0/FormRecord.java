@@ -295,6 +295,39 @@ public class FormRecord implements Serializable {
 		return Objects.equals(toString(), formRecord.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "datePublished")) {
+			return datePublished;
+		}
+		else if (Objects.equals(propertyName, "draft")) {
+			return draft;
+		}
+		else if (Objects.equals(propertyName, "formFieldValues")) {
+			return formFieldValues;
+		}
+		else if (Objects.equals(propertyName, "formId")) {
+			return formId;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

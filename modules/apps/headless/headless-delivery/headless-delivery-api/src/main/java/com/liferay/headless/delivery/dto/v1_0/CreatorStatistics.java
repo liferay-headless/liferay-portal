@@ -178,6 +178,27 @@ public class CreatorStatistics implements Serializable {
 		return Objects.equals(toString(), creatorStatistics.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "joinDate")) {
+			return joinDate;
+		}
+		else if (Objects.equals(propertyName, "joinDate")) {
+			return joinDate;
+		}
+		else if (Objects.equals(propertyName, "lastPostDate")) {
+			return lastPostDate;
+		}
+		else if (Objects.equals(propertyName, "postsNumber")) {
+			return postsNumber;
+		}
+		else if (Objects.equals(propertyName, "rank")) {
+			return rank;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

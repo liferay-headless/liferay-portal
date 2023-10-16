@@ -124,6 +124,21 @@ public class Mapping implements Serializable {
 		return Objects.equals(toString(), mapping.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fieldKey")) {
+			return fieldKey;
+		}
+		else if (Objects.equals(propertyName, "fieldKey")) {
+			return fieldKey;
+		}
+		else if (Objects.equals(propertyName, "itemReference")) {
+			return itemReference;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

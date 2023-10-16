@@ -286,6 +286,40 @@ public class PaymentMethodGroupRelOrderType implements Serializable {
 			toString(), paymentMethodGroupRelOrderType.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "orderType")) {
+			return orderType;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "paymentMethodGroupRelId")) {
+			return paymentMethodGroupRelId;
+		}
+		else if (Objects.equals(
+					propertyName, "paymentMethodGroupRelOrderTypeId")) {
+
+			return paymentMethodGroupRelOrderTypeId;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

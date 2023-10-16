@@ -125,6 +125,21 @@ public class WidgetPermission implements Serializable {
 		return Objects.equals(toString(), widgetPermission.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actionKeys")) {
+			return actionKeys;
+		}
+		else if (Objects.equals(propertyName, "actionKeys")) {
+			return actionKeys;
+		}
+		else if (Objects.equals(propertyName, "roleKey")) {
+			return roleKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

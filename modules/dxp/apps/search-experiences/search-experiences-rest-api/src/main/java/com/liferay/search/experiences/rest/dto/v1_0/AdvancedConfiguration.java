@@ -123,6 +123,21 @@ public class AdvancedConfiguration implements Serializable {
 		return Objects.equals(toString(), advancedConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "source")) {
+			return source;
+		}
+		else if (Objects.equals(propertyName, "source")) {
+			return source;
+		}
+		else if (Objects.equals(propertyName, "stored_fields")) {
+			return stored_fields;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

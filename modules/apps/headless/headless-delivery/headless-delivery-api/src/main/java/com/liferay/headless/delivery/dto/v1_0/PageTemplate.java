@@ -395,6 +395,48 @@ public class PageTemplate implements Serializable {
 		return Objects.equals(toString(), pageTemplate.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "pageDefinition")) {
+			return pageDefinition;
+		}
+		else if (Objects.equals(propertyName, "pageTemplateCollection")) {
+			return pageTemplateCollection;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryBriefs")) {
+			return taxonomyCategoryBriefs;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryIds")) {
+			return taxonomyCategoryIds;
+		}
+		else if (Objects.equals(propertyName, "uuid")) {
+			return uuid;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

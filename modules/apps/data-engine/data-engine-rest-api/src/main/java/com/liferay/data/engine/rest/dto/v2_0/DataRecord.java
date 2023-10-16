@@ -178,6 +178,27 @@ public class DataRecord implements Serializable {
 		return Objects.equals(toString(), dataRecord.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataRecordCollectionId")) {
+			return dataRecordCollectionId;
+		}
+		else if (Objects.equals(propertyName, "dataRecordCollectionId")) {
+			return dataRecordCollectionId;
+		}
+		else if (Objects.equals(propertyName, "dataRecordValues")) {
+			return dataRecordValues;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

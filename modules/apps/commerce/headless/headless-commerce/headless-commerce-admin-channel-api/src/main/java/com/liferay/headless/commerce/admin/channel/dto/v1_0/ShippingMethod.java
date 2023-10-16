@@ -269,6 +269,36 @@ public class ShippingMethod implements Serializable {
 		return Objects.equals(toString(), shippingMethod.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "engineKey")) {
+			return engineKey;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "shippingOptions")) {
+			return shippingOptions;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

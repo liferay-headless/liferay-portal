@@ -237,6 +237,33 @@ public class SearchResult implements Serializable {
 		return Objects.equals(toString(), searchResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "embedded")) {
+			return embedded;
+		}
+		else if (Objects.equals(propertyName, "itemURL")) {
+			return itemURL;
+		}
+		else if (Objects.equals(propertyName, "score")) {
+			return score;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -264,6 +264,36 @@ public class SkuForecast implements Serializable {
 		return Objects.equals(toString(), skuForecast.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actual")) {
+			return actual;
+		}
+		else if (Objects.equals(propertyName, "actual")) {
+			return actual;
+		}
+		else if (Objects.equals(propertyName, "forecast")) {
+			return forecast;
+		}
+		else if (Objects.equals(propertyName, "forecastLowerBound")) {
+			return forecastLowerBound;
+		}
+		else if (Objects.equals(propertyName, "forecastUpperBound")) {
+			return forecastUpperBound;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "timestamp")) {
+			return timestamp;
+		}
+		else if (Objects.equals(propertyName, "unit")) {
+			return unit;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

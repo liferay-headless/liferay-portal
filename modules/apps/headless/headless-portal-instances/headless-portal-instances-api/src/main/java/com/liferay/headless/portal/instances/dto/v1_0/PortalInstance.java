@@ -267,6 +267,36 @@ public class PortalInstance implements Serializable {
 		return Objects.equals(toString(), portalInstance.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "admin")) {
+			return admin;
+		}
+		else if (Objects.equals(propertyName, "companyId")) {
+			return companyId;
+		}
+		else if (Objects.equals(propertyName, "domain")) {
+			return domain;
+		}
+		else if (Objects.equals(propertyName, "portalInstanceId")) {
+			return portalInstanceId;
+		}
+		else if (Objects.equals(propertyName, "siteInitializerKey")) {
+			return siteInitializerKey;
+		}
+		else if (Objects.equals(propertyName, "virtualHost")) {
+			return virtualHost;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -266,6 +266,36 @@ public class DataLayoutRenderingContext implements Serializable {
 			toString(), dataLayoutRenderingContext.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "containerId")) {
+			return containerId;
+		}
+		else if (Objects.equals(propertyName, "containerId")) {
+			return containerId;
+		}
+		else if (Objects.equals(propertyName, "dataRecordValues")) {
+			return dataRecordValues;
+		}
+		else if (Objects.equals(propertyName, "namespace")) {
+			return namespace;
+		}
+		else if (Objects.equals(propertyName, "pathThemeImages")) {
+			return pathThemeImages;
+		}
+		else if (Objects.equals(propertyName, "readOnly")) {
+			return readOnly;
+		}
+		else if (Objects.equals(propertyName, "scopeGroupId")) {
+			return scopeGroupId;
+		}
+		else if (Objects.equals(propertyName, "siteGroupId")) {
+			return siteGroupId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

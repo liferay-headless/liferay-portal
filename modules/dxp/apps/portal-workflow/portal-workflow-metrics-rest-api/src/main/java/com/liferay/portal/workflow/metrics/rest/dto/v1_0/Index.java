@@ -156,6 +156,24 @@ public class Index implements Serializable {
 		return Objects.equals(toString(), index.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "group")) {
+			return group;
+		}
+		else if (Objects.equals(propertyName, "group")) {
+			return group;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -237,6 +237,33 @@ public class SiteBrief implements Serializable {
 		return Objects.equals(toString(), siteBrief.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "descriptiveName")) {
+			return descriptiveName;
+		}
+		else if (Objects.equals(propertyName, "descriptiveName")) {
+			return descriptiveName;
+		}
+		else if (Objects.equals(propertyName, "descriptiveName_i18n")) {
+			return descriptiveName_i18n;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else if (Objects.equals(propertyName, "roleBriefs")) {
+			return roleBriefs;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -540,6 +540,66 @@ public class AccountAddress implements Serializable {
 		return Objects.equals(toString(), accountAddress.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "city")) {
+			return city;
+		}
+		else if (Objects.equals(propertyName, "city")) {
+			return city;
+		}
+		else if (Objects.equals(propertyName, "countryISOCode")) {
+			return countryISOCode;
+		}
+		else if (Objects.equals(propertyName, "defaultBilling")) {
+			return defaultBilling;
+		}
+		else if (Objects.equals(propertyName, "defaultShipping")) {
+			return defaultShipping;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "latitude")) {
+			return latitude;
+		}
+		else if (Objects.equals(propertyName, "longitude")) {
+			return longitude;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "phoneNumber")) {
+			return phoneNumber;
+		}
+		else if (Objects.equals(propertyName, "regionISOCode")) {
+			return regionISOCode;
+		}
+		else if (Objects.equals(propertyName, "street1")) {
+			return street1;
+		}
+		else if (Objects.equals(propertyName, "street2")) {
+			return street2;
+		}
+		else if (Objects.equals(propertyName, "street3")) {
+			return street3;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "zip")) {
+			return zip;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

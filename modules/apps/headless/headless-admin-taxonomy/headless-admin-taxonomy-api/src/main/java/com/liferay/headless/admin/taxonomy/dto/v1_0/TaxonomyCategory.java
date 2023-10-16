@@ -670,6 +670,72 @@ public class TaxonomyCategory implements Serializable {
 		return Objects.equals(toString(), taxonomyCategory.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else if (Objects.equals(propertyName, "numberOfTaxonomyCategories")) {
+			return numberOfTaxonomyCategories;
+		}
+		else if (Objects.equals(propertyName, "parentTaxonomyCategory")) {
+			return parentTaxonomyCategory;
+		}
+		else if (Objects.equals(propertyName, "parentTaxonomyVocabulary")) {
+			return parentTaxonomyVocabulary;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryProperties")) {
+			return taxonomyCategoryProperties;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryUsageCount")) {
+			return taxonomyCategoryUsageCount;
+		}
+		else if (Objects.equals(propertyName, "taxonomyVocabularyId")) {
+			return taxonomyVocabularyId;
+		}
+		else if (Objects.equals(propertyName, "viewableBy")) {
+			return viewableBy;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

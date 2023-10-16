@@ -154,6 +154,24 @@ public class CustomField implements Serializable {
 		return Objects.equals(toString(), customField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customValue")) {
+			return customValue;
+		}
+		else if (Objects.equals(propertyName, "customValue")) {
+			return customValue;
+		}
+		else if (Objects.equals(propertyName, "dataType")) {
+			return dataType;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

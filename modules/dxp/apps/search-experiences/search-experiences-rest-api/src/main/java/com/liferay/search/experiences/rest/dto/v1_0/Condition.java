@@ -290,6 +290,39 @@ public class Condition implements Serializable {
 		return Objects.equals(toString(), condition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "allConditions")) {
+			return allConditions;
+		}
+		else if (Objects.equals(propertyName, "allConditions")) {
+			return allConditions;
+		}
+		else if (Objects.equals(propertyName, "anyConditions")) {
+			return anyConditions;
+		}
+		else if (Objects.equals(propertyName, "contains")) {
+			return contains;
+		}
+		else if (Objects.equals(propertyName, "equals")) {
+			return equals;
+		}
+		else if (Objects.equals(propertyName, "exists")) {
+			return exists;
+		}
+		else if (Objects.equals(propertyName, "in")) {
+			return in;
+		}
+		else if (Objects.equals(propertyName, "not")) {
+			return not;
+		}
+		else if (Objects.equals(propertyName, "range")) {
+			return range;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

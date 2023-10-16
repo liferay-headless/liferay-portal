@@ -209,6 +209,30 @@ public class Rescore implements Serializable {
 		return Objects.equals(toString(), rescore.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "query")) {
+			return query;
+		}
+		else if (Objects.equals(propertyName, "query")) {
+			return query;
+		}
+		else if (Objects.equals(propertyName, "queryWeight")) {
+			return queryWeight;
+		}
+		else if (Objects.equals(propertyName, "rescoreQueryWeight")) {
+			return rescoreQueryWeight;
+		}
+		else if (Objects.equals(propertyName, "scoreMode")) {
+			return scoreMode;
+		}
+		else if (Objects.equals(propertyName, "windowSize")) {
+			return windowSize;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

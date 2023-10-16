@@ -324,6 +324,42 @@ public class AccountCategoryForecast implements Serializable {
 		return Objects.equals(toString(), accountCategoryForecast.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "actual")) {
+			return actual;
+		}
+		else if (Objects.equals(propertyName, "category")) {
+			return category;
+		}
+		else if (Objects.equals(propertyName, "categoryTitle")) {
+			return categoryTitle;
+		}
+		else if (Objects.equals(propertyName, "forecast")) {
+			return forecast;
+		}
+		else if (Objects.equals(propertyName, "forecastLowerBound")) {
+			return forecastLowerBound;
+		}
+		else if (Objects.equals(propertyName, "forecastUpperBound")) {
+			return forecastUpperBound;
+		}
+		else if (Objects.equals(propertyName, "timestamp")) {
+			return timestamp;
+		}
+		else if (Objects.equals(propertyName, "unit")) {
+			return unit;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

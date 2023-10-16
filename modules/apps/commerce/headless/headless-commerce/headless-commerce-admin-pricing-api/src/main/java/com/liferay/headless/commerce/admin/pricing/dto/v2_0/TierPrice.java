@@ -625,6 +625,74 @@ public class TierPrice implements Serializable {
 		return Objects.equals(toString(), tierPrice.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "discountDiscovery")) {
+			return discountDiscovery;
+		}
+		else if (Objects.equals(propertyName, "discountLevel1")) {
+			return discountLevel1;
+		}
+		else if (Objects.equals(propertyName, "discountLevel2")) {
+			return discountLevel2;
+		}
+		else if (Objects.equals(propertyName, "discountLevel3")) {
+			return discountLevel3;
+		}
+		else if (Objects.equals(propertyName, "discountLevel4")) {
+			return discountLevel4;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "minimumQuantity")) {
+			return minimumQuantity;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(
+					propertyName, "priceEntryExternalReferenceCode")) {
+
+			return priceEntryExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "priceEntryId")) {
+			return priceEntryId;
+		}
+		else if (Objects.equals(propertyName, "priceFormatted")) {
+			return priceFormatted;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

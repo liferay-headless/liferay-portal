@@ -469,6 +469,57 @@ public class SkuUnitOfMeasure implements Serializable {
 		return Objects.equals(toString(), skuUnitOfMeasure.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "basePrice")) {
+			return basePrice;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "incrementalOrderQuantity")) {
+			return incrementalOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "precision")) {
+			return precision;
+		}
+		else if (Objects.equals(propertyName, "primary")) {
+			return primary;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "promoPrice")) {
+			return promoPrice;
+		}
+		else if (Objects.equals(propertyName, "rate")) {
+			return rate;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

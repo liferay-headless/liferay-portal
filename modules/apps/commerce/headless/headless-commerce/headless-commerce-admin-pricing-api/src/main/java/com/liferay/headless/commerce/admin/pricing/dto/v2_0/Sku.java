@@ -231,6 +231,33 @@ public class Sku implements Serializable {
 		return Objects.equals(toString(), sku.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "basePrice")) {
+			return basePrice;
+		}
+		else if (Objects.equals(propertyName, "basePrice")) {
+			return basePrice;
+		}
+		else if (Objects.equals(propertyName, "basePriceFormatted")) {
+			return basePriceFormatted;
+		}
+		else if (Objects.equals(propertyName, "basePromoPrice")) {
+			return basePromoPrice;
+		}
+		else if (Objects.equals(propertyName, "basePromoPriceFormatted")) {
+			return basePromoPriceFormatted;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

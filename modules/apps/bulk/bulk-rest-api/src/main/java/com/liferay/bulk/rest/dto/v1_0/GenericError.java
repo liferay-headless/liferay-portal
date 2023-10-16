@@ -92,6 +92,18 @@ public class GenericError implements Serializable {
 		return Objects.equals(toString(), genericError.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

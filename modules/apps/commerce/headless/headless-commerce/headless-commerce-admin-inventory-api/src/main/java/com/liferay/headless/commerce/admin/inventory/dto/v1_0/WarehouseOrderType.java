@@ -308,6 +308,43 @@ public class WarehouseOrderType implements Serializable {
 		return Objects.equals(toString(), warehouseOrderType.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "orderType")) {
+			return orderType;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(
+					propertyName, "warehouseExternalReferenceCode")) {
+
+			return warehouseExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "warehouseId")) {
+			return warehouseId;
+		}
+		else if (Objects.equals(propertyName, "warehouseOrderTypeId")) {
+			return warehouseOrderTypeId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

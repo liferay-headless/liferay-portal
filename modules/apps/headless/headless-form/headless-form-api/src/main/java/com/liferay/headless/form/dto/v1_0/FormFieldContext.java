@@ -319,6 +319,42 @@ public class FormFieldContext implements Serializable {
 		return Objects.equals(toString(), formFieldContext.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "evaluable")) {
+			return evaluable;
+		}
+		else if (Objects.equals(propertyName, "evaluable")) {
+			return evaluable;
+		}
+		else if (Objects.equals(propertyName, "formFieldOptions")) {
+			return formFieldOptions;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "readOnly")) {
+			return readOnly;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "valid")) {
+			return valid;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else if (Objects.equals(propertyName, "valueChanged")) {
+			return valueChanged;
+		}
+		else if (Objects.equals(propertyName, "visible")) {
+			return visible;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

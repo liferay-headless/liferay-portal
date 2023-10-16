@@ -156,6 +156,24 @@ public class PageDefinition implements Serializable {
 		return Objects.equals(toString(), pageDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "pageElement")) {
+			return pageElement;
+		}
+		else if (Objects.equals(propertyName, "pageElement")) {
+			return pageElement;
+		}
+		else if (Objects.equals(propertyName, "settings")) {
+			return settings;
+		}
+		else if (Objects.equals(propertyName, "version")) {
+			return version;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

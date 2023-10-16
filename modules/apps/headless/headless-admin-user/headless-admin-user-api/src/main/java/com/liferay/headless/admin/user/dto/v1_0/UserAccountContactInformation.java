@@ -369,6 +369,45 @@ public class UserAccountContactInformation implements Serializable {
 			toString(), userAccountContactInformation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "emailAddresses")) {
+			return emailAddresses;
+		}
+		else if (Objects.equals(propertyName, "emailAddresses")) {
+			return emailAddresses;
+		}
+		else if (Objects.equals(propertyName, "facebook")) {
+			return facebook;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "jabber")) {
+			return jabber;
+		}
+		else if (Objects.equals(propertyName, "postalAddresses")) {
+			return postalAddresses;
+		}
+		else if (Objects.equals(propertyName, "skype")) {
+			return skype;
+		}
+		else if (Objects.equals(propertyName, "sms")) {
+			return sms;
+		}
+		else if (Objects.equals(propertyName, "telephones")) {
+			return telephones;
+		}
+		else if (Objects.equals(propertyName, "twitter")) {
+			return twitter;
+		}
+		else if (Objects.equals(propertyName, "webUrls")) {
+			return webUrls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -393,6 +393,50 @@ public class ObjectView implements Serializable {
 		return Objects.equals(toString(), objectView.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "defaultObjectView")) {
+			return defaultObjectView;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode")) {
+
+			return objectDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionId")) {
+			return objectDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "objectViewColumns")) {
+			return objectViewColumns;
+		}
+		else if (Objects.equals(propertyName, "objectViewFilterColumns")) {
+			return objectViewFilterColumns;
+		}
+		else if (Objects.equals(propertyName, "objectViewSortColumns")) {
+			return objectViewSortColumns;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

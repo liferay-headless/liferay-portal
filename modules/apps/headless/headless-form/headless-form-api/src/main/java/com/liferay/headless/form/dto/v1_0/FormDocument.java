@@ -314,6 +314,42 @@ public class FormDocument implements Serializable {
 		return Objects.equals(toString(), formDocument.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentUrl")) {
+			return contentUrl;
+		}
+		else if (Objects.equals(propertyName, "contentUrl")) {
+			return contentUrl;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "encodingFormat")) {
+			return encodingFormat;
+		}
+		else if (Objects.equals(propertyName, "fileExtension")) {
+			return fileExtension;
+		}
+		else if (Objects.equals(propertyName, "folderId")) {
+			return folderId;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "sizeInBytes")) {
+			return sizeInBytes;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

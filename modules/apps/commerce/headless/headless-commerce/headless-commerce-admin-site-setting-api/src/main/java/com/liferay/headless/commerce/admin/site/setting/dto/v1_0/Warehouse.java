@@ -523,6 +523,63 @@ public class Warehouse implements Serializable {
 		return Objects.equals(toString(), warehouse.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "city")) {
+			return city;
+		}
+		else if (Objects.equals(propertyName, "commerceCountryId")) {
+			return commerceCountryId;
+		}
+		else if (Objects.equals(propertyName, "commerceRegionId")) {
+			return commerceRegionId;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "groupId")) {
+			return groupId;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "latitude")) {
+			return latitude;
+		}
+		else if (Objects.equals(propertyName, "longitude")) {
+			return longitude;
+		}
+		else if (Objects.equals(propertyName, "mvccVersion")) {
+			return mvccVersion;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "primary")) {
+			return primary;
+		}
+		else if (Objects.equals(propertyName, "street1")) {
+			return street1;
+		}
+		else if (Objects.equals(propertyName, "street2")) {
+			return street2;
+		}
+		else if (Objects.equals(propertyName, "street3")) {
+			return street3;
+		}
+		else if (Objects.equals(propertyName, "zip")) {
+			return zip;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

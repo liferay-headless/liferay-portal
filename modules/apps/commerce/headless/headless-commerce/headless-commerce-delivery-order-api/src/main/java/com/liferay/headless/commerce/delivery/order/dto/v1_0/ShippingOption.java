@@ -172,6 +172,27 @@ public class ShippingOption implements Serializable {
 		return Objects.equals(toString(), shippingOption.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "amount")) {
+			return amount;
+		}
+		else if (Objects.equals(propertyName, "amount")) {
+			return amount;
+		}
+		else if (Objects.equals(propertyName, "amountFormatted")) {
+			return amountFormatted;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

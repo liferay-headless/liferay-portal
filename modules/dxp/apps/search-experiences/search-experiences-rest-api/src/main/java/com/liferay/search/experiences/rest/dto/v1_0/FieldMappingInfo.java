@@ -142,6 +142,24 @@ public class FieldMappingInfo implements Serializable {
 		return Objects.equals(toString(), fieldMappingInfo.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "languageIdPosition")) {
+			return languageIdPosition;
+		}
+		else if (Objects.equals(propertyName, "languageIdPosition")) {
+			return languageIdPosition;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

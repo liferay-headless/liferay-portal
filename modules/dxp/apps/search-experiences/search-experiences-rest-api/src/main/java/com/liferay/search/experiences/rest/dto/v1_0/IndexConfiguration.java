@@ -118,6 +118,21 @@ public class IndexConfiguration implements Serializable {
 		return Objects.equals(toString(), indexConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "external")) {
+			return external;
+		}
+		else if (Objects.equals(propertyName, "external")) {
+			return external;
+		}
+		else if (Objects.equals(propertyName, "indexName")) {
+			return indexName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -209,6 +209,30 @@ public class ElementInstance implements Serializable {
 		return Objects.equals(toString(), elementInstance.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "configurationEntry")) {
+			return configurationEntry;
+		}
+		else if (Objects.equals(propertyName, "configurationEntry")) {
+			return configurationEntry;
+		}
+		else if (Objects.equals(propertyName, "sxpElement")) {
+			return sxpElement;
+		}
+		else if (Objects.equals(propertyName, "sxpElementId")) {
+			return sxpElementId;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "uiConfigurationValues")) {
+			return uiConfigurationValues;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

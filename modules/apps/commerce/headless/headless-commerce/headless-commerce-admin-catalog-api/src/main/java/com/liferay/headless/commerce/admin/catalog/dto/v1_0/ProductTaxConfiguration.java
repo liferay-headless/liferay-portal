@@ -149,6 +149,24 @@ public class ProductTaxConfiguration implements Serializable {
 		return Objects.equals(toString(), productTaxConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "taxCategory")) {
+			return taxCategory;
+		}
+		else if (Objects.equals(propertyName, "taxable")) {
+			return taxable;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

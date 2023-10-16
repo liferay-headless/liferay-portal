@@ -282,6 +282,40 @@ public class DiscountAccountGroup implements Serializable {
 		return Objects.equals(toString(), discountAccountGroup.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountGroup")) {
+			return accountGroup;
+		}
+		else if (Objects.equals(propertyName, "accountGroup")) {
+			return accountGroup;
+		}
+		else if (Objects.equals(
+					propertyName, "accountGroupExternalReferenceCode")) {
+
+			return accountGroupExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountGroupId")) {
+			return accountGroupId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "discountAccountGroupId")) {
+			return discountAccountGroupId;
+		}
+		else if (Objects.equals(
+					propertyName, "discountExternalReferenceCode")) {
+
+			return discountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "discountId")) {
+			return discountId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

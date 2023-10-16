@@ -184,6 +184,27 @@ public class AvailabilityEstimate implements Serializable {
 		return Objects.equals(toString(), availabilityEstimate.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "groupId")) {
+			return groupId;
+		}
+		else if (Objects.equals(propertyName, "groupId")) {
+			return groupId;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

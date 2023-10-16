@@ -204,6 +204,30 @@ public class TimeRange implements Serializable {
 		return Objects.equals(toString(), timeRange.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dateEnd")) {
+			return dateEnd;
+		}
+		else if (Objects.equals(propertyName, "dateEnd")) {
+			return dateEnd;
+		}
+		else if (Objects.equals(propertyName, "dateStart")) {
+			return dateStart;
+		}
+		else if (Objects.equals(propertyName, "defaultTimeRange")) {
+			return defaultTimeRange;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

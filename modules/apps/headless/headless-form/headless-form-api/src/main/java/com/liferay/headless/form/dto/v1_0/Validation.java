@@ -179,6 +179,27 @@ public class Validation implements Serializable {
 		return Objects.equals(toString(), validation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "errorMessage_i18n")) {
+			return errorMessage_i18n;
+		}
+		else if (Objects.equals(propertyName, "expression")) {
+			return expression;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -132,6 +132,21 @@ public class EmptyCollectionConfig implements Serializable {
 		return Objects.equals(toString(), emptyCollectionConfig.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "displayMessage")) {
+			return displayMessage;
+		}
+		else if (Objects.equals(propertyName, "displayMessage")) {
+			return displayMessage;
+		}
+		else if (Objects.equals(propertyName, "message_i18n")) {
+			return message_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

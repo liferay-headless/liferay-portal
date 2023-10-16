@@ -94,6 +94,18 @@ public class AggregationConfiguration implements Serializable {
 		return Objects.equals(toString(), aggregationConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "aggs")) {
+			return aggs;
+		}
+		else if (Objects.equals(propertyName, "aggs")) {
+			return aggs;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

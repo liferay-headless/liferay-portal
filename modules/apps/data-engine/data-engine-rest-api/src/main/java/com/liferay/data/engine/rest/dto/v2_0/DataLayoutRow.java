@@ -94,6 +94,18 @@ public class DataLayoutRow implements Serializable {
 		return Objects.equals(toString(), dataLayoutRow.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataLayoutColumns")) {
+			return dataLayoutColumns;
+		}
+		else if (Objects.equals(propertyName, "dataLayoutColumns")) {
+			return dataLayoutColumns;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

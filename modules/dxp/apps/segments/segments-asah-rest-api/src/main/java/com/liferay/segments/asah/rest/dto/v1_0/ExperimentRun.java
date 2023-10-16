@@ -158,6 +158,24 @@ public class ExperimentRun implements Serializable {
 		return Objects.equals(toString(), experimentRun.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "confidenceLevel")) {
+			return confidenceLevel;
+		}
+		else if (Objects.equals(propertyName, "confidenceLevel")) {
+			return confidenceLevel;
+		}
+		else if (Objects.equals(propertyName, "experimentVariants")) {
+			return experimentVariants;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

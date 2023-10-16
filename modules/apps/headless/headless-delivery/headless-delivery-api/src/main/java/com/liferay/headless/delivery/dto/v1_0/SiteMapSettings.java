@@ -176,6 +176,24 @@ public class SiteMapSettings implements Serializable {
 		return Objects.equals(toString(), siteMapSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "changeFrequency")) {
+			return changeFrequency;
+		}
+		else if (Objects.equals(propertyName, "changeFrequency")) {
+			return changeFrequency;
+		}
+		else if (Objects.equals(propertyName, "include")) {
+			return include;
+		}
+		else if (Objects.equals(propertyName, "pagePriority")) {
+			return pagePriority;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

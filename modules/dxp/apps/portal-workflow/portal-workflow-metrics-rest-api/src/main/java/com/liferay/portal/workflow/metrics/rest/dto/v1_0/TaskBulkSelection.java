@@ -205,6 +205,30 @@ public class TaskBulkSelection implements Serializable {
 		return Objects.equals(toString(), taskBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "assigneeIds")) {
+			return assigneeIds;
+		}
+		else if (Objects.equals(propertyName, "assigneeIds")) {
+			return assigneeIds;
+		}
+		else if (Objects.equals(propertyName, "instanceIds")) {
+			return instanceIds;
+		}
+		else if (Objects.equals(propertyName, "processId")) {
+			return processId;
+		}
+		else if (Objects.equals(propertyName, "slaStatuses")) {
+			return slaStatuses;
+		}
+		else if (Objects.equals(propertyName, "taskNames")) {
+			return taskNames;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

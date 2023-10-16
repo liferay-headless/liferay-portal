@@ -530,6 +530,63 @@ public class WorkflowTask implements Serializable {
 		return Objects.equals(toString(), workflowTask.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "assigneePerson")) {
+			return assigneePerson;
+		}
+		else if (Objects.equals(propertyName, "assigneeRoles")) {
+			return assigneeRoles;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "dateCompletion")) {
+			return dateCompletion;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateDue")) {
+			return dateDue;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "objectReviewed")) {
+			return objectReviewed;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionId")) {
+			return workflowDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionName")) {
+			return workflowDefinitionName;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionVersion")) {
+			return workflowDefinitionVersion;
+		}
+		else if (Objects.equals(propertyName, "workflowInstanceId")) {
+			return workflowInstanceId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

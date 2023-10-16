@@ -144,6 +144,24 @@ public class Status implements Serializable {
 		return Objects.equals(toString(), status.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "code")) {
+			return code;
+		}
+		else if (Objects.equals(propertyName, "code")) {
+			return code;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label_i18n")) {
+			return label_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

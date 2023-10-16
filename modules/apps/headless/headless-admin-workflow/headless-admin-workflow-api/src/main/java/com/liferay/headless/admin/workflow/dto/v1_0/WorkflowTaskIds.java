@@ -90,6 +90,18 @@ public class WorkflowTaskIds implements Serializable {
 		return Objects.equals(toString(), workflowTaskIds.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "workflowTaskIds")) {
+			return workflowTaskIds;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskIds")) {
+			return workflowTaskIds;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -126,6 +126,21 @@ public class SearchRequestBody implements Serializable {
 		return Objects.equals(toString(), searchRequestBody.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "facetConfigurations")) {
+			return facetConfigurations;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

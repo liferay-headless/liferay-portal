@@ -466,6 +466,57 @@ public class DataLayout implements Serializable {
 		return Objects.equals(toString(), dataLayout.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "dataDefinitionId")) {
+			return dataDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "dataLayoutFields")) {
+			return dataLayoutFields;
+		}
+		else if (Objects.equals(propertyName, "dataLayoutKey")) {
+			return dataLayoutKey;
+		}
+		else if (Objects.equals(propertyName, "dataLayoutPages")) {
+			return dataLayoutPages;
+		}
+		else if (Objects.equals(propertyName, "dataRules")) {
+			return dataRules;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "paginationMode")) {
+			return paginationMode;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

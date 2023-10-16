@@ -1397,6 +1397,155 @@ public class OrderItem implements Serializable {
 		return Objects.equals(toString(), orderItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "bookedQuantityId")) {
+			return bookedQuantityId;
+		}
+		else if (Objects.equals(propertyName, "bookedQuantityId")) {
+			return bookedQuantityId;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "decimalQuantity")) {
+			return decimalQuantity;
+		}
+		else if (Objects.equals(propertyName, "deliveryGroup")) {
+			return deliveryGroup;
+		}
+		else if (Objects.equals(propertyName, "discountAmount")) {
+			return discountAmount;
+		}
+		else if (Objects.equals(propertyName, "discountManuallyAdjusted")) {
+			return discountManuallyAdjusted;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel1")) {
+			return discountPercentageLevel1;
+		}
+		else if (Objects.equals(
+					propertyName, "discountPercentageLevel1WithTaxAmount")) {
+
+			return discountPercentageLevel1WithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel2")) {
+			return discountPercentageLevel2;
+		}
+		else if (Objects.equals(
+					propertyName, "discountPercentageLevel2WithTaxAmount")) {
+
+			return discountPercentageLevel2WithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel3")) {
+			return discountPercentageLevel3;
+		}
+		else if (Objects.equals(
+					propertyName, "discountPercentageLevel3WithTaxAmount")) {
+
+			return discountPercentageLevel3WithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "discountPercentageLevel4")) {
+			return discountPercentageLevel4;
+		}
+		else if (Objects.equals(
+					propertyName, "discountPercentageLevel4WithTaxAmount")) {
+
+			return discountPercentageLevel4WithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "discountWithTaxAmount")) {
+			return discountWithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "finalPrice")) {
+			return finalPrice;
+		}
+		else if (Objects.equals(propertyName, "finalPriceWithTaxAmount")) {
+			return finalPriceWithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "formattedQuantity")) {
+			return formattedQuantity;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "orderExternalReferenceCode")) {
+			return orderExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderId")) {
+			return orderId;
+		}
+		else if (Objects.equals(propertyName, "priceManuallyAdjusted")) {
+			return priceManuallyAdjusted;
+		}
+		else if (Objects.equals(propertyName, "printedNote")) {
+			return printedNote;
+		}
+		else if (Objects.equals(propertyName, "promoPrice")) {
+			return promoPrice;
+		}
+		else if (Objects.equals(propertyName, "promoPriceWithTaxAmount")) {
+			return promoPriceWithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "replacedSku")) {
+			return replacedSku;
+		}
+		else if (Objects.equals(propertyName, "replacedSkuId")) {
+			return replacedSkuId;
+		}
+		else if (Objects.equals(propertyName, "requestedDeliveryDate")) {
+			return requestedDeliveryDate;
+		}
+		else if (Objects.equals(propertyName, "shippedQuantity")) {
+			return shippedQuantity;
+		}
+		else if (Objects.equals(propertyName, "shippingAddress")) {
+			return shippingAddress;
+		}
+		else if (Objects.equals(propertyName, "shippingAddressId")) {
+			return shippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuExternalReferenceCode")) {
+			return skuExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "skuId")) {
+			return skuId;
+		}
+		else if (Objects.equals(propertyName, "subscription")) {
+			return subscription;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasure")) {
+			return unitOfMeasure;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasureKey")) {
+			return unitOfMeasureKey;
+		}
+		else if (Objects.equals(propertyName, "unitPrice")) {
+			return unitPrice;
+		}
+		else if (Objects.equals(propertyName, "unitPriceWithTaxAmount")) {
+			return unitPriceWithTaxAmount;
+		}
+		else if (Objects.equals(propertyName, "virtualItemURLs")) {
+			return virtualItemURLs;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

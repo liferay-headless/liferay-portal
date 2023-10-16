@@ -268,6 +268,36 @@ public class ContentFieldValue implements Serializable {
 		return Objects.equals(toString(), contentFieldValue.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "data")) {
+			return data;
+		}
+		else if (Objects.equals(propertyName, "data")) {
+			return data;
+		}
+		else if (Objects.equals(propertyName, "document")) {
+			return document;
+		}
+		else if (Objects.equals(propertyName, "geo")) {
+			return geo;
+		}
+		else if (Objects.equals(propertyName, "image")) {
+			return image;
+		}
+		else if (Objects.equals(propertyName, "link")) {
+			return link;
+		}
+		else if (Objects.equals(propertyName, "structuredContentLink")) {
+			return structuredContentLink;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

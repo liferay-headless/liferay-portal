@@ -208,6 +208,30 @@ public class ProcessMetric implements Serializable {
 		return Objects.equals(toString(), processMetric.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "instanceCount")) {
+			return instanceCount;
+		}
+		else if (Objects.equals(propertyName, "instanceCount")) {
+			return instanceCount;
+		}
+		else if (Objects.equals(propertyName, "onTimeInstanceCount")) {
+			return onTimeInstanceCount;
+		}
+		else if (Objects.equals(propertyName, "overdueInstanceCount")) {
+			return overdueInstanceCount;
+		}
+		else if (Objects.equals(propertyName, "process")) {
+			return process;
+		}
+		else if (Objects.equals(propertyName, "untrackedInstanceCount")) {
+			return untrackedInstanceCount;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

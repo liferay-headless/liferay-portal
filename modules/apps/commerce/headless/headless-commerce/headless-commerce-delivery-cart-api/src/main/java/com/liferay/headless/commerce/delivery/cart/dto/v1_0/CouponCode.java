@@ -88,6 +88,18 @@ public class CouponCode implements Serializable {
 		return Objects.equals(toString(), couponCode.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "code")) {
+			return code;
+		}
+		else if (Objects.equals(propertyName, "code")) {
+			return code;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

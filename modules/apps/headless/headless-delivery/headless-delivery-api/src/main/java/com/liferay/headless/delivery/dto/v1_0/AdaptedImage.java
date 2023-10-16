@@ -241,6 +241,33 @@ public class AdaptedImage implements Serializable {
 		return Objects.equals(toString(), adaptedImage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentUrl")) {
+			return contentUrl;
+		}
+		else if (Objects.equals(propertyName, "contentUrl")) {
+			return contentUrl;
+		}
+		else if (Objects.equals(propertyName, "contentValue")) {
+			return contentValue;
+		}
+		else if (Objects.equals(propertyName, "height")) {
+			return height;
+		}
+		else if (Objects.equals(propertyName, "resolutionName")) {
+			return resolutionName;
+		}
+		else if (Objects.equals(propertyName, "sizeInBytes")) {
+			return sizeInBytes;
+		}
+		else if (Objects.equals(propertyName, "width")) {
+			return width;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

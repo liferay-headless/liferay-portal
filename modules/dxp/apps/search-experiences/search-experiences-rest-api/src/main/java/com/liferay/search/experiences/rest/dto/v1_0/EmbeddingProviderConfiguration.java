@@ -214,6 +214,30 @@ public class EmbeddingProviderConfiguration implements Serializable {
 			toString(), embeddingProviderConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "embeddingVectorDimensions")) {
+			return embeddingVectorDimensions;
+		}
+		else if (Objects.equals(propertyName, "languageIds")) {
+			return languageIds;
+		}
+		else if (Objects.equals(propertyName, "modelClassNames")) {
+			return modelClassNames;
+		}
+		else if (Objects.equals(propertyName, "providerName")) {
+			return providerName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

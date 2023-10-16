@@ -157,6 +157,24 @@ public class FormPageContext implements Serializable {
 		return Objects.equals(toString(), formPageContext.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "enabled")) {
+			return enabled;
+		}
+		else if (Objects.equals(propertyName, "enabled")) {
+			return enabled;
+		}
+		else if (Objects.equals(propertyName, "formFieldContexts")) {
+			return formFieldContexts;
+		}
+		else if (Objects.equals(propertyName, "showRequiredFieldsWarning")) {
+			return showRequiredFieldsWarning;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

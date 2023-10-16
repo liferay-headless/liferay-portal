@@ -146,6 +146,24 @@ public class Calendar implements Serializable {
 		return Objects.equals(toString(), calendar.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "defaultCalendar")) {
+			return defaultCalendar;
+		}
+		else if (Objects.equals(propertyName, "defaultCalendar")) {
+			return defaultCalendar;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

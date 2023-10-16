@@ -322,6 +322,42 @@ public class Diagram implements Serializable {
 		return Objects.equals(toString(), diagram.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attachmentBase64")) {
+			return attachmentBase64;
+		}
+		else if (Objects.equals(propertyName, "attachmentBase64")) {
+			return attachmentBase64;
+		}
+		else if (Objects.equals(propertyName, "color")) {
+			return color;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "imageId")) {
+			return imageId;
+		}
+		else if (Objects.equals(propertyName, "imageURL")) {
+			return imageURL;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "radius")) {
+			return radius;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

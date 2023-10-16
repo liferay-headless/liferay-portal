@@ -151,6 +151,24 @@ public class Availability implements Serializable {
 		return Objects.equals(toString(), availability.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label_i18n")) {
+			return label_i18n;
+		}
+		else if (Objects.equals(propertyName, "stockQuantity")) {
+			return stockQuantity;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

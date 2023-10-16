@@ -479,6 +479,54 @@ public class DisplayPageTemplate implements Serializable {
 		return Objects.equals(toString(), displayPageTemplate.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "availableLanguages")) {
+			return availableLanguages;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "displayPageTemplateKey")) {
+			return displayPageTemplateKey;
+		}
+		else if (Objects.equals(propertyName, "displayPageTemplateSettings")) {
+			return displayPageTemplateSettings;
+		}
+		else if (Objects.equals(propertyName, "markedAsDefault")) {
+			return markedAsDefault;
+		}
+		else if (Objects.equals(propertyName, "pageDefinition")) {
+			return pageDefinition;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "uuid")) {
+			return uuid;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -88,6 +88,18 @@ public class Selection implements Serializable {
 		return Objects.equals(toString(), selection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "size")) {
+			return size;
+		}
+		else if (Objects.equals(propertyName, "size")) {
+			return size;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

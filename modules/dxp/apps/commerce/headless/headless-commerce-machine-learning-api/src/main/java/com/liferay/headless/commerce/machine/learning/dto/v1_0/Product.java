@@ -775,6 +775,87 @@ public class Product implements Serializable {
 		return Objects.equals(toString(), product.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "categoryIds")) {
+			return categoryIds;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "metaDescription")) {
+			return metaDescription;
+		}
+		else if (Objects.equals(propertyName, "metaKeyword")) {
+			return metaKeyword;
+		}
+		else if (Objects.equals(propertyName, "metaTitle")) {
+			return metaTitle;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "productChannelIds")) {
+			return productChannelIds;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productOptions")) {
+			return productOptions;
+		}
+		else if (Objects.equals(propertyName, "productSpecifications")) {
+			return productSpecifications;
+		}
+		else if (Objects.equals(propertyName, "productType")) {
+			return productType;
+		}
+		else if (Objects.equals(propertyName, "skus")) {
+			return skus;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "subscriptionEnabled")) {
+			return subscriptionEnabled;
+		}
+		else if (Objects.equals(propertyName, "tags")) {
+			return tags;
+		}
+		else if (Objects.equals(propertyName, "urls")) {
+			return urls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

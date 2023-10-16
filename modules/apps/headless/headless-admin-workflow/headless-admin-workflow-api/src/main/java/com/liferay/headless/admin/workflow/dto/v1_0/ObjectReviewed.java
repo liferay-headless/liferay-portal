@@ -175,6 +175,27 @@ public class ObjectReviewed implements Serializable {
 		return Objects.equals(toString(), objectReviewed.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetType")) {
+			return assetType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "resourceType")) {
+			return resourceType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -143,6 +143,21 @@ public class FragmentLinkValue implements Serializable {
 		return Objects.equals(toString(), fragmentLinkValue.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "href")) {
+			return href;
+		}
+		else if (Objects.equals(propertyName, "href")) {
+			return href;
+		}
+		else if (Objects.equals(propertyName, "target")) {
+			return target;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

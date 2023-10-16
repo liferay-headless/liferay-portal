@@ -90,6 +90,18 @@ public class SearchRequest implements Serializable {
 		return Objects.equals(toString(), searchRequest.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "queryString")) {
+			return queryString;
+		}
+		else if (Objects.equals(propertyName, "queryString")) {
+			return queryString;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

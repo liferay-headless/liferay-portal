@@ -499,6 +499,60 @@ public class DataDefinition implements Serializable {
 		return Objects.equals(toString(), dataDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "availableLanguageIds")) {
+			return availableLanguageIds;
+		}
+		else if (Objects.equals(propertyName, "availableLanguageIds")) {
+			return availableLanguageIds;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "dataDefinitionFields")) {
+			return dataDefinitionFields;
+		}
+		else if (Objects.equals(propertyName, "dataDefinitionKey")) {
+			return dataDefinitionKey;
+		}
+		else if (Objects.equals(propertyName, "dataRules")) {
+			return dataRules;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "defaultDataLayout")) {
+			return defaultDataLayout;
+		}
+		else if (Objects.equals(propertyName, "defaultLanguageId")) {
+			return defaultLanguageId;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "storageType")) {
+			return storageType;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

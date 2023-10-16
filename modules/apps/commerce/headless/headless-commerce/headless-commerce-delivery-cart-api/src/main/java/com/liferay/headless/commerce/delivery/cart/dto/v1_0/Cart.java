@@ -1087,6 +1087,125 @@ public class Cart implements Serializable {
 		return Objects.equals(toString(), cart.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "author")) {
+			return author;
+		}
+		else if (Objects.equals(propertyName, "billingAddress")) {
+			return billingAddress;
+		}
+		else if (Objects.equals(propertyName, "billingAddressId")) {
+			return billingAddressId;
+		}
+		else if (Objects.equals(propertyName, "cartItems")) {
+			return cartItems;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "couponCode")) {
+			return couponCode;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "currencyCode")) {
+			return currencyCode;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "errorMessages")) {
+			return errorMessages;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "lastPriceUpdateDate")) {
+			return lastPriceUpdateDate;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "notes")) {
+			return notes;
+		}
+		else if (Objects.equals(propertyName, "orderStatusInfo")) {
+			return orderStatusInfo;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "orderUUID")) {
+			return orderUUID;
+		}
+		else if (Objects.equals(propertyName, "paymentMethod")) {
+			return paymentMethod;
+		}
+		else if (Objects.equals(propertyName, "paymentMethodLabel")) {
+			return paymentMethodLabel;
+		}
+		else if (Objects.equals(propertyName, "paymentStatus")) {
+			return paymentStatus;
+		}
+		else if (Objects.equals(propertyName, "paymentStatusInfo")) {
+			return paymentStatusInfo;
+		}
+		else if (Objects.equals(propertyName, "paymentStatusLabel")) {
+			return paymentStatusLabel;
+		}
+		else if (Objects.equals(propertyName, "printedNote")) {
+			return printedNote;
+		}
+		else if (Objects.equals(propertyName, "purchaseOrderNumber")) {
+			return purchaseOrderNumber;
+		}
+		else if (Objects.equals(propertyName, "shippingAddress")) {
+			return shippingAddress;
+		}
+		else if (Objects.equals(propertyName, "shippingAddressId")) {
+			return shippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "shippingMethod")) {
+			return shippingMethod;
+		}
+		else if (Objects.equals(propertyName, "shippingOption")) {
+			return shippingOption;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "summary")) {
+			return summary;
+		}
+		else if (Objects.equals(propertyName, "useAsBilling")) {
+			return useAsBilling;
+		}
+		else if (Objects.equals(propertyName, "valid")) {
+			return valid;
+		}
+		else if (Objects.equals(propertyName, "workflowStatusInfo")) {
+			return workflowStatusInfo;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -173,6 +173,27 @@ public class WishList implements Serializable {
 		return Objects.equals(toString(), wishList.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "defaultWishList")) {
+			return defaultWishList;
+		}
+		else if (Objects.equals(propertyName, "defaultWishList")) {
+			return defaultWishList;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "wishListItems")) {
+			return wishListItems;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

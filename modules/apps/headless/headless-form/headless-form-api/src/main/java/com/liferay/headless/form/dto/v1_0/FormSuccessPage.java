@@ -209,6 +209,30 @@ public class FormSuccessPage implements Serializable {
 		return Objects.equals(toString(), formSuccessPage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "headline")) {
+			return headline;
+		}
+		else if (Objects.equals(propertyName, "headline_i18n")) {
+			return headline_i18n;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

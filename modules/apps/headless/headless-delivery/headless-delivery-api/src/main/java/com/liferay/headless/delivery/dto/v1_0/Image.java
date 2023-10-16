@@ -182,6 +182,27 @@ public class Image implements Serializable {
 		return Objects.equals(toString(), image.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "caption")) {
+			return caption;
+		}
+		else if (Objects.equals(propertyName, "caption")) {
+			return caption;
+		}
+		else if (Objects.equals(propertyName, "contentUrl")) {
+			return contentUrl;
+		}
+		else if (Objects.equals(propertyName, "contentValue")) {
+			return contentValue;
+		}
+		else if (Objects.equals(propertyName, "imageId")) {
+			return imageId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -316,6 +316,42 @@ public class User implements Serializable {
 		return Objects.equals(toString(), user.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "email")) {
+			return email;
+		}
+		else if (Objects.equals(propertyName, "email")) {
+			return email;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "firstName")) {
+			return firstName;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "jobTitle")) {
+			return jobTitle;
+		}
+		else if (Objects.equals(propertyName, "lastName")) {
+			return lastName;
+		}
+		else if (Objects.equals(propertyName, "male")) {
+			return male;
+		}
+		else if (Objects.equals(propertyName, "middleName")) {
+			return middleName;
+		}
+		else if (Objects.equals(propertyName, "roles")) {
+			return roles;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

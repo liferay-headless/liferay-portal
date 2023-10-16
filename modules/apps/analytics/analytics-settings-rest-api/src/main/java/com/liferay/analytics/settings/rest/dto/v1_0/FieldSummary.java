@@ -174,6 +174,27 @@ public class FieldSummary implements Serializable {
 		return Objects.equals(toString(), fieldSummary.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "account")) {
+			return account;
+		}
+		else if (Objects.equals(propertyName, "order")) {
+			return order;
+		}
+		else if (Objects.equals(propertyName, "people")) {
+			return people;
+		}
+		else if (Objects.equals(propertyName, "product")) {
+			return product;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

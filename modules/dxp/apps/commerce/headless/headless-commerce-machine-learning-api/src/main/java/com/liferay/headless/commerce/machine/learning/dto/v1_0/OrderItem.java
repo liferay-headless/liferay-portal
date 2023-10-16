@@ -555,6 +555,66 @@ public class OrderItem implements Serializable {
 		return Objects.equals(toString(), orderItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "cpDefinitionId")) {
+			return cpDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "cpDefinitionId")) {
+			return cpDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "finalPrice")) {
+			return finalPrice;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "orderId")) {
+			return orderId;
+		}
+		else if (Objects.equals(propertyName, "parentOrderItemId")) {
+			return parentOrderItemId;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "subscription")) {
+			return subscription;
+		}
+		else if (Objects.equals(propertyName, "unitOfMeasure")) {
+			return unitOfMeasure;
+		}
+		else if (Objects.equals(propertyName, "unitPrice")) {
+			return unitPrice;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

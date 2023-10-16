@@ -151,6 +151,24 @@ public class LinkedProduct implements Serializable {
 		return Objects.equals(toString(), linkedProduct.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -408,6 +408,51 @@ public class Summary implements Serializable {
 		return Objects.equals(toString(), summary.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "currency")) {
+			return currency;
+		}
+		else if (Objects.equals(propertyName, "itemsQuantity")) {
+			return itemsQuantity;
+		}
+		else if (Objects.equals(propertyName, "shippingDiscountPercentages")) {
+			return shippingDiscountPercentages;
+		}
+		else if (Objects.equals(propertyName, "shippingDiscountValue")) {
+			return shippingDiscountValue;
+		}
+		else if (Objects.equals(propertyName, "shippingValue")) {
+			return shippingValue;
+		}
+		else if (Objects.equals(propertyName, "subtotal")) {
+			return subtotal;
+		}
+		else if (Objects.equals(propertyName, "subtotalDiscountPercentages")) {
+			return subtotalDiscountPercentages;
+		}
+		else if (Objects.equals(propertyName, "subtotalDiscountValue")) {
+			return subtotalDiscountValue;
+		}
+		else if (Objects.equals(propertyName, "taxValue")) {
+			return taxValue;
+		}
+		else if (Objects.equals(propertyName, "total")) {
+			return total;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountPercentages")) {
+			return totalDiscountPercentages;
+		}
+		else if (Objects.equals(propertyName, "totalDiscountValue")) {
+			return totalDiscountValue;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

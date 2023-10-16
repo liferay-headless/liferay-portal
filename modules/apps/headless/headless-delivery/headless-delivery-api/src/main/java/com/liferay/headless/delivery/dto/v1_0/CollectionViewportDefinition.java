@@ -99,6 +99,18 @@ public class CollectionViewportDefinition implements Serializable {
 			toString(), collectionViewportDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "numberOfColumns")) {
+			return numberOfColumns;
+		}
+		else if (Objects.equals(propertyName, "numberOfColumns")) {
+			return numberOfColumns;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

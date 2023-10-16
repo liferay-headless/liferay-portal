@@ -128,6 +128,21 @@ public class ColumnViewport implements Serializable {
 		return Objects.equals(toString(), columnViewport.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "columnViewportDefinition")) {
+			return columnViewportDefinition;
+		}
+		else if (Objects.equals(propertyName, "columnViewportDefinition")) {
+			return columnViewportDefinition;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

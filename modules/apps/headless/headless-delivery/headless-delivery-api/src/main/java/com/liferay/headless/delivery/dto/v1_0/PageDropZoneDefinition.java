@@ -103,6 +103,18 @@ public class PageDropZoneDefinition implements Serializable {
 		return Objects.equals(toString(), pageDropZoneDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fragmentSettings")) {
+			return fragmentSettings;
+		}
+		else if (Objects.equals(propertyName, "fragmentSettings")) {
+			return fragmentSettings;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

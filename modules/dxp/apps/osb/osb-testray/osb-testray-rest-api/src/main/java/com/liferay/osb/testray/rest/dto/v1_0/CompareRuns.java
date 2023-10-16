@@ -122,6 +122,21 @@ public class CompareRuns implements Serializable {
 		return Objects.equals(toString(), compareRuns.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dueStatuses")) {
+			return dueStatuses;
+		}
+		else if (Objects.equals(propertyName, "dueStatuses")) {
+			return dueStatuses;
+		}
+		else if (Objects.equals(propertyName, "values")) {
+			return values;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

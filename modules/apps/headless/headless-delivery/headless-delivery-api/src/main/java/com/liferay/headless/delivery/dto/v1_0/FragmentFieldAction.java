@@ -197,6 +197,27 @@ public class FragmentFieldAction implements Serializable {
 		return Objects.equals(toString(), fragmentFieldAction.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "action")) {
+			return action;
+		}
+		else if (Objects.equals(propertyName, "action")) {
+			return action;
+		}
+		else if (Objects.equals(propertyName, "onError")) {
+			return onError;
+		}
+		else if (Objects.equals(propertyName, "onSuccess")) {
+			return onSuccess;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

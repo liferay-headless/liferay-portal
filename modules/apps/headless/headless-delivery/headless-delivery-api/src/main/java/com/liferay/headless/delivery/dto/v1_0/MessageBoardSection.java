@@ -546,6 +546,60 @@ public class MessageBoardSection implements Serializable {
 		return Objects.equals(toString(), messageBoardSection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "friendlyUrlPath")) {
+			return friendlyUrlPath;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "numberOfMessageBoardSections")) {
+			return numberOfMessageBoardSections;
+		}
+		else if (Objects.equals(propertyName, "numberOfMessageBoardThreads")) {
+			return numberOfMessageBoardThreads;
+		}
+		else if (Objects.equals(propertyName, "parentMessageBoardSectionId")) {
+			return parentMessageBoardSectionId;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "subscribed")) {
+			return subscribed;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "viewableBy")) {
+			return viewableBy;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

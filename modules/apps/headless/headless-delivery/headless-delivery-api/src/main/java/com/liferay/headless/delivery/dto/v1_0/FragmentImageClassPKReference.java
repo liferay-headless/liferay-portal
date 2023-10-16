@@ -136,6 +136,21 @@ public class FragmentImageClassPKReference implements Serializable {
 			toString(), fragmentImageClassPKReference.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "classPKReferences")) {
+			return classPKReferences;
+		}
+		else if (Objects.equals(propertyName, "classPKReferences")) {
+			return classPKReferences;
+		}
+		else if (Objects.equals(propertyName, "fragmentImageConfiguration")) {
+			return fragmentImageConfiguration;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -90,6 +90,18 @@ public class DSEnvelopeSignatureURL implements Serializable {
 		return Objects.equals(toString(), dsEnvelopeSignatureURL.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "url")) {
+			return url;
+		}
+		else if (Objects.equals(propertyName, "url")) {
+			return url;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

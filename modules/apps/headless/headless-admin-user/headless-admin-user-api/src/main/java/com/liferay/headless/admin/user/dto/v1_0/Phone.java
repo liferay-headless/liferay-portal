@@ -207,6 +207,30 @@ public class Phone implements Serializable {
 		return Objects.equals(toString(), phone.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "extension")) {
+			return extension;
+		}
+		else if (Objects.equals(propertyName, "extension")) {
+			return extension;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "phoneNumber")) {
+			return phoneNumber;
+		}
+		else if (Objects.equals(propertyName, "phoneType")) {
+			return phoneType;
+		}
+		else if (Objects.equals(propertyName, "primary")) {
+			return primary;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

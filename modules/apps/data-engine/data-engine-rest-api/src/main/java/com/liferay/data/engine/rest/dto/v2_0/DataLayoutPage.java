@@ -153,6 +153,24 @@ public class DataLayoutPage implements Serializable {
 		return Objects.equals(toString(), dataLayoutPage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataLayoutRows")) {
+			return dataLayoutRows;
+		}
+		else if (Objects.equals(propertyName, "dataLayoutRows")) {
+			return dataLayoutRows;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

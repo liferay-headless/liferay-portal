@@ -857,6 +857,99 @@ public class FragmentStyle implements Serializable {
 		return Objects.equals(toString(), fragmentStyle.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "backgroundColor")) {
+			return backgroundColor;
+		}
+		else if (Objects.equals(propertyName, "backgroundColor")) {
+			return backgroundColor;
+		}
+		else if (Objects.equals(propertyName, "backgroundFragmentImage")) {
+			return backgroundFragmentImage;
+		}
+		else if (Objects.equals(propertyName, "borderColor")) {
+			return borderColor;
+		}
+		else if (Objects.equals(propertyName, "borderRadius")) {
+			return borderRadius;
+		}
+		else if (Objects.equals(propertyName, "borderWidth")) {
+			return borderWidth;
+		}
+		else if (Objects.equals(propertyName, "fontFamily")) {
+			return fontFamily;
+		}
+		else if (Objects.equals(propertyName, "fontSize")) {
+			return fontSize;
+		}
+		else if (Objects.equals(propertyName, "fontWeight")) {
+			return fontWeight;
+		}
+		else if (Objects.equals(propertyName, "height")) {
+			return height;
+		}
+		else if (Objects.equals(propertyName, "hidden")) {
+			return hidden;
+		}
+		else if (Objects.equals(propertyName, "marginBottom")) {
+			return marginBottom;
+		}
+		else if (Objects.equals(propertyName, "marginLeft")) {
+			return marginLeft;
+		}
+		else if (Objects.equals(propertyName, "marginRight")) {
+			return marginRight;
+		}
+		else if (Objects.equals(propertyName, "marginTop")) {
+			return marginTop;
+		}
+		else if (Objects.equals(propertyName, "maxHeight")) {
+			return maxHeight;
+		}
+		else if (Objects.equals(propertyName, "maxWidth")) {
+			return maxWidth;
+		}
+		else if (Objects.equals(propertyName, "minHeight")) {
+			return minHeight;
+		}
+		else if (Objects.equals(propertyName, "minWidth")) {
+			return minWidth;
+		}
+		else if (Objects.equals(propertyName, "opacity")) {
+			return opacity;
+		}
+		else if (Objects.equals(propertyName, "overflow")) {
+			return overflow;
+		}
+		else if (Objects.equals(propertyName, "paddingBottom")) {
+			return paddingBottom;
+		}
+		else if (Objects.equals(propertyName, "paddingLeft")) {
+			return paddingLeft;
+		}
+		else if (Objects.equals(propertyName, "paddingRight")) {
+			return paddingRight;
+		}
+		else if (Objects.equals(propertyName, "paddingTop")) {
+			return paddingTop;
+		}
+		else if (Objects.equals(propertyName, "shadow")) {
+			return shadow;
+		}
+		else if (Objects.equals(propertyName, "textAlign")) {
+			return textAlign;
+		}
+		else if (Objects.equals(propertyName, "textColor")) {
+			return textColor;
+		}
+		else if (Objects.equals(propertyName, "width")) {
+			return width;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -351,6 +351,45 @@ public class ProductSpecification implements Serializable {
 		return Objects.equals(toString(), productSpecification.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "optionCategoryId")) {
+			return optionCategoryId;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "specificationGroupKey")) {
+			return specificationGroupKey;
+		}
+		else if (Objects.equals(propertyName, "specificationGroupTitle")) {
+			return specificationGroupTitle;
+		}
+		else if (Objects.equals(propertyName, "specificationId")) {
+			return specificationId;
+		}
+		else if (Objects.equals(propertyName, "specificationKey")) {
+			return specificationKey;
+		}
+		else if (Objects.equals(propertyName, "specificationTitle")) {
+			return specificationTitle;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

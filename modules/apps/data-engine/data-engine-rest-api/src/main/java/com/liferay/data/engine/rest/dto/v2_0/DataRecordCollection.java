@@ -240,6 +240,33 @@ public class DataRecordCollection implements Serializable {
 		return Objects.equals(toString(), dataRecordCollection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataDefinitionId")) {
+			return dataDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "dataDefinitionId")) {
+			return dataDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "dataRecordCollectionKey")) {
+			return dataRecordCollectionKey;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -93,6 +93,18 @@ public class ParentSitePage implements Serializable {
 		return Objects.equals(toString(), parentSitePage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "friendlyUrlPath")) {
+			return friendlyUrlPath;
+		}
+		else if (Objects.equals(propertyName, "friendlyUrlPath")) {
+			return friendlyUrlPath;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -284,6 +284,40 @@ public class OrderRuleAccountGroup implements Serializable {
 		return Objects.equals(toString(), orderRuleAccountGroup.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountGroup")) {
+			return accountGroup;
+		}
+		else if (Objects.equals(propertyName, "accountGroup")) {
+			return accountGroup;
+		}
+		else if (Objects.equals(
+					propertyName, "accountGroupExternalReferenceCode")) {
+
+			return accountGroupExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountGroupId")) {
+			return accountGroupId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "orderRuleAccountGroupId")) {
+			return orderRuleAccountGroupId;
+		}
+		else if (Objects.equals(
+					propertyName, "orderRuleExternalReferenceCode")) {
+
+			return orderRuleExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderRuleId")) {
+			return orderRuleId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

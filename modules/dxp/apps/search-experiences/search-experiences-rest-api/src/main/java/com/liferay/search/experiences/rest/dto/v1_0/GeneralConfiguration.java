@@ -326,6 +326,42 @@ public class GeneralConfiguration implements Serializable {
 		return Objects.equals(toString(), generalConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "clauseContributorsExcludes")) {
+			return clauseContributorsExcludes;
+		}
+		else if (Objects.equals(propertyName, "clauseContributorsExcludes")) {
+			return clauseContributorsExcludes;
+		}
+		else if (Objects.equals(propertyName, "clauseContributorsIncludes")) {
+			return clauseContributorsIncludes;
+		}
+		else if (Objects.equals(propertyName, "emptySearchEnabled")) {
+			return emptySearchEnabled;
+		}
+		else if (Objects.equals(propertyName, "explain")) {
+			return explain;
+		}
+		else if (Objects.equals(propertyName, "includeResponseString")) {
+			return includeResponseString;
+		}
+		else if (Objects.equals(propertyName, "languageId")) {
+			return languageId;
+		}
+		else if (Objects.equals(propertyName, "queryString")) {
+			return queryString;
+		}
+		else if (Objects.equals(propertyName, "searchableAssetTypes")) {
+			return searchableAssetTypes;
+		}
+		else if (Objects.equals(propertyName, "timeZoneId")) {
+			return timeZoneId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

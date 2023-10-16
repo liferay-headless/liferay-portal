@@ -334,6 +334,42 @@ public class PageFormDefinition implements Serializable {
 		return Objects.equals(toString(), pageFormDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "cssClasses")) {
+			return cssClasses;
+		}
+		else if (Objects.equals(propertyName, "cssClasses")) {
+			return cssClasses;
+		}
+		else if (Objects.equals(propertyName, "customCSS")) {
+			return customCSS;
+		}
+		else if (Objects.equals(propertyName, "customCSSViewports")) {
+			return customCSSViewports;
+		}
+		else if (Objects.equals(propertyName, "formConfig")) {
+			return formConfig;
+		}
+		else if (Objects.equals(propertyName, "fragmentStyle")) {
+			return fragmentStyle;
+		}
+		else if (Objects.equals(propertyName, "fragmentViewports")) {
+			return fragmentViewports;
+		}
+		else if (Objects.equals(propertyName, "indexed")) {
+			return indexed;
+		}
+		else if (Objects.equals(propertyName, "layout")) {
+			return layout;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

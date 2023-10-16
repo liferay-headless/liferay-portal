@@ -125,6 +125,21 @@ public class FragmentFieldImage implements Serializable {
 		return Objects.equals(toString(), fragmentFieldImage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fragmentImage")) {
+			return fragmentImage;
+		}
+		else if (Objects.equals(propertyName, "fragmentImage")) {
+			return fragmentImage;
+		}
+		else if (Objects.equals(propertyName, "fragmentLink")) {
+			return fragmentLink;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

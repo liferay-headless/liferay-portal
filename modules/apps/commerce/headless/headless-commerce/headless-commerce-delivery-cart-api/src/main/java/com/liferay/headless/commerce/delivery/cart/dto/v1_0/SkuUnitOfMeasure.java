@@ -268,6 +268,36 @@ public class SkuUnitOfMeasure implements Serializable {
 		return Objects.equals(toString(), skuUnitOfMeasure.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "incrementalOrderQuantity")) {
+			return incrementalOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "incrementalOrderQuantity")) {
+			return incrementalOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "precision")) {
+			return precision;
+		}
+		else if (Objects.equals(propertyName, "primary")) {
+			return primary;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "rate")) {
+			return rate;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

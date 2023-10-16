@@ -147,6 +147,24 @@ public class Suggestion implements Serializable {
 		return Objects.equals(toString(), suggestion.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "score")) {
+			return score;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

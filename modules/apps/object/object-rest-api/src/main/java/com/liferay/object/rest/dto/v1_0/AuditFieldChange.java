@@ -149,6 +149,24 @@ public class AuditFieldChange implements Serializable {
 		return Objects.equals(toString(), auditFieldChange.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "newValue")) {
+			return newValue;
+		}
+		else if (Objects.equals(propertyName, "oldValue")) {
+			return oldValue;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

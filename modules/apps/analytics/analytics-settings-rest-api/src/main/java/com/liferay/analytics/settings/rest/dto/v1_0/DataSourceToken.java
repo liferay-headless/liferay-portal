@@ -90,6 +90,18 @@ public class DataSourceToken implements Serializable {
 		return Objects.equals(toString(), dataSourceToken.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "token")) {
+			return token;
+		}
+		else if (Objects.equals(propertyName, "token")) {
+			return token;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -375,6 +375,48 @@ public class SLA implements Serializable {
 		return Objects.equals(toString(), sla.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "calendarKey")) {
+			return calendarKey;
+		}
+		else if (Objects.equals(propertyName, "calendarKey")) {
+			return calendarKey;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "duration")) {
+			return duration;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "pauseNodeKeys")) {
+			return pauseNodeKeys;
+		}
+		else if (Objects.equals(propertyName, "processId")) {
+			return processId;
+		}
+		else if (Objects.equals(propertyName, "startNodeKeys")) {
+			return startNodeKeys;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "stopNodeKeys")) {
+			return stopNodeKeys;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

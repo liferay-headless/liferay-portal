@@ -124,6 +124,21 @@ public class DocumentBulkSelection implements Serializable {
 		return Objects.equals(toString(), documentBulkSelection.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "documentIds")) {
+			return documentIds;
+		}
+		else if (Objects.equals(propertyName, "documentIds")) {
+			return documentIds;
+		}
+		else if (Objects.equals(propertyName, "selectionScope")) {
+			return selectionScope;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

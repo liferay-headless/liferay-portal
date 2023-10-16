@@ -93,6 +93,18 @@ public class UiConfiguration implements Serializable {
 		return Objects.equals(toString(), uiConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fieldSets")) {
+			return fieldSets;
+		}
+		else if (Objects.equals(propertyName, "fieldSets")) {
+			return fieldSets;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

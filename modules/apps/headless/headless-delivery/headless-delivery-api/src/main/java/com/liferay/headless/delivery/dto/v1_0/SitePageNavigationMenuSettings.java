@@ -173,6 +173,24 @@ public class SitePageNavigationMenuSettings implements Serializable {
 			toString(), sitePageNavigationMenuSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "queryString")) {
+			return queryString;
+		}
+		else if (Objects.equals(propertyName, "queryString")) {
+			return queryString;
+		}
+		else if (Objects.equals(propertyName, "target")) {
+			return target;
+		}
+		else if (Objects.equals(propertyName, "targetType")) {
+			return targetType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

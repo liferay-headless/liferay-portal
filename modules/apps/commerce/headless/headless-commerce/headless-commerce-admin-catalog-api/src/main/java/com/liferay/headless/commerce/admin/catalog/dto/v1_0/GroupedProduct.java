@@ -336,6 +336,44 @@ public class GroupedProduct implements Serializable {
 		return Objects.equals(toString(), groupedProduct.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "entryProductExternalReferenceCode")) {
+			return entryProductExternalReferenceCode;
+		}
+		else if (Objects.equals(
+					propertyName, "entryProductExternalReferenceCode")) {
+
+			return entryProductExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "entryProductId")) {
+			return entryProductId;
+		}
+		else if (Objects.equals(propertyName, "entryProductName")) {
+			return entryProductName;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "productExternalReferenceCode")) {
+			return productExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productName")) {
+			return productName;
+		}
+		else if (Objects.equals(propertyName, "quantity")) {
+			return quantity;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

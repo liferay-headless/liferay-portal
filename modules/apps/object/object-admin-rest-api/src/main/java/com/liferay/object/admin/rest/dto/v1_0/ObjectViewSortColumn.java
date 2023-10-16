@@ -188,6 +188,27 @@ public class ObjectViewSortColumn implements Serializable {
 		return Objects.equals(toString(), objectViewSortColumn.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "objectFieldName")) {
+			return objectFieldName;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "sortOrder")) {
+			return sortOrder;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

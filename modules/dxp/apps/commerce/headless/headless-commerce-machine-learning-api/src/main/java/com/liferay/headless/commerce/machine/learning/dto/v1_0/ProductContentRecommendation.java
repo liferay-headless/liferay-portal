@@ -237,6 +237,33 @@ public class ProductContentRecommendation implements Serializable {
 			toString(), productContentRecommendation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "jobId")) {
+			return jobId;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "rank")) {
+			return rank;
+		}
+		else if (Objects.equals(propertyName, "recommendedProductId")) {
+			return recommendedProductId;
+		}
+		else if (Objects.equals(propertyName, "score")) {
+			return score;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

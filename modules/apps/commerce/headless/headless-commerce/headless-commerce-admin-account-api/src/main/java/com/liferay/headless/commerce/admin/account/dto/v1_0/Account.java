@@ -601,6 +601,73 @@ public class Account implements Serializable {
 		return Objects.equals(toString(), account.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountAddresses")) {
+			return accountAddresses;
+		}
+		else if (Objects.equals(propertyName, "accountAddresses")) {
+			return accountAddresses;
+		}
+		else if (Objects.equals(propertyName, "accountMembers")) {
+			return accountMembers;
+		}
+		else if (Objects.equals(propertyName, "accountOrganizations")) {
+			return accountOrganizations;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(
+					propertyName, "defaultBillingAccountAddressId")) {
+
+			return defaultBillingAccountAddressId;
+		}
+		else if (Objects.equals(
+					propertyName, "defaultShippingAccountAddressId")) {
+
+			return defaultShippingAccountAddressId;
+		}
+		else if (Objects.equals(propertyName, "emailAddresses")) {
+			return emailAddresses;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "logoId")) {
+			return logoId;
+		}
+		else if (Objects.equals(propertyName, "logoURL")) {
+			return logoURL;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "root")) {
+			return root;
+		}
+		else if (Objects.equals(propertyName, "taxId")) {
+			return taxId;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

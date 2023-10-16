@@ -88,6 +88,18 @@ public class Body_1 implements Serializable {
 		return Objects.equals(toString(), body_1.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "logo")) {
+			return logo;
+		}
+		else if (Objects.equals(propertyName, "logo")) {
+			return logo;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

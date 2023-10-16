@@ -341,6 +341,45 @@ public class TypeOptions implements Serializable {
 		return Objects.equals(toString(), typeOptions.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "boost")) {
+			return boost;
+		}
+		else if (Objects.equals(propertyName, "boost")) {
+			return boost;
+		}
+		else if (Objects.equals(propertyName, "format")) {
+			return format;
+		}
+		else if (Objects.equals(propertyName, "max")) {
+			return max;
+		}
+		else if (Objects.equals(propertyName, "min")) {
+			return min;
+		}
+		else if (Objects.equals(propertyName, "nullable")) {
+			return nullable;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "step")) {
+			return step;
+		}
+		else if (Objects.equals(propertyName, "unit")) {
+			return unit;
+		}
+		else if (Objects.equals(propertyName, "unitSuffix")) {
+			return unitSuffix;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

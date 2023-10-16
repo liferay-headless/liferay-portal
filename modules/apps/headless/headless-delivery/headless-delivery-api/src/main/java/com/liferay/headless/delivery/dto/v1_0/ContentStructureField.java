@@ -503,6 +503,57 @@ public class ContentStructureField implements Serializable {
 		return Objects.equals(toString(), contentStructureField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dataType")) {
+			return dataType;
+		}
+		else if (Objects.equals(propertyName, "dataType")) {
+			return dataType;
+		}
+		else if (Objects.equals(propertyName, "inputControl")) {
+			return inputControl;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label_i18n")) {
+			return label_i18n;
+		}
+		else if (Objects.equals(propertyName, "localizable")) {
+			return localizable;
+		}
+		else if (Objects.equals(propertyName, "multiple")) {
+			return multiple;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "nestedContentStructureFields")) {
+			return nestedContentStructureFields;
+		}
+		else if (Objects.equals(propertyName, "options")) {
+			return options;
+		}
+		else if (Objects.equals(propertyName, "predefinedValue")) {
+			return predefinedValue;
+		}
+		else if (Objects.equals(propertyName, "predefinedValue_i18n")) {
+			return predefinedValue_i18n;
+		}
+		else if (Objects.equals(propertyName, "repeatable")) {
+			return repeatable;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "showLabel")) {
+			return showLabel;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

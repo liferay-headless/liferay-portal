@@ -251,6 +251,33 @@ public class PaymentMethodGroupRelTerm implements Serializable {
 		return Objects.equals(toString(), paymentMethodGroupRelTerm.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "paymentMethodGroupRelId")) {
+			return paymentMethodGroupRelId;
+		}
+		else if (Objects.equals(propertyName, "paymentMethodGroupRelTermId")) {
+			return paymentMethodGroupRelTermId;
+		}
+		else if (Objects.equals(propertyName, "term")) {
+			return term;
+		}
+		else if (Objects.equals(propertyName, "termExternalReferenceCode")) {
+			return termExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "termId")) {
+			return termId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

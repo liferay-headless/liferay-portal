@@ -101,6 +101,18 @@ public class PageCollectionItemDefinition implements Serializable {
 			toString(), pageCollectionItemDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "collectionItemConfig")) {
+			return collectionItemConfig;
+		}
+		else if (Objects.equals(propertyName, "collectionItemConfig")) {
+			return collectionItemConfig;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

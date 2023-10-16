@@ -183,6 +183,29 @@ public class Idp implements Serializable {
 		return Objects.equals(toString(), idp.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "authnRequestSignatureRequired")) {
+			return authnRequestSignatureRequired;
+		}
+		else if (Objects.equals(
+					propertyName, "authnRequestSignatureRequired")) {
+
+			return authnRequestSignatureRequired;
+		}
+		else if (Objects.equals(propertyName, "defaultAssertionLifetime")) {
+			return defaultAssertionLifetime;
+		}
+		else if (Objects.equals(propertyName, "sessionMaximumAge")) {
+			return sessionMaximumAge;
+		}
+		else if (Objects.equals(propertyName, "sessionTimeout")) {
+			return sessionTimeout;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

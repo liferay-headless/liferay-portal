@@ -90,6 +90,18 @@ public class MLModel implements Serializable {
 		return Objects.equals(toString(), mlModel.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "modelId")) {
+			return modelId;
+		}
+		else if (Objects.equals(propertyName, "modelId")) {
+			return modelId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

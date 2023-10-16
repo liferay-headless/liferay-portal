@@ -307,6 +307,39 @@ public class PunchOutSession implements Serializable {
 		return Objects.equals(toString(), punchOutSession.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "buyerAccountReferenceCode")) {
+			return buyerAccountReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "buyerAccountReferenceCode")) {
+			return buyerAccountReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "buyerGroup")) {
+			return buyerGroup;
+		}
+		else if (Objects.equals(propertyName, "buyerOrganization")) {
+			return buyerOrganization;
+		}
+		else if (Objects.equals(propertyName, "buyerUser")) {
+			return buyerUser;
+		}
+		else if (Objects.equals(propertyName, "cart")) {
+			return cart;
+		}
+		else if (Objects.equals(propertyName, "punchOutReturnURL")) {
+			return punchOutReturnURL;
+		}
+		else if (Objects.equals(propertyName, "punchOutSessionType")) {
+			return punchOutSessionType;
+		}
+		else if (Objects.equals(propertyName, "punchOutStartURL")) {
+			return punchOutStartURL;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

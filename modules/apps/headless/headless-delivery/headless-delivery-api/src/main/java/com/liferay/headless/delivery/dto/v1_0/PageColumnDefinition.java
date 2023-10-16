@@ -171,6 +171,24 @@ public class PageColumnDefinition implements Serializable {
 		return Objects.equals(toString(), pageColumnDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "columnViewportConfig")) {
+			return columnViewportConfig;
+		}
+		else if (Objects.equals(propertyName, "columnViewportConfig")) {
+			return columnViewportConfig;
+		}
+		else if (Objects.equals(propertyName, "columnViewports")) {
+			return columnViewports;
+		}
+		else if (Objects.equals(propertyName, "size")) {
+			return size;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

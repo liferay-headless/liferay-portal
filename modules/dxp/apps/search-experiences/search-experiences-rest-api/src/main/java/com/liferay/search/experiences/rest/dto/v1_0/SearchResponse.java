@@ -320,6 +320,42 @@ public class SearchResponse implements Serializable {
 		return Objects.equals(toString(), searchResponse.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "errors")) {
+			return errors;
+		}
+		else if (Objects.equals(propertyName, "errors")) {
+			return errors;
+		}
+		else if (Objects.equals(propertyName, "page")) {
+			return page;
+		}
+		else if (Objects.equals(propertyName, "pageSize")) {
+			return pageSize;
+		}
+		else if (Objects.equals(propertyName, "request")) {
+			return request;
+		}
+		else if (Objects.equals(propertyName, "requestString")) {
+			return requestString;
+		}
+		else if (Objects.equals(propertyName, "response")) {
+			return response;
+		}
+		else if (Objects.equals(propertyName, "responseString")) {
+			return responseString;
+		}
+		else if (Objects.equals(propertyName, "searchHits")) {
+			return searchHits;
+		}
+		else if (Objects.equals(propertyName, "searchRequest")) {
+			return searchRequest;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

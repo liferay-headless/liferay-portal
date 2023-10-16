@@ -107,6 +107,18 @@ public class ContextReference implements Serializable {
 		return Objects.equals(toString(), contextReference.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contextSource")) {
+			return contextSource;
+		}
+		else if (Objects.equals(propertyName, "contextSource")) {
+			return contextSource;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

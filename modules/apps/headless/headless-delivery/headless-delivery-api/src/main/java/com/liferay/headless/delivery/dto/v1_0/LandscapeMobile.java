@@ -146,6 +146,24 @@ public class LandscapeMobile implements Serializable {
 		return Objects.equals(toString(), landscapeMobile.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "modulesPerRow")) {
+			return modulesPerRow;
+		}
+		else if (Objects.equals(propertyName, "modulesPerRow")) {
+			return modulesPerRow;
+		}
+		else if (Objects.equals(propertyName, "reverseOrder")) {
+			return reverseOrder;
+		}
+		else if (Objects.equals(propertyName, "verticalAlignment")) {
+			return verticalAlignment;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

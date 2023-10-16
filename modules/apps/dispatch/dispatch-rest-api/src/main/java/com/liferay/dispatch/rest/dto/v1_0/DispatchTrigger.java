@@ -490,6 +490,60 @@ public class DispatchTrigger implements Serializable {
 		return Objects.equals(toString(), dispatchTrigger.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "companyId")) {
+			return companyId;
+		}
+		else if (Objects.equals(propertyName, "cronExpression")) {
+			return cronExpression;
+		}
+		else if (Objects.equals(propertyName, "dispatchTaskClusterMode")) {
+			return dispatchTaskClusterMode;
+		}
+		else if (Objects.equals(propertyName, "dispatchTaskExecutorType")) {
+			return dispatchTaskExecutorType;
+		}
+		else if (Objects.equals(propertyName, "dispatchTaskSettings")) {
+			return dispatchTaskSettings;
+		}
+		else if (Objects.equals(propertyName, "endDate")) {
+			return endDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "overlapAllowed")) {
+			return overlapAllowed;
+		}
+		else if (Objects.equals(propertyName, "startDate")) {
+			return startDate;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else if (Objects.equals(propertyName, "timeZoneId")) {
+			return timeZoneId;
+		}
+		else if (Objects.equals(propertyName, "userId")) {
+			return userId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

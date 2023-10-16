@@ -417,6 +417,51 @@ public class ProductOption implements Serializable {
 		return Objects.equals(toString(), productOption.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "facetable")) {
+			return facetable;
+		}
+		else if (Objects.equals(propertyName, "fieldType")) {
+			return fieldType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "optionId")) {
+			return optionId;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "productOptionValues")) {
+			return productOptionValues;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "skuContributor")) {
+			return skuContributor;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

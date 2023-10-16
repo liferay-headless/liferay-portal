@@ -100,6 +100,18 @@ public class FragmentSettingsUnallowed implements Serializable {
 		return Objects.equals(toString(), fragmentSettingsUnallowed.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "unallowedFragments")) {
+			return unallowedFragments;
+		}
+		else if (Objects.equals(propertyName, "unallowedFragments")) {
+			return unallowedFragments;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

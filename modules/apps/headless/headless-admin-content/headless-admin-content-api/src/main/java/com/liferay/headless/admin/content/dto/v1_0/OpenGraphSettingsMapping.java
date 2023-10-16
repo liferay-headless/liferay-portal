@@ -201,6 +201,27 @@ public class OpenGraphSettingsMapping implements Serializable {
 		return Objects.equals(toString(), openGraphSettingsMapping.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "descriptionMappingFieldKey")) {
+			return descriptionMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "descriptionMappingFieldKey")) {
+			return descriptionMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "imageAltMappingFieldKey")) {
+			return imageAltMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "imageMappingFieldKey")) {
+			return imageMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "titleMappingFieldKey")) {
+			return titleMappingFieldKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

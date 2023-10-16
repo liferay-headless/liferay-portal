@@ -210,6 +210,32 @@ public class AccountOrganization implements Serializable {
 		return Objects.equals(toString(), accountOrganization.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(
+					propertyName, "organizationExternalReferenceCode")) {
+
+			return organizationExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "organizationId")) {
+			return organizationId;
+		}
+		else if (Objects.equals(propertyName, "treePath")) {
+			return treePath;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

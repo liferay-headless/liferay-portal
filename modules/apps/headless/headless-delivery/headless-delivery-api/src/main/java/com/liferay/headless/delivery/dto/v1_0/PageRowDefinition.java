@@ -491,6 +491,57 @@ public class PageRowDefinition implements Serializable {
 		return Objects.equals(toString(), pageRowDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "cssClasses")) {
+			return cssClasses;
+		}
+		else if (Objects.equals(propertyName, "cssClasses")) {
+			return cssClasses;
+		}
+		else if (Objects.equals(propertyName, "customCSS")) {
+			return customCSS;
+		}
+		else if (Objects.equals(propertyName, "customCSSViewports")) {
+			return customCSSViewports;
+		}
+		else if (Objects.equals(propertyName, "fragmentStyle")) {
+			return fragmentStyle;
+		}
+		else if (Objects.equals(propertyName, "fragmentViewports")) {
+			return fragmentViewports;
+		}
+		else if (Objects.equals(propertyName, "gutters")) {
+			return gutters;
+		}
+		else if (Objects.equals(propertyName, "indexed")) {
+			return indexed;
+		}
+		else if (Objects.equals(propertyName, "modulesPerRow")) {
+			return modulesPerRow;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "numberOfColumns")) {
+			return numberOfColumns;
+		}
+		else if (Objects.equals(propertyName, "reverseOrder")) {
+			return reverseOrder;
+		}
+		else if (Objects.equals(propertyName, "rowViewportConfig")) {
+			return rowViewportConfig;
+		}
+		else if (Objects.equals(propertyName, "rowViewports")) {
+			return rowViewports;
+		}
+		else if (Objects.equals(propertyName, "verticalAlignment")) {
+			return verticalAlignment;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

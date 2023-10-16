@@ -239,6 +239,33 @@ public class FrequentPatternRecommendation implements Serializable {
 			toString(), frequentPatternRecommendation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "antecedentIds")) {
+			return antecedentIds;
+		}
+		else if (Objects.equals(propertyName, "antecedentIds")) {
+			return antecedentIds;
+		}
+		else if (Objects.equals(propertyName, "antecedentIdsLength")) {
+			return antecedentIdsLength;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "jobId")) {
+			return jobId;
+		}
+		else if (Objects.equals(propertyName, "recommendedProductId")) {
+			return recommendedProductId;
+		}
+		else if (Objects.equals(propertyName, "score")) {
+			return score;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

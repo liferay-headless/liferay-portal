@@ -164,6 +164,24 @@ public class DisplayPageTemplateSettings implements Serializable {
 			toString(), displayPageTemplateSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentAssociation")) {
+			return contentAssociation;
+		}
+		else if (Objects.equals(propertyName, "contentAssociation")) {
+			return contentAssociation;
+		}
+		else if (Objects.equals(propertyName, "openGraphSettingsMapping")) {
+			return openGraphSettingsMapping;
+		}
+		else if (Objects.equals(propertyName, "seoSettingsMapping")) {
+			return seoSettingsMapping;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

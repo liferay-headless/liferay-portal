@@ -501,6 +501,54 @@ public class ImportTask implements Serializable {
 		return Objects.equals(toString(), importTask.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "contentType")) {
+			return contentType;
+		}
+		else if (Objects.equals(propertyName, "endTime")) {
+			return endTime;
+		}
+		else if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "executeStatus")) {
+			return executeStatus;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "failedItems")) {
+			return failedItems;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "importStrategy")) {
+			return importStrategy;
+		}
+		else if (Objects.equals(propertyName, "operation")) {
+			return operation;
+		}
+		else if (Objects.equals(propertyName, "processedItemsCount")) {
+			return processedItemsCount;
+		}
+		else if (Objects.equals(propertyName, "startTime")) {
+			return startTime;
+		}
+		else if (Objects.equals(propertyName, "totalItemsCount")) {
+			return totalItemsCount;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

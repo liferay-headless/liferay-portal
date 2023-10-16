@@ -498,6 +498,57 @@ public class PageSectionDefinition implements Serializable {
 		return Objects.equals(toString(), pageSectionDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "backgroundColor")) {
+			return backgroundColor;
+		}
+		else if (Objects.equals(propertyName, "backgroundColor")) {
+			return backgroundColor;
+		}
+		else if (Objects.equals(propertyName, "backgroundFragmentImage")) {
+			return backgroundFragmentImage;
+		}
+		else if (Objects.equals(propertyName, "backgroundImage")) {
+			return backgroundImage;
+		}
+		else if (Objects.equals(propertyName, "contentVisibility")) {
+			return contentVisibility;
+		}
+		else if (Objects.equals(propertyName, "cssClasses")) {
+			return cssClasses;
+		}
+		else if (Objects.equals(propertyName, "customCSS")) {
+			return customCSS;
+		}
+		else if (Objects.equals(propertyName, "customCSSViewports")) {
+			return customCSSViewports;
+		}
+		else if (Objects.equals(propertyName, "fragmentLink")) {
+			return fragmentLink;
+		}
+		else if (Objects.equals(propertyName, "fragmentStyle")) {
+			return fragmentStyle;
+		}
+		else if (Objects.equals(propertyName, "fragmentViewports")) {
+			return fragmentViewports;
+		}
+		else if (Objects.equals(propertyName, "htmlProperties")) {
+			return htmlProperties;
+		}
+		else if (Objects.equals(propertyName, "indexed")) {
+			return indexed;
+		}
+		else if (Objects.equals(propertyName, "layout")) {
+			return layout;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

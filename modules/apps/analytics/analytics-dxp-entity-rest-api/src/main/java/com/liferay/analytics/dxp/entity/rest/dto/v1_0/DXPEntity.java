@@ -206,6 +206,30 @@ public class DXPEntity implements Serializable {
 		return Objects.equals(toString(), dxpEntity.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "expandoFields")) {
+			return expandoFields;
+		}
+		else if (Objects.equals(propertyName, "expandoFields")) {
+			return expandoFields;
+		}
+		else if (Objects.equals(propertyName, "fields")) {
+			return fields;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

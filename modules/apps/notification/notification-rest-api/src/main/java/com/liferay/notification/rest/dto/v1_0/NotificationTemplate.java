@@ -627,6 +627,77 @@ public class NotificationTemplate implements Serializable {
 		return Objects.equals(toString(), notificationTemplate.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(
+					propertyName,
+					"attachmentObjectFieldExternalReferenceCodes")) {
+
+			return attachmentObjectFieldExternalReferenceCodes;
+		}
+		else if (Objects.equals(propertyName, "attachmentObjectFieldIds")) {
+			return attachmentObjectFieldIds;
+		}
+		else if (Objects.equals(propertyName, "body")) {
+			return body;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "editorType")) {
+			return editorType;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "name_i18n")) {
+			return name_i18n;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode")) {
+
+			return objectDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionId")) {
+			return objectDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "recipientType")) {
+			return recipientType;
+		}
+		else if (Objects.equals(propertyName, "recipients")) {
+			return recipients;
+		}
+		else if (Objects.equals(propertyName, "subject")) {
+			return subject;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "typeLabel")) {
+			return typeLabel;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

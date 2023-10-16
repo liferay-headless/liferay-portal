@@ -124,6 +124,21 @@ public class ParentKnowledgeBaseFolder implements Serializable {
 		return Objects.equals(toString(), parentKnowledgeBaseFolder.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "folderId")) {
+			return folderId;
+		}
+		else if (Objects.equals(propertyName, "folderId")) {
+			return folderId;
+		}
+		else if (Objects.equals(propertyName, "folderName")) {
+			return folderName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

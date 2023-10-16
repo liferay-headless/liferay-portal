@@ -603,6 +603,73 @@ public class ObjectRelationship implements Serializable {
 		return Objects.equals(toString(), objectRelationship.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "deletionType")) {
+			return deletionType;
+		}
+		else if (Objects.equals(propertyName, "edge")) {
+			return edge;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode1")) {
+
+			return objectDefinitionExternalReferenceCode1;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode2")) {
+
+			return objectDefinitionExternalReferenceCode2;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionId1")) {
+			return objectDefinitionId1;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionId2")) {
+			return objectDefinitionId2;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionModifiable2")) {
+			return objectDefinitionModifiable2;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionName2")) {
+			return objectDefinitionName2;
+		}
+		else if (Objects.equals(propertyName, "objectDefinitionSystem2")) {
+			return objectDefinitionSystem2;
+		}
+		else if (Objects.equals(propertyName, "parameterObjectFieldId")) {
+			return parameterObjectFieldId;
+		}
+		else if (Objects.equals(propertyName, "parameterObjectFieldName")) {
+			return parameterObjectFieldName;
+		}
+		else if (Objects.equals(propertyName, "reverse")) {
+			return reverse;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

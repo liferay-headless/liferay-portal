@@ -203,6 +203,30 @@ public class Hit implements Serializable {
 		return Objects.equals(toString(), hit.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "documentFields")) {
+			return documentFields;
+		}
+		else if (Objects.equals(propertyName, "documentFields")) {
+			return documentFields;
+		}
+		else if (Objects.equals(propertyName, "explanation")) {
+			return explanation;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "score")) {
+			return score;
+		}
+		else if (Objects.equals(propertyName, "version")) {
+			return version;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

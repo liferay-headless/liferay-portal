@@ -203,6 +203,27 @@ public class SEOSettingsMapping implements Serializable {
 		return Objects.equals(toString(), seoSettingsMapping.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "descriptionMappingFieldKey")) {
+			return descriptionMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "descriptionMappingFieldKey")) {
+			return descriptionMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "htmlTitleMappingFieldKey")) {
+			return htmlTitleMappingFieldKey;
+		}
+		else if (Objects.equals(propertyName, "robots")) {
+			return robots;
+		}
+		else if (Objects.equals(propertyName, "robots_i18n")) {
+			return robots_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

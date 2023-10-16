@@ -841,6 +841,96 @@ public class Product implements Serializable {
 		return Objects.equals(toString(), product.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attachments")) {
+			return attachments;
+		}
+		else if (Objects.equals(propertyName, "attachments")) {
+			return attachments;
+		}
+		else if (Objects.equals(propertyName, "categories")) {
+			return categories;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "expando")) {
+			return expando;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "images")) {
+			return images;
+		}
+		else if (Objects.equals(propertyName, "linkedProducts")) {
+			return linkedProducts;
+		}
+		else if (Objects.equals(propertyName, "metaDescription")) {
+			return metaDescription;
+		}
+		else if (Objects.equals(propertyName, "metaKeyword")) {
+			return metaKeyword;
+		}
+		else if (Objects.equals(propertyName, "metaTitle")) {
+			return metaTitle;
+		}
+		else if (Objects.equals(propertyName, "modifiedDate")) {
+			return modifiedDate;
+		}
+		else if (Objects.equals(propertyName, "multipleOrderQuantity")) {
+			return multipleOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "productConfiguration")) {
+			return productConfiguration;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "productOptions")) {
+			return productOptions;
+		}
+		else if (Objects.equals(propertyName, "productSpecifications")) {
+			return productSpecifications;
+		}
+		else if (Objects.equals(propertyName, "productType")) {
+			return productType;
+		}
+		else if (Objects.equals(propertyName, "relatedProducts")) {
+			return relatedProducts;
+		}
+		else if (Objects.equals(propertyName, "shortDescription")) {
+			return shortDescription;
+		}
+		else if (Objects.equals(propertyName, "skus")) {
+			return skus;
+		}
+		else if (Objects.equals(propertyName, "slug")) {
+			return slug;
+		}
+		else if (Objects.equals(propertyName, "tags")) {
+			return tags;
+		}
+		else if (Objects.equals(propertyName, "urlImage")) {
+			return urlImage;
+		}
+		else if (Objects.equals(propertyName, "urls")) {
+			return urls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

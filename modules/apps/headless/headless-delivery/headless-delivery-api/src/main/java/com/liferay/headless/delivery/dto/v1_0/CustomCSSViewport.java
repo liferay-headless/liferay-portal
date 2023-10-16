@@ -127,6 +127,21 @@ public class CustomCSSViewport implements Serializable {
 		return Objects.equals(toString(), customCSSViewport.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customCSS")) {
+			return customCSS;
+		}
+		else if (Objects.equals(propertyName, "customCSS")) {
+			return customCSS;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

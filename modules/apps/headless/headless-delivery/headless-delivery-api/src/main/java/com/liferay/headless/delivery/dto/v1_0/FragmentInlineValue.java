@@ -126,6 +126,21 @@ public class FragmentInlineValue implements Serializable {
 		return Objects.equals(toString(), fragmentInlineValue.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else if (Objects.equals(propertyName, "value_i18n")) {
+			return value_i18n;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

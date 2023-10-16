@@ -807,6 +807,87 @@ public class BlogPosting implements Serializable {
 		return Objects.equals(toString(), blogPosting.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "aggregateRating")) {
+			return aggregateRating;
+		}
+		else if (Objects.equals(propertyName, "alternativeHeadline")) {
+			return alternativeHeadline;
+		}
+		else if (Objects.equals(propertyName, "articleBody")) {
+			return articleBody;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "datePublished")) {
+			return datePublished;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "encodingFormat")) {
+			return encodingFormat;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "friendlyUrlPath")) {
+			return friendlyUrlPath;
+		}
+		else if (Objects.equals(propertyName, "headline")) {
+			return headline;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "image")) {
+			return image;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "numberOfComments")) {
+			return numberOfComments;
+		}
+		else if (Objects.equals(propertyName, "relatedContents")) {
+			return relatedContents;
+		}
+		else if (Objects.equals(propertyName, "renderedContents")) {
+			return renderedContents;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryBriefs")) {
+			return taxonomyCategoryBriefs;
+		}
+		else if (Objects.equals(propertyName, "taxonomyCategoryIds")) {
+			return taxonomyCategoryIds;
+		}
+		else if (Objects.equals(propertyName, "viewableBy")) {
+			return viewableBy;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

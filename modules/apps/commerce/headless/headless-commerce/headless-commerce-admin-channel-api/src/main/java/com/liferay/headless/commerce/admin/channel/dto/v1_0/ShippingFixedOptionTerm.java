@@ -247,6 +247,33 @@ public class ShippingFixedOptionTerm implements Serializable {
 		return Objects.equals(toString(), shippingFixedOptionTerm.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "shippingFixedOptionId")) {
+			return shippingFixedOptionId;
+		}
+		else if (Objects.equals(propertyName, "shippingFixedOptionTermId")) {
+			return shippingFixedOptionTermId;
+		}
+		else if (Objects.equals(propertyName, "term")) {
+			return term;
+		}
+		else if (Objects.equals(propertyName, "termExternalReferenceCode")) {
+			return termExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "termId")) {
+			return termId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

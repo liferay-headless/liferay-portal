@@ -517,6 +517,63 @@ public class CTEntry implements Serializable {
 		return Objects.equals(toString(), ctEntry.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "changeType")) {
+			return changeType;
+		}
+		else if (Objects.equals(propertyName, "ctCollectionId")) {
+			return ctCollectionId;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "hideable")) {
+			return hideable;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modelClassNameId")) {
+			return modelClassNameId;
+		}
+		else if (Objects.equals(propertyName, "modelClassPK")) {
+			return modelClassPK;
+		}
+		else if (Objects.equals(propertyName, "ownerId")) {
+			return ownerId;
+		}
+		else if (Objects.equals(propertyName, "ownerName")) {
+			return ownerName;
+		}
+		else if (Objects.equals(propertyName, "siteId")) {
+			return siteId;
+		}
+		else if (Objects.equals(propertyName, "siteName")) {
+			return siteName;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else if (Objects.equals(propertyName, "typeName")) {
+			return typeName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

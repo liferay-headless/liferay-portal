@@ -348,6 +348,42 @@ public class Configuration implements Serializable {
 		return Objects.equals(toString(), configuration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "advancedConfiguration")) {
+			return advancedConfiguration;
+		}
+		else if (Objects.equals(propertyName, "advancedConfiguration")) {
+			return advancedConfiguration;
+		}
+		else if (Objects.equals(propertyName, "aggregationConfiguration")) {
+			return aggregationConfiguration;
+		}
+		else if (Objects.equals(propertyName, "generalConfiguration")) {
+			return generalConfiguration;
+		}
+		else if (Objects.equals(propertyName, "highlightConfiguration")) {
+			return highlightConfiguration;
+		}
+		else if (Objects.equals(propertyName, "indexConfiguration")) {
+			return indexConfiguration;
+		}
+		else if (Objects.equals(propertyName, "parameterConfiguration")) {
+			return parameterConfiguration;
+		}
+		else if (Objects.equals(propertyName, "queryConfiguration")) {
+			return queryConfiguration;
+		}
+		else if (Objects.equals(propertyName, "searchContextAttributes")) {
+			return searchContextAttributes;
+		}
+		else if (Objects.equals(propertyName, "sortConfiguration")) {
+			return sortConfiguration;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

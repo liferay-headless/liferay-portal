@@ -119,6 +119,21 @@ public class ReindexStatus implements Serializable {
 		return Objects.equals(toString(), reindexStatus.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "completionPercentage")) {
+			return completionPercentage;
+		}
+		else if (Objects.equals(propertyName, "completionPercentage")) {
+			return completionPercentage;
+		}
+		else if (Objects.equals(propertyName, "key")) {
+			return key;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

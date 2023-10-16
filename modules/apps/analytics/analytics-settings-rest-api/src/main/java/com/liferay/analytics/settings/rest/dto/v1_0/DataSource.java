@@ -146,6 +146,24 @@ public class DataSource implements Serializable {
 		return Objects.equals(toString(), dataSource.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "commerceChannelIds")) {
+			return commerceChannelIds;
+		}
+		else if (Objects.equals(propertyName, "commerceChannelIds")) {
+			return commerceChannelIds;
+		}
+		else if (Objects.equals(propertyName, "dataSourceId")) {
+			return dataSourceId;
+		}
+		else if (Objects.equals(propertyName, "siteIds")) {
+			return siteIds;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

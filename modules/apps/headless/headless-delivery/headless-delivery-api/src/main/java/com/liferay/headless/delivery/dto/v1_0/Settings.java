@@ -402,6 +402,48 @@ public class Settings implements Serializable {
 		return Objects.equals(toString(), settings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "colorSchemeName")) {
+			return colorSchemeName;
+		}
+		else if (Objects.equals(propertyName, "colorSchemeName")) {
+			return colorSchemeName;
+		}
+		else if (Objects.equals(propertyName, "css")) {
+			return css;
+		}
+		else if (Objects.equals(propertyName, "favIcon")) {
+			return favIcon;
+		}
+		else if (Objects.equals(propertyName, "globalCSSClientExtensions")) {
+			return globalCSSClientExtensions;
+		}
+		else if (Objects.equals(propertyName, "globalJSClientExtensions")) {
+			return globalJSClientExtensions;
+		}
+		else if (Objects.equals(propertyName, "javascript")) {
+			return javascript;
+		}
+		else if (Objects.equals(propertyName, "masterPage")) {
+			return masterPage;
+		}
+		else if (Objects.equals(propertyName, "styleBook")) {
+			return styleBook;
+		}
+		else if (Objects.equals(propertyName, "themeCSSClientExtension")) {
+			return themeCSSClientExtension;
+		}
+		else if (Objects.equals(propertyName, "themeName")) {
+			return themeName;
+		}
+		else if (Objects.equals(propertyName, "themeSettings")) {
+			return themeSettings;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

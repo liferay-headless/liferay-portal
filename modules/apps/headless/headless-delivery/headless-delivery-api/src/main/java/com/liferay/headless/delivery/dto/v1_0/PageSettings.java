@@ -220,6 +220,32 @@ public class PageSettings implements Serializable {
 		return Objects.equals(toString(), pageSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customMetaTags")) {
+			return customMetaTags;
+		}
+		else if (Objects.equals(propertyName, "customMetaTags")) {
+			return customMetaTags;
+		}
+		else if (Objects.equals(propertyName, "hiddenFromNavigation")) {
+			return hiddenFromNavigation;
+		}
+		else if (Objects.equals(propertyName, "openGraphSettings")) {
+			return openGraphSettings;
+		}
+		else if (Objects.equals(propertyName, "seoSettings")) {
+			return seoSettings;
+		}
+		else if (Objects.equals(
+					propertyName, "sitePageNavigationMenuSettings")) {
+
+			return sitePageNavigationMenuSettings;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -106,6 +106,18 @@ public class HtmlProperties implements Serializable {
 		return Objects.equals(toString(), htmlProperties.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "htmlTag")) {
+			return htmlTag;
+		}
+		else if (Objects.equals(propertyName, "htmlTag")) {
+			return htmlTag;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

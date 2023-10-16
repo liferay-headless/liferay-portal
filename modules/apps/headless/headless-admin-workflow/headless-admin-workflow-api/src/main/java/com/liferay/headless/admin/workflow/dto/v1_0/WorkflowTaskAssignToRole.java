@@ -165,6 +165,24 @@ public class WorkflowTaskAssignToRole implements Serializable {
 		return Objects.equals(toString(), workflowTaskAssignToRole.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "comment")) {
+			return comment;
+		}
+		else if (Objects.equals(propertyName, "comment")) {
+			return comment;
+		}
+		else if (Objects.equals(propertyName, "dueDate")) {
+			return dueDate;
+		}
+		else if (Objects.equals(propertyName, "roleId")) {
+			return roleId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

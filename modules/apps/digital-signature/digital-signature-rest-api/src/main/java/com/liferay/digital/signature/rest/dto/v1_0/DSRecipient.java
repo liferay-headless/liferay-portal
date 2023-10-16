@@ -228,6 +228,33 @@ public class DSRecipient implements Serializable {
 		return Objects.equals(toString(), dsRecipient.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "dsClientUserId")) {
+			return dsClientUserId;
+		}
+		else if (Objects.equals(propertyName, "dsClientUserId")) {
+			return dsClientUserId;
+		}
+		else if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "tabs")) {
+			return tabs;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -707,6 +707,80 @@ public class Organization implements Serializable {
 		return Objects.equals(toString(), organization.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "childOrganizations")) {
+			return childOrganizations;
+		}
+		else if (Objects.equals(propertyName, "comment")) {
+			return comment;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "image")) {
+			return image;
+		}
+		else if (Objects.equals(propertyName, "keywords")) {
+			return keywords;
+		}
+		else if (Objects.equals(propertyName, "location")) {
+			return location;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "numberOfAccounts")) {
+			return numberOfAccounts;
+		}
+		else if (Objects.equals(propertyName, "numberOfOrganizations")) {
+			return numberOfOrganizations;
+		}
+		else if (Objects.equals(propertyName, "numberOfUsers")) {
+			return numberOfUsers;
+		}
+		else if (Objects.equals(propertyName, "organizationAccounts")) {
+			return organizationAccounts;
+		}
+		else if (Objects.equals(
+					propertyName, "organizationContactInformation")) {
+
+			return organizationContactInformation;
+		}
+		else if (Objects.equals(propertyName, "parentOrganization")) {
+			return parentOrganization;
+		}
+		else if (Objects.equals(propertyName, "services")) {
+			return services;
+		}
+		else if (Objects.equals(propertyName, "treePath")) {
+			return treePath;
+		}
+		else if (Objects.equals(propertyName, "userAccounts")) {
+			return userAccounts;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

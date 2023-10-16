@@ -301,6 +301,41 @@ public class TierPrice implements Serializable {
 		return Objects.equals(toString(), tierPrice.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "minimumQuantity")) {
+			return minimumQuantity;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(
+					propertyName, "priceEntryExternalReferenceCode")) {
+
+			return priceEntryExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "priceEntryId")) {
+			return priceEntryId;
+		}
+		else if (Objects.equals(propertyName, "promoPrice")) {
+			return promoPrice;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

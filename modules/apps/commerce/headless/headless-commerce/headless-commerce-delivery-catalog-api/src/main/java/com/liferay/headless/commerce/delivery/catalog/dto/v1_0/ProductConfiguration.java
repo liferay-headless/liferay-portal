@@ -363,6 +363,45 @@ public class ProductConfiguration implements Serializable {
 		return Objects.equals(toString(), productConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "allowBackOrder")) {
+			return allowBackOrder;
+		}
+		else if (Objects.equals(propertyName, "allowBackOrder")) {
+			return allowBackOrder;
+		}
+		else if (Objects.equals(propertyName, "allowedOrderQuantities")) {
+			return allowedOrderQuantities;
+		}
+		else if (Objects.equals(propertyName, "displayAvailability")) {
+			return displayAvailability;
+		}
+		else if (Objects.equals(propertyName, "displayStockQuantity")) {
+			return displayStockQuantity;
+		}
+		else if (Objects.equals(propertyName, "inventoryEngine")) {
+			return inventoryEngine;
+		}
+		else if (Objects.equals(propertyName, "lowStockAction")) {
+			return lowStockAction;
+		}
+		else if (Objects.equals(propertyName, "maxOrderQuantity")) {
+			return maxOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "minOrderQuantity")) {
+			return minOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "minStockQuantity")) {
+			return minStockQuantity;
+		}
+		else if (Objects.equals(propertyName, "multipleOrderQuantity")) {
+			return multipleOrderQuantity;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

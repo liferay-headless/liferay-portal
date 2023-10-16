@@ -343,6 +343,42 @@ public class ContentField implements Serializable {
 		return Objects.equals(toString(), contentField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentFieldValue")) {
+			return contentFieldValue;
+		}
+		else if (Objects.equals(propertyName, "contentFieldValue")) {
+			return contentFieldValue;
+		}
+		else if (Objects.equals(propertyName, "contentFieldValue_i18n")) {
+			return contentFieldValue_i18n;
+		}
+		else if (Objects.equals(propertyName, "dataType")) {
+			return dataType;
+		}
+		else if (Objects.equals(propertyName, "inputControl")) {
+			return inputControl;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "label_i18n")) {
+			return label_i18n;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "nestedContentFields")) {
+			return nestedContentFields;
+		}
+		else if (Objects.equals(propertyName, "repeatable")) {
+			return repeatable;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

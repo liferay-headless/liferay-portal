@@ -101,6 +101,18 @@ public class SitePageFormSubmissionResult implements Serializable {
 			toString(), sitePageFormSubmissionResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "itemReference")) {
+			return itemReference;
+		}
+		else if (Objects.equals(propertyName, "itemReference")) {
+			return itemReference;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

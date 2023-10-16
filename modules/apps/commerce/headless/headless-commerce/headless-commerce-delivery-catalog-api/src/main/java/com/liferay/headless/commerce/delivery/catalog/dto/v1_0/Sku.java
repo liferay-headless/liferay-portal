@@ -957,6 +957,110 @@ public class Sku implements Serializable {
 		return Objects.equals(toString(), sku.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "DDMOptions")) {
+			return DDMOptions;
+		}
+		else if (Objects.equals(propertyName, "DDMOptions")) {
+			return DDMOptions;
+		}
+		else if (Objects.equals(propertyName, "allowedOrderQuantities")) {
+			return allowedOrderQuantities;
+		}
+		else if (Objects.equals(propertyName, "availability")) {
+			return availability;
+		}
+		else if (Objects.equals(propertyName, "backOrderAllowed")) {
+			return backOrderAllowed;
+		}
+		else if (Objects.equals(propertyName, "depth")) {
+			return depth;
+		}
+		else if (Objects.equals(propertyName, "discontinued")) {
+			return discontinued;
+		}
+		else if (Objects.equals(propertyName, "discontinuedDate")) {
+			return discontinuedDate;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "displayDiscountLevels")) {
+			return displayDiscountLevels;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "gtin")) {
+			return gtin;
+		}
+		else if (Objects.equals(propertyName, "height")) {
+			return height;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "incomingQuantityLabel")) {
+			return incomingQuantityLabel;
+		}
+		else if (Objects.equals(propertyName, "manufacturerPartNumber")) {
+			return manufacturerPartNumber;
+		}
+		else if (Objects.equals(propertyName, "maxOrderQuantity")) {
+			return maxOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "minOrderQuantity")) {
+			return minOrderQuantity;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "price")) {
+			return price;
+		}
+		else if (Objects.equals(propertyName, "productId")) {
+			return productId;
+		}
+		else if (Objects.equals(propertyName, "published")) {
+			return published;
+		}
+		else if (Objects.equals(propertyName, "purchasable")) {
+			return purchasable;
+		}
+		else if (Objects.equals(propertyName, "replacementSku")) {
+			return replacementSku;
+		}
+		else if (Objects.equals(
+					propertyName, "replacementSkuExternalReferenceCode")) {
+
+			return replacementSkuExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "replacementSkuId")) {
+			return replacementSkuId;
+		}
+		else if (Objects.equals(propertyName, "sku")) {
+			return sku;
+		}
+		else if (Objects.equals(propertyName, "skuOptions")) {
+			return skuOptions;
+		}
+		else if (Objects.equals(propertyName, "skuUnitOfMeasures")) {
+			return skuUnitOfMeasures;
+		}
+		else if (Objects.equals(propertyName, "tierPrices")) {
+			return tierPrices;
+		}
+		else if (Objects.equals(propertyName, "weight")) {
+			return weight;
+		}
+		else if (Objects.equals(propertyName, "width")) {
+			return width;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

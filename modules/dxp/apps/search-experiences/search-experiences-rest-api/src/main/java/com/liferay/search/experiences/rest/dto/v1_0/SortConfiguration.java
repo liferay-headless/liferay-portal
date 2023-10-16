@@ -94,6 +94,18 @@ public class SortConfiguration implements Serializable {
 		return Objects.equals(toString(), sortConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "sorts")) {
+			return sorts;
+		}
+		else if (Objects.equals(propertyName, "sorts")) {
+			return sorts;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -140,6 +140,21 @@ public class FragmentFieldBackgroundImage implements Serializable {
 			toString(), fragmentFieldBackgroundImage.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "backgroundFragmentImage")) {
+			return backgroundFragmentImage;
+		}
+		else if (Objects.equals(propertyName, "backgroundFragmentImage")) {
+			return backgroundFragmentImage;
+		}
+		else if (Objects.equals(propertyName, "backgroundImage")) {
+			return backgroundImage;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

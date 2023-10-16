@@ -862,6 +862,96 @@ public class PriceList implements Serializable {
 		return Objects.equals(toString(), priceList.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "author")) {
+			return author;
+		}
+		else if (Objects.equals(propertyName, "catalogBasePriceList")) {
+			return catalogBasePriceList;
+		}
+		else if (Objects.equals(propertyName, "catalogId")) {
+			return catalogId;
+		}
+		else if (Objects.equals(propertyName, "catalogName")) {
+			return catalogName;
+		}
+		else if (Objects.equals(propertyName, "createDate")) {
+			return createDate;
+		}
+		else if (Objects.equals(propertyName, "currencyCode")) {
+			return currencyCode;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "netPrice")) {
+			return netPrice;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(propertyName, "parentPriceListId")) {
+			return parentPriceListId;
+		}
+		else if (Objects.equals(propertyName, "priceEntries")) {
+			return priceEntries;
+		}
+		else if (Objects.equals(propertyName, "priceListAccountGroups")) {
+			return priceListAccountGroups;
+		}
+		else if (Objects.equals(propertyName, "priceListAccounts")) {
+			return priceListAccounts;
+		}
+		else if (Objects.equals(propertyName, "priceListChannels")) {
+			return priceListChannels;
+		}
+		else if (Objects.equals(propertyName, "priceListDiscounts")) {
+			return priceListDiscounts;
+		}
+		else if (Objects.equals(propertyName, "priceListOrderTypes")) {
+			return priceListOrderTypes;
+		}
+		else if (Objects.equals(propertyName, "priceModifiers")) {
+			return priceModifiers;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "workflowStatusInfo")) {
+			return workflowStatusInfo;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

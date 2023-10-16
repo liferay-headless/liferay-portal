@@ -180,6 +180,29 @@ public class ObjectFolderItem implements Serializable {
 		return Objects.equals(toString(), objectFolderItem.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "linkedObjectDefinition")) {
+			return linkedObjectDefinition;
+		}
+		else if (Objects.equals(propertyName, "linkedObjectDefinition")) {
+			return linkedObjectDefinition;
+		}
+		else if (Objects.equals(
+					propertyName, "objectDefinitionExternalReferenceCode")) {
+
+			return objectDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "positionX")) {
+			return positionX;
+		}
+		else if (Objects.equals(propertyName, "positionY")) {
+			return positionY;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

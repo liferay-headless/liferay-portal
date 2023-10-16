@@ -143,6 +143,21 @@ public class CollectionConfig implements Serializable {
 		return Objects.equals(toString(), collectionConfig.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "collectionReference")) {
+			return collectionReference;
+		}
+		else if (Objects.equals(propertyName, "collectionReference")) {
+			return collectionReference;
+		}
+		else if (Objects.equals(propertyName, "collectionType")) {
+			return collectionType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

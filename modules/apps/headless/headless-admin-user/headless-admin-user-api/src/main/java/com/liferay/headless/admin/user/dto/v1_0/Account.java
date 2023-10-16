@@ -691,6 +691,78 @@ public class Account implements Serializable {
 		return Objects.equals(toString(), account.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountUserAccounts")) {
+			return accountUserAccounts;
+		}
+		else if (Objects.equals(propertyName, "accountUserAccounts")) {
+			return accountUserAccounts;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "customFields")) {
+			return customFields;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "defaultBillingAddressId")) {
+			return defaultBillingAddressId;
+		}
+		else if (Objects.equals(propertyName, "defaultShippingAddressId")) {
+			return defaultShippingAddressId;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "domains")) {
+			return domains;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "logoId")) {
+			return logoId;
+		}
+		else if (Objects.equals(propertyName, "logoURL")) {
+			return logoURL;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "numberOfUsers")) {
+			return numberOfUsers;
+		}
+		else if (Objects.equals(propertyName, "organizationIds")) {
+			return organizationIds;
+		}
+		else if (Objects.equals(propertyName, "parentAccountId")) {
+			return parentAccountId;
+		}
+		else if (Objects.equals(propertyName, "postalAddresses")) {
+			return postalAddresses;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "taxId")) {
+			return taxId;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

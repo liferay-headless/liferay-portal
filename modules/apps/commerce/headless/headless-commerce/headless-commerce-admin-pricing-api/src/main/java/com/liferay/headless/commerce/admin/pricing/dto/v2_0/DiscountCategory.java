@@ -278,6 +278,40 @@ public class DiscountCategory implements Serializable {
 		return Objects.equals(toString(), discountCategory.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "category")) {
+			return category;
+		}
+		else if (Objects.equals(
+					propertyName, "categoryExternalReferenceCode")) {
+
+			return categoryExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "categoryId")) {
+			return categoryId;
+		}
+		else if (Objects.equals(propertyName, "discountCategoryId")) {
+			return discountCategoryId;
+		}
+		else if (Objects.equals(
+					propertyName, "discountExternalReferenceCode")) {
+
+			return discountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "discountId")) {
+			return discountId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

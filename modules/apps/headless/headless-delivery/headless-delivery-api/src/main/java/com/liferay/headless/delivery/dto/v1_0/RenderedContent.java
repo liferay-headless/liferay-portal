@@ -260,6 +260,33 @@ public class RenderedContent implements Serializable {
 		return Objects.equals(toString(), renderedContent.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "contentTemplateId")) {
+			return contentTemplateId;
+		}
+		else if (Objects.equals(propertyName, "contentTemplateId")) {
+			return contentTemplateId;
+		}
+		else if (Objects.equals(propertyName, "contentTemplateName")) {
+			return contentTemplateName;
+		}
+		else if (Objects.equals(propertyName, "contentTemplateName_i18n")) {
+			return contentTemplateName_i18n;
+		}
+		else if (Objects.equals(propertyName, "markedAsDefault")) {
+			return markedAsDefault;
+		}
+		else if (Objects.equals(propertyName, "renderedContentURL")) {
+			return renderedContentURL;
+		}
+		else if (Objects.equals(propertyName, "renderedContentValue")) {
+			return renderedContentValue;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

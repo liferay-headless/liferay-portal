@@ -316,6 +316,42 @@ public class Field implements Serializable {
 		return Objects.equals(toString(), field.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "fieldMappings")) {
+			return fieldMappings;
+		}
+		else if (Objects.equals(propertyName, "helpText")) {
+			return helpText;
+		}
+		else if (Objects.equals(propertyName, "helpTextLocalized")) {
+			return helpTextLocalized;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "labelLocalized")) {
+			return labelLocalized;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else if (Objects.equals(propertyName, "typeOptions")) {
+			return typeOptions;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

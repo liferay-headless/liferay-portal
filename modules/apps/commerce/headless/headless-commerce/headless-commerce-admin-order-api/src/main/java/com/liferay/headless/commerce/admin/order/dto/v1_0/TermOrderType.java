@@ -277,6 +277,38 @@ public class TermOrderType implements Serializable {
 		return Objects.equals(toString(), termOrderType.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "orderType")) {
+			return orderType;
+		}
+		else if (Objects.equals(
+					propertyName, "orderTypeExternalReferenceCode")) {
+
+			return orderTypeExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "orderTypeId")) {
+			return orderTypeId;
+		}
+		else if (Objects.equals(propertyName, "termExternalReferenceCode")) {
+			return termExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "termId")) {
+			return termId;
+		}
+		else if (Objects.equals(propertyName, "termOrderTypeId")) {
+			return termOrderTypeId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

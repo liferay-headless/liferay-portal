@@ -136,6 +136,21 @@ public class NotificationActionExecutionResult implements Serializable {
 			toString(), notificationActionExecutionResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "reload")) {
+			return reload;
+		}
+		else if (Objects.equals(propertyName, "reload")) {
+			return reload;
+		}
+		else if (Objects.equals(propertyName, "text")) {
+			return text;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

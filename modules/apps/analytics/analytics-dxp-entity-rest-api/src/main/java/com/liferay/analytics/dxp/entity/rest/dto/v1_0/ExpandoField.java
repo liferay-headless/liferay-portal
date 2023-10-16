@@ -144,6 +144,24 @@ public class ExpandoField implements Serializable {
 		return Objects.equals(toString(), expandoField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "columnId")) {
+			return columnId;
+		}
+		else if (Objects.equals(propertyName, "columnId")) {
+			return columnId;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "value")) {
+			return value;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

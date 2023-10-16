@@ -439,6 +439,54 @@ public class PostalAddress implements Serializable {
 		return Objects.equals(toString(), postalAddress.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "addressCountry")) {
+			return addressCountry;
+		}
+		else if (Objects.equals(propertyName, "addressCountry")) {
+			return addressCountry;
+		}
+		else if (Objects.equals(propertyName, "addressCountry_i18n")) {
+			return addressCountry_i18n;
+		}
+		else if (Objects.equals(propertyName, "addressLocality")) {
+			return addressLocality;
+		}
+		else if (Objects.equals(propertyName, "addressRegion")) {
+			return addressRegion;
+		}
+		else if (Objects.equals(propertyName, "addressType")) {
+			return addressType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "phoneNumber")) {
+			return phoneNumber;
+		}
+		else if (Objects.equals(propertyName, "postalCode")) {
+			return postalCode;
+		}
+		else if (Objects.equals(propertyName, "primary")) {
+			return primary;
+		}
+		else if (Objects.equals(propertyName, "streetAddressLine1")) {
+			return streetAddressLine1;
+		}
+		else if (Objects.equals(propertyName, "streetAddressLine2")) {
+			return streetAddressLine2;
+		}
+		else if (Objects.equals(propertyName, "streetAddressLine3")) {
+			return streetAddressLine3;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

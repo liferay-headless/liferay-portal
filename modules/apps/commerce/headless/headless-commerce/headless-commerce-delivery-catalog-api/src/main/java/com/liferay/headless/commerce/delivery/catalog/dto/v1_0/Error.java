@@ -188,6 +188,27 @@ public class Error implements Serializable {
 		return Objects.equals(toString(), error.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "errorCode")) {
+			return errorCode;
+		}
+		else if (Objects.equals(propertyName, "errorCode")) {
+			return errorCode;
+		}
+		else if (Objects.equals(propertyName, "errorDescription")) {
+			return errorDescription;
+		}
+		else if (Objects.equals(propertyName, "message")) {
+			return message;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

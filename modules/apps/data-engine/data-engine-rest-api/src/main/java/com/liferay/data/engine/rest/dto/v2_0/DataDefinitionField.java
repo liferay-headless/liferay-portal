@@ -539,6 +539,63 @@ public class DataDefinitionField implements Serializable {
 		return Objects.equals(toString(), dataDefinitionField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customProperties")) {
+			return customProperties;
+		}
+		else if (Objects.equals(propertyName, "customProperties")) {
+			return customProperties;
+		}
+		else if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "fieldType")) {
+			return fieldType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "indexType")) {
+			return indexType;
+		}
+		else if (Objects.equals(propertyName, "indexable")) {
+			return indexable;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "localizable")) {
+			return localizable;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "nestedDataDefinitionFields")) {
+			return nestedDataDefinitionFields;
+		}
+		else if (Objects.equals(propertyName, "readOnly")) {
+			return readOnly;
+		}
+		else if (Objects.equals(propertyName, "repeatable")) {
+			return repeatable;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "showLabel")) {
+			return showLabel;
+		}
+		else if (Objects.equals(propertyName, "tip")) {
+			return tip;
+		}
+		else if (Objects.equals(propertyName, "visible")) {
+			return visible;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

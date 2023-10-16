@@ -181,6 +181,27 @@ public class WorkflowTaskTransition implements Serializable {
 		return Objects.equals(toString(), workflowTaskTransition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "transitions")) {
+			return transitions;
+		}
+		else if (Objects.equals(propertyName, "transitions")) {
+			return transitions;
+		}
+		else if (Objects.equals(propertyName, "workflowDefinitionVersion")) {
+			return workflowDefinitionVersion;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskLabel")) {
+			return workflowTaskLabel;
+		}
+		else if (Objects.equals(propertyName, "workflowTaskName")) {
+			return workflowTaskName;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

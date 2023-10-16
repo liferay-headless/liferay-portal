@@ -676,6 +676,78 @@ public class Instance implements Serializable {
 		return Objects.equals(toString(), instance.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetTitle_i18n")) {
+			return assetTitle_i18n;
+		}
+		else if (Objects.equals(propertyName, "assetType")) {
+			return assetType;
+		}
+		else if (Objects.equals(propertyName, "assetType_i18n")) {
+			return assetType_i18n;
+		}
+		else if (Objects.equals(propertyName, "assignees")) {
+			return assignees;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "classPK")) {
+			return classPK;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "creator")) {
+			return creator;
+		}
+		else if (Objects.equals(propertyName, "dateCompletion")) {
+			return dateCompletion;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "duration")) {
+			return duration;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "processId")) {
+			return processId;
+		}
+		else if (Objects.equals(propertyName, "processVersion")) {
+			return processVersion;
+		}
+		else if (Objects.equals(propertyName, "slaResults")) {
+			return slaResults;
+		}
+		else if (Objects.equals(propertyName, "slaStatus")) {
+			return slaStatus;
+		}
+		else if (Objects.equals(propertyName, "taskNames")) {
+			return taskNames;
+		}
+		else if (Objects.equals(propertyName, "transitions")) {
+			return transitions;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -246,6 +246,35 @@ public class Sp implements Serializable {
 		return Objects.equals(toString(), sp.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "allowShowingTheLoginPortlet")) {
+			return allowShowingTheLoginPortlet;
+		}
+		else if (Objects.equals(propertyName, "allowShowingTheLoginPortlet")) {
+			return allowShowingTheLoginPortlet;
+		}
+		else if (Objects.equals(propertyName, "assertionSignatureRequired")) {
+			return assertionSignatureRequired;
+		}
+		else if (Objects.equals(propertyName, "clockSkew")) {
+			return clockSkew;
+		}
+		else if (Objects.equals(
+					propertyName, "keyStoreEncryptionCredentialPassword")) {
+
+			return keyStoreEncryptionCredentialPassword;
+		}
+		else if (Objects.equals(propertyName, "ldapImportEnabled")) {
+			return ldapImportEnabled;
+		}
+		else if (Objects.equals(propertyName, "signAuthnRequest")) {
+			return signAuthnRequest;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -284,6 +284,41 @@ public class DSDocument implements Serializable {
 		return Objects.equals(toString(), dsDocument.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "assignTabsToDSRecipientId")) {
+			return assignTabsToDSRecipientId;
+		}
+		else if (Objects.equals(propertyName, "assignTabsToDSRecipientId")) {
+			return assignTabsToDSRecipientId;
+		}
+		else if (Objects.equals(propertyName, "data")) {
+			return data;
+		}
+		else if (Objects.equals(
+					propertyName, "fileEntryExternalReferenceCode")) {
+
+			return fileEntryExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "fileExtension")) {
+			return fileExtension;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "transformPDFFields")) {
+			return transformPDFFields;
+		}
+		else if (Objects.equals(propertyName, "uri")) {
+			return uri;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

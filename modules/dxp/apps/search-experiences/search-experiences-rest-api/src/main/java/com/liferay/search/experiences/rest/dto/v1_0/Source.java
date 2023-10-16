@@ -146,6 +146,24 @@ public class Source implements Serializable {
 		return Objects.equals(toString(), source.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "excludes")) {
+			return excludes;
+		}
+		else if (Objects.equals(propertyName, "excludes")) {
+			return excludes;
+		}
+		else if (Objects.equals(propertyName, "fetchSource")) {
+			return fetchSource;
+		}
+		else if (Objects.equals(propertyName, "includes")) {
+			return includes;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

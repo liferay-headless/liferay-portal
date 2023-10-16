@@ -181,6 +181,27 @@ public class SuggestionsContributorConfiguration implements Serializable {
 			toString(), suggestionsContributorConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "attributes")) {
+			return attributes;
+		}
+		else if (Objects.equals(propertyName, "contributorName")) {
+			return contributorName;
+		}
+		else if (Objects.equals(propertyName, "displayGroupName")) {
+			return displayGroupName;
+		}
+		else if (Objects.equals(propertyName, "size")) {
+			return size;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -174,6 +174,27 @@ public class Settings implements Serializable {
 		return Objects.equals(toString(), settings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "allowedQuantities")) {
+			return allowedQuantities;
+		}
+		else if (Objects.equals(propertyName, "allowedQuantities")) {
+			return allowedQuantities;
+		}
+		else if (Objects.equals(propertyName, "maxQuantity")) {
+			return maxQuantity;
+		}
+		else if (Objects.equals(propertyName, "minQuantity")) {
+			return minQuantity;
+		}
+		else if (Objects.equals(propertyName, "multipleQuantity")) {
+			return multipleQuantity;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

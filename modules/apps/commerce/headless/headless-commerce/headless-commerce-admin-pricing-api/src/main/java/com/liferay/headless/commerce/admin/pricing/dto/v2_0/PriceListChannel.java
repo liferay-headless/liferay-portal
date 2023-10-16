@@ -308,6 +308,41 @@ public class PriceListChannel implements Serializable {
 		return Objects.equals(toString(), priceListChannel.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "channel")) {
+			return channel;
+		}
+		else if (Objects.equals(propertyName, "channelExternalReferenceCode")) {
+			return channelExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "order")) {
+			return order;
+		}
+		else if (Objects.equals(propertyName, "priceListChannelId")) {
+			return priceListChannelId;
+		}
+		else if (Objects.equals(
+					propertyName, "priceListExternalReferenceCode")) {
+
+			return priceListExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "priceListId")) {
+			return priceListId;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

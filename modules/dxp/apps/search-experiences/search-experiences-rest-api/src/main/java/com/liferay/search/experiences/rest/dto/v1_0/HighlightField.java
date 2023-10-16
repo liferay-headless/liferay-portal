@@ -146,6 +146,24 @@ public class HighlightField implements Serializable {
 		return Objects.equals(toString(), highlightField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "fragment_offset")) {
+			return fragment_offset;
+		}
+		else if (Objects.equals(propertyName, "fragment_offset")) {
+			return fragment_offset;
+		}
+		else if (Objects.equals(propertyName, "fragment_size")) {
+			return fragment_size;
+		}
+		else if (Objects.equals(propertyName, "number_of_fragments")) {
+			return number_of_fragments;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

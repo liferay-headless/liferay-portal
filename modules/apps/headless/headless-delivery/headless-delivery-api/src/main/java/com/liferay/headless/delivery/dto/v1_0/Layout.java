@@ -722,6 +722,75 @@ public class Layout implements Serializable {
 		return Objects.equals(toString(), layout.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "align")) {
+			return align;
+		}
+		else if (Objects.equals(propertyName, "align")) {
+			return align;
+		}
+		else if (Objects.equals(propertyName, "borderColor")) {
+			return borderColor;
+		}
+		else if (Objects.equals(propertyName, "borderRadius")) {
+			return borderRadius;
+		}
+		else if (Objects.equals(propertyName, "borderWidth")) {
+			return borderWidth;
+		}
+		else if (Objects.equals(propertyName, "containerType")) {
+			return containerType;
+		}
+		else if (Objects.equals(propertyName, "contentDisplay")) {
+			return contentDisplay;
+		}
+		else if (Objects.equals(propertyName, "flexWrap")) {
+			return flexWrap;
+		}
+		else if (Objects.equals(propertyName, "justify")) {
+			return justify;
+		}
+		else if (Objects.equals(propertyName, "marginBottom")) {
+			return marginBottom;
+		}
+		else if (Objects.equals(propertyName, "marginLeft")) {
+			return marginLeft;
+		}
+		else if (Objects.equals(propertyName, "marginRight")) {
+			return marginRight;
+		}
+		else if (Objects.equals(propertyName, "marginTop")) {
+			return marginTop;
+		}
+		else if (Objects.equals(propertyName, "opacity")) {
+			return opacity;
+		}
+		else if (Objects.equals(propertyName, "paddingBottom")) {
+			return paddingBottom;
+		}
+		else if (Objects.equals(propertyName, "paddingHorizontal")) {
+			return paddingHorizontal;
+		}
+		else if (Objects.equals(propertyName, "paddingLeft")) {
+			return paddingLeft;
+		}
+		else if (Objects.equals(propertyName, "paddingRight")) {
+			return paddingRight;
+		}
+		else if (Objects.equals(propertyName, "paddingTop")) {
+			return paddingTop;
+		}
+		else if (Objects.equals(propertyName, "shadow")) {
+			return shadow;
+		}
+		else if (Objects.equals(propertyName, "widthType")) {
+			return widthType;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

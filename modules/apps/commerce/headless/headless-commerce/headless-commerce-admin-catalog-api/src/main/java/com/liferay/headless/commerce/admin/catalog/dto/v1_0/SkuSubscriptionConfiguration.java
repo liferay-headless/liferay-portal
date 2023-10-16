@@ -429,6 +429,52 @@ public class SkuSubscriptionConfiguration implements Serializable {
 			toString(), skuSubscriptionConfiguration.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "deliverySubscriptionEnable")) {
+			return deliverySubscriptionEnable;
+		}
+		else if (Objects.equals(propertyName, "deliverySubscriptionEnable")) {
+			return deliverySubscriptionEnable;
+		}
+		else if (Objects.equals(propertyName, "deliverySubscriptionLength")) {
+			return deliverySubscriptionLength;
+		}
+		else if (Objects.equals(
+					propertyName, "deliverySubscriptionNumberOfLength")) {
+
+			return deliverySubscriptionNumberOfLength;
+		}
+		else if (Objects.equals(propertyName, "deliverySubscriptionType")) {
+			return deliverySubscriptionType;
+		}
+		else if (Objects.equals(
+					propertyName, "deliverySubscriptionTypeSettings")) {
+
+			return deliverySubscriptionTypeSettings;
+		}
+		else if (Objects.equals(propertyName, "enable")) {
+			return enable;
+		}
+		else if (Objects.equals(propertyName, "length")) {
+			return length;
+		}
+		else if (Objects.equals(propertyName, "numberOfLength")) {
+			return numberOfLength;
+		}
+		else if (Objects.equals(propertyName, "overrideSubscriptionInfo")) {
+			return overrideSubscriptionInfo;
+		}
+		else if (Objects.equals(propertyName, "subscriptionType")) {
+			return subscriptionType;
+		}
+		else if (Objects.equals(propertyName, "subscriptionTypeSettings")) {
+			return subscriptionTypeSettings;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

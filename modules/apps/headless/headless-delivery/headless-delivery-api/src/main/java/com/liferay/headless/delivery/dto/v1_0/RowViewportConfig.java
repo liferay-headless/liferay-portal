@@ -156,6 +156,24 @@ public class RowViewportConfig implements Serializable {
 		return Objects.equals(toString(), rowViewportConfig.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "landscapeMobile")) {
+			return landscapeMobile;
+		}
+		else if (Objects.equals(propertyName, "landscapeMobile")) {
+			return landscapeMobile;
+		}
+		else if (Objects.equals(propertyName, "portraitMobile")) {
+			return portraitMobile;
+		}
+		else if (Objects.equals(propertyName, "tablet")) {
+			return tablet;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

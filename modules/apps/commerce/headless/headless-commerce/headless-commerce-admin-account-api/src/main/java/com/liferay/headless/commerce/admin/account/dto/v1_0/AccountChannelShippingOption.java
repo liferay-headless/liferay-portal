@@ -361,6 +361,45 @@ public class AccountChannelShippingOption implements Serializable {
 			toString(), accountChannelShippingOption.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "accountExternalReferenceCode")) {
+			return accountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountExternalReferenceCode")) {
+			return accountExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "accountId")) {
+			return accountId;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "channelExternalReferenceCode")) {
+			return channelExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "channelId")) {
+			return channelId;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "shippingMethodId")) {
+			return shippingMethodId;
+		}
+		else if (Objects.equals(propertyName, "shippingMethodKey")) {
+			return shippingMethodKey;
+		}
+		else if (Objects.equals(propertyName, "shippingOptionId")) {
+			return shippingOptionId;
+		}
+		else if (Objects.equals(propertyName, "shippingOptionKey")) {
+			return shippingOptionKey;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

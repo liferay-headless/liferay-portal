@@ -205,6 +205,27 @@ public class OrganizationContactInformation implements Serializable {
 			toString(), organizationContactInformation.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "emailAddresses")) {
+			return emailAddresses;
+		}
+		else if (Objects.equals(propertyName, "emailAddresses")) {
+			return emailAddresses;
+		}
+		else if (Objects.equals(propertyName, "postalAddresses")) {
+			return postalAddresses;
+		}
+		else if (Objects.equals(propertyName, "telephones")) {
+			return telephones;
+		}
+		else if (Objects.equals(propertyName, "webUrls")) {
+			return webUrls;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -122,6 +122,21 @@ public class EmbeddingProviderValidationResult implements Serializable {
 			toString(), embeddingProviderValidationResult.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "errorMessage")) {
+			return errorMessage;
+		}
+		else if (Objects.equals(propertyName, "expectedDimensions")) {
+			return expectedDimensions;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

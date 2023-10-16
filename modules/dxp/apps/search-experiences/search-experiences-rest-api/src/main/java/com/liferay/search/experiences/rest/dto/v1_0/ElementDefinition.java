@@ -177,6 +177,27 @@ public class ElementDefinition implements Serializable {
 		return Objects.equals(toString(), elementDefinition.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "category")) {
+			return category;
+		}
+		else if (Objects.equals(propertyName, "category")) {
+			return category;
+		}
+		else if (Objects.equals(propertyName, "configuration")) {
+			return configuration;
+		}
+		else if (Objects.equals(propertyName, "icon")) {
+			return icon;
+		}
+		else if (Objects.equals(propertyName, "uiConfiguration")) {
+			return uiConfiguration;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

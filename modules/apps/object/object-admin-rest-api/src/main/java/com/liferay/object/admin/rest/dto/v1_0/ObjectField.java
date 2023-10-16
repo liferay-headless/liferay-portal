@@ -745,6 +745,83 @@ public class ObjectField implements Serializable {
 		return Objects.equals(toString(), objectField.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "DBType")) {
+			return DBType;
+		}
+		else if (Objects.equals(propertyName, "DBType")) {
+			return DBType;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "businessType")) {
+			return businessType;
+		}
+		else if (Objects.equals(propertyName, "defaultValue")) {
+			return defaultValue;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "indexed")) {
+			return indexed;
+		}
+		else if (Objects.equals(propertyName, "indexedAsKeyword")) {
+			return indexedAsKeyword;
+		}
+		else if (Objects.equals(propertyName, "indexedLanguageId")) {
+			return indexedLanguageId;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(
+					propertyName, "listTypeDefinitionExternalReferenceCode")) {
+
+			return listTypeDefinitionExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "listTypeDefinitionId")) {
+			return listTypeDefinitionId;
+		}
+		else if (Objects.equals(propertyName, "localized")) {
+			return localized;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "objectFieldSettings")) {
+			return objectFieldSettings;
+		}
+		else if (Objects.equals(propertyName, "readOnly")) {
+			return readOnly;
+		}
+		else if (Objects.equals(propertyName, "readOnlyConditionExpression")) {
+			return readOnlyConditionExpression;
+		}
+		else if (Objects.equals(propertyName, "relationshipType")) {
+			return relationshipType;
+		}
+		else if (Objects.equals(propertyName, "required")) {
+			return required;
+		}
+		else if (Objects.equals(propertyName, "state")) {
+			return state;
+		}
+		else if (Objects.equals(propertyName, "system")) {
+			return system;
+		}
+		else if (Objects.equals(propertyName, "type")) {
+			return type;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

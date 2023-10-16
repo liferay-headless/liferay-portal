@@ -629,6 +629,75 @@ public class Task implements Serializable {
 		return Objects.equals(toString(), task.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetTitle")) {
+			return assetTitle;
+		}
+		else if (Objects.equals(propertyName, "assetTitle_i18n")) {
+			return assetTitle_i18n;
+		}
+		else if (Objects.equals(propertyName, "assetType")) {
+			return assetType;
+		}
+		else if (Objects.equals(propertyName, "assetType_i18n")) {
+			return assetType_i18n;
+		}
+		else if (Objects.equals(propertyName, "assignee")) {
+			return assignee;
+		}
+		else if (Objects.equals(propertyName, "className")) {
+			return className;
+		}
+		else if (Objects.equals(propertyName, "classPK")) {
+			return classPK;
+		}
+		else if (Objects.equals(propertyName, "completed")) {
+			return completed;
+		}
+		else if (Objects.equals(propertyName, "completionUserId")) {
+			return completionUserId;
+		}
+		else if (Objects.equals(propertyName, "dateCompletion")) {
+			return dateCompletion;
+		}
+		else if (Objects.equals(propertyName, "dateCreated")) {
+			return dateCreated;
+		}
+		else if (Objects.equals(propertyName, "dateModified")) {
+			return dateModified;
+		}
+		else if (Objects.equals(propertyName, "duration")) {
+			return duration;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "instanceId")) {
+			return instanceId;
+		}
+		else if (Objects.equals(propertyName, "label")) {
+			return label;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "nodeId")) {
+			return nodeId;
+		}
+		else if (Objects.equals(propertyName, "processId")) {
+			return processId;
+		}
+		else if (Objects.equals(propertyName, "processVersion")) {
+			return processVersion;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -480,6 +480,60 @@ public class Plan implements Serializable {
 		return Objects.equals(toString(), plan.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "export")) {
+			return export;
+		}
+		else if (Objects.equals(propertyName, "externalType")) {
+			return externalType;
+		}
+		else if (Objects.equals(propertyName, "externalURL")) {
+			return externalURL;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "internalClassName")) {
+			return internalClassName;
+		}
+		else if (Objects.equals(propertyName, "internalClassNameKey")) {
+			return internalClassNameKey;
+		}
+		else if (Objects.equals(propertyName, "mappings")) {
+			return mappings;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else if (Objects.equals(propertyName, "policies")) {
+			return policies;
+		}
+		else if (Objects.equals(propertyName, "size")) {
+			return size;
+		}
+		else if (Objects.equals(propertyName, "status")) {
+			return status;
+		}
+		else if (Objects.equals(propertyName, "taskItemDelegateName")) {
+			return taskItemDelegateName;
+		}
+		else if (Objects.equals(propertyName, "template")) {
+			return template;
+		}
+		else if (Objects.equals(propertyName, "total")) {
+			return total;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

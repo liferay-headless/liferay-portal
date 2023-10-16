@@ -425,6 +425,48 @@ public class SEOSettings implements Serializable {
 		return Objects.equals(toString(), seoSettings.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "customCanonicalURL")) {
+			return customCanonicalURL;
+		}
+		else if (Objects.equals(propertyName, "customCanonicalURL")) {
+			return customCanonicalURL;
+		}
+		else if (Objects.equals(propertyName, "customCanonicalURL_i18n")) {
+			return customCanonicalURL_i18n;
+		}
+		else if (Objects.equals(propertyName, "description")) {
+			return description;
+		}
+		else if (Objects.equals(propertyName, "description_i18n")) {
+			return description_i18n;
+		}
+		else if (Objects.equals(propertyName, "htmlTitle")) {
+			return htmlTitle;
+		}
+		else if (Objects.equals(propertyName, "htmlTitle_i18n")) {
+			return htmlTitle_i18n;
+		}
+		else if (Objects.equals(propertyName, "robots")) {
+			return robots;
+		}
+		else if (Objects.equals(propertyName, "robots_i18n")) {
+			return robots_i18n;
+		}
+		else if (Objects.equals(propertyName, "seoKeywords")) {
+			return seoKeywords;
+		}
+		else if (Objects.equals(propertyName, "seoKeywords_i18n")) {
+			return seoKeywords_i18n;
+		}
+		else if (Objects.equals(propertyName, "siteMapSettings")) {
+			return siteMapSettings;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

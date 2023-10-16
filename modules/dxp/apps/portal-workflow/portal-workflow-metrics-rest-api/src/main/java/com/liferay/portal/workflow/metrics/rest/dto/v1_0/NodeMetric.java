@@ -265,6 +265,36 @@ public class NodeMetric implements Serializable {
 		return Objects.equals(toString(), nodeMetric.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "breachedInstanceCount")) {
+			return breachedInstanceCount;
+		}
+		else if (Objects.equals(propertyName, "breachedInstanceCount")) {
+			return breachedInstanceCount;
+		}
+		else if (Objects.equals(propertyName, "breachedInstancePercentage")) {
+			return breachedInstancePercentage;
+		}
+		else if (Objects.equals(propertyName, "durationAvg")) {
+			return durationAvg;
+		}
+		else if (Objects.equals(propertyName, "instanceCount")) {
+			return instanceCount;
+		}
+		else if (Objects.equals(propertyName, "node")) {
+			return node;
+		}
+		else if (Objects.equals(propertyName, "onTimeInstanceCount")) {
+			return onTimeInstanceCount;
+		}
+		else if (Objects.equals(propertyName, "overdueInstanceCount")) {
+			return overdueInstanceCount;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

@@ -116,6 +116,21 @@ public class NodeKey implements Serializable {
 		return Objects.equals(toString(), nodeKey.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "executionType")) {
+			return executionType;
+		}
+		else if (Objects.equals(propertyName, "executionType")) {
+			return executionType;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

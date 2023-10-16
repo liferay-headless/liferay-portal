@@ -577,6 +577,68 @@ public class PriceModifier implements Serializable {
 		return Objects.equals(toString(), priceModifier.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "actions")) {
+			return actions;
+		}
+		else if (Objects.equals(propertyName, "active")) {
+			return active;
+		}
+		else if (Objects.equals(propertyName, "displayDate")) {
+			return displayDate;
+		}
+		else if (Objects.equals(propertyName, "expirationDate")) {
+			return expirationDate;
+		}
+		else if (Objects.equals(propertyName, "externalReferenceCode")) {
+			return externalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "modifierAmount")) {
+			return modifierAmount;
+		}
+		else if (Objects.equals(propertyName, "modifierType")) {
+			return modifierType;
+		}
+		else if (Objects.equals(propertyName, "neverExpire")) {
+			return neverExpire;
+		}
+		else if (Objects.equals(
+					propertyName, "priceListExternalReferenceCode")) {
+
+			return priceListExternalReferenceCode;
+		}
+		else if (Objects.equals(propertyName, "priceListId")) {
+			return priceListId;
+		}
+		else if (Objects.equals(propertyName, "priceModifierCategories")) {
+			return priceModifierCategories;
+		}
+		else if (Objects.equals(propertyName, "priceModifierProductGroups")) {
+			return priceModifierProductGroups;
+		}
+		else if (Objects.equals(propertyName, "priceModifierProducts")) {
+			return priceModifierProducts;
+		}
+		else if (Objects.equals(propertyName, "priority")) {
+			return priority;
+		}
+		else if (Objects.equals(propertyName, "target")) {
+			return target;
+		}
+		else if (Objects.equals(propertyName, "title")) {
+			return title;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();

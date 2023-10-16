@@ -145,6 +145,24 @@ public class SegmentUser implements Serializable {
 		return Objects.equals(toString(), segmentUser.toString());
 	}
 
+	public Object getValue(String propertyName) {
+		if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "emailAddress")) {
+			return emailAddress;
+		}
+		else if (Objects.equals(propertyName, "id")) {
+			return id;
+		}
+		else if (Objects.equals(propertyName, "name")) {
+			return name;
+		}
+		else {
+			return null;
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		String string = toString();
