@@ -29,6 +29,265 @@ definition {
 		}
 	}
 
+	@priority = 4
+	test CanEditSchemaNameAndDescriptionInPublishedAPIApplication {
+		property portal.acceptance = "true";
+		property test.liferay.virtual.instance = "false";
+		property test.run.type = "single";
+
+		task ("Given create an published API application with related schema") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(locator1 = "Button#PLUS");
+
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "Name default");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description default");
+
+			Click(locator1 = "ObjectAdmin#OBJECT_DROPDOWN");
+
+			Click(
+				key_menuItem = "APIApplication",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			Click(locator1 = "APIBuilder#CREATE_BUTTON");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(
+				key_title = "Name default",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				key_unnamedTitle = "Name default",
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE");
+
+			Type(
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE",
+				value1 = "Name edited");
+
+			Click(locator1 = "TextInput#DESCRIPTION_FIELD");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description edited");
+		}
+
+		task ("When I publish changed name and description") {
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("Then I can see success alert message about API schema changes were published And Then I can see updated name and description in Info tab") {
+			Click(locator1 = "CommerceNavigation#BACK");
+
+			Click(
+				key_title = "App-test",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			AssertElementPresent(
+				key_name = "Name default",
+				locator1 = "ObjectAdmin#TABLE_LIST_TITLE");
+
+			AssertElementPresent(
+				key_name = "Description defaut",
+				locator1 = "ObjectAdmin#TABLE_LIST_DESCRIPTION");
+		}
+	}
+
+	@priority = 4
+	test CanEditSchemaNameAndDescriptionInUnpublishedAPIApplication {
+		property portal.acceptance = "true";
+		property test.liferay.virtual.instance = "false";
+		property test.run.type = "single";
+
+		task ("Given create an schema related to API Application that was created") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(locator1 = "Button#PLUS");
+
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "Name default");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description default");
+
+			Click(locator1 = "ObjectAdmin#OBJECT_DROPDOWN");
+
+			Click(
+				key_menuItem = "APIApplication",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			Click(locator1 = "APIBuilder#CREATE_BUTTON");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(
+				key_title = "Name default",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				key_unnamedTitle = "Name default",
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE");
+
+			Type(
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE",
+				value1 = "Name edited");
+
+			Click(locator1 = "TextInput#DESCRIPTION_FIELD");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description edited");
+		}
+
+		task ("When I save changed name and description") {
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("Then I can see Schemas > {updatedSchemaName}") {
+			Click(locator1 = "CommerceNavigation#BACK");
+
+			Click(
+				key_title = "App-test",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			AssertElementPresent(
+				key_name = "Name default",
+				locator1 = "ObjectAdmin#TABLE_LIST_TITLE");
+
+			AssertElementPresent(
+				key_name = "Description defaut",
+				locator1 = "ObjectAdmin#TABLE_LIST_DESCRIPTION");
+		}
+	}
+
+	@priority = 4
+	test CanGoBackToSchemasListWithCancelEdit {
+		property portal.acceptance = "true";
+		property test.liferay.virtual.instance = "false";
+		property test.run.type = "single";
+
+		task ("Given create an schema related to API Application that was created") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(locator1 = "Button#PLUS");
+
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "Name default");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description default");
+
+			Click(locator1 = "ObjectAdmin#OBJECT_DROPDOWN");
+
+			Click(
+				key_menuItem = "APIApplication",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			Click(locator1 = "APIBuilder#CREATE_BUTTON");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Given I edit the schema in Edit API Application > Schemas") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(
+				key_title = "Name default",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				key_unnamedTitle = "Name default",
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE");
+
+			Type(
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE",
+				value1 = "Name edited");
+
+			Click(locator1 = "TextInput#DESCRIPTION_FIELD");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description edited");
+		}
+
+		task ("When I click Cancel button without any changes") {
+			Click.pauseClickAt(locator1 = "AppBuilder#BUTTON_CANCEL");
+
+			Click(locator1 = "APIBuilder#CONTINUE_WITHOUT_SAVING_BUTTON");
+		}
+
+		task ("Then I can see the schema under Edit API Application > Schemas") {
+			AssertElementPresent(
+				key_name = "Name default",
+				locator1 = "ObjectAdmin#TABLE_LIST_TITLE");
+
+			AssertElementPresent(
+				key_name = "Description defaut",
+				locator1 = "ObjectAdmin#TABLE_LIST_DESCRIPTION");
+		}
+	}
+
 	@priority = 3
 	test CanNavigateToAppDetailsForm {
 		property portal.acceptance = "true";
@@ -51,6 +310,95 @@ definition {
 			AssertElementPresent(
 				key_value = "API",
 				locator1 = "APIBuilder#DESCRIPTION");
+		}
+	}
+
+	@priority = 4
+	test CannotEditSchemaRelatedObject {
+		property portal.acceptance = "true";
+		property test.liferay.virtual.instance = "false";
+		property test.run.type = "single";
+
+		task ("Given create an schema related to API Application that was created") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(locator1 = "Button#PLUS");
+
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "Name default");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description default");
+
+			Click(locator1 = "ObjectAdmin#OBJECT_DROPDOWN");
+
+			Click(
+				key_menuItem = "APIApplication",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			Click(locator1 = "APIBuilder#CREATE_BUTTON");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("When I edit the schema in Edit API Application > Schemas") {
+			APIBuilderUI.goToEditAPIApplicationPage(key_title = "App-test");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+
+			Click(
+				key_title = "Name default",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				key_unnamedTitle = "Name default",
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE");
+
+			Type(
+				locator1 = "TextInput#DEPOT_UNNAMED_DEFAULT_TITLE",
+				value1 = "Name edited");
+
+			Click(locator1 = "TextInput#DESCRIPTION_FIELD");
+
+			Type(
+				locator1 = "TextInput#DESCRIPTION_FIELD",
+				value1 = "Description edited");
+
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("And When I go to Application > Schemas") {
+			Click(locator1 = "CommerceNavigation#BACK");
+
+			Click(
+				key_title = "App-test",
+				locator1 = "APIBuilder#DROPDOWN_MENU");
+
+			Click(locator1 = "APIBuilder#EDIT_BUTTON");
+
+			Click(
+				locator1 = "Button#BUTTON_WITH_VALUE",
+				value = "Schemas");
+		}
+
+		task ("Then I can see the value for Object is the correct one") {
+			Click(
+				locator1 = "ObjectAdmin#TABLE_LIST_DESCRIPTION",
+				value1 = "APIApplication");
+		}
+
+		task ("And Then the related object is not able to change") {
+			AssertNotEditable(locator1 = "ObjectAdmin#TABLE_LIST_DESCRIPTION");
 		}
 	}
 
