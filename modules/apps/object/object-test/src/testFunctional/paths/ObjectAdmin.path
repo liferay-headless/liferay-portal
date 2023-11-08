@@ -201,6 +201,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>OBJECT_SCHEMAS</td>
+		<td>//button[contains(@class,'button-select-trigger display-placeholder btn btn-primary')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>LAYOUT_ENTRY_CHOOSE_OPTION</td>
 		<td>//span[contains(text(),'Choose an Option')]</td>
 		<td></td>
@@ -378,6 +383,11 @@
 	<tr>
 		<td>TABLE_LIST_TITLE</td>
 		<td>//div[contains(@class,'table-list-title') and contains (.,'${key_name}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TABLE_LIST_DESCRIPTION</td>
+		<td>//div[contains(@class,'dnd-td') and contains (.,'${key_name}')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -568,6 +578,11 @@
 	<tr>
 		<td>PLACEHOLDER_DELETE_RELATIONSHIP</td>
 		<td>//input[contains(@placeholder,'Confirm Relationship Name')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>OBJECT_DROPDOWN</td>
+		<td>//button[contains(@id,'selectTrigger')]</td>
 		<td></td>
 	</tr>
 	<tr>
