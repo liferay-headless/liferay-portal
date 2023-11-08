@@ -232,7 +232,7 @@ public class APIFilterRelevantObjectEntryModelListenerTest
 			).put(
 				"title",
 				"The API filter can only be associated to API endpoints with " +
-					"a \"collection\" retrieve type."
+					"a retrieve type of \"collection\"."
 			).toString(),
 			HTTPTestUtil.invokeToJSONObject(
 				JSONUtil.put(
@@ -244,6 +244,7 @@ public class APIFilterRelevantObjectEntryModelListenerTest
 				"headless-builder/filters", Http.Method.POST
 			).toString(),
 			JSONCompareMode.LENIENT);
+
 		JSONAssert.assertEquals(
 			JSONUtil.put(
 				"status", "BAD_REQUEST"
