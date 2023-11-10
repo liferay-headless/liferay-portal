@@ -101,6 +101,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENDPOINT_DESCRIPTION</td>
+	<td>//textarea[contains (@id,'endpointDescriptionField')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENTER_TITLE</td>
 	<td>//input[(@placeholder='Enter title.')]</td>
 	<td></td>
@@ -116,13 +121,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LABEL</td>
+	<td>//label[contains(text(),'${key_fieldLabel}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LAST_UPDATED_IN_FILTER</td>
 	<td>//div[contains(@class,'dropdown-menu show')]//button[contains(text(),'Last updated')]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_ERROR</td>
+	<td>//span[contains(@id,'selectScopeErrorMessage') and contains(text(),'${key_message_error}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MODAL_DELETE_BUTTON</td>
 	<td>//button[@id='modalDeleteButton']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NO_API_ENDPOINT_FOUND</td>
+	<td>//span[contains(text(),'No API Endpoint Found')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -153,6 +173,11 @@
 <tr>
 	<td>STATUS_LIST</td>
 	<td>xpath=(//span[(@class='label-item label-item-expand')])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SLASH</td>
+	<td>//div[contains(@class,'input-group-text')]</td>
 	<td></td>
 </tr>
 <tr>
