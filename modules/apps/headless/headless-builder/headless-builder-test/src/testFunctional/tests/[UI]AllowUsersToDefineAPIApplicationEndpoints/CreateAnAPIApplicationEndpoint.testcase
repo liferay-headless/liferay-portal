@@ -247,6 +247,43 @@ definition {
 	}
 
 	@priority = 4
+	test CanSeeScopeOfScopeFields {
+		property portal.acceptance = "true";
+
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("And Given I click 'Add API Endpoint' button") {
+			Click(locator1 = "Button#PLUS");
+		}
+
+		task ("When I click 'Create' button in 'New API Endpoint'") {
+			Click(
+				key_value = "Select Scope",
+				locator1 = "APIBuilder#CREATE_BUTTON");
+		}
+
+		task ("Then Then I click Scope option") {
+			Click(
+				key_value = "Select Scope",
+				locator1 = "APIBuilder#DROPDOWN_TOGGLE");
+		}
+
+		task ("And Then I can see site and company scope in the Scope option") {
+			AssertElementPresent(
+				key_optionName = "Site",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			AssertElementPresent(
+				key_optionName = "Company",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+		}
+	}
+
+	@priority = 4
 	test CanSeeValidationMessageForRequiredFields {
 		property portal.acceptance = "true";
 
