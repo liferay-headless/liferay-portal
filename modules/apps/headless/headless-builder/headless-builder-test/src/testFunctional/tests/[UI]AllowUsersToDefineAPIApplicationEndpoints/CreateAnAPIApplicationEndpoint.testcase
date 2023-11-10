@@ -11,6 +11,12 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		task ("Given the API Application is created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "test2",
+				title = "test2");
+		}
 	}
 
 	tearDown {
@@ -27,21 +33,15 @@ definition {
 	test CanCreateEndpointWithCompanyScope {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test1",
-				title = "test1");
-		}
-
 		task ("And Given adding new endpoint with Company scope") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
-				title = "test1");
+				title = "test2");
 
 			APIBuilderUI.createAPIEndpoint(
 				path = "testendpoint1",
 				scope = "Company",
-				title = "test1");
+				title = "test2");
 		}
 
 		task ("Then the endpoint with Company scope is created successfully and listed") {
@@ -58,15 +58,32 @@ definition {
 		}
 	}
 
+	@priority = 4
+	test CanCreateEndpointWithPathAndDescriptionWithSuccessAlert {
+		property portal.acceptance = "true";
+
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("When I enter a path and Scope to create the API endpoint") {
+			APIBuilderUI.createAPIEndpoint(
+				description = "Description default",
+				path = "testendpoint2",
+				scope = "Company",
+				title = "test2");
+		}
+
+		task ("Then I can see success alert") {
+			Alert.viewSuccessMessage();
+		}
+	}
+
 	@priority = 5
 	test CanCreateEndpointWithSiteScope {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given adding new endpoint with Site scope") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -94,19 +111,239 @@ definition {
 	}
 
 	@priority = 4
-	test PicklistScopeHasCorrectOptions {
+	test CanCreateEndpointWithSuccessAlert {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test3",
-				title = "test3");
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
 		}
+
+		task ("When I enter a path and Scope to create the API endpoint") {
+			APIBuilderUI.createAPIEndpoint(
+				description = "Description default",
+				path = "testendpoint2",
+				scope = "Company");
+		}
+
+		task ("Then I can see success alert") {
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Then I can see info of created endpoint with 'Get' method, scope, path") {
+			AssertElementPresent(
+				fieldLabel = "Method",
+				locator1 = "FormViewBuilder#FIELD_LABEL");
+
+			AssertElementPresent(
+				key_value = "GET",
+				locator1 = "APIBuilder#DROPDOWN_TOGGLE");
+
+			AssertElementPresent(
+				fieldLabel = "Scope",
+				locator1 = "FormViewBuilder#FIELD_LABEL");
+
+			AssertElementPresent(
+				fieldLabel = "Path",
+				locator1 = "FormViewBuilder#FIELD_LABEL");
+		}
+	}
+
+	@priority = 4
+	test CanSeeAllFieldsInCreationModal {
+		property portal.acceptance = "true";
+
+		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("And Given I click 'Add API Endpoint' button") {
+			Click(locator1 = "Button#PLUS");
+		}
+
+		task ("Then fields Scope *, Path * and Description are present") {
+			AssertElementPresent(
+				fieldLabel = "Scope",
+				locator1 = "FormViewBuilder#FIELD_FROM_FIELDSET");
+
+			AssertElementPresent(
+				fieldLabel = "Path",
+				locator1 = "FormViewBuilder#FIELD_FROM_FIELDSET");
+
+			AssertElementPresent(
+				fieldLabel = "Description",
+				locator1 = "FormViewBuilder#FIELD_FROM_FIELDSET");
+		}
+	}
+
+	@priority = 3
+	test CanSeeInfoOfCreatedEndpointWithDescription {
+		property portal.acceptance = "true";
+
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("When I enter a path and Scope to create the API endpoint") {
+			APIBuilderUI.createAPIEndpoint(
+				description = "Description default",
+				path = "testendpoint2",
+				scope = "Company");
+		}
+
+		task ("Then I can see success alert") {
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Then I can see info of created endpoint with 'Get' method, scope, path") {
+			AssertElementPresent(
+				key_optionName = "GET",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			AssertElementPresent(
+				key_optionName = "Company",
+				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
+
+			AssertElementPresent(
+				key_fieldLabel = "Path",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "testendpoint2");
+
+			AssertElementPresent(
+				key_value = "endpoint",
+				locator1 = "APIBuilder#DESCRIPTION",
+				value1 = "Description default");
+		}
+	}
+
+	@priority = 4
+	test CanSeePathOfPathFields {
+		property portal.acceptance = "true";
+
+		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("And Given I click 'Add API Endpoint' button") {
+			Click(locator1 = "Button#PLUS");
+		}
+
+		task ("Then I can see path under {portalUrl}/o/c/{applicationName}") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "APIBuilder#URL_LABEL",
+				value1 = "http://liferay-f0g7f0h7:8080/o/c/test2");
+		}
+
+		task ("And Then I can see path start with '/' with placeholder 'Enter path'") {
+			AssertElementPresent(locator1 = "APIBuilder#SLASH");
+		}
+	}
+
+	@priority = 4
+	test CanSeeValidationMessageForRequiredFields {
+		property portal.acceptance = "true";
+
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("And Given I click 'Add API Endpoint' button") {
+			Click(locator1 = "Button#PLUS");
+		}
+
+		task ("When I click 'Create' button in 'New API Endpoint'") {
+			Click(locator1 = "APIBuilder#CREATE_BUTTON");
+		}
+
+		task ("Then I can see error message about required Scope and Path") {
+			AssertElementPresent(
+				key_text = "Please select a scope.",
+				locator1 = "APIBuilder#WARNING_MESSAGE_IN_DIALOG");
+
+			AssertElementPresent(
+				key_text = "Please enter a path.",
+				locator1 = "APIBuilder#WARNING_MESSAGE_IN_DIALOG");
+		}
+
+		task ("And Then no endpoint is being created") {
+			Click(locator1 = "Modal#CLOSE_BUTTON");
+
+			AssertElementPresent(
+				key_entryName = "No API Endpoint Found",
+				locator1 = "ObjectAdmin#VIEW_ENTRY_NAME_ON_PAGE");
+		}
+	}
+
+	@priority = 4
+	test EndpointFieldsAreVisibleInCreationModal {
+		property portal.acceptance = "true";
+
+		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("Then 'Add API Enpoint' and plus buttons are present") {
+			AssertElementPresent(locator1 = "Button#PLUS");
+		}
+
+		task ("And Then I can see 'No API Endpoints found' message") {
+			AssertElementPresent(
+				key_entryName = "No API Endpoint Found",
+				locator1 = "ObjectAdmin#VIEW_ENTRY_NAME_ON_PAGE");
+		}
+	}
+
+	@priority = 4
+	test EndpointIsNotCreatedAfterClickingCancel {
+		property portal.acceptance = "true";
+
+		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Endpoints",
+				title = "test2");
+		}
+
+		task ("And Given I click 'Add API Endpoint' button") {
+			Click(locator1 = "Button#PLUS");
+		}
+
+		task ("And Given I enter a valid path") {
+			Type(
+				key_fieldLabel = "Path",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "path-defaul");
+		}
+
+		task ("When I click Cancel button") {
+			Click(locator1 = "AppBuilder#BUTTON_CANCEL");
+		}
+
+		task ("Then no endpoint is created in endpoint list") {
+			AssertElementPresent(
+				key_entryName = "No API Endpoint Found",
+				locator1 = "ObjectAdmin#VIEW_ENTRY_NAME_ON_PAGE");
+		}
+	}
+
+	@priority = 4
+	test PicklistScopeHasCorrectOptions {
+		property portal.acceptance = "true";
 
 		task ("When adding new endpoint") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
-				title = "test3");
+				title = "test2");
 
 			Click(locator1 = "Button#PLUS");
 
