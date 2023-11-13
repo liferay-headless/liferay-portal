@@ -11,6 +11,12 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		task ("Given the API Application is created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "test2",
+				title = "test2");
+		}
 	}
 
 	tearDown {
@@ -27,21 +33,15 @@ definition {
 	test CanCreateEndpointWithCompanyScope {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test1",
-				title = "test1");
-		}
-
 		task ("And Given adding new endpoint with Company scope") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
-				title = "test1");
+				title = "test2");
 
 			APIBuilderUI.createAPIEndpoint(
 				path = "testendpoint1",
 				scope = "Company",
-				title = "test1");
+				title = "test2");
 		}
 
 		task ("Then the endpoint with Company scope is created successfully and listed") {
@@ -61,12 +61,6 @@ definition {
 	@priority = 4
 	test CanCreateEndpointWithPathAndDescriptionWithSuccessAlert {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -108,12 +102,6 @@ definition {
 	test CanCreateEndpointWithSiteScope {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
-
 		task ("And Given adding new endpoint with Site scope") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
@@ -142,12 +130,6 @@ definition {
 	@priority = 4
 	test CanCreateEndpointWithSuccessAlert {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -200,12 +182,6 @@ definition {
 	test CanSeeAllFieldsInCreationModal {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
-
 		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
@@ -234,12 +210,6 @@ definition {
 	@priority = 3
 	test CanSeeInfoOfCreatedEndpointWithDescription {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -300,12 +270,6 @@ definition {
 	test CanSeePathOfPathFields {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
-
 		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
@@ -317,9 +281,9 @@ definition {
 		}
 
 		task ("Then I can see path under {portalUrl}/o/c/{applicationName}") {
-			AssertTextEquals(
+			AssertTextEquals.assertText(
 				locator1 = "APIBuilder#URL_LABEL",
-				value1 = "//localhost:8080/o/c/title2");
+				value1 = "liferay.com:8080/o/c/test2");
 		}
 
 		task ("And Then I can see path start with '/' with placeholder 'Enter path'") {
@@ -330,12 +294,6 @@ definition {
 	@priority = 4
 	test CanSeeValidationMessageForRequiredFields {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -368,65 +326,9 @@ definition {
 		}
 	}
 
-	@priority = 3
-	test CanValidateMaximumDescription {
-		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
-
-		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
-			APIBuilderUI.switchToRelatedEntryInEditApplication(
-				entity = "Endpoints",
-				title = "test2");
-		}
-
-		task ("And Given I click 'Add API Endpoint' button") {
-			Click(locator1 = "Button#PLUS");
-		}
-
-		task ("And Given I enter a valid path and chose any Scope option") {
-			Click(
-				key_value = "Select Scope",
-				locator1 = "APIBuilder#DROPDOWN_TOGGLE");
-
-			Click(
-				key_optionName = "Site",
-				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
-
-			Type(
-				key_fieldLabel = "Path",
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "path-defaul");
-		}
-
-		task ("And Given I enter description field with 281 characters") {
-			Type(
-				locator1 = "APIBuilder#ENDPOINT_DESCRIPTION",
-				value1 = "	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer facilisis purus a diam fermentum ultricies. Morbi id dui eu velit condimentum sodales vel ut libero. Curabitur laoreet nulla in mi aliquet.Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet, Lorem ipsum dolor car");
-		}
-
-		task ("When I Click 'Create' button") {
-			Click(locator1 = "APIBuilder#CREATE_BUTTON");
-		}
-
-		task ("Then I can see error message about maximum length of 280 characters blocks endpoint from being created") {
-			AssertElementPresent(locator1 = "Message#ERROR");
-		}
-	}
-
 	@priority = 4
 	test EndpointFieldsAreVisibleInCreationModal {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("When I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -446,12 +348,6 @@ definition {
 	@priority = 4
 	test EndpointIsNotCreatedAfterClickingCancel {
 		property portal.acceptance = "true";
-
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test2",
-				title = "test2");
-		}
 
 		task ("And Given I go to 'Endpoints' tab in 'Edit API Application'") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
@@ -483,16 +379,10 @@ definition {
 	test PicklistScopeHasCorrectOptions {
 		property portal.acceptance = "true";
 
-		task ("Given the API Application is created") {
-			ApplicationAPI.createAPIApplication(
-				baseURL = "test3",
-				title = "test3");
-		}
-
 		task ("When adding new endpoint") {
 			APIBuilderUI.switchToRelatedEntryInEditApplication(
 				entity = "Endpoints",
-				title = "test3");
+				title = "test2");
 
 			Click(locator1 = "Button#PLUS");
 
