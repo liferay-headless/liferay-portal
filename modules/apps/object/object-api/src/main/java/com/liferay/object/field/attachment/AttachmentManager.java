@@ -19,6 +19,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 public interface AttachmentManager {
 
 	public FileEntry addFileEntry(
+		long companyId, byte[] fileContent, String fileName,
+		String folderExternalReferenceCode, long groupId,
+		long objectFieldId, ServiceContext serviceContext)
+		throws Exception;
+
+	public FileEntry addFileEntry(
 			long companyId, byte[] fileContent, String fileName, long groupId,
 			long objectFieldId, ServiceContext serviceContext)
 		throws Exception;

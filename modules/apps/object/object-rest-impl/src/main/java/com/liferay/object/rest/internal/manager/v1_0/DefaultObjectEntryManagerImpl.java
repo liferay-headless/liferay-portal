@@ -26,6 +26,7 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
+import com.liferay.object.rest.dto.v1_0.Folder;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.filter.factory.FilterFactory;
@@ -1415,14 +1416,9 @@ public class DefaultObjectEntryManagerImpl
 		String fileSource = ObjectFieldSettingUtil.getValue(
 			ObjectFieldSettingConstants.NAME_FILE_SOURCE, objectField);
 
-		if (!StringUtil.equals(
-				fileSource, ObjectFieldSettingConstants.VALUE_USER_COMPUTER)) {
-
-			throw new UnsupportedOperationException(
-				"File source " + fileSource + " is not supported");
-		}
-
-		if (GetterUtil.getBoolean(
+		if (StringUtil.equals(
+				fileSource, ObjectFieldSettingConstants.VALUE_USER_COMPUTER) &&
+			GetterUtil.getBoolean(
 				ObjectFieldSettingUtil.getValue(
 					ObjectFieldSettingConstants.
 						NAME_SHOW_FILES_IN_DOCS_AND_MEDIA,
@@ -1436,11 +1432,42 @@ public class DefaultObjectEntryManagerImpl
 		}
 
 		com.liferay.portal.kernel.repository.model.FileEntry
+			serviceBuilderFileEntry = null;
+
+		if (StringUtil.equals(
+				fileSource, ObjectFieldSettingConstants.VALUE_USER_COMPUTER)) {
+
+			if (fileEntry.getFolder() != null) {
+				throw new IllegalArgumentException(
+					"Unexpected folder information for the file source \"" +
+						ObjectFieldSettingConstants.VALUE_USER_COMPUTER + "\"");
+			}
+
 			serviceBuilderFileEntry = _attachmentManager.addFileEntry(
 				objectField.getCompanyId(),
 				Base64.decode(fileEntry.getFileBase64()), fileEntry.getName(),
 				getGroupId(objectDefinition, scopeKey, true),
 				objectField.getObjectFieldId(), serviceContext);
+		}
+		else if (StringUtil.equals(
+					fileSource,
+					ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA)) {
+
+			Folder folder = fileEntry.getFolder();
+
+			if ((folder == null) || Validator.isNull(folder.getSiteId())) {
+				throw new IllegalArgumentException(
+					"Expected folder information for the file source \"" +
+						ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA +
+							"\"");
+			}
+
+			serviceBuilderFileEntry = _attachmentManager.addFileEntry(
+				objectField.getCompanyId(),
+				Base64.decode(fileEntry.getFileBase64()), fileEntry.getName(),
+				folder.getExternalReferenceCode(), folder.getSiteId(),
+				objectField.getObjectFieldId(), serviceContext);
+		}
 
 		fileEntry.setFileBase64((String)null);
 		fileEntry.setId(serviceBuilderFileEntry.getFileEntryId());
