@@ -6358,38 +6358,10 @@ public class ObjectEntryResourceTest {
 			ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
 
-		// File validation: extension not allowed
+		// File validation
 
 		com.liferay.object.rest.dto.v1_0.FileEntry testFileEntry =
 			fileEntryBuilder.build();
-
-		testFileEntry.setName(RandomTestUtil.randomString() + ".err");
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				"status", "BAD_REQUEST"
-			).put(
-				"title", "Invalid file extension for " + fileEntry.getName()
-			),
-			null, testFileEntry, null, objectDefinition, objectFieldName);
-
-		// File validation: file name is null
-
-		testFileEntry = fileEntryBuilder.build();
-
-		testFileEntry.setName((String)null);
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				"status", "BAD_REQUEST"
-			).put(
-				"title", "File name is null"
-			),
-			null, testFileEntry, null, objectDefinition, objectFieldName);
-
-		// File validation: size limit exceeded
-
-		testFileEntry = fileEntryBuilder.build();
 
 		testFileEntry.setFileBase64(
 			Base64.encode(
@@ -6409,6 +6381,30 @@ public class ObjectEntryResourceTest {
 			),
 			null, testFileEntry, null, objectDefinition, objectFieldName);
 
+		testFileEntry = fileEntryBuilder.build();
+
+		testFileEntry.setName((String)null);
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "File name is null"
+			),
+			null, testFileEntry, null, objectDefinition, objectFieldName);
+
+		testFileEntry = fileEntryBuilder.build();
+
+		testFileEntry.setName(RandomTestUtil.randomString() + ".err");
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "Invalid file extension for " + fileEntry.getName()
+			),
+			null, testFileEntry, null, objectDefinition, objectFieldName);
+
 		// File with a nonexistent name
 
 		_testPostCustomObjectEntryWithAttachmentField(
@@ -6422,7 +6418,22 @@ public class ObjectEntryResourceTest {
 			"fileBase64", fileEntryBuilder.build(), null, objectDefinition,
 			objectFieldName);
 
-		// File with the same name
+		// File with a nonexistent name and the Base64 content as a nested field
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
+				JSONUtil.put(
+					"fileBase64", fileEntry.getFileBase64()
+				).put(
+					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"name", fileEntry.getName()
+				)),
+			null, fileEntryBuilder.build(), "fileBase64", objectDefinition,
+			objectFieldName);
+
+		// File with an existing name
 
 		testFileEntry = fileEntryBuilder.build();
 
@@ -6446,23 +6457,6 @@ public class ObjectEntryResourceTest {
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
 			"fileBase64", testFileEntry, null, objectDefinition,
-			objectFieldName);
-
-		// File in base64 encoding requested as nested field
-
-		testFileEntry = fileEntryBuilder.build();
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				objectFieldName,
-				JSONUtil.put(
-					"fileBase64", fileEntry.getFileBase64()
-				).put(
-					"id", _testDLFileEntryModelListener.getLastFileEntryId()
-				).put(
-					"name", fileEntry.getName()
-				)),
-			null, testFileEntry, "fileBase64", objectDefinition,
 			objectFieldName);
 	}
 
