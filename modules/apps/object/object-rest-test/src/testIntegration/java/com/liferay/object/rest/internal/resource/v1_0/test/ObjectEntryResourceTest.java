@@ -121,6 +121,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.hamcrest.CoreMatchers;
 
@@ -209,8 +210,8 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
 					ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
-					_OBJECT_FIELD_NAME_ATTACHMENT,
-					_OBJECT_FIELD_NAME_ATTACHMENT,
+					_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+					_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 					Arrays.asList(
 						new ObjectFieldSettingBuilder(
 						).name(
@@ -301,8 +302,8 @@ public class ObjectEntryResourceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
 						ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
-						_OBJECT_FIELD_NAME_ATTACHMENT,
-						_OBJECT_FIELD_NAME_ATTACHMENT,
+						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 						Arrays.asList(
 							new ObjectFieldSettingBuilder(
 							).name(
@@ -3825,12 +3826,13 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, "value1"
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT, fileEntry.getFileEntryId()
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+				fileEntry.getFileEntryId()
 			).toString(),
 			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
 
 		JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-			_OBJECT_FIELD_NAME_ATTACHMENT);
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 		Assert.assertNull(attachmentJSONObject.get("fileBase64"));
 
@@ -3843,15 +3845,17 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, "value2"
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT, fileEntry.getFileEntryId()
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+				fileEntry.getFileEntryId()
 			).toString(),
 			StringBundler.concat(
 				_objectDefinition1.getRESTContextPath(), "?nestedFields=",
-				_OBJECT_FIELD_NAME_ATTACHMENT, ".fileBase64"),
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+				".fileBase64"),
 			Http.Method.POST);
 
 		attachmentJSONObject = jsonObject.getJSONObject(
-			_OBJECT_FIELD_NAME_ATTACHMENT);
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 		Assert.assertEquals(
 			Base64.encode(content.getBytes()),
@@ -3865,7 +3869,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.GET);
 
 		attachmentJSONObject = jsonObject.getJSONObject(
-			_OBJECT_FIELD_NAME_ATTACHMENT);
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 		Assert.assertNull(attachmentJSONObject.get("fileBase64"));
 
@@ -3875,11 +3879,12 @@ public class ObjectEntryResourceTest {
 				_objectDefinition1.getRESTContextPath(),
 				"/by-external-reference-code/",
 				jsonObject.getString("externalReferenceCode"), "?nestedFields=",
-				_OBJECT_FIELD_NAME_ATTACHMENT, ".fileBase64"),
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
+				".fileBase64"),
 			Http.Method.GET);
 
 		attachmentJSONObject = jsonObject.getJSONObject(
-			_OBJECT_FIELD_NAME_ATTACHMENT);
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 		Assert.assertEquals(
 			Base64.encode(content.getBytes()),
@@ -4559,9 +4564,12 @@ public class ObjectEntryResourceTest {
 	public void testPostCustomObjectEntryWithAttachmentField()
 		throws Exception {
 
-		_testPostCustomObjectEntryWithAttachmentField(_objectDefinition1);
 		_testPostCustomObjectEntryWithAttachmentField(
-			_siteScopedObjectDefinition1);
+			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
+		_testPostCustomObjectEntryWithAttachmentField(
+			_siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 	}
 
 	@Test
@@ -5970,7 +5978,7 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				_toFileEntryJSONObject(
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString() + ".txt")
@@ -5985,7 +5993,8 @@ public class ObjectEntryResourceTest {
 
 		if (nestedFields != null) {
 			endpoint = StringBundler.concat(
-				endpoint, "?nestedFields=", _OBJECT_FIELD_NAME_ATTACHMENT, ".",
+				endpoint, "?nestedFields=",
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER, ".",
 				nestedFields);
 		}
 
@@ -5993,7 +6002,7 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				_toFileEntryJSONObject(fileContent, fileName)
 			).put(
 				"externalReferenceCode",
@@ -6008,7 +6017,7 @@ public class ObjectEntryResourceTest {
 
 		if (expectedMissingFieldName != null) {
 			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				_OBJECT_FIELD_NAME_ATTACHMENT);
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 			Assert.assertNull(
 				attachmentJSONObject.get(expectedMissingFieldName));
@@ -6059,7 +6068,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6073,7 +6082,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"fileBase64", Base64.encode(fileContent.getBytes())
 				).put(
@@ -6091,7 +6100,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6101,7 +6110,7 @@ public class ObjectEntryResourceTest {
 			httpMethod, null, objectDefinition);
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6122,7 +6131,7 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				_toFileEntryJSONObject(
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString() + ".txt")
@@ -6136,7 +6145,8 @@ public class ObjectEntryResourceTest {
 
 		if (nestedFields != null) {
 			endpoint = StringBundler.concat(
-				endpoint, "?nestedFields=", _OBJECT_FIELD_NAME_ATTACHMENT, ".",
+				endpoint, "?nestedFields=",
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER, ".",
 				nestedFields);
 		}
 
@@ -6144,7 +6154,7 @@ public class ObjectEntryResourceTest {
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				_toFileEntryJSONObject(fileContent, fileName)
 			).put(
 				"id", jsonObject.getLong("id")
@@ -6158,7 +6168,7 @@ public class ObjectEntryResourceTest {
 
 		if (expectedMissingFieldName != null) {
 			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				_OBJECT_FIELD_NAME_ATTACHMENT);
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 
 			Assert.assertNull(
 				attachmentJSONObject.get(expectedMissingFieldName));
@@ -6208,7 +6218,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6222,7 +6232,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"fileBase64", Base64.encode(fileContent.getBytes())
 				).put(
@@ -6240,7 +6250,7 @@ public class ObjectEntryResourceTest {
 
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6250,7 +6260,7 @@ public class ObjectEntryResourceTest {
 			httpMethod, null, objectDefinition);
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+				_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6261,10 +6271,12 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
-			BiFunction<String, String, JSONObject> expectedJSONObjectFunction,
-			String expectedMissingFieldName, String fileContent,
-			String fileName, String nestedFields,
-			ObjectDefinition objectDefinition)
+			Function<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject>
+				expectedJSONObjectFunction,
+			String expectedMissingFieldName,
+			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry,
+			String nestedFields, ObjectDefinition objectDefinition,
+			String objectFieldName)
 		throws Exception {
 
 		String endpoint = _getEndpoint(
@@ -6272,27 +6284,25 @@ public class ObjectEntryResourceTest {
 
 		if (nestedFields != null) {
 			endpoint = StringBundler.concat(
-				endpoint, "?nestedFields=", _OBJECT_FIELD_NAME_ATTACHMENT, ".",
-				nestedFields);
+				endpoint, "?nestedFields=", objectFieldName, ".", nestedFields);
 		}
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
-				_toFileEntryJSONObject(fileContent, fileName)
+				objectFieldName,
+				JSONFactoryUtil.createJSONObject(fileEntry.toString())
 			).toString(),
 			endpoint, Http.Method.POST);
 
 		JSONAssert.assertEquals(
-			String.valueOf(
-				expectedJSONObjectFunction.apply(fileContent, fileName)),
+			String.valueOf(expectedJSONObjectFunction.apply(fileEntry)),
 			jsonObject.toString(), JSONCompareMode.LENIENT);
 
 		if (expectedMissingFieldName != null) {
 			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				_OBJECT_FIELD_NAME_ATTACHMENT);
+				objectFieldName);
 
 			Assert.assertNull(
 				attachmentJSONObject.get(expectedMissingFieldName));
@@ -6300,101 +6310,115 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
-			ObjectDefinition objectDefinition)
+			ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
 
 		// File validation: extension not allowed
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
+			fileEntry -> JSONUtil.put(
 				"status", "BAD_REQUEST"
 			).put(
-				"title", "Invalid file extension for " + fileName
+				"title", "Invalid file extension for " + fileEntry.getName()
 			),
-			null, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString() + ".err", null, objectDefinition);
+			null,
+			_toFileEntry(
+				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString() + ".err"),
+			null, objectDefinition, objectFieldName);
 
 		// File validation: file name is null
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
+			fileEntry -> JSONUtil.put(
 				"status", "BAD_REQUEST"
 			).put(
 				"title", "File name is null"
 			),
-			null, RandomTestUtil.randomString(), null, null, objectDefinition);
+			null, _toFileEntry(RandomTestUtil.randomString(), null), null,
+			objectDefinition, objectFieldName);
 
 		// File validation: size limit exceeded
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
+			fileEntry -> JSONUtil.put(
 				"status", "BAD_REQUEST"
 			).put(
 				"title",
 				StringBundler.concat(
-					"File ", fileName,
+					"File ", fileEntry.getName(),
 					" exceeds the maximum permitted size of ",
 					_MAX_FILE_SIZE_VALUE, " MB")
 			),
 			null,
-			RandomTestUtil.randomString(
-				(_MAX_FILE_SIZE_VALUE * 1024 * 1024) + 1),
-			RandomTestUtil.randomString() + ".txt", null, objectDefinition);
+			_toFileEntry(
+				RandomTestUtil.randomString(
+					(_MAX_FILE_SIZE_VALUE * 1024 * 1024) + 1),
+				RandomTestUtil.randomString() + ".txt"),
+			null, objectDefinition, objectFieldName);
 
 		// File with a nonexistent name
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
-					"name", fileName
+					"name", fileEntry.getName()
 				)),
-			"fileBase64", RandomTestUtil.randomString(),
-			RandomTestUtil.randomString() + ".txt", null, objectDefinition);
+			"fileBase64",
+			_toFileEntry(
+				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString() + ".txt"),
+			null, objectDefinition, objectFieldName);
 
 		// File with the same name
 
 		String name = RandomTestUtil.randomString();
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
-					"name", fileName
+					"name", fileEntry.getName()
 				)),
-			"fileBase64", RandomTestUtil.randomString(), name + ".txt", null,
-			objectDefinition);
+			"fileBase64",
+			_toFileEntry(RandomTestUtil.randomString(), name + ".txt"), null,
+			objectDefinition, objectFieldName);
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
-					"name", StringUtil.replace(fileName, ".txt", " (1).txt")
+					"name",
+					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
-			"fileBase64", RandomTestUtil.randomString(), name + ".txt", null,
-			objectDefinition);
+			"fileBase64",
+			_toFileEntry(RandomTestUtil.randomString(), name + ".txt"), null,
+			objectDefinition, objectFieldName);
 
 		// File in base64 encoding requested as nested field
 
 		_testPostCustomObjectEntryWithAttachmentField(
-			(fileContent, fileName) -> JSONUtil.put(
-				_OBJECT_FIELD_NAME_ATTACHMENT,
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
 				JSONUtil.put(
-					"fileBase64", Base64.encode(fileContent.getBytes())
+					"fileBase64", fileEntry.getFileBase64()
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
-					"name", fileName
+					"name", fileEntry.getName()
 				)),
-			null, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString() + ".txt", "fileBase64",
-			objectDefinition);
+			null,
+			_toFileEntry(
+				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString() + ".txt"),
+			"fileBase64", objectDefinition, objectFieldName);
 	}
 
 	private void
@@ -6749,9 +6773,8 @@ public class ObjectEntryResourceTest {
 			embeddedTaxonomyCategory.toString());
 	}
 
-	private JSONObject _toFileEntryJSONObject(
-			String fileContent, String fileName)
-		throws Exception {
+	private com.liferay.object.rest.dto.v1_0.FileEntry _toFileEntry(
+		String fileContent, String fileName) {
 
 		com.liferay.object.rest.dto.v1_0.FileEntry fileEntry =
 			new com.liferay.object.rest.dto.v1_0.FileEntry();
@@ -6759,7 +6782,15 @@ public class ObjectEntryResourceTest {
 		fileEntry.setFileBase64(Base64.encode(fileContent.getBytes()));
 		fileEntry.setName(fileName);
 
-		return JSONFactoryUtil.createJSONObject(fileEntry.toString());
+		return fileEntry;
+	}
+
+	private JSONObject _toFileEntryJSONObject(
+			String fileContent, String fileName)
+		throws Exception {
+
+		return JSONFactoryUtil.createJSONObject(
+			String.valueOf(_toFileEntry(fileContent, fileName)));
 	}
 
 	private static final String _ERC_VALUE_1 = RandomTestUtil.randomString();
@@ -6794,8 +6825,9 @@ public class ObjectEntryResourceTest {
 	private static final String _OBJECT_FIELD_NAME_4 =
 		"x" + RandomTestUtil.randomString();
 
-	private static final String _OBJECT_FIELD_NAME_ATTACHMENT =
-		"x" + RandomTestUtil.randomString();
+	private static final String
+		_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER =
+			"x" + RandomTestUtil.randomString();
 
 	private static final String _OBJECT_FIELD_NAME_MULTISELECT_PICKLIST =
 		"x" + RandomTestUtil.randomString();
