@@ -15,6 +15,9 @@ import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
@@ -35,6 +38,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.rest.dto.v1_0.Folder;
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.rest.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
@@ -62,6 +66,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
@@ -78,6 +83,7 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -188,6 +194,8 @@ public class ObjectEntryResourceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
 		_listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
 				null, TestPropsValues.getUserId(),
@@ -207,6 +215,32 @@ public class ObjectEntryResourceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_1, false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
+					ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
+					_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA,
+					_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA,
+					Arrays.asList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.
+								NAME_ACCEPTED_FILE_EXTENSIONS
+						).value(
+							_ACCEPTED_FILE_EXTENSION_VALUE
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_FILE_SOURCE
+						).value(
+							ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+						).value(
+							String.valueOf(_MAX_FILE_SIZE_VALUE)
+						).build()),
+					false),
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
 					ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
@@ -4612,6 +4646,64 @@ public class ObjectEntryResourceTest {
 	public void testPostCustomObjectEntryWithAttachmentField()
 		throws Exception {
 
+		// Attachment with source: docs and media with a given folder
+
+		DLFolder dlFolder1 = DLTestUtil.addDLFolder(
+			TestPropsValues.getGroupId());
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: docs and media with the default folder
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: user computer
+
 		_testPostCustomObjectEntryWithAttachmentField(
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
@@ -6886,6 +6978,10 @@ public class ObjectEntryResourceTest {
 		"x" + RandomTestUtil.randomString();
 
 	private static final String
+		_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA =
+			"x" + RandomTestUtil.randomString();
+
+	private static final String
 		_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER =
 			"x" + RandomTestUtil.randomString();
 
@@ -6913,6 +7009,10 @@ public class ObjectEntryResourceTest {
 	@Inject
 	private CompanyLocalService _companyLocalService;
 
+	@Inject
+	private DLAppLocalService _dlAppLocalService;
+
+	private Group _group;
 	private ListTypeDefinition _listTypeDefinition;
 
 	@Inject
@@ -6999,9 +7099,34 @@ public class ObjectEntryResourceTest {
 
 			fileEntry.setFileBase64(Base64.encode(fileContent.getBytes()));
 
+			if ((_folderExternalReferenceCode != null) ||
+				(_folderSiteId != null)) {
+
+				Folder folder = new Folder();
+
+				folder.setExternalReferenceCode(_folderExternalReferenceCode);
+				folder.setSiteId(_folderSiteId);
+
+				fileEntry.setFolder(folder);
+			}
+
 			fileEntry.setName(_fileNameSupplier.get());
 
 			return fileEntry;
+		}
+
+		public FileEntryBuilder withFolderExternalReferenceCode(
+			String folderExternalReferenceCode) {
+
+			_folderExternalReferenceCode = folderExternalReferenceCode;
+
+			return this;
+		}
+
+		public FileEntryBuilder withFolderSiteId(long folderSiteId) {
+			_folderSiteId = folderSiteId;
+
+			return this;
 		}
 
 		public FileEntryBuilder withRandomFileContentSupplier() {
@@ -7021,6 +7146,8 @@ public class ObjectEntryResourceTest {
 
 		private Supplier<String> _fileContentSupplier;
 		private Supplier<String> _fileNameSupplier;
+		private String _folderExternalReferenceCode;
+		private Long _folderSiteId;
 
 	}
 
