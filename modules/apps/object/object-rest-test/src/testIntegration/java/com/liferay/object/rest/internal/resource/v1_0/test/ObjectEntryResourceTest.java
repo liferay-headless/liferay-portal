@@ -122,6 +122,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.hamcrest.CoreMatchers;
 
@@ -218,7 +219,7 @@ public class ObjectEntryResourceTest {
 							ObjectFieldSettingConstants.
 								NAME_ACCEPTED_FILE_EXTENSIONS
 						).value(
-							"txt"
+							_ACCEPTED_FILE_EXTENSION_VALUE
 						).build(),
 						new ObjectFieldSettingBuilder(
 						).name(
@@ -310,7 +311,7 @@ public class ObjectEntryResourceTest {
 								ObjectFieldSettingConstants.
 									NAME_ACCEPTED_FILE_EXTENSIONS
 							).value(
-								"txt"
+								_ACCEPTED_FILE_EXTENSION_VALUE
 							).build(),
 							new ObjectFieldSettingBuilder(
 							).name(
@@ -3946,7 +3947,7 @@ public class ObjectEntryResourceTest {
 								ObjectFieldSettingConstants.
 									NAME_ACCEPTED_FILE_EXTENSIONS
 							).value(
-								"txt"
+								_ACCEPTED_FILE_EXTENSION_VALUE
 							).build(),
 							new ObjectFieldSettingBuilder(
 							).name(
@@ -4565,9 +4566,19 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
 			_objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPostCustomObjectEntryWithAttachmentField(
+			new FileEntryBuilder(
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
 			_siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 	}
@@ -6271,6 +6282,120 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
+			FileEntryBuilder fileEntryBuilder,
+			ObjectDefinition objectDefinition, String objectFieldName)
+		throws Exception {
+
+		// File validation: extension not allowed
+
+		com.liferay.object.rest.dto.v1_0.FileEntry testFileEntry =
+			fileEntryBuilder.build();
+
+		testFileEntry.setName(RandomTestUtil.randomString() + ".err");
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "Invalid file extension for " + fileEntry.getName()
+			),
+			null, testFileEntry, null, objectDefinition, objectFieldName);
+
+		// File validation: file name is null
+
+		testFileEntry = fileEntryBuilder.build();
+
+		testFileEntry.setName((String)null);
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "File name is null"
+			),
+			null, testFileEntry, null, objectDefinition, objectFieldName);
+
+		// File validation: size limit exceeded
+
+		testFileEntry = fileEntryBuilder.build();
+
+		testFileEntry.setFileBase64(
+			Base64.encode(
+				RandomTestUtil.randomString(
+					(_MAX_FILE_SIZE_VALUE * 1024 * 1024) + 1
+				).getBytes()));
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title",
+				StringBundler.concat(
+					"File ", fileEntry.getName(),
+					" exceeds the maximum permitted size of ",
+					_MAX_FILE_SIZE_VALUE, " MB")
+			),
+			null, testFileEntry, null, objectDefinition, objectFieldName);
+
+		// File with a nonexistent name
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
+				JSONUtil.put(
+					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"name", fileEntry.getName()
+				)),
+			"fileBase64", fileEntryBuilder.build(), null, objectDefinition,
+			objectFieldName);
+
+		// File with the same name
+
+		testFileEntry = fileEntryBuilder.build();
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
+				JSONUtil.put(
+					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"name", fileEntry.getName()
+				)),
+			"fileBase64", testFileEntry, null, objectDefinition,
+			objectFieldName);
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
+				JSONUtil.put(
+					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"name",
+					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
+				)),
+			"fileBase64", testFileEntry, null, objectDefinition,
+			objectFieldName);
+
+		// File in base64 encoding requested as nested field
+
+		testFileEntry = fileEntryBuilder.build();
+
+		_testPostCustomObjectEntryWithAttachmentField(
+			fileEntry -> JSONUtil.put(
+				objectFieldName,
+				JSONUtil.put(
+					"fileBase64", fileEntry.getFileBase64()
+				).put(
+					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"name", fileEntry.getName()
+				)),
+			null, testFileEntry, "fileBase64", objectDefinition,
+			objectFieldName);
+	}
+
+	private void _testPostCustomObjectEntryWithAttachmentField(
 			Function<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject>
 				expectedJSONObjectFunction,
 			String expectedMissingFieldName,
@@ -6307,118 +6432,6 @@ public class ObjectEntryResourceTest {
 			Assert.assertNull(
 				attachmentJSONObject.get(expectedMissingFieldName));
 		}
-	}
-
-	private void _testPostCustomObjectEntryWithAttachmentField(
-			ObjectDefinition objectDefinition, String objectFieldName)
-		throws Exception {
-
-		// File validation: extension not allowed
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				"status", "BAD_REQUEST"
-			).put(
-				"title", "Invalid file extension for " + fileEntry.getName()
-			),
-			null,
-			_toFileEntry(
-				RandomTestUtil.randomString(),
-				RandomTestUtil.randomString() + ".err"),
-			null, objectDefinition, objectFieldName);
-
-		// File validation: file name is null
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				"status", "BAD_REQUEST"
-			).put(
-				"title", "File name is null"
-			),
-			null, _toFileEntry(RandomTestUtil.randomString(), null), null,
-			objectDefinition, objectFieldName);
-
-		// File validation: size limit exceeded
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				"status", "BAD_REQUEST"
-			).put(
-				"title",
-				StringBundler.concat(
-					"File ", fileEntry.getName(),
-					" exceeds the maximum permitted size of ",
-					_MAX_FILE_SIZE_VALUE, " MB")
-			),
-			null,
-			_toFileEntry(
-				RandomTestUtil.randomString(
-					(_MAX_FILE_SIZE_VALUE * 1024 * 1024) + 1),
-				RandomTestUtil.randomString() + ".txt"),
-			null, objectDefinition, objectFieldName);
-
-		// File with a nonexistent name
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				objectFieldName,
-				JSONUtil.put(
-					"id", _testDLFileEntryModelListener.getLastFileEntryId()
-				).put(
-					"name", fileEntry.getName()
-				)),
-			"fileBase64",
-			_toFileEntry(
-				RandomTestUtil.randomString(),
-				RandomTestUtil.randomString() + ".txt"),
-			null, objectDefinition, objectFieldName);
-
-		// File with the same name
-
-		String name = RandomTestUtil.randomString();
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				objectFieldName,
-				JSONUtil.put(
-					"id", _testDLFileEntryModelListener.getLastFileEntryId()
-				).put(
-					"name", fileEntry.getName()
-				)),
-			"fileBase64",
-			_toFileEntry(RandomTestUtil.randomString(), name + ".txt"), null,
-			objectDefinition, objectFieldName);
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				objectFieldName,
-				JSONUtil.put(
-					"id", _testDLFileEntryModelListener.getLastFileEntryId()
-				).put(
-					"name",
-					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
-				)),
-			"fileBase64",
-			_toFileEntry(RandomTestUtil.randomString(), name + ".txt"), null,
-			objectDefinition, objectFieldName);
-
-		// File in base64 encoding requested as nested field
-
-		_testPostCustomObjectEntryWithAttachmentField(
-			fileEntry -> JSONUtil.put(
-				objectFieldName,
-				JSONUtil.put(
-					"fileBase64", fileEntry.getFileBase64()
-				).put(
-					"id", _testDLFileEntryModelListener.getLastFileEntryId()
-				).put(
-					"name", fileEntry.getName()
-				)),
-			null,
-			_toFileEntry(
-				RandomTestUtil.randomString(),
-				RandomTestUtil.randomString() + ".txt"),
-			"fileBase64", objectDefinition, objectFieldName);
 	}
 
 	private void
@@ -6793,6 +6806,8 @@ public class ObjectEntryResourceTest {
 			String.valueOf(_toFileEntry(fileContent, fileName)));
 	}
 
+	private static final String _ACCEPTED_FILE_EXTENSION_VALUE = "txt";
+
 	private static final String _ERC_VALUE_1 = RandomTestUtil.randomString();
 
 	private static final String _ERC_VALUE_2 = RandomTestUtil.randomString();
@@ -6926,6 +6941,41 @@ public class ObjectEntryResourceTest {
 		}
 
 		private List<Long> _fileEntryIds = new ArrayList<>();
+
+	}
+
+	private class FileEntryBuilder {
+
+		public com.liferay.object.rest.dto.v1_0.FileEntry build() {
+			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry =
+				new com.liferay.object.rest.dto.v1_0.FileEntry();
+
+			String fileContent = _fileContentSupplier.get();
+
+			fileEntry.setFileBase64(Base64.encode(fileContent.getBytes()));
+
+			fileEntry.setName(_fileNameSupplier.get());
+
+			return fileEntry;
+		}
+
+		public FileEntryBuilder withRandomFileContentSupplier() {
+			_fileContentSupplier = RandomTestUtil::randomString;
+
+			return this;
+		}
+
+		public FileEntryBuilder withRandomFileNameSupplier(
+			String fileExtension) {
+
+			_fileNameSupplier =
+				() -> RandomTestUtil.randomString() + "." + fileExtension;
+
+			return this;
+		}
+
+		private Supplier<String> _fileContentSupplier;
+		private Supplier<String> _fileNameSupplier;
 
 	}
 
