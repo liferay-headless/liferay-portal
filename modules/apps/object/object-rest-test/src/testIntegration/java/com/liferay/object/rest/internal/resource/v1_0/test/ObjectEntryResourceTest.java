@@ -6267,12 +6267,6 @@ public class ObjectEntryResourceTest {
 			ObjectDefinition objectDefinition)
 		throws Exception {
 
-		com.liferay.object.rest.dto.v1_0.FileEntry fileEntry =
-			new com.liferay.object.rest.dto.v1_0.FileEntry();
-
-		fileEntry.setFileBase64(Base64.encode(fileContent.getBytes()));
-		fileEntry.setName(fileName);
-
 		String endpoint = _getEndpoint(
 			TestPropsValues.getGroupId(), objectDefinition);
 
@@ -6287,7 +6281,7 @@ public class ObjectEntryResourceTest {
 				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
 			).put(
 				_OBJECT_FIELD_NAME_ATTACHMENT,
-				JSONFactoryUtil.createJSONObject(fileEntry.toString())
+				_toFileEntryJSONObject(fileContent, fileName)
 			).toString(),
 			endpoint, Http.Method.POST);
 
