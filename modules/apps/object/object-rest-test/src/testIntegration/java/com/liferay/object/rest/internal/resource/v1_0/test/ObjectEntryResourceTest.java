@@ -4560,6 +4560,94 @@ public class ObjectEntryResourceTest {
 	public void testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField()
 		throws Exception {
 
+		// Attachment with source: docs and media with a given folder
+
+		DLFolder dlFolder1 = DLTestUtil.addDLFolder(
+			TestPropsValues.getGroupId());
+
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
+
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: docs and media with the default folder
+
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: user computer
+
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
@@ -4602,6 +4690,94 @@ public class ObjectEntryResourceTest {
 	@Test
 	public void testPatchPutCustomObjectEntryWithAttachmentField()
 		throws Exception {
+
+		// Attachment with source: docs and media with a given folder
+
+		DLFolder dlFolder1 = DLTestUtil.addDLFolder(
+			TestPropsValues.getGroupId());
+
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
+
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: docs and media with the default folder
+
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+
+		// Attachment with source: user computer
 
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			() -> _getDLFolder(_objectDefinition1),
