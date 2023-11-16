@@ -16,7 +16,9 @@ import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.resource.v1_0.TaxonomyCategoryResource;
@@ -39,6 +41,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.Folder;
+import com.liferay.object.rest.dto.v1_0.Link;
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.rest.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
@@ -56,6 +59,8 @@ import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -66,11 +71,15 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -123,6 +132,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -174,8 +184,11 @@ public class ObjectEntryResourceTest {
 
 		_bundleContext = bundle.getBundleContext();
 
-		_serviceRegistration = _bundleContext.registerService(
-			ModelListener.class, _testDLFileEntryModelListener, null);
+		_serviceRegistrations = Arrays.asList(
+			_bundleContext.registerService(
+				ModelListener.class, _testDLFileEntryModelListener, null),
+			_bundleContext.registerService(
+				ModelListener.class, _testObjectEntryModelListener, null));
 
 		TaxonomyCategoryResource.Builder builder =
 			TaxonomyCategoryResource.builder();
@@ -189,7 +202,7 @@ public class ObjectEntryResourceTest {
 
 	@AfterClass
 	public static void tearDownClass() {
-		_serviceRegistration.unregister();
+		_serviceRegistrations.forEach(ServiceRegistration::unregister);
 	}
 
 	@Before
@@ -4652,6 +4665,7 @@ public class ObjectEntryResourceTest {
 			TestPropsValues.getGroupId());
 
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
 			new FileEntryBuilder(
 			).withFolderSiteId(
 				dlFolder1.getGroupId()
@@ -4667,6 +4681,7 @@ public class ObjectEntryResourceTest {
 		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
 
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
 			new FileEntryBuilder(
 			).withFolderSiteId(
 				dlFolder2.getGroupId()
@@ -4682,6 +4697,7 @@ public class ObjectEntryResourceTest {
 		// Attachment with source: docs and media with the default folder
 
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> null,
 			new FileEntryBuilder(
 			).withFolderSiteId(
 				TestPropsValues.getGroupId()
@@ -4692,6 +4708,7 @@ public class ObjectEntryResourceTest {
 			_objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> null,
 			new FileEntryBuilder(
 			).withFolderSiteId(
 				_group.getGroupId()
@@ -4705,6 +4722,7 @@ public class ObjectEntryResourceTest {
 		// Attachment with source: user computer
 
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4713,6 +4731,7 @@ public class ObjectEntryResourceTest {
 			_objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPostCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_siteScopedObjectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -5939,6 +5958,33 @@ public class ObjectEntryResourceTest {
 		return URLCodec.encodeURL(string);
 	}
 
+	private DLFolder _getDLFolder(ObjectDefinition objectDefinition)
+		throws Exception {
+
+		ObjectScopeProvider objectScopeProvider =
+			_objectScopeProviderRegistry.getObjectScopeProvider(
+				objectDefinition.getScope());
+
+		long groupId = 0;
+
+		if (objectScopeProvider.isGroupAware()) {
+			groupId = TestPropsValues.getGroupId();
+		}
+		else {
+			Company company = _companyLocalService.getCompany(
+				objectDefinition.getCompanyId());
+
+			groupId = company.getGroupId();
+		}
+
+		Repository repository = _portletFileRepository.getPortletRepository(
+			groupId, objectDefinition.getPortletId());
+
+		return _dlFolderLocalService.getFolder(
+			repository.getGroupId(), repository.getDlFolderId(),
+			String.valueOf(TestPropsValues.getUserId()));
+	}
+
 	private String _getEndpoint(
 		long groupId, ObjectDefinition objectDefinition) {
 
@@ -5951,6 +5997,54 @@ public class ObjectEntryResourceTest {
 		}
 
 		return objectDefinition.getRESTContextPath();
+	}
+
+	private JSONObject _getLinkJSONObject(
+			DLFolder dlFolder, long fileEntryId, String fileName, Folder folder,
+			ObjectDefinition objectDefinition)
+		throws Exception {
+
+		Company company = _companyLocalService.getCompany(
+			objectDefinition.getCompanyId());
+
+		long folderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+		long repositoryId = company.getGroupId();
+
+		if (dlFolder == null) {
+			if (folder != null) {
+				repositoryId = folder.getSiteId();
+			}
+		}
+		else {
+			folderId = dlFolder.getFolderId();
+			repositoryId = dlFolder.getRepositoryId();
+		}
+
+		FileEntry serviceBuilderFileEntry = _dlAppLocalService.getFileEntry(
+			fileEntryId);
+
+		FileVersion fileVersion = serviceBuilderFileEntry.getFileVersion();
+
+		Date modifiedDate = fileVersion.getModifiedDate();
+
+		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
+			_testObjectEntryModelListener.getLastObjectEntryId());
+
+		Link link = new Link();
+
+		link.setHref(
+			StringBundler.concat(
+				"/documents/", repositoryId, "/", folderId, "/",
+				URLCodec.encodeURL(fileName), "/",
+				serviceBuilderFileEntry.getExternalReferenceCode(), "?version=",
+				fileVersion.getVersion(), "&t=", modifiedDate.getTime(),
+				"&download=true&objectDefinitionExternalReferenceCode=",
+				objectDefinition.getExternalReferenceCode(),
+				"&objectEntryExternalReferenceCode=",
+				objectEntry.getExternalReferenceCode()));
+		link.setLabel(fileName);
+
+		return JSONFactoryUtil.createJSONObject(link.toString());
 	}
 
 	private NestedFieldsContext _getNestedFieldsContext(String nestedFields) {
@@ -6446,6 +6540,47 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
+			UnsafeFunction
+				<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
+				 Exception> expectedJSONObjectUnsafeFunction,
+			String expectedMissingFieldName,
+			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry,
+			String nestedFields, ObjectDefinition objectDefinition,
+			String objectFieldName)
+		throws Exception {
+
+		String endpoint = _getEndpoint(
+			TestPropsValues.getGroupId(), objectDefinition);
+
+		if (nestedFields != null) {
+			endpoint = StringBundler.concat(
+				endpoint, "?nestedFields=", objectFieldName, ".", nestedFields);
+		}
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
+			).put(
+				objectFieldName,
+				JSONFactoryUtil.createJSONObject(fileEntry.toString())
+			).toString(),
+			endpoint, Http.Method.POST);
+
+		JSONAssert.assertEquals(
+			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry)),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
+
+		if (expectedMissingFieldName != null) {
+			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
+				objectFieldName);
+
+			Assert.assertNull(
+				attachmentJSONObject.get(expectedMissingFieldName));
+		}
+	}
+
+	private void _testPostCustomObjectEntryWithAttachmentField(
+			UnsafeSupplier<DLFolder, Exception> dlFolderUnsafeSupplier,
 			FileEntryBuilder fileEntryBuilder,
 			ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
@@ -6499,15 +6634,24 @@ public class ObjectEntryResourceTest {
 
 		// File with a nonexistent name
 
+		testFileEntry = fileEntryBuilder.build();
+
 		_testPostCustomObjectEntryWithAttachmentField(
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", fileEntryBuilder.build(), null, objectDefinition,
+			"fileBase64", testFileEntry, null, objectDefinition,
 			objectFieldName);
 
 		// File with a nonexistent name and the Base64 content as a nested field
@@ -6519,6 +6663,13 @@ public class ObjectEntryResourceTest {
 					"fileBase64", fileEntry.getFileBase64()
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
 				).put(
 					"name", fileEntry.getName()
 				)),
@@ -6535,6 +6686,13 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
 			"fileBase64", testFileEntry, null, objectDefinition,
@@ -6545,50 +6703,19 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						StringUtil.replace(
+							fileEntry.getName(), ".txt", " (1).txt"),
+						fileEntry.getFolder(), objectDefinition)
+				).put(
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
 			"fileBase64", testFileEntry, null, objectDefinition,
 			objectFieldName);
-	}
-
-	private void _testPostCustomObjectEntryWithAttachmentField(
-			Function<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject>
-				expectedJSONObjectFunction,
-			String expectedMissingFieldName,
-			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry,
-			String nestedFields, ObjectDefinition objectDefinition,
-			String objectFieldName)
-		throws Exception {
-
-		String endpoint = _getEndpoint(
-			TestPropsValues.getGroupId(), objectDefinition);
-
-		if (nestedFields != null) {
-			endpoint = StringBundler.concat(
-				endpoint, "?nestedFields=", objectFieldName, ".", nestedFields);
-		}
-
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			JSONUtil.put(
-				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
-			).put(
-				objectFieldName,
-				JSONFactoryUtil.createJSONObject(fileEntry.toString())
-			).toString(),
-			endpoint, Http.Method.POST);
-
-		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectFunction.apply(fileEntry)),
-			jsonObject.toString(), JSONCompareMode.LENIENT);
-
-		if (expectedMissingFieldName != null) {
-			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				objectFieldName);
-
-			Assert.assertNull(
-				attachmentJSONObject.get(expectedMissingFieldName));
-		}
 	}
 
 	private void
@@ -7001,16 +7128,21 @@ public class ObjectEntryResourceTest {
 
 	private static AssetVocabulary _assetVocabulary;
 	private static BundleContext _bundleContext;
-	private static ServiceRegistration<?> _serviceRegistration;
+	private static List<ServiceRegistration<?>> _serviceRegistrations;
 	private static TaxonomyCategoryResource _taxonomyCategoryResource;
 	private static final TestDLFileEntryModelListener
 		_testDLFileEntryModelListener = new TestDLFileEntryModelListener();
+	private static final TestObjectEntryModelListener
+		_testObjectEntryModelListener = new TestObjectEntryModelListener();
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
 
 	@Inject
 	private DLAppLocalService _dlAppLocalService;
+
+	@Inject
+	private DLFolderLocalService _dlFolderLocalService;
 
 	private Group _group;
 	private ListTypeDefinition _listTypeDefinition;
@@ -7056,6 +7188,9 @@ public class ObjectEntryResourceTest {
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Inject
+	private PortletFileRepository _portletFileRepository;
+
+	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 	private ObjectDefinition _siteScopedObjectDefinition1;
@@ -7086,6 +7221,24 @@ public class ObjectEntryResourceTest {
 		}
 
 		private List<Long> _fileEntryIds = new ArrayList<>();
+
+	}
+
+	private static class TestObjectEntryModelListener
+		extends BaseModelListener<ObjectEntry> {
+
+		public Long getLastObjectEntryId() {
+			return _objectEntryIds.get(_objectEntryIds.size() - 1);
+		}
+
+		@Override
+		public void onAfterCreate(ObjectEntry objectEntry)
+			throws ModelListenerException {
+
+			_objectEntryIds.add(objectEntry.getObjectEntryId());
+		}
+
+		private List<Long> _objectEntryIds = new ArrayList<>();
 
 	}
 
