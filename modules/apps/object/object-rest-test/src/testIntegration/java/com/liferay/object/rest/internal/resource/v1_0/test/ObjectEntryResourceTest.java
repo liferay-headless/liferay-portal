@@ -6734,6 +6734,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -6755,6 +6757,8 @@ public class ObjectEntryResourceTest {
 				objectFieldName,
 				JSONUtil.put(
 					"fileBase64", fileEntry.getFileBase64()
+				).put(
+					"folder", _toJSONObject(fileEntry.getFolder())
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6778,6 +6782,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -6795,6 +6801,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -6928,6 +6936,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -6949,6 +6959,8 @@ public class ObjectEntryResourceTest {
 				objectFieldName,
 				JSONUtil.put(
 					"fileBase64", fileEntry.getFileBase64()
+				).put(
+					"folder", _toJSONObject(fileEntry.getFolder())
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -6972,6 +6984,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -6989,6 +7003,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -7107,6 +7123,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -7128,6 +7146,8 @@ public class ObjectEntryResourceTest {
 				objectFieldName,
 				JSONUtil.put(
 					"fileBase64", fileEntry.getFileBase64()
+				).put(
+					"folder", _toJSONObject(fileEntry.getFolder())
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
@@ -7151,6 +7171,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -7168,6 +7190,8 @@ public class ObjectEntryResourceTest {
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
 				JSONUtil.put(
+					"folder", _toJSONObject(fileEntry.getFolder())
+				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
 					"link",
@@ -7535,6 +7559,14 @@ public class ObjectEntryResourceTest {
 
 		return JSONFactoryUtil.createJSONObject(
 			embeddedTaxonomyCategory.toString());
+	}
+
+	private JSONObject _toJSONObject(Folder folder) throws Exception {
+		if (folder == null) {
+			return null;
+		}
+
+		return JSONFactoryUtil.createJSONObject(folder.toString());
 	}
 
 	private static final String _ACCEPTED_FILE_EXTENSION_VALUE = "txt";
