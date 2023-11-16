@@ -6619,7 +6619,6 @@ public class ObjectEntryResourceTest {
 				UnsafeFunction
 					<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
 					 Exception> expectedJSONObjectUnsafeFunction,
-				String expectedMissingFieldName,
 				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
 				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
 				Http.Method httpMethod, String nestedFields,
@@ -6658,16 +6657,18 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint, httpMethod);
 
+		JSONObject expectedJSONObject = expectedJSONObjectUnsafeFunction.apply(
+			fileEntry2);
+
 		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry2)),
-			jsonObject.toString(), JSONCompareMode.LENIENT);
+			expectedJSONObject.toString(), jsonObject.toString(),
+			JSONCompareMode.LENIENT);
 
-		if (expectedMissingFieldName != null) {
-			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				objectFieldName);
-
-			Assert.assertNull(
-				attachmentJSONObject.get(expectedMissingFieldName));
+		if (expectedJSONObject.get(objectFieldName) != null) {
+			JSONAssert.assertEquals(
+				String.valueOf(expectedJSONObject.get(objectFieldName)),
+				String.valueOf(jsonObject.get(objectFieldName)),
+				JSONCompareMode.STRICT);
 		}
 	}
 
@@ -6699,7 +6700,7 @@ public class ObjectEntryResourceTest {
 					" exceeds the maximum permitted size of ",
 					_MAX_FILE_SIZE_VALUE, " MB")
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
@@ -6712,7 +6713,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "File name is null"
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
@@ -6725,7 +6726,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "Invalid file extension for " + fileEntry.getName()
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		// File with a nonexistent name
@@ -6747,8 +6748,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", fileEntryBuilder.build(), fileEntryBuilder.build(),
-			httpMethod, null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), fileEntryBuilder.build(), httpMethod,
+			null, objectDefinition, objectFieldName);
 
 		// File with a nonexistent name and the Base64 content as a nested field
 
@@ -6771,8 +6772,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			null, fileEntryBuilder.build(), fileEntryBuilder.build(),
-			httpMethod, "fileBase64", objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), fileEntryBuilder.build(), httpMethod,
+			"fileBase64", objectDefinition, objectFieldName);
 
 		// File with an existing name
 
@@ -6795,8 +6796,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
-			null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			objectDefinition, objectFieldName);
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
@@ -6816,15 +6817,14 @@ public class ObjectEntryResourceTest {
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
-			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
-			null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			objectDefinition, objectFieldName);
 	}
 
 	private void _testPatchPutCustomObjectEntryWithAttachmentField(
 			UnsafeFunction
 				<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
 				 Exception> expectedJSONObjectUnsafeFunction,
-			String expectedMissingFieldName,
 			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
 			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
 			Http.Method httpMethod, String nestedFields,
@@ -6861,16 +6861,18 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint, httpMethod);
 
+		JSONObject expectedJSONObject = expectedJSONObjectUnsafeFunction.apply(
+			fileEntry2);
+
 		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry2)),
-			jsonObject.toString(), JSONCompareMode.LENIENT);
+			expectedJSONObject.toString(), jsonObject.toString(),
+			JSONCompareMode.LENIENT);
 
-		if (expectedMissingFieldName != null) {
-			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				objectFieldName);
-
-			Assert.assertNull(
-				attachmentJSONObject.get(expectedMissingFieldName));
+		if (expectedJSONObject.get(objectFieldName) != null) {
+			JSONAssert.assertEquals(
+				String.valueOf(expectedJSONObject.get(objectFieldName)),
+				String.valueOf(jsonObject.get(objectFieldName)),
+				JSONCompareMode.STRICT);
 		}
 	}
 
@@ -6901,7 +6903,7 @@ public class ObjectEntryResourceTest {
 					" exceeds the maximum permitted size of ",
 					_MAX_FILE_SIZE_VALUE, " MB")
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
@@ -6914,7 +6916,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "File name is null"
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
@@ -6927,7 +6929,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "Invalid file extension for " + fileEntry.getName()
 			),
-			null, fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
 			objectDefinition, objectFieldName);
 
 		// File with a nonexistent name
@@ -6949,8 +6951,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", fileEntryBuilder.build(), fileEntryBuilder.build(),
-			httpMethod, null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), fileEntryBuilder.build(), httpMethod,
+			null, objectDefinition, objectFieldName);
 
 		// File with a nonexistent name and the Base64 content as a nested field
 
@@ -6973,8 +6975,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			null, fileEntryBuilder.build(), fileEntryBuilder.build(),
-			httpMethod, "fileBase64", objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), fileEntryBuilder.build(), httpMethod,
+			"fileBase64", objectDefinition, objectFieldName);
 
 		// File with an existing name
 
@@ -6997,8 +6999,8 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
-			null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			objectDefinition, objectFieldName);
 		_testPatchPutCustomObjectEntryWithAttachmentField(
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
@@ -7018,15 +7020,14 @@ public class ObjectEntryResourceTest {
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
-			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
-			null, objectDefinition, objectFieldName);
+			fileEntryBuilder.build(), testFileEntry, httpMethod, null,
+			objectDefinition, objectFieldName);
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
 			UnsafeFunction
 				<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
 				 Exception> expectedJSONObjectUnsafeFunction,
-			String expectedMissingFieldName,
 			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry,
 			String nestedFields, ObjectDefinition objectDefinition,
 			String objectFieldName)
@@ -7049,16 +7050,18 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint, Http.Method.POST);
 
+		JSONObject expectedJSONObject = expectedJSONObjectUnsafeFunction.apply(
+			fileEntry);
+
 		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry)),
-			jsonObject.toString(), JSONCompareMode.LENIENT);
+			expectedJSONObject.toString(), jsonObject.toString(),
+			JSONCompareMode.LENIENT);
 
-		if (expectedMissingFieldName != null) {
-			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				objectFieldName);
-
-			Assert.assertNull(
-				attachmentJSONObject.get(expectedMissingFieldName));
+		if (expectedJSONObject.get(objectFieldName) != null) {
+			JSONAssert.assertEquals(
+				String.valueOf(expectedJSONObject.get(objectFieldName)),
+				String.valueOf(jsonObject.get(objectFieldName)),
+				JSONCompareMode.STRICT);
 		}
 	}
 
@@ -7089,7 +7092,7 @@ public class ObjectEntryResourceTest {
 					" exceeds the maximum permitted size of ",
 					_MAX_FILE_SIZE_VALUE, " MB")
 			),
-			null, testFileEntry, null, objectDefinition, objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
 
@@ -7101,7 +7104,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "File name is null"
 			),
-			null, testFileEntry, null, objectDefinition, objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 
 		testFileEntry = fileEntryBuilder.build();
 
@@ -7113,7 +7116,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				"title", "Invalid file extension for " + fileEntry.getName()
 			),
-			null, testFileEntry, null, objectDefinition, objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 
 		// File with a nonexistent name
 
@@ -7136,8 +7139,7 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", testFileEntry, null, objectDefinition,
-			objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 
 		// File with a nonexistent name and the Base64 content as a nested field
 
@@ -7160,7 +7162,7 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			null, fileEntryBuilder.build(), "fileBase64", objectDefinition,
+			fileEntryBuilder.build(), "fileBase64", objectDefinition,
 			objectFieldName);
 
 		// File with an existing name
@@ -7184,8 +7186,7 @@ public class ObjectEntryResourceTest {
 				).put(
 					"name", fileEntry.getName()
 				)),
-			"fileBase64", testFileEntry, null, objectDefinition,
-			objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 		_testPostCustomObjectEntryWithAttachmentField(
 			fileEntry -> JSONUtil.put(
 				objectFieldName,
@@ -7205,8 +7206,7 @@ public class ObjectEntryResourceTest {
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
-			"fileBase64", testFileEntry, null, objectDefinition,
-			objectFieldName);
+			testFileEntry, null, objectDefinition, objectFieldName);
 	}
 
 	private void
