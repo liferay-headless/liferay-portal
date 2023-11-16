@@ -348,6 +348,32 @@ public class ObjectEntryResourceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
 						ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
+						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA,
+						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA,
+						Arrays.asList(
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.
+									NAME_ACCEPTED_FILE_EXTENSIONS
+							).value(
+								_ACCEPTED_FILE_EXTENSION_VALUE
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_FILE_SOURCE
+							).value(
+								ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA
+							).build(),
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+							).value(
+								String.valueOf(_MAX_FILE_SIZE_VALUE)
+							).build()),
+						false),
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
+						ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
 						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 						_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER,
 						Arrays.asList(
@@ -4591,6 +4617,32 @@ public class ObjectEntryResourceTest {
 			),
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
 
@@ -4620,6 +4672,32 @@ public class ObjectEntryResourceTest {
 			),
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: docs and media with the default folder
 
@@ -4644,6 +4722,28 @@ public class ObjectEntryResourceTest {
 				_ACCEPTED_FILE_EXTENSION_VALUE
 			),
 			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: user computer
@@ -4722,6 +4822,32 @@ public class ObjectEntryResourceTest {
 			),
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
 
@@ -4751,6 +4877,32 @@ public class ObjectEntryResourceTest {
 			),
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: docs and media with the default folder
 
@@ -4775,6 +4927,28 @@ public class ObjectEntryResourceTest {
 				_ACCEPTED_FILE_EXTENSION_VALUE
 			),
 			Http.Method.PUT, _objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PATCH, _siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			Http.Method.PUT, _siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: user computer
@@ -4860,6 +5034,19 @@ public class ObjectEntryResourceTest {
 			),
 			_objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPostCustomObjectEntryWithAttachmentField(
+			() -> dlFolder1,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder1.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder1.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		DLFolder dlFolder2 = DLTestUtil.addDLFolder(_group.getGroupId());
 
@@ -4875,6 +5062,19 @@ public class ObjectEntryResourceTest {
 				_ACCEPTED_FILE_EXTENSION_VALUE
 			),
 			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPostCustomObjectEntryWithAttachmentField(
+			() -> dlFolder2,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				dlFolder2.getGroupId()
+			).withFolderExternalReferenceCode(
+				dlFolder2.getExternalReferenceCode()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: docs and media with the default folder
@@ -4894,12 +5094,34 @@ public class ObjectEntryResourceTest {
 			() -> null,
 			new FileEntryBuilder(
 			).withFolderSiteId(
+				TestPropsValues.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_siteScopedObjectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPostCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
 				_group.getGroupId()
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
 				_ACCEPTED_FILE_EXTENSION_VALUE
 			),
 			_objectDefinition1,
+			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
+		_testPostCustomObjectEntryWithAttachmentField(
+			() -> null,
+			new FileEntryBuilder(
+			).withFolderSiteId(
+				_group.getGroupId()
+			).withRandomFileContentSupplier(
+			).withRandomFileNameSupplier(
+				_ACCEPTED_FILE_EXTENSION_VALUE
+			),
+			_siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_DOCS_AND_MEDIA);
 
 		// Attachment with source: user computer
