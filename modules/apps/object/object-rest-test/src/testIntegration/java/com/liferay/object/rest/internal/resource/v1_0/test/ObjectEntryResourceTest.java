@@ -136,7 +136,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hamcrest.CoreMatchers;
@@ -4562,6 +4561,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4570,6 +4570,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PATCH, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4578,6 +4579,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> _getDLFolder(_siteScopedObjectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4586,6 +4588,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PATCH, _siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+			() -> _getDLFolder(_siteScopedObjectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4601,6 +4604,7 @@ public class ObjectEntryResourceTest {
 		throws Exception {
 
 		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4609,6 +4613,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PATCH, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_objectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4617,6 +4622,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PUT, _objectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_siteScopedObjectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -4625,6 +4631,7 @@ public class ObjectEntryResourceTest {
 			Http.Method.PATCH, _siteScopedObjectDefinition1,
 			_OBJECT_FIELD_NAME_ATTACHMENT_SOURCE_USER_COMPUTER);
 		_testPatchPutCustomObjectEntryWithAttachmentField(
+			() -> _getDLFolder(_siteScopedObjectDefinition1),
 			new FileEntryBuilder(
 			).withRandomFileContentSupplier(
 			).withRandomFileNameSupplier(
@@ -6211,6 +6218,64 @@ public class ObjectEntryResourceTest {
 
 	private void
 			_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+				UnsafeFunction
+					<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
+					 Exception> expectedJSONObjectUnsafeFunction,
+				String expectedMissingFieldName,
+				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
+				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
+				Http.Method httpMethod, String nestedFields,
+				ObjectDefinition objectDefinition, String objectFieldName)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
+			).put(
+				objectFieldName,
+				JSONFactoryUtil.createJSONObject(fileEntry1.toString())
+			).toString(),
+			_getEndpoint(TestPropsValues.getGroupId(), objectDefinition),
+			Http.Method.POST);
+
+		String endpoint =
+			_getEndpoint(TestPropsValues.getGroupId(), objectDefinition) +
+				"/by-external-reference-code/" +
+					jsonObject.getString("externalReferenceCode");
+
+		if (nestedFields != null) {
+			endpoint = StringBundler.concat(
+				endpoint, "?nestedFields=", objectFieldName, ".", nestedFields);
+		}
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
+			).put(
+				objectFieldName,
+				JSONFactoryUtil.createJSONObject(fileEntry2.toString())
+			).put(
+				"externalReferenceCode",
+				jsonObject.getString("externalReferenceCode")
+			).toString(),
+			endpoint, httpMethod);
+
+		JSONAssert.assertEquals(
+			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry2)),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
+
+		if (expectedMissingFieldName != null) {
+			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
+				objectFieldName);
+
+			Assert.assertNull(
+				attachmentJSONObject.get(expectedMissingFieldName));
+		}
+	}
+
+	private void
+			_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
+				UnsafeSupplier<DLFolder, Exception> dlFolderUnsafeSupplier,
 				FileEntryBuilder fileEntryBuilder, Http.Method httpMethod,
 				ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
@@ -6273,6 +6338,13 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
 			"fileBase64", fileEntryBuilder.build(), fileEntryBuilder.build(),
@@ -6287,6 +6359,13 @@ public class ObjectEntryResourceTest {
 					"fileBase64", fileEntry.getFileBase64()
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
 				).put(
 					"name", fileEntry.getName()
 				)),
@@ -6303,6 +6382,13 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
 			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
@@ -6313,6 +6399,14 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						StringUtil.replace(
+							fileEntry.getName(), ".txt", " (1).txt"),
+						fileEntry.getFolder(), objectDefinition)
+				).put(
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
@@ -6320,15 +6414,15 @@ public class ObjectEntryResourceTest {
 			null, objectDefinition, objectFieldName);
 	}
 
-	private void
-			_testPatchPutCustomObjectEntryByExternalReferenceCodeWithAttachmentField(
-				Function<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject>
-					expectedJSONObjectFunction,
-				String expectedMissingFieldName,
-				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
-				com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
-				Http.Method httpMethod, String nestedFields,
-				ObjectDefinition objectDefinition, String objectFieldName)
+	private void _testPatchPutCustomObjectEntryWithAttachmentField(
+			UnsafeFunction
+				<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject,
+				 Exception> expectedJSONObjectUnsafeFunction,
+			String expectedMissingFieldName,
+			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
+			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
+			Http.Method httpMethod, String nestedFields,
+			ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
@@ -6342,9 +6436,8 @@ public class ObjectEntryResourceTest {
 			Http.Method.POST);
 
 		String endpoint =
-			_getEndpoint(TestPropsValues.getGroupId(), objectDefinition) +
-				"/by-external-reference-code/" +
-					jsonObject.getString("externalReferenceCode");
+			objectDefinition.getRESTContextPath() + "/" +
+				jsonObject.getLong("id");
 
 		if (nestedFields != null) {
 			endpoint = StringBundler.concat(
@@ -6358,13 +6451,12 @@ public class ObjectEntryResourceTest {
 				objectFieldName,
 				JSONFactoryUtil.createJSONObject(fileEntry2.toString())
 			).put(
-				"externalReferenceCode",
-				jsonObject.getString("externalReferenceCode")
+				"id", jsonObject.getLong("id")
 			).toString(),
 			endpoint, httpMethod);
 
 		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectFunction.apply(fileEntry2)),
+			String.valueOf(expectedJSONObjectUnsafeFunction.apply(fileEntry2)),
 			jsonObject.toString(), JSONCompareMode.LENIENT);
 
 		if (expectedMissingFieldName != null) {
@@ -6377,6 +6469,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	private void _testPatchPutCustomObjectEntryWithAttachmentField(
+			UnsafeSupplier<DLFolder, Exception> dlFolderUnsafeSupplier,
 			FileEntryBuilder fileEntryBuilder, Http.Method httpMethod,
 			ObjectDefinition objectDefinition, String objectFieldName)
 		throws Exception {
@@ -6439,6 +6532,13 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
 			"fileBase64", fileEntryBuilder.build(), fileEntryBuilder.build(),
@@ -6453,6 +6553,13 @@ public class ObjectEntryResourceTest {
 					"fileBase64", fileEntry.getFileBase64()
 				).put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
+				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
 				).put(
 					"name", fileEntry.getName()
 				)),
@@ -6469,6 +6576,13 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						fileEntry.getName(), fileEntry.getFolder(),
+						objectDefinition)
+				).put(
 					"name", fileEntry.getName()
 				)),
 			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
@@ -6479,64 +6593,19 @@ public class ObjectEntryResourceTest {
 				JSONUtil.put(
 					"id", _testDLFileEntryModelListener.getLastFileEntryId()
 				).put(
+					"link",
+					_getLinkJSONObject(
+						dlFolderUnsafeSupplier.get(),
+						_testDLFileEntryModelListener.getLastFileEntryId(),
+						StringUtil.replace(
+							fileEntry.getName(), ".txt", " (1).txt"),
+						fileEntry.getFolder(), objectDefinition)
+				).put(
 					"name",
 					StringUtil.replace(fileEntry.getName(), ".txt", " (1).txt")
 				)),
 			"fileBase64", fileEntryBuilder.build(), testFileEntry, httpMethod,
 			null, objectDefinition, objectFieldName);
-	}
-
-	private void _testPatchPutCustomObjectEntryWithAttachmentField(
-			Function<com.liferay.object.rest.dto.v1_0.FileEntry, JSONObject>
-				expectedJSONObjectFunction,
-			String expectedMissingFieldName,
-			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry1,
-			com.liferay.object.rest.dto.v1_0.FileEntry fileEntry2,
-			Http.Method httpMethod, String nestedFields,
-			ObjectDefinition objectDefinition, String objectFieldName)
-		throws Exception {
-
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			JSONUtil.put(
-				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
-			).put(
-				objectFieldName,
-				JSONFactoryUtil.createJSONObject(fileEntry1.toString())
-			).toString(),
-			_getEndpoint(TestPropsValues.getGroupId(), objectDefinition),
-			Http.Method.POST);
-
-		String endpoint =
-			objectDefinition.getRESTContextPath() + "/" +
-				jsonObject.getLong("id");
-
-		if (nestedFields != null) {
-			endpoint = StringBundler.concat(
-				endpoint, "?nestedFields=", objectFieldName, ".", nestedFields);
-		}
-
-		jsonObject = HTTPTestUtil.invokeToJSONObject(
-			JSONUtil.put(
-				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
-			).put(
-				objectFieldName,
-				JSONFactoryUtil.createJSONObject(fileEntry2.toString())
-			).put(
-				"id", jsonObject.getLong("id")
-			).toString(),
-			endpoint, httpMethod);
-
-		JSONAssert.assertEquals(
-			String.valueOf(expectedJSONObjectFunction.apply(fileEntry2)),
-			jsonObject.toString(), JSONCompareMode.LENIENT);
-
-		if (expectedMissingFieldName != null) {
-			JSONObject attachmentJSONObject = jsonObject.getJSONObject(
-				objectFieldName);
-
-			Assert.assertNull(
-				attachmentJSONObject.get(expectedMissingFieldName));
-		}
 	}
 
 	private void _testPostCustomObjectEntryWithAttachmentField(
