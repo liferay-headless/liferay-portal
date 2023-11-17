@@ -135,12 +135,24 @@ definition {
 	macro deleteAllAPIApplication() {
 		var getAPIApplicationList = ApplicationAPI.getAPIApplications();
 
-		var aPIApplicationIdList = JSONPathUtil.getProperty(
-			property = "$.items[*].id",
+		var totalCount = JSONPathUtil.getProperty(
+			property = "$.totalCount",
 			response = ${getAPIApplicationList});
 
-		for (var aPIApplicationIdList : list ${aPIApplicationIdList}) {
-			ApplicationAPI.deleteAPIApplicationById(aPIApplicationId = ${aPIApplicationIdList});
+		while (${totalCount} != 0) {
+			var aPIApplicationIdList = JSONPathUtil.getProperty(
+				property = "$.items[*].id",
+				response = ${getAPIApplicationList});
+
+			for (var aPIApplicationIdList : list ${aPIApplicationIdList}) {
+				ApplicationAPI.deleteAPIApplicationById(aPIApplicationId = ${aPIApplicationIdList});
+			}
+
+			var getAPIApplicationList = ApplicationAPI.getAPIApplications();
+
+			var totalCount = JSONPathUtil.getProperty(
+				property = "$.totalCount",
+				response = ${getAPIApplicationList});
 		}
 	}
 
