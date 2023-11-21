@@ -163,19 +163,15 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 				return;
 			}
 
-			long userId = PrincipalThreadLocal.getUserId();
-
-			if (userId == 0) {
-				userId = _getUserId(baseModel);
-			}
-
-			JSONObject payloadJSONObject = _getPayloadJSONObject(
-				objectActionTriggerKey, objectDefinition, originalBaseModel,
-				baseModel, userId);
+			long userId = _getUserId(baseModel);
 
 			_objectActionEngine.executeObjectActions(
 				_modelClass.getName(), _getCompanyId(baseModel),
-				objectActionTriggerKey, () -> payloadJSONObject, userId);
+				objectActionTriggerKey,
+				() -> _getPayloadJSONObject(
+					objectActionTriggerKey, objectDefinition, originalBaseModel,
+					baseModel, userId),
+				userId);
 		}
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
@@ -264,6 +260,12 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 	}
 
 	private long _getUserId(T baseModel) {
+		long userId = PrincipalThreadLocal.getUserId();
+
+		if (userId != 0) {
+			return userId;
+		}
+
 		Map<String, Function<Object, Object>> functions =
 			(Map<String, Function<Object, Object>>)
 				(Map<String, ?>)baseModel.getAttributeGetterFunctions();
@@ -389,11 +391,7 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 				return;
 			}
 
-			long userId = PrincipalThreadLocal.getUserId();
-
-			if (userId == 0) {
-				userId = _getUserId(model);
-			}
+			long userId = _getUserId(model);
 
 			_validateReadOnlyObjectFields(
 				originalModel, model, objectDefinition);
