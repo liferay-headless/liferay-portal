@@ -7,6 +7,8 @@ package com.liferay.object.action.engine;
 
 import com.liferay.portal.kernel.json.JSONObject;
 
+import java.util.function.Supplier;
+
 /**
  * @author Marco Leo
  * @author Brian Wing Shun Chan
@@ -20,6 +22,6 @@ public interface ObjectActionEngine {
 
 	public void executeObjectActions(
 		String className, long companyId, String objectActionTriggerKey,
-		JSONObject payloadJSONObject, long userId);
+		Supplier<JSONObject> payloadJSONObjectSupplier, long userId);
 
 }

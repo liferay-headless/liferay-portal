@@ -42,8 +42,10 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -89,7 +91,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 	@Override
 	public void executeObjectActions(
 		String className, long companyId, String objectActionTriggerKey,
-		JSONObject payloadJSONObject, long userId) {
+		Supplier<JSONObject> payloadJSONObjectSupplier, long userId) {
 
 		if ((companyId == 0) || (userId == 0)) {
 			return;
@@ -109,6 +111,15 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			return;
 		}
 
+		List<ObjectAction> objectActions =
+			_objectActionLocalService.getObjectActions(
+				objectDefinition.getObjectDefinitionId(),
+				objectActionTriggerKey);
+
+		if (objectActions.isEmpty()) {
+			return;
+		}
+
 		String name = PrincipalThreadLocal.getName();
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -122,6 +133,8 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			PermissionThreadLocal.setPermissionChecker(
 				_permissionCheckerFactory.create(user));
 
+			JSONObject payloadJSONObject = payloadJSONObjectSupplier.get();
+
 			_updatePayloadJSONObject(objectDefinition, payloadJSONObject, user);
 
 			Map<String, Object> variables =
@@ -129,11 +142,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 					_systemObjectDefinitionManagerRegistry);
 
-			for (ObjectAction objectAction :
-					_objectActionLocalService.getObjectActions(
-						objectDefinition.getObjectDefinitionId(),
-						objectActionTriggerKey)) {
-
+			for (ObjectAction objectAction : objectActions) {
 				try {
 					_executeObjectAction(
 						objectAction, objectDefinition, payloadJSONObject,
