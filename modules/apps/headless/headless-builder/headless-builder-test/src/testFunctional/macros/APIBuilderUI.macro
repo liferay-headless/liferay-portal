@@ -198,6 +198,13 @@ definition {
 				locator1 = "ObjectAdmin#LAYOUT_ADD_FIELD_OPTION");
 		}
 
+		if (isSet(description)) {
+			Type(
+				key_value = "endpoint",
+				locator1 = "APIBuilder#DESCRIPTION",
+				value1 = ${description});
+		}
+
 		Type(
 			key_fieldLabel = "Path",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
