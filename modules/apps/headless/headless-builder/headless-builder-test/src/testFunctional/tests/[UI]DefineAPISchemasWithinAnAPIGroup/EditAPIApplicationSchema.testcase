@@ -1,0 +1,248 @@
+@component-name = "portal-headless"
+definition {
+
+	property custom.properties = "feature.flag.LPS-178642=true";
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.component.names = "Object";
+	property testray.main.component.name = "Headless Builder";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+	}
+
+	tearDown {
+		ApplicationAPI.deleteAllAPIApplication();
+
+		JSONObject.deleteAllCustomObjects(pageSize = 21);
+
+		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+
+		if (${testLiferayVirtualInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+	}
+
+	@priority = 4
+	test CanEditSchemaNameAndDescriptionInPublishedAPIApplication {
+		property portal.acceptance = "true";
+
+		task ("Given New API Application created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "my-app",
+				title = "My-app");
+
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Schemas",
+				title = "My-app");
+		}
+
+		task ("And Given create an published API application with related schema") {
+			APIBuilderUI.createAPISchema(
+				confirmCreation = "true",
+				fieldDescription = "Description default",
+				name = "testSchema",
+				objectDefinitionName = "APIApplication");
+
+			Alert.viewSuccessMessage();
+
+			Click(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			Type(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+
+		task ("When I publish changed name and description") {
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("Then I can see success alert message about API schema changes were published") {
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Then I can see updated name and description in Info tab") {
+			AssertElementPresent(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			AssertElementPresent(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+	}
+
+	@priority = 4
+	test CanEditSchemaNameAndDescriptionInUnpublishedAPIApplication {
+		property portal.acceptance = "true";
+
+		task ("Given New API Application created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "my-app",
+				title = "My-app");
+
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Schemas",
+				title = "My-app");
+		}
+
+		task ("And Given create an published API application with related schema") {
+			APIBuilderUI.createAPISchema(
+				confirmCreation = "true",
+				fieldDescription = "Description default",
+				name = "testSchema",
+				objectDefinitionName = "APIApplication");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			Type(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+
+		task ("When I save changed name and description") {
+			Button.clickSave();
+		}
+
+		task ("Then I can see success alert message about API schema changes were saved") {
+			Alert.viewSuccessMessage();
+		}
+
+		task ("And Then I can see updated name and description in Info tab") {
+			AssertElementPresent(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			AssertElementPresent(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+	}
+
+	@priority = 3
+	test CanGoBackToSchemasListWithCancelEdit {
+		property portal.acceptance = "true";
+
+		task ("Given New API Application created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "my-app",
+				title = "My-app");
+
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Schemas",
+				title = "My-app");
+		}
+
+		task ("And Given create an published API application with related schema") {
+			APIBuilderUI.createAPISchema(
+				confirmCreation = "true",
+				fieldDescription = "Description default",
+				name = "testSchema",
+				objectDefinitionName = "APIApplication");
+
+			Alert.viewSuccessMessage();
+
+			Click(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			Type(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+
+		task ("When I click Cancel button without any changes") {
+			Button.clickCancel();
+
+			Click(locator1 = "APIBuilder#CONTINUE_WITHOUT_SAVING_BUTTON");
+		}
+
+		task ("Then I can see the schema under Edit API Application > Schemas") {
+			AssertElementPresent(
+				key_name = "testSchema",
+				locator1 = "ObjectAdmin#TABLE_LIST_TITLE");
+
+			AssertElementPresent(
+				key_tabName = "Description default",
+				locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
+		}
+	}
+
+	@priority = 4
+	test CannotEditSchemaRelatedObject {
+		property portal.acceptance = "true";
+
+		task ("Given New API Application created") {
+			ApplicationAPI.createAPIApplication(
+				baseURL = "my-app",
+				title = "My-app");
+
+			APIBuilderUI.switchToRelatedEntryInEditApplication(
+				entity = "Schemas",
+				title = "My-app");
+		}
+
+		task ("And Given create an published API application with related schema") {
+			APIBuilderUI.createAPISchema(
+				confirmCreation = "true",
+				fieldDescription = "Description default",
+				name = "testSchema",
+				objectDefinitionName = "APIApplication");
+
+			Alert.viewSuccessMessage();
+
+			Click(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("And Given edit the schema in Edit API Application > Schemas") {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+
+			Type(
+				key_fieldId = "Description",
+				locator1 = "TextArea#ANY_ID",
+				value1 = "Description edited");
+		}
+
+		task ("When I publish changed name and description") {
+			Click.pauseClickAt(locator1 = "APIBuilder#PUBLISH_BUTTON");
+		}
+
+		task ("Then I can see the value for Object is the correct one") {
+			AssertElementPresent(
+				locator1 = "TextInput#NAME",
+				value1 = "testSchema edited");
+		}
+
+		task ("And Then the related object is not able to change") {
+			AssertElementPresent(
+				key_text = "APIApplication",
+				locator1 = "Button#ANY_DISABLED");
+		}
+	}
+
+}
