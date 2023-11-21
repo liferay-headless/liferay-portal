@@ -169,13 +169,13 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 				userId = _getUserId(baseModel);
 			}
 
+			JSONObject payloadJSONObject = _getPayloadJSONObject(
+				objectActionTriggerKey, objectDefinition, originalBaseModel,
+				baseModel, userId);
+
 			_objectActionEngine.executeObjectActions(
 				_modelClass.getName(), _getCompanyId(baseModel),
-				objectActionTriggerKey,
-				_getPayloadJSONObject(
-					objectActionTriggerKey, objectDefinition, originalBaseModel,
-					baseModel, userId),
-				userId);
+				objectActionTriggerKey, () -> payloadJSONObject, userId);
 		}
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
