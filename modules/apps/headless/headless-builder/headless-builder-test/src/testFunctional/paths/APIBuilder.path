@@ -197,7 +197,7 @@
 </tr>
 <tr>
 	<td>WARNING_MESSAGE_IN_DIALOG</td>
-	<td>//div[@class='form-feedback-item mt-2' and contains(text(),'${key_text}')]</td>
+	<td>//div[@class='form-feedback-item mt-2' and contains(.,'${key_text}')]</td>
 	<td></td>
 </tr>
 </tbody>
