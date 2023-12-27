@@ -286,6 +286,15 @@ public class InstanceInitializerCheck extends BaseCheck {
 				continue;
 			}
 
+			DetailAST firstGrandChildDetailAST =
+				firstChildDetailAST.getFirstChild();
+
+			if ((firstGrandChildDetailAST != null) &&
+				(firstGrandChildDetailAST.getType() == TokenTypes.METHOD_REF)) {
+
+				continue;
+			}
+
 			String variableName = StringUtil.lowerCaseFirstLetter(
 				methodName.substring(3));
 
