@@ -7,6 +7,7 @@ package com.liferay.source.formatter.checkstyle.check;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.source.formatter.check.util.BNDSourceUtil;
@@ -160,41 +161,22 @@ public class InstanceInitializerCheck extends BaseCheck {
 	private void _checkHasReplacableMethodSignature(
 		DetailAST detailAST, String methodName, JavaClass javaClass) {
 
-		for (JavaTerm javaTerm : javaClass.getChildJavaTerms()) {
-			if (!javaTerm.isJavaMethod() || javaTerm.isPrivate()) {
-				continue;
-			}
+		JavaMethod javaMethod = _getUnsafeSupplierSetMethod(
+			javaClass, methodName);
 
-			JavaMethod javaMethod = (JavaMethod)javaTerm;
+		if (javaMethod == null) {
+			return;
+		}
 
-			if (!StringUtil.equals(methodName, javaMethod.getName())) {
-				continue;
-			}
+		if (detailAST.getType() == TokenTypes.METHOD_CALL) {
+			log(detailAST, _MSG_INLINE_IF_STATEMENT, methodName);
+		}
+		else {
+			JavaParameter javaParameter = _getFirstJavaParameter(javaMethod);
 
-			JavaSignature javaSignature = javaMethod.getSignature();
-
-			List<JavaParameter> javaParameters = javaSignature.getParameters();
-
-			if (javaParameters.size() != 1) {
-				continue;
-			}
-
-			JavaParameter javaParameter = javaParameters.get(0);
-
-			String parameterType = javaParameter.getParameterType();
-
-			if (parameterType.startsWith("UnsafeSupplier")) {
-				if (detailAST.getType() == TokenTypes.METHOD_CALL) {
-					log(detailAST, _MSG_INLINE_IF_STATEMENT, methodName);
-				}
-				else {
-					log(
-						detailAST, _MSG_USE_SET_METHOD_INSTEAD, methodName,
-						parameterType);
-				}
-
-				return;
-			}
+			log(
+				detailAST, _MSG_USE_SET_METHOD_INSTEAD, methodName,
+				javaParameter.getParameterType());
 		}
 	}
 
@@ -253,41 +235,20 @@ public class InstanceInitializerCheck extends BaseCheck {
 		String methodName =
 			"set" + StringUtil.upperCaseFirstLetter(getName(detailAST));
 
-		for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
-			if (!childJavaTerm.isJavaMethod()) {
-				continue;
-			}
+		JavaMethod javaMethod = _getUnsafeSupplierSetMethod(
+			javaClass, methodName);
 
-			JavaMethod javaMethod = (JavaMethod)childJavaTerm;
-
-			if (!StringUtil.equals(javaMethod.getName(), methodName)) {
-				continue;
-			}
-
-			JavaSignature javaSignature = javaMethod.getSignature();
-
-			List<JavaParameter> javaParameters = javaSignature.getParameters();
-
-			if (javaParameters.size() != 1) {
-				continue;
-			}
-
-			JavaParameter javaParameter = javaParameters.get(0);
-
-			if (!StringUtil.startsWith(
-					javaParameter.getParameterType(), "UnsafeSupplier<")) {
-
-				continue;
-			}
-
-			log(
-				getStartLineNumber(detailAST),
-				_MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD, methodName,
-				javaParameter.getParameterType() + " " +
-					javaParameter.getParameterName());
-
-			break;
+		if (javaMethod == null) {
+			return;
 		}
+
+		JavaParameter javaParameter = _getFirstJavaParameter(javaMethod);
+
+		log(
+			getStartLineNumber(detailAST), _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD,
+			methodName,
+			javaParameter.getParameterType() + " " +
+				javaParameter.getParameterName());
 	}
 
 	private void _checkSetCall(
@@ -348,68 +309,44 @@ public class InstanceInitializerCheck extends BaseCheck {
 		String variableName = StringUtil.lowerCaseFirstLetter(
 			methodName.substring(3));
 
+		JavaMethod javaMethod = _getUnsafeSupplierSetMethod(
+			javaClass, methodName);
+
+		if (javaMethod != null) {
+			JavaParameter javaParameter = _getFirstJavaParameter(javaMethod);
+
+			log(
+				getStartLineNumber(detailAST),
+				_MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD, methodName,
+				javaParameter.getParameterType() + " " +
+					javaParameter.getParameterName());
+
+			return;
+		}
+
+		List<String> names = getNames(detailAST, true);
+
+		if (names.contains(variableName)) {
+			return;
+		}
+
 		Pattern pattern = Pattern.compile(
 			"\\s(\\S+)\\s+(\\S+\\.)?" + variableName);
 
-		JavaParameter javaParameter = null;
-		JavaTerm javaTerm = null;
-
-		for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
-			if (childJavaTerm.isJavaMethod()) {
-				JavaMethod javaMethod = (JavaMethod)childJavaTerm;
-
-				if (!StringUtil.equals(javaMethod.getName(), methodName)) {
-					continue;
-				}
-
-				JavaSignature javaSignature = javaMethod.getSignature();
-
-				List<JavaParameter> javaParameters =
-					javaSignature.getParameters();
-
-				if (javaParameters.size() != 1) {
-					continue;
-				}
-
-				JavaParameter firstJavaParameter = javaParameters.get(0);
-
-				if (!StringUtil.startsWith(
-						firstJavaParameter.getParameterType(),
-						"UnsafeSupplier<")) {
-
-					continue;
-				}
-
-				javaParameter = firstJavaParameter;
-			}
-			else if (childJavaTerm.isJavaVariable() &&
-					 !childJavaTerm.isPrivate()) {
-
-				Matcher matcher = pattern.matcher(childJavaTerm.getContent());
-
-				if (matcher.find()) {
-					javaTerm = childJavaTerm;
-				}
-			}
-		}
-
-		if (javaParameter != null) {
-			log(
-				startLineNumber, _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD,
-				methodName,
-				javaParameter.getParameterType() + " " +
-					javaParameter.getParameterName());
-		}
-		else if (javaTerm != null) {
-			List<String> names = getNames(detailAST, true);
-
-			if (names.contains(variableName)) {
-				return;
+		for (JavaTerm javaTerm : javaClass.getChildJavaTerms()) {
+			if (!javaTerm.isJavaVariable() || javaTerm.isPrivate()) {
+				continue;
 			}
 
-			log(
-				startLineNumber, _MSG_USE_ASSIGN_INSTEAD, javaTerm.getName(),
-				methodName);
+			Matcher matcher = pattern.matcher(javaTerm.getContent());
+
+			if (matcher.find()) {
+				log(
+					startLineNumber, _MSG_USE_ASSIGN_INSTEAD,
+					javaTerm.getName(), methodName);
+
+				break;
+			}
 		}
 	}
 
@@ -422,6 +359,22 @@ public class InstanceInitializerCheck extends BaseCheck {
 		}
 
 		return _bundleSymbolicNamesMap;
+	}
+
+	private JavaParameter _getFirstJavaParameter(JavaMethod javaMethod) {
+		JavaSignature javaSignature = javaMethod.getSignature();
+
+		if (javaSignature == null) {
+			return null;
+		}
+
+		List<JavaParameter> javaParameters = javaSignature.getParameters();
+
+		if (ListUtil.isEmpty(javaParameters)) {
+			return null;
+		}
+
+		return javaParameters.get(0);
 	}
 
 	private JavaClass _getJavaClass(
@@ -469,6 +422,35 @@ public class InstanceInitializerCheck extends BaseCheck {
 		_rootDirName = SourceUtil.getRootDirName(absolutePath);
 
 		return _rootDirName;
+	}
+
+	private JavaMethod _getUnsafeSupplierSetMethod(
+		JavaClass javaClass, String methodName) {
+
+		for (JavaTerm javaTerm : javaClass.getChildJavaTerms()) {
+			if (!javaTerm.isJavaMethod()) {
+				continue;
+			}
+
+			JavaMethod javaMethod = (JavaMethod)javaTerm;
+
+			if (!StringUtil.equals(javaMethod.getName(), methodName)) {
+				continue;
+			}
+
+			JavaParameter javaParameter = _getFirstJavaParameter(javaMethod);
+
+			if ((javaParameter == null) ||
+				!StringUtil.startsWith(
+					javaParameter.getParameterType(), "UnsafeSupplier<")) {
+
+				continue;
+			}
+
+			return javaMethod;
+		}
+
+		return null;
 	}
 
 	private static final String _MSG_INCORRECT_ASSIGN_ORDER =
