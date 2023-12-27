@@ -1,7 +1,69 @@
 ## InstanceInitializerCheck
 
-Directly assign value to a variable instead of using set call
-when possible:
+Use set call with UnsafeSupplier argument instead of using set call with
+a different parameter when possible:
+
+```java
+private ObjectDefinition _toObjectDefinition(
+    com.liferay.object.model.ObjectDefinition objectDefinition) {
+
+    return new ObjectDefinition() {
+        {
+            setAccountEntryRestricted(
+                objectDefinition::isAccountEntryRestricted);
+        }
+    };
+}
+```
+
+Instead of
+
+```java
+private ObjectDefinition _toObjectDefinition(
+	com.liferay.object.model.ObjectDefinition objectDefinition) {
+
+    return new ObjectDefinition() {
+        {
+            setAccountEntryRestricted(
+                objectDefinition.isAccountEntryRestricted());
+        }
+    };
+}
+```
+
+Use set call with UnsafeSupplier argument instead of assigning a direct value
+to a variable when possible:
+
+```java
+private ObjectDefinition _toObjectDefinition(
+    com.liferay.object.model.ObjectDefinition objectDefinition) {
+
+    return new ObjectDefinition() {
+        {
+            setAccountEntryRestricted(
+                objectDefinition::isAccountEntryRestricted);
+        }
+    };
+}
+```
+
+Instead of
+
+```java
+private ObjectDefinition _toObjectDefinition(
+	com.liferay.object.model.ObjectDefinition objectDefinition) {
+
+    return new ObjectDefinition() {
+        {
+            setAccountEntryRestricted(
+                objectDefinition.isAccountEntryRestricted());
+        }
+    };
+}
+```
+
+Directly assign value to a variable instead of using set call (with an argument
+different from the UnsafeSupplier) when possible:
 
 ```java
 private ObjectDefinition _toObjectDefinition(
