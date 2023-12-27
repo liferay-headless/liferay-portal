@@ -249,6 +249,47 @@ public class InstanceInitializerCheck extends BaseCheck {
 		}
 	}
 
+	private void _checkSetAssignCall(DetailAST detailAST, JavaClass javaClass) {
+		String methodName =
+			"set" + StringUtil.upperCaseFirstLetter(getName(detailAST));
+
+		for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
+			if (!childJavaTerm.isJavaMethod()) {
+				continue;
+			}
+
+			JavaMethod javaMethod = (JavaMethod)childJavaTerm;
+
+			if (!StringUtil.equals(javaMethod.getName(), methodName)) {
+				continue;
+			}
+
+			JavaSignature javaSignature = javaMethod.getSignature();
+
+			List<JavaParameter> javaParameters = javaSignature.getParameters();
+
+			if (javaParameters.size() != 1) {
+				continue;
+			}
+
+			JavaParameter javaParameter = javaParameters.get(0);
+
+			if (!StringUtil.startsWith(
+					javaParameter.getParameterType(), "UnsafeSupplier<")) {
+
+				continue;
+			}
+
+			log(
+				getStartLineNumber(detailAST),
+				_MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD, methodName,
+				javaParameter.getParameterType() + " " +
+					javaParameter.getParameterName());
+
+			break;
+		}
+	}
+
 	private void _checkSetCall(
 		DetailAST detailAST, List<DetailAST> exprDetailASTList,
 		JavaClass javaClass) {
@@ -256,112 +297,119 @@ public class InstanceInitializerCheck extends BaseCheck {
 		for (DetailAST exprDetailAST : exprDetailASTList) {
 			DetailAST firstChildDetailAST = exprDetailAST.getFirstChild();
 
-			if (firstChildDetailAST.getType() != TokenTypes.METHOD_CALL) {
-				continue;
+			if (firstChildDetailAST.getType() == TokenTypes.ASSIGN) {
+				_checkSetAssignCall(firstChildDetailAST, javaClass);
 			}
-
-			DetailAST dotDetailAST = firstChildDetailAST.findFirstToken(
-				TokenTypes.DOT);
-
-			if (dotDetailAST != null) {
-				continue;
+			else if (firstChildDetailAST.getType() == TokenTypes.METHOD_CALL) {
+				_checkSetMethodCall(detailAST, firstChildDetailAST, javaClass);
 			}
+		}
+	}
 
-			int startLineNumber = getStartLineNumber(firstChildDetailAST);
+	private void _checkSetMethodCall(
+		DetailAST detailAST, DetailAST firstChildDetailAST,
+		JavaClass javaClass) {
 
-			String methodName = getMethodName(firstChildDetailAST);
+		DetailAST dotDetailAST = firstChildDetailAST.findFirstToken(
+			TokenTypes.DOT);
 
-			if (!methodName.matches("set[A-Z]\\w*")) {
-				continue;
-			}
+		if (dotDetailAST != null) {
+			return;
+		}
 
-			DetailAST elistDetailAST = firstChildDetailAST.findFirstToken(
-				TokenTypes.ELIST);
+		int startLineNumber = getStartLineNumber(firstChildDetailAST);
 
-			firstChildDetailAST = elistDetailAST.getFirstChild();
+		String methodName = getMethodName(firstChildDetailAST);
 
-			if ((firstChildDetailAST == null) ||
-				(firstChildDetailAST.getType() != TokenTypes.EXPR)) {
+		if (!methodName.matches("set[A-Z]\\w*")) {
+			return;
+		}
 
-				continue;
-			}
+		DetailAST elistDetailAST = firstChildDetailAST.findFirstToken(
+			TokenTypes.ELIST);
 
-			DetailAST firstGrandChildDetailAST =
-				firstChildDetailAST.getFirstChild();
+		firstChildDetailAST = elistDetailAST.getFirstChild();
 
-			if ((firstGrandChildDetailAST != null) &&
-				(firstGrandChildDetailAST.getType() == TokenTypes.METHOD_REF)) {
+		if ((firstChildDetailAST == null) ||
+			(firstChildDetailAST.getType() != TokenTypes.EXPR)) {
 
-				continue;
-			}
+			return;
+		}
 
-			String variableName = StringUtil.lowerCaseFirstLetter(
-				methodName.substring(3));
+		DetailAST firstGrandChildDetailAST =
+			firstChildDetailAST.getFirstChild();
 
-			Pattern pattern = Pattern.compile(
-				"\\s(\\S+)\\s+(\\S+\\.)?" + variableName);
+		if ((firstGrandChildDetailAST != null) &&
+			(firstGrandChildDetailAST.getType() == TokenTypes.METHOD_REF)) {
 
-			JavaParameter javaParameter = null;
-			JavaTerm javaTerm = null;
+			return;
+		}
 
-			for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
-				if (childJavaTerm.isJavaMethod()) {
-					JavaMethod javaMethod = (JavaMethod)childJavaTerm;
+		String variableName = StringUtil.lowerCaseFirstLetter(
+			methodName.substring(3));
 
-					if (!StringUtil.equals(javaMethod.getName(), methodName)) {
-						continue;
-					}
+		Pattern pattern = Pattern.compile(
+			"\\s(\\S+)\\s+(\\S+\\.)?" + variableName);
 
-					JavaSignature javaSignature = javaMethod.getSignature();
+		JavaParameter javaParameter = null;
+		JavaTerm javaTerm = null;
 
-					List<JavaParameter> javaParameters =
-						javaSignature.getParameters();
+		for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
+			if (childJavaTerm.isJavaMethod()) {
+				JavaMethod javaMethod = (JavaMethod)childJavaTerm;
 
-					if (javaParameters.size() != 1) {
-						continue;
-					}
-
-					JavaParameter firstJavaParameter = javaParameters.get(0);
-
-					if (!StringUtil.startsWith(
-							firstJavaParameter.getParameterType(),
-							"UnsafeSupplier<")) {
-
-						continue;
-					}
-
-					javaParameter = firstJavaParameter;
-				}
-				else if (childJavaTerm.isJavaVariable() &&
-						 !childJavaTerm.isPrivate()) {
-
-					Matcher matcher = pattern.matcher(
-						childJavaTerm.getContent());
-
-					if (matcher.find()) {
-						javaTerm = childJavaTerm;
-					}
-				}
-			}
-
-			if (javaParameter != null) {
-				log(
-					startLineNumber, _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD,
-					methodName,
-					javaParameter.getParameterType() + " " +
-						javaParameter.getParameterName());
-			}
-			else if (javaTerm != null) {
-				List<String> names = getNames(detailAST, true);
-
-				if (names.contains(variableName)) {
+				if (!StringUtil.equals(javaMethod.getName(), methodName)) {
 					continue;
 				}
 
-				log(
-					startLineNumber, _MSG_USE_ASSIGN_INSTEAD,
-					javaTerm.getName(), methodName);
+				JavaSignature javaSignature = javaMethod.getSignature();
+
+				List<JavaParameter> javaParameters =
+					javaSignature.getParameters();
+
+				if (javaParameters.size() != 1) {
+					continue;
+				}
+
+				JavaParameter firstJavaParameter = javaParameters.get(0);
+
+				if (!StringUtil.startsWith(
+						firstJavaParameter.getParameterType(),
+						"UnsafeSupplier<")) {
+
+					continue;
+				}
+
+				javaParameter = firstJavaParameter;
 			}
+			else if (childJavaTerm.isJavaVariable() &&
+					 !childJavaTerm.isPrivate()) {
+
+				Matcher matcher = pattern.matcher(childJavaTerm.getContent());
+
+				if (matcher.find()) {
+					javaTerm = childJavaTerm;
+				}
+			}
+		}
+
+		if (javaParameter != null) {
+			log(
+				startLineNumber, _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD,
+				methodName,
+				javaParameter.getParameterType() + " " +
+					javaParameter.getParameterName());
+		}
+		else if (javaTerm != null) {
+			List<String> names = getNames(detailAST, true);
+
+			if (names.contains(variableName)) {
+				return;
+			}
+
+			log(
+				startLineNumber, _MSG_USE_ASSIGN_INSTEAD, javaTerm.getName(),
+				methodName);
 		}
 	}
 
