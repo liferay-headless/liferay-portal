@@ -298,29 +298,69 @@ public class InstanceInitializerCheck extends BaseCheck {
 			String variableName = StringUtil.lowerCaseFirstLetter(
 				methodName.substring(3));
 
-			List<String> names = getNames(detailAST, true);
-
-			if (names.contains(variableName)) {
-				continue;
-			}
-
 			Pattern pattern = Pattern.compile(
 				"\\s(\\S+)\\s+(\\S+\\.)?" + variableName);
 
-			for (JavaTerm javaTerm : javaClass.getChildJavaTerms()) {
-				if (!javaTerm.isJavaVariable() || javaTerm.isPrivate()) {
+			JavaParameter javaParameter = null;
+			JavaTerm javaTerm = null;
+
+			for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {
+				if (childJavaTerm.isJavaMethod()) {
+					JavaMethod javaMethod = (JavaMethod)childJavaTerm;
+
+					if (!StringUtil.equals(javaMethod.getName(), methodName)) {
+						continue;
+					}
+
+					JavaSignature javaSignature = javaMethod.getSignature();
+
+					List<JavaParameter> javaParameters =
+						javaSignature.getParameters();
+
+					if (javaParameters.size() != 1) {
+						continue;
+					}
+
+					JavaParameter firstJavaParameter = javaParameters.get(0);
+
+					if (!StringUtil.startsWith(
+							firstJavaParameter.getParameterType(),
+							"UnsafeSupplier<")) {
+
+						continue;
+					}
+
+					javaParameter = firstJavaParameter;
+				}
+				else if (childJavaTerm.isJavaVariable() &&
+						 !childJavaTerm.isPrivate()) {
+
+					Matcher matcher = pattern.matcher(
+						childJavaTerm.getContent());
+
+					if (matcher.find()) {
+						javaTerm = childJavaTerm;
+					}
+				}
+			}
+
+			if (javaParameter != null) {
+				log(
+					startLineNumber, _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD,
+					methodName,
+					javaParameter.getParameterType() + " " +
+						javaParameter.getParameterName());
+			}
+			else if (javaTerm != null) {
+				List<String> names = getNames(detailAST, true);
+
+				if (names.contains(variableName)) {
 					continue;
 				}
 
-				Matcher matcher = pattern.matcher(javaTerm.getContent());
-
-				if (matcher.find()) {
-					log(
-						startLineNumber, _MSG_USE_ASSIGN_INSTEAD,
-						javaTerm.getName(), methodName);
-
-					break;
-				}
+				log(
+					startLineNumber, _MSG_USE_ASSIGN_INSTEAD,
+					javaTerm.getName(), methodName);
 			}
 		}
 	}
@@ -399,6 +439,9 @@ public class InstanceInitializerCheck extends BaseCheck {
 
 	private static final String _MSG_USE_SET_METHOD_INSTEAD =
 		"set.method.use.instead";
+
+	private static final String _MSG_USE_UNSAFE_SUPPLIER_SET_INSTEAD =
+		"assign.use.unsafe.supplier.set.instead";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		InstanceInitializerCheck.class);
