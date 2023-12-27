@@ -232,6 +232,10 @@ public class InstanceInitializerCheck extends BaseCheck {
 	}
 
 	private void _checkSetAssignCall(DetailAST detailAST, JavaClass javaClass) {
+		if (_isTestModule(getAbsolutePath())) {
+			return;
+		}
+
 		String methodName =
 			"set" + StringUtil.upperCaseFirstLetter(getName(detailAST));
 
@@ -309,8 +313,11 @@ public class InstanceInitializerCheck extends BaseCheck {
 		String variableName = StringUtil.lowerCaseFirstLetter(
 			methodName.substring(3));
 
-		JavaMethod javaMethod = _getUnsafeSupplierSetMethod(
-			javaClass, methodName);
+		JavaMethod javaMethod = null;
+
+		if (!_isTestModule(getAbsolutePath())) {
+			javaMethod = _getUnsafeSupplierSetMethod(javaClass, methodName);
+		}
 
 		if (javaMethod != null) {
 			JavaParameter javaParameter = _getFirstJavaParameter(javaMethod);
@@ -451,6 +458,17 @@ public class InstanceInitializerCheck extends BaseCheck {
 		}
 
 		return null;
+	}
+
+	private boolean _isTestModule(String absolutePath) {
+		if (absolutePath.contains("/test/") ||
+			absolutePath.contains("/testIntegration/") ||
+			absolutePath.endsWith("Test.java")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final String _MSG_INCORRECT_ASSIGN_ORDER =
