@@ -443,12 +443,6 @@ public class NavigationMenuResourceImpl extends BaseNavigationMenuResourceImpl {
 	private NavigationMenu _toNavigationMenu(
 		SiteNavigationMenu siteNavigationMenu) {
 
-		Map<Long, List<SiteNavigationMenuItem>> siteNavigationMenuItemsMap =
-			_getSiteNavigationMenuItemsMap(
-				_siteNavigationMenuItemService.getSiteNavigationMenuItems(
-					siteNavigationMenu.getSiteNavigationMenuId(),
-					new SiteNavigationMenuItemOrderComparator()));
-
 		return new NavigationMenu() {
 			{
 				setActions(
@@ -475,12 +469,24 @@ public class NavigationMenuResourceImpl extends BaseNavigationMenuResourceImpl {
 				setId(siteNavigationMenu::getSiteNavigationMenuId);
 				setName(siteNavigationMenu::getName);
 				setNavigationMenuItems(
-					() -> transformToArray(
-						siteNavigationMenuItemsMap.getOrDefault(
-							0L, new ArrayList<>()),
-						siteNavigationMenuItem -> _toNavigationMenuItem(
-							siteNavigationMenuItem, siteNavigationMenuItemsMap),
-						NavigationMenuItem.class));
+					() -> {
+						Map<Long, List<SiteNavigationMenuItem>>
+							siteNavigationMenuItemsMap =
+								_getSiteNavigationMenuItemsMap(
+									_siteNavigationMenuItemService.
+										getSiteNavigationMenuItems(
+											siteNavigationMenu.
+												getSiteNavigationMenuId(),
+											new SiteNavigationMenuItemOrderComparator()));
+
+						return transformToArray(
+							siteNavigationMenuItemsMap.getOrDefault(
+								0L, new ArrayList<>()),
+							siteNavigationMenuItem -> _toNavigationMenuItem(
+								siteNavigationMenuItem,
+								siteNavigationMenuItemsMap),
+							NavigationMenuItem.class);
+					});
 				setNavigationType(
 					() -> {
 						if (siteNavigationMenu.getType() == 0) {
