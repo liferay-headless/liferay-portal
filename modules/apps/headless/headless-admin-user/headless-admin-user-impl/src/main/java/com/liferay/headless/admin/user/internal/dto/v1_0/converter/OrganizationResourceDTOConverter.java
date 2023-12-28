@@ -107,125 +107,21 @@ public class OrganizationResourceDTOConverter
 
 		return new Organization() {
 			{
-				actions = dtoConverterContext.getActions();
-				comment = organization.getComments();
-				customFields = CustomFieldsUtil.toCustomFields(
-					dtoConverterContext.isAcceptAllLanguages(),
-					com.liferay.portal.kernel.model.Organization.class.
-						getName(),
-					organization.getOrganizationId(),
-					organization.getCompanyId(),
-					dtoConverterContext.getLocale());
-				dateCreated = organization.getCreateDate();
-				dateModified = organization.getModifiedDate();
-				externalReferenceCode = organization.getExternalReferenceCode();
-				id = String.valueOf(organization.getOrganizationId());
-				keywords = ListUtil.toArray(
-					_assetTagLocalService.getTags(
-						organization.getModelClassName(),
-						organization.getOrganizationId()),
-					AssetTag.NAME_ACCESSOR);
-				location = new Location() {
-					{
-						setAddressCountry(
-							() -> {
-								if (organization.getCountryId() <= 0) {
-									return null;
-								}
-
-								Country country = _countryService.getCountry(
-									organization.getCountryId());
-
-								return country.getName(
-									dtoConverterContext.getLocale());
-							});
-						setAddressCountry_i18n(
-							() -> {
-								if (!dtoConverterContext.
-										isAcceptAllLanguages()) {
-
-									return null;
-								}
-
-								Map<String, String> countryNames =
-									new HashMap<>();
-
-								Country country = _countryService.getCountry(
-									organization.getCountryId());
-
-								for (Locale locale :
-										_language.getCompanyAvailableLocales(
-											organization.getCompanyId())) {
-
-									countryNames.put(
-										LocaleUtil.toBCP47LanguageId(locale),
-										country.getName());
-								}
-
-								return countryNames;
-							});
-						setAddressRegion(
-							() -> {
-								if (organization.getRegionId() <= 0) {
-									return null;
-								}
-
-								Region region = _regionService.getRegion(
-									organization.getRegionId());
-
-								return region.getName();
-							});
-					}
-				};
-				name = organization.getName();
-				numberOfAccounts =
-					_accountEntryOrganizationRelLocalService.
-						getAccountEntryOrganizationRelsCountByOrganizationId(
-							organization.getOrganizationId());
-				numberOfOrganizations =
-					_organizationService.getOrganizationsCount(
+				setActions(dtoConverterContext::getActions);
+				setComment(organization::getComments);
+				setCustomFields(
+					() -> CustomFieldsUtil.toCustomFields(
+						dtoConverterContext.isAcceptAllLanguages(),
+						com.liferay.portal.kernel.model.Organization.class.
+							getName(),
+						organization.getOrganizationId(),
 						organization.getCompanyId(),
-						organization.getOrganizationId());
-				numberOfUsers = _userService.getOrganizationUsersCount(
-					organization.getOrganizationId(),
-					WorkflowConstants.STATUS_ANY);
-				organizationContactInformation =
-					new OrganizationContactInformation() {
-						{
-							emailAddresses = TransformUtil.transformToArray(
-								_emailAddressService.getEmailAddresses(
-									organization.getModelClassName(),
-									organization.getOrganizationId()),
-								EmailAddressUtil::toEmailAddress,
-								EmailAddress.class);
-							postalAddresses = TransformUtil.transformToArray(
-								organization.getAddresses(),
-								address -> PostalAddressUtil.toPostalAddress(
-									dtoConverterContext.isAcceptAllLanguages(),
-									address, organization.getCompanyId(),
-									dtoConverterContext.getLocale()),
-								PostalAddress.class);
-							telephones = TransformUtil.transformToArray(
-								_phoneService.getPhones(
-									organization.getModelClassName(),
-									organization.getOrganizationId()),
-								PhoneUtil::toPhone, Phone.class);
-							webUrls = TransformUtil.transformToArray(
-								_websiteService.getWebsites(
-									organization.getModelClassName(),
-									organization.getOrganizationId()),
-								WebUrlUtil::toWebUrl, WebUrl.class);
-						}
-					};
-				parentOrganization = organizationResourceDTOConverter.toDTO(
-					dtoConverterContext, organization.getParentOrganization());
-				services = TransformUtil.transformToArray(
-					_orgLaborService.getOrgLabors(
-						organization.getOrganizationId()),
-					OrganizationResourceDTOConverter.this::_toService,
-					Service.class);
-				treePath = organization.getTreePath();
-
+						dtoConverterContext.getLocale()));
+				setDateCreated(organization::getCreateDate);
+				setDateModified(organization::getModifiedDate);
+				setExternalReferenceCode(
+					organization::getExternalReferenceCode);
+				setId(() -> String.valueOf(organization.getOrganizationId()));
 				setImage(
 					() -> {
 						if (organization.getLogoId() <= 0) {
@@ -234,6 +130,130 @@ public class OrganizationResourceDTOConverter
 
 						return organization.getLogoURL();
 					});
+				setKeywords(
+					() -> ListUtil.toArray(
+						_assetTagLocalService.getTags(
+							organization.getModelClassName(),
+							organization.getOrganizationId()),
+						AssetTag.NAME_ACCESSOR));
+				setLocation(
+					() -> new Location() {
+						{
+							setAddressCountry(
+								() -> {
+									if (organization.getCountryId() <= 0) {
+										return null;
+									}
+
+									Country country =
+										_countryService.getCountry(
+											organization.getCountryId());
+
+									return country.getName(
+										dtoConverterContext.getLocale());
+								});
+							setAddressCountry_i18n(
+								() -> {
+									if (!dtoConverterContext.
+											isAcceptAllLanguages()) {
+
+										return null;
+									}
+
+									Map<String, String> countryNames =
+										new HashMap<>();
+
+									Country country =
+										_countryService.getCountry(
+											organization.getCountryId());
+
+									for (Locale locale :
+											_language.
+												getCompanyAvailableLocales(
+													organization.
+														getCompanyId())) {
+
+										countryNames.put(
+											LocaleUtil.toBCP47LanguageId(
+												locale),
+											country.getName());
+									}
+
+									return countryNames;
+								});
+							setAddressRegion(
+								() -> {
+									if (organization.getRegionId() <= 0) {
+										return null;
+									}
+
+									Region region = _regionService.getRegion(
+										organization.getRegionId());
+
+									return region.getName();
+								});
+						}
+					});
+				setName(organization::getName);
+				setNumberOfAccounts(
+					() ->
+						_accountEntryOrganizationRelLocalService.
+							getAccountEntryOrganizationRelsCountByOrganizationId(
+								organization.getOrganizationId()));
+				setNumberOfOrganizations(
+					() -> _organizationService.getOrganizationsCount(
+						organization.getCompanyId(),
+						organization.getOrganizationId()));
+				setNumberOfUsers(
+					() -> _userService.getOrganizationUsersCount(
+						organization.getOrganizationId(),
+						WorkflowConstants.STATUS_ANY));
+				setOrganizationContactInformation(
+					() -> new OrganizationContactInformation() {
+						{
+							setEmailAddresses(
+								() -> TransformUtil.transformToArray(
+									_emailAddressService.getEmailAddresses(
+										organization.getModelClassName(),
+										organization.getOrganizationId()),
+									EmailAddressUtil::toEmailAddress,
+									EmailAddress.class));
+							setPostalAddresses(
+								() -> TransformUtil.transformToArray(
+									organization.getAddresses(),
+									address ->
+										PostalAddressUtil.toPostalAddress(
+											dtoConverterContext.
+												isAcceptAllLanguages(),
+											address,
+											organization.getCompanyId(),
+											dtoConverterContext.getLocale()),
+									PostalAddress.class));
+							setTelephones(
+								() -> TransformUtil.transformToArray(
+									_phoneService.getPhones(
+										organization.getModelClassName(),
+										organization.getOrganizationId()),
+									PhoneUtil::toPhone, Phone.class));
+							setWebUrls(
+								() -> TransformUtil.transformToArray(
+									_websiteService.getWebsites(
+										organization.getModelClassName(),
+										organization.getOrganizationId()),
+									WebUrlUtil::toWebUrl, WebUrl.class));
+						}
+					});
+				setParentOrganization(
+					() -> organizationResourceDTOConverter.toDTO(
+						dtoConverterContext,
+						organization.getParentOrganization()));
+				setServices(
+					() -> TransformUtil.transformToArray(
+						_orgLaborService.getOrgLabors(
+							organization.getOrganizationId()),
+						OrganizationResourceDTOConverter.this::_toService,
+						Service.class));
+				setTreePath(organization::getTreePath);
 			}
 		};
 	}
@@ -243,9 +263,9 @@ public class OrganizationResourceDTOConverter
 
 		return new HoursAvailable() {
 			{
-				closes = _formatHour(closeHour);
-				dayOfWeek = day;
-				opens = _formatHour(openHour);
+				setCloses(() -> _formatHour(closeHour));
+				setDayOfWeek(() -> day);
+				setOpens(() -> _formatHour(openHour));
 			}
 		};
 	}
@@ -275,30 +295,31 @@ public class OrganizationResourceDTOConverter
 
 		return new Service() {
 			{
-				hoursAvailable = new HoursAvailable[] {
-					_createHoursAvailable(
-						orgLabor.getSunClose(), "Sunday",
-						orgLabor.getSunOpen()),
-					_createHoursAvailable(
-						orgLabor.getMonClose(), "Monday",
-						orgLabor.getMonOpen()),
-					_createHoursAvailable(
-						orgLabor.getTueClose(), "Tuesday",
-						orgLabor.getTueOpen()),
-					_createHoursAvailable(
-						orgLabor.getWedClose(), "Wednesday",
-						orgLabor.getWedOpen()),
-					_createHoursAvailable(
-						orgLabor.getThuClose(), "Thursday",
-						orgLabor.getThuOpen()),
-					_createHoursAvailable(
-						orgLabor.getFriClose(), "Friday",
-						orgLabor.getFriOpen()),
-					_createHoursAvailable(
-						orgLabor.getSatClose(), "Saturday",
-						orgLabor.getSatOpen())
-				};
-				serviceType = listType.getName();
+				setHoursAvailable(
+					() -> new HoursAvailable[] {
+						_createHoursAvailable(
+							orgLabor.getSunClose(), "Sunday",
+							orgLabor.getSunOpen()),
+						_createHoursAvailable(
+							orgLabor.getMonClose(), "Monday",
+							orgLabor.getMonOpen()),
+						_createHoursAvailable(
+							orgLabor.getTueClose(), "Tuesday",
+							orgLabor.getTueOpen()),
+						_createHoursAvailable(
+							orgLabor.getWedClose(), "Wednesday",
+							orgLabor.getWedOpen()),
+						_createHoursAvailable(
+							orgLabor.getThuClose(), "Thursday",
+							orgLabor.getThuOpen()),
+						_createHoursAvailable(
+							orgLabor.getFriClose(), "Friday",
+							orgLabor.getFriOpen()),
+						_createHoursAvailable(
+							orgLabor.getSatClose(), "Saturday",
+							orgLabor.getSatOpen())
+					});
+				setServiceType(listType::getName);
 			}
 		};
 	}

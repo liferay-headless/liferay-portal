@@ -63,10 +63,10 @@ public class FieldResourceImpl extends BaseFieldResourceImpl {
 
 		return new Field() {
 			{
-				description = vulcanField.getDescription();
-				name = vulcanField.getName();
-				required = vulcanField.isRequired();
-				type = vulcanField.getType();
+				setDescription(vulcanField::getDescription);
+				setName(vulcanField::getName);
+				setRequired(vulcanField::isRequired);
+				setType(vulcanField::getType);
 			}
 		};
 	}
