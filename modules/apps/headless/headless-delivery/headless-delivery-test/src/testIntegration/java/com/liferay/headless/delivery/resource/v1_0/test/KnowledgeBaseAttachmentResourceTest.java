@@ -8,15 +8,18 @@ package com.liferay.headless.delivery.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseAttachment;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
+import com.liferay.headless.delivery.client.resource.v1_0.KnowledgeBaseAttachmentResource;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.File;
@@ -141,6 +144,45 @@ public class KnowledgeBaseAttachmentResourceTest
 					testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
 					prevKBArticle.getExternalReferenceCode(),
 					newKnowledgeBaseAttachment.getExternalReferenceCode()));
+	}
+
+	@Override
+	@Test
+	public void testPostKnowledgeBaseArticleKnowledgeBaseAttachment()
+		throws Exception {
+
+		super.testPostKnowledgeBaseArticleKnowledgeBaseAttachment();
+
+		KnowledgeBaseAttachment randomKnowledgeBaseAttachment =
+			randomKnowledgeBaseAttachment();
+
+		Map<String, File> multipartFiles = getMultipartFiles();
+
+		KnowledgeBaseAttachmentResource.Builder builder =
+			KnowledgeBaseAttachmentResource.builder();
+
+		KnowledgeBaseAttachmentResource knowledgeBaseAttachmentResource =
+			builder.authentication(
+				"test@liferay.com", "test"
+			).locale(
+				LocaleUtil.getDefault()
+			).header(
+				"Transfer-Encoding", "chunked"
+			).header(
+				HttpHeaders.CONTENT_TYPE,
+				"multipart/form-data; charset=utf-8; boundary=__MULTIPART_BOUNDARY__"
+			).build();
+
+		knowledgeBaseAttachmentResource.
+			postKnowledgeBaseArticleKnowledgeBaseAttachment(
+				testGetKnowledgeBaseArticleKnowledgeBaseAttachmentsPage_getKnowledgeBaseArticleId(),
+				randomKnowledgeBaseAttachment, multipartFiles);
+
+		assertEquals(
+			randomKnowledgeBaseAttachment, randomKnowledgeBaseAttachment);
+		assertValid(randomKnowledgeBaseAttachment);
+
+		assertValid(randomKnowledgeBaseAttachment, multipartFiles);
 	}
 
 	@Override
