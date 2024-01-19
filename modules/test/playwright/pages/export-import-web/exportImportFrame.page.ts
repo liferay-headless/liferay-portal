@@ -5,7 +5,7 @@
 
 // @ts-ignore
 
-import {Page, expect} from '@playwright/test';
+import {Page} from '@playwright/test';
 
 import {zipFolder} from '../../utils/util';
 
@@ -39,12 +39,10 @@ export class ExportImportFramePage {
 
 		await exportImportFrame.getByRole('button', {name: 'Continue'}).click();
 		await exportImportFrame.getByRole('button', {name: 'Import'}).click();
-		await expect(
-			exportImportFrame
-				.getByTestId('row')
-				.nth(0)
-				.locator('.background-task-status-successful')
-		).toBeVisible();
+		await frame.waitForSelector(
+			'[data-qa-id=row]:nth-of-type(1) .background-task-status-successful',
+			{state: 'visible'}
+		);
 	}
 
 	async close() {
