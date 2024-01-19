@@ -33,6 +33,13 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
+	async postObjectRelationship(data: DataObject, objectDefinitionId: number) {
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-relationships`,
+			data
+		);
+	}
+
 	async postObjectDefinition(data: DataObject) {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions`,
@@ -49,16 +56,34 @@ export class ObjectAdminApiHelper {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions`,
 			{
+				active: true,
 				externalReferenceCode: objectDefinitionExternalReferenceCode,
 				label: {
 					en_US: objectDefinitionExternalReferenceCode,
 				},
 				name: objectDefinitionExternalReferenceCode,
+				objectFields: [
+					{
+						DBType: 'String',
+						businessType: 'Text',
+						externalReferenceCode: 'textField',
+						indexed: true,
+						indexedAsKeyword: false,
+						indexedLanguageId: '',
+						label: {en_US: 'textField'},
+						listTypeDefinitionId: 0,
+						name: 'textField',
+						required: false,
+						system: false,
+						type: 'String',
+					},
+				],
 				objectFolderExternalReferenceCode,
 				pluralLabel: {
 					en_US: objectDefinitionExternalReferenceCode,
 				},
 				scope: 'company',
+				status: {code: 0},
 			}
 		);
 	}

@@ -26,4 +26,21 @@ export class ObjectApiHelper {
 			`${this.apiHelpers.baseUrl}/${applicationName}/scopes/${scopeKey}`
 		);
 	}
+
+	async postObjectDefinitionRandomObjectEntries(
+		applicationName: String,
+		fieldName: any,
+		fieldValue: String
+	) {
+		const data = {
+			[fieldName]: fieldValue,
+		};
+
+		return this.apiHelpers.postResponse(
+			`${this.apiHelpers.baseUrl}c/${
+				applicationName.toLowerCase() + 's'
+			}`,
+			data
+		);
+	}
 }
