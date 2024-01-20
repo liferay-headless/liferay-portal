@@ -101,9 +101,7 @@ test('can GET with API Filter', async ({apiHelpers}) => {
 	}
 
 	expect(
-		await apiHelpers.apiBuilder.getEndpointPage(
-			'c/test/path-endpoint'
-		)
+		await apiHelpers.apiBuilder.getEndpointPage('c/test/path-endpoint')
 	).toHaveItems([
 		{
 			textProperty: 'value5',

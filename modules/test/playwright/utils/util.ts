@@ -7,6 +7,32 @@ import * as os from 'node:os'; // eslint-disable-line @liferay/no-extraneous-dep
 import * as path from 'path';
 import {zip} from 'zip-a-folder';
 
+export function formatPlural(s: string): string {
+	if (!s) {
+		return s;
+	}
+	if (
+		s.endsWith(`ch`) ||
+		s.endsWith(`s`) ||
+		s.endsWith(`sh`) ||
+		s.endsWith(`x`) ||
+		s.endsWith(`z`)
+	) {
+		return s + `es`;
+	}
+	if (
+		s.endsWith(`y`) &&
+		!s.endsWith(`ay`) &&
+		!s.endsWith(`ey`) &&
+		!s.endsWith(`oy`) &&
+		!s.endsWith(`uy`)
+	) {
+		return s.substring(0, s.length - 1) + `ies`;
+	}
+
+	return s + `s`;
+}
+
 export function getRandomInt(): number {
 	return Math.floor(Math.random() * 9999999999);
 }
