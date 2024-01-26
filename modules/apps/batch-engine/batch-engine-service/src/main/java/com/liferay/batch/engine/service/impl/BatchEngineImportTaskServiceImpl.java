@@ -31,6 +31,25 @@ public class BatchEngineImportTaskServiceImpl
 	extends BatchEngineImportTaskServiceBaseImpl {
 
 	@Override
+	public BatchEngineImportTask getBatchEngineImportTask(Long importTaskId)
+		throws PortalException {
+
+		BatchEngineImportTask entry =
+			batchEngineImportTaskLocalService.getBatchEngineImportTask(
+				importTaskId);
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		if ((entry.getCompanyId() != permissionChecker.getCompanyId()) &&
+			!permissionChecker.isOmniadmin()) {
+
+			throw new PrincipalException();
+		}
+
+		return entry;
+	}
+
+	@Override
 	public List<BatchEngineImportTask> getBatchEngineImportTasks(
 			long companyId, int start, int end)
 		throws PortalException {
