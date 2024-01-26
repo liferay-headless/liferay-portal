@@ -31,6 +31,25 @@ public class BatchEngineExportTaskServiceImpl
 	extends BatchEngineExportTaskServiceBaseImpl {
 
 	@Override
+	public BatchEngineExportTask getBatchEngineExportTask(Long exportTaskId)
+		throws PortalException {
+
+		BatchEngineExportTask entry =
+			batchEngineExportTaskLocalService.getBatchEngineExportTask(
+				exportTaskId);
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		if ((entry.getCompanyId() != permissionChecker.getCompanyId()) &&
+			!permissionChecker.isOmniadmin()) {
+
+			throw new PrincipalException();
+		}
+
+		return entry;
+	}
+
+	@Override
 	public List<BatchEngineExportTask> getBatchEngineExportTasks(
 			long companyId, int start, int end)
 		throws PortalException {
