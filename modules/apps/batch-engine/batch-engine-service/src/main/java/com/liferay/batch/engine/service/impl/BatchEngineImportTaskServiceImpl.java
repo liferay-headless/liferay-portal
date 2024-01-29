@@ -32,7 +32,7 @@ public class BatchEngineImportTaskServiceImpl
 
 	@Override
 	public BatchEngineImportTask getBatchEngineImportTask(
-			Long batchEngineImportTaskId)
+			long batchEngineImportTaskId)
 		throws PortalException {
 
 		BatchEngineImportTask batchEngineImportTask =
