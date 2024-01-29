@@ -31,22 +31,24 @@ public class BatchEngineImportTaskServiceImpl
 	extends BatchEngineImportTaskServiceBaseImpl {
 
 	@Override
-	public BatchEngineImportTask getBatchEngineImportTask(Long importTaskId)
+	public BatchEngineImportTask getBatchEngineImportTask(
+			Long batchEngineImportTaskId)
 		throws PortalException {
 
-		BatchEngineImportTask entry =
+		BatchEngineImportTask batchEngineImportTask =
 			batchEngineImportTaskLocalService.getBatchEngineImportTask(
-				importTaskId);
+				batchEngineImportTaskId);
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if ((entry.getCompanyId() != permissionChecker.getCompanyId()) &&
+		if ((batchEngineImportTask.getCompanyId() !=
+				permissionChecker.getCompanyId()) &&
 			!permissionChecker.isOmniadmin()) {
 
 			throw new PrincipalException();
 		}
 
-		return entry;
+		return batchEngineImportTask;
 	}
 
 	@Override
