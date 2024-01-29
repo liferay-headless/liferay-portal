@@ -43,7 +43,7 @@ public class BatchEngineExportTaskServiceHttp {
 
 	public static com.liferay.batch.engine.model.BatchEngineExportTask
 			getBatchEngineExportTask(
-				HttpPrincipal httpPrincipal, Long exportTaskId)
+				HttpPrincipal httpPrincipal, long batchEngineExportTaskId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -53,7 +53,7 @@ public class BatchEngineExportTaskServiceHttp {
 				_getBatchEngineExportTaskParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, exportTaskId);
+				methodKey, batchEngineExportTaskId);
 
 			Object returnObj = null;
 
@@ -224,7 +224,7 @@ public class BatchEngineExportTaskServiceHttp {
 		BatchEngineExportTaskServiceHttp.class);
 
 	private static final Class<?>[] _getBatchEngineExportTaskParameterTypes0 =
-		new Class[] {Long.class};
+		new Class[] {long.class};
 	private static final Class<?>[] _getBatchEngineExportTasksParameterTypes1 =
 		new Class[] {long.class, int.class, int.class};
 	private static final Class<?>[] _getBatchEngineExportTasksParameterTypes2 =

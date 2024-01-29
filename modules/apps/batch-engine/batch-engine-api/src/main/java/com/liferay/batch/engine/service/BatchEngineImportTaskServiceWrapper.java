@@ -30,11 +30,11 @@ public class BatchEngineImportTaskServiceWrapper
 
 	@Override
 	public com.liferay.batch.engine.model.BatchEngineImportTask
-			getBatchEngineImportTask(Long importTaskId)
+			getBatchEngineImportTask(long batchEngineImportTaskId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _batchEngineImportTaskService.getBatchEngineImportTask(
-			importTaskId);
+			batchEngineImportTaskId);
 	}
 
 	@Override

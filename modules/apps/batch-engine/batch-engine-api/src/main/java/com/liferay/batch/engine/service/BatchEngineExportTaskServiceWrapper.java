@@ -30,11 +30,11 @@ public class BatchEngineExportTaskServiceWrapper
 
 	@Override
 	public com.liferay.batch.engine.model.BatchEngineExportTask
-			getBatchEngineExportTask(Long exportTaskId)
+			getBatchEngineExportTask(long batchEngineExportTaskId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _batchEngineExportTaskService.getBatchEngineExportTask(
-			exportTaskId);
+			batchEngineExportTaskId);
 	}
 
 	@Override

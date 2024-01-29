@@ -31,10 +31,10 @@ public class BatchEngineExportTaskServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.batch.engine.service.impl.BatchEngineExportTaskServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static BatchEngineExportTask getBatchEngineExportTask(
-			Long exportTaskId)
+			long batchEngineExportTaskId)
 		throws PortalException {
 
-		return getService().getBatchEngineExportTask(exportTaskId);
+		return getService().getBatchEngineExportTask(batchEngineExportTaskId);
 	}
 
 	public static List<BatchEngineExportTask> getBatchEngineExportTasks(
