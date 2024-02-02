@@ -42,7 +42,9 @@ public class BaseBatchEngineTaskServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		user = TestPropsValues.getUser();
+		omniadminuser = TestPropsValues.getUser();
+
+		UserTestUtil.setUser(omniadminuser);
 
 		companyAdminUser = UserTestUtil.addCompanyAdminUser(company);
 
@@ -58,6 +60,6 @@ public class BaseBatchEngineTaskServiceTest {
 	@DeleteAfterTestRun
 	protected User normalUser;
 
-	protected User user;
+	protected User omniadminuser;
 
 }
