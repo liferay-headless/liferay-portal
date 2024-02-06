@@ -47,6 +47,7 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -90,11 +91,17 @@ import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
+import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -248,8 +255,127 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
+	/**
+	 * @author Alejandro Tardín
+	 */
+	public class LazyMap<K, V> implements Map<K, V> {
+
+		public LazyMap(Map<K, Supplier<V>> supplierMap) {
+			_supplierMap = supplierMap;
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean containsKey(Object key) {
+			return _supplierMap.containsKey(key);
+		}
+
+		@Override
+		public boolean containsValue(Object value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Set<Map.Entry<K, V>> entrySet() {
+			return new AbstractSet<Map.Entry<K, V>>() {
+
+				@Override
+				public Iterator<Map.Entry<K, V>> iterator() {
+					return (Iterator<Map.Entry<K, V>>)new HashSet<>(
+						TransformUtil.transform(
+							_supplierMap.entrySet(),
+							entry -> new Map.Entry<K, V>() {
+
+								@Override
+								public K getKey() {
+									return entry.getKey();
+								}
+
+								@Override
+								public V getValue() {
+									Supplier<V> supplier = _supplierMap.get(
+										entry.getKey());
+
+									return supplier.get();
+								}
+
+								@Override
+								public Object setValue(Object value) {
+									return null;
+								}
+
+							}));
+				}
+
+				@Override
+				public int size() {
+					return _supplierMap.size();
+				}
+
+			};
+		}
+
+		@Override
+		public V get(Object key) {
+			return _valueMap.computeIfAbsent(
+				(K)key,
+				k -> {
+					Supplier<V> supplier = _supplierMap.get(k);
+
+					if (supplier != null) {
+						return supplier.get();
+					}
+
+					return null;
+				});
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return _supplierMap.isEmpty();
+		}
+
+		@Override
+		public Set<K> keySet() {
+			return _supplierMap.keySet();
+		}
+
+		@Override
+		public V put(K key, V value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void putAll(Map<? extends K, ? extends V> m) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public V remove(Object key) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int size() {
+			return _supplierMap.size();
+		}
+
+		@Override
+		public Collection<V> values() {
+			throw new UnsupportedOperationException();
+		}
+
+		private final Map<K, Supplier<V>> _supplierMap;
+		private final Map<K, V> _valueMap = new HashMap<>();
+
+	}
+
 	private void _addManyToOneObjectRelationshipNames(
-		Map<String, Object> map, ObjectField objectField,
+		Map<String, UnsafeSupplier<Object, Exception>> map, ObjectField objectField,
 		String objectFieldName, ObjectRelationship objectRelationship,
 		long primaryKey, Map<String, Serializable> values) {
 
@@ -264,18 +390,18 @@ public class ObjectEntryDTOConverter
 
 		if (map.get(objectRelationship.getName()) == null) {
 			map.put(
-				objectRelationship.getName() + "ERC", relatedObjectEntryERC);
+				objectRelationship.getName() + "ERC", () -> relatedObjectEntryERC);
 		}
 
-		map.put(objectFieldName, primaryKey);
+		map.put(objectFieldName, () -> primaryKey);
 
-		map.put(objectRelationshipERCObjectFieldName, relatedObjectEntryERC);
+		map.put(objectRelationshipERCObjectFieldName, () -> relatedObjectEntryERC);
 	}
 
 	private void _addManyToOneRelatedObjectEntries(
-			DTOConverterContext dtoConverterContext, Map<String, Object> map,
-			String objectFieldName, ObjectRelationship objectRelationship,
-			long primaryKey)
+			DTOConverterContext dtoConverterContext,
+			Map<String, UnsafeSupplier<Object, Exception>> map, String objectFieldName,
+			ObjectRelationship objectRelationship, long primaryKey)
 		throws Exception {
 
 		String relatedObjectDefinitionName = StringUtil.replaceLast(
@@ -406,14 +532,18 @@ public class ObjectEntryDTOConverter
 			if (StringUtil.equals(
 					nestedFieldName, objectRelationship.getName())) {
 
-				map.put(objectRelationship.getName(), entry.getValue());
+				map.put(
+					objectRelationship.getName(),
+					() ->  entry.getValue());
 			}
 
 			if (nestedFieldName.contains(relatedObjectDefinitionName) ||
 				StringUtil.equals(
 					nestedFieldName, objectRelationship.getName())) {
 
-				map.put(manyToOneRelationshipName, entry.getValue());
+				map.put(
+					manyToOneRelationshipName,
+					() -> entry.getValue());
 			}
 		}
 	}
@@ -685,7 +815,7 @@ public class ObjectEntryDTOConverter
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
 
-		Map<String, Object> map = new HashMap<>();
+		Map<String, UnsafeSupplier<Object, Exception>> map = new HashMap<>();
 
 		Map<String, Serializable> values = objectEntry.getValues();
 
@@ -701,7 +831,7 @@ public class ObjectEntryDTOConverter
 			if (objectField.isLocalized()) {
 				map.put(
 					objectField.getI18nObjectFieldName(),
-					values.get(objectField.getI18nObjectFieldName()));
+					() -> values.get(objectField.getI18nObjectFieldName()));
 			}
 
 			String objectFieldName = objectField.getName();
@@ -720,64 +850,75 @@ public class ObjectEntryDTOConverter
 
 				FileEntry fileEntry = new FileEntry();
 
-				DLFileEntry dlFileEntry =
-					_dLFileEntryLocalService.fetchDLFileEntry(fileEntryId);
+				map.put(
+					objectFieldName,
+					() -> {
+						DLFileEntry dlFileEntry =
+							_dLFileEntryLocalService.fetchDLFileEntry(
+								fileEntryId);
 
-				if (dlFileEntry != null) {
-					if (FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
-						fileEntry.setFileBase64(
-							(String)NestedFieldsSupplier.supply(
-								objectFieldName + ".fileBase64",
-								fieldName -> Base64.encode(
-									_file.getBytes(
-										dlFileEntry.getContentStream()))));
-						fileEntry.setFolder(
-							(Folder)NestedFieldsSupplier.supply(
-								objectFieldName + ".folder",
-								fieldName -> {
-									if (!Objects.equals(
-											ObjectFieldSettingConstants.
-												VALUE_DOCS_AND_MEDIA,
-											ObjectFieldSettingUtil.getValue(
-												ObjectFieldSettingConstants.
-													NAME_FILE_SOURCE,
-												objectField))) {
+						if (dlFileEntry != null) {
+							if (FeatureFlagManagerUtil.isEnabled(
+									"LPS-174455")) {
 
-										return null;
-									}
-
-									Folder folder = new Folder();
-
-									folder.setExternalReferenceCode(
-										() -> {
-											if (dlFileEntry.getFolderId() ==
-													0) {
+								fileEntry.setFileBase64(
+									(String)NestedFieldsSupplier.supply(
+										objectFieldName + ".fileBase64",
+										fieldName -> Base64.encode(
+											_file.getBytes(
+												dlFileEntry.
+													getContentStream()))));
+								fileEntry.setFolder(
+									(Folder)NestedFieldsSupplier.supply(
+										objectFieldName + ".folder",
+										fieldName -> {
+											if (!Objects.equals(
+													ObjectFieldSettingConstants.
+														VALUE_DOCS_AND_MEDIA,
+													ObjectFieldSettingUtil.
+														getValue(
+															ObjectFieldSettingConstants.NAME_FILE_SOURCE,
+															objectField))) {
 
 												return null;
 											}
 
-											DLFolder dlFolder =
-												dlFileEntry.getFolder();
+											Folder folder = new Folder();
 
-											return dlFolder.
-												getExternalReferenceCode();
-										});
-									folder.setSiteId(dlFileEntry.getGroupId());
+											folder.setExternalReferenceCode(
+												() -> {
+													if (dlFileEntry.
+															getFolderId() ==
+																0) {
 
-									return folder;
-								}));
-					}
+														return null;
+													}
 
-					fileEntry.setId(dlFileEntry.getFileEntryId());
-					fileEntry.setLink(
-						LinkUtil.toLink(
-							_dlAppService, dlFileEntry, _dlURLHelper,
-							objectDefinition.getExternalReferenceCode(),
-							objectEntry.getExternalReferenceCode(), _portal));
-					fileEntry.setName(dlFileEntry.getFileName());
-				}
+													DLFolder dlFolder =
+														dlFileEntry.getFolder();
 
-				map.put(objectFieldName, fileEntry);
+													return dlFolder.
+														getExternalReferenceCode();
+												});
+											folder.setSiteId(
+												dlFileEntry.getGroupId());
+
+											return folder;
+										}));
+							}
+
+							fileEntry.setId(dlFileEntry.getFileEntryId());
+							fileEntry.setLink(
+								LinkUtil.toLink(
+									_dlAppService, dlFileEntry, _dlURLHelper,
+									objectDefinition.getExternalReferenceCode(),
+									objectEntry.getExternalReferenceCode(),
+									_portal));
+							fileEntry.setName(dlFileEntry.getFileName());
+						}
+
+						return fileEntry;
+					});
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME)) {
@@ -788,21 +929,27 @@ public class ObjectEntryDTOConverter
 					continue;
 				}
 
-				String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+				map.put(
+					objectFieldName,
+					() -> {
+						String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
-				if (StringUtil.equals(
-						ObjectFieldSettingUtil.getValue(
-							ObjectFieldSettingConstants.NAME_TIME_STORAGE,
-							objectField),
-						ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC)) {
+						if (StringUtil.equals(
+								ObjectFieldSettingUtil.getValue(
+									ObjectFieldSettingConstants.
+										NAME_TIME_STORAGE,
+									objectField),
+								ObjectFieldSettingConstants.
+									VALUE_CONVERT_TO_UTC)) {
 
-					pattern += "'Z'";
-				}
+							pattern += "'Z'";
+						}
 
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-					pattern);
+						SimpleDateFormat simpleDateFormat =
+							new SimpleDateFormat(pattern);
 
-				map.put(objectFieldName, simpleDateFormat.format(timestamp));
+						return simpleDateFormat.format(timestamp);
+					});
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.
@@ -814,7 +961,7 @@ public class ObjectEntryDTOConverter
 
 				map.put(
 					objectFieldName,
-					TransformUtil.transformToList(
+					() -> TransformUtil.transformToList(
 						StringUtil.split(
 							(String)serializable, StringPool.COMMA_AND_SPACE),
 						key -> _getListEntry(
@@ -833,16 +980,17 @@ public class ObjectEntryDTOConverter
 					objectField.getListTypeDefinitionId());
 
 				if (listEntry != null) {
-					map.put(objectFieldName, listEntry);
+					map.put(objectFieldName, () -> listEntry);
 				}
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT)) {
 
-				map.put(objectFieldName, serializable);
+				map.put(objectFieldName, () -> serializable);
 				map.put(
 					objectFieldName + "RawText",
-					ObjectEntryValuesUtil.getValueString(objectField, values));
+					() -> ObjectEntryValuesUtil.getValueString(
+						objectField, values));
 			}
 			else if (Objects.equals(
 						objectField.getRelationshipType(),
@@ -866,11 +1014,13 @@ public class ObjectEntryDTOConverter
 					primaryKey, values);
 			}
 			else {
-				map.put(objectFieldName, serializable);
+				map.put(objectFieldName, () -> serializable);
 			}
 		}
 
 		values.remove(objectDefinition.getPKObjectFieldName());
+
+		LazyMap lazyMap = new LazyMap(map);
 
 		Map<String, Serializable> nestedFieldsRelatedProperties =
 			_getNestedFieldsRelatedProperties(
@@ -878,10 +1028,10 @@ public class ObjectEntryDTOConverter
 				objectEntry.getObjectEntryId());
 
 		if (nestedFieldsRelatedProperties != null) {
-			map.putAll(nestedFieldsRelatedProperties);
+			lazyMap.putAll(nestedFieldsRelatedProperties);
 		}
 
-		return map;
+		return lazyMap;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
