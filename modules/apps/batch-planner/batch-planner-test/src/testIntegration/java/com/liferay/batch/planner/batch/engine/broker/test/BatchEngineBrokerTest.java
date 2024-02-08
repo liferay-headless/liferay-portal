@@ -209,8 +209,7 @@ public class BatchEngineBrokerTest {
 				"object_definition.csv", null,
 				_objectDefinition1.getObjectDefinitionId(),
 				_objectDefinition1.getModifiedDate()),
-			_objectDefinition1.getExternalReferenceCode(),
-			_objectDefinitionExportCSVFieldNames);
+			_objectDefinition1.getExternalReferenceCode());
 	}
 
 	@Test
@@ -249,8 +248,7 @@ public class BatchEngineBrokerTest {
 				objectEntry.getCreateDate(), _OBJECT_ENTRY_ERC_1,
 				"object_entry.csv", null, objectEntry.getObjectEntryId(),
 				objectEntry.getModifiedDate()),
-			objectEntry.getExternalReferenceCode(),
-			_objectEntryExportCSVFieldNames);
+			objectEntry.getExternalReferenceCode());
 	}
 
 	@Test
@@ -561,7 +559,7 @@ public class BatchEngineBrokerTest {
 
 	private void _assertEqualsExportCSV(
 			String actualCSVString, String expectedCSVString,
-			String externalReferenceCode, List<String> fieldNames)
+			String externalReferenceCode)
 		throws Exception {
 
 		CSVFormat csvFormat = CSVFormat.Builder.create(
@@ -582,7 +580,6 @@ public class BatchEngineBrokerTest {
 
 		List<CSVRecord> expectedCSVRecords = expectedCSVParser.getRecords();
 
-		Assert.assertEquals(fieldNames, _toList(actualCSVRecords.get(0)));
 		Assert.assertEquals(
 			_toList(expectedCSVRecords.get(0)),
 			_toList(actualCSVRecords.get(0)));
@@ -1239,8 +1236,7 @@ public class BatchEngineBrokerTest {
 				objectEntry.getCreateDate(), objectEntryERC, "object_entry.csv",
 				groupId, objectEntry.getObjectEntryId(),
 				objectEntry.getModifiedDate()),
-			objectEntry.getExternalReferenceCode(),
-			_objectEntryExportCSVFieldNames);
+			objectEntry.getExternalReferenceCode());
 	}
 
 	private void _testImportExportSiteScopeObjectEntryJSON(
