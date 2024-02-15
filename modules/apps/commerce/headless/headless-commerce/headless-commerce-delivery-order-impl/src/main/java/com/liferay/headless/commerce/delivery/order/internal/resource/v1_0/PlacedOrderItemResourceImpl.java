@@ -116,18 +116,27 @@ public class PlacedOrderItemResourceImpl
 				continue;
 			}
 
-			if (parentOrderItem.getPlacedOrderItems() == null) {
-				parentOrderItem.setPlacedOrderItems(new PlacedOrderItem[0]);
-			}
+			PlacedOrderItem[] parentOrderItemPlacedOrderItems =
+				parentOrderItem.getPlacedOrderItems();
 
 			parentOrderItem.setPlacedOrderItems(
-				ArrayUtil.append(
-					parentOrderItem.getPlacedOrderItems(), placedOrderItem));
+				() -> _getPlacedOrderItems(
+					placedOrderItem, parentOrderItemPlacedOrderItems));
 
 			placedOrderItemMap.remove(placedOrderItem.getId());
 		}
 
 		return new ArrayList(placedOrderItemMap.values());
+	}
+
+	private PlacedOrderItem[] _getPlacedOrderItems(
+		PlacedOrderItem placedOrderItem, PlacedOrderItem[] placedOrderItems) {
+
+		if (placedOrderItems == null) {
+			placedOrderItems = new PlacedOrderItem[0];
+		}
+
+		return ArrayUtil.append(placedOrderItems, placedOrderItem);
 	}
 
 	private PlacedOrderItem _toPlacedOrderItem(

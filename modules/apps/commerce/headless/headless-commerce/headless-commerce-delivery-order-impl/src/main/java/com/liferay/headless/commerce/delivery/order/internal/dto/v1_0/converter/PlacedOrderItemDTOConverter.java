@@ -207,6 +207,19 @@ public class PlacedOrderItemDTOConverter
 		};
 	}
 
+	private CPDefinitionInventory _getCpDefinitionInventory(long cpInstanceId) {
+		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
+			cpInstanceId);
+
+		if (cpInstance != null) {
+			return _cpDefinitionInventoryLocalService.
+				fetchCPDefinitionInventoryByCPDefinitionId(
+					cpInstance.getCPDefinitionId());
+		}
+
+		return null;
+	}
+
 	private String[] _getErrorMessages(
 		CommerceOrderItem commerceOrderItem, Locale locale) {
 
@@ -241,129 +254,240 @@ public class PlacedOrderItemDTOConverter
 
 		BigDecimal unitPrice = unitPriceCommerceMoney.getPrice();
 
-		Price price = new Price() {
-			{
-				setCurrency(() -> commerceCurrency.getName(locale));
-				setPrice(unitPrice::doubleValue);
-				setPriceFormatted(() -> unitPriceCommerceMoney.format(locale));
-			}
-		};
-
 		CommerceMoney promoPriceCommerceMoney =
 			commerceOrderItemPrice.getPromoPrice();
-
-		if (promoPriceCommerceMoney != null) {
-			BigDecimal unitPromoPrice = promoPriceCommerceMoney.getPrice();
-
-			if (unitPromoPrice != null) {
-				price.setPromoPrice(unitPromoPrice.doubleValue());
-				price.setPromoPriceFormatted(
-					promoPriceCommerceMoney.format(locale));
-			}
-		}
 
 		CommerceMoney discountAmountCommerceMoney =
 			commerceOrderItemPrice.getDiscountAmount();
 
-		if (discountAmountCommerceMoney != null) {
-			BigDecimal discountAmount = discountAmountCommerceMoney.getPrice();
-
-			if (discountAmount != null) {
-				price.setDiscount(discountAmount.doubleValue());
-				price.setDiscountFormatted(
-					discountAmountCommerceMoney.format(locale));
-				price.setDiscountPercentage(
-					_commercePriceFormatter.format(
-						commerceOrderItemPrice.getDiscountPercentage(),
-						locale));
-
-				BigDecimal discountPercentageLevel1 =
-					commerceOrderItemPrice.getDiscountPercentageLevel1();
-				BigDecimal discountPercentageLevel2 =
-					commerceOrderItemPrice.getDiscountPercentageLevel2();
-				BigDecimal discountPercentageLevel3 =
-					commerceOrderItemPrice.getDiscountPercentageLevel3();
-				BigDecimal discountPercentageLevel4 =
-					commerceOrderItemPrice.getDiscountPercentageLevel4();
-
-				price.setDiscountPercentageLevel1(
-					discountPercentageLevel1.doubleValue());
-				price.setDiscountPercentageLevel2(
-					discountPercentageLevel2.doubleValue());
-				price.setDiscountPercentageLevel3(
-					discountPercentageLevel3.doubleValue());
-				price.setDiscountPercentageLevel4(
-					discountPercentageLevel4.doubleValue());
-			}
-		}
-
 		CommerceMoney finalPriceCommerceMoney =
 			commerceOrderItemPrice.getFinalPrice();
 
-		BigDecimal finalPrice = finalPriceCommerceMoney.getPrice();
+		BigDecimal priceCommerceMoney = finalPriceCommerceMoney.getPrice();
 
-		if (finalPrice != null) {
-			price.setFinalPriceFormatted(
-				finalPriceCommerceMoney.format(locale));
-			price.setFinalPrice(finalPrice.doubleValue());
-		}
+		return new Price() {
+			{
+				setCurrency(() -> commerceCurrency.getName(locale));
+				setDiscount(
+					() -> {
+						if (discountAmountCommerceMoney != null) {
+							BigDecimal discountAmount =
+								discountAmountCommerceMoney.getPrice();
 
-		return price;
+							if (discountAmount != null) {
+								return discountAmount.doubleValue();
+							}
+						}
+
+						return null;
+					});
+				setDiscountFormatted(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							return discountAmountCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
+
+				setDiscountPercentage(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							return _commercePriceFormatter.format(
+								commerceOrderItemPrice.getDiscountPercentage(),
+								locale);
+						}
+
+						return null;
+					});
+				setDiscountPercentageLevel1(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							BigDecimal discountPercentageLevel1 =
+								commerceOrderItemPrice.
+									getDiscountPercentageLevel1();
+
+							return discountPercentageLevel1.doubleValue();
+						}
+
+						return null;
+					});
+				setDiscountPercentageLevel2(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							BigDecimal discountPercentageLevel2 =
+								commerceOrderItemPrice.
+									getDiscountPercentageLevel2();
+
+							return discountPercentageLevel2.doubleValue();
+						}
+
+						return null;
+					});
+				setDiscountPercentageLevel3(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							BigDecimal discountPercentageLevel3 =
+								commerceOrderItemPrice.
+									getDiscountPercentageLevel3();
+
+							return discountPercentageLevel3.doubleValue();
+						}
+
+						return null;
+					});
+				setDiscountPercentageLevel4(
+					() -> {
+						if ((discountAmountCommerceMoney != null) &&
+							(discountAmountCommerceMoney.getPrice() != null)) {
+
+							BigDecimal discountPercentageLevel4 =
+								commerceOrderItemPrice.
+									getDiscountPercentageLevel4();
+
+							return discountPercentageLevel4.doubleValue();
+						}
+
+						return null;
+					});
+
+				setFinalPrice(
+					() -> {
+						if (priceCommerceMoney != null) {
+							return priceCommerceMoney.doubleValue();
+						}
+
+						return null;
+					});
+				setFinalPriceFormatted(
+					() -> {
+						if (priceCommerceMoney != null) {
+							return finalPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
+				setPrice(unitPrice::doubleValue);
+				setPriceFormatted(() -> unitPriceCommerceMoney.format(locale));
+				setPromoPrice(
+					() -> {
+						if (promoPriceCommerceMoney != null) {
+							BigDecimal unitPromoPrice =
+								promoPriceCommerceMoney.getPrice();
+
+							if (unitPromoPrice != null) {
+								return unitPromoPrice.doubleValue();
+							}
+						}
+
+						return null;
+					});
+				setPromoPriceFormatted(
+					() -> {
+						if ((promoPriceCommerceMoney != null) &&
+							(promoPriceCommerceMoney.getPrice() != null)) {
+
+							return promoPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
+			}
+		};
 	}
 
 	private Settings _getSettings(long cpInstanceId) {
-		Settings settings = new Settings();
-
-		BigDecimal minOrderQuantity =
-			CPDefinitionInventoryConstants.DEFAULT_MIN_ORDER_QUANTITY;
-		BigDecimal maxOrderQuantity =
-			CPDefinitionInventoryConstants.DEFAULT_MAX_ORDER_QUANTITY;
-		BigDecimal multipleQuantity =
-			CPDefinitionInventoryConstants.DEFAULT_MULTIPLE_ORDER_QUANTITY;
-
-		CPDefinitionInventory cpDefinitionInventory = null;
-
-		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
+		CPDefinitionInventory cpDefinitionInventory = _getCpDefinitionInventory(
 			cpInstanceId);
 
-		if (cpInstance != null) {
-			cpDefinitionInventory =
-				_cpDefinitionInventoryLocalService.
-					fetchCPDefinitionInventoryByCPDefinitionId(
-						cpInstance.getCPDefinitionId());
-		}
+		return new Settings() {
+			{
+				setAllowedQuantities(
+					() -> {
+						if (cpDefinitionInventory != null) {
+							BigDecimal[] allowedOrderQuantitiesArray =
+								cpDefinitionInventory.
+									getAllowedOrderQuantitiesArray();
 
-		if (cpDefinitionInventory != null) {
-			minOrderQuantity = cpDefinitionInventory.getMinOrderQuantity();
-			maxOrderQuantity = cpDefinitionInventory.getMaxOrderQuantity();
-			multipleQuantity = cpDefinitionInventory.getMultipleOrderQuantity();
+							if ((allowedOrderQuantitiesArray != null) &&
+								(allowedOrderQuantitiesArray.length > 0)) {
 
-			BigDecimal[] allowedOrderQuantitiesArray =
-				cpDefinitionInventory.getAllowedOrderQuantitiesArray();
+								return allowedOrderQuantitiesArray;
+							}
+						}
 
-			if ((allowedOrderQuantitiesArray != null) &&
-				(allowedOrderQuantitiesArray.length > 0)) {
+						return null;
+					});
 
-				settings.setAllowedQuantities(allowedOrderQuantitiesArray);
+				setMaxQuantity(
+					() -> {
+						BigDecimal maxOrderQuantity =
+							CPDefinitionInventoryConstants.
+								DEFAULT_MAX_ORDER_QUANTITY;
+
+						if (cpDefinitionInventory != null) {
+							maxOrderQuantity =
+								cpDefinitionInventory.getMaxOrderQuantity();
+						}
+
+						if (maxOrderQuantity != null) {
+							return BigDecimalUtil.stripTrailingZeros(
+								maxOrderQuantity);
+						}
+
+						return null;
+					});
+
+				setMinQuantity(
+					() -> {
+						BigDecimal minOrderQuantity =
+							CPDefinitionInventoryConstants.
+								DEFAULT_MIN_ORDER_QUANTITY;
+
+						if (cpDefinitionInventory != null) {
+							minOrderQuantity =
+								cpDefinitionInventory.getMinOrderQuantity();
+						}
+
+						if (minOrderQuantity != null) {
+							return BigDecimalUtil.stripTrailingZeros(
+								minOrderQuantity);
+						}
+
+						return null;
+					});
+
+				setMultipleQuantity(
+					() -> {
+						BigDecimal multipleQuantity =
+							CPDefinitionInventoryConstants.
+								DEFAULT_MULTIPLE_ORDER_QUANTITY;
+
+						if (cpDefinitionInventory != null) {
+							multipleQuantity =
+								cpDefinitionInventory.
+									getMultipleOrderQuantity();
+						}
+
+						if (multipleQuantity != null) {
+							return BigDecimalUtil.stripTrailingZeros(
+								multipleQuantity);
+						}
+
+						return null;
+					});
 			}
-		}
-
-		if (minOrderQuantity != null) {
-			settings.setMinQuantity(
-				BigDecimalUtil.stripTrailingZeros(minOrderQuantity));
-		}
-
-		if (maxOrderQuantity != null) {
-			settings.setMaxQuantity(
-				BigDecimalUtil.stripTrailingZeros(maxOrderQuantity));
-		}
-
-		if (multipleQuantity != null) {
-			settings.setMultipleQuantity(
-				BigDecimalUtil.stripTrailingZeros(multipleQuantity));
-		}
-
-		return settings;
+		};
 	}
 
 	private VirtualItem[] _toVirtualItems(

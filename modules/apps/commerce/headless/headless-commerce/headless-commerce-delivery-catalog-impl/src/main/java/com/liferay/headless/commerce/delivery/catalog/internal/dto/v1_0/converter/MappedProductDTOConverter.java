@@ -393,37 +393,77 @@ public class MappedProductDTOConverter
 			Locale locale, String sku, String unitOfMeasureKey)
 		throws Exception {
 
-		Availability availability = new Availability();
+		return new Availability() {
+			{
+				setLabel(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayAvailability(
+								cpInstance)) {
 
-		if (_cpDefinitionInventoryEngine.isDisplayAvailability(cpInstance)) {
-			if (Objects.equals(
-					_commerceInventoryEngine.getAvailabilityStatus(
-						cpInstance.getCompanyId(), cpInstance.getGroupId(),
-						commerceChannelGroupId,
-						_cpDefinitionInventoryEngine.getMinStockQuantity(
-							cpInstance),
-						cpInstance.getSku(), unitOfMeasureKey),
-					CommerceInventoryAvailabilityConstants.AVAILABLE)) {
+							if (Objects.equals(
+									_commerceInventoryEngine.
+										getAvailabilityStatus(
+											cpInstance.getCompanyId(),
+											cpInstance.getGroupId(),
+											commerceChannelGroupId,
+											_cpDefinitionInventoryEngine.
+												getMinStockQuantity(cpInstance),
+											cpInstance.getSku(),
+											unitOfMeasureKey),
+									CommerceInventoryAvailabilityConstants.
+										AVAILABLE)) {
 
-				availability.setLabel_i18n(_language.get(locale, "available"));
-				availability.setLabel("available");
+								return "available";
+							}
+
+							return "unavailable";
+						}
+
+						return null;
+					});
+
+				setLabel_i18n(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayAvailability(
+								cpInstance)) {
+
+							if (Objects.equals(
+									_commerceInventoryEngine.
+										getAvailabilityStatus(
+											cpInstance.getCompanyId(),
+											cpInstance.getGroupId(),
+											commerceChannelGroupId,
+											_cpDefinitionInventoryEngine.
+												getMinStockQuantity(cpInstance),
+											cpInstance.getSku(),
+											unitOfMeasureKey),
+									CommerceInventoryAvailabilityConstants.
+										AVAILABLE)) {
+
+								return _language.get(locale, "available");
+							}
+
+							return _language.get(locale, "unavailable");
+						}
+
+						return null;
+					});
+				setStockQuantity(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayStockQuantity(
+								cpInstance)) {
+
+							return BigDecimalUtil.stripTrailingZeros(
+								_commerceInventoryEngine.getStockQuantity(
+									companyId, cpInstance.getGroupId(),
+									commerceChannelGroupId, sku,
+									unitOfMeasureKey));
+						}
+
+						return null;
+					});
 			}
-			else {
-				availability.setLabel_i18n(
-					_language.get(locale, "unavailable"));
-				availability.setLabel("unavailable");
-			}
-		}
-
-		if (_cpDefinitionInventoryEngine.isDisplayStockQuantity(cpInstance)) {
-			availability.setStockQuantity(
-				BigDecimalUtil.stripTrailingZeros(
-					_commerceInventoryEngine.getStockQuantity(
-						companyId, cpInstance.getGroupId(),
-						commerceChannelGroupId, sku, unitOfMeasureKey)));
-		}
-
-		return availability;
+		};
 	}
 
 	private String[] _getFormattedDiscountPercentages(
@@ -464,9 +504,52 @@ public class MappedProductDTOConverter
 		CommerceMoney unitPriceCommerceMoney =
 			commerceProductPrice.getUnitPrice();
 
-		Price price = new Price() {
+		CommerceDiscountValue discountValue =
+			commerceProductPrice.getDiscountValue();
+
+		return new Price() {
 			{
 				setCurrency(() -> commerceCurrency.getName(locale));
+				setDiscount(
+					() -> {
+						if (discountValue != null) {
+							CommerceMoney discountAmountCommerceMoney =
+								discountValue.getDiscountAmount();
+
+							return discountAmountCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
+				setDiscountPercentage(
+					() -> {
+						if (discountValue != null) {
+							return _commercePriceFormatter.format(
+								discountValue.getDiscountPercentage(), locale);
+						}
+
+						return null;
+					});
+				setDiscountPercentages(
+					() -> {
+						if (discountValue != null) {
+							return _getFormattedDiscountPercentages(
+								discountValue.getPercentages(), locale);
+						}
+
+						return null;
+					});
+				setFinalPrice(
+					() -> {
+						if (discountValue != null) {
+							CommerceMoney finalPriceCommerceMoney =
+								commerceProductPrice.getFinalPrice();
+
+							return finalPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
 				setPrice(
 					() -> {
 						BigDecimal unitPrice =
@@ -475,46 +558,44 @@ public class MappedProductDTOConverter
 						return unitPrice.doubleValue();
 					});
 				setPriceFormatted(() -> unitPriceCommerceMoney.format(locale));
+				setPromoPrice(
+					() -> {
+						CommerceMoney unitPromoPriceCommerceMoney =
+							commerceProductPrice.getUnitPromoPrice();
+
+						BigDecimal unitPromoPrice =
+							unitPromoPriceCommerceMoney.getPrice();
+
+						if ((unitPromoPrice != null) &&
+							(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+							(unitPromoPrice.compareTo(
+								unitPriceCommerceMoney.getPrice()) < 0)) {
+
+							return unitPromoPrice.doubleValue();
+						}
+
+						return null;
+					});
+				setPromoPriceFormatted(
+					() -> {
+						CommerceMoney unitPromoPriceCommerceMoney =
+							commerceProductPrice.getUnitPromoPrice();
+
+						BigDecimal unitPromoPrice =
+							unitPromoPriceCommerceMoney.getPrice();
+
+						if ((unitPromoPrice != null) &&
+							(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+							(unitPromoPrice.compareTo(
+								unitPriceCommerceMoney.getPrice()) < 0)) {
+
+							return unitPromoPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
 			}
 		};
-
-		CommerceMoney unitPromoPriceCommerceMoney =
-			commerceProductPrice.getUnitPromoPrice();
-
-		BigDecimal unitPromoPrice = unitPromoPriceCommerceMoney.getPrice();
-
-		if ((unitPromoPrice != null) &&
-			(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
-			(unitPromoPrice.compareTo(unitPriceCommerceMoney.getPrice()) < 0)) {
-
-			price.setPromoPrice(unitPromoPrice.doubleValue());
-			price.setPromoPriceFormatted(
-				unitPromoPriceCommerceMoney.format(locale));
-		}
-
-		CommerceDiscountValue discountValue =
-			commerceProductPrice.getDiscountValue();
-
-		if (discountValue != null) {
-			CommerceMoney discountAmountCommerceMoney =
-				discountValue.getDiscountAmount();
-
-			price.setDiscount(discountAmountCommerceMoney.format(locale));
-
-			price.setDiscountPercentage(
-				_commercePriceFormatter.format(
-					discountValue.getDiscountPercentage(), locale));
-			price.setDiscountPercentages(
-				_getFormattedDiscountPercentages(
-					discountValue.getPercentages(), locale));
-
-			CommerceMoney finalPriceCommerceMoney =
-				commerceProductPrice.getFinalPrice();
-
-			price.setFinalPrice(finalPriceCommerceMoney.format(locale));
-		}
-
-		return price;
 	}
 
 	@Reference

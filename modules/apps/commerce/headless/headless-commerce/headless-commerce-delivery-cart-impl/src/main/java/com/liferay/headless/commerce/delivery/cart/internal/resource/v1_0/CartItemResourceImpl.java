@@ -196,17 +196,23 @@ public class CartItemResourceImpl extends BaseCartItemResourceImpl {
 				continue;
 			}
 
-			if (parentCartItem.getCartItems() == null) {
-				parentCartItem.setCartItems(new CartItem[0]);
-			}
+			CartItem[] parentCartItemCartItems = parentCartItem.getCartItems();
 
 			parentCartItem.setCartItems(
-				ArrayUtil.append(parentCartItem.getCartItems(), cartItem));
+				() -> _getCartItems(cartItem, parentCartItemCartItems));
 
 			cartItemsMap.remove(cartItem.getId());
 		}
 
 		return new ArrayList(cartItemsMap.values());
+	}
+
+	private CartItem[] _getCartItems(CartItem cartItem, CartItem[] cartItems) {
+		if (cartItems == null) {
+			cartItems = new CartItem[0];
+		}
+
+		return ArrayUtil.append(cartItems, cartItem);
 	}
 
 	private CartItem _toCartItem(

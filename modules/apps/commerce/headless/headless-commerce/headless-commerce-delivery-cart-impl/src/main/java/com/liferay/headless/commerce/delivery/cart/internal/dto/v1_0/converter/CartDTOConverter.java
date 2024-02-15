@@ -237,6 +237,32 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 		};
 	}
 
+	private BigDecimal _getShippingDiscountAmount(
+		CommerceOrder commerceOrder, String priceDisplayType) {
+
+		if (Objects.equals(
+				priceDisplayType,
+				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+
+			return commerceOrder.getShippingDiscountWithTaxAmount();
+		}
+
+		return commerceOrder.getShippingDiscountAmount();
+	}
+
+	private BigDecimal _getSubtotalDiscountAmount(
+		CommerceOrder commerceOrder, String priceDisplayType) {
+
+		if (Objects.equals(
+				priceDisplayType,
+				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+
+			return commerceOrder.getSubtotalDiscountWithTaxAmount();
+		}
+
+		return commerceOrder.getSubtotalDiscountAmount();
+	}
+
 	private Summary _getSummary(CommerceOrder commerceOrder, Locale locale)
 		throws Exception {
 
@@ -288,6 +314,8 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 		BigDecimal finalOrderPriceSubtotalPrice = orderPriceSubtotalPrice;
 		BigDecimal finalOrderPriceTotalPrice = orderPriceTotalPrice;
 
+		BigDecimal taxAmount = commerceOrder.getTaxAmount();
+
 		Summary summary = new Summary() {
 			{
 				setCurrency(() -> commerceCurrency.getName(locale));
@@ -311,19 +339,29 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 				setSubtotalFormatted(
 					() -> commerceOrderPriceSubtotalCommerceMoney.format(
 						locale));
+
+				setTaxValue(
+					() -> {
+						if (taxAmount != null) {
+							return taxAmount.doubleValue();
+						}
+
+						return null;
+					});
+				setTaxValueFormatted(
+					() -> {
+						if (taxAmount != null) {
+							return _formatPrice(
+								taxAmount, commerceCurrency, locale);
+						}
+
+						return null;
+					});
 				setTotal(finalOrderPriceTotalPrice::doubleValue);
 				setTotalFormatted(
 					() -> commerceOrderPriceTotalCommerceMoney.format(locale));
 			}
 		};
-
-		BigDecimal taxAmount = commerceOrder.getTaxAmount();
-
-		if (taxAmount != null) {
-			summary.setTaxValue(taxAmount.doubleValue());
-			summary.setTaxValueFormatted(
-				_formatPrice(taxAmount, commerceCurrency, locale));
-		}
 
 		_setShippingDiscountOnSummary(
 			commerceOrder, commerceCurrency, locale,
@@ -340,60 +378,47 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 		return summary;
 	}
 
-	private void _setShippingDiscountOnSummary(
-			CommerceOrder commerceOrder, CommerceCurrency commerceCurrency,
-			Locale locale, String priceDisplayType, Summary summary)
-		throws Exception {
-
-		BigDecimal shippingDiscountAmount =
-			commerceOrder.getShippingDiscountAmount();
-
-		if (shippingDiscountAmount == null) {
-			return;
-		}
-
-		BigDecimal shippingDiscountPercentageLevel1 =
-			commerceOrder.getShippingDiscountPercentageLevel1();
-		BigDecimal shippingDiscountPercentageLevel2 =
-			commerceOrder.getShippingDiscountPercentageLevel2();
-		BigDecimal shippingDiscountPercentageLevel3 =
-			commerceOrder.getShippingDiscountPercentageLevel3();
-		BigDecimal shippingDiscountPercentageLevel4 =
-			commerceOrder.getShippingDiscountPercentageLevel4();
+	private BigDecimal _getTotalDiscountAmount(
+		CommerceOrder commerceOrder, String priceDisplayType) {
 
 		if (Objects.equals(
 				priceDisplayType,
 				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 
-			shippingDiscountAmount =
-				commerceOrder.getShippingDiscountWithTaxAmount();
-
-			shippingDiscountPercentageLevel1 =
-				commerceOrder.
-					getShippingDiscountPercentageLevel1WithTaxAmount();
-			shippingDiscountPercentageLevel2 =
-				commerceOrder.
-					getShippingDiscountPercentageLevel2WithTaxAmount();
-			shippingDiscountPercentageLevel3 =
-				commerceOrder.
-					getShippingDiscountPercentageLevel3WithTaxAmount();
-			shippingDiscountPercentageLevel4 =
-				commerceOrder.
-					getShippingDiscountPercentageLevel4WithTaxAmount();
+			return commerceOrder.getTotalDiscountWithTaxAmount();
 		}
 
+		return commerceOrder.getTotalDiscountAmount();
+	}
+
+	private void _setShippingDiscountOnSummary(
+		CommerceOrder commerceOrder, CommerceCurrency commerceCurrency,
+		Locale locale, String priceDisplayType, Summary summary) {
+
+		if (commerceOrder.getShippingDiscountAmount() == null) {
+			return;
+		}
+
+		BigDecimal shippingDiscountAmount = _getShippingDiscountAmount(
+			commerceOrder, priceDisplayType);
+
 		summary.setShippingDiscountPercentages(
-			_getFormattedDiscountPercentages(
+			() -> _getFormattedDiscountPercentages(
 				new BigDecimal[] {
-					shippingDiscountPercentageLevel1,
-					shippingDiscountPercentageLevel2,
-					shippingDiscountPercentageLevel3,
-					shippingDiscountPercentageLevel4
+					commerceOrder.
+						getShippingDiscountPercentageLevel1WithTaxAmount(),
+					commerceOrder.
+						getShippingDiscountPercentageLevel2WithTaxAmount(),
+					commerceOrder.
+						getShippingDiscountPercentageLevel3WithTaxAmount(),
+					commerceOrder.
+						getShippingDiscountPercentageLevel4WithTaxAmount()
 				},
 				locale));
-		summary.setShippingDiscountValue(shippingDiscountAmount.doubleValue());
+		summary.setShippingDiscountValue(shippingDiscountAmount::doubleValue);
 		summary.setShippingDiscountValueFormatted(
-			_formatPrice(shippingDiscountAmount, commerceCurrency, locale));
+			() -> _formatPrice(
+				shippingDiscountAmount, commerceCurrency, locale));
 	}
 
 	private void _setSubtotalDiscountOnSummary(
@@ -401,55 +426,56 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 			Locale locale, String priceDisplayType, Summary summary)
 		throws Exception {
 
-		BigDecimal subtotalDiscountAmount =
-			commerceOrder.getSubtotalDiscountAmount();
-
-		if (subtotalDiscountAmount == null) {
+		if (commerceOrder.getSubtotalDiscountAmount() == null) {
 			return;
 		}
 
-		BigDecimal subtotalDiscountPercentageLevel1 =
-			commerceOrder.getSubtotalDiscountPercentageLevel1();
-		BigDecimal subtotalDiscountPercentageLevel2 =
-			commerceOrder.getSubtotalDiscountPercentageLevel2();
-		BigDecimal subtotalDiscountPercentageLevel3 =
-			commerceOrder.getSubtotalDiscountPercentageLevel3();
-		BigDecimal subtotalDiscountPercentageLevel4 =
-			commerceOrder.getSubtotalDiscountPercentageLevel4();
-
-		if (Objects.equals(
-				priceDisplayType,
-				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
-
-			subtotalDiscountAmount =
-				commerceOrder.getSubtotalDiscountWithTaxAmount();
-
-			subtotalDiscountPercentageLevel1 =
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel1WithTaxAmount();
-			subtotalDiscountPercentageLevel2 =
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel2WithTaxAmount();
-			subtotalDiscountPercentageLevel3 =
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel3WithTaxAmount();
-			subtotalDiscountPercentageLevel4 =
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel4WithTaxAmount();
-		}
+		BigDecimal subtotalDiscountAmount = _getSubtotalDiscountAmount(
+			commerceOrder, priceDisplayType);
 
 		summary.setSubtotalDiscountPercentages(
-			_getFormattedDiscountPercentages(
-				new BigDecimal[] {
+			() -> {
+				BigDecimal subtotalDiscountPercentageLevel1 =
+					commerceOrder.getSubtotalDiscountPercentageLevel1();
+				BigDecimal subtotalDiscountPercentageLevel2 =
+					commerceOrder.getSubtotalDiscountPercentageLevel2();
+				BigDecimal subtotalDiscountPercentageLevel3 =
+					commerceOrder.getSubtotalDiscountPercentageLevel3();
+				BigDecimal subtotalDiscountPercentageLevel4 =
+					commerceOrder.getSubtotalDiscountPercentageLevel4();
+
+				if (Objects.equals(
+						priceDisplayType,
+						CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+
+					subtotalDiscountPercentageLevel1 =
+						commerceOrder.
+							getSubtotalDiscountPercentageLevel1WithTaxAmount();
+					subtotalDiscountPercentageLevel2 =
+						commerceOrder.
+							getSubtotalDiscountPercentageLevel2WithTaxAmount();
+					subtotalDiscountPercentageLevel3 =
+						commerceOrder.
+							getSubtotalDiscountPercentageLevel3WithTaxAmount();
+					subtotalDiscountPercentageLevel4 =
+						commerceOrder.
+							getSubtotalDiscountPercentageLevel4WithTaxAmount();
+				}
+
+				BigDecimal[] discountPercentagesBigDecimal = {
 					subtotalDiscountPercentageLevel1,
 					subtotalDiscountPercentageLevel2,
 					subtotalDiscountPercentageLevel3,
 					subtotalDiscountPercentageLevel4
-				},
-				locale));
-		summary.setSubtotalDiscountValue(subtotalDiscountAmount.doubleValue());
+				};
+
+				return _getFormattedDiscountPercentages(
+					discountPercentagesBigDecimal, locale);
+			});
+		summary.setSubtotalDiscountValue(subtotalDiscountAmount::doubleValue);
 		summary.setSubtotalDiscountValueFormatted(
-			_formatPrice(subtotalDiscountAmount, commerceCurrency, locale));
+			() -> _formatPrice(
+				subtotalDiscountAmount, commerceCurrency, locale));
 	}
 
 	private void _setTotalDiscountOnSummary(
@@ -457,48 +483,54 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 			Locale locale, String priceDisplayType, Summary summary)
 		throws Exception {
 
-		BigDecimal totalDiscountAmount = commerceOrder.getTotalDiscountAmount();
-
-		if (totalDiscountAmount == null) {
+		if (commerceOrder.getTotalDiscountAmount() == null) {
 			return;
 		}
 
-		BigDecimal totalDiscountPercentageLevel1 =
-			commerceOrder.getTotalDiscountPercentageLevel1();
-		BigDecimal totalDiscountPercentageLevel2 =
-			commerceOrder.getTotalDiscountPercentageLevel2();
-		BigDecimal totalDiscountPercentageLevel3 =
-			commerceOrder.getTotalDiscountPercentageLevel3();
-		BigDecimal totalDiscountPercentageLevel4 =
-			commerceOrder.getTotalDiscountPercentageLevel4();
-
-		if (Objects.equals(
-				priceDisplayType,
-				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
-
-			totalDiscountAmount = commerceOrder.getTotalDiscountWithTaxAmount();
-
-			totalDiscountPercentageLevel1 =
-				commerceOrder.getTotalDiscountPercentageLevel1WithTaxAmount();
-			totalDiscountPercentageLevel2 =
-				commerceOrder.getTotalDiscountPercentageLevel2WithTaxAmount();
-			totalDiscountPercentageLevel3 =
-				commerceOrder.getTotalDiscountPercentageLevel3WithTaxAmount();
-			totalDiscountPercentageLevel4 =
-				commerceOrder.getTotalDiscountPercentageLevel4WithTaxAmount();
-		}
+		BigDecimal totalDiscountAmount = _getTotalDiscountAmount(
+			commerceOrder, priceDisplayType);
 
 		summary.setTotalDiscountPercentages(
-			_getFormattedDiscountPercentages(
-				new BigDecimal[] {
+			() -> {
+				BigDecimal totalDiscountPercentageLevel1 =
+					commerceOrder.getTotalDiscountPercentageLevel1();
+				BigDecimal totalDiscountPercentageLevel2 =
+					commerceOrder.getTotalDiscountPercentageLevel2();
+				BigDecimal totalDiscountPercentageLevel3 =
+					commerceOrder.getTotalDiscountPercentageLevel3();
+				BigDecimal totalDiscountPercentageLevel4 =
+					commerceOrder.getTotalDiscountPercentageLevel4();
+
+				if (Objects.equals(
+						priceDisplayType,
+						CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+
+					totalDiscountPercentageLevel1 =
+						commerceOrder.
+							getTotalDiscountPercentageLevel1WithTaxAmount();
+					totalDiscountPercentageLevel2 =
+						commerceOrder.
+							getTotalDiscountPercentageLevel2WithTaxAmount();
+					totalDiscountPercentageLevel3 =
+						commerceOrder.
+							getTotalDiscountPercentageLevel3WithTaxAmount();
+					totalDiscountPercentageLevel4 =
+						commerceOrder.
+							getTotalDiscountPercentageLevel4WithTaxAmount();
+				}
+
+				BigDecimal[] discountPercentagesBidDecimalArray = {
 					totalDiscountPercentageLevel1,
 					totalDiscountPercentageLevel2,
 					totalDiscountPercentageLevel3, totalDiscountPercentageLevel4
-				},
-				locale));
-		summary.setTotalDiscountValue(totalDiscountAmount.doubleValue());
+				};
+
+				return _getFormattedDiscountPercentages(
+					discountPercentagesBidDecimalArray, locale);
+			});
+		summary.setTotalDiscountValue(totalDiscountAmount::doubleValue);
 		summary.setTotalDiscountValueFormatted(
-			_formatPrice(totalDiscountAmount, commerceCurrency, locale));
+			() -> _formatPrice(totalDiscountAmount, commerceCurrency, locale));
 	}
 
 	private Status _toStatus(

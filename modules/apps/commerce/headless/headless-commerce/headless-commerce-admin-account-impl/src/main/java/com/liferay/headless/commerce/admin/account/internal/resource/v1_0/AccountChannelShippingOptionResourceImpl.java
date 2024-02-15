@@ -151,23 +151,9 @@ public class AccountChannelShippingOptionResourceImpl
 				commerceChannel.getGroupId(),
 				accountChannelShippingOption.getShippingMethodKey());
 
-		if ((commerceShippingMethod == null) ||
-			!commerceShippingMethod.isActive()) {
-
-			commerceShippingMethod =
-				_commerceShippingMethodLocalService.fetchCommerceShippingMethod(
-					GetterUtil.getLong(
-						accountChannelShippingOption.getShippingMethodId()));
-
-			if ((commerceShippingMethod == null) ||
-				!commerceShippingMethod.isActive()) {
-
-				throw new NoSuchShippingMethodException();
-			}
-
-			accountChannelShippingOption.setShippingMethodKey(
-				commerceShippingMethod.getEngineKey());
-		}
+		accountChannelShippingOption.setShippingMethodKey(
+			() -> _getEngineKey(
+				accountChannelShippingOption, commerceShippingMethod));
 
 		CommerceShippingFixedOption commerceShippingFixedOption =
 			_commerceShippingFixedOptionLocalService.
@@ -175,21 +161,9 @@ public class AccountChannelShippingOptionResourceImpl
 					contextCompany.getCompanyId(),
 					accountChannelShippingOption.getShippingOptionKey());
 
-		if (commerceShippingFixedOption == null) {
-			commerceShippingFixedOption =
-				_commerceShippingFixedOptionLocalService.
-					fetchCommerceShippingFixedOption(
-						GetterUtil.getLong(
-							accountChannelShippingOption.
-								getShippingOptionId()));
-
-			if (commerceShippingFixedOption == null) {
-				throw new NoSuchShippingFixedOptionException();
-			}
-
-			accountChannelShippingOption.setShippingOptionKey(
-				commerceShippingFixedOption.getKey());
-		}
+		accountChannelShippingOption.setShippingOptionKey(
+			() -> _getKey(
+				accountChannelShippingOption, commerceShippingFixedOption));
 
 		if (commerceShippingMethod.getCommerceShippingMethodId() !=
 				commerceShippingFixedOption.getCommerceShippingMethodId()) {
@@ -359,6 +333,54 @@ public class AccountChannelShippingOptionResourceImpl
 		}
 
 		return commerceChannel.getCommerceChannelId();
+	}
+
+	private String _getEngineKey(
+			AccountChannelShippingOption accountChannelShippingOption,
+			CommerceShippingMethod commerceShippingMethod)
+		throws Exception {
+
+		if ((commerceShippingMethod == null) ||
+			!commerceShippingMethod.isActive()) {
+
+			commerceShippingMethod =
+				_commerceShippingMethodLocalService.fetchCommerceShippingMethod(
+					GetterUtil.getLong(
+						accountChannelShippingOption.getShippingMethodId()));
+
+			if ((commerceShippingMethod == null) ||
+				!commerceShippingMethod.isActive()) {
+
+				throw new NoSuchShippingMethodException();
+			}
+
+			return commerceShippingMethod.getEngineKey();
+		}
+
+		return accountChannelShippingOption.getShippingMethodKey();
+	}
+
+	private String _getKey(
+			AccountChannelShippingOption accountChannelShippingOption,
+			CommerceShippingFixedOption commerceShippingFixedOption)
+		throws Exception {
+
+		if (commerceShippingFixedOption == null) {
+			commerceShippingFixedOption =
+				_commerceShippingFixedOptionLocalService.
+					fetchCommerceShippingFixedOption(
+						GetterUtil.getLong(
+							accountChannelShippingOption.
+								getShippingOptionId()));
+
+			if (commerceShippingFixedOption == null) {
+				throw new NoSuchShippingFixedOptionException();
+			}
+
+			return commerceShippingFixedOption.getKey();
+		}
+
+		return accountChannelShippingOption.getShippingOptionKey();
 	}
 
 	private Page<AccountChannelShippingOption> _getPage(

@@ -299,36 +299,75 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 			String unitOfMeasureKey, Locale locale)
 		throws Exception {
 
-		Availability availability = new Availability();
+		return new Availability() {
+			{
+				setLabel(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayAvailability(
+								cpInstance)) {
 
-		if (_cpDefinitionInventoryEngine.isDisplayAvailability(cpInstance)) {
-			if (Objects.equals(
-					_commerceInventoryEngine.getAvailabilityStatus(
-						cpInstance.getCompanyId(), commerceCatalogGroupId,
-						commerceChannelGroupId,
-						_cpDefinitionInventoryEngine.getMinStockQuantity(
-							cpInstance),
-						cpInstance.getSku(), unitOfMeasureKey),
-					CommerceInventoryAvailabilityConstants.AVAILABLE)) {
+							if (Objects.equals(
+									_commerceInventoryEngine.
+										getAvailabilityStatus(
+											cpInstance.getCompanyId(),
+											commerceCatalogGroupId,
+											commerceChannelGroupId,
+											_cpDefinitionInventoryEngine.
+												getMinStockQuantity(cpInstance),
+											cpInstance.getSku(),
+											unitOfMeasureKey),
+									CommerceInventoryAvailabilityConstants.
+										AVAILABLE)) {
 
-				availability.setLabel_i18n(_language.get(locale, "available"));
-				availability.setLabel("available");
+								return "available";
+							}
+
+							return "unavailable";
+						}
+
+						return null;
+					});
+
+				setLabel_i18n(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayAvailability(
+								cpInstance)) {
+
+							if (Objects.equals(
+									_commerceInventoryEngine.
+										getAvailabilityStatus(
+											cpInstance.getCompanyId(),
+											commerceCatalogGroupId,
+											commerceChannelGroupId,
+											_cpDefinitionInventoryEngine.
+												getMinStockQuantity(cpInstance),
+											cpInstance.getSku(),
+											unitOfMeasureKey),
+									CommerceInventoryAvailabilityConstants.
+										AVAILABLE)) {
+
+								return _language.get(locale, "available");
+							}
+
+							return _language.get(locale, "unavailable");
+						}
+
+						return null;
+					});
+				setStockQuantity(
+					() -> {
+						if (_cpDefinitionInventoryEngine.isDisplayStockQuantity(
+								cpInstance)) {
+
+							return _commerceInventoryEngine.getStockQuantity(
+								companyId, commerceCatalogGroupId,
+								commerceChannelGroupId, sku, unitOfMeasureKey);
+						}
+
+						return null;
+					});
 			}
-			else {
-				availability.setLabel_i18n(
-					_language.get(locale, "unavailable"));
-				availability.setLabel("unavailable");
-			}
-		}
-
-		if (_cpDefinitionInventoryEngine.isDisplayStockQuantity(cpInstance)) {
-			availability.setStockQuantity(
-				_commerceInventoryEngine.getStockQuantity(
-					companyId, commerceCatalogGroupId, commerceChannelGroupId,
-					sku, unitOfMeasureKey));
-		}
-
-		return availability;
+		};
 	}
 
 	private CommerceProductPriceRequest _getCommerceProductPriceRequest(
@@ -337,20 +376,19 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 			BigDecimal quantity, String unitOfMeasureKey)
 		throws Exception {
 
-		CommerceProductPriceRequest commerceProductPriceRequest =
-			new CommerceProductPriceRequest();
-
-		commerceProductPriceRequest.setCalculateTax(
-			_isTaxIncludedInPrice(commerceContext.getCommerceChannelId()));
-		commerceProductPriceRequest.setCommerceContext(commerceContext);
-		commerceProductPriceRequest.setCommerceOptionValues(
-			commerceOptionValues);
-		commerceProductPriceRequest.setCpInstanceId(cpInstanceId);
-		commerceProductPriceRequest.setQuantity(quantity);
-		commerceProductPriceRequest.setSecure(true);
-		commerceProductPriceRequest.setUnitOfMeasureKey(unitOfMeasureKey);
-
-		return commerceProductPriceRequest;
+		return new CommerceProductPriceRequest() {
+			{
+				setCalculateTax(
+					_isTaxIncludedInPrice(
+						commerceContext.getCommerceChannelId()));
+				setCommerceContext(commerceContext);
+				setCommerceOptionValues(commerceOptionValues);
+				setCpInstanceId(cpInstanceId);
+				setQuantity(quantity);
+				setSecure(true);
+				setUnitOfMeasureKey(unitOfMeasureKey);
+			}
+		};
 	}
 
 	private String[] _getFormattedDiscountPercentages(
@@ -389,6 +427,9 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 		CommerceCurrency commerceCurrency =
 			commerceContext.getCommerceCurrency();
 
+		CommerceDiscountValue discountValue =
+			commerceProductPrice.getDiscountValue();
+
 		CommerceMoney unitPriceCommerceMoney =
 			commerceProductPrice.getUnitPrice();
 
@@ -397,49 +438,82 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 
 		BigDecimal unitPrice = unitPriceCommerceMoney.getPrice();
 
-		Price price = new Price() {
+		BigDecimal unitPromoPrice = unitPromoPriceCommerceMoney.getPrice();
+
+		return new Price() {
 			{
 				setCurrency(() -> commerceCurrency.getName(locale));
+				setDiscount(
+					() -> {
+						if (discountValue != null) {
+							CommerceMoney discountAmountCommerceMoney =
+								discountValue.getDiscountAmount();
+
+							return discountAmountCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
+				setDiscountPercentage(
+					() -> {
+						if (discountValue != null) {
+							return _commercePriceFormatter.format(
+								discountValue.getDiscountPercentage(), locale);
+						}
+
+						return null;
+					});
+				setDiscountPercentages(
+					() -> {
+						if (discountValue != null) {
+							return _getFormattedDiscountPercentages(
+								discountValue.getPercentages(), locale);
+						}
+
+						return null;
+					});
+				setFinalPrice(
+					() -> {
+						if (discountValue != null) {
+							CommerceMoney finalPriceCommerceMoney =
+								commerceProductPrice.getFinalPrice();
+
+							return finalPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
 				setPrice(unitPrice::doubleValue);
 				setPriceFormatted(() -> unitPriceCommerceMoney.format(locale));
 				setPriceOnApplication(
 					commerceProductPrice::isPriceOnApplication);
+
+				setPromoPrice(
+					() -> {
+						if ((unitPromoPrice != null) &&
+							(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+							((unitPromoPrice.compareTo(unitPrice) < 0) ||
+							 unitPriceCommerceMoney.isPriceOnApplication())) {
+
+							return unitPromoPrice.doubleValue();
+						}
+
+						return null;
+					});
+				setPromoPriceFormatted(
+					() -> {
+						if ((unitPromoPrice != null) &&
+							(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+							((unitPromoPrice.compareTo(unitPrice) < 0) ||
+							 unitPriceCommerceMoney.isPriceOnApplication())) {
+
+							return unitPromoPriceCommerceMoney.format(locale);
+						}
+
+						return null;
+					});
 			}
 		};
-
-		BigDecimal unitPromoPrice = unitPromoPriceCommerceMoney.getPrice();
-
-		if ((unitPromoPrice != null) &&
-			(unitPromoPrice.compareTo(BigDecimal.ZERO) > 0) &&
-			((unitPromoPrice.compareTo(unitPrice) < 0) ||
-			 unitPriceCommerceMoney.isPriceOnApplication())) {
-
-			price.setPromoPrice(unitPromoPrice.doubleValue());
-			price.setPromoPriceFormatted(
-				unitPromoPriceCommerceMoney.format(locale));
-		}
-
-		CommerceDiscountValue discountValue =
-			commerceProductPrice.getDiscountValue();
-
-		if (discountValue != null) {
-			CommerceMoney discountAmountCommerceMoney =
-				discountValue.getDiscountAmount();
-
-			CommerceMoney finalPriceCommerceMoney =
-				commerceProductPrice.getFinalPrice();
-
-			price.setDiscount(discountAmountCommerceMoney.format(locale));
-			price.setDiscountPercentage(
-				_commercePriceFormatter.format(
-					discountValue.getDiscountPercentage(), locale));
-			price.setDiscountPercentages(
-				_getFormattedDiscountPercentages(
-					discountValue.getPercentages(), locale));
-			price.setFinalPrice(finalPriceCommerceMoney.format(locale));
-		}
-
-		return price;
 	}
 
 	private SkuOption[] _getSkuOptions(
