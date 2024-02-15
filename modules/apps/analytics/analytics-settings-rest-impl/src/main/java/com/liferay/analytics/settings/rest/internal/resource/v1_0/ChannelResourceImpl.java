@@ -152,13 +152,21 @@ public class ChannelResourceImpl extends BaseChannelResourceImpl {
 
 		DataSource dataSource = dataSources[0];
 
-		if (dataSource.getDataSourceId() == null) {
-			dataSource.setDataSourceId(
-				analyticsConfiguration.liferayAnalyticsDataSourceId());
-		}
-		else if (!Objects.equals(
-					dataSource.getDataSourceId(),
-					analyticsConfiguration.liferayAnalyticsDataSourceId())) {
+		String dataSourceId = dataSource.getDataSourceId();
+
+		dataSource.setDataSourceId(
+			() -> {
+				if (dataSourceId == null) {
+					return analyticsConfiguration.
+						liferayAnalyticsDataSourceId();
+				}
+
+				return dataSourceId;
+			});
+
+		if (!Objects.equals(
+				dataSource.getDataSourceId(),
+				analyticsConfiguration.liferayAnalyticsDataSourceId())) {
 
 			throw new PortalException("Invalid data source ID");
 		}
