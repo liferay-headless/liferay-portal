@@ -170,9 +170,6 @@ public class PunchOutSessionResourceImpl
 			commerceOrderUuid = editCartCommerceOrder.getUuid();
 		}
 
-		String punchOutStartURL = _getPunchOutStartURL(
-			commerceChannel.getGroupId());
-
 		PunchOutContext punchOutContext = new PunchOutContext(
 			businessAccountEntry, buyerGroup, buyerLiferayUser, commerceChannel,
 			editCartCommerceOrder, punchOutSession);
@@ -188,15 +185,21 @@ public class PunchOutSessionResourceImpl
 
 		String tokenString = Base64.encodeToURL(punchOutAccessToken.getToken());
 
-		punchOutStartURL +=
-			StringPool.QUESTION + _PUNCH_OUT_ACCESS_TOKEN_PARAMETER +
-				URLEncoder.encode(tokenString, "UTF-8");
+		cart.setChannelId(commerceChannel::getCommerceChannelId);
 
-		cart.setChannelId(commerceChannel.getCommerceChannelId());
+		punchOutSession.setCart(() -> cart);
 
-		punchOutSession.setCart(cart);
+		punchOutSession.setPunchOutStartURL(
+			() -> {
+				String punchOutStartURL = _getPunchOutStartURL(
+					commerceChannel.getGroupId());
 
-		punchOutSession.setPunchOutStartURL(punchOutStartURL);
+				punchOutStartURL +=
+					StringPool.QUESTION + _PUNCH_OUT_ACCESS_TOKEN_PARAMETER +
+						URLEncoder.encode(tokenString, "UTF-8");
+
+				return punchOutStartURL;
+			});
 
 		return punchOutSession;
 	}
