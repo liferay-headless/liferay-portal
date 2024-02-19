@@ -731,40 +731,85 @@ public class DefaultObjectEntryManagerImpl
 		ObjectEntry existingObjectEntry = getObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntryId);
 
-		if (objectEntry.getDateCreated() != null) {
-			existingObjectEntry.setDateCreated(objectEntry.getDateCreated());
-		}
+		Date existingDateCreated = existingObjectEntry.getDateCreated();
 
-		if (objectEntry.getDateModified() != null) {
-			existingObjectEntry.setDateModified(objectEntry.getDateModified());
-		}
+		existingObjectEntry.setDateCreated(
+			() -> {
+				if (objectEntry.getDateCreated() != null) {
+					return objectEntry.getDateCreated();
+				}
 
-		if (objectEntry.getExternalReferenceCode() != null) {
-			existingObjectEntry.setExternalReferenceCode(
-				objectEntry.getExternalReferenceCode());
-		}
+				return existingDateCreated;
+			});
 
-		if (objectEntry.getKeywords() != null) {
-			existingObjectEntry.setKeywords(objectEntry.getKeywords());
-		}
+		Date existingDateModified = existingObjectEntry.getDateModified();
 
-		if (objectEntry.getProperties() != null) {
-			Map<String, Object> properties =
-				existingObjectEntry.getProperties();
+		existingObjectEntry.setDateModified(
+			() -> {
+				if (objectEntry.getDateModified() != null) {
+					return objectEntry.getDateModified();
+				}
 
-			properties.putAll(objectEntry.getProperties());
+				return existingDateModified;
+			});
 
-			existingObjectEntry.setProperties(properties);
-		}
+		String existingExternalReferenceCode =
+			existingObjectEntry.getExternalReferenceCode();
 
-		if (objectEntry.getStatus() != null) {
-			existingObjectEntry.setStatus(objectEntry.getStatus());
-		}
+		existingObjectEntry.setExternalReferenceCode(
+			() -> {
+				if (objectEntry.getExternalReferenceCode() != null) {
+					return objectEntry.getExternalReferenceCode();
+				}
 
-		if (objectEntry.getTaxonomyCategoryIds() != null) {
-			existingObjectEntry.setTaxonomyCategoryIds(
-				objectEntry.getTaxonomyCategoryIds());
-		}
+				return existingExternalReferenceCode;
+			});
+
+		String[] existingKeywords = existingObjectEntry.getKeywords();
+
+		existingObjectEntry.setKeywords(
+			() -> {
+				if (objectEntry.getKeywords() != null) {
+					return objectEntry.getKeywords();
+				}
+
+				return existingKeywords;
+			});
+
+		Map<String, Object> existingProperties =
+			existingObjectEntry.getProperties();
+
+		existingObjectEntry.setProperties(
+			() -> {
+				if (objectEntry.getProperties() != null) {
+					existingProperties.putAll(objectEntry.getProperties());
+				}
+
+				return existingProperties;
+			});
+
+		Status existingStatus = existingObjectEntry.getStatus();
+
+		existingObjectEntry.setStatus(
+			() -> {
+				if (objectEntry.getStatus() != null) {
+					return objectEntry.getStatus();
+				}
+
+				return existingStatus;
+			});
+
+		Long[] existingTaxonomyCategoryIds =
+			existingObjectEntry.getTaxonomyCategoryIds();
+
+		existingObjectEntry.setTaxonomyCategoryIds(
+			() -> {
+				if (objectEntry.getTaxonomyCategoryIds() != null) {
+					return objectEntry.getTaxonomyCategoryIds();
+				}
+
+				return existingTaxonomyCategoryIds;
+			});
 
 		return updateObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntryId,
@@ -1422,8 +1467,8 @@ public class DefaultObjectEntryManagerImpl
 				objectField.getObjectFieldId(), serviceContext);
 		}
 
-		fileEntry.setFileBase64((String)null);
-		fileEntry.setId(serviceBuilderFileEntry.getFileEntryId());
+		fileEntry.setFileBase64(() -> (String)null);
+		fileEntry.setId(serviceBuilderFileEntry::getFileEntryId);
 
 		Map<String, Object> properties = objectEntry.getProperties();
 

@@ -129,29 +129,45 @@ public class ImportObjectDefinitionMVCActionCommand
 		ObjectDefinition objectDefinition = ObjectDefinition.toDTO(
 			objectDefinitionJSONObject.toString());
 
-		objectDefinition.setActive(false);
+		objectDefinition.setActive(() -> Boolean.FALSE);
 
 		String externalReferenceCode = ParamUtil.getString(
 			actionRequest, "externalReferenceCode");
 
-		if (Validator.isNotNull(externalReferenceCode)) {
-			objectDefinition.setExternalReferenceCode(externalReferenceCode);
-		}
+		String objectDefinitionExternalReferenceCode =
+			objectDefinition.getExternalReferenceCode();
 
-		objectDefinition.setName(ParamUtil.getString(actionRequest, "name"));
+		objectDefinition.setExternalReferenceCode(
+			() -> {
+				if (Validator.isNotNull(externalReferenceCode)) {
+					return externalReferenceCode;
+				}
+
+				return objectDefinitionExternalReferenceCode;
+			});
+
+		objectDefinition.setName(
+			() -> ParamUtil.getString(actionRequest, "name"));
 		objectDefinition.setObjectFolderExternalReferenceCode(
-			ParamUtil.getString(
+			() -> ParamUtil.getString(
 				actionRequest, "objectFolderExternalReferenceCode"));
 
 		ObjectDefinition putObjectDefinition =
 			objectDefinitionResource.putObjectDefinitionByExternalReferenceCode(
 				objectDefinition.getExternalReferenceCode(), objectDefinition);
 
-		putObjectDefinition.setPortlet(objectDefinition.getPortlet());
+		putObjectDefinition.setPortlet(objectDefinition::getPortlet);
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-			putObjectDefinition.setStorageType(StringPool.BLANK);
-		}
+		String storageType = objectDefinition.getStorageType();
+
+		putObjectDefinition.setStorageType(
+			() -> {
+				if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
+					return StringPool.BLANK;
+				}
+
+				return storageType;
+			});
 
 		objectDefinitionResource.putObjectDefinition(
 			putObjectDefinition.getId(), putObjectDefinition);

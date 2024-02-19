@@ -8,6 +8,7 @@ package com.liferay.object.rest.internal.resource.v1_0;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
@@ -522,9 +523,16 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	protected void preparePatch(
 		ObjectEntry objectEntry, ObjectEntry existingObjectEntry) {
 
-		if (objectEntry.getStatus() != null) {
-			existingObjectEntry.setStatus(objectEntry.getStatus());
-		}
+		Status existingStatus = existingObjectEntry.getStatus();
+
+		existingObjectEntry.setStatus(
+			() -> {
+				if (objectEntry.getStatus() != null) {
+					return objectEntry.getStatus();
+				}
+
+				return existingStatus;
+			});
 	}
 
 	private DefaultDTOConverterContext _getDTOConverterContext(

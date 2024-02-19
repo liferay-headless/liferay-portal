@@ -688,7 +688,7 @@ public class ObjectDefinitionResourceImpl
 					fetchObjectDefinitionByExternalReferenceCode(
 						externalReferenceCode, contextCompany.getCompanyId());
 
-		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+		objectDefinition.setExternalReferenceCode(() -> externalReferenceCode);
 
 		if (serviceBuilderObjectDefinition != null) {
 			return putObjectDefinition(
@@ -707,11 +707,12 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		for (ObjectField objectField : objectDefinition.getObjectFields()) {
-			objectField.setListTypeDefinitionId(
-				ObjectFieldUtil.addListTypeDefinition(
-					contextUser.getCompanyId(), _listTypeDefinitionLocalService,
-					_listTypeEntryLocalService, objectField,
-					contextUser.getUserId()));
+			long listTypeDefinitionId = ObjectFieldUtil.addListTypeDefinition(
+				contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+				_listTypeEntryLocalService, objectField,
+				contextUser.getUserId());
+
+			objectField.setListTypeDefinitionId(() -> listTypeDefinitionId);
 		}
 	}
 

@@ -177,18 +177,26 @@ public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception {
 
-		if (Validator.isNotNull(
-				objectLayout.getObjectDefinitionExternalReferenceCode())) {
+		Long objectDefinitionId = objectLayout.getObjectDefinitionId();
 
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.
-					getObjectDefinitionByExternalReferenceCode(
-						objectLayout.getObjectDefinitionExternalReferenceCode(),
-						contextCompany.getCompanyId());
+		objectLayout.setObjectDefinitionId(
+			() -> {
+				if (Validator.isNotNull(
+						objectLayout.
+							getObjectDefinitionExternalReferenceCode())) {
 
-			objectLayout.setObjectDefinitionId(
-				objectDefinition.getObjectDefinitionId());
-		}
+					ObjectDefinition objectDefinition =
+						_objectDefinitionLocalService.
+							getObjectDefinitionByExternalReferenceCode(
+								objectLayout.
+									getObjectDefinitionExternalReferenceCode(),
+								contextCompany.getCompanyId());
+
+					return objectDefinition.getObjectDefinitionId();
+				}
+
+				return objectDefinitionId;
+			});
 
 		return _toObjectLayout(
 			_objectLayoutService.updateObjectLayout(

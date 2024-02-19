@@ -129,21 +129,27 @@ public class ObjectEntryDTOConverter
 
 		User user = dtoConverterContext.getUser();
 
-		objectEntry.setActions(dtoConverterContext.getActions());
+		objectEntry.setActions(dtoConverterContext::getActions);
 
-		if (objectEntry.getStatus() == null) {
-			objectEntry.setStatus(
-				new Status() {
-					{
-						setCode(() -> WorkflowConstants.STATUS_APPROVED);
-						setLabel(() -> WorkflowConstants.LABEL_APPROVED);
-						setLabel_i18n(
-							() -> _language.get(
-								user.getLocale(),
-								WorkflowConstants.LABEL_APPROVED));
-					}
-				});
-		}
+		Status status = objectEntry.getStatus();
+
+		objectEntry.setStatus(
+			() -> {
+				if (status == null) {
+					return new Status() {
+						{
+							setCode(() -> WorkflowConstants.STATUS_APPROVED);
+							setLabel(() -> WorkflowConstants.LABEL_APPROVED);
+							setLabel_i18n(
+								() -> _language.get(
+									user.getLocale(),
+									WorkflowConstants.LABEL_APPROVED));
+						}
+					};
+				}
+
+				return status;
+			});
 
 		List<ObjectField> objectFields =
 			_objectFieldLocalService.getObjectFields(
@@ -168,7 +174,7 @@ public class ObjectEntryDTOConverter
 					dtoConverterContext, map.get("key"),
 					objectField.getListTypeDefinitionId()));
 
-			objectEntry.setProperties(properties);
+			objectEntry.setProperties(() -> properties);
 		}
 
 		return objectEntry;
@@ -431,6 +437,109 @@ public class ObjectEntryDTOConverter
 			dtoConverterContext.getUser());
 	}
 
+	private FileEntry _getFileEntry(
+		ObjectDefinition objectDefinition,
+		com.liferay.object.model.ObjectEntry objectEntry,
+		ObjectField objectField, Map<String, Serializable> values) {
+
+		long fileEntryId = GetterUtil.getLong(
+			values.get(objectField.getName()));
+
+		if (fileEntryId == 0) {
+			return null;
+		}
+
+		FileEntry fileEntry = new FileEntry();
+
+		DLFileEntry dlFileEntry = _dLFileEntryLocalService.fetchDLFileEntry(
+			fileEntryId);
+
+		fileEntry.setFileBase64(
+			() -> {
+				if ((dlFileEntry != null) &&
+					FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
+
+					return (String)NestedFieldsSupplier.supply(
+						objectField.getName() + ".fileBase64",
+						fieldName -> Base64.encode(
+							_file.getBytes(dlFileEntry.getContentStream())));
+				}
+
+				return null;
+			});
+
+		fileEntry.setFolder(
+			() -> {
+				if ((dlFileEntry != null) &&
+					FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
+
+					return (Folder)NestedFieldsSupplier.supply(
+						objectField.getName() + ".folder",
+						fieldName -> {
+							if (!Objects.equals(
+									ObjectFieldSettingConstants.
+										VALUE_DOCS_AND_MEDIA,
+									ObjectFieldSettingUtil.getValue(
+										ObjectFieldSettingConstants.
+											NAME_FILE_SOURCE,
+										objectField))) {
+
+								return null;
+							}
+
+							Folder folder = new Folder();
+
+							folder.setExternalReferenceCode(
+								() -> {
+									if (dlFileEntry.getFolderId() == 0) {
+										return null;
+									}
+
+									DLFolder dlFolder = dlFileEntry.getFolder();
+
+									return dlFolder.getExternalReferenceCode();
+								});
+							folder.setSiteId(dlFileEntry::getGroupId);
+
+							return folder;
+						});
+				}
+
+				return null;
+			});
+
+		fileEntry.setId(
+			() -> {
+				if (dlFileEntry != null) {
+					return dlFileEntry.getFileEntryId();
+				}
+
+				return null;
+			});
+
+		fileEntry.setLink(
+			() -> {
+				if (dlFileEntry != null) {
+					return LinkUtil.toLink(
+						_dlAppService, dlFileEntry, _dlURLHelper,
+						objectDefinition.getExternalReferenceCode(),
+						objectEntry.getExternalReferenceCode(), _portal);
+				}
+
+				return null;
+			});
+		fileEntry.setName(
+			() -> {
+				if (dlFileEntry != null) {
+					return dlFileEntry.getFileName();
+				}
+
+				return null;
+			});
+
+		return fileEntry;
+	}
+
 	private ListEntry _getListEntry(
 		DTOConverterContext dtoConverterContext, String key,
 		long listTypeDefinitionId) {
@@ -597,17 +706,16 @@ public class ObjectEntryDTOConverter
 						AuditEvent newAuditEvent = new AuditEvent();
 
 						newAuditEvent.setAuditFieldChanges(
-							_toAuditFieldChanges(
+							() -> _toAuditFieldChanges(
 								auditEvent.getAdditionalInfo(),
 								auditEvent.getEventType()));
 						newAuditEvent.setCreator(
-							CreatorUtil.toCreator(
+							() -> CreatorUtil.toCreator(
 								_portal, dtoConverterContext.getUriInfo(),
 								_userLocalService.fetchUser(
 									auditEvent.getUserId())));
-						newAuditEvent.setDateCreated(
-							auditEvent.getCreateDate());
-						newAuditEvent.setEventType(auditEvent.getEventType());
+						newAuditEvent.setDateCreated(auditEvent::getCreateDate);
+						newAuditEvent.setEventType(auditEvent::getEventType);
 
 						return newAuditEvent;
 					},
@@ -711,70 +819,11 @@ public class ObjectEntryDTOConverter
 			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
-				long fileEntryId = GetterUtil.getLong(
-					values.get(objectField.getName()));
+				FileEntry fileEntry = _getFileEntry(
+					objectDefinition, objectEntry, objectField, values);
 
-				if (fileEntryId == 0) {
+				if (fileEntry == null) {
 					continue;
-				}
-
-				FileEntry fileEntry = new FileEntry();
-
-				DLFileEntry dlFileEntry =
-					_dLFileEntryLocalService.fetchDLFileEntry(fileEntryId);
-
-				if (dlFileEntry != null) {
-					if (FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
-						fileEntry.setFileBase64(
-							(String)NestedFieldsSupplier.supply(
-								objectFieldName + ".fileBase64",
-								fieldName -> Base64.encode(
-									_file.getBytes(
-										dlFileEntry.getContentStream()))));
-						fileEntry.setFolder(
-							(Folder)NestedFieldsSupplier.supply(
-								objectFieldName + ".folder",
-								fieldName -> {
-									if (!Objects.equals(
-											ObjectFieldSettingConstants.
-												VALUE_DOCS_AND_MEDIA,
-											ObjectFieldSettingUtil.getValue(
-												ObjectFieldSettingConstants.
-													NAME_FILE_SOURCE,
-												objectField))) {
-
-										return null;
-									}
-
-									Folder folder = new Folder();
-
-									folder.setExternalReferenceCode(
-										() -> {
-											if (dlFileEntry.getFolderId() ==
-													0) {
-
-												return null;
-											}
-
-											DLFolder dlFolder =
-												dlFileEntry.getFolder();
-
-											return dlFolder.
-												getExternalReferenceCode();
-										});
-									folder.setSiteId(dlFileEntry.getGroupId());
-
-									return folder;
-								}));
-					}
-
-					fileEntry.setId(dlFileEntry.getFileEntryId());
-					fileEntry.setLink(
-						LinkUtil.toLink(
-							_dlAppService, dlFileEntry, _dlURLHelper,
-							objectDefinition.getExternalReferenceCode(),
-							objectEntry.getExternalReferenceCode(), _portal));
-					fileEntry.setName(dlFileEntry.getFileName());
 				}
 
 				map.put(objectFieldName, fileEntry);

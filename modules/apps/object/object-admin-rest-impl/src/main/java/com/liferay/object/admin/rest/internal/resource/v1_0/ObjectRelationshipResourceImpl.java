@@ -233,11 +233,14 @@ public class ObjectRelationshipResourceImpl
 			throw new UnsupportedOperationException();
 		}
 
-		if (Validator.isNotNull(
-				objectRelationship.getParameterObjectFieldName())) {
+		Long parameterObjectFieldId =
+			objectRelationship.getParameterObjectFieldId();
 
-			objectRelationship.setParameterObjectFieldId(
-				() -> {
+		objectRelationship.setParameterObjectFieldId(
+			() -> {
+				if (Validator.isNotNull(
+						objectRelationship.getParameterObjectFieldName())) {
+
 					com.liferay.object.model.ObjectDefinition objectDefinition =
 						_objectDefinitionLocalService.
 							getObjectDefinitionByExternalReferenceCode(
@@ -251,8 +254,10 @@ public class ObjectRelationshipResourceImpl
 							objectRelationship.getParameterObjectFieldName());
 
 					return objectField.getObjectFieldId();
-				});
-		}
+				}
+
+				return parameterObjectFieldId;
+			});
 
 		return _toObjectRelationship(
 			_objectRelationshipService.updateObjectRelationship(
@@ -282,7 +287,8 @@ public class ObjectRelationshipResourceImpl
 						externalReferenceCode, contextCompany.getCompanyId(),
 						objectRelationship.getObjectDefinitionId1());
 
-		objectRelationship.setExternalReferenceCode(externalReferenceCode);
+		objectRelationship.setExternalReferenceCode(
+			() -> externalReferenceCode);
 
 		if (serviceBuilderObjectRelationship != null) {
 			return putObjectRelationship(
