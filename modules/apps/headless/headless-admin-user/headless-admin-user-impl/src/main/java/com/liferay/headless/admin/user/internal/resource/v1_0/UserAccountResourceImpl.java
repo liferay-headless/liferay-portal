@@ -1068,85 +1068,166 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 	protected void preparePatch(
 		UserAccount userAccount, UserAccount existingUserAccount) {
 
-		AccountBrief[] accountBriefs = userAccount.getAccountBriefs();
+		AccountBrief[] existingAccountBriefs =
+			existingUserAccount.getAccountBriefs();
 
-		if (accountBriefs != null) {
-			existingUserAccount.setAccountBriefs(accountBriefs);
-		}
+		existingUserAccount.setAccountBriefs(
+			() -> {
+				AccountBrief[] accountBriefs = userAccount.getAccountBriefs();
 
-		OrganizationBrief[] organizationBriefs =
-			userAccount.getOrganizationBriefs();
+				if (accountBriefs != null) {
+					return accountBriefs;
+				}
 
-		if (organizationBriefs != null) {
-			existingUserAccount.setOrganizationBriefs(organizationBriefs);
-		}
+				return existingAccountBriefs;
+			});
+
+		OrganizationBrief[] existingOrganizationBriefs =
+			existingUserAccount.getOrganizationBriefs();
+
+		existingUserAccount.setOrganizationBriefs(
+			() -> {
+				OrganizationBrief[] organizationBriefs =
+					userAccount.getOrganizationBriefs();
+
+				if (organizationBriefs != null) {
+					return organizationBriefs;
+				}
+
+				return existingOrganizationBriefs;
+			});
 
 		UserAccountContactInformation userAccountContactInformation =
 			userAccount.getUserAccountContactInformation();
 
-		if (userAccountContactInformation != null) {
-			UserAccountContactInformation
-				existingUserAccountContactInformation =
-					existingUserAccount.getUserAccountContactInformation();
+		UserAccountContactInformation existingUserAccountContactInformation =
+			existingUserAccount.getUserAccountContactInformation();
 
-			EmailAddress[] emailAddresses =
-				userAccountContactInformation.getEmailAddresses();
+		EmailAddress[] existingEmailAddresses =
+			existingUserAccountContactInformation.getEmailAddresses();
 
-			if (emailAddresses != null) {
-				existingUserAccountContactInformation.setEmailAddresses(
-					emailAddresses);
-			}
+		existingUserAccountContactInformation.setEmailAddresses(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getEmailAddresses() !=
+						null)) {
 
-			String facebook = userAccountContactInformation.getFacebook();
+					return userAccountContactInformation.getEmailAddresses();
+				}
 
-			if (facebook != null) {
-				existingUserAccountContactInformation.setFacebook(facebook);
-			}
+				return existingEmailAddresses;
+			});
 
-			String jabber = userAccountContactInformation.getJabber();
+		String existingFacebook =
+			existingUserAccountContactInformation.getFacebook();
 
-			if (jabber != null) {
-				existingUserAccountContactInformation.setJabber(jabber);
-			}
+		existingUserAccountContactInformation.setFacebook(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getFacebook() != null)) {
 
-			PostalAddress[] postalAddresses =
-				userAccountContactInformation.getPostalAddresses();
+					return userAccountContactInformation.getFacebook();
+				}
 
-			if (postalAddresses != null) {
-				existingUserAccountContactInformation.setPostalAddresses(
-					postalAddresses);
-			}
+				return existingFacebook;
+			});
 
-			String skype = userAccountContactInformation.getSkype();
+		String existingJabber =
+			existingUserAccountContactInformation.getJabber();
 
-			if (skype != null) {
-				existingUserAccountContactInformation.setSkype(skype);
-			}
+		existingUserAccountContactInformation.setJabber(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getJabber() != null)) {
 
-			String sms = userAccountContactInformation.getSms();
+					return userAccountContactInformation.getJabber();
+				}
 
-			if (sms != null) {
-				existingUserAccountContactInformation.setSms(sms);
-			}
+				return existingJabber;
+			});
 
-			Phone[] telephones = userAccountContactInformation.getTelephones();
+		PostalAddress[] existingPostalAddresses =
+			existingUserAccountContactInformation.getPostalAddresses();
 
-			if (telephones != null) {
-				existingUserAccountContactInformation.setTelephones(telephones);
-			}
+		existingUserAccountContactInformation.setPostalAddresses(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getPostalAddresses() !=
+						null)) {
 
-			String twitter = userAccountContactInformation.getTwitter();
+					return userAccountContactInformation.getPostalAddresses();
+				}
 
-			if (twitter != null) {
-				existingUserAccountContactInformation.setTwitter(twitter);
-			}
+				return existingPostalAddresses;
+			});
 
-			WebUrl[] webUrls = userAccountContactInformation.getWebUrls();
+		String existingSkype = existingUserAccountContactInformation.getSkype();
 
-			if (webUrls != null) {
-				existingUserAccountContactInformation.setWebUrls(webUrls);
-			}
-		}
+		existingUserAccountContactInformation.setSkype(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getSkype() != null)) {
+
+					return userAccountContactInformation.getSkype();
+				}
+
+				return existingSkype;
+			});
+
+		String existingSms = existingUserAccountContactInformation.getSms();
+
+		existingUserAccountContactInformation.setSms(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getSms() != null)) {
+
+					return userAccountContactInformation.getSms();
+				}
+
+				return existingSms;
+			});
+
+		Phone[] existingTelephones =
+			existingUserAccountContactInformation.getTelephones();
+
+		existingUserAccountContactInformation.setTelephones(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getTelephones() != null)) {
+
+					return userAccountContactInformation.getTelephones();
+				}
+
+				return existingTelephones;
+			});
+
+		String existingTwitter =
+			existingUserAccountContactInformation.getTwitter();
+
+		existingUserAccountContactInformation.setTwitter(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getTwitter() != null)) {
+
+					return userAccountContactInformation.getTwitter();
+				}
+
+				return existingTwitter;
+			});
+
+		WebUrl[] existingWebUrls =
+			existingUserAccountContactInformation.getWebUrls();
+
+		existingUserAccountContactInformation.setWebUrls(
+			() -> {
+				if ((userAccountContactInformation != null) &&
+					(userAccountContactInformation.getWebUrls() != null)) {
+
+					return userAccountContactInformation.getWebUrls();
+				}
+
+				return existingWebUrls;
+			});
 	}
 
 	private void _checkCurrentPassword(User user, String currentPassword)

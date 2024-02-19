@@ -189,10 +189,16 @@ public class PageElementDTOConverter
 			groupId, layoutStructureItem, saveInlineContent,
 			saveMappingConfiguration);
 
-		if ((pageElement != null) && !pageElements.isEmpty()) {
-			pageElement.setPageElements(
-				pageElements.toArray(new PageElement[0]));
-		}
+		PageElement[] pageElementPageElements = pageElement.getPageElements();
+
+		pageElement.setPageElements(
+			() -> {
+				if ((pageElement != null) && !pageElements.isEmpty()) {
+					return pageElements.toArray(new PageElement[0]);
+				}
+
+				return pageElementPageElements;
+			});
 
 		return pageElement;
 	}

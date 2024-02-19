@@ -149,15 +149,22 @@ public class RegionResourceImpl extends BaseRegionResourceImpl {
 	}
 
 	private void _setTitleMap(Region region) {
-		if (region.getTitle_i18n() == null) {
-			Map<String, String> titleMap = new HashMap<>();
+		Map<String, String> titleI18n = region.getTitle_i18n();
 
-			for (Locale locale : _language.getAvailableLocales()) {
-				titleMap.put(_language.getLanguageId(locale), null);
-			}
+		region.setTitle_i18n(
+			() -> {
+				if (titleI18n == null) {
+					Map<String, String> titleMap = new HashMap<>();
 
-			region.setTitle_i18n(titleMap);
-		}
+					for (Locale locale : _language.getAvailableLocales()) {
+						titleMap.put(_language.getLanguageId(locale), null);
+					}
+
+					return titleMap;
+				}
+
+				return titleI18n;
+			});
 	}
 
 	private OrderByComparator<com.liferay.portal.kernel.model.Region>

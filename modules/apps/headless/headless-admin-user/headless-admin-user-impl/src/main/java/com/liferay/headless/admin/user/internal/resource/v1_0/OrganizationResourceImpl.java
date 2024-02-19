@@ -635,52 +635,102 @@ public class OrganizationResourceImpl extends BaseOrganizationResourceImpl {
 		OrganizationContactInformation organizationContactInformation =
 			organization.getOrganizationContactInformation();
 
-		if (organizationContactInformation != null) {
-			OrganizationContactInformation
-				existingOrganizationContactInformation =
-					existingOrganization.getOrganizationContactInformation();
+		OrganizationContactInformation existingOrganizationContactInformation =
+			existingOrganization.getOrganizationContactInformation();
 
-			if (organizationContactInformation.getEmailAddresses() != null) {
-				existingOrganizationContactInformation.setEmailAddresses(
-					organizationContactInformation.getEmailAddresses());
-			}
+		EmailAddress[] existingEmailAddresses =
+			existingOrganizationContactInformation.getEmailAddresses();
 
-			if (organizationContactInformation.getPostalAddresses() != null) {
-				existingOrganizationContactInformation.setPostalAddresses(
-					organizationContactInformation.getPostalAddresses());
-			}
+		existingOrganizationContactInformation.setEmailAddresses(
+			() -> {
+				if ((organizationContactInformation != null) &&
+					(organizationContactInformation.getEmailAddresses() !=
+						null)) {
 
-			if (organizationContactInformation.getTelephones() != null) {
-				existingOrganizationContactInformation.setTelephones(
-					organizationContactInformation.getTelephones());
-			}
+					return organizationContactInformation.getEmailAddresses();
+				}
 
-			if (organizationContactInformation.getWebUrls() != null) {
-				existingOrganizationContactInformation.setWebUrls(
-					organizationContactInformation.getWebUrls());
-			}
-		}
+				return existingEmailAddresses;
+			});
+
+		PostalAddress[] existingPostalAddresses =
+			existingOrganizationContactInformation.getPostalAddresses();
+
+		existingOrganizationContactInformation.setPostalAddresses(
+			() -> {
+				if ((organizationContactInformation != null) &&
+					(organizationContactInformation.getPostalAddresses() !=
+						null)) {
+
+					return organizationContactInformation.getPostalAddresses();
+				}
+
+				return existingPostalAddresses;
+			});
+
+		Phone[] existingTelephones =
+			existingOrganizationContactInformation.getTelephones();
+
+		existingOrganizationContactInformation.setTelephones(
+			() -> {
+				if ((organizationContactInformation != null) &&
+					(organizationContactInformation.getTelephones() != null)) {
+
+					return organizationContactInformation.getTelephones();
+				}
+
+				return existingTelephones;
+			});
+
+		WebUrl[] existingWebUrls =
+			existingOrganizationContactInformation.getWebUrls();
+
+		existingOrganizationContactInformation.setWebUrls(
+			() -> {
+				if ((organizationContactInformation != null) &&
+					(organizationContactInformation.getWebUrls() != null)) {
+
+					return organizationContactInformation.getWebUrls();
+				}
+
+				return existingWebUrls;
+			});
 
 		_patchCustomFields(
 			organization.getCustomFields(), existingOrganization);
 
-		Organization parentOrganization = organization.getParentOrganization();
+		Organization existingParentOrganization =
+			existingOrganization.getParentOrganization();
 
-		if (parentOrganization != null) {
-			try {
-				existingOrganization.setParentOrganization(
-					_toOrganization(parentOrganization.getId()));
-			}
-			catch (Exception exception) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+		existingOrganization.setParentOrganization(
+			() -> {
+				Organization parentOrganization =
+					organization.getParentOrganization();
+
+				if (parentOrganization != null) {
+					try {
+						return _toOrganization(parentOrganization.getId());
+					}
+					catch (Exception exception) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(exception);
+						}
+					}
 				}
-			}
-		}
 
-		if (organization.getServices() != null) {
-			existingOrganization.setServices(organization.getServices());
-		}
+				return existingParentOrganization;
+			});
+
+		Service[] existingServices = existingOrganization.getServices();
+
+		existingOrganization.setServices(
+			() -> {
+				if (organization.getServices() != null) {
+					return organization.getServices();
+				}
+
+				return existingServices;
+			});
 	}
 
 	private ServiceContext _createServiceContext(Organization organization)

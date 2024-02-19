@@ -122,15 +122,22 @@ public class CountryResourceImpl extends BaseCountryResourceImpl {
 				ServiceContextFactory.getInstance(
 					Country.class.getName(), contextHttpServletRequest));
 
-		if (country.getTitle_i18n() == null) {
-			Map<String, String> titleMap = new HashMap<>();
+		Map<String, String> titleI18n = country.getTitle_i18n();
 
-			for (Locale locale : _language.getAvailableLocales()) {
-				titleMap.put(_language.getLanguageId(locale), null);
-			}
+		country.setTitle_i18n(
+			() -> {
+				if (titleI18n == null) {
+					Map<String, String> titleMap = new HashMap<>();
 
-			country.setTitle_i18n(titleMap);
-		}
+					for (Locale locale : _language.getAvailableLocales()) {
+						titleMap.put(_language.getLanguageId(locale), null);
+					}
+
+					return titleMap;
+				}
+
+				return titleI18n;
+			});
 
 		_countryLocalService.updateCountryLocalizations(
 			serviceBuilderCountry, country.getTitle_i18n());
@@ -155,15 +162,22 @@ public class CountryResourceImpl extends BaseCountryResourceImpl {
 				GetterUtil.getBoolean(country.getShippingAllowed(), true),
 				GetterUtil.getBoolean(country.getSubjectToVAT()));
 
-		if (country.getTitle_i18n() == null) {
-			Map<String, String> titleMap = new HashMap<>();
+		Map<String, String> titleI18n = country.getTitle_i18n();
 
-			for (Locale locale : _language.getAvailableLocales()) {
-				titleMap.put(_language.getLanguageId(locale), null);
-			}
+		country.setTitle_i18n(
+			() -> {
+				if (titleI18n == null) {
+					Map<String, String> titleMap = new HashMap<>();
 
-			country.setTitle_i18n(titleMap);
-		}
+					for (Locale locale : _language.getAvailableLocales()) {
+						titleMap.put(_language.getLanguageId(locale), null);
+					}
+
+					return titleMap;
+				}
+
+				return titleI18n;
+			});
 
 		_countryLocalService.updateCountryLocalizations(
 			serviceBuilderCountry, country.getTitle_i18n());

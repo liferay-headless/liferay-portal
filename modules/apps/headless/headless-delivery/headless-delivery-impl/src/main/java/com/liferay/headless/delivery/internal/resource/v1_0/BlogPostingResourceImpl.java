@@ -287,26 +287,39 @@ public class BlogPostingResourceImpl extends BaseBlogPostingResourceImpl {
 		BlogPosting blogPosting, BlogPosting existingBlogPosting) {
 
 		Image image = blogPosting.getImage();
+		Image existingBlogPostingImage = existingBlogPosting.getImage();
 
-		if (image != null) {
-			existingBlogPosting.setImage(
-				new Image() {
-					{
-						setCaption(image::getCaption);
-						setImageId(image::getImageId);
-					}
-				});
-		}
+		existingBlogPosting.setImage(
+			() -> {
+				if (image != null) {
+					return new Image() {
+						{
+							setCaption(image::getCaption);
+							setImageId(image::getImageId);
+						}
+					};
+				}
+
+				return existingBlogPostingImage;
+			});
 
 		TaxonomyCategoryBrief[] taxonomyCategoryBriefs =
 			blogPosting.getTaxonomyCategoryBriefs();
 
-		if (taxonomyCategoryBriefs != null) {
-			blogPosting.setTaxonomyCategoryIds(
-				transform(
-					taxonomyCategoryBriefs,
-					TaxonomyCategoryBrief::getTaxonomyCategoryId, Long.class));
-		}
+		Long[] existingTaxonomyCategoryIds =
+			blogPosting.getTaxonomyCategoryIds();
+
+		blogPosting.setTaxonomyCategoryIds(
+			() -> {
+				if (taxonomyCategoryBriefs != null) {
+					return transform(
+						taxonomyCategoryBriefs,
+						TaxonomyCategoryBrief::getTaxonomyCategoryId,
+						Long.class);
+				}
+
+				return existingTaxonomyCategoryIds;
+			});
 	}
 
 	private BlogPosting _addBlogPosting(
