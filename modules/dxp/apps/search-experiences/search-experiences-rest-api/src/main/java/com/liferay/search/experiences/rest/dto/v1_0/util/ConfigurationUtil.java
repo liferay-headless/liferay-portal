@@ -33,13 +33,7 @@ public class ConfigurationUtil {
 			return null;
 		}
 
-		AggregationConfiguration aggregationConfiguration =
-			configuration.getAggregationConfiguration();
-
-		if (aggregationConfiguration != null) {
-			aggregationConfiguration.setAggs(
-				UnpackUtil.unpack(aggregationConfiguration.getAggs()));
-		}
+		_setAggs(configuration.getAggregationConfiguration());
 
 		QueryConfiguration queryConfiguration =
 			configuration.getQueryConfiguration();
@@ -58,22 +52,42 @@ public class ConfigurationUtil {
 
 					Condition condition = queryEntry.getCondition();
 
-					if (condition != null) {
-						queryEntry.setCondition(
-							ConditionUtil.unpack(condition));
-					}
+					queryEntry.setCondition(
+						() -> {
+							if (condition != null) {
+								return ConditionUtil.unpack(condition);
+							}
+
+							return condition;
+						});
 				});
 		}
 
-		SortConfiguration sortConfiguration =
-			configuration.getSortConfiguration();
-
-		if (sortConfiguration != null) {
-			sortConfiguration.setSorts(
-				UnpackUtil.unpack(sortConfiguration.getSorts()));
-		}
+		_setSorts(configuration.getSortConfiguration());
 
 		return configuration;
+	}
+
+	private static void _setAggs(
+		AggregationConfiguration aggregationConfiguration) {
+
+		if (aggregationConfiguration == null) {
+			return;
+		}
+
+		Object aggs = aggregationConfiguration.getAggs();
+
+		aggregationConfiguration.setAggs(() -> UnpackUtil.unpack(aggs));
+	}
+
+	private static void _setSorts(SortConfiguration sortConfiguration) {
+		if (sortConfiguration == null) {
+			return;
+		}
+
+		Object sorts = sortConfiguration.getSorts();
+
+		sortConfiguration.setSorts(() -> UnpackUtil.unpack(sorts));
 	}
 
 	private static void _unpack(Clause clause) {
@@ -81,7 +95,9 @@ public class ConfigurationUtil {
 			return;
 		}
 
-		clause.setQuery(UnpackUtil.unpack(clause.getQuery()));
+		Object query = clause.getQuery();
+
+		clause.setQuery(() -> UnpackUtil.unpack(query));
 	}
 
 	private static void _unpack(Rescore rescore) {
@@ -89,7 +105,9 @@ public class ConfigurationUtil {
 			return;
 		}
 
-		rescore.setQuery(UnpackUtil.unpack(rescore.getQuery()));
+		Object query = rescore.getQuery();
+
+		rescore.setQuery(() -> UnpackUtil.unpack(query));
 	}
 
 }

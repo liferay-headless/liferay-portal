@@ -20,10 +20,14 @@ public class SXPElementUtil {
 	protected static SXPElement unpack(SXPElement sxpElement) {
 		ElementDefinition elementDefinition = sxpElement.getElementDefinition();
 
-		if (elementDefinition != null) {
-			sxpElement.setElementDefinition(
-				ElementDefinitionUtil.unpack(elementDefinition));
-		}
+		sxpElement.setElementDefinition(
+			() -> {
+				if (elementDefinition != null) {
+					return ElementDefinitionUtil.unpack(elementDefinition);
+				}
+
+				return elementDefinition;
+			});
 
 		return sxpElement;
 	}

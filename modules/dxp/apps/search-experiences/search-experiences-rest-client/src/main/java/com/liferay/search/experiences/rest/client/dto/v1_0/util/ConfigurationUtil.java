@@ -40,22 +40,26 @@ public class ConfigurationUtil {
 	}
 
 	private static void _unpack(Clause clause) {
-		if (clause.getQuery() instanceof Map) {
-			clause.setQuery(
-				JSONFactoryUtil.createJSONObject((Map<?, ?>)clause.getQuery()));
-		}
-		else {
-			try {
-				clause.setQuery(
-					JSONFactoryUtil.createJSONObject(
-						String.valueOf(clause.getQuery())));
-			}
-			catch (JSONException jsonException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(jsonException);
+		Object query = clause.getQuery();
+
+		clause.setQuery(
+			() -> {
+				if (query instanceof Map) {
+					return JSONFactoryUtil.createJSONObject((Map<?, ?>)query);
 				}
-			}
-		}
+
+				try {
+					return JSONFactoryUtil.createJSONObject(
+						String.valueOf(query));
+				}
+				catch (JSONException jsonException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(jsonException);
+					}
+				}
+
+				return null;
+			});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

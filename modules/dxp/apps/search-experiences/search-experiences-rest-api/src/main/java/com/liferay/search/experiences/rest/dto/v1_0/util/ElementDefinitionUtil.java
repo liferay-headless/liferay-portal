@@ -34,10 +34,14 @@ public class ElementDefinitionUtil {
 
 		Configuration configuration = elementDefinition.getConfiguration();
 
-		if (configuration != null) {
-			elementDefinition.setConfiguration(
-				ConfigurationUtil.unpack(configuration));
-		}
+		elementDefinition.setConfiguration(
+			() -> {
+				if (configuration != null) {
+					return ConfigurationUtil.unpack(configuration);
+				}
+
+				return configuration;
+			});
 
 		_unpack(elementDefinition.getUiConfiguration());
 
@@ -49,7 +53,9 @@ public class ElementDefinitionUtil {
 			return;
 		}
 
-		field.setDefaultValue(UnpackUtil.unpack(field.getDefaultValue()));
+		Object defaultValue = field.getDefaultValue();
+
+		field.setDefaultValue(() -> UnpackUtil.unpack(defaultValue));
 	}
 
 	private static void _unpack(UiConfiguration uiConfiguration) {

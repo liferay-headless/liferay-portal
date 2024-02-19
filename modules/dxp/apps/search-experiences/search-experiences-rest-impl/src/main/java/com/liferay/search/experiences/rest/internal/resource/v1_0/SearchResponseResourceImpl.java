@@ -127,13 +127,22 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 				SearchResponse searchResponse = toSearchResponse(
 					_searcher.search(searchRequestBuilder.build()));
 
-				if (ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(runtimeException);
-					}
+				Map[] errors = searchResponse.getErrors();
 
-					searchResponse.setErrors(_toErrorMaps(runtimeException));
-				}
+				searchResponse.setErrors(
+					() -> {
+						if (ArrayUtil.isNotEmpty(
+								runtimeException.getSuppressed())) {
+
+							if (_log.isWarnEnabled()) {
+								_log.warn(runtimeException);
+							}
+
+							return _toErrorMaps(runtimeException);
+						}
+
+						return errors;
+					});
 
 				return searchResponse;
 			}

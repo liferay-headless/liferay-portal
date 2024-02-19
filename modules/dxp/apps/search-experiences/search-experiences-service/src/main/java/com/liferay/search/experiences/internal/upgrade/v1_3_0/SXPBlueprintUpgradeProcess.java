@@ -97,24 +97,6 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 			}
 
 			if (serviceBuilderSXPElement.isReadOnly()) {
-				if (Objects.equals(
-						serviceBuilderSXPElement.getExternalReferenceCode(),
-						"BOOST_CONTENTS_IN_A_CATEGORY_FOR_A_PERIOD_OF_TIME") ||
-					Objects.equals(
-						serviceBuilderSXPElement.getExternalReferenceCode(),
-						"BOOST_CONTENTS_IN_A_CATEGORY_FOR_THE_TIME_OF_DAY") ||
-					Objects.equals(
-						serviceBuilderSXPElement.getExternalReferenceCode(),
-						"LIMIT_SEARCH_TO_CONTENTS_CREATED_WITHIN_A_PERIOD_OF_" +
-							"TIME")) {
-
-					sxpElement.setElementDefinition(
-						ElementDefinition.unsafeToDTO(
-							_renameElementDefinitionJSON(
-								String.valueOf(
-									sxpElement.getElementDefinition()))));
-				}
-
 				Map<String, String> description_i18n =
 					sxpElement.getDescription_i18n();
 
@@ -126,9 +108,38 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 				title_i18n.put("en-US", _renameTitle(title_i18n.get("en-US")));
 			}
 
+			ElementDefinition elementDefinition =
+				sxpElement.getElementDefinition();
+
+			sxpElement.setElementDefinition(
+				() -> {
+					if (serviceBuilderSXPElement.isReadOnly() &&
+						(Objects.equals(
+							serviceBuilderSXPElement.getExternalReferenceCode(),
+							"BOOST_CONTENTS_IN_A_CATEGORY_FOR_A_PERIOD_OF_" +
+								"TIME") ||
+						 Objects.equals(
+							 serviceBuilderSXPElement.
+								 getExternalReferenceCode(),
+							 "BOOST_CONTENTS_IN_A_CATEGORY_FOR_THE_TIME_OF_" +
+								 "DAY") ||
+						 Objects.equals(
+							 serviceBuilderSXPElement.
+								 getExternalReferenceCode(),
+							 "LIMIT_SEARCH_TO_CONTENTS_CREATED_WITHIN_A_" +
+								 "PERIOD_OF_TIME"))) {
+
+						return ElementDefinition.unsafeToDTO(
+							_renameElementDefinitionJSON(
+								String.valueOf(elementDefinition)));
+					}
+
+					return elementDefinition;
+				});
+
 			sxpElement.setExternalReferenceCode(
-				serviceBuilderSXPElement.getExternalReferenceCode());
-			sxpElement.setVersion(serviceBuilderSXPElement.getVersion());
+				serviceBuilderSXPElement::getExternalReferenceCode);
+			sxpElement.setVersion(serviceBuilderSXPElement::getVersion);
 		}
 
 		return Arrays.toString(elementInstances);

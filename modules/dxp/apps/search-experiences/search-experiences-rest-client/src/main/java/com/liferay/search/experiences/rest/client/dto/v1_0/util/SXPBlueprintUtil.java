@@ -20,10 +20,14 @@ public class SXPBlueprintUtil {
 	protected static SXPBlueprint unpack(SXPBlueprint sxpBlueprint) {
 		Configuration configuration = sxpBlueprint.getConfiguration();
 
-		if (configuration != null) {
-			sxpBlueprint.setConfiguration(
-				ConfigurationUtil.unpack(configuration));
-		}
+		sxpBlueprint.setConfiguration(
+			() -> {
+				if (configuration != null) {
+					return ConfigurationUtil.unpack(configuration);
+				}
+
+				return configuration;
+			});
 
 		return sxpBlueprint;
 	}

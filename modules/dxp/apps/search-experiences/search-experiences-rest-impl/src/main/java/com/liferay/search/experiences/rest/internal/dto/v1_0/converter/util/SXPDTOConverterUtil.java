@@ -44,15 +44,28 @@ public class SXPDTOConverterUtil {
 				Field[] fields = fieldSet.getFields();
 
 				for (Field field : fields) {
-					if (!Validator.isBlank(field.getHelpText())) {
-						field.setHelpTextLocalized(
-							language.get(locale, field.getHelpText()));
-					}
+					String helpTextLocalized = field.getHelpTextLocalized();
 
-					if (!Validator.isBlank(field.getLabel())) {
-						field.setLabelLocalized(
-							language.get(locale, field.getLabel()));
-					}
+					field.setHelpTextLocalized(
+						() -> {
+							if (!Validator.isBlank(field.getHelpText())) {
+								return language.get(
+									locale, field.getHelpText());
+							}
+
+							return helpTextLocalized;
+						});
+
+					String labelLocalized = field.getLabelLocalized();
+
+					field.setLabelLocalized(
+						() -> {
+							if (!Validator.isBlank(field.getLabel())) {
+								return language.get(locale, field.getLabel());
+							}
+
+							return labelLocalized;
+						});
 				}
 			}
 
