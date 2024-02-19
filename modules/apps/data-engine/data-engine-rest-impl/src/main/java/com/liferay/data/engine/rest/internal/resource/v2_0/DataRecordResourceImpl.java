@@ -283,7 +283,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 		DDLRecordSet ddlRecordSet = _ddlRecordSetLocalService.getRecordSet(
 			dataRecordCollectionId);
 
-		dataRecord.setDataRecordCollectionId(dataRecordCollectionId);
+		dataRecord.setDataRecordCollectionId(() -> dataRecordCollectionId);
 
 		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
 
@@ -324,9 +324,9 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 		DDLRecordSet ddlRecordSet = ddlRecord.getRecordSet();
 
-		dataRecord.setDataRecordCollectionId(ddlRecordSet.getRecordSetId());
+		dataRecord.setDataRecordCollectionId(ddlRecordSet::getRecordSetId);
 
-		dataRecord.setId(dataRecordId);
+		dataRecord.setId(() -> dataRecordId);
 
 		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
 
@@ -373,9 +373,12 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	protected void preparePatch(
 		DataRecord dataRecord, DataRecord existingDataRecord) {
 
-		if (dataRecord.getDataRecordValues() != null) {
-			existingDataRecord.setDataRecordValues(
-				() -> {
+		Map<String, Object> existingDataRecordDataRecordValues =
+			existingDataRecord.getDataRecordValues();
+
+		existingDataRecord.setDataRecordValues(
+			() -> {
+				if (dataRecord.getDataRecordValues() != null) {
 					DataRecord getDataRecord = getDataRecord(
 						existingDataRecord.getId());
 
@@ -385,8 +388,10 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 					dataRecordValues.putAll(dataRecord.getDataRecordValues());
 
 					return dataRecordValues;
-				});
-		}
+				}
+
+				return existingDataRecordDataRecordValues;
+			});
 	}
 
 	private BooleanFilter _getBooleanFilter(
