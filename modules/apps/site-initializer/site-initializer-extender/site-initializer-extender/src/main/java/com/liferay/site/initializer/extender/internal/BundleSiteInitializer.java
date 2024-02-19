@@ -2321,11 +2321,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		if (!folder) {
 			knowledgeBaseArticle.setParentKnowledgeBaseArticleId(
-				parentKnowledgeBaseObjectId);
+				() -> parentKnowledgeBaseObjectId);
 		}
 		else {
 			knowledgeBaseArticle.setParentKnowledgeBaseFolderId(
-				parentKnowledgeBaseObjectId);
+				() -> parentKnowledgeBaseObjectId);
 		}
 
 		return knowledgeBaseArticleResource.
@@ -2378,7 +2378,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			jsonObject.toString());
 
 		knowledgeBaseFolder.setParentKnowledgeBaseFolderId(
-			parentKnowledgeBaseObjectId);
+			() -> parentKnowledgeBaseObjectId);
 
 		return knowledgeBaseFolderResource.
 			putSiteKnowledgeBaseFolderByExternalReferenceCode(
@@ -3225,7 +3225,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			return;
 		}
 
-		organization.setParentOrganization(parentOrganization);
+		organization.setParentOrganization(() -> parentOrganization);
 
 		OrganizationResource.Builder organizationResourceBuilder =
 			_organizationResourceFactory.create();
@@ -3778,7 +3778,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			StructuredContentFolder.toDTO(json);
 
 		structuredContentFolder.setParentStructuredContentFolderId(
-			documentFolderId);
+			() -> documentFolderId);
 
 		structuredContentFolder =
 			structuredContentFolderResource.
@@ -4471,7 +4471,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			userAccount = userAccountResource.getUserAccountByEmailAddress(
 				userAccount.getEmailAddress());
 
-			userAccount.setStatus(UserAccount.Status.INACTIVE);
+			userAccount.setStatus(() -> UserAccount.Status.INACTIVE);
 
 			userAccountResource.patchUserAccount(
 				userAccount.getId(), userAccount);
