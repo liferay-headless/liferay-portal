@@ -166,7 +166,7 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 			String externalReferenceCode, ObjectFolder objectFolder)
 		throws Exception {
 
-		objectFolder.setExternalReferenceCode(externalReferenceCode);
+		objectFolder.setExternalReferenceCode(() -> externalReferenceCode);
 
 		com.liferay.object.model.ObjectFolder serviceBuilderObjectFolder =
 			_objectFolderLocalService.fetchObjectFolderByExternalReferenceCode(
@@ -186,7 +186,7 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 
 		if (objectFolder.getObjectFolderItems() != null) {
 			existingObjectFolder.setObjectFolderItems(
-				objectFolder.getObjectFolderItems());
+				objectFolder::getObjectFolderItems);
 		}
 	}
 
@@ -220,7 +220,7 @@ public class ObjectFolderResourceImpl extends BaseObjectFolderResourceImpl {
 
 			if (objectDefinition != null) {
 				objectDefinition.setObjectFolderExternalReferenceCode(
-					objectFolderExternalReferenceCode);
+					() -> objectFolderExternalReferenceCode);
 
 				try {
 					objectDefinition =

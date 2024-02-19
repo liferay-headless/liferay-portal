@@ -129,28 +129,30 @@ public class ImportObjectDefinitionMVCActionCommand
 		ObjectDefinition objectDefinition = ObjectDefinition.toDTO(
 			objectDefinitionJSONObject.toString());
 
-		objectDefinition.setActive(false);
+		objectDefinition.setActive(() -> false);
 
 		String externalReferenceCode = ParamUtil.getString(
 			actionRequest, "externalReferenceCode");
 
 		if (Validator.isNotNull(externalReferenceCode)) {
-			objectDefinition.setExternalReferenceCode(externalReferenceCode);
+			objectDefinition.setExternalReferenceCode(
+				() -> externalReferenceCode);
 		}
 
-		objectDefinition.setName(ParamUtil.getString(actionRequest, "name"));
+		objectDefinition.setName(
+			() -> ParamUtil.getString(actionRequest, "name"));
 		objectDefinition.setObjectFolderExternalReferenceCode(
-			ParamUtil.getString(
+			() -> ParamUtil.getString(
 				actionRequest, "objectFolderExternalReferenceCode"));
 
 		ObjectDefinition putObjectDefinition =
 			objectDefinitionResource.putObjectDefinitionByExternalReferenceCode(
 				objectDefinition.getExternalReferenceCode(), objectDefinition);
 
-		putObjectDefinition.setPortlet(objectDefinition.getPortlet());
+		putObjectDefinition.setPortlet(objectDefinition::getPortlet);
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-			putObjectDefinition.setStorageType(StringPool.BLANK);
+			putObjectDefinition.setStorageType(() -> StringPool.BLANK);
 		}
 
 		objectDefinitionResource.putObjectDefinition(
