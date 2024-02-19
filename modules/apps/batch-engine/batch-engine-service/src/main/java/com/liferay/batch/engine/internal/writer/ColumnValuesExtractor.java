@@ -7,6 +7,7 @@ package com.liferay.batch.engine.internal.writer;
 
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
@@ -323,7 +324,7 @@ public class ColumnValuesExtractor {
 		}
 
 		ObjectValuePair<Field, Method> propertiesObjectValuePair =
-			fieldNameObjectValuePairs.get("properties");
+			fieldNameObjectValuePairs.get("lazyProperties");
 
 		if (!ItemClassIndexUtil.isObjectEntryProperties(
 				propertiesObjectValuePair)) {
@@ -343,6 +344,18 @@ public class ColumnValuesExtractor {
 					object, propertiesObjectValuePair);
 
 				Object value = map.get(fieldName);
+
+				try {
+					UnsafeSupplier<Object, Exception> unsafeSupplier =
+						(UnsafeSupplier<Object, Exception>)map.get(fieldName);
+
+					if (unsafeSupplier != null) {
+						value = unsafeSupplier.get();
+					}
+				}
+				catch (Throwable throwable) {
+					throw new RuntimeException(throwable);
+				}
 
 				if (value == null) {
 					return StringPool.BLANK;
