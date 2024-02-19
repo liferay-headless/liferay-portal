@@ -403,12 +403,19 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 		String modifiedDate = document.getString(
 			com.liferay.portal.kernel.search.Field.MODIFIED_DATE);
 
-		if (modifiedDate != null) {
-			searchResult.setDateModified(
-				_parseDateStringFieldValue(
-					document.getString(
-						com.liferay.portal.kernel.search.Field.MODIFIED_DATE)));
-		}
+		Date dateModified = searchResult.getDateModified();
+
+		searchResult.setDateModified(
+			() -> {
+				if (modifiedDate != null) {
+					return _parseDateStringFieldValue(
+						document.getString(
+							com.liferay.portal.kernel.search.Field.
+								MODIFIED_DATE));
+				}
+
+				return dateModified;
+			});
 	}
 
 	private void _setDescription(
@@ -419,14 +426,15 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 			return;
 		}
 
-		if (summary != null) {
-			searchResult.setDescription(summary.getContent());
-		}
-		else {
-			searchResult.setDescription(
-				assetRenderer.getSearchSummary(
-					contextAcceptLanguage.getPreferredLocale()));
-		}
+		searchResult.setDescription(
+			() -> {
+				if (summary != null) {
+					return summary.getContent();
+				}
+
+				return assetRenderer.getSearchSummary(
+					contextAcceptLanguage.getPreferredLocale());
+			});
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -459,36 +467,38 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 		SearchResult searchResult) {
 
 		try {
-			if (_isObjectToDTOEntryClassName(entryClassName)) {
-				Object object = _fetchObject(entryClassName, entryClassPK);
+			searchResult.setEmbedded(
+				() -> {
+					if (_isObjectToDTOEntryClassName(entryClassName)) {
+						Object object = _fetchObject(
+							entryClassName, entryClassPK);
 
-				if (object == null) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"No DTO converter found for " + entryClassName);
+						if (object == null) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(
+									"No DTO converter found for " +
+										entryClassName);
+							}
+						}
+
+						return dtoConverter.toDTO(
+							new DefaultDTOConverterContext(
+								contextAcceptLanguage.isAcceptAllLanguages(),
+								new HashMap<>(), _dtoConverterRegistry,
+								contextHttpServletRequest, entryClassPK,
+								contextAcceptLanguage.getPreferredLocale(),
+								contextUriInfo, contextUser),
+							object);
 					}
-				}
 
-				searchResult.setEmbedded(
-					dtoConverter.toDTO(
+					return dtoConverter.toDTO(
 						new DefaultDTOConverterContext(
 							contextAcceptLanguage.isAcceptAllLanguages(),
 							new HashMap<>(), _dtoConverterRegistry,
 							contextHttpServletRequest, entryClassPK,
 							contextAcceptLanguage.getPreferredLocale(),
-							contextUriInfo, contextUser),
-						object));
-			}
-			else {
-				searchResult.setEmbedded(
-					dtoConverter.toDTO(
-						new DefaultDTOConverterContext(
-							contextAcceptLanguage.isAcceptAllLanguages(),
-							new HashMap<>(), _dtoConverterRegistry,
-							contextHttpServletRequest, entryClassPK,
-							contextAcceptLanguage.getPreferredLocale(),
-							contextUriInfo, contextUser)));
-			}
+							contextUriInfo, contextUser));
+				});
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -507,9 +517,16 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 		String jaxRsLink = dtoConverter.getJaxRsLink(
 			entryClassPK, contextUriInfo);
 
-		if (!Validator.isBlank(jaxRsLink)) {
-			searchResult.setItemURL(jaxRsLink);
-		}
+		String itemURL = searchResult.getItemURL();
+
+		searchResult.setItemURL(
+			() -> {
+				if (!Validator.isBlank(jaxRsLink)) {
+					return jaxRsLink;
+				}
+
+				return itemURL;
+			});
 	}
 
 	private void _setScore(
@@ -519,7 +536,7 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 			return;
 		}
 
-		searchResult.setScore(searchHit.getScore());
+		searchResult.setScore(searchHit::getScore);
 	}
 
 	private void _setTitle(
@@ -530,14 +547,15 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 			return;
 		}
 
-		if (summary != null) {
-			searchResult.setTitle(summary.getTitle());
-		}
-		else {
-			searchResult.setTitle(
-				assetRenderer.getTitle(
-					contextAcceptLanguage.getPreferredLocale()));
-		}
+		searchResult.setTitle(
+			() -> {
+				if (summary != null) {
+					return summary.getTitle();
+				}
+
+				return assetRenderer.getTitle(
+					contextAcceptLanguage.getPreferredLocale());
+			});
 	}
 
 	private Object _toAggregations(
