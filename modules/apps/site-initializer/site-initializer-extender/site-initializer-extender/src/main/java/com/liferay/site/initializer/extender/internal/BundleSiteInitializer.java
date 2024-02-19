@@ -2314,14 +2314,29 @@ public class BundleSiteInitializer implements SiteInitializer {
 		KnowledgeBaseArticle knowledgeBaseArticle = KnowledgeBaseArticle.toDTO(
 			jsonObject.toString());
 
-		if (!folder) {
-			knowledgeBaseArticle.setParentKnowledgeBaseArticleId(
-				parentKnowledgeBaseObjectId);
-		}
-		else {
-			knowledgeBaseArticle.setParentKnowledgeBaseFolderId(
-				parentKnowledgeBaseObjectId);
-		}
+		Long parentKnowledgeBaseArticleId =
+			knowledgeBaseArticle.getParentKnowledgeBaseArticleId();
+
+		knowledgeBaseArticle.setParentKnowledgeBaseArticleId(
+			() -> {
+				if (!folder) {
+					return parentKnowledgeBaseObjectId;
+				}
+
+				return parentKnowledgeBaseArticleId;
+			});
+
+		Long parentKnowledgeBaseFolderId =
+			knowledgeBaseArticle.getParentKnowledgeBaseFolderId();
+
+		knowledgeBaseArticle.setParentKnowledgeBaseFolderId(
+			() -> {
+				if (folder) {
+					return parentKnowledgeBaseObjectId;
+				}
+
+				return parentKnowledgeBaseFolderId;
+			});
 
 		return knowledgeBaseArticleResource.
 			putSiteKnowledgeBaseArticleByExternalReferenceCode(
@@ -2373,7 +2388,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			jsonObject.toString());
 
 		knowledgeBaseFolder.setParentKnowledgeBaseFolderId(
-			parentKnowledgeBaseObjectId);
+			() -> parentKnowledgeBaseObjectId);
 
 		return knowledgeBaseFolderResource.
 			putSiteKnowledgeBaseFolderByExternalReferenceCode(
@@ -3220,7 +3235,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			return;
 		}
 
-		organization.setParentOrganization(parentOrganization);
+		organization.setParentOrganization(() -> parentOrganization);
 
 		OrganizationResource.Builder organizationResourceBuilder =
 			_organizationResourceFactory.create();
@@ -3773,7 +3788,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			StructuredContentFolder.toDTO(json);
 
 		structuredContentFolder.setParentStructuredContentFolderId(
-			documentFolderId);
+			() -> documentFolderId);
 
 		structuredContentFolder =
 			structuredContentFolderResource.
@@ -4466,7 +4481,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			userAccount = userAccountResource.getUserAccountByEmailAddress(
 				userAccount.getEmailAddress());
 
-			userAccount.setStatus(UserAccount.Status.INACTIVE);
+			userAccount.setStatus(() -> UserAccount.Status.INACTIVE);
 
 			userAccountResource.patchUserAccount(
 				userAccount.getId(), userAccount);
