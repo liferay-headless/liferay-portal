@@ -277,7 +277,7 @@ public class KoroneikiRestController extends BaseRestController {
 				}
 			}
 
-			sku.setExternalReferenceCode(koroneikiProduct.getKey());
+			sku.setExternalReferenceCode(koroneikiProduct::getKey);
 
 			_skuResource.patchSku(sku.getId(), sku);
 		}
@@ -324,7 +324,7 @@ public class KoroneikiRestController extends BaseRestController {
 			return;
 		}
 
-		order.setOrderStatus(_COMMERCE_ORDER_STATUS_PROCESSING);
+		order.setOrderStatus(() -> _COMMERCE_ORDER_STATUS_PROCESSING);
 
 		_orderResource.patchOrder(commerceOrderJSONObject.getLong("id"), order);
 
@@ -346,10 +346,21 @@ public class KoroneikiRestController extends BaseRestController {
 						Pagination.of(1, 20)
 					).getItems());
 
+		Integer orderStatus = order.getOrderStatus();
+
+		order.setOrderStatus(
+			() -> {
+				if (Objects.equals(
+						productSpecificationsMap.get("price-model"), "Free")) {
+
+					return _COMMERCE_ORDER_STATUS_COMPLETED;
+				}
+
+				return orderStatus;
+			});
+
 		if (Objects.equals(
 				productSpecificationsMap.get("price-model"), "Free")) {
-
-			order.setOrderStatus(_COMMERCE_ORDER_STATUS_COMPLETED);
 
 			_orderResource.patchOrder(
 				commerceOrderJSONObject.getLong("id"), order);
@@ -360,15 +371,28 @@ public class KoroneikiRestController extends BaseRestController {
 		Account account = _accountResource.getAccount(
 			commerceOrderJSONObject.getLong("accountId"));
 
-		if (!account.getExternalReferenceCode(
+		String accountExternalReferenceCode =
+			account.getExternalReferenceCode();
+
+		account.setExternalReferenceCode(
+			() -> {
+				if (!account.getExternalReferenceCode(
+					).startsWith(
+						"KOR-"
+					)) {
+
+					return _postKoroneikiAccount(
+						account, jwt
+					).getKey();
+				}
+
+				return accountExternalReferenceCode;
+			});
+
+		if (account.getExternalReferenceCode(
 			).startsWith(
 				"KOR-"
 			)) {
-
-			account.setExternalReferenceCode(
-				_postKoroneikiAccount(
-					account, jwt
-				).getKey());
 
 			_accountResource.patchAccount(account.getId(), account);
 		}
@@ -379,7 +403,7 @@ public class KoroneikiRestController extends BaseRestController {
 					account, jwt, orderItem, productSpecificationsMap);
 			}
 
-			order.setOrderStatus(_COMMERCE_ORDER_STATUS_COMPLETED);
+			order.setOrderStatus(() -> _COMMERCE_ORDER_STATUS_COMPLETED);
 
 			_orderResource.patchOrder(
 				commerceOrderJSONObject.getLong("id"), order);

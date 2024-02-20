@@ -440,7 +440,8 @@ public class Main {
 							structuredContent.getFriendlyUrlPath());
 
 					structuredContent.setPermissions(
-						_getPermissions(fileName, structuredContent.getId()));
+						() -> _getPermissions(
+							fileName, structuredContent.getId()));
 
 					importedStructuredContent =
 						_structuredContentResource.
@@ -1247,12 +1248,27 @@ public class Main {
 
 			String name = taxonomyCategoryJSONObject.getString("name");
 
+			TaxonomyCategory taxonomyCategory = new TaxonomyCategory();
+
+			taxonomyCategory.setName(
+				() -> {
+					if (!existingTaxonomyCategories.containsKey(name)) {
+						return name;
+					}
+
+					return null;
+				});
+
+			taxonomyCategory.setTaxonomyVocabularyId(
+				() -> {
+					if (!existingTaxonomyCategories.containsKey(name)) {
+						return taxonomyVocabularyId;
+					}
+
+					return null;
+				});
+
 			if (!existingTaxonomyCategories.containsKey(name)) {
-				TaxonomyCategory taxonomyCategory = new TaxonomyCategory();
-
-				taxonomyCategory.setName(name);
-				taxonomyCategory.setTaxonomyVocabularyId(taxonomyVocabularyId);
-
 				if (parentTaxonomyCategoryId != null) {
 					taxonomyCategory =
 						_taxonomyCategoryResource.
@@ -1341,12 +1357,18 @@ public class Main {
 
 			Long taxonomyVocabularyId = existingTaxonomyVocabularies.get(name);
 
+			TaxonomyVocabulary taxonomyVocabulary = new TaxonomyVocabulary();
+
+			taxonomyVocabulary.setName(
+				() -> {
+					if (taxonomyVocabularyId == null) {
+						return name;
+					}
+
+					return null;
+				});
+
 			if (taxonomyVocabularyId == null) {
-				TaxonomyVocabulary taxonomyVocabulary =
-					new TaxonomyVocabulary();
-
-				taxonomyVocabulary.setName(name);
-
 				taxonomyVocabulary =
 					_taxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 						_liferaySiteId, taxonomyVocabulary);
@@ -1443,133 +1465,122 @@ public class Main {
 		File japaneseFile = new File(
 			StringUtil.replace(fileName, "/en/", "/ja/"));
 
-		if (japaneseFile.exists()) {
-			String japaneseText = FileUtils.readFileToString(
-				japaneseFile, StandardCharsets.UTF_8);
+		structuredContent.setContentFields(
+			() -> {
+				if (japaneseFile.exists()) {
+					String japaneseText = _processMarkdown(
+						FileUtils.readFileToString(
+							japaneseFile, StandardCharsets.UTF_8),
+						japaneseFile);
 
-			structuredContent.setContentFields(
-				new ContentField[] {
-					new ContentField() {
-						{
-							setContentFieldValue(
-								() -> englishBreadcrumbLinksContentFieldValue);
-							setContentFieldValue_i18n(
-								() -> HashMapBuilder.put(
-									"en-US",
-									englishBreadcrumbLinksContentFieldValue
-								).put(
-									"ja-JP",
-									new ContentFieldValue() {
-										{
-											setData(
-												() -> String.valueOf(
-													_getBreadcrumbLinksJSONArray(
-														japaneseFile)));
+					return new ContentField[] {
+						new ContentField() {
+							{
+								setContentFieldValue(
+									() ->
+										englishBreadcrumbLinksContentFieldValue);
+								setContentFieldValue_i18n(
+									() -> HashMapBuilder.put(
+										"en-US",
+										englishBreadcrumbLinksContentFieldValue
+									).put(
+										"ja-JP",
+										new ContentFieldValue() {
+											{
+												setData(
+													() -> String.valueOf(
+														_getBreadcrumbLinksJSONArray(
+															japaneseFile)));
+											}
 										}
-									}
-								).build());
-							setName(() -> "breadcrumbLinks");
-						}
-					},
-					new ContentField() {
-						{
-							setContentFieldValue(
-								() -> englishContentContentFieldValue);
-							setContentFieldValue_i18n(
-								() -> HashMapBuilder.put(
-									"en-US", englishContentContentFieldValue
-								).put(
-									"ja-JP",
-									new ContentFieldValue() {
-										{
-											setData(
-												() -> _getHTML(japaneseFile));
-										}
-									}
-								).build());
-							setName(() -> "content");
-						}
-					},
-					new ContentField() {
-						{
-							setContentFieldValue(
-								() -> englishLandingPageContentFieldValue);
-							setContentFieldValue_i18n(
-								() -> HashMapBuilder.put(
-									"en-US", englishLandingPageContentFieldValue
-								).put(
-									"ja-JP", englishLandingPageContentFieldValue
-								).build());
-							setName(() -> "landingPage");
-						}
-					},
-					new ContentField() {
-						{
-							setContentFieldValue(
-								() -> englishNavigationLinksContentFieldValue);
-							setContentFieldValue_i18n(
-								() -> HashMapBuilder.put(
-									"en-US",
-									englishNavigationLinksContentFieldValue
-								).put(
-									"ja-JP",
-									new ContentFieldValue() {
-										{
-											setData(
-												() -> String.valueOf(
-													_getNavigationLinksJSONArray(
+									).build());
+								setName(() -> "breadcrumbLinks");
+							}
+						},
+						new ContentField() {
+							{
+								setContentFieldValue(
+									() -> englishContentContentFieldValue);
+								setContentFieldValue_i18n(
+									() -> HashMapBuilder.put(
+										"en-US", englishContentContentFieldValue
+									).put(
+										"ja-JP",
+										new ContentFieldValue() {
+											{
+												setData(
+													() -> _toHTML(
 														japaneseFile,
-														japaneseText)));
+														japaneseText));
+											}
 										}
-									}
-								).build());
-							setName(() -> "navigationLinks");
-						}
-					},
-					new ContentField() {
-						{
-							setContentFieldValue(
-								() -> englishProductContentFieldValue);
-							setContentFieldValue_i18n(
-								() -> HashMapBuilder.put(
-									"en-US", englishProductContentFieldValue
-								).put(
-									"ja-JP",
-									new ContentFieldValue() {
-										{
-											setData(
-												() -> _getProduct(
-													japaneseFile));
+									).build());
+								setName(() -> "content");
+							}
+						},
+						new ContentField() {
+							{
+								setContentFieldValue(
+									() -> englishLandingPageContentFieldValue);
+								setContentFieldValue_i18n(
+									() -> HashMapBuilder.put(
+										"en-US",
+										englishLandingPageContentFieldValue
+									).put(
+										"ja-JP",
+										englishLandingPageContentFieldValue
+									).build());
+								setName(() -> "landingPage");
+							}
+						},
+						new ContentField() {
+							{
+								setContentFieldValue(
+									() ->
+										englishNavigationLinksContentFieldValue);
+								setContentFieldValue_i18n(
+									() -> HashMapBuilder.put(
+										"en-US",
+										englishNavigationLinksContentFieldValue
+									).put(
+										"ja-JP",
+										new ContentFieldValue() {
+											{
+												setData(
+													() -> String.valueOf(
+														_getNavigationLinksJSONArray(
+															japaneseFile,
+															japaneseText)));
+											}
 										}
-									}
-								).build());
-							setName(() -> "product");
+									).build());
+								setName(() -> "navigationLinks");
+							}
+						},
+						new ContentField() {
+							{
+								setContentFieldValue(
+									() -> englishProductContentFieldValue);
+								setContentFieldValue_i18n(
+									() -> HashMapBuilder.put(
+										"en-US", englishProductContentFieldValue
+									).put(
+										"ja-JP",
+										new ContentFieldValue() {
+											{
+												setData(
+													() -> _getProduct(
+														japaneseFile));
+											}
+										}
+									).build());
+								setName(() -> "product");
+							}
 						}
-					}
-				});
-			structuredContent.setDescription_i18n(
-				HashMapBuilder.put(
-					"en-US", _getDescription(englishText)
-				).put(
-					"ja-JP", _getDescription(japaneseText)
-				).build());
+					};
+				}
 
-			structuredContent.setFriendlyUrlPath_i18n(
-				HashMapBuilder.put(
-					"en-US", _toFriendlyURLPath(englishFile)
-				).put(
-					"ja-JP", _toFriendlyURLPath(japaneseFile)
-				).build());
-			structuredContent.setTitle_i18n(
-				HashMapBuilder.put(
-					"en-US", englishTitle
-				).put(
-					"ja-JP", _getTitle(japaneseText)
-				).build());
-		}
-		else {
-			structuredContent.setContentFields(
-				new ContentField[] {
+				return new ContentField[] {
 					new ContentField() {
 						{
 							setContentFieldValue(
@@ -1605,24 +1616,88 @@ public class Main {
 							setName(() -> "product");
 						}
 					}
-				});
-			structuredContent.setDescription(_getDescription(englishText));
-		}
+				};
+			});
 
-		structuredContent.setContentStructureId(_liferayContentStructureId);
-		structuredContent.setExternalReferenceCode(_getUuid(englishText));
-		structuredContent.setFriendlyUrlPath(_toFriendlyURLPath(englishFile));
+		structuredContent.setDescription(
+			() -> {
+				if (!japaneseFile.exists()) {
+					return _getDescription(englishText);
+				}
+
+				return null;
+			});
+
+		structuredContent.setDescription_i18n(
+			() -> {
+				if (japaneseFile.exists()) {
+					return HashMapBuilder.put(
+						"en-US", _getDescription(englishText)
+					).put(
+						"ja-JP",
+						_getDescription(
+							_processMarkdown(
+								FileUtils.readFileToString(
+									japaneseFile, StandardCharsets.UTF_8),
+								japaneseFile))
+					).build();
+				}
+
+				return null;
+			});
+
+		structuredContent.setFriendlyUrlPath_i18n(
+			() -> {
+				if (japaneseFile.exists()) {
+					return HashMapBuilder.put(
+						"en-US", _toFriendlyURLPath(englishFile)
+					).put(
+						"ja-JP", _toFriendlyURLPath(japaneseFile)
+					).build();
+				}
+
+				return null;
+			});
+
+		structuredContent.setTitle_i18n(
+			() -> {
+				if (japaneseFile.exists()) {
+					return HashMapBuilder.put(
+						"en-US", englishTitle
+					).put(
+						"ja-JP",
+						_getTitle(
+							processMarkdown(
+								FileUtils.readFileToString(
+									japaneseFile, StandardCharsets.UTF_8),
+								japaneseFile))
+					).build();
+				}
+
+				return null;
+			});
+
+		structuredContent.setContentStructureId(
+			() -> _liferayContentStructureId);
+		structuredContent.setExternalReferenceCode(() -> _getUuid(englishText));
+		structuredContent.setFriendlyUrlPath(
+			() -> _toFriendlyURLPath(englishFile));
 		structuredContent.setTaxonomyCategoryIds(
-			_getTaxonomyCategoryIds(englishText));
+			() -> _getTaxonomyCategoryIds(englishText));
 
-		if (!_offline) {
-			structuredContent.setStructuredContentFolderId(
-				_getStructuredContentFolderId(
-					FilenameUtils.getPathNoEndSeparator(
-						fileName.substring(_docsDirName.length()))));
-		}
+		structuredContent.setStructuredContentFolderId(
+			() -> {
+				if (!_offline) {
+					return _getStructuredContentFolderId(
+						FilenameUtils.getPathNoEndSeparator(
+							fileName.substring(
+								_markdownImportDirName.length())));
+				}
 
-		structuredContent.setTitle(englishTitle);
+				return null;
+			});
+
+		structuredContent.setTitle(() -> englishTitle);
 
 		return structuredContent;
 	}
