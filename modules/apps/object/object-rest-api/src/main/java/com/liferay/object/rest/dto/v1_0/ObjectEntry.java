@@ -50,8 +50,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ObjectEntry")
 public class ObjectEntry implements Serializable {
 
-	private Map<String, UnsafeSupplier<Object, Exception>> _lazyProperties;
-
 	public static ObjectEntry toDTO(String json) {
 		return ObjectMapperUtil.readValue(ObjectEntry.class, json);
 	}
@@ -411,7 +409,8 @@ public class ObjectEntry implements Serializable {
 		if (_lazyProperties != null) {
 			properties = new HashMap<>();
 
-			_lazyProperties.forEach((key, value) -> {
+			_lazyProperties.forEach(
+				(key, value) -> {
 					try {
 						properties.put(key, value.get());
 					}
@@ -420,10 +419,10 @@ public class ObjectEntry implements Serializable {
 					}
 				});
 
-				_propertiesSupplier = null;
+			_propertiesSupplier = null;
 
-				return properties;
-			}
+			return properties;
+		}
 
 		if (_propertiesSupplier != null) {
 			properties = _propertiesSupplier.get();
@@ -434,14 +433,18 @@ public class ObjectEntry implements Serializable {
 		return properties;
 	}
 
+	public void setLazyProperties(
+		Map<String, UnsafeSupplier<Object, Exception>> lazyProperties) {
+
+		this._lazyProperties = lazyProperties;
+	}
+
+	private Map<String, UnsafeSupplier<Object, Exception>> _lazyProperties;
+
 	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 
 		_propertiesSupplier = null;
-	}
-
-	public void setLazyProperties(Map<String, UnsafeSupplier<Object, Exception>> lazyProperties) {
-		this._lazyProperties = lazyProperties;
 	}
 
 	@JsonIgnore
@@ -1034,4 +1037,5 @@ public class ObjectEntry implements Serializable {
 	};
 
 	private Map<String, Serializable> _extendedProperties;
+
 }
