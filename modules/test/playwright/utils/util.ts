@@ -7,6 +7,8 @@ import * as os from 'node:os'; // eslint-disable-line @liferay/no-extraneous-dep
 import * as path from 'path';
 import {zip} from 'zip-a-folder';
 
+import {open} from 'yauzl'
+
 export function getRandomInt(): number {
 	return Math.floor(Math.random() * 9999999999);
 }
@@ -32,4 +34,17 @@ export async function zipFolder(folderPath: string) {
 	await zip(folderPath, tempFilePath);
 
 	return tempFilePath;
+}
+
+export async function unzipFile(filePath: string, json: any, callback: any) {
+	open(filePath, { lazyEntries: true }, async function (error, zip) {
+		zip.readEntry();
+		zip.on("entry", function (entry) {
+			if (/\/$/.test(entry.fileName)) {
+				zip.readEntry();
+			} else {
+				zip.openReadStream(entry, callback(zip, json));
+			}
+		});
+	});
 }

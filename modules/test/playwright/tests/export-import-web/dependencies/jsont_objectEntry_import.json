@@ -1,0 +1,165 @@
+{
+	"actions": {
+		"createBatch": {
+			"href": "/o/headless-batch-engine/v1.0/import-task/com.liferay.object.rest.dto.v1_0.ObjectEntry",
+			"method": "POST"
+		},
+		"deleteBatch": {
+			"href": "/o/headless-batch-engine/v1.0/import-task/com.liferay.object.rest.dto.v1_0.ObjectEntry",
+			"method": "DELETE"
+		},
+		"updateBatch": {
+			"href": "/o/headless-batch-engine/v1.0/import-task/com.liferay.object.rest.dto.v1_0.ObjectEntry",
+			"method": "PUT"
+		}
+	},
+	"configuration": {
+		"callbackURL": null,
+		"className": "com.liferay.object.rest.dto.v1_0.ObjectEntry",
+		"companyId": 8281200787995746197,
+		"multiCompany": false,
+		"parameters": {
+			"containsHeaders": "true",
+			"createStrategy": "INSERT",
+			"importStrategy": "ON_ERROR_FAIL",
+			"taskItemDelegateName": "C_Abc",
+			"updateStrategy": "UPDATE"
+		},
+		"userId": 20122,
+		"version": "v1.0"
+	},
+	"items": [
+		{
+			"aa": "cc",
+			"actions": {
+				"delete": {
+					"href": "/headless-batch-engine/33855",
+					"method": "DELETE"
+				},
+				"get": {
+					"href": "/headless-batch-engine/33855",
+					"method": "GET"
+				},
+				"permissions": {
+					"href": "/headless-batch-engine/33855/permissions",
+					"method": "GET"
+				},
+				"replace": {
+					"href": "/headless-batch-engine/33855",
+					"method": "PUT"
+				},
+				"update": {
+					"href": "/headless-batch-engine/33855",
+					"method": "PATCH"
+				}
+			},
+			"creator": {
+				"additionalName": "",
+				"contentType": "UserAccount",
+				"familyName": "Test",
+				"givenName": "Test",
+				"id": 20122,
+				"name": "Test Test"
+			},
+			"dateCreated": "2024-02-09T11:25:15Z",
+			"dateModified": "2024-02-09T11:25:19Z",
+			"externalReferenceCode": "302f9df7-050a-89e4-8741-093fc631737d",
+			"id": 33855,
+			"keywords": [
+			],
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"aa": "a",
+			"actions": {
+				"delete": {
+					"href": "/headless-batch-engine/33857",
+					"method": "DELETE"
+				},
+				"get": {
+					"href": "/headless-batch-engine/33857",
+					"method": "GET"
+				},
+				"permissions": {
+					"href": "/headless-batch-engine/33857/permissions",
+					"method": "GET"
+				},
+				"replace": {
+					"href": "/headless-batch-engine/33857",
+					"method": "PUT"
+				},
+				"update": {
+					"href": "/headless-batch-engine/33857",
+					"method": "PATCH"
+				}
+			},
+			"creator": {
+				"additionalName": "",
+				"contentType": "UserAccount",
+				"familyName": "Test",
+				"givenName": "Test",
+				"id": 20122,
+				"name": "Test Test"
+			},
+			"dateCreated": "2024-02-09T11:25:24Z",
+			"dateModified": "2024-02-09T11:25:24Z",
+			"externalReferenceCode": "9426012f-d432-abaa-8929-ca4104d7f59d",
+			"id": 33857,
+			"keywords": [
+			],
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"aa": "b",
+			"actions": {
+				"delete": {
+					"href": "/headless-batch-engine/33859",
+					"method": "DELETE"
+				},
+				"get": {
+					"href": "/headless-batch-engine/33859",
+					"method": "GET"
+				},
+				"permissions": {
+					"href": "/headless-batch-engine/33859/permissions",
+					"method": "GET"
+				},
+				"replace": {
+					"href": "/headless-batch-engine/33859",
+					"method": "PUT"
+				},
+				"update": {
+					"href": "/headless-batch-engine/33859",
+					"method": "PATCH"
+				}
+			},
+			"creator": {
+				"additionalName": "",
+				"contentType": "UserAccount",
+				"familyName": "Test",
+				"givenName": "Test",
+				"id": 20122,
+				"name": "Test Test"
+			},
+			"dateCreated": "2024-02-09T11:25:29Z",
+			"dateModified": "2024-02-09T11:25:29Z",
+			"externalReferenceCode": "dddf1a8a-0201-9387-75ec-2d2bf115bb34",
+			"id": 33859,
+			"keywords": [
+			],
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		}
+	]
+}
