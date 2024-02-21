@@ -333,6 +333,9 @@ public class ColumnValuesExtractor {
 				"Invalid field name: " + fieldName);
 		}
 
+		ObjectValuePair<Field, Method> finalPropertiesObjectValuePair =
+			propertiesObjectValuePair;
+
 		return new UnsafeFunction
 			<Object, Object, ReflectiveOperationException>() {
 
@@ -341,7 +344,7 @@ public class ColumnValuesExtractor {
 				throws ReflectiveOperationException {
 
 				Map<?, ?> map = (Map<?, ?>)_getValue(
-					object, propertiesObjectValuePair);
+					object, finalPropertiesObjectValuePair);
 
 				Object value = map.get(fieldName);
 
