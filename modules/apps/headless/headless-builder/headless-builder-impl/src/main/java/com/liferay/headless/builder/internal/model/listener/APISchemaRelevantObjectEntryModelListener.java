@@ -12,9 +12,11 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.listener.RelevantObjectEntryModelListener;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -66,6 +68,19 @@ public class APISchemaRelevantObjectEntryModelListener
 					"an-api-schema-must-be-related-to-an-api-application");
 			}
 
+			ObjectEntry objectEntryAPIApplication =
+				_objectEntryLocalService.fetchObjectEntry(
+					(long)values.get(
+						"r_apiApplicationToAPISchemas_c_apiApplicationId"));
+
+			if (objectEntryAPIApplication.getCompanyId() !=
+					CompanyThreadLocal.getCompanyId()) {
+
+				throw new ObjectEntryValuesException.InvalidObjectField(
+					null, "API Application is not related to this instance",
+					"api-application-is-not-related-to-this-instance");
+			}
+
 			String mainObjectDefinitionERC = (String)values.get(
 				"mainObjectDefinitionERC");
 
@@ -112,6 +127,9 @@ public class APISchemaRelevantObjectEntryModelListener
 
 	@Reference
 	private ObjectEntryHelper _objectEntryHelper;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ValidationHelper _validationHelper;
