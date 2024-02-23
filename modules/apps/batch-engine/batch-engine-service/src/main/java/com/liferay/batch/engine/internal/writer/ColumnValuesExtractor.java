@@ -326,6 +326,11 @@ public class ColumnValuesExtractor {
 		ObjectValuePair<Field, Method> propertiesObjectValuePair =
 			fieldNameObjectValuePairs.get("lazyProperties");
 
+		if (propertiesObjectValuePair == null) {
+			propertiesObjectValuePair = fieldNameObjectValuePairs.get(
+				"properties");
+		}
+
 		if (!ItemClassIndexUtil.isObjectEntryProperties(
 				propertiesObjectValuePair)) {
 
