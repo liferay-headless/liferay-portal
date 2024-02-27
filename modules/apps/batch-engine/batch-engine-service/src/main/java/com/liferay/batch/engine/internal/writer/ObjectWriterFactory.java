@@ -47,7 +47,6 @@ public class ObjectWriterFactory {
 			disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 			enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
 			enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-			setDateFormat(new ISO8601DateFormat());
 			registerModule(
 				new SimpleModule() {
 					{
@@ -57,6 +56,7 @@ public class ObjectWriterFactory {
 							new UnsafeSupplierSerializer());
 					}
 				});
+			setDateFormat(new ISO8601DateFormat());
 			setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		}
 	};
