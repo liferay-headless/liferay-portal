@@ -12,6 +12,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.listener.RelevantObjectEntryModelListener;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
@@ -42,6 +43,8 @@ public class APISchemaRelevantObjectEntryModelListener
 		throws ModelListenerException {
 
 		_validate(objectEntry);
+
+		_validateCreate(objectEntry);
 	}
 
 	@Override
@@ -107,11 +110,31 @@ public class APISchemaRelevantObjectEntryModelListener
 		}
 	}
 
+	private void _validateCreate(ObjectEntry objectEntry) {
+		try {
+			
+			if (_objectEntryLocalService.fetchObjectEntry(
+					objectEntry.getExternalReferenceCode(),
+					objectEntry.getObjectDefinitionId()) != null) {
+
+				throw new ObjectEntryValuesException.InvalidObjectField(
+					null, "This external reference code is already in use",
+					"this-external-reference-code-is-already-in-use");
+			}
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
 	private ObjectEntryHelper _objectEntryHelper;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
 	private ValidationHelper _validationHelper;
