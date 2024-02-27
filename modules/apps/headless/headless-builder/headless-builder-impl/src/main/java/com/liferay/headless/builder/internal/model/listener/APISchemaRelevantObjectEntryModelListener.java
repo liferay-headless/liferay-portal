@@ -112,7 +112,6 @@ public class APISchemaRelevantObjectEntryModelListener
 
 	private void _validateCreate(ObjectEntry objectEntry) {
 		try {
-			
 			if (_objectEntryLocalService.fetchObjectEntry(
 					objectEntry.getExternalReferenceCode(),
 					objectEntry.getObjectDefinitionId()) != null) {
