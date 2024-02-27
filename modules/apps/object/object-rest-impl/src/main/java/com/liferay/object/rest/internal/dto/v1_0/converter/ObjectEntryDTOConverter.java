@@ -436,57 +436,59 @@ public class ObjectEntryDTOConverter
 		DLFileEntry dlFileEntry = _dLFileEntryLocalService.fetchDLFileEntry(
 			fileEntryId);
 
-		if (dlFileEntry != null) {
-			if (FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
-				fileEntry.setFileBase64(
-					(String)NestedFieldsSupplier.supply(
-						objectFieldName + ".fileBase64",
-						fieldName -> Base64.encode(
-							_file.getBytes(dlFileEntry.getContentStream()))));
-				fileEntry.setFolder(
-					(Folder)NestedFieldsSupplier.supply(
-						objectFieldName + ".folder",
-						fieldName -> {
-							if (!Objects.equals(
-									ObjectFieldSettingConstants.
-										VALUE_DOCS_AND_MEDIA,
-									ObjectFieldSettingUtil.getValue(
-										ObjectFieldSettingConstants.
-											NAME_FILE_SOURCE,
-										objectField))) {
-
-								return null;
-							}
-
-							Folder folder = new Folder();
-
-							long folderId = dlFileEntry.getFolderId();
-
-							folder.setExternalReferenceCode(
-								() -> {
-									if (folderId == 0) {
-										return null;
-									}
-
-									DLFolder dlFolder = dlFileEntry.getFolder();
-
-									return dlFolder.getExternalReferenceCode();
-								});
-
-							folder.setSiteId(dlFileEntry.getGroupId());
-
-							return folder;
-						}));
-			}
-
-			fileEntry.setId(dlFileEntry.getFileEntryId());
-			fileEntry.setLink(
-				LinkUtil.toLink(
-					_dlAppService, dlFileEntry, _dlURLHelper,
-					objectDefinition.getExternalReferenceCode(),
-					objectEntry.getExternalReferenceCode(), _portal));
-			fileEntry.setName(dlFileEntry.getFileName());
+		if (dlFileEntry == null) {
+			return fileEntry;
 		}
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-174455")) {
+			fileEntry.setFileBase64(
+				(String)NestedFieldsSupplier.supply(
+					objectFieldName + ".fileBase64",
+					fieldName -> Base64.encode(
+						_file.getBytes(dlFileEntry.getContentStream()))));
+			fileEntry.setFolder(
+				(Folder)NestedFieldsSupplier.supply(
+					objectFieldName + ".folder",
+					fieldName -> {
+						if (!Objects.equals(
+								ObjectFieldSettingConstants.
+									VALUE_DOCS_AND_MEDIA,
+								ObjectFieldSettingUtil.getValue(
+									ObjectFieldSettingConstants.
+										NAME_FILE_SOURCE,
+									objectField))) {
+
+							return null;
+						}
+
+						Folder folder = new Folder();
+
+						long folderId = dlFileEntry.getFolderId();
+
+						folder.setExternalReferenceCode(
+							() -> {
+								if (folderId == 0) {
+									return null;
+								}
+
+								DLFolder dlFolder = dlFileEntry.getFolder();
+
+								return dlFolder.getExternalReferenceCode();
+							});
+
+						folder.setSiteId(dlFileEntry.getGroupId());
+
+						return folder;
+					}));
+		}
+
+		fileEntry.setId(dlFileEntry.getFileEntryId());
+		fileEntry.setLink(
+			LinkUtil.toLink(
+				_dlAppService, dlFileEntry, _dlURLHelper,
+				objectDefinition.getExternalReferenceCode(),
+				objectEntry.getExternalReferenceCode(), _portal));
+		fileEntry.setName(dlFileEntry.getFileName());
 
 		return fileEntry;
 	}
