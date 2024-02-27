@@ -156,7 +156,7 @@ public class DefaultObjectEntryManagerImpl
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
-			_addOrUpdateNestedObjectEntries(
+			_addNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
 				_getObjectRelationships(objectDefinition, objectEntry),
 				serviceBuilderObjectEntry.getPrimaryKey(), scopeKey));
@@ -862,6 +862,170 @@ public class DefaultObjectEntryManagerImpl
 
 		return _addAction(
 			actionName, methodName, serviceBuilderObjectEntry, null, uriInfo);
+	}
+
+	private com.liferay.object.model.ObjectEntry _addNestedObjectEntries(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			Map<String, ObjectRelationship> objectRelationships,
+			long primaryKey, String scopeKey)
+		throws Exception {
+
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		for (Map.Entry<String, ObjectRelationship> entry :
+				objectRelationships.entrySet()) {
+
+			ObjectRelationship objectRelationship = objectRelationships.get(
+				entry.getKey());
+
+			ObjectDefinition relatedObjectDefinition =
+				_getRelatedObjectDefinition(
+					objectDefinition, objectRelationship);
+
+			ObjectRelationshipElementsParser objectRelationshipElementsParser =
+				_objectRelationshipElementsParserRegistry.
+					getObjectRelationshipElementsParser(
+						relatedObjectDefinition.getClassName(),
+						relatedObjectDefinition.getCompanyId(),
+						objectRelationship.getType());
+
+			List<?> nestedObjectEntries =
+				objectRelationshipElementsParser.parse(
+					objectRelationship, properties.get(entry.getKey()));
+
+			List<String> nestedExternalReferenceCodes = new ArrayList<>();
+
+			if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
+				SystemObjectDefinitionManager systemObjectDefinitionManager =
+					_systemObjectDefinitionManagerRegistry.
+						getSystemObjectDefinitionManager(
+							relatedObjectDefinition.getName());
+
+				for (Object item : nestedObjectEntries) {
+					Map<String, Object> nestedObjectEntry =
+						(Map<String, Object>)item;
+
+					long nestedObjectEntryId =
+						systemObjectDefinitionManager.upsertBaseModel(
+							String.valueOf(
+								nestedObjectEntry.get("externalReferenceCode")),
+							relatedObjectDefinition.getCompanyId(),
+							dtoConverterContext.getUser(), nestedObjectEntry);
+
+					_relateNestedObjectEntry(
+						objectDefinition, objectRelationship, primaryKey,
+						nestedObjectEntryId, new ServiceContext());
+
+					nestedExternalReferenceCodes.add(
+						systemObjectDefinitionManager.
+							getBaseModelExternalReferenceCode(
+								nestedObjectEntryId));
+				}
+			}
+			else {
+				boolean manyToOneObjectRelationship =
+					_isManyToOneObjectRelationship(
+						objectDefinition, objectRelationship,
+						relatedObjectDefinition);
+
+				for (Object item : nestedObjectEntries) {
+					ObjectEntry nestedObjectEntry = (ObjectEntry)item;
+
+					if (manyToOneObjectRelationship) {
+						Map<String, Object> nestedObjectEntryProperties =
+							nestedObjectEntry.getProperties();
+
+						String objectRelationshipName = StringBundler.concat(
+							"r_", objectRelationship.getName(), "_",
+							objectDefinition.getPKObjectFieldName());
+
+						nestedObjectEntryProperties.put(
+							objectRelationshipName, primaryKey);
+					}
+
+					nestedObjectEntry = _addObjectEntry(
+						objectDefinition.getCompanyId(), dtoConverterContext,
+						nestedObjectEntry.getExternalReferenceCode(),
+						relatedObjectDefinition, nestedObjectEntry, scopeKey);
+
+					if (!manyToOneObjectRelationship) {
+						_relateNestedObjectEntry(
+							objectDefinition, objectRelationship, primaryKey,
+							nestedObjectEntry.getId(),
+							ServiceContextUtil.createServiceContext(
+								nestedObjectEntry,
+								dtoConverterContext.getUserId()));
+					}
+
+					nestedExternalReferenceCodes.add(
+						nestedObjectEntry.getExternalReferenceCode());
+				}
+			}
+
+			long[] toDisassociatePrimaryKeys =
+				TransformUtil.transformToLongArray(
+					_getRelatedModels(
+						objectDefinition, objectRelationship, primaryKey,
+						relatedObjectDefinition),
+					relatedModel -> {
+						ExternalReferenceCodeModel externalReferenceCodeModel =
+							(ExternalReferenceCodeModel)relatedModel;
+
+						if (nestedExternalReferenceCodes.contains(
+								externalReferenceCodeModel.
+									getExternalReferenceCode())) {
+
+							return null;
+						}
+
+						return relatedModel.getPrimaryKeyObj();
+					});
+
+			if (toDisassociatePrimaryKeys.length > 0) {
+				_disassociateRelatedModels(
+					objectDefinition, objectRelationship, primaryKey,
+					toDisassociatePrimaryKeys, relatedObjectDefinition,
+					dtoConverterContext.getUserId());
+			}
+
+			if (properties.containsKey(entry.getKey())) {
+				NestedFieldsSupplier.addFieldName(entry.getKey());
+			}
+		}
+
+		return objectEntryLocalService.getObjectEntry(primaryKey);
+	}
+
+	private ObjectEntry _addObjectEntry(
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry, String scopeKey)
+		throws Exception {
+
+		validateReadOnlyObjectFields(
+			externalReferenceCode, objectDefinition, objectEntry);
+
+		ServiceContext serviceContext = ServiceContextUtil.createServiceContext(
+			objectEntry, dtoConverterContext.getUserId());
+
+		serviceContext.setCompanyId(companyId);
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryService.addObjectEntry(
+				getGroupId(objectDefinition, scopeKey),
+				objectDefinition.getObjectDefinitionId(),
+				_toObjectValues(
+					dtoConverterContext.getLocale(), objectDefinition,
+					objectEntry, scopeKey, serviceContext),
+				serviceContext);
+
+		return _toObjectEntry(
+			dtoConverterContext, objectDefinition,
+			_addOrUpdateNestedObjectEntries(
+				dtoConverterContext, objectDefinition, objectEntry,
+				_getObjectRelationships(objectDefinition, objectEntry),
+				serviceBuilderObjectEntry.getPrimaryKey(), scopeKey));
 	}
 
 	private com.liferay.object.model.ObjectEntry
