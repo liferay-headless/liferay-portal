@@ -218,10 +218,16 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 			Pagination pagination, TaskBulkSelection taskBulkSelection)
 		throws Exception {
 
-		if (ArrayUtil.isEmpty(taskBulkSelection.getAssigneeIds())) {
-			taskBulkSelection.setAssigneeIds(
-				new Long[] {-1L, contextUser.getUserId()});
-		}
+		Long[] assigneeIds = taskBulkSelection.getAssigneeIds();
+
+		taskBulkSelection.setAssigneeIds(
+			() -> {
+				if (ArrayUtil.isEmpty(assigneeIds)) {
+					return new Long[] {-1L, contextUser.getUserId()};
+				}
+
+				return assigneeIds;
+			});
 
 		SearchSearchResponse searchSearchResponse = _getSearchSearchResponse(
 			taskBulkSelection.getAssigneeIds(),
