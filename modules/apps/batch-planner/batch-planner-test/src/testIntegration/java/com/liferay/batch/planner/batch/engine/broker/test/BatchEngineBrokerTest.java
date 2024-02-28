@@ -229,8 +229,9 @@ public class BatchEngineBrokerTest {
 
 	@Test
 	public void testExportCompanyScopeObjectEntryJSONT() throws Exception {
-		_objectDefinition1 = _publishObjectDefinition("TestObjectJSONT",
-			ObjectDefinitionConstants.SCOPE_COMPANY, TestPropsValues.getUser());
+		_objectDefinition1 = _publishObjectDefinition(
+			"TestObjectJSONT", ObjectDefinitionConstants.SCOPE_COMPANY,
+			TestPropsValues.getUser());
 
 		ObjectEntry objectEntry = _addObjectEntry(
 			TestPropsValues.getCompanyId(), RandomTestUtil.randomString(),
@@ -289,8 +290,9 @@ public class BatchEngineBrokerTest {
 
 		// Default group
 
-		_objectDefinition1 = _publishObjectDefinition("TestObjectJSONT",
-			ObjectDefinitionConstants.SCOPE_SITE, TestPropsValues.getUser());
+		_objectDefinition1 = _publishObjectDefinition(
+			"TestObjectJSONT", ObjectDefinitionConstants.SCOPE_SITE,
+			TestPropsValues.getUser());
 
 		_testExportSiteScopeObjectEntryJSONT(
 			TestPropsValues.getGroupId(), _OBJECT_ENTRY_ERC_1);
@@ -1121,182 +1123,172 @@ public class BatchEngineBrokerTest {
 					LocaleUtil.US, RandomTestUtil.randomString()),
 				false, Arrays.asList(listTypeEntry1, listTypeEntry2));
 
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.addCustomObjectDefinition(
-					user.getUserId(), 0, false, false, false,
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString()),
-					name, null, null,
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString()),
-					false, scope,
-					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-					Arrays.asList(
-						new AttachmentObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testAttachmentField"
-						).objectFieldSettings(
-							Arrays.asList(
-								_createObjectFieldSetting(
-									"acceptedFileExtensions", "txt"),
-								_createObjectFieldSetting(
-									"fileSource", "documentsAndMedia"),
-								_createObjectFieldSetting(
-									"maximumFileSize", "100"))
-						).build(),
-						new BooleanObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testBooleanField"
-						).build(),
-						new DateObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testDateField"
-						).build(),
-						new DateTimeObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testDateTimeField"
-						).objectFieldSettings(
-							Collections.singletonList(
-								_createObjectFieldSetting(
-									ObjectFieldSettingConstants.
-										NAME_TIME_STORAGE,
-									ObjectFieldSettingConstants.
-										VALUE_USE_INPUT_AS_ENTERED))
-						).build(),
-						new DecimalObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testDecimalField"
-						).build(),
-						new FormulaObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testFormulaField"
-						).objectFieldSettings(
-							Arrays.asList(
-								_createObjectFieldSetting("output", "Integer"),
-								_createObjectFieldSetting("script", "id / id"))
-						).build(),
-						new IntegerObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testIntegerField"
-						).build(),
-						new LongIntegerObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testLongIntegerField"
-						).build(),
-						new LongTextObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testLongTextField"
-						).build(),
-						new MultiselectPicklistObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).listTypeDefinitionId(
-							listTypeDefinition.getListTypeDefinitionId()
-						).name(
-							"testMultiselectPicklistField"
-						).build(),
-						new PicklistObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).listTypeDefinitionId(
-							listTypeDefinition.getListTypeDefinitionId()
-						).name(
-							"testPicklistField"
-						).build(),
-						new PrecisionDecimalObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testPrecisionDecimalField"
-						).build(),
-						new RichTextObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testRichTextField"
-						).build(),
-						new TextObjectFieldBuilder(
-						).labelMap(
-							LocalizedMapUtil.getLocalizedMap(
-								RandomTestUtil.randomString())
-						).name(
-							"testTextField"
-						).build()));
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.addCustomObjectDefinition(
+				user.getUserId(), 0, false, false, false,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				name, null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				false, scope, ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+				Arrays.asList(
+					new AttachmentObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testAttachmentField"
+					).objectFieldSettings(
+						Arrays.asList(
+							_createObjectFieldSetting(
+								"acceptedFileExtensions", "txt"),
+							_createObjectFieldSetting(
+								"fileSource", "documentsAndMedia"),
+							_createObjectFieldSetting("maximumFileSize", "100"))
+					).build(),
+					new BooleanObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testBooleanField"
+					).build(),
+					new DateObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testDateField"
+					).build(),
+					new DateTimeObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testDateTimeField"
+					).objectFieldSettings(
+						Collections.singletonList(
+							_createObjectFieldSetting(
+								ObjectFieldSettingConstants.NAME_TIME_STORAGE,
+								ObjectFieldSettingConstants.
+									VALUE_USE_INPUT_AS_ENTERED))
+					).build(),
+					new DecimalObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testDecimalField"
+					).build(),
+					new FormulaObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testFormulaField"
+					).objectFieldSettings(
+						Arrays.asList(
+							_createObjectFieldSetting("output", "Integer"),
+							_createObjectFieldSetting("script", "id / id"))
+					).build(),
+					new IntegerObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testIntegerField"
+					).build(),
+					new LongIntegerObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testLongIntegerField"
+					).build(),
+					new LongTextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testLongTextField"
+					).build(),
+					new MultiselectPicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"testMultiselectPicklistField"
+					).build(),
+					new PicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"testPicklistField"
+					).build(),
+					new PrecisionDecimalObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testPrecisionDecimalField"
+					).build(),
+					new RichTextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testRichTextField"
+					).build(),
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"testTextField"
+					).build()));
 
-			ObjectRelationship objectRelationship =
-				_objectRelationshipLocalService.addObjectRelationship(
-					null, TestPropsValues.getUserId(),
-					objectDefinition.getObjectDefinitionId(),
-					objectDefinition.getObjectDefinitionId(), 0,
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString()),
-					"a" + RandomTestUtil.randomString(), false,
-					ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.addObjectRelationship(
+				null, TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				objectDefinition.getObjectDefinitionId(), 0,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"a" + RandomTestUtil.randomString(), false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
-			_addCustomObjectField(
-				new AggregationObjectFieldBuilder(
-				).labelMap(
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString())
-				).name(
-					"testAggregationField"
-				).objectDefinitionId(
-					objectDefinition.getObjectDefinitionId()
-				).objectFieldSettings(
-					Arrays.asList(
-						_createObjectFieldSetting("function", "COUNT"),
-						_createObjectFieldSetting(
-							"objectRelationshipName",
-							objectRelationship.getName()))
-				).build());
+		_addCustomObjectField(
+			new AggregationObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"testAggregationField"
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).objectFieldSettings(
+				Arrays.asList(
+					_createObjectFieldSetting("function", "COUNT"),
+					_createObjectFieldSetting(
+						"objectRelationshipName", objectRelationship.getName()))
+			).build());
 
-			_addCustomObjectField(
-				new EncryptedObjectFieldBuilder(
-				).labelMap(
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString())
-				).name(
-					"testEncryptedField"
-				).objectDefinitionId(
-					objectDefinition.getObjectDefinitionId()
-				).build());
+		_addCustomObjectField(
+			new EncryptedObjectFieldBuilder(
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"testEncryptedField"
+			).objectDefinitionId(
+				objectDefinition.getObjectDefinitionId()
+			).build());
 
-			return _objectDefinitionLocalService.publishCustomObjectDefinition(
-				user.getUserId(), objectDefinition.getObjectDefinitionId());
-		}
-
+		return _objectDefinitionLocalService.publishCustomObjectDefinition(
+			user.getUserId(), objectDefinition.getObjectDefinitionId());
+	}
 
 	private void _setUpObjectDefinition(String name) throws Exception {
 		_objectDefinition1 = _publishObjectDefinition(
