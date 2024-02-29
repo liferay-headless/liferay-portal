@@ -14,7 +14,6 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -32,13 +31,14 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = ValidationHelper.class)
 public class ValidationHelper {
 
-	public boolean isValidAPIApplicationCompanyId(long objectEntryId) {
+	public boolean isValidAPIApplicationCompanyId(
+		long objectEntryId, long companyId) {
+
 		ObjectEntry objectEntryAPIApplication =
 			_objectEntryLocalService.fetchObjectEntry(objectEntryId);
 
 		if ((objectEntryAPIApplication == null) ||
-			(objectEntryAPIApplication.getCompanyId() !=
-				CompanyThreadLocal.getCompanyId())) {
+			(objectEntryAPIApplication.getCompanyId() != companyId)) {
 
 			return false;
 		}
