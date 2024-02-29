@@ -28,6 +28,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
@@ -1061,6 +1062,81 @@ public class DefaultObjectEntryManagerImplTest
 			).put(
 				"name", listTypeEntry.getName(LocaleUtil.US)
 			).build());
+	}
+
+	@Test(expected = DuplicateObjectEntryExternalReferenceCodeException.class)
+	public void testAddObjectEntryThrowsDuplicateObjectEntryExternalReferenceCodeException()
+		throws Exception {
+
+		ObjectEntry parentObjectEntry1 =
+			_defaultObjectEntryManager.addObjectEntry(
+				_simpleDTOConverterContext, _objectDefinition1,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							"externalReferenceCode", "newExternalReferenceCode"
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCObjectFieldName,
+						parentObjectEntry1.getExternalReferenceCode()
+					).put(
+						"dateObjectFieldName", "2020-01-02"
+					).put(
+						"decimalObjectFieldName", 15.7
+					).put(
+						"externalReferenceCode",
+						"externalReferenceCodeChildObject"
+					).put(
+						"integerObjectFieldName", 15
+					).put(
+						"longIntegerObjectFieldName", 100L
+					).put(
+						"picklistObjectFieldName", _addListTypeEntry()
+					).put(
+						"precisionDecimalObjectFieldName",
+						new BigDecimal("0.9876543217654321")
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_defaultObjectEntryManager.addObjectEntry(
+			dtoConverterContext, _objectDefinition2,
+			new ObjectEntry() {
+				{
+					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCObjectFieldName,
+						parentObjectEntry1.getExternalReferenceCode()
+					).put(
+						"dateObjectFieldName", "2020-01-02"
+					).put(
+						"decimalObjectFieldName", 15.7
+					).put(
+						"externalReferenceCode",
+						"externalReferenceCodeChildObject"
+					).put(
+						"integerObjectFieldName", 15
+					).put(
+						"longIntegerObjectFieldName", 100L
+					).put(
+						"picklistObjectFieldName", _addListTypeEntry()
+					).put(
+						"precisionDecimalObjectFieldName",
+						new BigDecimal("0.9876543217654321")
+					).build();
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
 	@Test
