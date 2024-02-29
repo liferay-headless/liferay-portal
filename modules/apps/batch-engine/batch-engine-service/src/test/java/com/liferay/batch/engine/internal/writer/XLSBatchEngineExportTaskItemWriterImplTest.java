@@ -10,14 +10,10 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.CSVUtil;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,21 +101,18 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 					int index = fieldName.indexOf(CharPool.UNDERLINE);
 
 					if (index == -1) {
-						ObjectValuePair<Field, Method> objectValuePair =
-							fieldNameObjectValuePairs.get(fieldName);
+						FieldValueExtractor fieldValueExtractor =
+							fieldValueExtractors.get(fieldName);
 
-						Method method = objectValuePair.getValue();
-
-						values.add(method.invoke(item));
+						values.add(fieldValueExtractor.extract(item));
 					}
 					else {
-						ObjectValuePair<Field, Method> objectValuePair =
-							fieldNameObjectValuePairs.get(
+						FieldValueExtractor fieldValueExtractor =
+							fieldValueExtractors.get(
 								fieldName.substring(0, index));
 
-						Method method = objectValuePair.getValue();
-
-						Map<?, ?> valueMap = (Map<?, ?>)method.invoke(item);
+						Map<?, ?> valueMap =
+							(Map<?, ?>)fieldValueExtractor.extract(item);
 
 						values.add(
 							valueMap.get(fieldName.substring(index + 1)));

@@ -11,13 +11,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.util.CSVUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -123,14 +121,14 @@ public class CSVBatchEngineExportTaskItemWriterImplTest
 			for (int i = 0; i < fieldNames.size(); i++) {
 				String fieldName = fieldNames.get(i);
 
-				ObjectValuePair<Field, Method> objectValuePair =
-					fieldNameObjectValuePairs.get(fieldName);
+				FieldValueExtractor fieldValueExtractor =
+					fieldValueExtractors.get(fieldName);
 
-				Field field = objectValuePair.getKey();
-				Method method = objectValuePair.getValue();
+				Field field = fieldValueExtractor.getField();
 
 				if (Objects.equals(field.getType(), Map.class)) {
-					Map<?, ?> map = (Map<?, ?>)method.invoke(item);
+					Map<?, ?> map = (Map<?, ?>)fieldValueExtractor.extract(
+						item);
 
 					Set<? extends Map.Entry<?, ?>> entries = map.entrySet();
 
@@ -164,7 +162,8 @@ public class CSVBatchEngineExportTaskItemWriterImplTest
 					}
 				}
 				else {
-					sb.append(_formatValue(method.invoke(item), i));
+					sb.append(
+						_formatValue(fieldValueExtractor.extract(item), i));
 				}
 
 				sb.append(StringPool.COMMA);

@@ -6,7 +6,6 @@
 package com.liferay.batch.engine.internal.writer;
 
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
@@ -29,39 +28,39 @@ public class ItemClassIndexUtilTest {
 		Assert.assertEquals(
 			HashMapBuilder.put(
 				"abcTestEnum",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField("abcTestEnum"),
 					TestClass.class.getMethod("getABCTestEnum"))
 			).put(
 				"missingGetterTestStringField1",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField(
 						"missingGetterTestStringField1"),
 					null)
 			).put(
 				"missingGetterTestStringField2",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField(
 						"_missingGetterTestStringField2"),
 					null)
 			).put(
 				"testIntegerField1",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField("testIntegerField1"),
 					TestClass.class.getMethod("getTestIntegerField1"))
 			).put(
 				"testIntegerField2",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField("_testIntegerField2"),
 					TestClass.class.getMethod("getTestIntegerField2"))
 			).put(
 				"testStringField1",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField("testStringField1"),
 					TestClass.class.getMethod("getTestStringField1"))
 			).put(
 				"testStringField2",
-				new ObjectValuePair<>(
+				new FieldValueExtractor(
 					TestClass.class.getDeclaredField("_testStringField2"),
 					TestClass.class.getMethod("getTestStringField2"))
 			).build(),
