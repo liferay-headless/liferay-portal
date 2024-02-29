@@ -10,8 +10,7 @@ import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.petra.memory.FinalizeManager;
-import com.liferay.petra.string.CharPool;
-import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.lang.reflect.Field;
@@ -37,21 +36,27 @@ import java.util.function.Supplier;
  */
 public class ItemClassIndexUtil {
 
-	public static Map<String, ObjectValuePair<Field, Method>> index(
-		Class<?> itemClass) {
+	public static String getSanitizedFieldName(String fieldName) {
+		if (fieldName.startsWith(StringPool.UNDERLINE)) {
+			return fieldName.substring(1);
+		}
 
+		return fieldName;
+	}
+
+	public static Map<String, FieldValueExtractor> index(Class<?> itemClass) {
 		Queue<Class<?>> queue = new LinkedList<>();
 
-		Map<String, ObjectValuePair<Field, Method>> fieldNameObjectValuePairs =
-			_fieldNameObjectValuePairs.computeIfAbsent(
+		Map<String, FieldValueExtractor> fieldValueExtractors =
+			_fieldValueExtractors.computeIfAbsent(
 				itemClass, clazz -> _index(clazz, queue));
 
 		while ((itemClass = queue.poll()) != null) {
-			_fieldNameObjectValuePairs.computeIfAbsent(
+			_fieldValueExtractors.computeIfAbsent(
 				itemClass, clazz -> _index(clazz, queue));
 		}
 
-		return fieldNameObjectValuePairs;
+		return fieldValueExtractors;
 	}
 
 	public static boolean isIterable(Class<?> valueClass) {
@@ -95,13 +100,13 @@ public class ItemClassIndexUtil {
 	}
 
 	public static boolean isObjectEntryProperties(
-		ObjectValuePair<Field, Method> objectValuePair) {
+		FieldValueExtractor fieldValueExtractor) {
 
-		if (objectValuePair == null) {
+		if (fieldValueExtractor == null) {
 			return false;
 		}
 
-		Field field = objectValuePair.getKey();
+		Field field = fieldValueExtractor.getField();
 
 		if ((field == null) ||
 			!Objects.equals(field.getDeclaringClass(), ObjectEntry.class) ||
@@ -161,11 +166,10 @@ public class ItemClassIndexUtil {
 		return null;
 	}
 
-	private static Map<String, ObjectValuePair<Field, Method>> _index(
+	private static Map<String, FieldValueExtractor> _index(
 		Class<?> clazz, Queue<Class<?>> queue) {
 
-		Map<String, ObjectValuePair<Field, Method>> fieldNameObjectValuePairs =
-			new HashMap<>();
+		Map<String, FieldValueExtractor> fieldValueExtractors = new HashMap<>();
 
 		while (clazz != Object.class) {
 			for (Field field : clazz.getDeclaredFields()) {
@@ -177,19 +181,15 @@ public class ItemClassIndexUtil {
 
 				field.setAccessible(true);
 
-				String name = field.getName();
-
-				if (name.charAt(0) == CharPool.UNDERLINE) {
-					name = name.substring(1);
-				}
-
 				if (field.isSynthetic()) {
 					continue;
 				}
 
-				fieldNameObjectValuePairs.put(
+				String name = getSanitizedFieldName(field.getName());
+
+				fieldValueExtractors.put(
 					name,
-					new ObjectValuePair<>(
+					new FieldValueExtractor(
 						field, _getGetterMethod(clazz, field, name)));
 
 				Class<?> fieldClass = field.getType();
@@ -212,15 +212,14 @@ public class ItemClassIndexUtil {
 			clazz = clazz.getSuperclass();
 		}
 
-		return fieldNameObjectValuePairs;
+		return fieldValueExtractors;
 	}
 
-	private static final Map
-		<Class<?>, Map<String, ObjectValuePair<Field, Method>>>
-			_fieldNameObjectValuePairs = new ConcurrentReferenceKeyHashMap<>(
-				new ConcurrentReferenceValueHashMap<>(
-					FinalizeManager.WEAK_REFERENCE_FACTORY),
-				FinalizeManager.WEAK_REFERENCE_FACTORY);
+	private static final Map<Class<?>, Map<String, FieldValueExtractor>>
+		_fieldValueExtractors = new ConcurrentReferenceKeyHashMap<>(
+			new ConcurrentReferenceValueHashMap<>(
+				FinalizeManager.WEAK_REFERENCE_FACTORY),
+			FinalizeManager.WEAK_REFERENCE_FACTORY);
 	private static final List<Class<?>> _objectTypes = Arrays.asList(
 		Boolean.class, BigDecimal.class, BigInteger.class, Byte.class,
 		Date.class, Double.class, Float.class, Integer.class, Long.class,
