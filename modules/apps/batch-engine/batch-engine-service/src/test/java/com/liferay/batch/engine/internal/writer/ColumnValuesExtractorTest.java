@@ -38,8 +38,8 @@ public class ColumnValuesExtractorTest {
 			new String[] {"A,BC", "D\"EF", "GHI", "J'KL", "``NO,P"});
 
 		ColumnValuesExtractor columnValuesExtractor = new ColumnValuesExtractor(
-			ItemClassIndexUtil.index(arraysAggregator.getClass()),
-			Arrays.asList("doubles", "length", "strings"));
+			Arrays.asList("doubles", "length", "strings"),
+			arraysAggregator.getClass());
 
 		_assertHeaders(
 			new String[] {"doubles", "length", "strings"},
@@ -84,8 +84,8 @@ public class ColumnValuesExtractorTest {
 			new NestedObjectsAggregator(arraysAggregator, arraysAggregator);
 
 		ColumnValuesExtractor columnValuesExtractor = new ColumnValuesExtractor(
-			ItemClassIndexUtil.index(nestedObjectsAggregator.getClass()),
-			Arrays.asList("arraysAggregator1", "arraysAggregator2", "length"));
+			Arrays.asList("arraysAggregator1", "arraysAggregator2", "length"),
+			nestedObjectsAggregator.getClass());
 
 		_assertHeaders(
 			new String[] {
