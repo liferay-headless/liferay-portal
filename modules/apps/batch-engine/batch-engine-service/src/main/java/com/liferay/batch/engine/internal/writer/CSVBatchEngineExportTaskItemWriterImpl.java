@@ -10,16 +10,12 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import java.text.DateFormat;
 
@@ -40,11 +36,8 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 	implements BatchEngineExportTaskItemWriter {
 
 	public CSVBatchEngineExportTaskItemWriterImpl(
-			String delimiter,
-			Map<String, ObjectValuePair<Field, Method>>
-				fieldNameObjectValuePairs,
-			List<String> fieldNames, OutputStream outputStream,
-			Map<String, Serializable> parameters)
+			String delimiter, List<String> fieldNames, Class<?> itemClass,
+			OutputStream outputStream, Map<String, Serializable> parameters)
 		throws IOException {
 
 		if (fieldNames.isEmpty()) {
@@ -59,7 +52,7 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 			fieldNames, (value1, value2) -> value1.compareToIgnoreCase(value2));
 
 		_columnValuesExtractor = new ColumnValuesExtractor(
-			fieldNameObjectValuePairs, fieldNames);
+			fieldNames, itemClass);
 
 		if (Boolean.valueOf(
 				(String)parameters.getOrDefault(

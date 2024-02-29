@@ -35,12 +35,9 @@ import java.util.Set;
  */
 public class ColumnValuesExtractor {
 
-	public ColumnValuesExtractor(
-		Map<String, ObjectValuePair<Field, Method>> fieldNameObjectValuePairs,
-		List<String> fieldNames) {
-
+	public ColumnValuesExtractor(List<String> fieldNames, Class<?> itemClass) {
 		_columnDescriptors = _getColumnDescriptors(
-			fieldNameObjectValuePairs, fieldNames, 0, null);
+			ItemClassIndexUtil.index(itemClass), fieldNames, 0, null);
 	}
 
 	public List<Object[]> extractValues(Object item)

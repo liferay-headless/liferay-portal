@@ -5,18 +5,12 @@
 
 package com.liferay.batch.engine.internal.writer;
 
-import com.liferay.portal.kernel.util.ObjectValuePair;
-
 import java.io.IOException;
 import java.io.OutputStream;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -34,17 +28,17 @@ public class XLSBatchEngineExportTaskItemWriterImpl
 	implements BatchEngineExportTaskItemWriter {
 
 	public XLSBatchEngineExportTaskItemWriterImpl(
-		Map<String, ObjectValuePair<Field, Method>> fieldNameObjectValuePairs,
-		List<String> fieldNames, OutputStream outputStream) {
+		List<String> fieldNames, Class<?> itemClass,
+		OutputStream outputStream) {
 
 		if (fieldNames.isEmpty()) {
 			throw new IllegalArgumentException("Field names are not set");
 		}
 
-		_outputStream = outputStream;
-
 		_columnValuesExtractor = new ColumnValuesExtractor(
-			fieldNameObjectValuePairs, fieldNames);
+			fieldNames, itemClass);
+
+		_outputStream = outputStream;
 
 		_sheet = _workbook.createSheet();
 
