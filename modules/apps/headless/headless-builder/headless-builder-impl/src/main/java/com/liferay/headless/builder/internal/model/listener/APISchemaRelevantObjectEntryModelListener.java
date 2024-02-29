@@ -67,9 +67,9 @@ public class APISchemaRelevantObjectEntryModelListener
 			}
 
 			if (!_validationHelper.isValidAPIApplicationCompanyId(
+					objectEntry.getCompanyId(),
 					(long)values.get(
-						"r_apiApplicationToAPISchemas_c_apiApplicationId"),
-					objectEntry.getCompanyId())) {
+						"r_apiApplicationToAPISchemas_c_apiApplicationId"))) {
 
 				throw new ObjectEntryValuesException.InvalidObjectField(
 					null, "API Application is not related to this instance",

@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 public class ValidationHelper {
 
 	public boolean isValidAPIApplicationCompanyId(
-		long objectEntryId, long companyId) {
+		long companyId, long objectEntryId) {
 
 		ObjectEntry objectEntryAPIApplication =
 			_objectEntryLocalService.fetchObjectEntry(objectEntryId);
