@@ -208,95 +208,75 @@ public class ColumnValuesExtractor {
 			Class<?> fieldClass = field.getType();
 
 			if (ItemClassIndexUtil.isSingleColumnAdoptableValue(fieldClass)) {
-				return new UnsafeFunction<Object, Object, Exception>() {
+				return object -> {
+					Object value = fieldValueExtractor.extract(object);
 
-					@Override
-					public Object apply(Object object) throws Exception {
-						Object value = fieldValueExtractor.extract(object);
-
-						if (value == null) {
-							return StringPool.BLANK;
-						}
-
-						return value;
+					if (value == null) {
+						return StringPool.BLANK;
 					}
 
+					return value;
 				};
 			}
 
 			if (ItemClassIndexUtil.isSingleColumnAdoptableArray(fieldClass)) {
-				return new UnsafeFunction<Object, Object, Exception>() {
+				return object -> {
+					Object value = fieldValueExtractor.extract(object);
 
-					@Override
-					public Object apply(Object object) throws Exception {
-						Object value = fieldValueExtractor.extract(object);
-
-						if (value == null) {
-							return StringPool.BLANK;
-						}
-
-						return StringUtil.merge(
-							(Object[])value, CSVUtil::encode, StringPool.COMMA);
+					if (value == null) {
+						return StringPool.BLANK;
 					}
 
+					return StringUtil.merge(
+						(Object[])value, CSVUtil::encode, StringPool.COMMA);
 				};
 			}
 
 			if (ItemClassIndexUtil.isMap(fieldClass)) {
-				return new UnsafeFunction<Object, Object, Exception>() {
+				return object -> {
+					Map<?, ?> map = (Map<?, ?>)fieldValueExtractor.extract(
+						object);
 
-					@Override
-					public Object apply(Object object) throws Exception {
-						Map<?, ?> map = (Map<?, ?>)fieldValueExtractor.extract(
-							object);
-
-						if (map == null) {
-							return StringPool.BLANK;
-						}
-
-						StringBundler sb = new StringBundler(map.size() * 3);
-
-						Set<? extends Map.Entry<?, ?>> entries = map.entrySet();
-
-						Iterator<? extends Map.Entry<?, ?>> iterator =
-							entries.iterator();
-
-						while (iterator.hasNext()) {
-							Map.Entry<?, ?> entry = iterator.next();
-
-							sb.append(CSVUtil.encode(entry.getKey()));
-
-							sb.append(StringPool.COLON);
-
-							if (entry.getValue() != null) {
-								sb.append(CSVUtil.encode(entry.getValue()));
-							}
-							else {
-								sb.append(StringPool.BLANK);
-							}
-
-							if (iterator.hasNext()) {
-								sb.append(StringPool.COMMA_AND_SPACE);
-							}
-						}
-
-						return sb.toString();
-					}
-
-				};
-			}
-
-			return new UnsafeFunction<Object, Object, Exception>() {
-
-				@Override
-				public Object apply(Object object) throws Exception {
-					if (fieldValueExtractor.extract(object) == null) {
+					if (map == null) {
 						return StringPool.BLANK;
 					}
 
-					return CSVUtil.encode(object);
+					StringBundler sb = new StringBundler(map.size() * 3);
+
+					Set<? extends Map.Entry<?, ?>> entries = map.entrySet();
+
+					Iterator<? extends Map.Entry<?, ?>> iterator =
+						entries.iterator();
+
+					while (iterator.hasNext()) {
+						Map.Entry<?, ?> entry = iterator.next();
+
+						sb.append(CSVUtil.encode(entry.getKey()));
+
+						sb.append(StringPool.COLON);
+
+						if (entry.getValue() != null) {
+							sb.append(CSVUtil.encode(entry.getValue()));
+						}
+						else {
+							sb.append(StringPool.BLANK);
+						}
+
+						if (iterator.hasNext()) {
+							sb.append(StringPool.COMMA_AND_SPACE);
+						}
+					}
+
+					return sb.toString();
+				};
+			}
+
+			return object -> {
+				if (fieldValueExtractor.extract(object) == null) {
+					return StringPool.BLANK;
 				}
 
+				return CSVUtil.encode(object);
 			};
 		}
 
@@ -310,30 +290,25 @@ public class ColumnValuesExtractor {
 				"Invalid field name: " + fieldName);
 		}
 
-		return new UnsafeFunction<Object, Object, Exception>() {
+		return object -> {
+			Map<?, ?> map = (Map<?, ?>)propertiesFieldValueExtractor.extract(
+				object);
 
-			@Override
-			public Object apply(Object object) throws Exception {
-				Map<?, ?> map =
-					(Map<?, ?>)propertiesFieldValueExtractor.extract(object);
+			Object value = map.get(fieldName);
 
-				Object value = map.get(fieldName);
-
-				if (value == null) {
-					return StringPool.BLANK;
-				}
-
-				if (ItemClassIndexUtil.isListEntry(value)) {
-					return _getListEntryKey(value);
-				}
-
-				if (value instanceof String) {
-					return CSVUtil.encode(value);
-				}
-
-				return value;
+			if (value == null) {
+				return StringPool.BLANK;
 			}
 
+			if (ItemClassIndexUtil.isListEntry(value)) {
+				return _getListEntryKey(value);
+			}
+
+			if (value instanceof String) {
+				return CSVUtil.encode(value);
+			}
+
+			return value;
 		};
 	}
 
