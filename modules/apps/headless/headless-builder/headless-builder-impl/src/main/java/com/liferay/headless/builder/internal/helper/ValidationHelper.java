@@ -36,8 +36,9 @@ public class ValidationHelper {
 		ObjectEntry objectEntryAPIApplication =
 			_objectEntryLocalService.fetchObjectEntry(objectEntryId);
 
-		if (objectEntryAPIApplication.getCompanyId() !=
-				CompanyThreadLocal.getCompanyId()) {
+		if ((objectEntryAPIApplication == null) ||
+			(objectEntryAPIApplication.getCompanyId() !=
+				CompanyThreadLocal.getCompanyId())) {
 
 			return false;
 		}
