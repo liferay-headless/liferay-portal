@@ -28,7 +28,6 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
-import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectRelationshipDeletionTypeException;
@@ -75,6 +74,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -102,6 +102,7 @@ import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
@@ -112,6 +113,7 @@ import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -173,6 +175,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 /**
  * @author Feliphe Marinho
@@ -414,7 +419,7 @@ public class DefaultObjectEntryManagerImplTest
 					"localizedTextObjectFieldName"
 				).build()));
 
-		ObjectRelationship objectRelationship1 =
+		_objectRelationship1 =
 			_objectRelationshipLocalService.addObjectRelationship(
 				null, adminUser.getUserId(),
 				_objectDefinition1.getObjectDefinitionId(),
@@ -427,25 +432,26 @@ public class DefaultObjectEntryManagerImplTest
 		_addAggregationObjectField(
 			"precisionDecimalObjectFieldName", "AVERAGE",
 			_objectDefinition1.getObjectDefinitionId(),
-			"averageAggregationObjectFieldName", objectRelationship1.getName());
+			"averageAggregationObjectFieldName",
+			_objectRelationship1.getName());
 		_addAggregationObjectField(
 			null, "COUNT", _objectDefinition1.getObjectDefinitionId(),
-			"countAggregationObjectFieldName1", objectRelationship1.getName());
+			"countAggregationObjectFieldName1", _objectRelationship1.getName());
 		_addAggregationObjectField(
 			"integerObjectFieldName", "MAX",
 			_objectDefinition1.getObjectDefinitionId(),
-			"maxAggregationObjectFieldName", objectRelationship1.getName());
+			"maxAggregationObjectFieldName", _objectRelationship1.getName());
 		_addAggregationObjectField(
 			"longIntegerObjectFieldName", "MIN",
 			_objectDefinition1.getObjectDefinitionId(),
-			"minAggregationObjectFieldName", objectRelationship1.getName());
+			"minAggregationObjectFieldName", _objectRelationship1.getName());
 		_addAggregationObjectField(
 			"decimalObjectFieldName", "SUM",
 			_objectDefinition1.getObjectDefinitionId(),
-			"sumAggregationObjectFieldName", objectRelationship1.getName());
+			"sumAggregationObjectFieldName", _objectRelationship1.getName());
 
 		ObjectField objectField = objectFieldLocalService.getObjectField(
-			objectRelationship1.getObjectFieldId2());
+			_objectRelationship1.getObjectFieldId2());
 
 		_objectRelationshipERCObjectFieldName = ObjectFieldSettingUtil.getValue(
 			ObjectFieldSettingConstants.
@@ -1064,79 +1070,53 @@ public class DefaultObjectEntryManagerImplTest
 			).build());
 	}
 
-	@Test(expected = DuplicateObjectEntryExternalReferenceCodeException.class)
+	@Test
 	public void testAddObjectEntryThrowsDuplicateObjectEntryExternalReferenceCodeException()
 		throws Exception {
 
-		ObjectEntry parentObjectEntry1 =
-			_defaultObjectEntryManager.addObjectEntry(
-				_simpleDTOConverterContext, _objectDefinition1,
-				new ObjectEntry() {
-					{
-						properties = HashMapBuilder.<String, Object>put(
-							"externalReferenceCode", "newExternalReferenceCode"
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			200,
+			HTTPTestUtil.invokeToHttpCode(
+				JSONUtil.put(
+					"externalReferenceCode", externalReferenceCode
+				).put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).put(
+					_objectRelationship1.getName(),
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", externalReferenceCode
 						).put(
 							"textObjectFieldName", RandomTestUtil.randomString()
-						).build();
-					}
-				},
-				ObjectDefinitionConstants.SCOPE_COMPANY);
+						))
+				).toString(),
+				_objectDefinition1.getRESTContextPath(), Http.Method.POST));
 
-		_defaultObjectEntryManager.addObjectEntry(
-			dtoConverterContext, _objectDefinition2,
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.<String, Object>put(
-						_objectRelationshipERCObjectFieldName,
-						parentObjectEntry1.getExternalReferenceCode()
-					).put(
-						"dateObjectFieldName", "2020-01-02"
-					).put(
-						"decimalObjectFieldName", 15.7
-					).put(
-						"externalReferenceCode",
-						"externalReferenceCodeChildObject"
-					).put(
-						"integerObjectFieldName", 15
-					).put(
-						"longIntegerObjectFieldName", 100L
-					).put(
-						"picklistObjectFieldName", _addListTypeEntry()
-					).put(
-						"precisionDecimalObjectFieldName",
-						new BigDecimal("0.9876543217654321")
-					).build();
-				}
-			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
-
-		_defaultObjectEntryManager.addObjectEntry(
-			dtoConverterContext, _objectDefinition2,
-			new ObjectEntry() {
-				{
-					properties = HashMapBuilder.<String, Object>put(
-						_objectRelationshipERCObjectFieldName,
-						parentObjectEntry1.getExternalReferenceCode()
-					).put(
-						"dateObjectFieldName", "2020-01-02"
-					).put(
-						"decimalObjectFieldName", 15.7
-					).put(
-						"externalReferenceCode",
-						"externalReferenceCodeChildObject"
-					).put(
-						"integerObjectFieldName", 15
-					).put(
-						"longIntegerObjectFieldName", 100L
-					).put(
-						"picklistObjectFieldName", _addListTypeEntry()
-					).put(
-						"precisionDecimalObjectFieldName",
-						new BigDecimal("0.9876543217654321")
-					).build();
-				}
-			},
-			ObjectDefinitionConstants.SCOPE_COMPANY);
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "This external reference code is already in use."
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				JSONUtil.put(
+					"externalReferenceCode", RandomTestUtil.randomString()
+				).put(
+					"textObjectFieldName", RandomTestUtil.randomString()
+				).put(
+					_objectRelationship1.getName(),
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", externalReferenceCode
+						).put(
+							"textObjectFieldName", RandomTestUtil.randomString()
+						))
+				).toString(),
+				_objectDefinition1.getRESTContextPath(), Http.Method.POST
+			).toString(),
+			JSONCompareMode.STRICT);
 	}
 
 	@Test
@@ -4214,6 +4194,7 @@ public class DefaultObjectEntryManagerImplTest
 	@Inject
 	private ObjectFilterLocalService _objectFilterLocalService;
 
+	private ObjectRelationship _objectRelationship1;
 	private String _objectRelationshipERCObjectFieldName;
 	private String _objectRelationshipFieldName;
 
