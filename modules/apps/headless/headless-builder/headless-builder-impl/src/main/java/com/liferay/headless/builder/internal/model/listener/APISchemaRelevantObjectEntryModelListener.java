@@ -50,6 +50,7 @@ public class APISchemaRelevantObjectEntryModelListener
 		throws ModelListenerException {
 
 		_validate(objectEntry);
+		_validateExternalReferenceCode(objectEntry, originalObjectEntry);
 	}
 
 	private void _validate(ObjectEntry objectEntry) {
@@ -84,28 +85,6 @@ public class APISchemaRelevantObjectEntryModelListener
 					_objectEntryHelper.getObjectEntry(
 						objectEntry.getCompanyId(),
 						StringBundler.concat(
-							"externalReferenceCode eq '",
-							objectEntry.getExternalReferenceCode(),
-							"' and r_apiApplicationToAPISchemas_c_",
-							"apiApplicationId ne '",
-							values.get(
-								"r_apiApplicationToAPISchemas_c_" +
-									"apiApplicationId"),
-							"'"),
-						"L_API_SCHEMA"))) {
-
-				throw new ObjectEntryValuesException.InvalidObjectField(
-					null,
-					"There is an API schema with the same external reference " +
-						"code",
-					"there-is-an-api-schema-with-the-same-external-reference-" +
-						"code");
-			}
-
-			if (Validator.isNotNull(
-					_objectEntryHelper.getObjectEntry(
-						objectEntry.getCompanyId(),
-						StringBundler.concat(
 							"id ne '", objectEntry.getObjectEntryId(),
 							"' and name eq '", values.get("name"),
 							"' and r_apiApplicationToAPISchemas_c_",
@@ -122,6 +101,40 @@ public class APISchemaRelevantObjectEntryModelListener
 						"application",
 					"there-is-an-api-schema-with-the-same-name-in-the-api-" +
 						"application");
+			}
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
+	private void _validateExternalReferenceCode(
+		ObjectEntry objectEntry, ObjectEntry originalObjectEntry) {
+
+		try {
+			Map<String, Serializable> originalObjectEntryValues =
+				originalObjectEntry.getValues();
+
+			if (Validator.isNotNull(
+					_objectEntryHelper.getObjectEntry(
+						objectEntry.getCompanyId(),
+						StringBundler.concat(
+							"externalReferenceCode eq '",
+							objectEntry.getExternalReferenceCode(),
+							"' and r_apiApplicationToAPISchemas_c_",
+							"apiApplicationId ne '",
+							originalObjectEntryValues.get(
+								"r_apiApplicationToAPISchemas_c_" +
+									"apiApplicationId"),
+							"'"),
+						"L_API_SCHEMA"))) {
+
+				throw new ObjectEntryValuesException.InvalidObjectField(
+					null,
+					"There is an API schema with the same external reference " +
+						"code",
+					"there-is-an-api-schema-with-the-same-external-reference-" +
+						"code");
 			}
 		}
 		catch (Exception exception) {
