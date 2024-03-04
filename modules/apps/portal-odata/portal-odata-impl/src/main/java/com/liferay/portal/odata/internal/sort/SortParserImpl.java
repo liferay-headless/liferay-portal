@@ -5,12 +5,14 @@
 
 package com.liferay.portal.odata.internal.sort;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.sort.ComplexSortField;
 import com.liferay.portal.odata.sort.InvalidSortException;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.odata.sort.SortParser;
@@ -77,7 +79,7 @@ public class SortParserImpl implements SortParser {
 	protected EntityField getEntityField(
 		Map<String, EntityField> entityFieldsMap, String fieldName) {
 
-		if (fieldName.contains(StringPool.FORWARD_SLASH)) {
+		if (_isComplexFieldName(fieldName)) {
 			List<String> list = StringUtil.split(fieldName, '/');
 
 			String complexTypeName = list.get(0);
@@ -139,6 +141,13 @@ public class SortParserImpl implements SortParser {
 				"Unable to sort by property: " + fieldName);
 		}
 
+		if (_isComplexFieldName(fieldName)) {
+			return new ComplexSortField(
+				ascending, entityField,
+				_getPathComplexEntityFields(
+					_entityModel.getEntityFieldsMap(), fieldName));
+		}
+
 		return new SortField(entityField, ascending);
 	}
 
@@ -162,6 +171,33 @@ public class SortParserImpl implements SortParser {
 		}
 
 		return _ASC_DEFAULT;
+	}
+
+	private List<ComplexEntityField> _getPathComplexEntityFields(
+		Map<String, EntityField> entityFields, String fieldName) {
+
+		List<ComplexEntityField> complexEntityFields = new ArrayList<>();
+
+		List<String> fieldNameParts = StringUtil.split(
+			fieldName, CharPool.FORWARD_SLASH);
+
+		Map<String, EntityField> currentEntityFields = entityFields;
+
+		for (int i = 0; i < (fieldNameParts.size() - 1); i++) {
+			ComplexEntityField complexEntityField =
+				(ComplexEntityField)currentEntityFields.get(
+					fieldNameParts.get(i));
+
+			complexEntityFields.add(complexEntityField);
+
+			currentEntityFields = complexEntityField.getEntityFieldsMap();
+		}
+
+		return complexEntityFields;
+	}
+
+	private boolean _isComplexFieldName(String fieldName) {
+		return fieldName.contains(StringPool.FORWARD_SLASH);
 	}
 
 	private static final boolean _ASC_DEFAULT = true;
