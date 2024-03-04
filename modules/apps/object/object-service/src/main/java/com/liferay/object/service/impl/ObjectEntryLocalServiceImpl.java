@@ -51,7 +51,7 @@ import com.liferay.object.internal.filter.parser.EqualityOperatorsObjectFilterPa
 import com.liferay.object.internal.filter.parser.InclusionOperatorsObjectFilterParser;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
-import com.liferay.object.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
+import com.liferay.object.internal.sort.SortDSLQueryBuilderContributor;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -74,6 +74,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectStateFlowLocalService;
 import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.service.base.ObjectEntryLocalServiceBaseImpl;
@@ -1178,56 +1179,70 @@ public class ObjectEntryLocalServiceImpl
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
 			_EXPRESSIONS);
 
-		List<Object[]> rows = _list(
-			new DSLQueryBuilder(
-			).select(
-				selectExpressions
-			).from(
-				dynamicObjectDefinitionTable
-			).innerJoin(
-				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
-				).eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-				),
-				extensionDynamicObjectDefinitionTable
-			).innerJoin(
-				ObjectEntryTable.INSTANCE.objectEntryId.eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn()),
-				ObjectEntryTable.INSTANCE
-			).innerJoin(
-				_getInnerJoinRootObjectDefinitionTablePredicate(
-					rootDynamicObjectDefinitionTable),
-				rootDynamicObjectDefinitionTable
-			).leftJoin(
-				_getLeftJoinLocalizationTablePredicate(
-					dynamicObjectDefinitionLocalizationTable,
-					dynamicObjectDefinitionTable),
-				dynamicObjectDefinitionLocalizationTable
-			).where(
-				ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
-					objectDefinitionId
-				).and(
-					() -> {
-						if (groupId == 0) {
-							return null;
-						}
-
-						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+		DSLQueryBuilder dslQueryBuilder = new DSLQueryBuilder(
+		).select(
+			selectExpressions
+		).from(
+			dynamicObjectDefinitionTable
+		).innerJoin(
+			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
+			).eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
+			),
+			extensionDynamicObjectDefinitionTable
+		).innerJoin(
+			ObjectEntryTable.INSTANCE.objectEntryId.eq(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn()),
+			ObjectEntryTable.INSTANCE
+		).innerJoin(
+			_getInnerJoinRootObjectDefinitionTablePredicate(
+				rootDynamicObjectDefinitionTable),
+			rootDynamicObjectDefinitionTable
+		).leftJoin(
+			_getLeftJoinLocalizationTablePredicate(
+				dynamicObjectDefinitionLocalizationTable,
+				dynamicObjectDefinitionTable),
+			dynamicObjectDefinitionLocalizationTable
+		).where(
+			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
+				objectDefinitionId
+			).and(
+				() -> {
+					if (groupId == 0) {
+						return null;
 					}
-				).and(
-					Predicate.withParentheses(
-						_fillPredicate(objectDefinitionId, predicate, search))
-				).and(
-					_getPermissionWherePredicate(
-						dynamicObjectDefinitionTable, groupId)
-				)
-			).orderBy(
-				OrderByExpressionUtil.getOrderByExpressions(
-					objectDefinitionId, _objectFieldLocalService, sorts)
-			).limit(
-				start, end
-			).build(),
-			objectDefinitionId, selectExpressions);
+
+					return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+				}
+			).and(
+				Predicate.withParentheses(
+					_fillPredicate(objectDefinitionId, predicate, search))
+			).and(
+				_getPermissionWherePredicate(
+					dynamicObjectDefinitionTable, groupId)
+			)
+		).limit(
+			end, start
+		);
+
+		if (sorts != null) {
+			SortDSLQueryBuilderContributor sortDSLQueryBuilderContributor =
+				new SortDSLQueryBuilderContributor(
+					_objectFieldLocalService,
+					_objectRelationshipLocalServiceSnapshot.get());
+
+			for (Sort sort : sorts) {
+				sortDSLQueryBuilderContributor.contribute(
+					dslQueryBuilder,
+					new com.liferay.object.internal.sort.Sort(
+						_objectDefinitionPersistence.findByPrimaryKey(
+							objectDefinitionId),
+						sort));
+			}
+		}
+
+		List<Object[]> rows = _list(
+			dslQueryBuilder.build(), objectDefinitionId, selectExpressions);
 
 		List<Map<String, Serializable>> valuesList = new ArrayList<>(
 			rows.size());
@@ -4743,6 +4758,10 @@ public class ObjectEntryLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);
 
+	private static final Snapshot<ObjectRelationshipLocalService>
+		_objectRelationshipLocalServiceSnapshot = new Snapshot<>(
+			ObjectEntryLocalServiceImpl.class,
+			ObjectRelationshipLocalService.class, null);
 	private static final ThreadLocal<Boolean> _skipModelListeners =
 		new CentralizedThreadLocal<>(
 			ObjectEntryLocalServiceImpl.class + "._skipModelListeners",

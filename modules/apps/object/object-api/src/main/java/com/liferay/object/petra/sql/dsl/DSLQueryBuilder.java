@@ -5,6 +5,8 @@
 
 package com.liferay.object.petra.sql.dsl;
 
+import com.liferay.object.model.ObjectEntryTable;
+import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.expression.Expression;
@@ -18,7 +20,9 @@ import com.liferay.petra.sql.dsl.query.sort.OrderByExpression;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Carlos Correa
@@ -32,7 +36,17 @@ public class DSLQueryBuilder {
 			_fromTable
 		);
 
+		Set<String> allTableNames = new HashSet<>();
+
+		allTableNames.add(_fromTable.getName());
+
 		for (JoinItem joinItem : _joinItems) {
+			Table<?> table = joinItem.getTable();
+
+			if (!allTableNames.add(table.getName())) {
+				continue;
+			}
+
 			if (joinItem.getJoinType() == JoinItem.JoinType.INNER) {
 				joinStep = joinStep.innerJoinON(
 					joinItem.getTable(), joinItem.getPredicate());
@@ -74,24 +88,49 @@ public class DSLQueryBuilder {
 
 	public DSLQueryBuilder from(Table<?> table) {
 		_fromTable = table;
+		_lastTable = table;
 
 		return this;
 	}
 
-	public DSLQueryBuilder groupBy(Expression<?>... expressions) {
-		_groupByExpressions = expressions;
+	public DSLQueryBuilder groupBySelectExpressions() {
+		_groupByExpressions = _selectExpressions;
 
 		return this;
 	}
 
 	public DSLQueryBuilder innerJoin(Predicate predicate, Table<?> table) {
+		if (table == null) {
+			return this;
+		}
+
 		_joinItems.add(new JoinItem(JoinItem.JoinType.INNER, predicate, table));
+		_lastTable = table;
+
+		return this;
+	}
+
+	public DSLQueryBuilder leftJoin(Column<?, Long> column, Table<?> table) {
+		if (table == null) {
+			return this;
+		}
+
+		_joinItems.add(
+			new JoinItem(
+				JoinItem.JoinType.LEFT, _getJoinPredicate(column, _lastTable),
+				table));
+		_lastTable = table;
 
 		return this;
 	}
 
 	public DSLQueryBuilder leftJoin(Predicate predicate, Table<?> table) {
+		if (table == null) {
+			return this;
+		}
+
 		_joinItems.add(new JoinItem(JoinItem.JoinType.LEFT, predicate, table));
+		_lastTable = table;
 
 		return this;
 	}
@@ -126,9 +165,38 @@ public class DSLQueryBuilder {
 		return this;
 	}
 
+	private Predicate _getJoinPredicate(
+		Column<?, Long> column, Table<?> table) {
+
+		Column<?, Long> pkColumn = null;
+
+		if (table instanceof DynamicObjectDefinitionLocalizationTable) {
+			DynamicObjectDefinitionLocalizationTable
+				dynamicObjectDefinitionLocalizationTable =
+					(DynamicObjectDefinitionLocalizationTable)table;
+
+			pkColumn =
+				dynamicObjectDefinitionLocalizationTable.getForeignKeyColumn();
+		}
+		else if (table instanceof DynamicObjectDefinitionTable) {
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
+				(DynamicObjectDefinitionTable)table;
+
+			pkColumn = dynamicObjectDefinitionTable.getPrimaryKeyColumn();
+		}
+		else if (table instanceof ObjectEntryTable) {
+			ObjectEntryTable objectEntryTable = (ObjectEntryTable)table;
+
+			pkColumn = objectEntryTable.objectEntryId;
+		}
+
+		return pkColumn.eq(column);
+	}
+
 	private Table<?> _fromTable;
 	private Expression<?>[] _groupByExpressions;
 	private final List<JoinItem> _joinItems = new ArrayList<>();
+	private Table<?> _lastTable;
 	private LimitItem _limitItem;
 	private final List<OrderByExpression> _orderByExpressions =
 		new ArrayList<>();
