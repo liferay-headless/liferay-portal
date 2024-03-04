@@ -14,6 +14,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -30,6 +31,7 @@ import org.junit.Test;
 /**
  * @author Sergio Jiménez del Coso
  */
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @FeatureFlags("LPS-178642")
 public class APISchemaRelevantObjectEntryModelListenerTest
 	extends BaseTestCase {
@@ -177,7 +179,58 @@ public class APISchemaRelevantObjectEntryModelListenerTest
 		Assert.assertEquals(
 			"There is an API schema with the same name in the API application.",
 			jsonObject.get("title"));
+
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"apiApplicationToAPISchemas",
+				JSONUtil.put(
+					JSONUtil.put(
+						"externalReferenceCode", _API_SCHEMA_ERC
+					).put(
+						"mainObjectDefinitionERC", "L_API_APPLICATION"
+					).put(
+						"name", RandomTestUtil.randomString()
+					))
+			).put(
+				"applicationStatus", "unpublished"
+			).put(
+				"baseURL", StringUtil.toLowerCase(RandomTestUtil.randomString())
+			).put(
+				"externalReferenceCode", RandomTestUtil.randomString()
+			).put(
+				"title", RandomTestUtil.randomString()
+			).toString(),
+			"headless-builder/applications", Http.Method.POST);
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"apiApplicationToAPISchemas",
+				JSONUtil.put(
+					JSONUtil.put(
+						"externalReferenceCode", _API_SCHEMA_ERC
+					).put(
+						"mainObjectDefinitionERC", "L_API_APPLICATION"
+					).put(
+						"name", RandomTestUtil.randomString()
+					))
+			).put(
+				"applicationStatus", "unpublished"
+			).put(
+				"baseURL", StringUtil.toLowerCase(RandomTestUtil.randomString())
+			).put(
+				"externalReferenceCode", RandomTestUtil.randomString()
+			).put(
+				"title", RandomTestUtil.randomString()
+			).toString(),
+			"headless-builder/applications", Http.Method.POST);
+
+		Assert.assertEquals("BAD_REQUEST", jsonObject.get("status"));
+		Assert.assertEquals(
+			"There is an API schema with the same external reference code.",
+			jsonObject.get("title"));
 	}
+
+	private static final String _API_SCHEMA_ERC = RandomTestUtil.randomString();
 
 	private static final String _API_SCHEMA_NAME =
 		RandomTestUtil.randomString();
