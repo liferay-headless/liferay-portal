@@ -84,6 +84,28 @@ public class APISchemaRelevantObjectEntryModelListener
 					_objectEntryHelper.getObjectEntry(
 						objectEntry.getCompanyId(),
 						StringBundler.concat(
+							"externalReferenceCode eq '",
+							objectEntry.getExternalReferenceCode(),
+							"' and r_apiApplicationToAPISchemas_c_",
+							"apiApplicationId ne '",
+							values.get(
+								"r_apiApplicationToAPISchemas_c_" +
+									"apiApplicationId"),
+							"'"),
+						"L_API_SCHEMA"))) {
+
+				throw new ObjectEntryValuesException.InvalidObjectField(
+					null,
+					"There is an API schema with the same external reference " +
+						"code",
+					"there-is-an-api-schema-with-the-same-external-reference-" +
+						"code");
+			}
+
+			if (Validator.isNotNull(
+					_objectEntryHelper.getObjectEntry(
+						objectEntry.getCompanyId(),
+						StringBundler.concat(
 							"id ne '", objectEntry.getObjectEntryId(),
 							"' and name eq '", values.get("name"),
 							"' and r_apiApplicationToAPISchemas_c_",
