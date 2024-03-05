@@ -11,6 +11,7 @@ import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
+import com.liferay.portal.odata.sort.ComplexSortField;
 import com.liferay.portal.odata.sort.InvalidSortException;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -139,6 +140,15 @@ public class SortParserImplTest {
 			sortField.getSortableFieldName(LocaleUtil.getDefault()));
 
 		Assert.assertTrue(sortField.isAscending());
+
+		Assert.assertTrue(sortField instanceof ComplexSortField);
+
+		ComplexSortField complexSortField = (ComplexSortField)sortField;
+
+		Assert.assertEquals(
+			"complexFieldExternal/fieldInsideComplexFieldInternal",
+			complexSortField.getSortableComplexFieldName(
+				LocaleUtil.getDefault()));
 	}
 
 	@Test
@@ -153,6 +163,15 @@ public class SortParserImplTest {
 			sortField.getSortableFieldName(LocaleUtil.getDefault()));
 
 		Assert.assertTrue(sortField.isAscending());
+
+		Assert.assertTrue(sortField instanceof ComplexSortField);
+
+		ComplexSortField complexSortField = (ComplexSortField)sortField;
+
+		Assert.assertEquals(
+			"complexFieldExternal/fieldInsideComplexFieldInternal",
+			complexSortField.getSortableComplexFieldName(
+				LocaleUtil.getDefault()));
 	}
 
 	@Test
@@ -167,6 +186,15 @@ public class SortParserImplTest {
 			sortField.getSortableFieldName(LocaleUtil.getDefault()));
 
 		Assert.assertTrue(!sortField.isAscending());
+
+		Assert.assertTrue(sortField instanceof ComplexSortField);
+
+		ComplexSortField complexSortField = (ComplexSortField)sortField;
+
+		Assert.assertEquals(
+			"complexFieldExternal/fieldInsideComplexFieldInternal",
+			complexSortField.getSortableComplexFieldName(
+				LocaleUtil.getDefault()));
 	}
 
 	@Test
@@ -329,7 +357,16 @@ public class SortParserImplTest {
 
 		@Override
 		public Map<String, EntityField> getEntityFieldsMap() {
-			return HashMapBuilder.put(
+			return _entityFieldsMap;
+		}
+
+		@Override
+		public String getName() {
+			return "SomeEntityName";
+		}
+
+		private final Map<String, EntityField> _entityFieldsMap =
+			HashMapBuilder.put(
 				"complexFieldExternal",
 				(EntityField)new ComplexEntityField(
 					"complexFieldExternal",
@@ -350,12 +387,6 @@ public class SortParserImplTest {
 				new StringEntityField(
 					"fieldExternal2", locale -> "fieldInternal2")
 			).build();
-		}
-
-		@Override
-		public String getName() {
-			return "SomeEntityName";
-		}
 
 	};
 
