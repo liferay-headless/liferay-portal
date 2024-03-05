@@ -550,17 +550,6 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
-	private List<ListEntry> _getMultiselectPiclistField(
-		DTOConverterContext dtoConverterContext, ObjectField objectField,
-		String serializable) {
-
-		return TransformUtil.transformToList(
-			StringUtil.split(serializable, StringPool.COMMA_AND_SPACE),
-			key -> _getListEntry(
-				dtoConverterContext, key,
-				objectField.getListTypeDefinitionId()));
-	}
-
 	private Map<String, UnsafeSupplier<Object, Exception>>
 			_getNestedFieldsRelatedProperties(
 				DTOConverterContext dtoConverterContext, long groupId,
@@ -869,9 +858,12 @@ public class ObjectEntryDTOConverter
 
 				map.put(
 					objectFieldName,
-					() -> _getMultiselectPiclistField(
-						dtoConverterContext, objectField,
-						(String)serializable));
+					() -> TransformUtil.transformToList(
+						StringUtil.split(
+							(String)serializable, StringPool.COMMA_AND_SPACE),
+						key -> _getListEntry(
+							dtoConverterContext, key,
+							objectField.getListTypeDefinitionId())));
 			}
 			else if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
