@@ -354,10 +354,10 @@ public class ColumnValuesExtractor {
 				Object value = map.get(fieldName);
 
 				try {
-					UnsafeSupplier<Object, Exception> unsafeSupplier =
-						(UnsafeSupplier<Object, Exception>)map.get(fieldName);
+					if (value instanceof UnsafeSupplier) {
+						UnsafeSupplier<Object, Exception> unsafeSupplier =
+							(UnsafeSupplier<Object, Exception>)value;
 
-					if (unsafeSupplier != null) {
 						value = unsafeSupplier.get();
 					}
 				}
