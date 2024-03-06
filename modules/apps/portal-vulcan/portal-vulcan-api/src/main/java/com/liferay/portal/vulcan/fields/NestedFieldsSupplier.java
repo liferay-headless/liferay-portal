@@ -93,12 +93,18 @@ public class NestedFieldsSupplier<T> {
 		NestedFieldsContext clonedNestedFieldsContext =
 			nestedFieldsContext.clone();
 
+		if (!_mustProcessNestedFields(nestedFieldsContext)) {
+			return () -> null;
+		}
+
 		return () -> {
 			NestedFieldsContext oldNestedFieldsContext =
 				NestedFieldsContextThreadLocal.getAndSetNestedFieldsContext(
 					clonedNestedFieldsContext);
 
 			try {
+				clonedNestedFieldsContext.incrementCurrentDepth();
+
 				return unsafeSupplier.get();
 			}
 			finally {

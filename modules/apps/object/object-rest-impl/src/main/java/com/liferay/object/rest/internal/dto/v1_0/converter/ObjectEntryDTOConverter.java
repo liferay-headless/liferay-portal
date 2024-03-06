@@ -620,20 +620,22 @@ public class ObjectEntryDTOConverter
 			else {
 				nestedFieldValues.put(
 					nestedFieldName,
-					() -> TransformUtil.transformToArray(
-						relatedModels,
-						relatedModel -> {
-							com.liferay.object.model.ObjectEntry objectEntry =
-								(com.liferay.object.model.ObjectEntry)
-									relatedModel;
+					NestedFieldsSupplier.supply(
+						() -> TransformUtil.transformToArray(
+							relatedModels,
+							relatedModel -> {
+								com.liferay.object.model.ObjectEntry
+									objectEntry =
+										(com.liferay.object.model.ObjectEntry)
+											relatedModel;
 
-							return toDTO(
-								_getDTOConverterContext(
-									dtoConverterContext,
-									objectEntry.getObjectEntryId()),
-								objectEntry);
-						},
-						ObjectEntry.class));
+								return toDTO(
+									_getDTOConverterContext(
+										dtoConverterContext,
+										objectEntry.getObjectEntryId()),
+									objectEntry);
+							},
+							ObjectEntry.class)));
 			}
 		}
 
