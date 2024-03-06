@@ -60,6 +60,7 @@ import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
+import com.liferay.object.petra.sql.dsl.DSLQueryBuilder;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
@@ -1177,29 +1178,30 @@ public class ObjectEntryLocalServiceImpl
 			_EXPRESSIONS);
 
 		List<Object[]> rows = _list(
-			DSLQueryFactoryUtil.select(
+			new DSLQueryBuilder(
+			).select(
 				selectExpressions
 			).from(
 				dynamicObjectDefinitionTable
-			).innerJoinON(
-				extensionDynamicObjectDefinitionTable,
+			).innerJoin(
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
 				).eq(
 					dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-				)
-			).innerJoinON(
-				ObjectEntryTable.INSTANCE,
+				),
+				extensionDynamicObjectDefinitionTable
+			).innerJoin(
 				ObjectEntryTable.INSTANCE.objectEntryId.eq(
-					dynamicObjectDefinitionTable.getPrimaryKeyColumn())
-			).innerJoinON(
-				rootDynamicObjectDefinitionTable,
+					dynamicObjectDefinitionTable.getPrimaryKeyColumn()),
+				ObjectEntryTable.INSTANCE
+			).innerJoin(
 				_getInnerJoinRootObjectDefinitionTablePredicate(
-					rootDynamicObjectDefinitionTable)
-			).leftJoinOn(
-				dynamicObjectDefinitionLocalizationTable,
+					rootDynamicObjectDefinitionTable),
+				rootDynamicObjectDefinitionTable
+			).leftJoin(
 				_getLeftJoinLocalizationTablePredicate(
 					dynamicObjectDefinitionLocalizationTable,
-					dynamicObjectDefinitionTable)
+					dynamicObjectDefinitionTable),
+				dynamicObjectDefinitionLocalizationTable
 			).where(
 				ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 					objectDefinitionId
@@ -1222,7 +1224,7 @@ public class ObjectEntryLocalServiceImpl
 				orderByExpressions
 			).limit(
 				start, end
-			),
+			).build(),
 			objectDefinitionId, selectExpressions);
 
 		List<Map<String, Serializable>> valuesList = new ArrayList<>(
