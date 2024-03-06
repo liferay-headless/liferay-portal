@@ -402,10 +402,6 @@ public class ObjectEntry implements Serializable {
 	}
 
 	public Map<String, Object> getProperties() {
-		if (properties != null) {
-			return properties;
-		}
-
 		if (_lazyProperties != null) {
 			properties = new HashMap<>();
 
@@ -424,6 +420,10 @@ public class ObjectEntry implements Serializable {
 			return properties;
 		}
 
+		if (properties != null) {
+			return properties;
+		}
+
 		if (_propertiesSupplier != null) {
 			properties = _propertiesSupplier.get();
 
@@ -433,6 +433,7 @@ public class ObjectEntry implements Serializable {
 		return properties;
 	}
 
+	@JsonIgnore
 	public void setLazyProperties(
 		Map<String, UnsafeSupplier<Object, Exception>> lazyProperties) {
 
