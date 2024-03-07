@@ -45,16 +45,17 @@ public class ColumnValuesExtractorTest {
 			new String[] {"doubles", "length", "strings"},
 			columnValuesExtractor.getHeaders());
 
-		List<Object[]> valuesList = columnValuesExtractor.extractValues(
-			arraysAggregator);
+		List<List<Object>> valuesList = columnValuesExtractor.extractValues(
+			arraysAggregator,
+			Arrays.asList(columnValuesExtractor.getHeaders()));
 
 		Assert.assertFalse(valuesList.isEmpty());
 
-		Object[] values = valuesList.get(0);
+		List<Object> values = valuesList.get(0);
 
-		Assert.assertEquals(values.toString(), 3, values.length);
+		Assert.assertEquals(values.toString(), 3, values.size());
 
-		CSVRecord csvRecord = _toCSVRecord((String)values[0]);
+		CSVRecord csvRecord = _toCSVRecord((String)values.get(0));
 
 		Assert.assertEquals(5, csvRecord.size());
 
@@ -63,9 +64,9 @@ public class ColumnValuesExtractorTest {
 				arraysAggregator.doubles[i], Double.valueOf(csvRecord.get(i)));
 		}
 
-		Assert.assertEquals(Integer.valueOf(5), values[1]);
+		Assert.assertEquals(Integer.valueOf(5), values.get(1));
 
-		csvRecord = _toCSVRecord((String)values[2]);
+		csvRecord = _toCSVRecord((String)values.get(2));
 
 		Assert.assertEquals(5, csvRecord.size());
 
@@ -96,19 +97,23 @@ public class ColumnValuesExtractorTest {
 			},
 			columnValuesExtractor.getHeaders());
 
-		List<Object[]> valuesList = columnValuesExtractor.extractValues(
-			nestedObjectsAggregator);
+		List<List<Object>> valuesList = columnValuesExtractor.extractValues(
+			nestedObjectsAggregator,
+			Arrays.asList(columnValuesExtractor.getHeaders()));
 
 		Assert.assertFalse(valuesList.isEmpty());
 
-		Object[] values = valuesList.get(0);
+		List<Object> values = valuesList.get(0);
 
-		Assert.assertEquals(Arrays.toString(values), 7, values.length);
-		Assert.assertEquals(Integer.valueOf(2), values[6]);
+		Assert.assertEquals(
+			values.toArray(
+			).toString(),
+			7, values.size());
+		Assert.assertEquals(Integer.valueOf(2), values.get(6));
 
 		values = valuesList.get(1);
 
-		CSVRecord csvRecord = _toCSVRecord((String)values[0]);
+		CSVRecord csvRecord = _toCSVRecord((String)values.get(0));
 
 		Assert.assertEquals(5, csvRecord.size());
 
@@ -117,7 +122,7 @@ public class ColumnValuesExtractorTest {
 				arraysAggregator.doubles[i], Double.valueOf(csvRecord.get(i)));
 		}
 
-		csvRecord = _toCSVRecord((String)values[2]);
+		csvRecord = _toCSVRecord((String)values.get(2));
 
 		Assert.assertEquals(5, csvRecord.size());
 
