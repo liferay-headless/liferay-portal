@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.writer;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.petra.function.UnsafeFunction;
@@ -14,6 +15,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CSVUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
@@ -66,12 +68,14 @@ public class ColumnValuesExtractor {
 
 			Object value = columnDescriptor._getValue(item);
 
-			if (!_headerFieldMap.containsKey(columnDescriptor._fieldName)) {
+			if (!_headerFieldValueMap.containsKey(
+					columnDescriptor._fieldName)) {
+
 				continue;
 			}
 
 			if ((value == null) || Objects.equals(value, StringPool.BLANK)) {
-				List<String> headerFields = _headerFieldMap.get(
+				List<String> headerFields = _headerFieldValueMap.get(
 					columnDescriptor._fieldName);
 
 				index += headerFields.size();
@@ -123,7 +127,7 @@ public class ColumnValuesExtractor {
 		for (ColumnDescriptor columnDescriptor : _columnDescriptors) {
 			headers[columnDescriptor._index] = columnDescriptor._getHeader();
 
-			_headerFieldMap.put(
+			_headerFieldValueMap.put(
 				columnDescriptor._fieldName,
 				ListUtil.toList(String.valueOf(columnDescriptor._getHeader())));
 		}
@@ -132,33 +136,33 @@ public class ColumnValuesExtractor {
 	}
 
 	public String[] getHeaders(Object item) throws Exception {
-		List<Object> objectList = new ArrayList<>();
+		List<Object> headerList = new ArrayList<>();
 
 		for (ColumnDescriptor columnDescriptor : _columnDescriptors) {
 			Object header = columnDescriptor._getHeader(item);
 
+			List<String> headerColumnValueList = null;
+
 			if (header instanceof Object[]) {
 				String[] objects = (String[])header;
 
-				Collections.addAll(objectList, objects);
+				Collections.addAll(headerList, objects);
 
-				if (!Objects.equals(header, StringPool.BLANK)) {
-					_headerFieldMap.put(
-						columnDescriptor._fieldName, Arrays.asList(objects));
-				}
+				headerColumnValueList = Arrays.asList(objects);
 			}
 			else {
-				objectList.add(header);
+				headerList.add(header);
 
-				if (!Objects.equals(header, StringPool.BLANK)) {
-					_headerFieldMap.put(
-						columnDescriptor._fieldName,
-						ListUtil.toList(String.valueOf(header)));
-				}
+				headerColumnValueList = ListUtil.toList(String.valueOf(header));
+			}
+
+			if (!Objects.equals(header, StringPool.BLANK)) {
+				_headerFieldValueMap.put(
+					columnDescriptor._fieldName, headerColumnValueList);
 			}
 		}
 
-		return objectList.toArray(new String[0]);
+		return ArrayUtil.toStringArray(headerList);
 	}
 
 	private <T> T[] _combine(T[] array1, T[] array2, int index) {
@@ -280,19 +284,18 @@ public class ColumnValuesExtractor {
 			}
 		}
 
-		FieldValueExtractor propertiesFieldValueExtractor =
-			fieldValueExtractors.get("properties");
+		FieldValueExtractor jsonAnySetterPropertyFieldValueExtractor =
+			_getJsonAnySetterPropertyFieldValueExtractor(fieldValueExtractors);
 
-		if (!ItemClassIndexUtil.isObjectEntryProperties(
-				propertiesFieldValueExtractor)) {
-
+		if (jsonAnySetterPropertyFieldValueExtractor == null) {
 			throw new IllegalArgumentException(
 				"Invalid field name: " + fieldName);
 		}
 
 		return object -> {
-			Map<?, ?> map = (Map<?, ?>)propertiesFieldValueExtractor.extract(
-				object);
+			Map<?, ?> map =
+				(Map<?, ?>)jsonAnySetterPropertyFieldValueExtractor.extract(
+					object);
 
 			Object value = map.get(fieldName);
 
@@ -313,6 +316,24 @@ public class ColumnValuesExtractor {
 					fieldName, StringPool.PERIOD, headerName),
 				String.class);
 		};
+	}
+
+	private FieldValueExtractor _getJsonAnySetterPropertyFieldValueExtractor(
+		Map<String, FieldValueExtractor> fieldValueExtractors) {
+
+		for (FieldValueExtractor fieldValueExtractor :
+				fieldValueExtractors.values()) {
+
+			Field field = fieldValueExtractor.getField();
+
+			if (ArrayUtil.isNotEmpty(
+					field.getDeclaredAnnotationsByType(JsonAnySetter.class))) {
+
+				return fieldValueExtractor;
+			}
+		}
+
+		return null;
 	}
 
 	private int _getLastMasterIndex(ColumnDescriptor[] columnDescriptors) {
@@ -421,19 +442,18 @@ public class ColumnValuesExtractor {
 			};
 		}
 
-		FieldValueExtractor propertiesFieldValueExtractor =
-			fieldValueExtractors.get("properties");
+		FieldValueExtractor jsonAnySetterPropertyFieldValueExtractor =
+			_getJsonAnySetterPropertyFieldValueExtractor(fieldValueExtractors);
 
-		if (!ItemClassIndexUtil.isObjectEntryProperties(
-				propertiesFieldValueExtractor)) {
-
+		if (jsonAnySetterPropertyFieldValueExtractor == null) {
 			throw new IllegalArgumentException(
 				"Invalid field name: " + fieldName);
 		}
 
 		return object -> {
-			Map<?, ?> map = (Map<?, ?>)propertiesFieldValueExtractor.extract(
-				object);
+			Map<?, ?> map =
+				(Map<?, ?>)jsonAnySetterPropertyFieldValueExtractor.extract(
+					object);
 
 			Object value = map.get(fieldName);
 
@@ -451,22 +471,18 @@ public class ColumnValuesExtractor {
 				return value;
 			}
 
-			List<Object> objectList = new ArrayList<>();
-
 			Map<String, FieldValueExtractor> index = ItemClassIndexUtil.index(
 				value.getClass());
 
-			String[] fieldNamesArray =
-				ItemClassIndexUtil.getColumnFieldNamesArray(value.getClass());
+			return TransformUtil.transform(
+				ItemClassIndexUtil.getColumnFieldNamesArray(value.getClass()),
+				columnFieldName -> {
+					FieldValueExtractor fieldValueExtractorKeyValue = index.get(
+						columnFieldName);
 
-			for (String columnFieldName : fieldNamesArray) {
-				FieldValueExtractor fieldValueExtractorKeyValue = index.get(
-					columnFieldName);
-
-				objectList.add(fieldValueExtractorKeyValue.extract(value));
-			}
-
-			return objectList.toArray();
+					return fieldValueExtractorKeyValue.extract(value);
+				},
+				Object.class);
 		};
 	}
 
@@ -480,7 +496,8 @@ public class ColumnValuesExtractor {
 		ColumnValuesExtractor.class);
 
 	private final ColumnDescriptor[] _columnDescriptors;
-	private final Map<String, List<String>> _headerFieldMap = new HashMap<>();
+	private final Map<String, List<String>> _headerFieldValueMap =
+		new HashMap<>();
 
 	private static class ColumnDescriptor {
 

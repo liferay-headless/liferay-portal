@@ -5,7 +5,6 @@
 
 package com.liferay.batch.engine.internal.writer;
 
-import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.petra.memory.FinalizeManager;
@@ -126,25 +125,6 @@ public class ItemClassIndexUtil {
 		Class<?> componentTypeClass = clazz.getComponentType();
 
 		if (!componentTypeClass.isArray()) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public static boolean isObjectEntryProperties(
-		FieldValueExtractor fieldValueExtractor) {
-
-		if (fieldValueExtractor == null) {
-			return false;
-		}
-
-		Field field = fieldValueExtractor.getField();
-
-		if ((field == null) ||
-			!Objects.equals(field.getDeclaringClass(), ObjectEntry.class) ||
-			!Objects.equals(field.getType(), Map.class)) {
-
 			return false;
 		}
 
