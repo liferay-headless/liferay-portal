@@ -8,6 +8,7 @@ package com.liferay.batch.engine.internal.writer;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +43,7 @@ public class XLSBatchEngineExportTaskItemWriterImpl
 
 		_sheet = _workbook.createSheet();
 
-		_write(_columnValuesExtractor.getHeaders());
+		_write(Arrays.asList(_columnValuesExtractor.getHeaders()));
 	}
 
 	@Override
@@ -57,13 +58,17 @@ public class XLSBatchEngineExportTaskItemWriterImpl
 	@Override
 	public void write(Collection<?> items) throws Exception {
 		for (Object item : items) {
-			for (Object[] values : _columnValuesExtractor.extractValues(item)) {
+			for (List<Object> values :
+					_columnValuesExtractor.extractValues(
+						item,
+						Arrays.asList(_columnValuesExtractor.getHeaders()))) {
+
 				_write(values);
 			}
 		}
 	}
 
-	private void _write(Object[] values) {
+	private void _write(List<Object> values) {
 		Row row = _sheet.createRow(_rowNum++);
 
 		int column = 0;

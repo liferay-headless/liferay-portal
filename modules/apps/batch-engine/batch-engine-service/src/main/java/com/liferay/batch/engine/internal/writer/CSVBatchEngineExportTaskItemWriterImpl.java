@@ -5,8 +5,6 @@
 
 package com.liferay.batch.engine.internal.writer;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -17,12 +15,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 
-import java.text.DateFormat;
-
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -54,12 +52,9 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 		_columnValuesExtractor = new ColumnValuesExtractor(
 			fieldNames, itemClass);
 
-		if (Boolean.valueOf(
-				(String)parameters.getOrDefault(
-					"containsHeaders", StringPool.TRUE))) {
-
-			_csvPrinter.printRecord(_columnValuesExtractor.getHeaders());
-		}
+		_containsHeaders = Boolean.valueOf(
+			(String)parameters.getOrDefault(
+				"containsHeaders", StringPool.TRUE));
 	}
 
 	@Override
@@ -69,11 +64,26 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 
 	@Override
 	public void write(Collection<?> items) throws Exception {
-		DateFormat dateFormat = new ISO8601DateFormat();
+		SortedSet<String> sortedSet = new TreeSet<>();
 
 		for (Object item : items) {
-			for (Object[] values : _columnValuesExtractor.extractValues(item)) {
-				_write(dateFormat, values);
+			Collections.addAll(
+				sortedSet, _columnValuesExtractor.getHeaders(item));
+		}
+
+		sortedSet.removeIf(String::isEmpty);
+
+		if (_containsHeaders) {
+			_containsHeaders = false;
+
+			_csvPrinter.printRecord(sortedSet);
+		}
+
+		for (Object item : items) {
+			for (List<Object> values :
+					_columnValuesExtractor.extractValues(item, sortedSet)) {
+
+				_write(values);
 			}
 		}
 	}
@@ -86,14 +96,9 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 		return builder.build();
 	}
 
-	private void _write(DateFormat dateFormat, Object[] values)
-		throws Exception {
-
+	private void _write(List<Object> values) throws Exception {
 		for (Object value : values) {
-			if (value instanceof Date) {
-				value = dateFormat.format((Date)value);
-			}
-			else if (value instanceof Map) {
+			if (value instanceof Map) {
 				Map<String, Object> map = (Map<String, Object>)value;
 
 				StringBundler sb = new StringBundler();
@@ -115,6 +120,7 @@ public class CSVBatchEngineExportTaskItemWriterImpl
 	}
 
 	private final ColumnValuesExtractor _columnValuesExtractor;
+	private boolean _containsHeaders;
 	private final CSVPrinter _csvPrinter;
 
 }
