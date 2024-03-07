@@ -5,21 +5,22 @@
 
 package com.liferay.batch.engine.internal.writer;
 
-import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.SortedArrayList;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +37,37 @@ import java.util.function.Supplier;
  * @author Igor Beslic
  */
 public class ItemClassIndexUtil {
+
+	public static String[] getColumnFieldNamesArray(Class<?> itemClass) {
+		List<String> complexColumnName = new SortedArrayList<>();
+
+		while (itemClass != Object.class) {
+			for (Field field : itemClass.getDeclaredFields()) {
+				if (isMultidimensionalArray(field.getType()) ||
+					Objects.equals(field.getType(), Supplier.class) ||
+					!Modifier.isProtected(field.getModifiers()) ||
+					Objects.equals(field.getType(), Map.class) ||
+					field.isSynthetic()) {
+
+					continue;
+				}
+
+				String name = getSanitizedFieldName(field.getName());
+
+				complexColumnName.add(name);
+			}
+
+			if (Objects.equals(
+					itemClass.getSuperclass(), itemClass.getDeclaringClass())) {
+
+				break;
+			}
+
+			itemClass = itemClass.getSuperclass();
+		}
+
+		return ArrayUtil.toStringArray(complexColumnName);
+	}
 
 	public static String getSanitizedFieldName(String fieldName) {
 		if (fieldName.startsWith(StringPool.UNDERLINE)) {
@@ -60,18 +92,18 @@ public class ItemClassIndexUtil {
 		return fieldValueExtractors;
 	}
 
-	public static boolean isIterable(Class<?> valueClass) {
-		if (valueClass.isArray() ||
-			Collection.class.isAssignableFrom(valueClass)) {
-
+	public static boolean isDate(Class<?> clazz) {
+		if (Objects.equals(clazz, Date.class)) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public static boolean isListEntry(Object object) {
-		if (object instanceof ListEntry) {
+	public static boolean isIterable(Class<?> valueClass) {
+		if (valueClass.isArray() ||
+			Collection.class.isAssignableFrom(valueClass)) {
+
 			return true;
 		}
 
@@ -98,18 +130,6 @@ public class ItemClassIndexUtil {
 		}
 
 		return true;
-	}
-
-	public static boolean isMultiselectList(Object object) {
-		if (object instanceof ArrayList) {
-			List<?> list = (List<?>)object;
-
-			if (!list.isEmpty() && (list.get(0) instanceof ListEntry)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	public static boolean isObjectEntryProperties(
