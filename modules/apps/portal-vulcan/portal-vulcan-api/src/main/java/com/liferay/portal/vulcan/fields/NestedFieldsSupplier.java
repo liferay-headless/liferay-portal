@@ -83,35 +83,54 @@ public class NestedFieldsSupplier<T> {
 		return nestedFieldValues;
 	}
 
-	public static <T> UnsafeSupplier<T, Exception> supply(
-			UnsafeSupplier<T, Exception> unsafeSupplier)
+	public static Map<String, UnsafeSupplier<Object, Exception>>
+			supplyUnsafeSupplier(
+				UnsafeFunction
+					<String, UnsafeSupplier<Object, Exception>, Exception>
+						unsafeFunction)
 		throws Exception {
 
 		NestedFieldsContext nestedFieldsContext =
 			NestedFieldsContextThreadLocal.getNestedFieldsContext();
 
+		if (!_mustProcessNestedFields(nestedFieldsContext)) {
+			return null;
+		}
+
+		Map<String, UnsafeSupplier<Object, Exception>> nestedFieldValues =
+			new HashMap<>();
+
+		nestedFieldsContext.incrementCurrentDepth();
+
 		NestedFieldsContext clonedNestedFieldsContext =
 			nestedFieldsContext.clone();
 
-		if (!_mustProcessNestedFields(nestedFieldsContext)) {
-			return () -> null;
+		for (String fieldName : nestedFieldsContext.getFieldNames()) {
+			UnsafeSupplier<Object, Exception> unsafeSupplier =
+				unsafeFunction.apply(fieldName);
+
+			if (unsafeSupplier != null) {
+				nestedFieldValues.put(fieldName, () -> {
+					NestedFieldsContext oldNestedFieldsContext =
+						NestedFieldsContextThreadLocal.getAndSetNestedFieldsContext(
+							clonedNestedFieldsContext);
+
+					try {
+						clonedNestedFieldsContext.incrementCurrentDepth();
+
+						return unsafeSupplier.get();
+					}
+					finally {
+						NestedFieldsContextThreadLocal.setNestedFieldsContext(
+							oldNestedFieldsContext);
+					}
+				});
+			}
 		}
 
-		return () -> {
-			NestedFieldsContext oldNestedFieldsContext =
-				NestedFieldsContextThreadLocal.getAndSetNestedFieldsContext(
-					clonedNestedFieldsContext);
+		nestedFieldsContext.decrementCurrentDepth();
 
-			try {
-				clonedNestedFieldsContext.incrementCurrentDepth();
-
-				return unsafeSupplier.get();
-			}
-			finally {
-				NestedFieldsContextThreadLocal.setNestedFieldsContext(
-					oldNestedFieldsContext);
-			}
-		};
+		return nestedFieldValues;
 	}
 
 	private static boolean _mustProcessNestedFields(
