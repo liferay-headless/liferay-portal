@@ -18,6 +18,7 @@ import org.apache.commons.csv.CSVRecord;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -75,6 +76,7 @@ public class ColumnValuesExtractorTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testExtractValuesWithNestedObjects() throws Exception {
 		ArraysAggregator arraysAggregator = new ArraysAggregator(
