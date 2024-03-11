@@ -101,7 +101,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Juan Fernández
  */
-@FeatureFlags("LPS-199086")
 @RunWith(Arquillian.class)
 @Sync(cleanTransaction = true)
 public class JournalExportImportTest extends BasePortletExportImportTestCase {
@@ -141,6 +140,7 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	/**
 	 * LPD-6808: AC15-AC16
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testExportImportJournalArticleWithLayoutURLLayoutDoesNotExistOnImportSide()
 		throws Exception {
@@ -200,6 +200,7 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	/**
 	 * LPD-6808: AC15-AC17
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testExportImportJournalArticleWithLayoutURLLayoutExistOnImportSide()
 		throws Exception {

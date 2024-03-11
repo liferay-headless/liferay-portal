@@ -63,7 +63,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Eduardo García
  */
-@FeatureFlags("LPS-199086")
 @RunWith(Arquillian.class)
 public class LayoutExportImportTest extends BaseExportImportTestCase {
 
@@ -519,6 +518,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	/**
 	 * LPD-6808: AC9-AC10
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testLayoutExportImportWithModifiedContentAndExistingParentAndChildLayoutsOnImportSide()
 		throws Exception {
@@ -610,6 +610,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	/**
 	 * LPD-6808: AC9-AC11
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testLayoutExportImportWithModifiedContentAndNonexistentParentAndChildLayoutsOnImportSide()
 		throws Exception {
@@ -657,6 +658,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	/**
 	 * LPD-6808: AC12-AC13
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testLayoutExportImportWithUncheckedConfigurationAndModifiedContentAndExistingParentAndChildLayoutsOnImportSide()
 		throws Exception {
@@ -748,6 +750,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	/**
 	 * LPD-6808: AC12-AC14
 	 */
+	@FeatureFlags("LPS-199086")
 	@Test
 	public void testLayoutExportImportWithUncheckedConfigurationAndModifiedContentAndNonexistentParentAndChildLayoutsOnImportSide()
 		throws Exception {
