@@ -49,13 +49,11 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
@@ -81,9 +79,22 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 			DTOConverterContext dtoConverterContext, BaseModel<?> baseModel)
 		throws Exception {
 
+		Map<String, Function<?, Object>> attributeGetterFunctions =
+			(Map<String, Function<?, Object>>)
+				baseModel.getAttributeGetterFunctions();
+
+		Function<Object, Object> modifiedDateGetterFunction =
+			(Function<Object, Object>)attributeGetterFunctions.get(
+				"modifiedDate");
+
 		try {
 			return TransactionInvokerUtil.invoke(
-				_transactionConfig, () -> _toDXPEntity(baseModel));
+				_transactionConfig,
+				() -> _toDXPEntity(
+					_getExpandoFields(baseModel), _getFields(baseModel),
+					String.valueOf(baseModel.getPrimaryKeyObj()),
+					(Date)modifiedDateGetterFunction.apply(baseModel),
+					baseModel.getModelClassName()));
 		}
 		catch (Throwable throwable) {
 			throw new Exception(throwable);
@@ -92,7 +103,7 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 
 	@SuppressWarnings("unchecked")
 	private void _addFieldAttributes(
-		BaseModel<?> baseModel, Map<String, Field> fields,
+		BaseModel<?> baseModel, List<Field> fields,
 		List<String> includeAttributeNames) {
 
 		Map<String, Function<?, Object>> attributeGetterFunctions =
@@ -115,11 +126,9 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 				continue;
 			}
 
-			String fieldName = entry.getKey();
-
 			Field field = new Field() {
 				{
-					setName(() -> fieldName);
+					setName(entry::getKey);
 					setValue(
 						() -> {
 							Object value = function.apply(baseModel);
@@ -139,7 +148,7 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 				}
 			};
 
-			fields.put(fieldName, field);
+			fields.add(field);
 		}
 	}
 
@@ -323,7 +332,7 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 			return _getExpandoColumnFields(className, dataType, expandoColumn);
 		}
 
-		Map<String, Field> fields = new TreeMap<>();
+		List<Field> fields = new ArrayList<>();
 
 		List<String> includeAttributeNames = new ArrayList<>();
 
@@ -362,8 +371,7 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 			long[] organizationIds = user.getOrganizationIds();
 			long[] userGroupIds = user.getUserGroupIds();
 
-			fields.put(
-				"groupIds",
+			fields.add(
 				new Field() {
 					{
 						setName(() -> "groupIds");
@@ -373,8 +381,7 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 					}
 				});
 
-			fields.put(
-				"organizationIds",
+			fields.add(
 				new Field() {
 					{
 						setName(() -> "organizationIds");
@@ -384,24 +391,21 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 									"]");
 					}
 				});
-			fields.put(
-				"roleIds",
+			fields.add(
 				new Field() {
 					{
 						setName(() -> "roleIds");
 						setValue(() -> _getRoleIds(user));
 					}
 				});
-			fields.put(
-				"teamIds",
+			fields.add(
 				new Field() {
 					{
 						setName(() -> "teamIds");
 						setValue(() -> _getTeamIds(user));
 					}
 				});
-			fields.put(
-				"userGroupIds",
+			fields.add(
 				new Field() {
 					{
 						setName(() -> "userGroupIds");
@@ -415,48 +419,35 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 
 		_addFieldAttributes(baseModel, fields, includeAttributeNames);
 
-		fields.computeIfPresent(
-			"name",
-			(key, field) -> {
-				field.setValue(
-					() -> {
-						if (StringUtil.equals(
-								baseModel.getModelClassName(),
-								Group.class.getName())) {
+		if (StringUtil.equals(
+				baseModel.getModelClassName(), Group.class.getName())) {
 
-							Group group = (Group)baseModel;
+			for (Field field : fields) {
+				if (StringUtil.equals(field.getName(), "name")) {
+					Group group = (Group)baseModel;
 
-							return group.getNameCurrentValue();
-						}
+					field.setValue(group::getNameCurrentValue);
 
-						return field.getValue();
-					});
-
-				return field;
-			});
+					break;
+				}
+			}
+		}
 
 		if (StringUtil.equals(
 				baseModel.getModelClassName(), Organization.class.getName())) {
 
-			Field field = new Field() {
-				{
-					setName(() -> "parentOrganizationName");
+			Field field = new Field();
 
-					setValue(
-						() -> {
-							Organization organization = (Organization)baseModel;
+			field.setName(() -> "parentOrganizationName");
 
-							return organization.getParentOrganizationName();
-						});
-				}
-			};
+			Organization organization = (Organization)baseModel;
 
-			fields.put("parentOrganizationName", field);
+			field.setValue(organization::getParentOrganizationName);
+
+			fields.add(field);
 		}
 
-		Collection<Field> fieldCollection = fields.values();
-
-		return fieldCollection.toArray(new Field[0]);
+		return fields.toArray(new Field[0]);
 	}
 
 	private String _getGroupIds(
@@ -584,29 +575,35 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 		return null;
 	}
 
-	private DXPEntity _toDXPEntity(BaseModel<?> baseModel) {
-		Map<String, Function<?, Object>> attributeGetterFunctions =
-			(Map<String, Function<?, Object>>)
-				baseModel.getAttributeGetterFunctions();
+	private DXPEntity _toDXPEntity(
+		ExpandoField[] expandoFields, Field[] fields, String id,
+		Date modifiedDate, String type) {
 
-		Function<Object, Object> modifiedDateGetterFunction =
-			(Function<Object, Object>)attributeGetterFunctions.get(
-				"modifiedDate");
+		DXPEntity dxpEntity = new DXPEntity();
 
-		return new DXPEntity() {
-			{
-				setExpandoFields(() -> _getExpandoFields(baseModel));
+		dxpEntity.setExpandoFields(
+			() -> {
+				if (expandoFields != null) {
+					return expandoFields;
+				}
 
-				setFields(() -> _getFields(baseModel));
+				return new ExpandoField[0];
+			});
 
-				setId(() -> String.valueOf(baseModel.getPrimaryKeyObj()));
+		dxpEntity.setFields(
+			() -> {
+				if (fields != null) {
+					return fields;
+				}
 
-				setModifiedDate(
-					() -> (Date)modifiedDateGetterFunction.apply(baseModel));
+				return new Field[0];
+			});
 
-				setType(baseModel::getModelClassName);
-			}
-		};
+		dxpEntity.setId(() -> id);
+		dxpEntity.setModifiedDate(() -> modifiedDate);
+		dxpEntity.setType(() -> type);
+
+		return dxpEntity;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

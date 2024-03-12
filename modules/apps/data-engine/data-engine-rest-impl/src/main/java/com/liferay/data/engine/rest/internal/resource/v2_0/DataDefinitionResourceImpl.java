@@ -471,10 +471,19 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 			_journalArticleLocalService.getStructureArticlesCount(
 				ddmStructure.getGroupId(), ddmStructure.getStructureId()));
 
-		DataLayout dataLayout = _getDefaultDataLayout(
-			dataDefinitionId, dataDefinition);
+		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
 
-		dataDefinition.setDefaultDataLayout(() -> dataLayout);
+		if (dataLayout != null) {
+			dataDefinition.setDefaultDataLayout(
+				() -> {
+					DataLayoutResource dataLayoutResource =
+						_getDataLayoutResource(false);
+
+					return dataLayoutResource.putDataLayout(
+						_getDefaultDataLayoutId(dataDefinitionId, dataLayout),
+						dataLayout);
+				});
+		}
 
 		JSONObject definitionJSONObject = _jsonFactory.createJSONObject(
 			ddmStructure.getDefinition());
@@ -690,31 +699,6 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return null;
 	}
 
-	private DataLayout _getDataLayout(
-		DataDefinition dataDefinition, DDMStructure ddmStructure) {
-
-		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
-
-		if (dataLayout == null) {
-			return null;
-		}
-
-		dataLayout.setDataLayoutKey(ddmStructure::getStructureKey);
-
-		Map<String, Object> dataLayoutName = dataLayout.getName();
-
-		dataLayout.setName(
-			() -> {
-				if (dataLayoutName == null) {
-					return dataDefinition.getName();
-				}
-
-				return dataLayoutName;
-			});
-
-		return dataLayout;
-	}
-
 	private DataLayoutResource _getDataLayoutResource(boolean checkPermission) {
 		DataLayoutResource.Builder dataLayoutResourceBuilder =
 			_dataLayoutResourceFactory.create();
@@ -777,22 +761,6 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return _ddmStructureLocalService.fetchStructure(
 			_portal.getSiteGroupId(contextCompany.getGroupId()), classNameId,
 			ddmStructureKey);
-	}
-
-	private DataLayout _getDefaultDataLayout(
-			Long dataDefinitionId, DataDefinition dataDefinition)
-		throws Exception {
-
-		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
-
-		if (dataLayout == null) {
-			return null;
-		}
-
-		DataLayoutResource dataLayoutResource = _getDataLayoutResource(false);
-
-		return dataLayoutResource.putDataLayout(
-			_getDefaultDataLayoutId(dataDefinitionId, dataLayout), dataLayout);
 	}
 
 	private long _getDefaultDataLayoutId(
@@ -1037,19 +1005,24 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 									new String[] {"fields"})),
 							"JSONArray/pages", "Object/0", "JSONArray/rows")));
 
-				Gson gson = new Gson();
-
-				DataDefinitionField[] nestedDataDefinitionFields =
-					gson.fromJson(
-						_jsonFactory.looseSerializeDeep(
-							dataDefinition.getDataDefinitionFields()),
-						DataDefinitionField[].class);
-
-				_normalizeNestedDataDefinitionFields(
-					dataDefinitionFieldsCount, nestedDataDefinitionFields);
+				int finalDataDefinitionFieldsCount = dataDefinitionFieldsCount;
 
 				dataDefinitionField.setNestedDataDefinitionFields(
-					() -> nestedDataDefinitionFields);
+					() -> {
+						Gson gson = new Gson();
+
+						DataDefinitionField[] nestedDataDefinitionFields =
+							gson.fromJson(
+								_jsonFactory.looseSerializeDeep(
+									dataDefinition.getDataDefinitionFields()),
+								DataDefinitionField[].class);
+
+						_normalizeNestedDataDefinitionFields(
+							finalDataDefinitionFieldsCount,
+							nestedDataDefinitionFields);
+
+						return nestedDataDefinitionFields;
+					});
 
 				if ((structureArticlesCount > 0) &&
 					!GetterUtil.getBoolean(
@@ -1151,28 +1124,6 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 		return rowsJSONArray.toString();
 	}
 
-	private DataLayout _postDataLayout(
-			DataLayout dataLayout, DDMStructure ddmStructure)
-		throws Exception {
-
-		if (dataLayout != null) {
-			DataLayoutResource dataLayoutResource = _getDataLayoutResource(
-				false);
-
-			try {
-				return dataLayoutResource.postDataDefinitionDataLayout(
-					ddmStructure.getStructureId(), dataLayout);
-			}
-			catch (Exception exception) {
-				_ddmStructureLocalService.deleteStructure(ddmStructure);
-
-				throw exception;
-			}
-		}
-
-		return null;
-	}
-
 	private DataDefinition _postSiteDataDefinitionByContentType(
 			Long siteId, String contentType, DataDefinition dataDefinition,
 			boolean copyPermissions)
@@ -1223,18 +1174,31 @@ public class DataDefinitionResourceImpl extends BaseDataDefinitionResourceImpl {
 				StorageType.DEFAULT.getValue()),
 			new ServiceContext());
 
-		DataLayout dataLayout = _getDataLayout(dataDefinition, ddmStructure);
+		DataLayout dataLayout = dataDefinition.getDefaultDataLayout();
 
-		DataLayout postDataLayout = _postDataLayout(dataLayout, ddmStructure);
+		if (dataLayout != null) {
+			dataLayout.setDataLayoutKey(ddmStructure::getStructureKey);
 
-		dataDefinition.setDefaultDataLayout(
-			() -> {
-				if (dataLayout != null) {
-					return postDataLayout;
-				}
+			if (Validator.isNull(dataLayout.getName())) {
+				dataLayout.setName(dataDefinition::getName);
+			}
 
-				return dataLayout;
-			});
+			dataDefinition.setDefaultDataLayout(
+				() -> {
+					DataLayoutResource dataLayoutResource =
+						_getDataLayoutResource(false);
+
+					try {
+						return dataLayoutResource.postDataDefinitionDataLayout(
+							ddmStructure.getStructureId(), dataLayout);
+					}
+					catch (Exception exception) {
+						_ddmStructureLocalService.deleteStructure(ddmStructure);
+
+						throw exception;
+					}
+				});
+		}
 
 		_addDataDefinitionFieldLinks(
 			contentType, ddmStructure.getStructureId(),

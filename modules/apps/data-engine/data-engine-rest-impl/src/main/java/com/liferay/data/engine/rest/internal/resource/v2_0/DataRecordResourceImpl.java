@@ -373,12 +373,9 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	protected void preparePatch(
 		DataRecord dataRecord, DataRecord existingDataRecord) {
 
-		Map<String, Object> existingDataRecordDataRecordValues =
-			existingDataRecord.getDataRecordValues();
-
-		existingDataRecord.setDataRecordValues(
-			() -> {
-				if (dataRecord.getDataRecordValues() != null) {
+		if (dataRecord.getDataRecordValues() != null) {
+			existingDataRecord.setDataRecordValues(
+				() -> {
 					DataRecord getDataRecord = getDataRecord(
 						existingDataRecord.getId());
 
@@ -388,10 +385,8 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 					dataRecordValues.putAll(dataRecord.getDataRecordValues());
 
 					return dataRecordValues;
-				}
-
-				return existingDataRecordDataRecordValues;
-			});
+				});
+		}
 	}
 
 	private BooleanFilter _getBooleanFilter(
