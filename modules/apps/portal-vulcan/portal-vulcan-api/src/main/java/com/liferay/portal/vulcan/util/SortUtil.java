@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.sort.ComplexSortField;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.odata.sort.SortParser;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -60,9 +61,20 @@ public class SortUtil {
 		for (int i = 0; i < sortFields.size(); i++) {
 			SortField sortField = sortFields.get(i);
 
+			String fieldName = sortField.getSortableFieldName(
+				acceptLanguage.getPreferredLocale());
+
+			String fieldPath = fieldName;
+
+			if (sortField instanceof ComplexSortField) {
+				ComplexSortField complexSortField = (ComplexSortField)sortField;
+
+				fieldPath = complexSortField.getSortableComplexFieldName(
+					acceptLanguage.getPreferredLocale());
+			}
+
 			sorts[i] = new Sort(
-				sortField.getSortableFieldName(
-					acceptLanguage.getPreferredLocale()),
+				fieldName, fieldPath, Sort.STRING_TYPE,
 				!sortField.isAscending());
 		}
 
