@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.odata.sort.ComplexSortField;
 import com.liferay.portal.odata.sort.InvalidSortException;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.odata.sort.SortParser;
@@ -142,9 +141,9 @@ public class SortParserImpl implements SortParser {
 		}
 
 		if (_isComplexFieldName(fieldName)) {
-			return new ComplexSortField(
+			return new SortField(
 				ascending, entityField,
-				_getPathComplexEntityFields(
+				_getParentEntityFields(
 					_entityModel.getEntityFieldsMap(), fieldName));
 		}
 
@@ -173,10 +172,10 @@ public class SortParserImpl implements SortParser {
 		return _ASC_DEFAULT;
 	}
 
-	private List<ComplexEntityField> _getPathComplexEntityFields(
+	private List<EntityField> _getParentEntityFields(
 		Map<String, EntityField> entityFields, String fieldName) {
 
-		List<ComplexEntityField> complexEntityFields = new ArrayList<>();
+		List<EntityField> parentEntityFields = new ArrayList<>();
 
 		List<String> fieldNameParts = StringUtil.split(
 			fieldName, CharPool.FORWARD_SLASH);
@@ -188,12 +187,12 @@ public class SortParserImpl implements SortParser {
 				(ComplexEntityField)currentEntityFields.get(
 					fieldNameParts.get(i));
 
-			complexEntityFields.add(complexEntityField);
+			parentEntityFields.add(complexEntityField);
 
 			currentEntityFields = complexEntityField.getEntityFieldsMap();
 		}
 
-		return complexEntityFields;
+		return parentEntityFields;
 	}
 
 	private boolean _isComplexFieldName(String fieldName) {
