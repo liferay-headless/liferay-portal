@@ -61,7 +61,6 @@ import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectState;
 import com.liferay.object.model.ObjectStateFlow;
-import com.liferay.object.petra.sql.dsl.DSLQueryBuilder;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTableUtil;
@@ -1179,30 +1178,29 @@ public class ObjectEntryLocalServiceImpl
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
 			_EXPRESSIONS);
 
-		DSLQueryBuilder dslQueryBuilder = new DSLQueryBuilder(
-		).select(
+		DSLQuery dslQuery = DSLQueryFactoryUtil.select(
 			selectExpressions
 		).from(
 			dynamicObjectDefinitionTable
-		).innerJoin(
+		).innerJoinON(
+			extensionDynamicObjectDefinitionTable,
 			extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn(
 			).eq(
 				dynamicObjectDefinitionTable.getPrimaryKeyColumn()
-			),
-			extensionDynamicObjectDefinitionTable
-		).innerJoin(
+			)
+		).innerJoinON(
+			ObjectEntryTable.INSTANCE,
 			ObjectEntryTable.INSTANCE.objectEntryId.eq(
-				dynamicObjectDefinitionTable.getPrimaryKeyColumn()),
-			ObjectEntryTable.INSTANCE
-		).innerJoin(
+				dynamicObjectDefinitionTable.getPrimaryKeyColumn())
+		).innerJoinON(
+			rootDynamicObjectDefinitionTable,
 			_getInnerJoinRootObjectDefinitionTablePredicate(
-				rootDynamicObjectDefinitionTable),
-			rootDynamicObjectDefinitionTable
-		).leftJoin(
+				rootDynamicObjectDefinitionTable)
+		).leftJoinOn(
+			dynamicObjectDefinitionLocalizationTable,
 			_getLeftJoinLocalizationTablePredicate(
 				dynamicObjectDefinitionLocalizationTable,
-				dynamicObjectDefinitionTable),
-			dynamicObjectDefinitionLocalizationTable
+				dynamicObjectDefinitionTable)
 		).where(
 			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 				objectDefinitionId
@@ -1222,10 +1220,8 @@ public class ObjectEntryLocalServiceImpl
 					dynamicObjectDefinitionTable, groupId)
 			)
 		).limit(
-			end, start
+			start, end
 		);
-
-		DSLQuery dslQuery = dslQueryBuilder.build();
 
 		if (sorts != null) {
 			SortDSLQueryVisitor sortDSLQueryVisitor = new SortDSLQueryVisitor(
