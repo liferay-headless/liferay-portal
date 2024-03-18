@@ -498,17 +498,79 @@ public class ObjectEntryResourceTest {
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		_objectDefinition3 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			ObjectDefinitionTestUtil.getRandomName(),
 			Arrays.asList(
 				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_3, false),
+					ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN,
+					ObjectFieldConstants.DB_TYPE_BOOLEAN, true, false, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_BOOLEAN,
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DATE,
+					ObjectFieldConstants.DB_TYPE_DATE,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DATE,
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
+					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DATE_TIME,
+					Collections.singletonList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_TIME_STORAGE
+						).value(
+							ObjectFieldSettingConstants.
+								VALUE_USE_INPUT_AS_ENTERED
+						).build()),
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DECIMAL,
+					ObjectFieldConstants.DB_TYPE_DOUBLE, true, false, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DECIMAL,
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
+					ObjectFieldConstants.DB_TYPE_INTEGER, true, true, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_INTEGER,
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
+					ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_LONG_INTEGER, false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT,
+					ObjectFieldConstants.DB_TYPE_CLOB, false, false, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_LONG_TEXT,
+					false),
 				ObjectFieldUtil.createObjectField(
 					_listTypeDefinition.getListTypeDefinitionId(),
 					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST,
 					null, ObjectFieldConstants.DB_TYPE_STRING, true, false,
 					null, RandomTestUtil.randomString(),
-					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false)));
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST, false, false),
+				ObjectFieldUtil.createObjectField(
+					_listTypeDefinition.getListTypeDefinitionId(),
+					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, null,
+					ObjectFieldConstants.DB_TYPE_STRING, true, false, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_PICKLIST,
+					false, false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_PRECISION_DECIMAL,
+					ObjectFieldConstants.DB_TYPE_BIG_DECIMAL, true, false, null,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_PRECISION_DECIMAL, false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_TEXT,
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_3,
+					false)),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		_objectDefinition4 = ObjectDefinitionTestUtil.publishObjectDefinition(
 			Arrays.asList(
@@ -7294,11 +7356,16 @@ public class ObjectEntryResourceTest {
 		_objectRelationship1 = ObjectRelationshipTestUtil.addObjectRelationship(
 			_objectDefinition1, _objectDefinition2, TestPropsValues.getUserId(),
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+		_objectRelationship2 = ObjectRelationshipTestUtil.addObjectRelationship(
+			_objectDefinition2, _objectDefinition3, TestPropsValues.getUserId(),
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
 		String endpoint1 = _getEndpoint(
 			TestPropsValues.getGroupId(), _objectDefinition1);
 		String endpoint2 = _getEndpoint(
 			TestPropsValues.getGroupId(), _objectDefinition2);
+		String endpoint3 = _getEndpoint(
+			TestPropsValues.getGroupId(), _objectDefinition3);
 
 		BigDecimal randomBigDecimal = new BigDecimal(
 			RandomTestUtil.randomDouble());
@@ -7312,7 +7379,7 @@ public class ObjectEntryResourceTest {
 		String randomString1 = RandomTestUtil.randomString();
 		String randomString2 = RandomTestUtil.randomString();
 
-		JSONObject relatedJSONObject1 = HTTPTestUtil.invokeToJSONObject(
+		JSONObject depth1JSONObject1 = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_BOOLEAN, false
 			).put(
@@ -7340,7 +7407,7 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint2, Http.Method.POST);
 
-		JSONObject relatedJSONObject2 = HTTPTestUtil.invokeToJSONObject(
+		JSONObject depth1JSONObject2 = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_BOOLEAN, false
 			).put(
@@ -7372,7 +7439,7 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint2, Http.Method.POST);
 
-		JSONObject relatedJSONObject3 = HTTPTestUtil.invokeToJSONObject(
+		JSONObject depth1JSONObject3 = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_BOOLEAN, true
 			).put(
@@ -7404,7 +7471,7 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint2, Http.Method.POST);
 
-		JSONObject relatedJSONObject4 = HTTPTestUtil.invokeToJSONObject(
+		JSONObject depth1JSONObject4 = HTTPTestUtil.invokeToJSONObject(
 			JSONUtil.put(
 				_OBJECT_FIELD_NAME_BOOLEAN, true
 			).put(
@@ -7436,6 +7503,130 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			endpoint2, Http.Method.POST);
 
+		JSONObject depth2JSONObject1 = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_BOOLEAN, false
+			).put(
+				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
+			).put(
+				_OBJECT_FIELD_NAME_DATE_TIME,
+				_dateTimeDateFormat.format(randomDate2)
+			).put(
+				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
+			).put(
+				_OBJECT_FIELD_NAME_INTEGER, randomInt
+			).put(
+				_OBJECT_FIELD_NAME_LONG_INTEGER, randomLong
+			).put(
+				_OBJECT_FIELD_NAME_LONG_TEXT, "a" + randomString1
+			).put(
+				_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST,
+				JSONUtil.putAll(_LIST_TYPE_ENTRY_KEY_1, _LIST_TYPE_ENTRY_KEY_2)
+			).put(
+				_OBJECT_FIELD_NAME_PICKLIST, _LIST_TYPE_ENTRY_KEY_1
+			).put(
+				_OBJECT_FIELD_NAME_PRECISION_DECIMAL, randomBigDecimal
+			).put(
+				_OBJECT_FIELD_NAME_TEXT, "a" + randomString2
+			).toString(),
+			endpoint3, Http.Method.POST);
+
+		JSONObject depth2JSONObject2 = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_BOOLEAN, false
+			).put(
+				_OBJECT_FIELD_NAME_DATE,
+				() -> _dateFormat.format(
+					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
+			).put(
+				_OBJECT_FIELD_NAME_DATE_TIME,
+				_dateTimeDateFormat.format(
+					new Date(randomDate2.getTime() + 2000))
+			).put(
+				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1 + 2
+			).put(
+				_OBJECT_FIELD_NAME_INTEGER, randomInt + 2
+			).put(
+				_OBJECT_FIELD_NAME_LONG_INTEGER, randomLong + 2
+			).put(
+				_OBJECT_FIELD_NAME_LONG_TEXT, "c" + randomString1
+			).put(
+				_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST,
+				JSONUtil.putAll(_LIST_TYPE_ENTRY_KEY_1, _LIST_TYPE_ENTRY_KEY_2)
+			).put(
+				_OBJECT_FIELD_NAME_PICKLIST, _LIST_TYPE_ENTRY_KEY_2
+			).put(
+				_OBJECT_FIELD_NAME_PRECISION_DECIMAL,
+				randomBigDecimal.add(new BigDecimal(2))
+			).put(
+				_OBJECT_FIELD_NAME_TEXT, "c" + randomString2
+			).toString(),
+			endpoint3, Http.Method.POST);
+
+		JSONObject depth2JSONObject3 = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_BOOLEAN, true
+			).put(
+				_OBJECT_FIELD_NAME_DATE,
+				() -> _dateFormat.format(
+					new Date(randomDate1.getTime() + (24 * 3600 * 1000)))
+			).put(
+				_OBJECT_FIELD_NAME_DATE_TIME,
+				_dateTimeDateFormat.format(
+					new Date(randomDate2.getTime() + 1000))
+			).put(
+				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1 + 1
+			).put(
+				_OBJECT_FIELD_NAME_INTEGER, randomInt + 1
+			).put(
+				_OBJECT_FIELD_NAME_LONG_INTEGER, randomLong + 1
+			).put(
+				_OBJECT_FIELD_NAME_LONG_TEXT, "b" + randomString1
+			).put(
+				_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST,
+				JSONUtil.putAll(_LIST_TYPE_ENTRY_KEY_2, _LIST_TYPE_ENTRY_KEY_3)
+			).put(
+				_OBJECT_FIELD_NAME_PICKLIST, _LIST_TYPE_ENTRY_KEY_2
+			).put(
+				_OBJECT_FIELD_NAME_PRECISION_DECIMAL,
+				randomBigDecimal.add(BigDecimal.ONE)
+			).put(
+				_OBJECT_FIELD_NAME_TEXT, "b" + randomString2
+			).toString(),
+			endpoint3, Http.Method.POST);
+
+		JSONObject depth2JSONObject4 = HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_BOOLEAN, true
+			).put(
+				_OBJECT_FIELD_NAME_DATE,
+				() -> _dateFormat.format(
+					new Date(randomDate1.getTime() + (3 * 24 * 3600 * 1000)))
+			).put(
+				_OBJECT_FIELD_NAME_DATE_TIME,
+				_dateTimeDateFormat.format(
+					new Date(randomDate2.getTime() + 3000))
+			).put(
+				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1 + 3
+			).put(
+				_OBJECT_FIELD_NAME_INTEGER, randomInt + 3
+			).put(
+				_OBJECT_FIELD_NAME_LONG_INTEGER, randomLong + 3
+			).put(
+				_OBJECT_FIELD_NAME_LONG_TEXT, "d" + randomString1
+			).put(
+				_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST,
+				JSONUtil.putAll(_LIST_TYPE_ENTRY_KEY_2, _LIST_TYPE_ENTRY_KEY_3)
+			).put(
+				_OBJECT_FIELD_NAME_PICKLIST, _LIST_TYPE_ENTRY_KEY_3
+			).put(
+				_OBJECT_FIELD_NAME_PRECISION_DECIMAL,
+				randomBigDecimal.add(new BigDecimal(3))
+			).put(
+				_OBJECT_FIELD_NAME_TEXT, "d" + randomString2
+			).toString(),
+			endpoint3, Http.Method.POST);
+
 		JSONObject jsonObject1 = HTTPTestUtil.invokeToJSONObject(
 			JSONFactoryUtil.getNullJSON(
 			).toString(),
@@ -7451,7 +7642,7 @@ public class ObjectEntryResourceTest {
 			String.format(
 				"%s/%d/%s/%d", endpoint1, jsonObject1.getLong("id"),
 				_objectRelationship1.getName(),
-				relatedJSONObject1.getLong("id")),
+				depth1JSONObject1.getLong("id")),
 			Http.Method.PUT);
 
 		HTTPTestUtil.invokeToJSONObject(
@@ -7459,7 +7650,7 @@ public class ObjectEntryResourceTest {
 			String.format(
 				"%s/%d/%s/%d", endpoint1, jsonObject1.getLong("id"),
 				_objectRelationship1.getName(),
-				relatedJSONObject2.getLong("id")),
+				depth1JSONObject2.getLong("id")),
 			Http.Method.PUT);
 
 		HTTPTestUtil.invokeToJSONObject(
@@ -7467,7 +7658,7 @@ public class ObjectEntryResourceTest {
 			String.format(
 				"%s/%d/%s/%d", endpoint1, jsonObject2.getLong("id"),
 				_objectRelationship1.getName(),
-				relatedJSONObject3.getLong("id")),
+				depth1JSONObject3.getLong("id")),
 			Http.Method.PUT);
 
 		HTTPTestUtil.invokeToJSONObject(
@@ -7475,94 +7666,218 @@ public class ObjectEntryResourceTest {
 			String.format(
 				"%s/%d/%s/%d", endpoint1, jsonObject2.getLong("id"),
 				_objectRelationship1.getName(),
-				relatedJSONObject4.getLong("id")),
+				depth1JSONObject4.getLong("id")),
+			Http.Method.PUT);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			String.format(
+				"%s/%d/%s/%d", endpoint2, depth1JSONObject1.getLong("id"),
+				_objectRelationship2.getName(),
+				depth2JSONObject1.getLong("id")),
+			Http.Method.PUT);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			String.format(
+				"%s/%d/%s/%d", endpoint2, depth1JSONObject2.getLong("id"),
+				_objectRelationship2.getName(),
+				depth2JSONObject2.getLong("id")),
+			Http.Method.PUT);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			String.format(
+				"%s/%d/%s/%d", endpoint2, depth1JSONObject3.getLong("id"),
+				_objectRelationship2.getName(),
+				depth2JSONObject3.getLong("id")),
+			Http.Method.PUT);
+
+		HTTPTestUtil.invokeToJSONObject(
+			null,
+			String.format(
+				"%s/%d/%s/%d", endpoint2, depth1JSONObject4.getLong("id"),
+				_objectRelationship2.getName(),
+				depth2JSONObject4.getLong("id")),
 			Http.Method.PUT);
 
 		try {
+
+			// Depth 1
+
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_BOOLEAN));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_DATE));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_DATE_TIME));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_DECIMAL));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_INTEGER));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_LONG_INTEGER));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_LONG_TEXT));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_PICKLIST));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_PRECISION_DECIMAL));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_TEXT));
+
+			// Depth 2
+
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_BOOLEAN));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DATE));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_DATE_TIME));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_DECIMAL));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_INTEGER));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_LONG_INTEGER));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_LONG_TEXT));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_PICKLIST));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_PRECISION_DECIMAL));
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_TEXT));
 
 			// Sort by several fields
 
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
-				relatedJSONObject1, relatedJSONObject2, relatedJSONObject3,
-				relatedJSONObject4,
+				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
+				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_BOOLEAN),
@@ -7596,26 +7911,90 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_TEXT));
+
+			_testSortByOneToManyRelationshipCustomObjectFields(
+				endpoint1, endpoint3, jsonObject1, jsonObject2,
+				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
+				depth2JSONObject4,
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_BOOLEAN),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DATE),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_DATE_TIME),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DECIMAL),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_INTEGER),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_LONG_INTEGER),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_LONG_TEXT),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_PICKLIST),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(),
+					_OBJECT_FIELD_NAME_PRECISION_DECIMAL),
+				String.format(
+					"%s/%s/%s", _objectRelationship1.getName(),
+					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_TEXT));
 		}
 		finally {
-			if (relatedJSONObject1 != null) {
+			if (depth2JSONObject1 != null) {
 				_objectEntryLocalService.deleteObjectEntry(
-					relatedJSONObject1.getLong("id"));
+					depth2JSONObject1.getLong("id"));
 			}
 
-			if (relatedJSONObject2 != null) {
+			if (depth2JSONObject2 != null) {
 				_objectEntryLocalService.deleteObjectEntry(
-					relatedJSONObject2.getLong("id"));
+					depth2JSONObject2.getLong("id"));
 			}
 
-			if (relatedJSONObject3 != null) {
+			if (depth2JSONObject3 != null) {
 				_objectEntryLocalService.deleteObjectEntry(
-					relatedJSONObject3.getLong("id"));
+					depth2JSONObject3.getLong("id"));
 			}
 
-			if (relatedJSONObject4 != null) {
+			if (depth2JSONObject4 != null) {
 				_objectEntryLocalService.deleteObjectEntry(
-					relatedJSONObject4.getLong("id"));
+					depth2JSONObject4.getLong("id"));
+			}
+
+			if (depth1JSONObject1 != null) {
+				_objectEntryLocalService.deleteObjectEntry(
+					depth1JSONObject1.getLong("id"));
+			}
+
+			if (depth1JSONObject2 != null) {
+				_objectEntryLocalService.deleteObjectEntry(
+					depth1JSONObject2.getLong("id"));
+			}
+
+			if (depth1JSONObject3 != null) {
+				_objectEntryLocalService.deleteObjectEntry(
+					depth1JSONObject3.getLong("id"));
+			}
+
+			if (depth1JSONObject4 != null) {
+				_objectEntryLocalService.deleteObjectEntry(
+					depth1JSONObject4.getLong("id"));
 			}
 
 			if (jsonObject1 != null) {
