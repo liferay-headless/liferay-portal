@@ -6,6 +6,7 @@
 package com.liferay.object.internal.sort.relationship;
 
 import com.liferay.object.internal.sort.BaseSortDSLQueryBuilderContributor;
+import com.liferay.object.internal.sort.RelationshipSort;
 import com.liferay.object.internal.sort.Sort;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;

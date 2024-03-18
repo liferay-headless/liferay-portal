@@ -5,7 +5,6 @@
 
 package com.liferay.object.internal.sort;
 
-import com.liferay.object.internal.sort.relationship.RelationshipSort;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
