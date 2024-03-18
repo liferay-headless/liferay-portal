@@ -51,7 +51,7 @@ import com.liferay.object.internal.filter.parser.EqualityOperatorsObjectFilterPa
 import com.liferay.object.internal.filter.parser.InclusionOperatorsObjectFilterParser;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionLocalizationTableFactory;
-import com.liferay.object.internal.sort.SortDSLQueryBuilderContributor;
+import com.liferay.object.internal.sort.SortDSLQueryVisitor;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
@@ -1225,15 +1225,16 @@ public class ObjectEntryLocalServiceImpl
 			end, start
 		);
 
+		DSLQuery dslQuery = dslQueryBuilder.build();
+
 		if (sorts != null) {
-			SortDSLQueryBuilderContributor sortDSLQueryBuilderContributor =
-				new SortDSLQueryBuilderContributor(
-					_objectFieldLocalService,
-					_objectRelationshipLocalServiceSnapshot.get());
+			SortDSLQueryVisitor sortDSLQueryVisitor = new SortDSLQueryVisitor(
+				_objectFieldLocalService,
+				_objectRelationshipLocalServiceSnapshot.get());
 
 			for (Sort sort : sorts) {
-				sortDSLQueryBuilderContributor.contribute(
-					dslQueryBuilder,
+				dslQuery = sortDSLQueryVisitor.visit(
+					dslQuery,
 					new com.liferay.object.internal.sort.Sort(
 						_objectDefinitionPersistence.findByPrimaryKey(
 							objectDefinitionId),
@@ -1242,7 +1243,7 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		List<Object[]> rows = _list(
-			dslQueryBuilder.build(), objectDefinitionId, selectExpressions);
+			dslQuery, objectDefinitionId, selectExpressions);
 
 		List<Map<String, Serializable>> valuesList = new ArrayList<>(
 			rows.size());
