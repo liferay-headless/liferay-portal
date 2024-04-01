@@ -563,7 +563,9 @@ public class LayoutStagedModelDataHandler
 				_layoutFriendlyURLLocalService.fetchFirstLayoutFriendlyURL(
 					groupId, privateLayout, friendlyURL);
 
-			if ((layoutFriendlyURL != null) && (existingLayout == null)) {
+			if ((layoutFriendlyURL != null) && (existingLayout == null) &&
+				!portletDataContext.isDataStrategyMirror()) {
+
 				Layout mergeFailFriendlyURLLayout =
 					_layoutLocalService.getLayout(layoutFriendlyURL.getPlid());
 
