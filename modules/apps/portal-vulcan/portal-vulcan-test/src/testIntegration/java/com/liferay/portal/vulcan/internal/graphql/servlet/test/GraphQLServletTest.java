@@ -72,31 +72,57 @@ public class GraphQLServletTest {
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		_testDTO = new TestDTO();
+		_testDTOV1 = new TestDTOV1();
 
-		TestServletData testServletData = new TestServletData(_testDTO);
+		TestServletDataV1 testServletData = new TestServletDataV1(_testDTOV1);
+		
 
-		_serviceRegistration = bundleContext.registerService(
+		_testDTOV2 = new TestDTOV2();
+
+		TestServletDataV2 testServletDataV2 = new TestServletDataV2(_testDTOV2);
+
+		_serviceRegistrationV1 = bundleContext.registerService(
 			ServletData.class, testServletData, null);
+		_serviceRegistrationV2 = bundleContext.registerService(
+			ServletData.class, testServletDataV2, null);
 	}
 
 	@After
 	public void tearDown() {
-		_serviceRegistration.unregister();
+		_serviceRegistrationV1.unregister();
+		_serviceRegistrationV2.unregister();
 	}
 
 	@Test
-	public void testMutation() throws Exception {
-		TestDTO testDTO = new TestDTO();
+	public void testMutationV1() throws Exception {
+		TestDTOV1 testDTO = new TestDTOV1();
 
-		_assertEquals(
+		_assertEqualsV1(
 			false, testDTO,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
 					new GraphQLField(
 						"createTestDTO",
 						Collections.singletonMap(
-							"testDTO", _toGraphQLString(testDTO)),
+							"testDTO", _toGraphQLStringV1(testDTO)),
+						new GraphQLField("id"), new GraphQLField("map"),
+						new GraphQLField("string")),
+					"mutation"),
+				"JSONObject/data", "JSONObject/createTestDTO"));
+	}
+	
+	@Test
+	public void testMutationV2() throws Exception {
+		TestDTOV2 testDTO = new TestDTOV2();
+
+		_assertEqualsV2(
+			false, testDTO,
+			JSONUtil.getValueAsJSONObject(
+				_invoke(
+					new GraphQLField(
+						"createTestDTO",
+						Collections.singletonMap(
+							"testDTO", _toGraphQLStringV2(testDTO)),
 						new GraphQLField("id"), new GraphQLField("map"),
 						new GraphQLField("string")),
 					"mutation"),
@@ -104,13 +130,31 @@ public class GraphQLServletTest {
 	}
 
 	@Test
+	public void testMutationWithGraphQLSimpleNamespace() throws Exception {
+
+		JSONObject json = JSONUtil.getValueAsJSONObject(
+			_invoke(
+				new GraphQLField(
+					"testPath",
+					new GraphQLField(
+						"testDTO",
+							new GraphQLField("oneVersionOnly"), new GraphQLField("twoVersionOnly"))),
+				"mutation"),
+			"JSONObject/data", "JSONObject/testPath","JSONObject/createTestDTO");
+
+		Assert.assertTrue(json != null &&
+			json.getString("oneVersionOnly") != null
+			&& json.getString("twoVersionOnly") != null);
+	}
+
+	@Test
 	public void testMutationWithGraphQLNamespace() throws Exception {
 
 		// With namespace
 
-		TestDTO testDTO = new TestDTO();
+		TestDTOV1 testDTO = new TestDTOV1();
 
-		_assertEquals(
+		_assertEqualsV1(
 			false, testDTO,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
@@ -119,7 +163,7 @@ public class GraphQLServletTest {
 						new GraphQLField(
 							"createTestDTO",
 							Collections.singletonMap(
-								"testDTO", _toGraphQLString(testDTO)),
+								"testDTO", _toGraphQLStringV1(testDTO)),
 							new GraphQLField("id"), new GraphQLField("map"),
 							new GraphQLField("string"))),
 					"mutation"),
@@ -128,16 +172,16 @@ public class GraphQLServletTest {
 
 		// Without namespace (backwards compatibility)
 
-		testDTO = new TestDTO();
+		testDTO = new TestDTOV1();
 
-		_assertEquals(
+		_assertEqualsV1(
 			false, testDTO,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
 					new GraphQLField(
 						"createTestDTO",
 						Collections.singletonMap(
-							"testDTO", _toGraphQLString(testDTO)),
+							"testDTO", _toGraphQLStringV1(testDTO)),
 						new GraphQLField("id"), new GraphQLField("map"),
 						new GraphQLField("string")),
 					"mutation"),
@@ -145,9 +189,23 @@ public class GraphQLServletTest {
 	}
 
 	@Test
-	public void testQuery() throws Exception {
-		_assertEquals(
-			true, _testDTO,
+	public void testQueryV1() throws Exception {
+		_assertEqualsV1(
+			true, _testDTOV1,
+			JSONUtil.getValueAsJSONObject(
+				_invoke(
+					new GraphQLField(
+						"testDTO", new GraphQLField("extendedString"),
+						new GraphQLField("id"), new GraphQLField("map"),
+						new GraphQLField("string")),
+					"query"),
+				"JSONObject/data", "JSONObject/testDTO"));
+	}
+	
+	@Test
+	public void testQueryV2() throws Exception {
+		_assertEqualsV2(
+			true, _testDTOV2,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
 					new GraphQLField(
@@ -211,8 +269,8 @@ public class GraphQLServletTest {
 					"queryDepthLimit", 2
 				).build());
 
-			_assertEquals(
-				true, _testDTO,
+			_assertEqualsV1(
+				true, _testDTOV1,
 				JSONUtil.getValueAsJSONObject(
 					_invoke(
 						new GraphQLField(
@@ -332,8 +390,8 @@ public class GraphQLServletTest {
 
 		// With namespace
 
-		_assertEquals(
-			true, _testDTO,
+		_assertEqualsV1(
+			true, _testDTOV1,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
 					new GraphQLField(
@@ -360,8 +418,8 @@ public class GraphQLServletTest {
 
 		// Without namespace (backwards compatibility)
 
-		_assertEquals(
-			true, _testDTO,
+		_assertEqualsV1(
+			true, _testDTOV1,
 			JSONUtil.getValueAsJSONObject(
 				_invoke(
 					new GraphQLField(
@@ -419,6 +477,15 @@ public class GraphQLServletTest {
 				"JSONObject/type", "JSONArray/fields"),
 			true, "createTestDTO");
 
+		_assertGraphQLSchemaField(
+			false, mutationFieldsJSONArray, true, "testPath_v2_0");
+		_assertGraphQLSchemaField(
+			false,
+			JSONUtil.getValueAsJSONArray(
+				_getJSONObject(mutationFieldsJSONArray, "testPath_v2_0"),
+				"JSONObject/type", "JSONArray/fields"),
+			true, "createTestDTO");
+
 		// Query fields
 
 		JSONArray queryFieldsJSONArray = JSONUtil.getValueAsJSONArray(
@@ -457,9 +524,11 @@ public class GraphQLServletTest {
 			false, namespacedQueryFieldsJSONArray, false, "testDTOPage");
 	}
 
-	public static class TestDTO {
+	public static class TestDTOV1 {
 
-		public TestDTO() {
+		final double version = 1.0;
+
+		public TestDTOV1() {
 			this(
 				RandomTestUtil.randomString(), RandomTestUtil.randomLong(),
 				HashMapBuilder.put(
@@ -472,7 +541,7 @@ public class GraphQLServletTest {
 				RandomTestUtil.randomString());
 		}
 
-		public TestDTO(
+		public TestDTOV1(
 			String extendedString, long id, Map<String, String> map,
 			String string) {
 
@@ -484,8 +553,74 @@ public class GraphQLServletTest {
 		}
 
 		public String getExtendedString() {
-			return _extendedString;
+			return _extendedString + " " + version + " version";
 		}
+
+		public long getId() {
+			return id;
+		}
+
+		public Map<String, String> getMap() {
+			return map;
+		}
+
+		public String getOneVersionOnly() {
+			return "1.0 only text";
+		}
+
+		public double getVersion() {
+			return version;
+		}
+
+		public String getString() {
+			return string;
+		}
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		protected long id;
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		protected Map<String, String> map;
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		protected String string;
+
+		private String _extendedString;
+
+	}
+
+	public static class TestDTOV2 {
+
+		final double version = 2.0;
+
+		public TestDTOV2() {
+			this(
+				RandomTestUtil.randomString(), RandomTestUtil.randomLong(),
+				HashMapBuilder.put(
+					"a" + RandomTestUtil.randomString(),
+					RandomTestUtil.randomString() 
+				).put(
+					"a" + RandomTestUtil.randomString(),
+					RandomTestUtil.randomString()
+				).build(),
+				RandomTestUtil.randomString());
+		}
+
+		public TestDTOV2(
+			String extendedString, long id, Map<String, String> map,
+			String string) {
+
+			_extendedString = extendedString;
+
+			this.id = id;
+			this.map = map;
+			this.string = string;
+		}
+
+		public String getExtendedString() {
+			return _extendedString + " " + version +" version";
+		}
+		
 
 		public long getId() {
 			return id;
@@ -497,6 +632,14 @@ public class GraphQLServletTest {
 
 		public String getString() {
 			return string;
+		}
+
+		public String getTwoVersionOnly() {
+			return "2.0 only text";
+		}
+
+		public double getVersion() {
+			return version;
 		}
 
 		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
@@ -535,26 +678,90 @@ public class GraphQLServletTest {
 
 	}
 
-	public static class TestMutation {
+	public static class TestMutationV1 {
 
 		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
-		public TestDTO createTestDTO(@GraphQLName("testDTO") TestDTO testDTO) {
+		public TestDTOV1 createTestDTO(@GraphQLName("testDTO") TestDTOV1 testDTO) {
 			return testDTO;
 		}
 
 	}
 
-	public static class TestQuery {
+	public static class TestMutationV2 {
 
-		public TestQuery() {
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		public TestDTOV2 createTestDTO(@GraphQLName("testDTO") TestDTOV2 testDTO) {
+			return testDTO;
 		}
 
-		public TestQuery(TestDTO testDTO) {
+	}
+
+	public static class TestQueryV1 {
+
+		public TestQueryV1(TestDTOV1 testDTO) {
 			_testDTO = testDTO;
 		}
 
 		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
-		public TestDTO testDTO() {
+		public TestDTOV1 testDTO() {
+			return _testDTO;
+		}
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		public TestDTOPage testDTOPage(
+			@GraphQLName("page") int page,
+			@GraphQLName("pageSize") int pageSize) {
+
+			return new TestDTOPage(page, pageSize);
+		}
+
+		public TestDTOV1 testNoPermissionOverDTO()
+			throws PrincipalException.MustHavePermission {
+
+			throw new PrincipalException.MustHavePermission(
+				0L, StringUtil.randomString());
+		}
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		public TestDTOV1 testNotFoundDTO() {
+			throw new NotFoundException();
+		}
+
+		
+		@GraphQLTypeExtension(TestDTOV1.class)
+		public class TestGraphQLTypeExtension {
+
+			public TestGraphQLTypeExtension(TestDTOV1 testDTO) {
+				_testDTO = testDTO;
+			}
+
+			@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+			public String extendedString() {
+				return _testDTO.getExtendedString();
+			}
+
+			@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+			public String oneVersionOnly() {
+				return _testDTO.getOneVersionOnly();
+			}
+
+			private final TestDTOV1 _testDTO;
+
+		}
+
+		private static TestDTOV1 _testDTO;
+		private static TestDTOPage _testDTOPage;
+
+	}
+	
+	public static class TestQueryV2 {
+
+		public TestQueryV2(TestDTOV2 testDTO) {
+			_testDTO = testDTO;
+		}
+
+		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+		public TestDTOV2 testDTO() {
 			return _testDTO;
 		}
 
@@ -567,14 +774,21 @@ public class GraphQLServletTest {
 		}
 
 		@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
-		public TestDTO testNotFoundDTO() {
+		public TestDTOV2 testNotFoundDTO() {
 			throw new NotFoundException();
 		}
 
-		@GraphQLTypeExtension(TestDTO.class)
+		public TestDTOV2 testNoPermissionOverDTO()
+			throws PrincipalException.MustHavePermission {
+
+			throw new PrincipalException.MustHavePermission(
+				0L, StringUtil.randomString());
+		}
+
+		@GraphQLTypeExtension(TestDTOV2.class)
 		public class TestGraphQLTypeExtension {
 
-			public TestGraphQLTypeExtension(TestDTO testDTO) {
+			public TestGraphQLTypeExtension(TestDTOV2 testDTO) {
 				_testDTO = testDTO;
 			}
 
@@ -583,11 +797,16 @@ public class GraphQLServletTest {
 				return _testDTO.getExtendedString();
 			}
 
-			private final TestDTO _testDTO;
+			@com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+			public String twoVersionOnly() {
+				return _testDTO.getTwoVersionOnly();
+			}
+
+			private final TestDTOV2 _testDTO;
 
 		}
 
-		private static TestDTO _testDTO;
+		private static TestDTOV2 _testDTO;
 		private static TestDTOPage _testDTOPage;
 
 	}
@@ -650,10 +869,10 @@ public class GraphQLServletTest {
 
 	}
 
-	public class TestServletData implements ServletData {
+	public class TestServletDataV1 implements ServletData {
 
-		public TestServletData(TestDTO testDTO) {
-			_testQuery = new TestQuery(testDTO);
+		public TestServletDataV1(TestDTOV1 testDTO) {
+			_testQuery = new TestQueryV1(testDTO);
 		}
 
 		@Override
@@ -672,7 +891,7 @@ public class GraphQLServletTest {
 		}
 
 		@Override
-		public TestQuery getQuery() {
+		public TestQueryV1 getQuery() {
 			return _testQuery;
 		}
 
@@ -681,8 +900,45 @@ public class GraphQLServletTest {
 			return false;
 		}
 
-		private final TestMutation _testMutation = new TestMutation();
-		private final TestQuery _testQuery;
+		private final TestMutationV1 _testMutation = new TestMutationV1();
+		private final TestQueryV1 _testQuery;
+
+	}
+
+	public class TestServletDataV2 implements ServletData {
+	
+		public TestServletDataV2(TestDTOV2 testDTO) {
+			_testQuery = new TestQueryV2(testDTO);
+		}
+		
+
+		@Override
+		public String getApplicationName() {
+			return "test";
+		}
+
+		@Override
+		public Object getMutation() {
+			return _testMutation;
+		}
+
+		@Override
+		public String getPath() {
+			return "/test-path-graphql/V2_0";
+		}
+
+		@Override
+		public TestQueryV2 getQuery() {
+			return _testQuery;
+		}
+
+		@Override
+		public boolean isJaxRsResourceInvocation() {
+			return false;
+		}
+
+		private final TestMutationV2 _testMutation = new TestMutationV2();
+		private final TestQueryV2 _testQuery;
 
 	}
 
@@ -718,8 +974,8 @@ public class GraphQLServletTest {
 		}
 	}
 
-	private void _assertEquals(
-		boolean assertExtendedProperties, TestDTO expectedTestDTO,
+	private void _assertEqualsV1(
+		boolean assertExtendedProperties, TestDTOV1 expectedTestDTO,
 		JSONObject jsonObject) {
 
 		if (assertExtendedProperties) {
@@ -736,6 +992,23 @@ public class GraphQLServletTest {
 			expectedTestDTO.getString(), jsonObject.get("string"));
 	}
 
+	private void _assertEqualsV2(
+		boolean assertExtendedProperties, TestDTOV2 expectedTestDTO,
+		JSONObject jsonObject) {
+
+		if (assertExtendedProperties) {
+			Assert.assertEquals(
+				expectedTestDTO.getExtendedString(),
+				jsonObject.get("extendedString"));
+		}
+
+		Assert.assertEquals(expectedTestDTO.getId(), jsonObject.get("id"));
+		Assert.assertEquals(
+			expectedTestDTO.getMap(),
+			JSONUtil.toStringMap(jsonObject.getJSONObject("map")));
+		Assert.assertEquals(
+			expectedTestDTO.getString(), jsonObject.get("string"));
+	}
 	private void _assertGraphQLSchemaField(
 			boolean deprecated, JSONArray fieldsJSONArray, boolean mutation,
 			String operationName)
@@ -829,14 +1102,41 @@ public class GraphQLServletTest {
 		Assert.assertEquals(expectedPageSize, jsonObject.getInt("pageSize"));
 	}
 
-	private String _toGraphQLString(TestDTO testDTO) throws Exception {
+	private String _toGraphQLStringV1(TestDTOV1 testDTO) throws Exception {
 		StringBuilder sb = new StringBuilder("{");
 
-		for (Field field : ReflectionUtil.getDeclaredFields(TestDTO.class)) {
+		for (Field field : ReflectionUtil.getDeclaredFields(TestDTOV1.class)) {
 			if (ArrayUtil.isEmpty(
 					field.getAnnotationsByType(
 						com.liferay.portal.vulcan.graphql.annotation.
-							GraphQLField.class))) {
+							GraphQLField.class)) && !field.getName().endsWith("VersionOnly")) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			_appendGraphQLFieldValue(sb, field.get(testDTO));
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private String _toGraphQLStringV2(TestDTOV2 testDTO) throws Exception {
+		StringBuilder sb = new StringBuilder("{");
+
+		for (Field field : ReflectionUtil.getDeclaredFields(TestDTOV2.class)) {
+			if (ArrayUtil.isEmpty(
+					field.getAnnotationsByType(
+						com.liferay.portal.vulcan.graphql.annotation.
+							GraphQLField.class)) && field.getName().endsWith("versionOnly")) {
 
 				continue;
 			}
@@ -859,7 +1159,9 @@ public class GraphQLServletTest {
 	@Inject
 	private ConfigurationAdmin _configurationAdmin;
 
-	private ServiceRegistration<ServletData> _serviceRegistration;
-	private TestDTO _testDTO;
+	private ServiceRegistration<ServletData> _serviceRegistrationV1;
+	private ServiceRegistration<ServletData> _serviceRegistrationV2;
+	private TestDTOV1 _testDTOV1;
+	private TestDTOV2 _testDTOV2;
 
 }

@@ -971,7 +971,6 @@ public class GraphQLServletExtender {
 	}
 
 	private Servlet _createServlet(long companyId) throws Exception {
-		_servlets.clear();
 		Servlet servlet = _servlets.get(companyId);
 
 		if (servlet != null) {
@@ -1714,7 +1713,7 @@ public class GraphQLServletExtender {
 			throw new RuntimeException(exception);
 		}
 	}
-	
+
 	private Set<String> _registerNamespace(
 		Function<ServletData, Object> function,
 		GraphQLObjectType.Builder graphQLObjectTypeBuilder,
