@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -129,11 +130,11 @@ public class ObjectEntryDTOConverter
 
 		User user = dtoConverterContext.getUser();
 
-		objectEntry.setActions(dtoConverterContext.getActions());
+		objectEntry.setActions(dtoConverterContext::getActions);
 
 		if (objectEntry.getStatus() == null) {
 			objectEntry.setStatus(
-				new Status() {
+				() -> new Status() {
 					{
 						setCode(() -> WorkflowConstants.STATUS_APPROVED);
 						setLabel(() -> WorkflowConstants.LABEL_APPROVED);
@@ -168,7 +169,7 @@ public class ObjectEntryDTOConverter
 					dtoConverterContext, map.get("key"),
 					objectField.getListTypeDefinitionId()));
 
-			objectEntry.setProperties(properties);
+			objectEntry.setProperties(() -> properties);
 		}
 
 		return objectEntry;
@@ -597,17 +598,16 @@ public class ObjectEntryDTOConverter
 						AuditEvent newAuditEvent = new AuditEvent();
 
 						newAuditEvent.setAuditFieldChanges(
-							_toAuditFieldChanges(
+							() -> _toAuditFieldChanges(
 								auditEvent.getAdditionalInfo(),
 								auditEvent.getEventType()));
 						newAuditEvent.setCreator(
-							CreatorUtil.toCreator(
+							() -> CreatorUtil.toCreator(
 								_portal, dtoConverterContext.getUriInfo(),
 								_userLocalService.fetchUser(
 									auditEvent.getUserId())));
-						newAuditEvent.setDateCreated(
-							auditEvent.getCreateDate());
-						newAuditEvent.setEventType(auditEvent.getEventType());
+						newAuditEvent.setDateCreated(auditEvent::getCreateDate);
+						newAuditEvent.setEventType(auditEvent::getEventType);
 
 						return newAuditEvent;
 					},
@@ -698,15 +698,27 @@ public class ObjectEntryDTOConverter
 				continue;
 			}
 
-			if (objectField.isLocalized()) {
-				map.put(
-					objectField.getI18nObjectFieldName(),
-					values.get(objectField.getI18nObjectFieldName()));
-			}
-
 			String objectFieldName = objectField.getName();
 
 			Serializable serializable = values.get(objectFieldName);
+
+			if (objectField.isLocalized()) {
+				String i18nObjectFieldName =
+					objectField.getI18nObjectFieldName();
+
+				Map<String, Serializable> objectField_i18n =
+					(Map<String, Serializable>)values.get(i18nObjectFieldName);
+
+				map.put(i18nObjectFieldName, objectField_i18n);
+
+				if ((dtoConverterContext.getLocale() != null) &&
+					(objectField_i18n != null)) {
+
+					serializable = GetterUtil.getString(
+						objectField_i18n.get(
+							String.valueOf(dtoConverterContext.getLocale())));
+				}
+			}
 
 			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
@@ -728,13 +740,13 @@ public class ObjectEntryDTOConverter
 							objectDefinition.getCompanyId(), "LPS-174455")) {
 
 						fileEntry.setFileBase64(
-							(String)NestedFieldsSupplier.supply(
+							() -> (String)NestedFieldsSupplier.supply(
 								objectFieldName + ".fileBase64",
 								fieldName -> Base64.encode(
 									_file.getBytes(
 										dlFileEntry.getContentStream()))));
 						fileEntry.setFolder(
-							(Folder)NestedFieldsSupplier.supply(
+							() -> (Folder)NestedFieldsSupplier.supply(
 								objectFieldName + ".folder",
 								fieldName -> {
 									if (!Objects.equals(
@@ -764,19 +776,19 @@ public class ObjectEntryDTOConverter
 											return dlFolder.
 												getExternalReferenceCode();
 										});
-									folder.setSiteId(dlFileEntry.getGroupId());
+									folder.setSiteId(dlFileEntry::getGroupId);
 
 									return folder;
 								}));
 					}
 
-					fileEntry.setId(dlFileEntry.getFileEntryId());
+					fileEntry.setId(dlFileEntry::getFileEntryId);
 					fileEntry.setLink(
-						LinkUtil.toLink(
+						() -> LinkUtil.toLink(
 							_dlAppService, dlFileEntry, _dlURLHelper,
 							objectDefinition.getExternalReferenceCode(),
 							objectEntry.getExternalReferenceCode(), _portal));
-					fileEntry.setName(dlFileEntry.getFileName());
+					fileEntry.setName(dlFileEntry::getFileName);
 				}
 
 				map.put(objectFieldName, fileEntry);
@@ -844,7 +856,8 @@ public class ObjectEntryDTOConverter
 				map.put(objectFieldName, serializable);
 				map.put(
 					objectFieldName + "RawText",
-					ObjectEntryValuesUtil.getValueString(objectField, values));
+					HtmlParserUtil.extractText(
+						GetterUtil.getString(serializable)));
 			}
 			else if (Objects.equals(
 						objectField.getRelationshipType(),

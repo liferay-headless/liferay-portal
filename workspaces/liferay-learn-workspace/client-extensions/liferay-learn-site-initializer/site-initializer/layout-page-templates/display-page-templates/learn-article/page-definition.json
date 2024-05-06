@@ -1,28 +1,98 @@
 {
 	"pageElement": {
+		"id": "9c26c401-0591-47ad-fb60-31b0b2104486",
 		"pageElements": [
 			{
 				"definition": {
-					"customCSS": ".[$FRAGMENT_CLASS$] {\ngap: var(--spacer-4);\n}",
+					"customCSS": ".[$FRAGMENT_CLASS$] {\nposition: relative;\n}",
+					"customCSSViewports": [
+						{
+							"customCSS": ".[$FRAGMENT_CLASS$] {\nposition: relative;\nflex-wrap: wrap;\n}",
+							"id": "landscapeMobile"
+						}
+					],
 					"fragmentStyle": {
+						"paddingBottom": "4",
+						"paddingLeft": "4",
+						"paddingRight": "4",
+						"paddingTop": "4"
 					},
 					"indexed": true,
 					"layout": {
 						"contentDisplay": "FlexRow",
+						"paddingBottom": 2,
+						"paddingLeft": 2,
+						"paddingRight": 2,
+						"paddingTop": 2,
 						"widthType": "Fixed"
 					}
 				},
+				"id": "0e780a34-f7eb-e287-ba77-43217e8796b6",
 				"pageElements": [
 					{
 						"definition": {
-							"fragmentStyle": {
-								"maxWidth": "300px"
+							"customCSS": ".[$FRAGMENT_CLASS$] > div {\n  display: flex;\n  height: 100%;\n}",
+							"customCSSViewports": [
+								{
+									"customCSS": ".[$FRAGMENT_CLASS$] > div {\n  display: flex;\n  height: 100%;\n  width: 100%;\n  .component-html {\n    width: 100%;\n  }\n}",
+									"id": "landscapeMobile"
+								}
+							],
+							"fragment": {
+								"key": "BASIC_COMPONENT-html"
 							},
+							"fragmentConfig": {
+							},
+							"fragmentFields": [
+								{
+									"id": "element-html",
+									"value": {
+										"html": {
+											"mapping": {
+												"fieldKey": "_ddmTemplate_LEARN_ARTICLE_NAV",
+												"itemReference": {
+													"contextSource": "DisplayPageItem"
+												}
+											}
+										}
+									}
+								}
+							],
+							"fragmentStyle": {
+								"marginRight": "3",
+								"maxWidth": "336px"
+							},
+							"fragmentViewports": [
+								{
+									"fragmentViewportStyle": {
+										"marginRight": "0",
+										"maxWidth": "100%",
+										"width": "100%"
+									},
+									"id": "landscapeMobile"
+								}
+							],
+							"indexed": true
+						},
+						"id": "79f87ec5-c193-644a-338d-b517885caedf",
+						"type": "Fragment"
+					},
+					{
+						"definition": {
+							"customCSSViewports": [
+								{
+									"customCSS": ".[$FRAGMENT_CLASS$] {\n  .learn-article {\n    padding: var(--spacer-4) var(--spacer-2, 0.5rem);\n  }\n  .learn-article-page-nav {\n    display: none;\n  }\n}",
+									"id": "landscapeMobile"
+								}
+							],
 							"indexed": true,
 							"layout": {
+								"contentDisplay": "FlexRow",
+								"justify": "Center",
 								"widthType": "Fixed"
 							}
 						},
+						"id": "37e5c0df-e4bb-9e32-ccfa-4145f150f47b",
 						"pageElements": [
 							{
 								"definition": {
@@ -37,7 +107,7 @@
 											"value": {
 												"html": {
 													"mapping": {
-														"fieldKey": "_ddmTemplate_LEARN-ARTICLE-NAV",
+														"fieldKey": "_ddmTemplate_LEARN_ARTICLE",
 														"itemReference": {
 															"contextSource": "DisplayPageItem"
 														}
@@ -48,63 +118,8 @@
 									],
 									"indexed": true
 								},
+								"id": "c61417b1-3fdb-5204-d3be-b20d6d1b376d",
 								"type": "Fragment"
-							}
-						],
-						"type": "Section"
-					},
-					{
-						"definition": {
-							"fragmentStyle": {
-								"width": "100%"
-							},
-							"indexed": true,
-							"layout": {
-								"contentDisplay": "FlexRow",
-								"justifyContent": "Center",
-								"widthType": "Fixed"
-							}
-						},
-						"pageElements": [
-							{
-								"definition": {
-									"fragmentStyle": {
-										"maxWidth": "var(--container-max-lg)",
-										"width": "100%"
-									},
-									"indexed": true,
-									"layout": {
-									}
-								},
-								"pageElements": [
-									{
-										"definition": {
-											"fragment": {
-												"key": "BASIC_COMPONENT-html"
-											},
-											"fragmentConfig": {
-											},
-											"fragmentFields": [
-												{
-													"id": "element-html",
-													"value": {
-														"html": {
-															"mapping": {
-																"fieldKey": "_ddmTemplate_LEARN-ARTICLE",
-																"itemReference": {
-																	"contextSource": "DisplayPageItem"
-																}
-															}
-														}
-													}
-												}
-											],
-											"indexed": true
-										},
-										"type": "Fragment"
-									}
-								],
-								"type": "Section"
 							}
 						],
 						"type": "Section"
@@ -116,9 +131,11 @@
 		"type": "Root"
 	},
 	"settings": {
+		"colorSchemeName": "01",
 		"masterPage": {
 			"key": "liferay-learn"
-		}
+		},
+		"themeName": "Dialect"
 	},
 	"version": 1.0
 }

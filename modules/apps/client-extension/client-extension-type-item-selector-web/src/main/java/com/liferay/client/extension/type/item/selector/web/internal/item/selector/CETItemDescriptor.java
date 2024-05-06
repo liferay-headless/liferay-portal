@@ -7,6 +7,7 @@ package com.liferay.client.extension.type.item.selector.web.internal.item.select
 
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.client.extension.type.CET;
+import com.liferay.client.extension.type.GlobalJSCET;
 import com.liferay.client.extension.type.ThemeFaviconCET;
 import com.liferay.item.selector.ItemSelectorViewDescriptor;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -47,6 +48,20 @@ public class CETItemDescriptor
 			"cetExternalReferenceCode", _cet.getExternalReferenceCode()
 		).put(
 			"name", _cet.getName(LocaleUtil.getMostRelevantLocale())
+		).put(
+			"scriptElementAttributesJSON",
+			() -> {
+				if (!Objects.equals(
+						_cet.getType(),
+						ClientExtensionEntryConstants.TYPE_GLOBAL_JS)) {
+
+					return null;
+				}
+
+				GlobalJSCET globalJSCET = (GlobalJSCET)_cet;
+
+				return globalJSCET.getScriptElementAttributesJSON();
+			}
 		).put(
 			"type", _cet.getType()
 		).put(

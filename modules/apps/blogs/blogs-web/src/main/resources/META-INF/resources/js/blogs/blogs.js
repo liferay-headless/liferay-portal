@@ -177,22 +177,24 @@ export default class Blogs {
 			`#${this._config.namespace}urlOptions input`
 		);
 
-		if (urlOptions.length) {
-			urlOptions.forEach((option) => {
-				this._addEventListener(
-					option,
-					STR_CHANGE,
-					this._onChangeURLOptions.bind(this)
-				);
-			});
-		}
+		if (!Liferay.FeatureFlags['LPD-11147']) {
+			if (urlOptions.length) {
+				urlOptions.forEach((option) => {
+					this._addEventListener(
+						option,
+						STR_CHANGE,
+						this._onChangeURLOptions.bind(this)
+					);
+				});
+			}
 
-		const titleInput = this._getElementById('title');
+			const titleInput = this._getElementById('title');
 
-		if (titleInput) {
-			this._addEventListener(titleInput, STR_CHANGE, (event) => {
-				this.updateFriendlyURL(event.target.value);
-			});
+			if (titleInput) {
+				this._addEventListener(titleInput, STR_CHANGE, (event) => {
+					this.updateFriendlyURL(event.target.value);
+				});
+			}
 		}
 
 		const descriptionInput = this._getElementById('description');
@@ -408,6 +410,9 @@ export default class Blogs {
 						displayDateYear: this._getElementById('displayDateYear')
 							.value,
 						entryId: this._getElementById('entryId').value,
+						friendlyUrlCategories: this._getValuesByName(
+							'friendlyURLAssetCategoryIds'
+						),
 						inputPermissionsViewRole,
 						referringPortletResource: this._getElementById(
 							'referringPortletResource'

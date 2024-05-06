@@ -2230,6 +2230,13 @@ public class ContactsEngineClientImpl
 	}
 
 	@Override
+	public Date getLastSeenDate(FaroProject faroProject) {
+		return get(
+			faroProject, Rels.PROJECTS_LAST_SEEN_DATE,
+			faroProject.getProjectId(), Date.class);
+	}
+
+	@Override
 	public Results<PageVisited> getPagesVisited(
 		FaroProject faroProject, String channelId, String ownerId,
 		String ownerType, String query, String interestName, Date startDate,
@@ -2267,6 +2274,17 @@ public class ContactsEngineClientImpl
 	@Override
 	public PageVisited getPageVisited(FaroProject faroProject, String id) {
 		return get(faroProject, Rels.PAGE_VISITED, id, PageVisited.class);
+	}
+
+	@Override
+	public long getReportsExportCSVCount(
+			FaroProject faroProject, String path,
+			Map<String, List<String>> queryParameters)
+		throws Exception {
+
+		return get(
+			faroProject, Collections.emptyMap(), path, queryParameters,
+			Long.class);
 	}
 
 	@Override

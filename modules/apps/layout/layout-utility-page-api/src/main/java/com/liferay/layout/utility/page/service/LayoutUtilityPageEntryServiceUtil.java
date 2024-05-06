@@ -7,6 +7,7 @@ package com.liferay.layout.utility.page.service;
 
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
@@ -97,6 +98,14 @@ public class LayoutUtilityPageEntryServiceUtil {
 	}
 
 	public static List<LayoutUtilityPageEntry> getLayoutUtilityPageEntries(
+		long groupId, String keyword, String[] types, int start, int end,
+		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
+
+		return getService().getLayoutUtilityPageEntries(
+			groupId, keyword, types, start, end, orderByComparator);
+	}
+
+	public static List<LayoutUtilityPageEntry> getLayoutUtilityPageEntries(
 		long groupId, String[] types, int start, int end,
 		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
 
@@ -106,6 +115,13 @@ public class LayoutUtilityPageEntryServiceUtil {
 
 	public static int getLayoutUtilityPageEntriesCount(long groupId) {
 		return getService().getLayoutUtilityPageEntriesCount(groupId);
+	}
+
+	public static int getLayoutUtilityPageEntriesCount(
+		long groupId, String keyword, String[] types) {
+
+		return getService().getLayoutUtilityPageEntriesCount(
+			groupId, keyword, types);
 	}
 
 	public static int getLayoutUtilityPageEntriesCount(
@@ -156,13 +172,12 @@ public class LayoutUtilityPageEntryServiceUtil {
 	}
 
 	public static LayoutUtilityPageEntryService getService() {
-		return _service;
+		return _serviceSnapshot.get();
 	}
 
-	public static void setService(LayoutUtilityPageEntryService service) {
-		_service = service;
-	}
-
-	private static volatile LayoutUtilityPageEntryService _service;
+	private static final Snapshot<LayoutUtilityPageEntryService>
+		_serviceSnapshot = new Snapshot<>(
+			LayoutUtilityPageEntryServiceUtil.class,
+			LayoutUtilityPageEntryService.class);
 
 }

@@ -24,14 +24,14 @@ public interface FieldPredicateProvider {
 
 	public Predicate getContainsPredicate(
 		Function<String, Column<?, ?>> objectDefinitionColumnSupplier,
-		Object fieldValue);
+		String fieldName, Object fieldValue);
 
 	public Predicate getInPredicate(
 		Function<String, Column<?, ?>> objectDefinitionColumnSupplier,
-		List<Object> rights);
+		Object left, List<Object> rights);
 
 	public Predicate getStartsWithPredicate(
 		Function<String, Column<?, ?>> objectDefinitionColumnSupplier,
-		Object fieldValue);
+		String fieldName, Object fieldValue);
 
 }

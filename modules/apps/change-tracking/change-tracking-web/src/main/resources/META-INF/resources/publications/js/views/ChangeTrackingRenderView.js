@@ -20,11 +20,13 @@ import {
 	fetch,
 	navigate as navigateUtil,
 	openConfirmModal,
+	openToast,
 } from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import ExperienceDropdown from '../components/ExperienceDropdown';
 import {WorkflowStatusLabel} from '../components/WorkflowStatusLabel';
+import ChangeTrackingWorkflowView from './ChangeTrackingWorkflowView';
 
 const LocalizationDropdown = ({
 	currentLocale,
@@ -136,6 +138,7 @@ export default function ChangeTrackingRenderView({
 	handleNavigation,
 	initialDataURL,
 	moveChangesURL,
+	namespace,
 	parentEntries,
 	showDropdown,
 	showHeader = true,
@@ -159,11 +162,16 @@ export default function ChangeTrackingRenderView({
 
 	const [dataURL, setDataURL] = useState(initialDataURL);
 	const [loading, setLoading] = useState(false);
+	const [refresh, setRefresh] = useState({});
 	const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
 	const [
 		selectedSegmentsExperienceId,
 		setSelectedSegmentsExperienceId,
 	] = useState(null);
+	const [
+		showWorkflowSuccessMessage,
+		setShowWorkflowSuccessMessage,
+	] = useState(false);
 	const [state, setState] = useState({
 		contentType: CONTENT_TYPE_PREVIEW,
 		renderData: null,
@@ -191,7 +199,6 @@ export default function ChangeTrackingRenderView({
 
 				const newState = {
 					children: childEntries,
-					contentType: CONTENT_TYPE_PREVIEW,
 					parents: parentEntries,
 					renderData: json,
 					view: VIEW_UNIFIED,
@@ -238,7 +245,8 @@ export default function ChangeTrackingRenderView({
 							json,
 							'unifiedLocalizedRender'
 						)) ||
-						(newState.contentType === CONTENT_TYPE_PREVIEW &&
+						((!newState.contentType ||
+							newState.contentType === CONTENT_TYPE_PREVIEW) &&
 							!Object.prototype.hasOwnProperty.call(
 								json,
 								'unifiedPreview'
@@ -251,7 +259,7 @@ export default function ChangeTrackingRenderView({
 					newState.view = VIEW_SPLIT;
 				}
 
-				setState(newState);
+				setState((prevState) => ({...prevState, ...newState}));
 
 				setLoading(false);
 			})
@@ -265,7 +273,28 @@ export default function ChangeTrackingRenderView({
 					},
 				});
 			});
-	}, [childEntries, dataURL, parentEntries, selectedSegmentsExperienceId]);
+	}, [
+		childEntries,
+		dataURL,
+		parentEntries,
+		refresh,
+		selectedSegmentsExperienceId,
+	]);
+
+	useEffect(() => {
+		if (showWorkflowSuccessMessage) {
+			Liferay.fire('closeModal');
+
+			setRefresh({});
+
+			openToast({
+				message: Liferay.Language.get(
+					'your-request-completed-successfully'
+				),
+				type: 'success',
+			});
+		}
+	}, [showWorkflowSuccessMessage]);
 
 	let currentLocale = selectedLocale;
 	let currentTitle = title;
@@ -657,14 +686,12 @@ export default function ChangeTrackingRenderView({
 			state.contentType === CONTENT_TYPE_WORKFLOW &&
 			Object.prototype.hasOwnProperty.call(
 				state.renderData,
-				'workflowView'
+				'workflowData'
 			)
 		) {
 			return (
-				<div
-					dangerouslySetInnerHTML={{
-						__html: state.renderData.workflowView,
-					}}
+				<ChangeTrackingWorkflowView
+					workflowData={state.renderData.workflowData}
 				/>
 			);
 		}
@@ -743,7 +770,7 @@ export default function ChangeTrackingRenderView({
 			return null;
 		}
 
-		const dropdownItems = [];
+		let dropdownItems = [];
 
 		if (state.renderData.editInPublication) {
 			dropdownItems.push({
@@ -785,6 +812,55 @@ export default function ChangeTrackingRenderView({
 				onClick: () => navigate(moveChangesURL),
 				symbolLeft: 'move-folder',
 			});
+		}
+
+		const workflowActionsDropdownItems = [];
+
+		state.renderData.workflowActions?.forEach((workflowAction) => {
+			workflowActionsDropdownItems.push({
+				label: workflowAction.label,
+				onClick: () =>
+					Liferay.Util.openModal({
+						center: true,
+						customEvents: [
+							{
+								name: `${namespace}workflowTaskUpdated`,
+								onEvent() {
+									const iframe = document.querySelector(
+										'.liferay-modal iframe'
+									);
+
+									iframe.contentWindow.location.reload();
+
+									setShowWorkflowSuccessMessage(true);
+								},
+							},
+						],
+						height: workflowAction.modalHeight,
+						onOpen: () => setShowWorkflowSuccessMessage(false),
+						size: 'lg',
+						title: workflowAction.label,
+						url: workflowAction.href,
+					}),
+				symbolLeft: 'workflow',
+			});
+		});
+
+		if (workflowActionsDropdownItems.length) {
+			dropdownItems = [
+				{
+					items: dropdownItems,
+					label: Liferay.Language.get('publication'),
+					type: 'group',
+				},
+				{type: 'divider'},
+				{
+					items: workflowActionsDropdownItems,
+					label: Liferay.Language.get('workflow'),
+					type: 'group',
+				},
+				{type: 'divider'},
+			];
 		}
 
 		if (discardURL !== null) {
@@ -1025,7 +1101,7 @@ export default function ChangeTrackingRenderView({
 					description={Liferay.Language.get(
 						'there-are-no-changes-to-display-in-this-view'
 					)}
-					imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
+					imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.svg`}
 					title={Liferay.Language.get('no-results-found')}
 				/>
 			);
@@ -1337,14 +1413,20 @@ export default function ChangeTrackingRenderView({
 			);
 		}
 
-		if (workflowStatus && showWorkflow) {
+		if (workflowStatus !== null && showWorkflow) {
 			items.push(
 				<ClayNavigationBar.Item
 					active={state.contentType === CONTENT_TYPE_WORKFLOW}
 					key="workflow"
 				>
 					<ClayLink
-						onClick={() => setContentType(CONTENT_TYPE_WORKFLOW)}
+						onClick={() =>
+							setState((prevState) => ({
+								...prevState,
+								contentType: CONTENT_TYPE_WORKFLOW,
+								view: VIEW_UNIFIED,
+							}))
+						}
 					>
 						{Liferay.Language.get('workflow')}
 					</ClayLink>

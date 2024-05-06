@@ -15,18 +15,18 @@ import java.util.List;
  */
 public class StringUtil {
 
-	public static <T> String merge(Collection<T> col, String delimiter) {
-		if (col == null) {
+	public static <T> String merge(Collection<T> collection, String delimiter) {
+		if (collection == null) {
 			return null;
 		}
 
-		if (col.isEmpty()) {
+		if (collection.isEmpty()) {
 			return "";
 		}
 
-		StringBuilder sb = new StringBuilder(2 * col.size());
+		StringBuilder sb = new StringBuilder(2 * collection.size());
 
-		for (T t : col) {
+		for (T t : collection) {
 			sb.append(String.valueOf(t));
 			sb.append(delimiter);
 		}

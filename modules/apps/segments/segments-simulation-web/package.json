@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"@clayui/alert": "3.111.0",
-		"@clayui/core": "3.113.0",
+		"@clayui/core": "3.114.0",
 		"@clayui/form": "3.113.0",
 		"@clayui/link": "3.111.0",
 		"@liferay/layout-js-components-web": "*",
@@ -17,5 +17,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "env TZ=utc liferay-npm-scripts test"
 	},
-	"version": "3.0.49"
+	"version": "3.0.50"
 }

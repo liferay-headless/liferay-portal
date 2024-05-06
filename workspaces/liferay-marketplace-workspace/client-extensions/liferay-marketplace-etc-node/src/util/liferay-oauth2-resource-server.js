@@ -15,7 +15,7 @@ const clientExtensionOauthJwksRoute =
 	config[
 		'liferay-marketplace-etc-node-oauth-application-user-agent.oauth2.jwks.uri'
 	];
-const domains = config['com.liferay.lxc.dxp.domains'];
+const domains = config['com.liferay.lxc.dxp.domains'].split('\n');
 const externalReferenceCode = config[
 	'liferay.oauth.application.external.reference.codes'
 ]?.split(',')[0];
@@ -28,9 +28,9 @@ const oauth2JWKSURI = `${lxcDXPServerProtocol}://${lxcDXPMainDomain}${
 	clientExtensionOauthJwksRoute
 }`;
 
-const allowList = domains
-	.split(',')
-	.map((domain) => `${lxcDXPServerProtocol}://${domain}`);
+const allowList = domains.map(
+	(domain) => `${lxcDXPServerProtocol}://${domain}`
+);
 
 const corsOptions = {
 	origin(origin, callback) {

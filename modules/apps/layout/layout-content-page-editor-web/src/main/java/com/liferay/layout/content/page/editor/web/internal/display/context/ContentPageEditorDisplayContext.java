@@ -17,6 +17,7 @@ import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
 import com.liferay.info.collection.provider.item.selector.criterion.InfoCollectionProviderItemSelectorCriterion;
+import com.liferay.info.field.item.selector.criterion.InfoFieldItemSelectorCriterion;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.info.search.InfoSearchClassMapperRegistry;
@@ -528,6 +529,8 @@ public class ContentPageEditorDisplayContext {
 				"imagesPath",
 				portal.getPathContext(httpServletRequest) + "/images"
 			).put(
+				"infoFieldItemSelectorURL", _getInfoFieldItemSelectorURL()
+			).put(
 				"infoItemSelectorURL", _getInfoItemSelectorURL()
 			).put(
 				"infoListSelectorURL", _getInfoListSelectorURL()
@@ -617,9 +620,9 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"redirectURL", _getRedirect()
 			).put(
-				"renderFragmentEntryURL",
+				"renderFragmentEntriesURL",
 				_getResourceURL(
-					"/layout_content_page_editor/get_fragment_entry_link")
+					"/layout_content_page_editor/get_fragment_entry_links")
 			).put(
 				"restoreCollectionDisplayConfigURL",
 				getFragmentEntryActionURL(
@@ -1494,6 +1497,20 @@ public class ContentPageEditorDisplayContext {
 		_imageItemSelectorCriterion = itemSelectorCriterion;
 
 		return _imageItemSelectorCriterion;
+	}
+
+	private String _getInfoFieldItemSelectorURL() {
+		InfoFieldItemSelectorCriterion infoFieldItemSelectorCriterion =
+			new InfoFieldItemSelectorCriterion();
+
+		infoFieldItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new UUIDItemSelectorReturnType());
+
+		return String.valueOf(
+			_itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
+				renderResponse.getNamespace() + "selectInfoField",
+				infoFieldItemSelectorCriterion));
 	}
 
 	private String _getInfoItemSelectorURL() {

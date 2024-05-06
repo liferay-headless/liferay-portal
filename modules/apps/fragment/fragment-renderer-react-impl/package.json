@@ -1,9 +1,10 @@
 {
+	"main": "js/index.js",
 	"name": "fragment-renderer-react-impl",
 	"scripts": {
 		"build": "liferay-npm-scripts build",
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "2.0.21"
+	"version": "2.0.22"
 }

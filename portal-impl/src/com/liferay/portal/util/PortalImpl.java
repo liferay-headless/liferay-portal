@@ -116,7 +116,6 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -124,15 +123,17 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ImageLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourceLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.TicketLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
-import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
@@ -920,6 +921,17 @@ public class PortalImpl implements Portal {
 				else if (allowedDomain.equals(domain)) {
 					return url;
 				}
+				else if (allowedDomain.equals("PORTAL_DOMAIN")) {
+					ServiceContext serviceContext =
+						ServiceContextThreadLocal.getServiceContext();
+
+					ThemeDisplay themeDisplay =
+						serviceContext.getThemeDisplay();
+
+					if (domain.equals(themeDisplay.getPortalDomain())) {
+						return url;
+					}
+				}
 			}
 
 			if (_log.isWarnEnabled()) {
@@ -1042,10 +1054,8 @@ public class PortalImpl implements Portal {
 		Layout layout = null;
 
 		if (Validator.isNull(friendlyURL)) {
-			layout = _getLayout(
-				groupId, privateLayout,
-				_getPermissionChecker(
-					(HttpServletRequest)requestContext.get("request")));
+			layout = LayoutServiceUtil.fetchFirstLayout(
+				groupId, privateLayout, true);
 
 			if (layout == null) {
 				throw new NoSuchLayoutException(
@@ -2880,6 +2890,8 @@ public class PortalImpl implements Portal {
 				virtualHostname, themeDisplay.getServerPort(),
 				themeDisplay.isSecure());
 
+			portalURL += _pathContext;
+
 			// Use the layout set's virtual host setting only if the layout set
 			// is already used for the current request
 
@@ -2892,7 +2904,7 @@ public class PortalImpl implements Portal {
 			if ((layoutSet.getLayoutSetId() != curLayoutSetId) ||
 				portalURL.startsWith(themeDisplay.getURLPortal())) {
 
-				String layoutSetFriendlyURL = portalURL + _pathContext;
+				String layoutSetFriendlyURL = portalURL;
 
 				if (themeDisplay.isI18n()) {
 					layoutSetFriendlyURL +=
@@ -4448,7 +4460,11 @@ public class PortalImpl implements Portal {
 				PropsKeys.
 					SITES_CONTENT_SHARING_THROUGH_ADMINISTRATORS_ENABLED)) {
 
-			groups.addAll(GroupLocalServiceUtil.getUserSitesGroups(userId));
+			User user = UserLocalServiceUtil.fetchUser(userId);
+
+			if (user != null) {
+				groups.addAll(GroupLocalServiceUtil.getUserSitesGroups(userId));
+			}
 		}
 
 		// Ancestor sites and global site
@@ -5130,21 +5146,13 @@ public class PortalImpl implements Portal {
 
 	@Override
 	public String getUserEmailAddress(long userId) {
-		try {
-			User user = UserLocalServiceUtil.getUserById(userId);
+		User user = UserLocalServiceUtil.fetchUser(userId);
 
-			return user.getEmailAddress();
-		}
-		catch (PortalException portalException) {
-
-			// LPS-52675
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-
+		if (user == null) {
 			return StringPool.BLANK;
 		}
+
+		return user.getEmailAddress();
 	}
 
 	@Override
@@ -7457,41 +7465,6 @@ public class PortalImpl implements Portal {
 		return _LOCALHOST;
 	}
 
-	private Layout _getFirstPublishedLayout(
-		long groupId, boolean privateLayout,
-		PermissionChecker permissionChecker) {
-
-		boolean hasNext = true;
-
-		int start = 1;
-		int end = 0;
-		int interval = 20;
-
-		while (hasNext) {
-			end = start + interval;
-
-			List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-				groupId, privateLayout,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, true, start, end);
-
-			for (Layout layout : layouts) {
-				if (layout.isPublished() &&
-					_hasViewPermission(layout, permissionChecker)) {
-
-					return layout;
-				}
-			}
-
-			start = start + interval;
-
-			if (layouts.size() < interval) {
-				hasNext = false;
-			}
-		}
-
-		return null;
-	}
-
 	private String _getGroupFriendlyURL(
 			Group group, LayoutSet layoutSet, ThemeDisplay themeDisplay,
 			boolean canonicalURL, boolean controlPanel)
@@ -7671,73 +7644,6 @@ public class PortalImpl implements Portal {
 		}
 
 		return sb.toString();
-	}
-
-	private Layout _getLayout(
-		long groupId, boolean privateLayout,
-		PermissionChecker permissionChecker) {
-
-		// We need to ensure that virtual layouts are merged
-
-		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			true, 0, 1);
-
-		if (layouts.isEmpty()) {
-			return null;
-		}
-
-		Layout layout = layouts.get(0);
-
-		boolean viewPermission = _hasViewPermission(layout, permissionChecker);
-
-		if (layout.isPublished() && viewPermission) {
-			return layout;
-		}
-
-		Layout firstPublishedLayout = _getFirstPublishedLayout(
-			groupId, privateLayout, permissionChecker);
-
-		if (firstPublishedLayout != null) {
-			return firstPublishedLayout;
-		}
-
-		if (viewPermission) {
-			return layout;
-		}
-
-		return null;
-	}
-
-	private PermissionChecker _getPermissionChecker(
-			HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (permissionChecker != null) {
-			return permissionChecker;
-		}
-
-		User user = null;
-
-		try {
-			user = getUser(httpServletRequest);
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
-		}
-
-		if (user == null) {
-			Company company = getCompany(httpServletRequest);
-
-			user = company.getGuestUser();
-		}
-
-		return PermissionCheckerFactoryUtil.create(user);
 	}
 
 	private String _getPortalURL(
@@ -8092,25 +7998,6 @@ public class PortalImpl implements Portal {
 		}
 
 		return virtualHostnames.firstKey();
-	}
-
-	private boolean _hasViewPermission(
-		Layout layout, PermissionChecker permissionChecker) {
-
-		try {
-			if (LayoutPermissionUtil.contains(
-					permissionChecker, layout, ActionKeys.VIEW)) {
-
-				return true;
-			}
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		return false;
 	}
 
 	private boolean _layoutContainsPortletId(Layout layout, String portletId) {

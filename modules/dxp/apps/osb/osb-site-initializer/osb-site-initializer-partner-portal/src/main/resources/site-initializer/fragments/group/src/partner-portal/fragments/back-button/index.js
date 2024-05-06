@@ -10,12 +10,19 @@ if (backButton) {
 	const siteURL = Liferay.ThemeDisplay.getPortalURL().split('/l/')[0];
 
 	backButton.onclick = () => {
-		const urlParams = new URLSearchParams(window.location.href);
+		const urlParams = new URLSearchParams(window.location.search);
 
 		if (urlParams.has('p_l_back_url')) {
-			const backURL = urlParams.get('p_l_back_url');
+			const backURLs = urlParams.getAll('p_l_back_url');
+			const backURL = backURLs.pop();
 
-			location.assign(`${siteURL}${decodeURIComponent(backURL)}`);
+			urlParams.delete('p_l_back_url', backURL);
+
+			location.assign(
+				`${siteURL}${decodeURIComponent(
+					`${backURL}?${urlParams.toString()}`
+				)}`
+			);
 		}
 		else {
 			location.assign(decodeURIComponent(configuration.backURL));

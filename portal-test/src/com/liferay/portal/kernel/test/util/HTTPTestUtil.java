@@ -14,8 +14,11 @@ import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.nio.charset.StandardCharsets;
+
+import java.util.Map;
 
 /**
  * @author Luis Miguel Barcos
@@ -31,7 +34,8 @@ public class HTTPTestUtil {
 			String body, String endpoint, Http.Method httpMethod)
 		throws Exception {
 
-		Http.Options options = _getHttpOptions(body, endpoint, httpMethod);
+		Http.Options options = _getHttpOptions(
+			body, endpoint, null, httpMethod);
 
 		HttpUtil.URLtoString(options);
 
@@ -44,15 +48,32 @@ public class HTTPTestUtil {
 			String body, String endpoint, Http.Method httpMethod)
 		throws Exception {
 
+		return invokeToJSONObject(body, endpoint, null, httpMethod);
+	}
+
+	public static JSONObject invokeToJSONObject(
+			String body, String endpoint, Map<String, String> headers,
+			Http.Method httpMethod)
+		throws Exception {
+
 		return JSONFactoryUtil.createJSONObject(
-			invokeToString(body, endpoint, httpMethod));
+			invokeToString(body, endpoint, headers, httpMethod));
 	}
 
 	public static String invokeToString(
 			String body, String endpoint, Http.Method httpMethod)
 		throws Exception {
 
-		Http.Options options = _getHttpOptions(body, endpoint, httpMethod);
+		return invokeToString(body, endpoint, null, httpMethod);
+	}
+
+	public static String invokeToString(
+			String body, String endpoint, Map<String, String> headers,
+			Http.Method httpMethod)
+		throws Exception {
+
+		Http.Options options = _getHttpOptions(
+			body, endpoint, headers, httpMethod);
 
 		return HttpUtil.URLtoString(options);
 	}
@@ -100,7 +121,8 @@ public class HTTPTestUtil {
 	}
 
 	private static Http.Options _getHttpOptions(
-		String body, String endpoint, Http.Method httpMethod) {
+		String body, String endpoint, Map<String, String> headers,
+		Http.Method httpMethod) {
 
 		Http.Options options = new Http.Options();
 
@@ -108,6 +130,11 @@ public class HTTPTestUtil {
 			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
 		options.addHeader(
 			"Authorization", "Basic " + Base64.encode(_credentials.getBytes()));
+
+		if (MapUtil.isNotEmpty(headers)) {
+			headers.forEach(options::addHeader);
+		}
+
 		options.setLocation(_baseURL + "/o/" + endpoint);
 		options.setMethod(httpMethod);
 

@@ -5,6 +5,7 @@
 
 package com.liferay.commerce.pricing.web.internal.portlet.action;
 
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.price.list.exception.CommerceTierPriceEntryMinQuantityException;
 import com.liferay.commerce.price.list.exception.DuplicateCommerceTierPriceEntryException;
 import com.liferay.commerce.price.list.exception.NoSuchTierPriceEntryException;
@@ -13,6 +14,7 @@ import com.liferay.commerce.price.list.model.CommerceTierPriceEntry;
 import com.liferay.commerce.price.list.service.CommercePriceEntryService;
 import com.liferay.commerce.price.list.service.CommerceTierPriceEntryService;
 import com.liferay.commerce.product.constants.CPPortletKeys;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -139,20 +141,20 @@ public class EditCPInstanceCommerceTierPriceEntryMVCActionCommand
 			_commercePriceEntryService.getCommercePriceEntry(
 				commercePriceEntryId);
 
-		BigDecimal price = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "price", BigDecimal.ZERO);
-		BigDecimal minQuantity = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "minQuantity", BigDecimal.ZERO);
+		BigDecimal price = _commercePriceFormatter.parse(
+			actionRequest, "price");
+		BigDecimal minQuantity = _commerceOrderItemQuantityFormatter.parse(
+			actionRequest, "minQuantity");
 		boolean overrideDiscount = ParamUtil.getBoolean(
 			actionRequest, "overrideDiscount");
-		BigDecimal discountLevel1 = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "discountLevel1", BigDecimal.ZERO);
-		BigDecimal discountLevel2 = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "discountLevel2", BigDecimal.ZERO);
-		BigDecimal discountLevel3 = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "discountLevel3", BigDecimal.ZERO);
-		BigDecimal discountLevel4 = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "discountLevel4", BigDecimal.ZERO);
+		BigDecimal discountLevel1 = _commercePriceFormatter.parse(
+			actionRequest, "discountLevel1");
+		BigDecimal discountLevel2 = _commercePriceFormatter.parse(
+			actionRequest, "discountLevel2");
+		BigDecimal discountLevel3 = _commercePriceFormatter.parse(
+			actionRequest, "discountLevel3");
+		BigDecimal discountLevel4 = _commercePriceFormatter.parse(
+			actionRequest, "discountLevel4");
 
 		Date date = new Date();
 
@@ -230,7 +232,14 @@ public class EditCPInstanceCommerceTierPriceEntryMVCActionCommand
 	}
 
 	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
+
+	@Reference
 	private CommercePriceEntryService _commercePriceEntryService;
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CommerceTierPriceEntryService _commerceTierPriceEntryService;

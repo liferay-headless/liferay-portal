@@ -96,7 +96,10 @@ public class FriendlyURLEntryLocalServiceImpl
 
 		validate(groupId, classNameId, classPK, urlTitleMap);
 
-		_validateAssetCategories(urlTitleMap, serviceContext);
+		Group group = _groupLocalService.getGroup(groupId);
+
+		_validateAssetCategories(
+			group.getCompanyId(), urlTitleMap, serviceContext);
 
 		FriendlyURLEntryMapping friendlyURLEntryMapping =
 			_friendlyURLEntryMappingPersistence.fetchByC_C(
@@ -123,6 +126,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		if ((friendlyURLEntry != null) &&
 			_containsAllURLTitles(existingUrlTitleMap, urlTitleMap)) {
 
+			_updateAssetEntry(friendlyURLEntry, serviceContext);
+
 			return friendlyURLEntry;
 		}
 
@@ -132,13 +137,9 @@ public class FriendlyURLEntryLocalServiceImpl
 			friendlyURLEntryId);
 
 		friendlyURLEntry.setUuid(serviceContext.getUuid());
-
-		Group group = _groupLocalService.getGroup(groupId);
-
-		friendlyURLEntry.setCompanyId(group.getCompanyId());
-
 		friendlyURLEntry.setDefaultLanguageId(defaultLanguageId);
 		friendlyURLEntry.setGroupId(groupId);
+		friendlyURLEntry.setCompanyId(group.getCompanyId());
 		friendlyURLEntry.setClassNameId(classNameId);
 		friendlyURLEntry.setClassPK(classPK);
 
@@ -214,6 +215,7 @@ public class FriendlyURLEntryLocalServiceImpl
 		// Asset
 
 		_deleteAssetEntry(
+			deletedFriendlyURLEntry.getCompanyId(),
 			FriendlyURLEntry.class.getName(),
 			deletedFriendlyURLEntry.getFriendlyURLEntryId());
 
@@ -258,6 +260,7 @@ public class FriendlyURLEntryLocalServiceImpl
 			// Asset
 
 			_deleteAssetEntry(
+				friendlyURLEntry.getCompanyId(),
 				FriendlyURLEntry.class.getName(),
 				friendlyURLEntry.getFriendlyURLEntryId());
 		}
@@ -270,9 +273,10 @@ public class FriendlyURLEntryLocalServiceImpl
 			long friendlyURLEntryId, String languageId)
 		throws PortalException {
 
-		friendlyURLEntryLocalizationPersistence.
-			removeByFriendlyURLEntryId_LanguageId(
-				friendlyURLEntryId, languageId);
+		FriendlyURLEntryLocalization friendlyURLEntryLocalization =
+			friendlyURLEntryLocalizationPersistence.
+				removeByFriendlyURLEntryId_LanguageId(
+					friendlyURLEntryId, languageId);
 
 		int count =
 			friendlyURLEntryLocalizationPersistence.countByFriendlyURLEntryId(
@@ -293,7 +297,9 @@ public class FriendlyURLEntryLocalServiceImpl
 
 		// Asset
 
-		_deleteAssetEntry(FriendlyURLEntry.class.getName(), friendlyURLEntryId);
+		_deleteAssetEntry(
+			friendlyURLEntryLocalization.getCompanyId(),
+			FriendlyURLEntry.class.getName(), friendlyURLEntryId);
 	}
 
 	@Override
@@ -331,6 +337,7 @@ public class FriendlyURLEntryLocalServiceImpl
 				// Asset
 
 				_deleteAssetEntry(
+					friendlyURLEntry.getCompanyId(),
 					FriendlyURLEntry.class.getName(),
 					friendlyURLEntry.getFriendlyURLEntryId());
 			});
@@ -554,7 +561,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		validate(
 			friendlyURLEntry.getGroupId(), classNameId, classPK, urlTitleMap);
 
-		_validateAssetCategories(urlTitleMap, serviceContext);
+		_validateAssetCategories(
+			friendlyURLEntry.getCompanyId(), urlTitleMap, serviceContext);
 
 		friendlyURLEntry.setDefaultLanguageId(defaultLanguageId);
 		friendlyURLEntry.setClassNameId(classNameId);
@@ -676,8 +684,10 @@ public class FriendlyURLEntryLocalServiceImpl
 		return true;
 	}
 
-	private void _deleteAssetEntry(String className, long classPK) {
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-11147")) {
+	private void _deleteAssetEntry(
+		long companyId, String className, long classPK) {
+
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-11147")) {
 			return;
 		}
 
@@ -797,7 +807,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		throws PortalException {
 
 		if ((serviceContext == null) ||
-			!FeatureFlagManagerUtil.isEnabled("LPD-11147")) {
+			!FeatureFlagManagerUtil.isEnabled(
+				friendlyURLEntry.getCompanyId(), "LPD-11147")) {
 
 			return;
 		}
@@ -879,10 +890,11 @@ public class FriendlyURLEntryLocalServiceImpl
 	}
 
 	private void _validateAssetCategories(
-			Map<String, String> urlTitleMap, ServiceContext serviceContext)
+			long companyId, Map<String, String> urlTitleMap,
+			ServiceContext serviceContext)
 		throws PortalException {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-11147")) {
+		if (!FeatureFlagManagerUtil.isEnabled(companyId, "LPD-11147")) {
 			return;
 		}
 

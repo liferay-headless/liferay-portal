@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.log4j.Log4JUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtil;
@@ -138,13 +137,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		try {
 			HotDeployUtil.reset();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
-		try {
-			PortalLifecycleUtil.reset();
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -444,8 +436,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			springInitTask.get();
 		}
 
-		InitUtil.registerSpringInitialized();
-
 		ServletContextPool.put(_portalServletContextName, servletContext);
 
 		ApplicationContext applicationContext =
@@ -472,12 +462,25 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		dynamicProxyCreator.clear();
 
-		if (DBUpgrader.isUpgradeDatabaseAutoRunEnabled()) {
+		boolean upgradeDatabaseAutoRun =
+			DBUpgrader.isUpgradeDatabaseAutoRunEnabled();
+
+		if (upgradeDatabaseAutoRun) {
 			StartupHelperUtil.setUpgrading(true);
 
-			DBUpgrader.upgradePortal();
+			try {
+				DBUpgrader.upgradePortal();
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
 		}
-		else {
+
+		ModuleFrameworkUtil.registerContext(applicationContext);
+
+		CustomJspBagRegistryUtil.getCustomJspBags();
+
+		if (!upgradeDatabaseAutoRun) {
 
 			// Check class names
 
@@ -485,13 +488,14 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 				_log.debug("Check class names");
 			}
 
-			DBPartitionUtil.forEachCompanyId(
-				companyId -> ClassNameLocalServiceUtil.checkClassNames());
+			try {
+				DBPartitionUtil.forEachCompanyId(
+					companyId -> ClassNameLocalServiceUtil.checkClassNames());
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
 		}
-
-		ModuleFrameworkUtil.registerContext(applicationContext);
-
-		CustomJspBagRegistryUtil.getCustomJspBags();
 	}
 
 	private void _logJVMArguments() {

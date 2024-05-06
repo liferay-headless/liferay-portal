@@ -12,7 +12,7 @@ import com.liferay.jethr0.event.github.pullrequest.GitHubPullRequest;
 import com.liferay.jethr0.event.github.repository.GitHubRepository;
 import com.liferay.jethr0.event.github.user.GitHubUser;
 import com.liferay.jethr0.git.branch.GitBranchEntity;
-import com.liferay.jethr0.git.branch.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitBranchEntityRepository;
 import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.job.PortalPullRequestJobEntity;
 import com.liferay.jethr0.job.PullRequestJobEntity;
@@ -140,7 +140,7 @@ public abstract class BaseGitHubIssueEventHandler
 
 		String body = StringUtil.combine(
 			"Closing pull request because pulls for reference ",
-			upstreamGitBranchEntity.getBranchName(),
+			upstreamGitBranchEntity.getName(),
 			" should not be sent to repository ",
 			upstreamGitBranchEntity.getRepositoryName(), ".");
 
@@ -186,12 +186,13 @@ public abstract class BaseGitHubIssueEventHandler
 		GitHubIssue gitHubIssue = getGitHubIssue();
 
 		JobEntity jobEntity = jobEntityRepository.create(
+			null,
 			StringUtil.combine(
-				"[", upstreamGitBranchEntity.getBranchName(), "] - ci:test:",
+				"[", upstreamGitBranchEntity.getName(), "] - ci:test:",
 				testSuite, " ", gitHubIssue.getRepositoryName(), "/",
 				gitHubIssue.getReceiverUserName(), "#",
 				gitHubIssue.getNumber()),
-			jobPriority, null, JobEntity.State.OPENED, jobEntityType);
+			null, jobPriority, null, JobEntity.State.OPENED, jobEntityType);
 
 		if (!(jobEntity instanceof PullRequestJobEntity)) {
 			return null;
@@ -231,9 +232,9 @@ public abstract class BaseGitHubIssueEventHandler
 
 		if (upstreamGitBranchEntity != null) {
 			pullRequestJobEntity.setUpstreamBranchName(
-				upstreamGitBranchEntity.getBranchName());
+				upstreamGitBranchEntity.getName());
 			pullRequestJobEntity.setUpstreamBranchSHA(
-				upstreamGitBranchEntity.getBranchSHA());
+				upstreamGitBranchEntity.getLatestSHA());
 		}
 
 		jobEntityRepository.update(pullRequestJobEntity);
@@ -425,7 +426,7 @@ public abstract class BaseGitHubIssueEventHandler
 
 			if (Objects.equals(
 					gitHubCIEnabledBranchName,
-					upstreamGitBranchEntity.getBranchName())) {
+					upstreamGitBranchEntity.getName())) {
 
 				return true;
 			}

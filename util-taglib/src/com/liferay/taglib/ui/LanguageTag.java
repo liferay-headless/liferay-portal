@@ -6,6 +6,7 @@
 package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.servlet.taglib.ui.LanguageEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -148,15 +149,19 @@ public class LanguageTag extends IncludeTag {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		formAction =
-			themeDisplay.getPathMain() + "/portal/update_language?p_l_id=" +
-				themeDisplay.getPlid();
+		formAction = themeDisplay.getPathMain() + "/portal/update_language";
 
 		formAction = HttpComponentsUtil.setParameter(
 			formAction, "redirect",
 			PortalUtil.getCurrentURL(httpServletRequest));
 
-		return formAction;
+		formAction = HttpComponentsUtil.setParameter(
+			formAction, "groupId", themeDisplay.getScopeGroupId());
+
+		Layout layout = themeDisplay.getLayout();
+
+		return HttpComponentsUtil.setParameter(
+			formAction, "layoutId", layout.getLayoutId());
 	}
 
 	protected List<LanguageEntry> getLanguageEntries(

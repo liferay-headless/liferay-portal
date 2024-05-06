@@ -24,6 +24,7 @@ export type Operators =
 
 export interface SearchBuilderConstructor {
 	useURIEncode?: boolean;
+	[key: string]: any;
 }
 
 /**
@@ -60,21 +61,6 @@ export default class SearchBuilder {
 	static in(key: Key, values: Value[]) {
 		if (values) {
 			const operator = `${key} in ({values})`;
-
-			return operator
-				.replace(
-					'{values}',
-					values.map((value) => `'${value}'`).join(',')
-				)
-				.trim();
-		}
-
-		return '';
-	}
-
-	static equal(key: Key, values: Value[]) {
-		if (values) {
-			const operator = `${key} = ({values})`;
 
 			return operator
 				.replace(
@@ -140,6 +126,57 @@ export default class SearchBuilder {
 		return _filter;
 	}
 
+	static formatValuesToString(values: Value[]) {
+		if (values) {
+			return values
+				.map((value) => `${value}`)
+				.join(',')
+				.trim();
+		}
+
+		return '';
+	}
+
+	static createCustomFilter(schema: RendererFields, filter: any) {
+		const customOperator = schema?.operator;
+		const requestOperator = schema?.requestOperator as string;
+		const optionalOperator = schema?.optionalOperator as Operators;
+
+		if (customOperator && SearchBuilder[customOperator]) {
+			if (Array.isArray(filter)) {
+				const filters = filter
+					.map((item) =>
+						typeof item === 'object' ? item.value : item
+					)
+					.join(',');
+
+				if (filters.includes('DIDNOTRUN')) {
+					return SearchBuilder[optionalOperator](
+						requestOperator,
+						filters
+					);
+				}
+
+				return SearchBuilder[customOperator](requestOperator, filters);
+			}
+			else if (typeof filter === 'object' && 'value' in filter) {
+				return SearchBuilder[customOperator](
+					requestOperator,
+					filter.value
+				);
+			}
+			else {
+				return SearchBuilder[customOperator](requestOperator, filter);
+			}
+		}
+
+		return this.formatValuesToString(
+			filter.map((_value: any) =>
+				typeof _value === 'object' ? _value.value : _value
+			)
+		);
+	}
+
 	static createFilter({
 		appliedFilter,
 		defaultFilter,
@@ -198,29 +235,12 @@ export default class SearchBuilder {
 			}
 			else {
 				if (Array.isArray(value)) {
-					if (
-						schema?.name?.includes('testrayCasePriorities') ||
-						schema?.name?.includes('testrayTeamId')
-					) {
-						searchCondition = SearchBuilder.equal(
-							key,
-							value.map((_value) =>
-								typeof _value === 'object'
-									? _value.value
-									: _value
-							)
-						);
-					}
-					else {
-						searchCondition = SearchBuilder.in(
-							key,
-							value.map((_value) =>
-								typeof _value === 'object'
-									? _value.value
-									: _value
-							)
-						);
-					}
+					searchCondition = SearchBuilder.in(
+						key,
+						value.map((_value) =>
+							typeof _value === 'object' ? _value.value : _value
+						)
+					);
 				}
 				else {
 					searchCondition = SearchBuilder.eq(key, value);

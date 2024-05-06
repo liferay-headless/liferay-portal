@@ -5,10 +5,9 @@
 
 import {Root, createRoot} from 'react-dom/client';
 
-import AppRoutes, {RouteType} from './Routes';
+import Routes, {RouteType} from './Routes';
 
-import './index.scss';
-import Providers from './providers';
+import './main.scss';
 
 class WebComponent extends HTMLElement {
 	private root: Root | undefined;
@@ -18,17 +17,21 @@ class WebComponent extends HTMLElement {
 			this.root = createRoot(this);
 
 			this.root.render(
-				<Providers
+				<Routes
+					path={this.getAttribute('path') as RouteType}
 					properties={{
 						cloudBaseURL: this.getAttribute('cloudBaseURL') || '',
 						contactSupportUrl:
 							this.getAttribute('contactSupportUrl') || '',
 						eulaBaseURL: this.getAttribute('eulaBaseURL') || '',
+						featureFlags: (this.getAttribute('featureFlags') ?? '')
+							.split(',')
+							.map((featureflag) => featureflag.trim()),
 						marketoFormId: this.getAttribute('marketoFormId') || '',
+						trialProductId:
+							this.getAttribute('trialProductId') || '',
 					}}
-				>
-					<AppRoutes path={this.getAttribute('path') as RouteType} />
-				</Providers>
+				/>
 			);
 		}
 	}

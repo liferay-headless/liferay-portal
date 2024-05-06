@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -540,8 +541,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 			return;
 		}
 
-		_lastImportTime = System.currentTimeMillis();
-
 		LDAPImportConfiguration ldapImportConfiguration =
 			_ldapImportConfigurationProvider.getConfiguration(companyId);
 
@@ -557,6 +556,8 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 						" is no longer valid, company ", companyId,
 						" now uses ", ldapServerConfiguration.ldapServerId()));
 			}
+
+			_lastImportTime = System.currentTimeMillis();
 
 			return;
 		}
@@ -598,6 +599,8 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 			_log.error("Unable to import LDAP users and groups", exception);
 		}
 		finally {
+			_lastImportTime = System.currentTimeMillis();
+
 			safeLdapContext.close();
 		}
 	}
@@ -1710,6 +1713,12 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 			}
 		}
 
+		LDAPImportConfiguration ldapImportConfiguration =
+			_ldapImportConfigurationProvider.getConfiguration(companyId);
+		LDAPServerConfiguration ldapServerConfiguration =
+			_ldapServerConfigurationProvider.getConfiguration(
+				companyId, ldapServerId);
+
 		Date modifiedDate = null;
 
 		try {
@@ -1729,17 +1738,28 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 			modifiedDate = new Date();
 		}
 
-		LDAPImportConfiguration ldapImportConfiguration =
-			_ldapImportConfigurationProvider.getConfiguration(companyId);
-
 		boolean passwordReset = ldapUser.isPasswordReset();
 
 		if (_ldapSettings.isExportEnabled(companyId)) {
 			passwordReset = user.isPasswordReset();
 		}
 
+		ServiceContext serviceContext = ldapUser.getServiceContext();
+		boolean updatedCustomMappings = false;
+
+		if (Validator.isNotNull(ldapServerConfiguration.modifiedDate())) {
+			Date serverConfigurationModifiedDate = DateUtil.parseDate(
+				"EEE MMM d HH:mm:ss zzz yyyy",
+				ldapServerConfiguration.modifiedDate(),
+				serviceContext.getLocale());
+
+			updatedCustomMappings = serverConfigurationModifiedDate.after(
+				new Date(_lastImportTime));
+		}
+
 		if ((modifiedDate != null) &&
-			modifiedDate.equals(user.getModifiedDate())) {
+			modifiedDate.equals(user.getModifiedDate()) &&
+			!updatedCustomMappings) {
 
 			if ((ldapUser.isUpdatePassword() ||
 				 !ldapImportConfiguration.importUserPasswordEnabled()) &&
@@ -1770,10 +1790,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 
 			return user;
 		}
-
-		LDAPServerConfiguration ldapServerConfiguration =
-			_ldapServerConfigurationProvider.getConfiguration(
-				companyId, ldapServerId);
 
 		if (ldapServerConfiguration.ldapServerId() != ldapServerId) {
 			if (_log.isDebugEnabled()) {
@@ -1838,8 +1854,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter {
 		int birthdayMonth = birthdayCal.get(Calendar.MONTH);
 		int birthdayDay = birthdayCal.get(Calendar.DAY_OF_MONTH);
 		int birthdayYear = birthdayCal.get(Calendar.YEAR);
-
-		ServiceContext serviceContext = ldapUser.getServiceContext();
 
 		if (modifiedDate != null) {
 			serviceContext.setModifiedDate(modifiedDate);

@@ -5,6 +5,7 @@
 
 package com.liferay.commerce.pricing.web.internal.portlet.action;
 
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListException;
 import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.commerce.pricing.exception.NoSuchPriceModifierException;
@@ -117,8 +118,8 @@ public class EditCommercePriceModifierMVCActionCommand
 			actionRequest, "commercePriceListId");
 		String modifierType = ParamUtil.getString(
 			actionRequest, "modifierType");
-		BigDecimal modifierAmount = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "modifierAmount", BigDecimal.ZERO);
+		BigDecimal modifierAmount = _commercePriceFormatter.parse(
+			actionRequest, "modifierAmount");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
@@ -188,6 +189,9 @@ public class EditCommercePriceModifierMVCActionCommand
 			expirationDateDay, expirationDateYear, expirationDateHour,
 			expirationDateMinute, neverExpire, serviceContext);
 	}
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CommercePriceModifierService _commercePriceModifierService;

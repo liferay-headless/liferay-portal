@@ -15,7 +15,8 @@ import com.liferay.jethr0.event.github.client.GitHubClient;
 import com.liferay.jethr0.event.jenkins.JenkinsEventProcessor;
 import com.liferay.jethr0.event.jenkins.client.JenkinsClient;
 import com.liferay.jethr0.event.jrp.JRPEventProcessor;
-import com.liferay.jethr0.git.branch.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitCommitEntityRepository;
 import com.liferay.jethr0.jenkins.JenkinsQueue;
 import com.liferay.jethr0.jenkins.repository.JenkinsCohortEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsNodeEntityRepository;
@@ -23,6 +24,8 @@ import com.liferay.jethr0.jenkins.repository.JenkinsServerEntityRepository;
 import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.job.queue.JobQueue;
 import com.liferay.jethr0.job.repository.JobEntityRepository;
+import com.liferay.jethr0.routine.repository.RoutineEntityRepository;
+import com.liferay.jethr0.routine.scheduler.RoutineEntityScheduler;
 import com.liferay.jethr0.util.StringUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
@@ -42,20 +45,24 @@ public abstract class BaseEventHandler implements EventHandler {
 		_messageJSONObject = messageJSONObject;
 	}
 
+	protected BuildEntityRepository getBuildEntityRepository() {
+		return _eventHandlerContext.getBuildEntityRepository();
+	}
+
 	protected BuildQueue getBuildQueue() {
 		return _eventHandlerContext.getBuildQueue();
 	}
 
-	protected BuildEntityRepository getBuildRepository() {
-		return _eventHandlerContext.getBuildRepository();
-	}
-
-	protected BuildRunEntityRepository getBuildRunRepository() {
-		return _eventHandlerContext.getBuildRunRepository();
+	protected BuildRunEntityRepository getBuildRunEntityRepository() {
+		return _eventHandlerContext.getBuildRunEntityRepository();
 	}
 
 	protected GitBranchEntityRepository getGitBranchEntityRepository() {
 		return _eventHandlerContext.getGitBranchEntityRepository();
+	}
+
+	protected GitCommitEntityRepository getGitCommitEntityRepository() {
+		return _eventHandlerContext.getGitCommitEntityRepository();
 	}
 
 	protected GitHubClient getGitHubClient() {
@@ -108,6 +115,14 @@ public abstract class BaseEventHandler implements EventHandler {
 
 	protected JSONObject getMessageJSONObject() {
 		return _messageJSONObject;
+	}
+
+	protected RoutineEntityRepository getRoutineEntityRepository() {
+		return _eventHandlerContext.getRoutineEntityRepository();
+	}
+
+	protected RoutineEntityScheduler getRoutineEntityScheduler() {
+		return _eventHandlerContext.getRoutineEntityScheduler();
 	}
 
 	protected void updateJRPStatus(

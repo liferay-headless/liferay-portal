@@ -5,7 +5,6 @@
 
 import Rest from '../../core/Rest';
 import yupSchema from '../../schema/yup';
-import {testrayCaseResultImpl} from './TestrayCaseResult';
 import {TestrayRun} from './types';
 
 type RunForm = Omit<typeof yupSchema.run.__outputType, 'id'>;
@@ -28,7 +27,9 @@ class TestrayRunImpl extends Rest<RunForm, TestrayRun> {
 			}),
 			nestedFields: 'build.routine,build.projectToBuilds',
 			transformData: (run) => {
-				const environmentValues = run.name.split('|');
+				const environmentValues = run.testrayRunName
+					? run.testrayRunName.split('|')
+					: run.name.split('|');
 
 				const [
 					applicationServer,
@@ -40,9 +41,6 @@ class TestrayRunImpl extends Rest<RunForm, TestrayRun> {
 
 				return {
 					...run,
-					...testrayCaseResultImpl.normalizeCaseResultAggregation(
-						run
-					),
 					applicationServer,
 					browser,
 					build: run?.r_buildToRuns_c_build

@@ -16,6 +16,7 @@ import Details from './fds_view/Details';
 import Pagination from './fds_view/Pagination';
 import Settings from './fds_view/Settings';
 import Sorting from './fds_view/Sorting';
+import SortingDeprecated from './fds_view/SortingDeprecated';
 import Filters from './fds_view/filters/Filters';
 import VisualizationModes from './fds_view/visualization_modes/VisualizationModes';
 import {API_URL, OBJECT_RELATIONSHIP} from './utils/constants';
@@ -34,10 +35,15 @@ const NAVIGATION_BAR_ITEMS = [
 		Component: Filters,
 		label: Liferay.Language.get('filters'),
 	},
-	{
-		Component: Sorting,
-		label: Liferay.Language.get('sorting'),
-	},
+	Liferay.FeatureFlags['LPD-19465']
+		? {
+				Component: Sorting,
+				label: Liferay.Language.get('sorting'),
+		  }
+		: {
+				Component: SortingDeprecated,
+				label: Liferay.Language.get('sorting'),
+		  },
 	{
 		Component: Actions,
 		label: Liferay.Language.get('actions'),

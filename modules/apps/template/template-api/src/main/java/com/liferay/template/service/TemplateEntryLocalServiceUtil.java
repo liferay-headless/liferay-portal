@@ -9,6 +9,7 @@ import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.template.model.TemplateEntry;
 
@@ -36,14 +37,15 @@ public class TemplateEntryLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.template.service.impl.TemplateEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static TemplateEntry addTemplateEntry(
-			long userId, long groupId, long ddmTemplateId,
-			String infoItemClassName, String infoItemFormVariationKey,
+			String externalReferenceCode, long userId, long groupId,
+			long ddmTemplateId, String infoItemClassName,
+			String infoItemFormVariationKey,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addTemplateEntry(
-			userId, groupId, ddmTemplateId, infoItemClassName,
-			infoItemFormVariationKey, serviceContext);
+			externalReferenceCode, userId, groupId, ddmTemplateId,
+			infoItemClassName, infoItemFormVariationKey, serviceContext);
 	}
 
 	/**
@@ -105,6 +107,12 @@ public class TemplateEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteTemplateEntry(templateEntryId);
+	}
+
+	public static TemplateEntry deleteTemplateEntry(
+		String externalReferenceCode, long groupId) {
+
+		return getService().deleteTemplateEntry(externalReferenceCode, groupId);
 	}
 
 	/**
@@ -216,6 +224,13 @@ public class TemplateEntryLocalServiceUtil {
 		long ddmTemplateId) {
 
 		return getService().fetchTemplateEntryByDDMTemplateId(ddmTemplateId);
+	}
+
+	public static TemplateEntry fetchTemplateEntryByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return getService().fetchTemplateEntryByExternalReferenceCode(
+			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -375,6 +390,14 @@ public class TemplateEntryLocalServiceUtil {
 		return getService().getTemplateEntry(templateEntryId);
 	}
 
+	public static TemplateEntry getTemplateEntryByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().getTemplateEntryByExternalReferenceCode(
+			externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the template entry matching the UUID and group.
 	 *
@@ -396,6 +419,13 @@ public class TemplateEntryLocalServiceUtil {
 		return getService().updateTemplateEntry(templateEntryId);
 	}
 
+	public static TemplateEntry updateTemplateEntry(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().updateTemplateEntry(externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Updates the template entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -413,13 +443,12 @@ public class TemplateEntryLocalServiceUtil {
 	}
 
 	public static TemplateEntryLocalService getService() {
-		return _service;
+		return _serviceSnapshot.get();
 	}
 
-	public static void setService(TemplateEntryLocalService service) {
-		_service = service;
-	}
-
-	private static volatile TemplateEntryLocalService _service;
+	private static final Snapshot<TemplateEntryLocalService> _serviceSnapshot =
+		new Snapshot<>(
+			TemplateEntryLocalServiceUtil.class,
+			TemplateEntryLocalService.class);
 
 }

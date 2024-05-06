@@ -38,7 +38,7 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			restSchema,
 		};
 
-		return this.post(url, data);
+		return this.post(url, {data});
 	}
 
 	async createDataSetView({
@@ -73,7 +73,7 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			symbol,
 		};
 
-		return this.post(url, data);
+		return this.post(url, {data});
 	}
 
 	async createDataSetViewCardsSection({
@@ -93,7 +93,7 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			r_fdsViewFDSCardsSectionRelationship_c_fdsViewERC,
 		};
 
-		return this.post(url, data);
+		return this.post(url, {data});
 	}
 
 	async createDataSetViewCreationAction({
@@ -128,20 +128,24 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			url,
 		};
 
-		return this.post(endpointUrl, data);
+		return this.post(endpointUrl, {data});
 	}
 
-	async createDataSetViewFields({
+	async createDataSetField({
 		extraBodyParams = {},
 		label_i18n = {en_US: 'Title'},
 		name = 'title',
 		r_fdsViewFDSFieldRelationship_c_fdsViewERC = DEFAULT_DATA_SET_ERC,
+		renderer = 'default',
+		rendererType = 'internal',
 		type = 'string',
 	}: {
 		extraBodyParams?: any;
 		label_i18n?: {[key: string]: string};
 		name?: string;
 		r_fdsViewFDSFieldRelationship_c_fdsViewERC?: string;
+		renderer?: string;
+		rendererType?: string;
 		type?: string;
 	}) {
 		const url = `${this.baseUrl}data-set-manager/fields`;
@@ -150,11 +154,42 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			label_i18n,
 			name,
 			r_fdsViewFDSFieldRelationship_c_fdsViewERC,
+			renderer,
+			rendererType,
 			type,
 			...extraBodyParams,
 		};
 
-		return this.post(url, data);
+		return this.post(url, {data});
+	}
+
+	async createDataSetDateFilter({
+		fieldName,
+		from = '',
+		label_i18n = {en_US: 'Title'},
+		r_fdsViewFDSDateFilterRelationship_c_fdsViewERC,
+		to = '',
+		type,
+	}: {
+		fieldName: string;
+		from?: string;
+		label_i18n?: {[key: string]: string};
+		r_fdsViewFDSDateFilterRelationship_c_fdsViewERC: string;
+		to?: string;
+		type: 'date' | 'date-time';
+	}) {
+		const url = `${this.baseUrl}data-set-manager/date-filters`;
+
+		const data = {
+			fieldName,
+			from,
+			label_i18n,
+			r_fdsViewFDSDateFilterRelationship_c_fdsViewERC,
+			to,
+			type,
+		};
+
+		return this.post(url, {data});
 	}
 
 	async createDataSetViewItemAction({
@@ -204,7 +239,7 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			url,
 		};
 
-		return this.post(endpointUrl, data);
+		return this.post(endpointUrl, {data});
 	}
 
 	async createDataSetViewListSection({
@@ -224,7 +259,7 @@ export class DataSetManagerApiHelpers extends ApiHelpers {
 			r_fdsViewFDSListSectionRelationship_c_fdsViewERC,
 		};
 
-		return this.post(url, data);
+		return this.post(url, {data});
 	}
 
 	async deleteDataSet({erc = DEFAULT_DATA_SET_ERC}: {erc?: string}) {

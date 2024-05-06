@@ -155,7 +155,7 @@ export default function FieldSetList({searchTerm}) {
 								),
 								[searchTerm]
 							)}
-							imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
+							imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.svg`}
 							small
 							title={Liferay.Language.get('no-results-found')}
 						/>
@@ -164,7 +164,7 @@ export default function FieldSetList({searchTerm}) {
 							description={Liferay.Language.get(
 								'there-are-no-fieldsets-description'
 							)}
-							imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
+							imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.svg`}
 							small
 							title={Liferay.Language.get(
 								'there-are-no-fieldsets'

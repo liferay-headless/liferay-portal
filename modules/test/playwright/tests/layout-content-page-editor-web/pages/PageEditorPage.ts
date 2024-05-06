@@ -103,6 +103,31 @@ export class PageEditorPage {
 		await this.waitForChangesSaved();
 	}
 
+	async chooseCollectionDisplayOption(
+		collectionType: string,
+		collectionTitle?: string
+	) {
+		await this.page.getByLabel('Select Collection', {exact: true}).click();
+
+		await this.page
+			.frameLocator('iframe[title="Select"]')
+			.getByRole('link', {name: collectionType})
+			.click();
+		await this.page
+			.frameLocator('iframe[title="Select"]')
+			.getByRole('button', {name: 'Select ' + collectionTitle})
+			.click();
+	}
+
+	async chooseCollectionFilterOption(fieldName: string, option: string) {
+		await this.page.getByLabel('View Collection Options').click();
+		await this.page
+			.getByRole('menuitem', {name: 'Filter Collection'})
+			.click();
+		await this.page.getByLabel(fieldName).selectOption(option);
+		await this.page.getByRole('button', {name: 'Save'}).click();
+	}
+
 	async closeExperienceSelector() {
 		const isOpen = await this.experienceSelector.evaluate(
 			(element) => element.getAttribute('aria-expanded') === 'true'

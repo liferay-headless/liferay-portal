@@ -25,8 +25,8 @@ const EmptyState = ({
 				imgSrc={
 					!hideAnimation &&
 					(filtered
-						? `${themeDisplay.getPathThemeImages()}/states/search_state.gif`
-						: `${themeDisplay.getPathThemeImages()}/states/empty_state.gif`)
+						? `${themeDisplay.getPathThemeImages()}/states/search_state.svg`
+						: `${themeDisplay.getPathThemeImages()}/states/empty_state.svg`)
 				}
 				small={messageClassName === 'small'}
 				title={title}

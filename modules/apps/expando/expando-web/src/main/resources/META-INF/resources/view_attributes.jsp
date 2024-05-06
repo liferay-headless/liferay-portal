@@ -14,12 +14,12 @@ String modelResource = ParamUtil.getString(request, "modelResource");
 
 ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.getCompanyId(), modelResource);
 
-ExpandoDisplayContext expandoDisplayContext = new ExpandoDisplayContext(request, renderRequest, renderResponse);
+ExpandoDisplayContext expandoDisplayContext = (ExpandoDisplayContext)request.getAttribute(ExpandoDisplayContext.class.getName());
 
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
-).setMVCPath(
-	"/view_attributes.jsp"
+).setMVCRenderCommandName(
+	"/expando/view_attributes"
 ).setRedirect(
 	redirect
 ).setParameter(

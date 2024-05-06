@@ -2,14 +2,13 @@ import * as breadcrumbs from 'shared/util/breadcrumbs';
 import BasePage from 'shared/components/base-page';
 import BundleRouter from 'route-middleware/BundleRouter';
 import DownloadCSVReport from 'shared/components/download-report/DownloadCSVReport';
-import DownloadPDFReport, {
-	Containers
-} from 'shared/components/download-report/DownloadPDFReport';
+import DownloadPDFReport from 'shared/components/download-report/DownloadPDFReport';
 import Filter from '../hocs/Filter';
 import getCN from 'classnames';
 import Loading from 'shared/components/Loading';
 import React, {lazy, Suspense, useState} from 'react';
 import RouteNotFound from 'shared/components/RouteNotFound';
+import {CSVType} from 'shared/components/download-report/utils';
 import {ENABLE_GLOBAL_FILTER} from 'shared/util/constants';
 import {getMatchedRoute, Routes} from 'shared/util/router';
 import {pickBy} from 'lodash';
@@ -98,13 +97,6 @@ const Blog: React.FC<{
 				<BasePage.SubHeader>
 					<div className='d-flex justify-content-end w-100'>
 						<DownloadPDFReport
-							containers={[
-								Containers.VisitorsBehaviorCard,
-								Containers.AudienceCard,
-								Containers.ViewsByLocationCard,
-								Containers.ViewsByTechnologyCard,
-								Containers.AssetAppearsOnCard
-							]}
 							disabled={dataSourceStates.empty}
 							subtitle={selectedChannel?.name}
 							title={
@@ -125,8 +117,8 @@ const Blog: React.FC<{
 							assetId={assetId}
 							assetType='blog'
 							disabled={dataSourceStates.empty}
-							type='individual'
-							typeLang={Liferay.Language.get('blogs')}
+							type={CSVType.Individual}
+							typeLang={Liferay.Language.get('known-individuals')}
 						/>
 					</div>
 				</BasePage.SubHeader>

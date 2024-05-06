@@ -26,7 +26,7 @@ export async function createJob({data, redirect}) {
 	await liferayRequest({
 		headers,
 		method: 'PUT',
-		urlPath: `/o/c/jobs/${jobsResult.id}/object-actions/Jethr0EtcSpringBootJobAdd`,
+		urlPath: `/o/c/jobs/${jobsResult.id}/object-actions/Jethr0EtcSpringBootAddJob`,
 	});
 
 	if (jobsResult && redirect) {
@@ -212,11 +212,19 @@ export function getUpdatedJobParameters({jobParameters, key, value}) {
 	let updated = false;
 
 	for (const jobParameter of jobParameters) {
+		const jobParameterKey = jobParameter.key;
+		let jobParameterValue = jobParameter.value;
+
 		if (jobParameter.key === key) {
-			updatedJobParameters.push({key, value});
+			jobParameterValue = value;
 
 			updated = true;
 		}
+
+		updatedJobParameters.push({
+			key: jobParameterKey,
+			value: jobParameterValue,
+		});
 	}
 
 	if (!updated) {

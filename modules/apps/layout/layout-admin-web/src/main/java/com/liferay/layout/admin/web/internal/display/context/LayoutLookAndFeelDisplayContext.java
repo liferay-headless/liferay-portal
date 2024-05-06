@@ -9,6 +9,7 @@ import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.client.extension.model.ClientExtensionEntryRel;
 import com.liferay.client.extension.service.ClientExtensionEntryRelLocalServiceUtil;
 import com.liferay.client.extension.type.CET;
+import com.liferay.client.extension.type.GlobalJSCET;
 import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItemListBuilder;
@@ -439,6 +440,20 @@ public class LayoutLookAndFeelDisplayContext {
 			() -> typeSettingsUnicodeProperties.getProperty("loadType", null)
 		).put(
 			"name", cet.getName(_themeDisplay.getLocale())
+		).put(
+			"scriptElementAttributesJSON",
+			() -> {
+				if (!Objects.equals(
+						cet.getType(),
+						ClientExtensionEntryConstants.TYPE_GLOBAL_JS)) {
+
+					return null;
+				}
+
+				GlobalJSCET globalJSCET = (GlobalJSCET)cet;
+
+				return globalJSCET.getScriptElementAttributesJSON();
+			}
 		).put(
 			"scriptLocation",
 			() -> typeSettingsUnicodeProperties.getProperty(

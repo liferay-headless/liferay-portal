@@ -8,20 +8,25 @@ package com.liferay.portal.catapult.internal;
 import com.liferay.oauth.client.LocalOAuthClient;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
+import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.catapult.PortalCatapult;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
 
 import java.io.IOException;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.osgi.service.component.annotations.Component;
@@ -61,12 +66,25 @@ public class PortalCatapultImpl implements PortalCatapult {
 
 		options.setMethod(method);
 
-		_localOAuthClient.consumeAccessToken(
-			accessToken -> options.addHeader(
-				"Authorization", "Bearer " + accessToken),
-			oAuth2Application, userId);
+		try {
+			TransactionInvokerUtil.invoke(
+				_transactionConfig,
+				() -> {
+					_localOAuthClient.consumeAccessToken(
+						accessToken -> options.addHeader(
+							"Authorization", "Bearer " + accessToken),
+						oAuth2Application, userId);
 
-		ExecutorService executorService = Executors.newSingleThreadExecutor();
+					return null;
+				});
+		}
+		catch (Throwable throwable) {
+			throw new RuntimeException(throwable);
+		}
+
+		ExecutorService executorService =
+			_portalExecutorManager.getPortalExecutor(
+				PortalCatapultImpl.class.getName());
 
 		return executorService.submit(
 			() -> {
@@ -74,6 +92,8 @@ public class PortalCatapultImpl implements PortalCatapult {
 					return _http.URLtoByteArray(options);
 				}
 				catch (IOException ioException) {
+					_log.error(ioException);
+
 					return ReflectionUtil.throwException(ioException);
 				}
 			});
@@ -100,6 +120,13 @@ public class PortalCatapultImpl implements PortalCatapult {
 			homePageURL, StringPool.SLASH, resourcePath);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalCatapultImpl.class);
+
+	private static final TransactionConfig _transactionConfig =
+		TransactionConfig.Factory.create(
+			Propagation.REQUIRES_NEW, new Class<?>[] {Exception.class});
+
 	@Reference
 	private Http _http;
 
@@ -108,5 +135,8 @@ public class PortalCatapultImpl implements PortalCatapult {
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
+	@Reference
+	private PortalExecutorManager _portalExecutorManager;
 
 }

@@ -209,6 +209,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -616,23 +617,40 @@ public class BundleSiteInitializerTest {
 				_group.getGroupId());
 
 		Assert.assertEquals(
-			assetListEntries.toString(), 2, assetListEntries.size());
+			assetListEntries.toString(), 4, assetListEntries.size());
 
-		AssetListEntry assetListEntry1 = assetListEntries.get(0);
-
-		Assert.assertEquals(
-			"Test Asset List Entry 1", assetListEntry1.getTitle());
-		Assert.assertEquals(
-			"com.liferay.journal.model.JournalArticle",
-			assetListEntry1.getAssetEntryType());
-
-		AssetListEntry assetListEntry2 = assetListEntries.get(1);
+		AssetListEntry assetListEntry = assetListEntries.get(0);
 
 		Assert.assertEquals(
-			"Test Asset List Entry 2", assetListEntry2.getTitle());
+			"Test Asset List Entry 1", assetListEntry.getTitle());
 		Assert.assertEquals(
 			"com.liferay.journal.model.JournalArticle",
-			assetListEntry2.getAssetEntryType());
+			assetListEntry.getAssetEntryType());
+
+		assetListEntry = assetListEntries.get(1);
+
+		Assert.assertEquals(
+			"Test Asset List Entry 2", assetListEntry.getTitle());
+		Assert.assertEquals(
+			"com.liferay.journal.model.JournalArticle",
+			assetListEntry.getAssetEntryType());
+
+		assetListEntry = assetListEntries.get(2);
+
+		Assert.assertEquals(
+			"Test Asset List Entry 3", assetListEntry.getTitle());
+		Assert.assertEquals(
+			"com.liferay.document.library.kernel.model.DLFileEntry",
+			assetListEntry.getAssetEntryType());
+
+		assetListEntry = assetListEntries.get(3);
+
+		Assert.assertEquals(
+			"Test Asset List Entry 4", assetListEntry.getTitle());
+		Assert.assertTrue(
+			StringUtil.startsWith(
+				assetListEntry.getAssetEntryType(),
+				"com.liferay.object.model.ObjectDefinition"));
 	}
 
 	private void _assertAssetVocabularies() throws Exception {
@@ -1508,10 +1526,14 @@ public class BundleSiteInitializerTest {
 
 		expandoBridge = siteNavigationMenuItem.getExpandoBridge();
 
+		Map<Locale, String[]> expandoBridgeAttribute =
+			(Map<Locale, String[]>)expandoBridge.getAttribute(
+				"Test Expando Column 6");
+
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
-				new int[] {32, 40},
-				(int[])expandoBridge.getAttribute("Test Expando Column 6")));
+				new String[] {"Test Value 1", "Test Value 2"},
+				expandoBridgeAttribute.get(LocaleUtil.getSiteDefault())));
 	}
 
 	private void _assertFragmentEntries() throws Exception {

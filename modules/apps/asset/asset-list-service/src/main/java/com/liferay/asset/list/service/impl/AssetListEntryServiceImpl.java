@@ -67,7 +67,8 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 	@Override
 	public AssetListEntry addAssetListEntry(
-			long groupId, String title, int type, ServiceContext serviceContext)
+			String externalReferenceCode, long groupId, String title, int type,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -75,13 +76,14 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
 
 		return assetListEntryLocalService.addAssetListEntry(
-			getUserId(), groupId, title, type, serviceContext);
+			externalReferenceCode, getUserId(), groupId, title, type,
+			serviceContext);
 	}
 
 	@Override
 	public AssetListEntry addDynamicAssetListEntry(
-			long groupId, String title, String typeSettings,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long groupId, String title,
+			String typeSettings, ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -89,13 +91,14 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
 
 		return assetListEntryLocalService.addDynamicAssetListEntry(
-			getUserId(), groupId, title, typeSettings, serviceContext);
+			externalReferenceCode, getUserId(), groupId, title, typeSettings,
+			serviceContext);
 	}
 
 	@Override
 	public AssetListEntry addManualAssetListEntry(
-			long groupId, String title, long[] assetEntryIds,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long groupId, String title,
+			long[] assetEntryIds, ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
@@ -103,7 +106,8 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
 
 		return assetListEntryLocalService.addManualAssetListEntry(
-			getUserId(), groupId, title, assetEntryIds, serviceContext);
+			externalReferenceCode, getUserId(), groupId, title, assetEntryIds,
+			serviceContext);
 	}
 
 	@Override

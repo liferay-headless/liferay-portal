@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayIcon from '@clayui/icon';
 import Link from '@clayui/link';
 import ClayPanel from '@clayui/panel';
-import {FormikContextType} from 'formik';
+import {FormikContextType, FormikErrors} from 'formik';
 import {useCallback, useState} from 'react';
 
 import PRMForm from '../../../../../../common/components/PRMForm';
@@ -31,7 +32,10 @@ import useBudgetsAmount from './hooks/useBudgetsAmount';
 interface IProps {
 	activity: MDFClaimActivity;
 	activityIndex: number;
+	errors: FormikErrors<MDFClaim>;
 	hasPermissionEditClaimActivity: boolean;
+	isButtonClicked: boolean;
+	isEdit: boolean;
 	overallCampaignDescription: string;
 }
 
@@ -63,11 +67,28 @@ const activityClaimStatusClassName = {
 const ActivityClaimPanel = ({
 	activity,
 	activityIndex,
+	errors,
 	hasPermissionEditClaimActivity,
+	isButtonClicked,
+	isEdit,
 	overallCampaignDescription,
 	setFieldValue,
 }: IProps & Pick<FormikContextType<MDFClaim>, 'setFieldValue'>) => {
 	const [expanded, setExpanded] = useState<boolean>(!activity.selected);
+
+	const isBudgetSelected = Array.isArray(errors?.activities)
+		? errors.activities.reduce((accumulator, activity, index) => {
+				if (
+					activity &&
+					'budgets' in activity &&
+					typeof activity.budgets !== 'string'
+				) {
+					accumulator.push(index);
+				}
+
+				return accumulator;
+		  }, [])
+		: undefined;
 
 	const siteURL = Liferay.ThemeDisplay.getLayoutRelativeControlPanelURL().split(
 		'/'
@@ -225,6 +246,22 @@ const ActivityClaimPanel = ({
 								setFieldValue={setFieldValue}
 							/>
 						))}
+
+						{isBudgetSelected &&
+							errors?.activities &&
+							!isBudgetSelected.includes(activityIndex) &&
+							(isButtonClicked || isEdit) && (
+								<ClayAlert
+									displayType="danger"
+									hideCloseIcon={true}
+								>
+									{
+										(errors?.activities[activityIndex] as {
+											budgets?: string;
+										})?.budgets
+									}
+								</ClayAlert>
+							)}
 
 						<div className="align-items-center d-flex justify-content-between">
 							<PRMFormik.Field

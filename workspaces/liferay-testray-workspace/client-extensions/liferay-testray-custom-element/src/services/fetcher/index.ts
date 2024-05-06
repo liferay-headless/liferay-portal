@@ -16,8 +16,15 @@ const headlessDeliveryAPIs = [
 	'message-board-threads',
 ];
 
+const testrayRestAPIs = [
+	'testray-build-autofill',
+	'testray-run-comparisons',
+	'testray-status-metrics',
+	'testray-testflow',
+];
+
 function changeResource(resource: RequestInfo) {
-	const getIsResourceFromAPI = (apis: string[]) =>
+	const getResourceFromAPI = (apis: string[]) =>
 		apis.some((api) => resource.toString().includes(api));
 
 	if (resource.toString().startsWith('http')) {
@@ -32,15 +39,15 @@ function changeResource(resource: RequestInfo) {
 		return `${liferayHost}/o/dispatch-rest/v1.0${resource}`;
 	}
 
-	if (resource.toString().startsWith('/testray-run-comparisons')) {
+	if (getResourceFromAPI(testrayRestAPIs)) {
 		return `${liferayHost}/o/testray-rest/v1.0${resource}`;
 	}
 
-	if (getIsResourceFromAPI(headlessDeliveryAPIs)) {
+	if (getResourceFromAPI(headlessDeliveryAPIs)) {
 		return `${liferayHost}/o/headless-delivery/v1.0${resource}`;
 	}
 
-	if (getIsResourceFromAPI(headlessAdminUserAPIs)) {
+	if (getResourceFromAPI(headlessAdminUserAPIs)) {
 		return `${liferayHost}/o/headless-admin-user/v1.0${resource}`;
 	}
 

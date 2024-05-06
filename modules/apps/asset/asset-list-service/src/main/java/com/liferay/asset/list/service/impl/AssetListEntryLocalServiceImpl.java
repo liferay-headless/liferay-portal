@@ -159,18 +159,20 @@ public class AssetListEntryLocalServiceImpl
 
 	@Override
 	public AssetListEntry addAssetListEntry(
-			long userId, long groupId, String title, int type,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			String title, int type, ServiceContext serviceContext)
 		throws PortalException {
 
 		return addAssetListEntry(
-			userId, groupId, title, type, null, serviceContext);
+			externalReferenceCode, userId, groupId, title, type, null,
+			serviceContext);
 	}
 
 	@Override
 	public AssetListEntry addAssetListEntry(
-			long userId, long groupId, String title, int type,
-			String typeSettings, ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			String title, int type, String typeSettings,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		// Asset list entry
@@ -185,6 +187,7 @@ public class AssetListEntryLocalServiceImpl
 			assetListEntryId);
 
 		assetListEntry.setUuid(serviceContext.getUuid());
+		assetListEntry.setExternalReferenceCode(externalReferenceCode);
 		assetListEntry.setGroupId(groupId);
 		assetListEntry.setCompanyId(user.getCompanyId());
 		assetListEntry.setUserId(user.getUserId());
@@ -229,24 +232,25 @@ public class AssetListEntryLocalServiceImpl
 
 	@Override
 	public AssetListEntry addDynamicAssetListEntry(
-			long userId, long groupId, String title, String typeSettings,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			String title, String typeSettings, ServiceContext serviceContext)
 		throws PortalException {
 
 		return addAssetListEntry(
-			userId, groupId, title, AssetListEntryTypeConstants.TYPE_DYNAMIC,
-			typeSettings, serviceContext);
+			externalReferenceCode, userId, groupId, title,
+			AssetListEntryTypeConstants.TYPE_DYNAMIC, typeSettings,
+			serviceContext);
 	}
 
 	@Override
 	public AssetListEntry addManualAssetListEntry(
-			long userId, long groupId, String title, long[] assetEntryIds,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			String title, long[] assetEntryIds, ServiceContext serviceContext)
 		throws PortalException {
 
 		AssetListEntry assetListEntry = addAssetListEntry(
-			userId, groupId, title, AssetListEntryTypeConstants.TYPE_MANUAL,
-			serviceContext);
+			externalReferenceCode, userId, groupId, title,
+			AssetListEntryTypeConstants.TYPE_MANUAL, serviceContext);
 
 		addAssetEntrySelections(
 			assetListEntry.getAssetListEntryId(), assetEntryIds,
@@ -352,6 +356,17 @@ public class AssetListEntryLocalServiceImpl
 				assetListEntryId, segmentsEntryId);
 
 		return assetListEntry;
+	}
+
+	@Override
+	public AssetListEntry deleteAssetListEntry(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry = assetListEntryPersistence.findByERC_G(
+			externalReferenceCode, groupId);
+
+		return deleteAssetListEntry(assetListEntry);
 	}
 
 	@Override

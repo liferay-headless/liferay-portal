@@ -7,7 +7,10 @@ package com.liferay.jethr0.entity;
 
 import com.liferay.jethr0.bui1d.repository.BuildEntityRepository;
 import com.liferay.jethr0.bui1d.repository.BuildRunEntityRepository;
-import com.liferay.jethr0.git.branch.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitCommitEntityRepository;
+import com.liferay.jethr0.git.repository.GitPullRequestEntityRepository;
+import com.liferay.jethr0.git.repository.GitUserEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsCohortEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsNodeEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsServerEntityRepository;
@@ -15,6 +18,8 @@ import com.liferay.jethr0.job.queue.JobQueue;
 import com.liferay.jethr0.job.repository.JobComparatorEntityRepository;
 import com.liferay.jethr0.job.repository.JobEntityRepository;
 import com.liferay.jethr0.job.repository.JobPrioritizerEntityRepository;
+import com.liferay.jethr0.routine.repository.RoutineEntityRepository;
+import com.liferay.jethr0.routine.scheduler.RoutineEntityScheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +38,31 @@ public class EntityInitializer {
 		_buildRunEntityRepository.setBuildEntityRepository(
 			_buildEntityRepository);
 
+		_gitBranchEntityRepository.setGitCommitEntityRepository(
+			_gitCommitEntityRepository);
+		_gitBranchEntityRepository.setGitPullRequestEntityRepository(
+			_gitPullRequestEntityRepository);
+		_gitBranchEntityRepository.setGitUserEntityRepository(
+			_gitUserEntityRepository);
+		_gitBranchEntityRepository.setRoutineEntityRepository(
+			_routineEntityRepository);
+
+		_gitCommitEntityRepository.setJobEntityRepository(_jobEntityRepository);
+		_gitCommitEntityRepository.setRoutineEntityRepository(
+			_routineEntityRepository);
+
+		_gitPullRequestEntityRepository.setGitBranchEntityRepository(
+			_gitBranchEntityRepository);
+		_gitPullRequestEntityRepository.setGitUserEntityRepository(
+			_gitUserEntityRepository);
+		_gitPullRequestEntityRepository.setJobEntityRepository(
+			_jobEntityRepository);
+
+		_gitUserEntityRepository.setGitBranchEntityRepository(
+			_gitBranchEntityRepository);
+		_gitUserEntityRepository.setGitPullRequestEntityRepository(
+			_gitPullRequestEntityRepository);
+
 		_jenkinsCohortEntityRepository.setJenkinsServerEntityRepository(
 			_jenkinsServerEntityRepository);
 
@@ -48,30 +78,48 @@ public class EntityInitializer {
 			_jobPrioritizerEntityRepository);
 
 		_jobEntityRepository.setBuildEntityRepository(_buildEntityRepository);
+		_jobEntityRepository.setGitPullRequestEntityRepository(
+			_gitPullRequestEntityRepository);
 		_jobEntityRepository.setJobQueue(_jobQueue);
+		_jobEntityRepository.setRoutineEntityRepository(
+			_routineEntityRepository);
 
 		_jobPrioritizerEntityRepository.setJobComparatorEntityRepository(
 			_jobComparatorEntityRepository);
 
+		_routineEntityRepository.setGitBranchEntityRepository(
+			_gitBranchEntityRepository);
+		_routineEntityRepository.setJobEntityRepository(_jobEntityRepository);
+
 		_buildEntityRepository.initialize();
 		_buildRunEntityRepository.initialize();
 		_gitBranchEntityRepository.initialize();
+		_gitCommitEntityRepository.initialize();
+		_gitPullRequestEntityRepository.initialize();
+		_gitUserEntityRepository.initialize();
 		_jenkinsCohortEntityRepository.initialize();
 		_jenkinsNodeEntityRepository.initialize();
 		_jenkinsServerEntityRepository.initialize();
 		_jobComparatorEntityRepository.initialize();
 		_jobEntityRepository.initialize();
 		_jobPrioritizerEntityRepository.initialize();
+		_routineEntityRepository.initialize();
 
 		_buildEntityRepository.initializeRelationships();
 		_buildRunEntityRepository.initializeRelationships();
 		_gitBranchEntityRepository.initializeRelationships();
+		_gitCommitEntityRepository.initializeRelationships();
+		_gitPullRequestEntityRepository.initializeRelationships();
+		_gitUserEntityRepository.initializeRelationships();
 		_jenkinsCohortEntityRepository.initializeRelationships();
 		_jenkinsNodeEntityRepository.initializeRelationships();
 		_jenkinsServerEntityRepository.initializeRelationships();
 		_jobComparatorEntityRepository.initializeRelationships();
 		_jobEntityRepository.initializeRelationships();
 		_jobPrioritizerEntityRepository.initializeRelationships();
+		_routineEntityRepository.initializeRelationships();
+
+		_routineEntityScheduler.initialize();
 	}
 
 	@Autowired
@@ -82,6 +130,15 @@ public class EntityInitializer {
 
 	@Autowired
 	private GitBranchEntityRepository _gitBranchEntityRepository;
+
+	@Autowired
+	private GitCommitEntityRepository _gitCommitEntityRepository;
+
+	@Autowired
+	private GitPullRequestEntityRepository _gitPullRequestEntityRepository;
+
+	@Autowired
+	private GitUserEntityRepository _gitUserEntityRepository;
 
 	@Autowired
 	private JenkinsCohortEntityRepository _jenkinsCohortEntityRepository;
@@ -103,5 +160,11 @@ public class EntityInitializer {
 
 	@Autowired
 	private JobQueue _jobQueue;
+
+	@Autowired
+	private RoutineEntityRepository _routineEntityRepository;
+
+	@Autowired
+	private RoutineEntityScheduler _routineEntityScheduler;
 
 }

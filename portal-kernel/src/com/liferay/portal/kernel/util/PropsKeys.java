@@ -2536,6 +2536,9 @@ public interface PropsKeys {
 
 	public static final String SOURCE_FORGE_MIRRORS = "source.forge.mirrors";
 
+	public static final String SPRING_BEANFACTORY_STRICT_LIFECYCLE_ENABLED =
+		"spring.beanfactory.strict.lifecycle.enabled";
+
 	public static final String SPRING_CONFIGS = "spring.configs";
 
 	public static final String
@@ -2642,9 +2645,6 @@ public interface PropsKeys {
 		"thread.dump.speed.threshold";
 
 	public static final String TIME_ZONES = "time.zones";
-
-	public static final String TRANSACTION_ISOLATION_COUNTER =
-		"transaction.isolation.counter";
 
 	public static final String TRANSACTION_ISOLATION_PORTAL =
 		"transaction.isolation.portal";

@@ -29,6 +29,7 @@ interface ModalEditObjectFolderProps {
 	id: number;
 	initialLabel?: LocalizedValue<string>;
 	name?: string;
+	onAfterSubmit: (value: ObjectFolder) => void;
 }
 
 type TInitialValues = {
@@ -43,6 +44,7 @@ export function ModalEditObjectFolder({
 	id,
 	initialLabel,
 	name,
+	onAfterSubmit,
 }: ModalEditObjectFolderProps) {
 	const [error, setError] = useState<string>('');
 
@@ -64,13 +66,12 @@ export function ModalEditObjectFolder({
 		const objectFolder: Partial<ObjectFolder> = values;
 
 		try {
-			await API.save({
+			const editedObjectFolder = await API.save<ObjectFolder>({
 				item: objectFolder,
 				method: 'PATCH',
+				returnValue: true,
 				url: `/o/object-admin/v1.0/object-folders/${id}`,
 			});
-
-			onClose();
 
 			openToast({
 				message: sub(
@@ -86,7 +87,9 @@ export function ModalEditObjectFolder({
 				type: 'success',
 			});
 
-			setTimeout(() => window.location.reload(), 1000);
+			onClose();
+
+			onAfterSubmit(editedObjectFolder as ObjectFolder);
 		}
 		catch (error) {
 			setError((error as Error).message);
@@ -129,6 +132,7 @@ export function ModalEditObjectFolder({
 						<InputLocalized
 							error={errors.label}
 							label={Liferay.Language.get('label')}
+							name="objectFolderLabel"
 							onChange={(label) => setValues({label})}
 							onSelectedLocaleChange={setSelectedLocale}
 							required

@@ -28,7 +28,6 @@ import com.liferay.frontend.js.importmaps.extender.JSImportMapsContributor;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.service.Snapshot;
@@ -38,7 +37,6 @@ import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,8 +62,7 @@ public class CETDeployerImpl implements CETDeployer {
 	public List<ServiceRegistration<?>> deploy(CET cet) {
 		if (Objects.equals(
 				cet.getType(),
-				ClientExtensionEntryConstants.TYPE_COMMERCE_CHECKOUT_STEP) &&
-			FeatureFlagManagerUtil.isEnabled("LPD-15804")) {
+				ClientExtensionEntryConstants.TYPE_COMMERCE_CHECKOUT_STEP)) {
 
 			return _deploy((CommerceCheckoutStepCET)cet);
 		}
@@ -211,9 +208,7 @@ public class CETDeployerImpl implements CETDeployer {
 		serviceRegistrations.add(
 			_register(
 				Portlet.class,
-				new IFrameCETPortlet(
-					iFrameCET, _absolutePortalURLBuilderFactory, portletId,
-					_portal)));
+				new IFrameCETPortlet(iFrameCET, portletId, _portal)));
 
 		return serviceRegistrations;
 	}
@@ -258,9 +253,6 @@ public class CETDeployerImpl implements CETDeployer {
 	private static final Snapshot<CommerceCETDeployer>
 		_commerceCETDeployerSnapshot = new Snapshot<>(
 			CETDeployer.class, CommerceCETDeployer.class);
-
-	@Reference
-	private AbsolutePortalURLBuilderFactory _absolutePortalURLBuilderFactory;
 
 	private BundleContext _bundleContext;
 

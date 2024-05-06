@@ -353,7 +353,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		if (!DBPartition.isPartitionEnabled()) {
 			throw new UnsupportedOperationException(
-				"Database partition must be enabled");
+				"Database partitioning must be enabled");
 		}
 
 		if (companyId == PortalInstancePool.getDefaultCompanyId()) {
@@ -409,6 +409,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 					preregisterCompany(company);
 
 					_resourceActionLocalService.checkResourceActions();
+
+					_portletLocalService.checkPortlets(company.getCompanyId());
 
 					TransactionCommitCallbackUtil.registerCallback(
 						() -> {
@@ -542,7 +544,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		if (!DBPartition.isPartitionEnabled()) {
 			throw new UnsupportedOperationException(
-				"Database partition must be enabled");
+				"Database partitioning must be enabled");
 		}
 
 		if (companyId == PortalInstancePool.getDefaultCompanyId()) {

@@ -7,6 +7,7 @@ package com.liferay.notification.internal.type;
 
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
+import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.InfoItemFieldValues;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -58,6 +60,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -232,6 +235,11 @@ public class EmailNotificationType extends BaseNotificationType {
 
 		Group userGroup = user.getGroup();
 
+		if ((userGroup == null) && user.isGuestUser()) {
+			userGroup = _groupLocalService.getGroup(
+				user.getCompanyId(), GroupConstants.GUEST);
+		}
+
 		if (userGroup != null) {
 			groupId = userGroup.getGroupId();
 		}
@@ -244,7 +252,7 @@ public class EmailNotificationType extends BaseNotificationType {
 			notificationContext.getNotificationTemplate();
 
 		String body = _formatBody(
-			notificationTemplate.getBodyMap(), groupId, notificationContext);
+			notificationTemplate.getBodyMap(), userGroup, notificationContext);
 		NotificationRecipient notificationRecipient =
 			notificationTemplate.getNotificationRecipient();
 		String subject = formatLocalizedContent(
@@ -466,9 +474,10 @@ public class EmailNotificationType extends BaseNotificationType {
 			new RoleEmailProvider(
 				_accountEntryLocalService,
 				_accountEntryOrganizationRelLocalService,
+				_accountEntryUserRelLocalService, _groupLocalService,
 				_objectDefinitionLocalService, _objectFieldLocalService,
 				_organizationLocalService, _roleLocalService,
-				_userGroupRoleLocalService));
+				_userGroupRoleLocalService, _userLocalService));
 	}
 
 	private void _addFileAttachments(
@@ -497,7 +506,7 @@ public class EmailNotificationType extends BaseNotificationType {
 	}
 
 	private String _formatBody(
-			Map<Locale, String> bodyMap, long groupId,
+			Map<Locale, String> bodyMap, Group group,
 			NotificationContext notificationContext)
 		throws PortalException {
 
@@ -541,9 +550,7 @@ public class EmailNotificationType extends BaseNotificationType {
 					notificationContext.getClassName());
 
 		ServiceContextThreadLocal.pushServiceContext(
-			_getServiceContext(
-				_groupLocalService.getGroup(groupId),
-				notificationContext.getUserId()));
+			_getServiceContext(group, notificationContext.getUserId()));
 
 		try {
 			InfoItemFieldValues infoItemFieldValues =
@@ -708,6 +715,9 @@ public class EmailNotificationType extends BaseNotificationType {
 	private AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
 
+	@Reference
+	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
+
 	private final Map<String, EmailProvider> _emailProviders = new HashMap<>();
 
 	@Reference
@@ -743,5 +753,8 @@ public class EmailNotificationType extends BaseNotificationType {
 
 	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

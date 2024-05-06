@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useContext, useEffect} from 'react';
 
 import {DefinitionBuilderContext} from '../../../../../DefinitionBuilderContext';
-import {filterGroovyOption} from '../../../../util/filterGroovyOption';
+import {filterScriptOption} from '../../../../util/filterScriptOption';
 import {sortElements} from '../utils';
 
 const BaseActionsInfo = ({
@@ -40,7 +40,7 @@ const BaseActionsInfo = ({
 }) => {
 	const {
 		allowScriptContentToBeExecutedOrIncluded,
-		hadGroovyScriptBefore,
+		hadGroovyOrJavaScriptBefore,
 	} = useContext(DefinitionBuilderContext);
 
 	useEffect(() => {
@@ -58,9 +58,9 @@ const BaseActionsInfo = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const filteredActionTypes = filterGroovyOption(
+	const filteredActionTypes = filterScriptOption(
 		allowScriptContentToBeExecutedOrIncluded,
-		hadGroovyScriptBefore,
+		hadGroovyOrJavaScriptBefore,
 		actionTypes
 	);
 

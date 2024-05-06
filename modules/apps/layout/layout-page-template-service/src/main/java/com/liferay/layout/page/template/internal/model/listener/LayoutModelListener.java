@@ -54,6 +54,16 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			return;
 		}
 
+		if (layout.isTypeContent() && !layout.isTypeUtility()) {
+			_reindexLayout(layout);
+		}
+
+		if (ExportImportThreadLocal.isImportInProcess() ||
+			ExportImportThreadLocal.isStagingInProcess()) {
+
+			return;
+		}
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -71,35 +81,22 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			throw new ModelListenerException(portalException);
 		}
 
-		if (!layout.isTypeContent()) {
-			return;
-		}
-
-		_reindexLayout(layout);
-
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry(layout);
 
-		if (ExportImportThreadLocal.isImportInProcess() ||
-			ExportImportThreadLocal.isStagingInProcess() ||
-			(layoutPageTemplateEntry == null)) {
-
-			return;
+		if (layoutPageTemplateEntry != null) {
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> _copyStructure(layoutPageTemplateEntry, layout));
 		}
-
-		TransactionCommitCallbackUtil.registerCallback(
-			() -> _copyStructure(layoutPageTemplateEntry, layout));
 	}
 
 	@Override
 	public void onAfterUpdate(Layout originalLayout, Layout layout)
 		throws ModelListenerException {
 
-		if (!layout.isTypeContent()) {
-			return;
+		if (layout.isTypeContent() && !layout.isTypeUtility()) {
+			_reindexLayout(layout);
 		}
-
-		_reindexLayout(layout);
 	}
 
 	@Override

@@ -8,10 +8,12 @@ import {HashRouter, Route, Routes} from 'react-router-dom';
 import AdministratorDashboardOutlet from './AdministratorDashboardOutlet';
 
 import './index.scss';
+import withProviders from '../../hoc/withProviders';
 import App from '../PublisherDashboard/pages/Apps/App';
 import Apps from './pages/Apps';
 import Metrics from './pages/Metrics';
 import PublisherRequest from './pages/PublisherRequest';
+import Trial from './pages/Trial';
 
 const AdministratorDashboardRouter = () => (
 	<HashRouter>
@@ -23,6 +25,7 @@ const AdministratorDashboardRouter = () => (
 					element={<PublisherRequest />}
 					path="publisher-request"
 				/>
+				<Route element={<Trial />} path="trial" />
 
 				<Route path="apps">
 					<Route element={<Apps />} index />
@@ -38,4 +41,4 @@ const AdministratorDashboardRouter = () => (
 	</HashRouter>
 );
 
-export default AdministratorDashboardRouter;
+export default withProviders(AdministratorDashboardRouter);

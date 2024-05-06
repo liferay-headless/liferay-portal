@@ -193,6 +193,14 @@ public class JSONUtil {
 		return false;
 	}
 
+	public static boolean isEmpty(JSONObject jsonObject) {
+		if ((jsonObject == null) || (jsonObject.length() == 0)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isJSONArray(String json) {
 		try {
 			_createJSONArray(json);

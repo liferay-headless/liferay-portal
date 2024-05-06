@@ -29,6 +29,11 @@
 			<property name="description" value="Checks that the `default` is after all the cases in a `switch` statement." />
 			<property name="documentationLocation" value="coding/defaultcomeslast.html" />
 		</module>
+		<module name="EqualsHashCodeCheck">
+			<property name="category" value="Bug Prevention" />
+			<property name="description" value="Checks that classes that either override `equals()` or `hashCode()` also overrides the other." />
+			<property name="documentationLocation" value="coding/equalshashcode.html" />
+		</module>
 		<module name="JavadocStyleCheck">
 			<property name="category" value="Javadoc" />
 			<property name="checkFirstSentence" value="false" />
@@ -240,6 +245,11 @@
 			<message key="assert.add.information" value="Add ''{0}'' as extra parameter at the beginning of the ''Assert.assertEquals'' call to provide more information to the test. See LPS-70411." />
 			<message key="assert.use.boolean" value="Use ''Assert.assert{0}'' instead of ''Assert.assertEquals'' when assert boolean" />
 		</module>
+		<module name="com.liferay.source.formatter.checkstyle.check.AssertFailCheck">
+			<property name="category" value="Bug Prevention" />
+			<property name="description" value="Checks that calls to `Assert.fail` can be only used inside a try block as the last statement." />
+			<message key="assert.fail.avoid" value="''Assert.fail'' can be only used inside a try block as the last statement" />
+		</module>
 		<module name="com.liferay.source.formatter.checkstyle.check.AssignAsUsedCheck">
 			<property name="category" value="Performance" />
 			<property name="description" value="Finds cases where an assign statement can be inlined or moved closer to where it is used." />
@@ -431,9 +441,7 @@
 			<property name="enabled" value="false" />
 			<message key="assign.move.before.method.call" value="The variable assignment for ''{0}'' should come before the method calling ''{1}''" />
 			<message key="assign.order.incorrect" value="The variable assignment for ''{0}'' should come before the variable assignment for ''{1}''" />
-			<message key="if.statement.inline" value="Use ''{0}({1})'' with inlined if-statement" />
 			<message key="method.call.order.incorrect" value="The method calling ''{0}'' should come before the method calling ''{1}''" />
-			<message key="set.method.use.instead" value="Use ''{0}({1})'' instead" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.check.InstanceofOrderCheck">
 			<property name="category" value="Styling" />
@@ -737,6 +745,13 @@
 			<property name="description" value="Checks usage of `*ResourcePermissionFactory` classes." />
 			<property name="enabled" value="false" />
 			<message key="deprecated.get.instance.usage" value="Do not use ''{0}''. Use @Reference instead" />
+		</module>
+		<module name="com.liferay.source.formatter.checkstyle.check.RESTDTOSetCallCheck">
+			<property name="category" value="Performance" />
+			<property name="description" value="Ensures using set calls with `UnsafeSupplier` parameter for REST DTO." />
+			<property name="enabled" value="false" />
+			<message key="if.statement.inline" value="Use ''{0}(UnsafeSupplier)'' with inlined if-statement" />
+			<message key="set.method.use.instead" value="Use ''{0}(UnsafeSupplier)'' instead" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.check.SelfReferenceCheck">
 			<property name="category" value="Bug Prevention" />

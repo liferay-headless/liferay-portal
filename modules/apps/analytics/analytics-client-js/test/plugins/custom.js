@@ -8,36 +8,6 @@ import fetchMock from 'fetch-mock';
 
 import AnalyticsClient from '../../src/analytics';
 
-const localStorageMock = (function () {
-	const store = {};
-
-	return {
-		getItem(key) {
-			return JSON.parse(decodeURIComponent(store[key]));
-		},
-		removeItem(key) {
-			delete localStorage[key];
-		},
-		setItem(key, value, encode) {
-			const newValue = JSON.stringify(value);
-
-			store[key] = encode ? encodeURIComponent(newValue) : newValue;
-		},
-	};
-})();
-
-const INITIAL_CONFIG = {
-	cookieManager: {
-		actions: {
-			getItem: localStorageMock.getItem,
-			removeItem: localStorageMock.removeItem,
-			setItem: localStorageMock.setItem,
-		},
-	},
-};
-
-Object.defineProperty(window, 'localStorage', {value: localStorageMock});
-
 const applicationId = 'Custom';
 
 const googleUrl = 'http://google.com/';
@@ -112,7 +82,7 @@ describe('Custom Asset Plugin', () => {
 
 		fetchMock.mock('*', () => 200);
 
-		Analytics = AnalyticsClient.create(INITIAL_CONFIG);
+		Analytics = AnalyticsClient.create();
 	});
 
 	afterEach(() => {

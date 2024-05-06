@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Brian Wing Shun Chan
@@ -90,7 +91,14 @@ public class FileSystemStore implements Store {
 	public void deleteDirectory(
 		long companyId, long repositoryId, String dirName) {
 
-		File dirNameDir = getDirNameDir(companyId, repositoryId, dirName);
+		File dirNameDir = null;
+
+		if (Objects.equals(dirName, StringPool.SLASH)) {
+			dirNameDir = getRepositoryDir(companyId, repositoryId);
+		}
+		else {
+			dirNameDir = getDirNameDir(companyId, repositoryId, dirName);
+		}
 
 		if (!dirNameDir.exists()) {
 			return;
@@ -312,7 +320,7 @@ public class FileSystemStore implements Store {
 	}
 
 	private void _deleteEmptyAncestors(File file) {
-		while (file != null) {
+		while ((file != null) && !file.equals(_rootDir)) {
 			if (!file.delete()) {
 				return;
 			}

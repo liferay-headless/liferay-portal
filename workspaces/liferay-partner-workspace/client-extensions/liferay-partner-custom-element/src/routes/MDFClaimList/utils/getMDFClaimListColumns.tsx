@@ -22,6 +22,7 @@ import {ResourceName} from '../../../common/services/liferay/object/enum/resourc
 import {Status} from '../../../common/utils/constants/status';
 
 export default function getMDFClaimListColumns(
+	urlParams: URLSearchParams,
 	siteURL?: string,
 	actions?: PermissionActionType[],
 	mutated?: KeyedMutator<LiferayItems<MDFClaimDTO[]>>
@@ -30,12 +31,12 @@ export default function getMDFClaimListColumns(
 		const options = actions?.reduce<DropdownOption[]>(
 			(previousValue, currentValue) => {
 				const currentMDFClaimHasValidStatusToEdit =
-					row[MDFClaimColumnKey.STATUS] === Status.DRAFT.name ||
-					row[MDFClaimColumnKey.STATUS] ===
+					row[MDFClaimColumnKey.CLAIM_STATUS] === Status.DRAFT.name ||
+					row[MDFClaimColumnKey.CLAIM_STATUS] ===
 						Status.REQUEST_MORE_INFO.name;
 
 				const currentMDFClaimHasValidStatusToDelete =
-					row[MDFClaimColumnKey.STATUS] === Status.DRAFT.name;
+					row[MDFClaimColumnKey.CLAIM_STATUS] === Status.DRAFT.name;
 
 				if (currentValue === PermissionActionType.VIEW) {
 					previousValue.push({
@@ -48,7 +49,7 @@ export default function getMDFClaimListColumns(
 									row[MDFClaimColumnKey.CLAIM_ID]
 								}?p_l_back_url=${encodeURIComponent(
 									Liferay.ThemeDisplay.getLayoutRelativeURL()
-								)}`
+								)}&${urlParams.toString()}`
 							),
 					});
 				}
@@ -145,7 +146,7 @@ export default function getMDFClaimListColumns(
 						row[MDFClaimColumnKey.CLAIM_ID]
 					}?p_l_back_url=${encodeURIComponent(
 						Liferay.ThemeDisplay.getLayoutRelativeURL()
-					)}`}
+					)}&${urlParams.toString()}`}
 				>
 					{data}
 				</a>
@@ -161,7 +162,7 @@ export default function getMDFClaimListColumns(
 						row[MDFClaimColumnKey.REQUEST_ID]
 					}?p_l_back_url=${encodeURIComponent(
 						Liferay.ThemeDisplay.getLayoutRelativeURL()
-					)}`}
+					)}&${urlParams.toString()}`}
 				>
 					{data}
 				</a>
@@ -170,9 +171,10 @@ export default function getMDFClaimListColumns(
 		{
 			columnKey: MDFClaimColumnKey.PARTNER,
 			label: 'Partner',
+			size: 'md',
 		},
 		{
-			columnKey: MDFClaimColumnKey.STATUS,
+			columnKey: MDFClaimColumnKey.CLAIM_STATUS,
 			label: 'Status',
 			render: (data?: string) => <StatusLabel status={data as string} />,
 		},

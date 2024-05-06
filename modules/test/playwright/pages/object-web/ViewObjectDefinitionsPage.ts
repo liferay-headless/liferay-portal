@@ -5,6 +5,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
+import {PORTLET_URLS} from '../../utils/portletUrls';
 import {ApplicationsMenuPage} from '../product-navigation-applications-menu/ApplicationsMenuPage';
 
 export class ViewObjectDefinitionsPage {
@@ -13,13 +14,16 @@ export class ViewObjectDefinitionsPage {
 	readonly createObjectDefinitionButton: Locator;
 	readonly createObjectFolderButton: Locator;
 	readonly confirmObjectFolderNameInput: Locator;
-	readonly defaultObjectFolderLink: Locator;
+	readonly defaultObjectFolder: Locator;
+	readonly deleteObjectDefinitionOption: Locator;
 	readonly deleteObjectFolderButton: Locator;
 	readonly frontendDataSetEntries: Locator;
-	readonly objectFolderActionsLink: Locator;
+	readonly objectFolderActions: Locator;
+	readonly objectFolderCardHeader: Locator;
 	readonly objectFolderDeleteFolderOption: Locator;
 	readonly objectFolderEditLabelAndERCOption: Locator;
-	readonly objectFolderLabel: Locator;
+	readonly objectFolders: Locator;
+	readonly objectFolderLabelInput: Locator;
 	readonly page: Page;
 	readonly viewInModelBuilderButton: Locator;
 
@@ -35,23 +39,32 @@ export class ViewObjectDefinitionsPage {
 		this.createObjectFolderButton = page.getByRole('button', {
 			name: 'Create Folder',
 		});
-		this.defaultObjectFolderLink = page
-			.locator('li')
+		this.defaultObjectFolder = page
+			.getByRole('listitem')
 			.filter({hasText: 'Default'});
+		this.deleteObjectDefinitionOption = page.getByRole('menuitem', {
+			name: 'Delete',
+		});
 		this.deleteObjectFolderButton = page.getByRole('button', {
 			name: 'Delete',
 		});
 		this.frontendDataSetEntries = page.locator('div.table-list-title a');
-		this.objectFolderActionsLink = page
+		this.objectFolders = page
+			.getByRole('list')
+			.filter({hasText: 'Default'});
+		this.objectFolderActions = page
 			.locator('div.lfr__object-web-view-object-definitions-title-kebab')
 			.getByLabel('Object Folder Actions');
+		this.objectFolderCardHeader = page.locator(
+			'div.lfr-objects__card-header'
+		);
 		this.objectFolderDeleteFolderOption = page.getByRole('menuitem', {
 			name: 'Delete Object Folder',
 		});
 		this.objectFolderEditLabelAndERCOption = page.getByRole('menuitem', {
 			name: 'Edit Label and ERC',
 		});
-		this.objectFolderLabel = page.locator('input[name="label"]');
+		this.objectFolderLabelInput = page.locator('input[name="label"]');
 		this.page = page;
 		this.viewInModelBuilderButton = page.getByLabel(
 			'View in Model Builder'
@@ -59,13 +72,21 @@ export class ViewObjectDefinitionsPage {
 	}
 
 	async clickDefaultObjectFolder() {
-		await this.defaultObjectFolderLink.click();
+		await this.defaultObjectFolder.click();
+	}
+
+	async clickEditObjectDefinitionLink(objectDefinitionName: string) {
+		await this.page.getByRole('link', {name: objectDefinitionName}).click();
+	}
+
+	async clickDeleteObjectDefinition() {
+		await this.deleteObjectDefinitionOption.click();
 	}
 
 	async createObjectFolder(objectFolderLabel: string) {
 		await this.addObjectFolderButton.click();
-		await this.objectFolderLabel.click();
-		await this.objectFolderLabel.fill(objectFolderLabel);
+		await this.objectFolderLabelInput.click();
+		await this.objectFolderLabelInput.fill(objectFolderLabel);
 
 		const responsePromise = this.page.waitForResponse('**/object-folders');
 		await this.createObjectFolderButton.click();
@@ -81,17 +102,33 @@ export class ViewObjectDefinitionsPage {
 		await this.deleteObjectFolderButton.click();
 	}
 
-	async goto() {
-		await this.applicationsMenuPage.goToObjects();
+	getObjectFolderCardHeaderERC = (objectFolderERC: string) => {
+		return this.objectFolderCardHeader
+			.getByRole('strong')
+			.filter({hasText: objectFolderERC});
+	};
+
+	getObjectFolderCardHeaderLabel = (objectFolderLabel: string) => {
+		return this.objectFolderCardHeader
+			.locator('span')
+			.filter({hasText: objectFolderLabel})
+			.first();
+	};
+
+	async goto(siteUrl?: Site['friendlyUrlPath']) {
+		await this.page.goto(
+			`/group${siteUrl || '/guest'}${PORTLET_URLS.objects}`,
+			{waitUntil: 'load'}
+		);
 	}
 
 	async openObjectFolderActions() {
-		await this.objectFolderActionsLink.click();
+		await this.objectFolderActions.click();
 	}
 
 	async openObjectFolder(objectFolderLabel: string) {
 		await this.page
-			.locator('li')
+			.getByRole('listitem')
 			.filter({hasText: objectFolderLabel})
 			.click();
 	}

@@ -26,6 +26,7 @@ import useIsChannel from '../../common/hooks/useIsChannel';
 import useLiferayNavigate from '../../common/hooks/useLiferayNavigate';
 import usePagination from '../../common/hooks/usePagination';
 import usePermissionActions from '../../common/hooks/usePermissionActions';
+import useQueryParams from '../../common/hooks/useQueryParams';
 import MDFRequestDTO from '../../common/interfaces/dto/mdfRequestDTO';
 import {MDFRequestListItem} from '../../common/interfaces/mdfRequestListItem';
 import TableColumn from '../../common/interfaces/tableColumn';
@@ -47,10 +48,9 @@ type MDFRequestItem = {
 
 const MDFRequestList = () => {
 	const {isChannel} = useIsChannel();
+	const urlParams = useQueryParams();
 	const [openRequestFilter, setOpenRequestFilter] = useState(
-		JSON.parse(sessionStorage.getItem('openRequestFilter')!) === null
-			? true
-			: JSON.parse(sessionStorage.getItem('openRequestFilter')!)
+		!urlParams.get('tab') || urlParams.get('tab') === 'open' ? true : false
 	);
 
 	const {userAccount} = useDynamicFieldEntries();
@@ -58,9 +58,10 @@ const MDFRequestList = () => {
 
 	const {filters, filtersTerm, onFilter, setFilters} = useFilters(
 		openRequestFilter,
+		urlParams,
 		isChannel
 	);
-	const pagination = usePagination();
+	const pagination = usePagination(urlParams);
 
 	const {data, isValidating, mutate} = useGet<LiferayItems<MDFRequestDTO[]>>(
 		filtersTerm &&
@@ -102,6 +103,7 @@ const MDFRequestList = () => {
 					mdfRequestItems?.[index].r_accToMDFReqs_accountEntryId
 			),
 		siteURL,
+		urlParams,
 		actions,
 		mutate,
 		isChannel
@@ -131,8 +133,8 @@ const MDFRequestList = () => {
 				<div className="mt-3">
 					<Table<MDFRequestListItem>
 						columns={columns}
-						layoutAuto
 						rows={items}
+						tableLayoutAuto
 					/>
 
 					<ClayPaginationBarWithBasicItems
@@ -224,14 +226,20 @@ const MDFRequestList = () => {
 					<ClayTabs.Item
 						active={openRequestFilter}
 						className="nav-item"
-						onClick={() => setOpenRequestFilter(true)}
+						onClick={() => {
+							setOpenRequestFilter(true);
+							urlParams.set('tab', 'open');
+						}}
 					>
 						Open
 					</ClayTabs.Item>
 					<ClayTabs.Item
 						active={!openRequestFilter}
 						className="nav-item"
-						onClick={() => setOpenRequestFilter(false)}
+						onClick={() => {
+							setOpenRequestFilter(false);
+							urlParams.set('tab', 'completed');
+						}}
 					>
 						Completed
 					</ClayTabs.Item>
@@ -248,6 +256,7 @@ const MDFRequestList = () => {
 									searchTerm,
 								})
 							}
+							urlParams={urlParams}
 						/>
 
 						<div className="bd-highlight flex-shrink-2 mt-1">

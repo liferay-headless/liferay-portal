@@ -3,15 +3,14 @@ import BasePage from 'shared/components/base-page';
 import BundleRouter from 'route-middleware/BundleRouter';
 import ClayLink from '@clayui/link';
 import DownloadCSVReport from 'shared/components/download-report/DownloadCSVReport';
-import DownloadPDFReport, {
-	Containers
-} from 'shared/components/download-report/DownloadPDFReport';
+import DownloadPDFReport from 'shared/components/download-report/DownloadPDFReport';
 import FilterBySegment from '../components/FilterBySegment';
 import getCN from 'classnames';
 import Loading from 'shared/components/Loading';
 import React, {lazy, Suspense, useEffect, useState} from 'react';
 import RouteNotFound from 'shared/components/RouteNotFound';
 import TextTruncate from 'shared/components/TextTruncate';
+import {CSVType} from 'shared/components/download-report/utils';
 import {DropdownRangeKey} from 'shared/components/dropdown-range-key/DropdownRangeKey';
 import {getMatchedRoute, Routes} from 'shared/util/router';
 import {pickBy} from 'lodash';
@@ -117,12 +116,6 @@ function TouchpointRoutes({className, router}) {
 				<BasePage.SubHeader>
 					<div className='d-flex justify-content-end w-100'>
 						<DownloadPDFReport
-							containers={[
-								Containers.VisitorsBehaviorCard,
-								Containers.AudienceCard,
-								Containers.ViewsByLocationCard,
-								Containers.ViewsByTechnologyCard
-							]}
 							disabled={dataSourceStates.empty}
 							subtitle={`${
 								selectedChannel.name
@@ -141,7 +134,8 @@ function TouchpointRoutes({className, router}) {
 							assetId={decodedTouchpoint}
 							assetType='page'
 							disabled={dataSourceStates.empty}
-							type='individual'
+							type={CSVType.Individual}
+							typeLang={Liferay.Language.get('known-individuals')}
 						/>
 					</div>
 				</BasePage.SubHeader>
@@ -155,7 +149,10 @@ function TouchpointRoutes({className, router}) {
 			>
 				{matchedRoute === Routes.SITES_TOUCHPOINTS_PATH && (
 					<BasePage.SubHeader>
-						<FilterBySegment onFilterChange={setSelectedSegment} />
+						<FilterBySegment
+							onFilterChange={setSelectedSegment}
+							rangeSelectors={pathRangeSelectors}
+						/>
 
 						<DropdownRangeKey
 							legacy={false}

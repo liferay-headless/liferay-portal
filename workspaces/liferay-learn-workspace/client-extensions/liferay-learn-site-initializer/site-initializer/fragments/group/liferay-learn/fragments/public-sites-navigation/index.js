@@ -289,14 +289,15 @@ function getBreadcrumbFromURL(url) {
 		.join(' ');
 }
 
-function changeFocus(event) {
-	event.target.focus();
+const inputElements = ['input', 'textarea'];
+const searchInput = document.getElementById('searchInput');
+const siteSearchWrapper = document.getElementById('siteSearchWrapper');
+
+function changeFocus() {
+	searchInput.focus();
 }
 
 document.getElementById('searchIcon').addEventListener('click', changeFocus);
-
-const searchInput = document.getElementById('searchInput');
-const siteSearchWrapper = document.getElementById('siteSearchWrapper');
 
 window.addEventListener('keyup', (event) => {
 	if (event.code === 'Escape' || event.key === 'Escape') {
@@ -308,7 +309,11 @@ window.addEventListener('keyup', (event) => {
 		siteSearchWrapper.classList.remove('search-open');
 	}
 
-	if (event.code === 'Slash' || event.key === '/') {
+	if (
+		(event.code === 'Slash' || event.key === '/') &&
+		inputElements.indexOf(document.activeElement.tagName.toLowerCase()) ===
+			-1
+	) {
 		searchInput.focus();
 
 		if (siteSearchWrapper.classList.contains('search-open')) {

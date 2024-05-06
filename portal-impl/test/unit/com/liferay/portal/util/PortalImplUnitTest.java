@@ -6,15 +6,22 @@
 package com.liferay.portal.util;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.security.auth.AlwaysAllowDoAsUser;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.PersistentHttpServletRequestWrapper;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upgrade.MockPortletPreferences;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -22,11 +29,14 @@ import com.liferay.portal.kernel.util.LayoutTypePortletFactoryUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.portal.model.impl.LayoutSetImpl;
 import com.liferay.portal.model.impl.PortletAppImpl;
 import com.liferay.portal.model.impl.PortletImpl;
 import com.liferay.portal.model.impl.UserImpl;
+import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -42,6 +52,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 import javax.portlet.ActionRequest;
@@ -53,7 +64,9 @@ import javax.portlet.WindowState;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -73,6 +86,18 @@ public class PortalImplUnitTest {
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
+
+	@Before
+	public void setUp() throws Exception {
+		_groupLocalServiceUtilMockedStatic.reset();
+		_portalContextLoaderListenerMockedStatic.reset();
+	}
+
+	@After
+	public void tearDown() {
+		_groupLocalServiceUtilMockedStatic.close();
+		_portalContextLoaderListenerMockedStatic.close();
+	}
 
 	@Test
 	public void testCopyRequestParameters() throws PortletException {
@@ -344,6 +369,93 @@ public class PortalImplUnitTest {
 	}
 
 	@Test
+	public void testGetLayoutSetFriendlyURLLayoutSetWithoutVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl(StringPool.BLANK);
+
+		_assertGetLayoutSetFriendlyURL(
+			"/web/test-group", "http://liferay.com:8080", false,
+			new TreeMap<>());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLPrivateLayoutSetWithoutVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl(StringPool.BLANK);
+
+		_assertGetLayoutSetFriendlyURL(
+			"/group/test-group", "http://liferay.com:8080", true,
+			new TreeMap<>());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLUserGroupLayoutSetWithoutVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl(StringPool.BLANK, true);
+
+		_assertGetLayoutSetFriendlyURL(
+			"/user/test-group", "http://liferay.com:8080", true,
+			new TreeMap<>());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLWhenLayoutSetMatchesWithDifferentVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl(StringPool.BLANK);
+
+		_assertGetLayoutSetFriendlyURL(
+			"/web/test-group", "http://liferay.com:8080", false,
+			TreeMapBuilder.put(
+				"test.com", StringPool.BLANK
+			).build());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLWhenLayoutSetMatchesWithSameVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl(StringPool.BLANK);
+
+		_assertGetLayoutSetFriendlyURL(
+			"http://test.com:8080", "http://test.com:8080", false,
+			TreeMapBuilder.put(
+				"test.com", StringPool.BLANK
+			).build());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLWithContextPathWhenLayoutSetMatchesWithDifferentVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl("context-path");
+
+		_assertGetLayoutSetFriendlyURL(
+			"/context-path/web/test-group",
+			"http://liferay.com:8080/context-path", false,
+			TreeMapBuilder.put(
+				"test.com", StringPool.BLANK
+			).build());
+	}
+
+	@Test
+	public void testGetLayoutSetFriendlyURLWithContextPathWhenLayoutSetMatchesWithSameVirtualHost()
+		throws Exception {
+
+		_setUpPortalImpl("context-path");
+
+		_assertGetLayoutSetFriendlyURL(
+			"http://test.com:8080/context-path",
+			"http://test.com:8080/context-path", false,
+			TreeMapBuilder.put(
+				"test.com", StringPool.BLANK
+			).build());
+	}
+
+	@Test
 	public void testGetOriginalServletRequest() {
 		HttpServletRequest httpServletRequest = new MockHttpServletRequest();
 
@@ -589,6 +701,41 @@ public class PortalImplUnitTest {
 		Assert.assertEquals(host, _portalImpl.getHost(mockHttpServletRequest));
 	}
 
+	private void _assertGetLayoutSetFriendlyURL(
+			String expectedFriendlyURL, String portalURL, boolean privateLayout,
+			TreeMap<String, String> virtualHostnames)
+		throws Exception {
+
+		LayoutSet layoutSet = new LayoutSetImpl();
+
+		layoutSet.setLayoutSetId(11L);
+		layoutSet.setGroupId(2000L);
+		layoutSet.setPrivateLayout(privateLayout);
+		layoutSet.setVirtualHostnames(virtualHostnames);
+
+		ThemeDisplay themeDisplay = ThemeDisplayFactory.create();
+
+		themeDisplay.setDoAsGroupId(0);
+		themeDisplay.setI18nLanguageId(null);
+
+		Layout layout = new LayoutImpl();
+
+		layout.setType(LayoutConstants.TYPE_CONTENT);
+		layout.setLayoutSet(layoutSet);
+
+		themeDisplay.setLayout(layout);
+
+		themeDisplay.setRefererGroupId(0);
+		themeDisplay.setRefererPlid(0);
+		themeDisplay.setSecure(false);
+		themeDisplay.setServerPort(8080);
+		themeDisplay.setURLPortal(portalURL);
+
+		Assert.assertEquals(
+			expectedFriendlyURL,
+			_portalImpl.getLayoutSetFriendlyURL(layoutSet, themeDisplay));
+	}
+
 	private ActionRequest _createActionRequest(
 		Map<String, String[]> params, Enumeration<String> enumeration) {
 
@@ -706,6 +853,55 @@ public class PortalImplUnitTest {
 			"WEB_SERVER_FORWARDED_HOST_HEADER", _webServerForwardedHostHeader);
 	}
 
+	private void _setUpGroupLocalServiceUtil(boolean userGroup)
+		throws Exception {
+
+		Group group = Mockito.mock(Group.class);
+
+		Mockito.when(
+			group.getGroupId()
+		).thenReturn(
+			2000L
+		);
+		Mockito.when(
+			group.isUser()
+		).thenReturn(
+			userGroup
+		);
+		Mockito.when(
+			group.getFriendlyURL()
+		).thenReturn(
+			"/test-group"
+		);
+
+		Mockito.when(
+			GroupLocalServiceUtil.getGroup(Mockito.anyLong())
+		).thenReturn(
+			group
+		);
+	}
+
+	private void _setUpPortalContextLoaderListener(String contextPath) {
+		Mockito.when(
+			PortalContextLoaderListener.getPortalServletContextPath()
+		).thenReturn(
+			contextPath
+		);
+	}
+
+	private void _setUpPortalImpl(String contextPath) throws Exception {
+		_setUpPortalImpl(contextPath, false);
+	}
+
+	private void _setUpPortalImpl(String contextPath, boolean userGroup)
+		throws Exception {
+
+		_setUpGroupLocalServiceUtil(userGroup);
+		_setUpPortalContextLoaderListener(contextPath);
+
+		_portalImpl = new PortalImpl();
+	}
+
 	private void _storeAndResetPropsValuesValue(
 		String forwaredHostHeader, String forwaredServer) {
 
@@ -727,7 +923,13 @@ public class PortalImplUnitTest {
 			"WEB_SERVER_FORWARDED_HOST_HEADER", forwaredHostHeader);
 	}
 
-	private final PortalImpl _portalImpl = new PortalImpl();
+	private final MockedStatic<GroupLocalServiceUtil>
+		_groupLocalServiceUtilMockedStatic = Mockito.mockStatic(
+			GroupLocalServiceUtil.class);
+	private final MockedStatic<PortalContextLoaderListener>
+		_portalContextLoaderListenerMockedStatic = Mockito.mockStatic(
+			PortalContextLoaderListener.class);
+	private PortalImpl _portalImpl = new PortalImpl();
 	private String[] _virtualHostsValidHosts;
 	private boolean _webServerForwardedHostEnabled;
 	private String _webServerForwardedHostHeader;

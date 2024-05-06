@@ -16,6 +16,7 @@ import com.liferay.layout.display.page.BaseLayoutDisplayPageProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
@@ -106,6 +107,14 @@ public class BlogsLayoutDisplayPageProvider
 
 		BlogsEntry blogsEntry = _blogsEntryLocalService.fetchEntry(
 			groupId, urlTitle);
+
+		if (FeatureFlagManagerUtil.isEnabled("LPD-11147") &&
+			(blogsEntry == null)) {
+
+			blogsEntry = _blogsEntryLocalService.fetchEntry(
+				groupId,
+				urlTitle.substring(urlTitle.lastIndexOf(StringPool.SLASH) + 1));
+		}
 
 		if ((blogsEntry == null) || blogsEntry.isInTrash()) {
 			return null;

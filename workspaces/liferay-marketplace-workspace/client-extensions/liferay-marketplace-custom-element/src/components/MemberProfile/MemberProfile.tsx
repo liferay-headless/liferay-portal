@@ -11,11 +11,7 @@ import './MemberProfile.scss';
 
 import {useEffect, useState} from 'react';
 
-import catalogIcon from '../../assets/icons/catalog_icon.svg';
-import shieldCheckIcon from '../../assets/icons/shield_check_icon.svg';
-import userIcon from '../../assets/icons/user_icon.svg';
 import {Liferay} from '../../liferay/liferay';
-import {useAppContext} from '../../manage-app-state/AppManageState';
 import {
 	getMyUserAditionalInfos,
 	updateUserAdditionalInfos,
@@ -31,7 +27,7 @@ import {
 	sendRoleAccountUser,
 } from '../InviteMemberModal/services';
 
-interface MemberProfileProps {
+type MemberProfileProps = {
 	memberUser: MemberProps;
 	setSelectedMember: (value: MemberProps | undefined) => void;
 	userLogged?: UserAccount & {
@@ -39,7 +35,7 @@ interface MemberProfileProps {
 		isCustomerAccount?: boolean;
 		isPublisherAccount?: boolean;
 	};
-}
+};
 
 const finalPathUrl = {
 	'customer-dashboard': 'customer-gate',
@@ -51,8 +47,6 @@ export function MemberProfile({
 	setSelectedMember,
 	userLogged,
 }: MemberProfileProps) {
-	const [{gravatarAPI}] = useAppContext();
-
 	const paths = Liferay.ThemeDisplay.getLayoutURL().split('/');
 
 	const finalPath =
@@ -135,8 +129,8 @@ export function MemberProfile({
 
 				Liferay.Util.openToast({
 					message: newInvite.ok
-						? `invited again successfully`
-						: `Please contact Administrator`,
+						? 'invited again successfull'
+						: 'Please contact Administrator',
 					title: memberUser.name as string,
 					type: newInvite.ok ? 'success' : 'danger',
 				});
@@ -161,7 +155,6 @@ export function MemberProfile({
 				<div className="member-profile-image">
 					<Avatar
 						emailAddress={memberUser.email}
-						gravatarAPI={gravatarAPI}
 						initialImage={memberUser.image}
 						userName={memberUser.name}
 					/>
@@ -216,9 +209,9 @@ export function MemberProfile({
 
 			<div className="member-profile-row">
 				<DetailedCard
-					cardIcon={userIcon}
 					cardIconAltText="Member Card Icon"
 					cardTitle="Profile"
+					clayIcon="user"
 				>
 					<table className="member-profile-information mt-4">
 						<tr className="member-profile-name">
@@ -244,9 +237,9 @@ export function MemberProfile({
 				</DetailedCard>
 
 				<DetailedCard
-					cardIcon={shieldCheckIcon}
 					cardIconAltText="Member Roles Icon"
 					cardTitle="Roles"
+					clayIcon="shield-check"
 				>
 					<table className="member-roles-information mt-4">
 						<tr>
@@ -262,9 +255,9 @@ export function MemberProfile({
 
 			<div className="member-profile-row">
 				<DetailedCard
-					cardIcon={catalogIcon}
 					cardIconAltText="Member Account Icon"
 					cardTitle="Account"
+					clayIcon="catalog"
 				>
 					<table className="member-account-information mt-4">
 						<tr>

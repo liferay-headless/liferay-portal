@@ -27,6 +27,7 @@ import getReplaceCurrentURL from './utils/getReplaceCurrentURL';
 import {postCartByPaymentMethod} from './utils/postCartByPaymentMethod';
 
 import './styles/index.scss';
+import {Analytics} from '../../core/Analytics';
 import i18n from '../../i18n';
 import {Liferay} from '../../liferay/liferay';
 
@@ -186,6 +187,12 @@ const GetAppOutlet = () => {
 				: await postCartByPaymentMethod(cart, channel.id);
 
 			await postCheckoutCart({cartId: cartResponse.id});
+
+			Analytics.track('APP_PURCHASE', {
+				isFreeApp,
+				paymentMethod,
+				productName: product.name,
+			});
 
 			await postEmailAppInformation({
 				dashboardLink: getReplaceCurrentURL(

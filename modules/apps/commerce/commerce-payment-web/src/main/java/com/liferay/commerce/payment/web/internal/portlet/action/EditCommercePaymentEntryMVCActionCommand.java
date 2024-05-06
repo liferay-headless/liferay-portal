@@ -6,12 +6,12 @@
 package com.liferay.commerce.payment.web.internal.portlet.action;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.payment.exception.NoSuchPaymentEntryException;
 import com.liferay.commerce.payment.gateway.CommercePaymentGateway;
 import com.liferay.commerce.payment.model.CommercePaymentEntry;
 import com.liferay.commerce.payment.service.CommercePaymentEntryService;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -134,13 +133,14 @@ public class EditCommercePaymentEntryMVCActionCommand
 
 	private CommercePaymentEntry _addOrUpdateCommercePaymentEntry(
 			ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		long commercePaymentEntryId = ParamUtil.getLong(
 			actionRequest, "commercePaymentEntryId");
 
-		BigDecimal amount = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "amount", BigDecimal.ZERO);
+		BigDecimal amount = _commercePriceFormatter.parse(
+			actionRequest, "amount");
+
 		String reasonKey = ParamUtil.getString(actionRequest, "reasonKey");
 
 		if (commercePaymentEntryId > 0) {
@@ -166,30 +166,20 @@ public class EditCommercePaymentEntryMVCActionCommand
 				curCommercePaymentEntry.getType());
 		}
 
-		long commerceChannelId = ParamUtil.getLong(
-			actionRequest, "commerceChannelId");
-		String className = ParamUtil.getString(actionRequest, "className");
-		long classPK = ParamUtil.getLong(actionRequest, "classPK");
-		String currencyCode = ParamUtil.getString(
-			actionRequest, "currencyCode");
-		String languageId = ParamUtil.getString(actionRequest, "languageId");
-		String paymentIntegrationKey = ParamUtil.getString(
-			actionRequest, "paymentIntegrationKey");
-		int paymentIntegrationType = ParamUtil.getInteger(
-			actionRequest, "paymentIntegrationType");
-		String transactionCode = ParamUtil.getString(
-			actionRequest, "transactionCode");
-		int type = ParamUtil.getInteger(actionRequest, "type");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CommercePaymentEntry.class.getName(), actionRequest);
-
 		return _commercePaymentEntryService.addCommercePaymentEntry(
-			_classNameLocalService.getClassNameId(className), classPK,
-			commerceChannelId, amount, StringPool.BLANK, StringPool.BLANK,
-			currencyCode, languageId, StringPool.BLANK, paymentIntegrationKey,
-			paymentIntegrationType, reasonKey, transactionCode, type,
-			serviceContext);
+			_classNameLocalService.getClassNameId(
+				ParamUtil.getString(actionRequest, "className")),
+			ParamUtil.getLong(actionRequest, "classPK"),
+			ParamUtil.getLong(actionRequest, "commerceChannelId"), amount,
+			StringPool.BLANK, StringPool.BLANK,
+			ParamUtil.getString(actionRequest, "currencyCode"),
+			ParamUtil.getString(actionRequest, "languageId"), StringPool.BLANK,
+			ParamUtil.getString(actionRequest, "paymentIntegrationKey"),
+			ParamUtil.getInteger(actionRequest, "paymentIntegrationType"),
+			reasonKey, ParamUtil.getString(actionRequest, "transactionCode"),
+			ParamUtil.getInteger(actionRequest, "type"),
+			ServiceContextFactory.getInstance(
+				CommercePaymentEntry.class.getName(), actionRequest));
 	}
 
 	@Reference
@@ -200,6 +190,9 @@ public class EditCommercePaymentEntryMVCActionCommand
 
 	@Reference
 	private CommercePaymentGateway _commercePaymentGateway;
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private Portal _portal;

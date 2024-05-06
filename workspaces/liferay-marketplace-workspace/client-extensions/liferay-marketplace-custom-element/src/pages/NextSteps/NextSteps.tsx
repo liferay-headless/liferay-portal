@@ -7,7 +7,6 @@ import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import {ReactNode} from 'react';
 
-import catalogIcon from '../../assets/icons/catalog_icon.svg';
 import {AccountAndAppCard} from '../../components/Card/AccountAndAppCard';
 import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
@@ -23,6 +22,7 @@ import './NextSteps.scss';
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 
+import withProviders from '../../hoc/withProviders';
 import CommerceSelectAccountImpl from '../../services/rest/CommerceSelectAccount';
 import {PaymentStatus} from '../GetApp/enums/PaymentStatus';
 import getProductPriceModel from '../GetApp/utils/getProductPriceModel';
@@ -180,16 +180,14 @@ export function NextSteps({
 					<div className="next-step-page-cards">
 						<AccountAndAppCard
 							category="Application"
-							logo={appLogo || catalogIcon}
+							logo={appLogo || 'catalog'}
 							title={appName}
 						/>
 
-						<div className="icon-container">
-							<ClayIcon
-								className="m-0 next-step-page-icon"
-								symbol="arrow-right-full"
-							/>
-						</div>
+						<ClayIcon
+							className="m-0 next-step-page-icon"
+							symbol="arrow-right-full"
+						/>
 
 						<AccountAndAppCard
 							category="Account"
@@ -246,3 +244,5 @@ export function NextSteps({
 		</div>
 	);
 }
+
+export default withProviders(NextSteps);

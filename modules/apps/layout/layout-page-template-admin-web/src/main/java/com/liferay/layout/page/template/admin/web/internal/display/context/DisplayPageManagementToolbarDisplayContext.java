@@ -64,14 +64,33 @@ public class DisplayPageManagementToolbarDisplayContext
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
 		return DropdownItemListBuilder.addGroup(
+			() -> FeatureFlagManagerUtil.isEnabled("LPS-189856"),
 			dropdownGroupItem -> {
 				dropdownGroupItem.setDropdownItems(
 					DropdownItemListBuilder.add(
 						dropdownItem -> {
 							dropdownItem.putData(
-								"action", "exportDisplayPages");
+								"action", "copySelectedEntries");
 							dropdownItem.putData(
-								"exportDisplayPageURL",
+								"copySelectedEntriesURL",
+								_getCopySelectedEntriesURL());
+							dropdownItem.setIcon("copy");
+							dropdownItem.setLabel(
+								LanguageUtil.get(httpServletRequest, "copy"));
+							dropdownItem.setQuickAction(true);
+						}
+					).build());
+				dropdownGroupItem.setSeparator(true);
+			}
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						dropdownItem -> {
+							dropdownItem.putData(
+								"action", "exportSelectedEntries");
+							dropdownItem.putData(
+								"exportSelectedEntriesURL",
 								_getExportDisplayPageURL());
 							dropdownItem.setIcon("upload");
 							dropdownItem.setLabel(
@@ -82,6 +101,7 @@ public class DisplayPageManagementToolbarDisplayContext
 				dropdownGroupItem.setSeparator(true);
 			}
 		).addGroup(
+			() -> FeatureFlagManagerUtil.isEnabled("LPS-189856"),
 			dropdownGroupItem -> {
 				dropdownGroupItem.setDropdownItems(
 					DropdownItemListBuilder.add(
@@ -134,8 +154,16 @@ public class DisplayPageManagementToolbarDisplayContext
 
 		if (LayoutPageTemplateCollectionPermission.contains(
 				_themeDisplay.getPermissionChecker(),
+				layoutPageTemplateCollection, ActionKeys.VIEW)) {
+
+			availableActions.add("exportSelectedEntries");
+		}
+
+		if (LayoutPageTemplateCollectionPermission.contains(
+				_themeDisplay.getPermissionChecker(),
 				layoutPageTemplateCollection, ActionKeys.UPDATE)) {
 
+			availableActions.add("copySelectedEntries");
 			availableActions.add("moveSelectedEntries");
 		}
 
@@ -158,13 +186,14 @@ public class DisplayPageManagementToolbarDisplayContext
 		if ((layoutPageTemplateEntry.getLayoutPrototypeId() == 0) &&
 			!layoutPageTemplateEntry.isDraft()) {
 
-			availableActions.add("exportDisplayPages");
+			availableActions.add("exportSelectedEntries");
 		}
 
 		if (LayoutPageTemplateEntryPermission.contains(
 				_themeDisplay.getPermissionChecker(), layoutPageTemplateEntry,
 				ActionKeys.UPDATE)) {
 
+			availableActions.add("copySelectedEntries");
 			availableActions.add("moveSelectedEntries");
 		}
 
@@ -282,6 +311,23 @@ public class DisplayPageManagementToolbarDisplayContext
 		return new String[] {"create-date", "modified-date", "name"};
 	}
 
+	private String _getCopySelectedEntriesURL() {
+		return PortletURLBuilder.createActionURL(
+			liferayPortletResponse
+		).setActionName(
+			"/layout_page_template_admin/copy_layout_page_template_entries_" +
+				"and_layout_page_template_collections"
+		).setRedirect(
+			_themeDisplay.getURLCurrent()
+		).setParameter(
+			"copyPermissions", false
+		).setParameter(
+			"layoutParentPageTemplateCollectionId",
+			ParamUtil.getLong(
+				httpServletRequest, "layoutPageTemplateCollectionId")
+		).buildString();
+	}
+
 	private String _getDeleteSelectedEntriesURL() {
 		if (FeatureFlagManagerUtil.isEnabled("LPS-189856")) {
 			return PortletURLBuilder.createActionURL(
@@ -313,7 +359,8 @@ public class DisplayPageManagementToolbarDisplayContext
 		return ResourceURLBuilder.createResourceURL(
 			liferayPortletResponse
 		).setResourceID(
-			"/layout_page_template_admin/export_display_pages"
+			"/layout_page_template_admin/export_layout_page_template_entries_" +
+				"and_layout_page_template_collections"
 		).buildString();
 	}
 

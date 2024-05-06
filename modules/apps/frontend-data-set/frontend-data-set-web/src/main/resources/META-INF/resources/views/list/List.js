@@ -20,6 +20,10 @@ import {getLocalizedValue} from '../../utils/getLocalizedValue';
 const List = ({header, items, schema}) => {
 	const {selectedItemsKey} = useContext(FrontendDataSetContext);
 
+	if (!items?.length) {
+		return null;
+	}
+
 	return (
 		<ClayLayout.Sheet
 			className={classNames('list-sheet', {
@@ -115,7 +119,7 @@ const ListItem = ({item, schema}) => {
 				<ClayList.ItemField>
 					<ImageRenderer
 						sticker={sticker && item[sticker]}
-						value={{src: item[image]}}
+						value={item[image]}
 					/>
 				</ClayList.ItemField>
 			) : (

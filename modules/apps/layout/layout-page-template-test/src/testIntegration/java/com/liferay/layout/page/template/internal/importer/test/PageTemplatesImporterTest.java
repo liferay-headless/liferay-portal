@@ -166,7 +166,7 @@ public class PageTemplatesImporterTest {
 			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				_layoutPageTemplateCollectionLocalService.
 					addLayoutPageTemplateCollection(
-						TestPropsValues.getUserId(), _group.getGroupId(),
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						name, RandomTestUtil.randomString(),
@@ -542,7 +542,7 @@ public class PageTemplatesImporterTest {
 			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				_layoutPageTemplateCollectionLocalService.
 					addLayoutPageTemplateCollection(
-						TestPropsValues.getUserId(), _group.getGroupId(),
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						RandomTestUtil.randomString(),
@@ -561,7 +561,7 @@ public class PageTemplatesImporterTest {
 
 			FragmentCollection fragmentCollection =
 				_fragmentCollectionLocalService.addFragmentCollection(
-					TestPropsValues.getUserId(), _group.getGroupId(),
+					null, TestPropsValues.getUserId(), _group.getGroupId(),
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(), serviceContext);
 
@@ -625,7 +625,7 @@ public class PageTemplatesImporterTest {
 			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				_layoutPageTemplateCollectionLocalService.
 					addLayoutPageTemplateCollection(
-						TestPropsValues.getUserId(), _group.getGroupId(),
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						RandomTestUtil.randomString(),
@@ -644,7 +644,7 @@ public class PageTemplatesImporterTest {
 
 			FragmentCollection fragmentCollection =
 				_fragmentCollectionLocalService.addFragmentCollection(
-					TestPropsValues.getUserId(), _group.getGroupId(),
+					null, TestPropsValues.getUserId(), _group.getGroupId(),
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(), serviceContext);
 
@@ -711,7 +711,7 @@ public class PageTemplatesImporterTest {
 			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				_layoutPageTemplateCollectionLocalService.
 					addLayoutPageTemplateCollection(
-						TestPropsValues.getUserId(), _group.getGroupId(),
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						RandomTestUtil.randomString(),
@@ -730,7 +730,7 @@ public class PageTemplatesImporterTest {
 
 			FragmentCollection fragmentCollection =
 				_fragmentCollectionLocalService.addFragmentCollection(
-					TestPropsValues.getUserId(), _group.getGroupId(),
+					null, TestPropsValues.getUserId(), _group.getGroupId(),
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(), serviceContext);
 
@@ -813,7 +813,7 @@ public class PageTemplatesImporterTest {
 			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				_layoutPageTemplateCollectionLocalService.
 					addLayoutPageTemplateCollection(
-						TestPropsValues.getUserId(), _group.getGroupId(),
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						RandomTestUtil.randomString(),
@@ -832,7 +832,7 @@ public class PageTemplatesImporterTest {
 
 			FragmentCollection fragmentCollection =
 				_fragmentCollectionLocalService.addFragmentCollection(
-					TestPropsValues.getUserId(), _group.getGroupId(),
+					null, TestPropsValues.getUserId(), _group.getGroupId(),
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString(), serviceContext);
 
@@ -1236,7 +1236,7 @@ public class PageTemplatesImporterTest {
 
 		FragmentCollection fragmentCollection =
 			_fragmentCollectionLocalService.addFragmentCollection(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				null, TestPropsValues.getUserId(), _group.getGroupId(),
 				"Test Collection", StringPool.BLANK, serviceContext);
 
 		_fragmentEntryLocalService.addFragmentEntry(

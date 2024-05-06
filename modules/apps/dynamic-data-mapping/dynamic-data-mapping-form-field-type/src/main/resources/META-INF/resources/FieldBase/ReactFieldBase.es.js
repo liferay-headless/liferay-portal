@@ -109,9 +109,9 @@ const RequiredProperty = () => {
 	);
 };
 
-const TooltipProperty = ({showPopover = false, tooltip}) => {
-	return showPopover ? (
-		<Popover tooltip={tooltip} />
+const FieldInformation = ({popover, tooltip}) => {
+	return popover ? (
+		<Popover {...popover} />
 	) : Liferay.FeatureFlags['LPS-114700'] ? (
 		<span
 			className="c-ml-2 text-4 text-secondary"
@@ -127,20 +127,18 @@ const TooltipProperty = ({showPopover = false, tooltip}) => {
 	);
 };
 
-const Popover = ({tooltip}) => {
+const Popover = ({alignPosition, content, header, hideOnTriggerOut, image}) => {
 	const [isPopoverVisible, setIsPopoverVisible] = useState(false);
 
-	const POPOVER_IMAGE_HEIGHT = 170;
-	const POPOVER_IMAGE_WIDTH = 232;
 	const POPOVER_MAX_WIDTH = 256;
 
 	return (
 		<ClayPopover
-			alignPosition="right-bottom"
+			alignPosition={alignPosition}
 			closeOnClickOutside
 			data-testid="clayPopover"
 			disableScroll
-			header={Liferay.Language.get('input-mask-format')}
+			header={header}
 			onShowChange={setIsPopoverVisible}
 			show={isPopoverVisible}
 			style={{maxWidth: POPOVER_MAX_WIDTH}}
@@ -157,7 +155,9 @@ const Popover = ({tooltip}) => {
 				) : (
 					<span
 						className="ddm-tooltip"
-						onMouseOut={() => setIsPopoverVisible(false)}
+						onMouseOut={() =>
+							hideOnTriggerOut && setIsPopoverVisible(false)
+						}
 						onMouseOver={() => setIsPopoverVisible(true)}
 					>
 						<ClayIcon symbol="question-circle-full" />
@@ -165,14 +165,21 @@ const Popover = ({tooltip}) => {
 				)
 			}
 		>
-			<p>{tooltip}</p>
-
-			<img
-				alt={Liferay.Language.get('input-mask-format')}
-				height={POPOVER_IMAGE_HEIGHT}
-				src={`${themeDisplay.getPathThemeImages()}/forms/input_mask_format.png`}
-				width={POPOVER_IMAGE_WIDTH}
+			<p
+				className="mb-4"
+				dangerouslySetInnerHTML={{
+					__html: content,
+				}}
 			/>
+
+			{image && (
+				<img
+					alt={image.alt}
+					height={image.height}
+					src={image.src}
+					width={image.width}
+				/>
+			)}
 		</ClayPopover>
 	);
 };
@@ -195,10 +202,12 @@ export default function FieldBase({
 	itemPath,
 	label,
 	localizedValue = {},
+	localizedValueEdited,
 	name,
 	nestedFields,
 	onClick,
 	overMaximumRepetitionsLimit,
+	popover,
 	readOnly,
 	repeatable,
 	required,
@@ -250,6 +259,9 @@ export default function FieldBase({
 				<input
 					data-field-name={`${fieldName}${instanceId}`}
 					data-languageid={locale}
+					data-translated={
+						!!localizedValueEdited?.[editingLanguageId]
+					}
 					key={locale}
 					name={name.replace(editingLanguageId, locale)}
 					type="hidden"
@@ -257,7 +269,15 @@ export default function FieldBase({
 				/>
 			);
 		});
-	}, [localizedValue, editingLanguageId, fieldName, instanceId, name, type]);
+	}, [
+		localizedValue,
+		localizedValueEdited,
+		editingLanguageId,
+		fieldName,
+		instanceId,
+		name,
+		type,
+	]);
 
 	const renderLabel =
 		(label && showLabel) || hideField || repeatable || required || tooltip;
@@ -271,7 +291,7 @@ export default function FieldBase({
 		type === 'grid' ||
 		type === 'paragraph' ||
 		type === 'radio';
-	const showPopover = fieldName === 'inputMaskFormat';
+	const popoverOrTooltip = !!popover || !!tooltip;
 	const showFor =
 		type === 'date' ||
 		type === 'document_library' ||
@@ -315,8 +335,10 @@ export default function FieldBase({
 			const repeatableFields = [];
 
 			visitor.visitFields((field) => {
-				const fieldFieldsets = field.name.match(FIELDSET_REGEX);
-				const fieldsetRepeatIndexes = field.name.match(
+				const fieldName = field.name ?? field.fieldName;
+
+				const fieldFieldsets = fieldName.match(FIELDSET_REGEX);
+				const fieldsetRepeatIndexes = fieldName.match(
 					FIELDSET_REPEAT_INDEX_REGEX
 				);
 
@@ -361,6 +383,111 @@ export default function FieldBase({
 			setDisabledRepeatableButton(false);
 		}, 1000);
 	};
+
+	const translationFilterChange = useCallback(
+		(event) => {
+			const pagesVisitor = new PagesVisitor(pages);
+			switch (event.option) {
+				case 'translated':
+					dispatch({
+						payload: pagesVisitor.mapFields(
+							(field) => {
+								if (!field.localizable) {
+									return {
+										...field,
+										disabled: true,
+										hidden: true,
+										visible: false,
+									};
+								}
+								if (
+									field.localizedValueEdited?.[
+										editingLanguageId
+									]
+								) {
+									return {
+										...field,
+										disabled: false,
+										hidden: false,
+										visible: true,
+									};
+								}
+								else {
+									return {
+										...field,
+										disabled: true,
+										hidden: true,
+										visible: false,
+									};
+								}
+							},
+							false,
+							true
+						),
+						type: CORE_EVENT_TYPES.PAGE.UPDATE,
+					});
+
+					break;
+				case 'untranslated':
+					dispatch({
+						payload: pagesVisitor.mapFields(
+							(field) => {
+								if (!field.localizable) {
+									return {
+										...field,
+										disabled: true,
+										hidden: true,
+										visible: false,
+									};
+								}
+								if (
+									field.localizedValueEdited?.[
+										editingLanguageId
+									]
+								) {
+									return {
+										...field,
+										disabled: true,
+										hidden: true,
+										visible: false,
+									};
+								}
+								else {
+									return {
+										...field,
+										disabled: false,
+										hidden: false,
+										visible: true,
+									};
+								}
+							},
+							false,
+							true
+						),
+						type: CORE_EVENT_TYPES.PAGE.UPDATE,
+					});
+					break;
+				default:
+					dispatch({
+						payload: pagesVisitor.mapFields(
+							(field) => {
+								return {
+									...field,
+									disabled: false,
+									hidden: false,
+									visible: true,
+								};
+							},
+							false,
+							true
+						),
+						type: CORE_EVENT_TYPES.PAGE.UPDATE,
+					});
+					break;
+			}
+		},
+		[dispatch, editingLanguageId, pages]
+	);
 
 	useEffect(() => {
 		Liferay.on('disableRepeatableButton', disableRepeatableButton);
@@ -434,6 +561,10 @@ export default function FieldBase({
 	useEffect(() => {
 		Liferay.on('inputLocalized:resetTranslations', resetTranslations);
 		Liferay.on('inputLocalized:markAsTranslated', markAsTranslated);
+		Liferay.on(
+			'inputLocalized:translationFilterChange',
+			translationFilterChange
+		);
 
 		return () => {
 			Liferay.detach(
@@ -441,8 +572,9 @@ export default function FieldBase({
 				resetTranslations
 			);
 			Liferay.detach('inputLocalized:markAsTranslated', markAsTranslated);
+			Liferay.on('translationFilterChange', translationFilterChange);
 		};
-	}, [resetTranslations, markAsTranslated]);
+	}, [resetTranslations, markAsTranslated, translationFilterChange]);
 
 	return (
 		<ClayForm.Group
@@ -530,15 +662,15 @@ export default function FieldBase({
 								{required && <RequiredProperty />}
 							</label>
 
-							{tooltip && (
-								<TooltipProperty
-									showPopover={showPopover}
+							{popoverOrTooltip && (
+								<FieldInformation
+									popover={popover}
 									tooltip={tooltip}
 								/>
 							)}
 
 							{showDisabledFieldIcon && (
-								<TooltipProperty
+								<FieldInformation
 									tooltip={Liferay.Language.get(
 										'this-field-cannot-be-localized'
 									)}
@@ -571,15 +703,15 @@ export default function FieldBase({
 								{hideField && <HideFieldProperty />}
 							</label>
 
-							{showLabel && tooltip && (
-								<TooltipProperty
-									showPopover={showPopover}
+							{showLabel && popoverOrTooltip && (
+								<FieldInformation
+									popover={popover}
 									tooltip={tooltip}
 								/>
 							)}
 
 							{showDisabledFieldIcon && (
-								<TooltipProperty
+								<FieldInformation
 									tooltip={Liferay.Language.get(
 										'this-field-cannot-be-localized'
 									)}
@@ -588,9 +720,9 @@ export default function FieldBase({
 
 							{children}
 
-							{!showLabel && tooltip && (
-								<TooltipProperty
-									showPopover={showPopover}
+							{!showLabel && popoverOrTooltip && (
+								<FieldInformation
+									popover={popover}
 									tooltip={tooltip}
 								/>
 							)}

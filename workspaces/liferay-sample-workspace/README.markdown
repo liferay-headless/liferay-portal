@@ -18,7 +18,7 @@ The standard directory name of a client extension is broken up into several part
 
 For `liferay-sample-batch`, the owner is `liferay` and the project is `sample`. The owner and the project must not contain `-` since we use `-` to differentiate the owner from the project.
 
-The third part is usually one of the available client extension types: batch, custom-element, fds-cell-renderer, global-css, global-js, iframe, notification-type, oauth-application-headless-server, oauth-application-user-agent, object-action, site-initializer, static-content, theme-css, theme-favicon, theme-js, theme-spritemap, or workflow-action.
+The third part is usually one of the available client extension types: batch, custom-element, fds-cell-renderer, global-css, global-js, iframe, notification-type, oauth-application-headless-server, oauth-application-user-agent, object-action, site-initializer, static-content, theme-css, theme-favicon, theme-spritemap, or workflow-action.
 
 For `liferay-sample-batch`, the third part is the client extension type `batch`.
 
@@ -82,17 +82,9 @@ For `liferay-sample-etc-cron` and `liferay-sample-etc-spring-boot` the third typ
 
 	1. Go to `liferay-sample-workspace/client-extensions/liferay-sample-etc-cron` and type `./gradlew bootRun` to start Spring Boot.
 
-- *liferay-sample-etc-frontend-1*
+- *liferay-sample-etc-frontend*
 
-	Combine multiple frontend client extensions.
-
-- *liferay-sample-etc-frontend-2*
-
-	Combine multiple frontend client extensions that use `shared-utils.js` without duplicating or rerequesting it.
-
-- *liferay-sample-etc-frontend-3*
-
-	Share code through an import map client extension.
+	Share code via JavaScript import maps to a custom element.
 
 - *liferay-sample-etc-node*
 
@@ -112,11 +104,15 @@ For `liferay-sample-etc-cron` and `liferay-sample-etc-spring-boot` the third typ
 
 - *liferay-sample-global-css*
 
-	Serve global CSS on a page.
+	Add a global CSS to a page.
 
-- *liferay-sample-global-js*
+- *liferay-sample-global-js-1*
 
-	Serve global JavaScript on a page.
+	Add a global script element to a page.
+
+- *liferay-sample-global-js-2*
+
+	Add a global script element with attributes to a page.
 
 - *liferay-sample-iframe-1*
 
@@ -132,7 +128,7 @@ For `liferay-sample-etc-cron` and `liferay-sample-etc-spring-boot` the third typ
 
 - *liferay-sample-js-import-maps-entry*
 
-	TODO
+	Share jQuery via JavaScript import maps.
 
 - *liferay-sample-site-initializer*
 
@@ -149,6 +145,10 @@ For `liferay-sample-etc-cron` and `liferay-sample-etc-spring-boot` the third typ
 - *liferay-sample-theme-css-2*
 
 	Extend a theme's CSS with a CSS that uses `unstyled` as its base theme.
+
+- *liferay-sample-theme-css-3*
+
+	Extend a theme's CSS with CSS that uses a frontend-token-definition.json file.
 
 - *liferay-sample-theme-favicon*
 

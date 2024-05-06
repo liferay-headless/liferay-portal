@@ -18,7 +18,7 @@ export default function DefinitionBuilder(props) {
 	const [active, setActive] = useState(true);
 	const [alertMessage, setAlertMessage] = useState('');
 	const [alertType, setAlertType] = useState(null);
-	const [blockingErrors, setBlockingErrors] = useState({errorType: ''});
+	const [blockingError, setBlockingError] = useState({errorType: ''});
 	const [currentEditor, setCurrentEditor] = useState(null);
 	const [definitionDescription, setDefinitionDescription] = useState('');
 	const [definitionInfo, setDefinitionInfo] = useState(null);
@@ -30,13 +30,13 @@ export default function DefinitionBuilder(props) {
 	] = useState(props.translations);
 	const [deserialize, setDeserialize] = useState(false);
 	const [elements, setElements] = useState(defaultNodes);
-	const [hadGroovyScriptBefore, setHadGroovyScriptBefore] = useState(false);
-	const [hasGroovyScript, setHasGroovyScript] = useState(false);
+	const [
+		hadGroovyOrJavaScriptBefore,
+		setHadGroovyOrJavaScriptBefore,
+	] = useState(false);
+	const [hasGroovyOrJavaScript, setHasGroovyOrJavaScript] = useState(false);
 	const [selectedLanguageId, setSelectedLanguageId] = useState('');
 	const [showDefinitionInfo, setShowDefinitionInfo] = useState(false);
-	const [showInvalidContentMessage, setShowInvalidContentMessage] = useState(
-		false
-	);
 	const [sourceView, setSourceView] = useState(false);
 	const [showAlert, setShowAlert] = useState(false);
 	const [version, setVersion] = useState(parseInt(props.version, 10));
@@ -48,7 +48,7 @@ export default function DefinitionBuilder(props) {
 		alertType,
 		allowScriptContentToBeExecutedOrIncluded:
 			props.allowScriptContentToBeExecutedOrIncluded,
-		blockingErrors,
+		blockingError,
 		currentEditor,
 		definitionDescription,
 		definitionInfo,
@@ -58,8 +58,8 @@ export default function DefinitionBuilder(props) {
 		deserialize,
 		elements,
 		functionActionExecutors: props.functionActionExecutors,
-		hadGroovyScriptBefore,
-		hasGroovyScript,
+		hadGroovyOrJavaScriptBefore,
+		hasGroovyOrJavaScript,
 		scriptManagementConfigurationPortletURL:
 			props.scriptManagementConfigurationPortletURL,
 		selectedLanguageId,
@@ -67,7 +67,7 @@ export default function DefinitionBuilder(props) {
 		setActive,
 		setAlertMessage,
 		setAlertType,
-		setBlockingErrors,
+		setBlockingError,
 		setCurrentEditor,
 		setDefinitionDescription,
 		setDefinitionInfo,
@@ -76,17 +76,15 @@ export default function DefinitionBuilder(props) {
 		setDefinitionTitleTranslations,
 		setDeserialize,
 		setElements,
-		setHadGroovyScriptBefore,
-		setHasGroovyScript,
+		setHadGroovyOrJavaScriptBefore,
+		setHasGroovyOrJavaScript,
 		setSelectedLanguageId,
 		setShowAlert,
 		setShowDefinitionInfo,
-		setShowInvalidContentMessage,
 		setSourceView,
 		setVersion,
 		showAlert,
 		showDefinitionInfo,
-		showInvalidContentMessage,
 		sourceView,
 		statuses: props.statuses,
 		version,

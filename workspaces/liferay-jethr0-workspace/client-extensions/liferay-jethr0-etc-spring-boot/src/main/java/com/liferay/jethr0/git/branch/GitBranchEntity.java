@@ -7,7 +7,10 @@ package com.liferay.jethr0.git.branch;
 
 import com.liferay.jethr0.entity.Entity;
 import com.liferay.jethr0.event.github.client.GitHubClient;
-import com.liferay.jethr0.job.JobEntity;
+import com.liferay.jethr0.git.commit.GitCommitEntity;
+import com.liferay.jethr0.git.pullrequest.GitPullRequestEntity;
+import com.liferay.jethr0.git.user.GitUserEntity;
+import com.liferay.jethr0.routine.RoutineEntity;
 
 import java.io.IOException;
 
@@ -25,62 +28,76 @@ import org.json.JSONObject;
  */
 public interface GitBranchEntity extends Entity {
 
-	public void addJobEntities(Set<JobEntity> jobEntities);
+	public void addGitCommitEntities(Set<GitCommitEntity> gitCommitEntities);
 
-	public void addJobEntity(JobEntity jobEntity);
+	public void addGitCommitEntity(GitCommitEntity gitCommitEntity);
 
-	public String getBranchName();
+	public void addGitPullRequestEntities(
+		Set<GitPullRequestEntity> gitPullRequestEntities);
 
-	public String getBranchSHA();
+	public void addGitPullRequestEntity(
+		GitPullRequestEntity gitPullRequestEntity);
 
-	public URL getBranchURL();
+	public void addRoutineEntities(Set<RoutineEntity> routineEntities);
 
-	public String getBranchUserName();
+	public void addRoutineEntity(RoutineEntity routineEntity);
 
 	public String getFileContent(String filePath);
 
-	public Set<JobEntity> getJobEntities();
+	public Set<GitCommitEntity> getGitCommitEntities();
+
+	public Set<GitPullRequestEntity> getGitPullRequestEntities();
+
+	public GitUserEntity getGitUserEntity();
+
+	public long getGitUserEntityId();
+
+	public GitCommitEntity getLatestGitCommitEntity();
+
+	public String getLatestSHA();
+
+	public String getName();
 
 	public Properties getProperties(String propertiesFilePath)
 		throws IOException;
 
-	public boolean getRebased();
-
 	public String getRepositoryName();
 
-	public String getShortBranchSHA();
+	public Set<RoutineEntity> getRoutineEntities();
 
-	public String getShortUpstreamBranchSHA();
+	public String getShortLatestSHA();
 
 	public Type getType();
 
-	public String getUpstreamBranchName();
+	public URL getURL();
 
-	public String getUpstreamBranchSHA();
+	public String getUserName();
 
-	public URL getUpstreamBranchURL();
+	public void removeGitCommitEntities(Set<GitCommitEntity> gitCommitEntities);
 
-	public String getUpstreamBranchUserName();
+	public void removeGitCommitEntity(GitCommitEntity gitCommitEntity);
 
-	public void removeJobEntities(Set<JobEntity> jobEntities);
+	public void removeGitPullRequestEntities(
+		Set<GitPullRequestEntity> gitPullRequestEntities);
 
-	public void removeJobEntity(JobEntity jobEntity);
+	public void removeGitPullRequestEntity(
+		GitPullRequestEntity gitPullRequestEntity);
 
-	public void setBranchSHA(String branchSHA);
+	public void removeRoutineEntities(Set<RoutineEntity> routineEntities);
 
-	public void setBranchURL(URL branchURL);
+	public void removeRoutineEntity(RoutineEntity routineEntity);
 
 	public void setGitHubClient(GitHubClient gitHubClient);
 
-	public void setRebased(boolean rebased);
+	public void setGitUserEntity(GitUserEntity gitUserEntity);
 
-	public void setUpstreamBranchSHA(String upstreamBranchSHA);
+	public void setLatestSHA(String latestSHA);
 
-	public void setUpstreamBranchURL(URL upstreamBranchURL);
+	public void setURL(URL url);
 
 	public static enum Type {
 
-		DEFAULT("default"), SENDER("sender"), UPSTREAM("upstream");
+		DEFAULT("default"), UPSTREAM("upstream");
 
 		public static Type get(JSONObject jsonObject) {
 			return getByKey(jsonObject.getString("key"));

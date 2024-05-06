@@ -222,49 +222,36 @@ export default {
 		);
 	},
 
-	renderFragmentEntryLinkContent({
-		fragmentEntryLinkId,
-		itemClassName,
-		itemClassPK,
-		itemExternalReferenceCode,
+	renderFragmentEntryLinksContent({
+		data,
 		languageId,
 		segmentsExperienceId,
 	}: {
-		fragmentEntryLinkId: string;
-		itemClassName?: string | null;
-		itemClassPK?: string | null;
-		itemExternalReferenceCode?: string | null;
-		languageId: Liferay.Language.Locale;
+		data: Array<{
+			fragmentEntryLinkId: string;
+			itemClassName?: string | null;
+			itemClassPK?: string | null;
+			itemExternalReferenceCode?: string | null;
+		}>;
+		languageId: string;
 		segmentsExperienceId: string;
 	}) {
 		const body: {
-			fragmentEntryLinkId: string;
-			itemClassName?: string;
-			itemClassPK?: string;
-			itemExternalReferenceCode?: string;
-			languageId: Liferay.Language.Locale;
+			data: string;
+			languageId: string;
 			segmentsExperienceId: string;
 		} = {
-			fragmentEntryLinkId,
+			data: JSON.stringify(data),
 			languageId,
 			segmentsExperienceId,
 		};
 
-		if (itemClassName) {
-			body.itemClassName = itemClassName;
-		}
-
-		if (itemClassPK) {
-			body.itemClassPK = itemClassPK;
-		}
-
-		if (itemExternalReferenceCode) {
-			body.itemExternalReferenceCode = itemExternalReferenceCode;
-		}
-
-		return serviceFetch<{content: string}>(config.renderFragmentEntryURL, {
-			body,
-		});
+		return serviceFetch<[{content: string; fragmentEntryLinkId: string}]>(
+			config.renderFragmentEntriesURL,
+			{
+				body,
+			}
+		);
 	},
 
 	toggleFragmentHighlighted({

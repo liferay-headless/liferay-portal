@@ -213,7 +213,7 @@ export default function ViewObjectDefinitions({
 			description: Liferay.Language.get(
 				'create-your-first-object-or-import-an-existing-one-to-start-working-with-object-folders'
 			),
-			image: '/states/empty_state.gif',
+			image: '/states/empty_state.svg',
 			title: Liferay.Language.get('no-objects-created-yet'),
 		},
 		id: objectDefinitionsFDSName,
@@ -596,6 +596,29 @@ export default function ViewObjectDefinitions({
 					id={selectedObjectFolder.id as number}
 					initialLabel={selectedObjectFolder.label}
 					name={selectedObjectFolder.name}
+					onAfterSubmit={(editedObjectFolder) => {
+						setSelectedObjectFolder(editedObjectFolder);
+						setObjectFoldersRequestInfo({
+							...objectFoldersRequestInfo,
+							items: objectFoldersRequestInfo.items.map(
+								(objectFolder) => {
+									if (
+										objectFolder.name ===
+										editedObjectFolder.name
+									) {
+										return {
+											...objectFolder,
+											externalReferenceCode:
+												editedObjectFolder.externalReferenceCode,
+											label: editedObjectFolder.label,
+										};
+									}
+
+									return objectFolder;
+								}
+							),
+						});
+					}}
 				/>
 			)}
 			{showModal.moveObjectDefinition && (

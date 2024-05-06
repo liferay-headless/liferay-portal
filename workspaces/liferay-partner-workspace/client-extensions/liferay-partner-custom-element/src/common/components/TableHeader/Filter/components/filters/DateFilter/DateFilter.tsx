@@ -12,6 +12,7 @@ interface IProps {
 	dateFilters: (dates: {endDate: string; startDate: string}) => void;
 	filterDescription?: string;
 	initialDates?: {endDate: string; startDate: string};
+	years?: {end: string; start: string};
 }
 
 const DateFilter = ({
@@ -19,6 +20,7 @@ const DateFilter = ({
 	dateFilters,
 	filterDescription,
 	initialDates,
+	years,
 }: IProps) => {
 	const [startActivityDate, setStartActivityDate] = useState(
 		initialDates?.startDate ? initialDates?.startDate : ''
@@ -34,10 +36,11 @@ const DateFilter = ({
 				On Or After
 				<ClayInput
 					id="basicInputText"
+					max={years?.end}
+					min={years?.start}
 					onChange={(event) => {
 						setStartActivityDate(event.target.value);
 					}}
-					placeholder="mm-dd-yyyye"
 					type="date"
 					value={startActivityDate}
 				/>
@@ -48,10 +51,11 @@ const DateFilter = ({
 				On Or Before
 				<ClayInput
 					id="basicInputText"
+					max={years?.end}
+					min={years?.start}
 					onChange={(event) => {
 						setEndActivityDate(event.target.value);
 					}}
-					placeholder="mm-dd-yyyy"
 					type="date"
 					value={endActivityDate}
 				/>

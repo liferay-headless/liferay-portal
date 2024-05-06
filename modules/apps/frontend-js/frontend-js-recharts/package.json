@@ -7,9 +7,9 @@
 	},
 	"name": "frontend-js-recharts",
 	"scripts": {
-		"build": "liferay-npm-bundler",
+		"build": "cross-env NODE_OPTIONS=--no-experimental-fetch liferay-npm-bundler",
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "2.0.13"
+	"version": "2.0.14"
 }

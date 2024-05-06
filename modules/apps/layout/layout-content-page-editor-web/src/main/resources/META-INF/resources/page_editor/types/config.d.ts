@@ -142,6 +142,7 @@ export interface Config {
 	getRolesURL: string;
 	getUsersURL: string;
 	imageSelectorURL: string;
+	infoFieldItemSelectorURL: string;
 	infoItemPreviewSelectorURL: string;
 	infoItemSelectorURL: string;
 	isConversionDraft: boolean;
@@ -169,7 +170,7 @@ export interface Config {
 	portletNamespace: string;
 	publishURL: string;
 	redirectURL: string;
-	renderFragmentEntryURL: string;
+	renderFragmentEntriesURL: string;
 	restoreCollectionDisplayConfigURL: string;
 	searchContainerPageMaxDelta: number;
 

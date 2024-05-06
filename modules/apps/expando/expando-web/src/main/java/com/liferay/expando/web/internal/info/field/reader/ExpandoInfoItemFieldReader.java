@@ -10,7 +10,8 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.util.ExpandoConverterUtil;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.TextInfoFieldType;
-import com.liferay.info.item.field.reader.LocalizedInfoItemFieldReader;
+import com.liferay.info.item.field.reader.InfoItemFieldReader;
+import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.localized.SingleValueInfoLocalizedValue;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -41,8 +42,7 @@ import java.util.Map;
  * @author Pavel Savinov
  * @author Jorge Ferrer
  */
-public class ExpandoInfoItemFieldReader
-	implements LocalizedInfoItemFieldReader {
+public class ExpandoInfoItemFieldReader implements InfoItemFieldReader {
 
 	public ExpandoInfoItemFieldReader(
 		String attributeName, ExpandoBridge expandoBridge) {
@@ -73,120 +73,128 @@ public class ExpandoInfoItemFieldReader
 
 	@Override
 	public Object getValue(Object model) {
-		return getValue(model, LocaleUtil.getDefault());
-	}
+		return InfoLocalizedValue.function(
+			locale -> {
+				if (!(model instanceof ClassedModel)) {
+					return _expandoBridge.getAttributeDefault(_attributeName);
+				}
 
-	@Override
-	public Object getValue(Object model, Locale locale) {
-		if (!(model instanceof ClassedModel)) {
-			return _expandoBridge.getAttributeDefault(_attributeName);
-		}
+				ClassedModel classedModel = (ClassedModel)model;
 
-		ClassedModel classedModel = (ClassedModel)model;
+				_expandoBridge.setClassPK(
+					GetterUtil.getLong(classedModel.getPrimaryKeyObj()));
 
-		_expandoBridge.setClassPK(
-			GetterUtil.getLong(classedModel.getPrimaryKeyObj()));
+				Serializable attributeValue = _expandoBridge.getAttribute(
+					_attributeName, false);
 
-		Serializable attributeValue = _expandoBridge.getAttribute(
-			_attributeName, false);
+				if (Validator.isNull(attributeValue)) {
+					return _expandoBridge.getAttributeDefault(_attributeName);
+				}
 
-		if (Validator.isNull(attributeValue)) {
-			return _expandoBridge.getAttributeDefault(_attributeName);
-		}
-
-		int attributeType = _expandoBridge.getAttributeType(_attributeName);
-
-		if (attributeType == ExpandoColumnConstants.BOOLEAN_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((boolean[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.DATE) {
-			DateFormat dateFormat = DateFormat.getDateTimeInstance(
-				DateFormat.FULL, DateFormat.FULL, locale);
-
-			return dateFormat.format((Date)attributeValue);
-		}
-		else if (attributeType == ExpandoColumnConstants.DOUBLE_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((double[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.FLOAT_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((float[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.GEOLOCATION) {
-			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					attributeValue.toString());
-
-				attributeValue = StringBundler.concat(
-					jsonObject.get("latitude"), StringPool.COMMA_AND_SPACE,
-					jsonObject.get("longitude"));
-			}
-			catch (JSONException jsonException) {
-				_log.error("Unable to parse geolocation JSON", jsonException);
-			}
-		}
-		else if (attributeType == ExpandoColumnConstants.INTEGER_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((int[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.LONG_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((long[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.NUMBER_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((double[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.SHORT_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((short[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType == ExpandoColumnConstants.STRING_ARRAY) {
-			return StringUtil.merge(
-				ArrayUtil.toStringArray((String[])attributeValue),
-				StringPool.COMMA_AND_SPACE);
-		}
-		else if (attributeType ==
-					ExpandoColumnConstants.STRING_ARRAY_LOCALIZED) {
-
-			Map<Locale, String[]> values =
-				(Map<Locale, String[]>)attributeValue;
-
-			Map<Locale, String[]> defaultValues =
-				(Map<Locale, String[]>)_expandoBridge.getAttributeDefault(
+				int attributeType = _expandoBridge.getAttributeType(
 					_attributeName);
 
-			attributeValue = values.getOrDefault(
-				locale, defaultValues.get(locale));
-		}
-		else if (attributeType == ExpandoColumnConstants.STRING_LOCALIZED) {
-			Map<Locale, String> values = (Map<Locale, String>)attributeValue;
+				if (attributeType == ExpandoColumnConstants.BOOLEAN_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((boolean[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.DATE) {
+					DateFormat dateFormat = DateFormat.getDateTimeInstance(
+						DateFormat.FULL, DateFormat.FULL, locale);
 
-			Map<Locale, String> defaultValues =
-				(Map<Locale, String>)_expandoBridge.getAttributeDefault(
-					_attributeName);
+					return dateFormat.format((Date)attributeValue);
+				}
+				else if (attributeType == ExpandoColumnConstants.DOUBLE_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((double[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.FLOAT_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((float[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.GEOLOCATION) {
+					try {
+						JSONObject jsonObject =
+							JSONFactoryUtil.createJSONObject(
+								attributeValue.toString());
 
-			attributeValue = values.getOrDefault(
-				locale, defaultValues.get(locale));
+						attributeValue = StringBundler.concat(
+							jsonObject.get("latitude"),
+							StringPool.COMMA_AND_SPACE,
+							jsonObject.get("longitude"));
+					}
+					catch (JSONException jsonException) {
+						_log.error(
+							"Unable to parse geolocation JSON", jsonException);
+					}
+				}
+				else if (attributeType ==
+							ExpandoColumnConstants.INTEGER_ARRAY) {
 
-			if (attributeValue == null) {
-				return StringPool.BLANK;
-			}
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((int[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.LONG_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((long[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.NUMBER_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((double[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.SHORT_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((short[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType == ExpandoColumnConstants.STRING_ARRAY) {
+					return StringUtil.merge(
+						ArrayUtil.toStringArray((String[])attributeValue),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType ==
+							ExpandoColumnConstants.STRING_ARRAY_LOCALIZED) {
 
-			return attributeValue;
-		}
+					Map<Locale, String[]> values =
+						(Map<Locale, String[]>)attributeValue;
 
-		return ExpandoConverterUtil.getStringFromAttribute(
-			attributeType, attributeValue);
+					Map<Locale, String[]> defaultValues =
+						(Map<Locale, String[]>)
+							_expandoBridge.getAttributeDefault(_attributeName);
+
+					return StringUtil.merge(
+						values.getOrDefault(locale, defaultValues.get(locale)),
+						StringPool.COMMA_AND_SPACE);
+				}
+				else if (attributeType ==
+							ExpandoColumnConstants.STRING_LOCALIZED) {
+
+					Map<Locale, String> values =
+						(Map<Locale, String>)attributeValue;
+
+					Map<Locale, String> defaultValues =
+						(Map<Locale, String>)_expandoBridge.getAttributeDefault(
+							_attributeName);
+
+					attributeValue = values.getOrDefault(
+						locale, defaultValues.get(locale));
+
+					if (attributeValue == null) {
+						return StringPool.BLANK;
+					}
+
+					return attributeValue;
+				}
+
+				return ExpandoConverterUtil.getStringFromAttribute(
+					attributeType, attributeValue);
+			});
 	}
 
 	private String _getLabel(Locale locale) {

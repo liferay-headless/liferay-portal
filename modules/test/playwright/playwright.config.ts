@@ -5,6 +5,7 @@
 
 import {defineConfig} from '@playwright/test';
 
+import {wemSiteSetup, wemSiteTeardown} from './setup/wem-site/config';
 import {config as accountAdminWebConfig} from './tests/account-admin-web/config';
 import {config as analyticsSettingsWebConfig} from './tests/analytics-settings-web/config';
 import {config as analyticsWebConfig} from './tests/analytics-web/config';
@@ -16,6 +17,7 @@ import {config as clientExtensionWebConfig} from './tests/client-extension-web/c
 import {config as commerceConfig} from './tests/commerce/config';
 import {config as dispatchWebConfig} from './tests/dispatch-web/config';
 import {config as documentLibraryWebConfig} from './tests/document-library-web/config';
+import {config as dynamicDataMappingFormWebConfig} from './tests/dynamic-data-mapping-form-web/config';
 import {config as exportImportWebConfig} from './tests/export-import-web/config';
 import {config as frontendDataSetViewsWebConfig} from './tests/frontend-data-set-views-web/config';
 import {config as headlessBuilderImplConfig} from './tests/headless-builder-impl/config';
@@ -27,9 +29,11 @@ import {config as layoutContentPageEditorWebConfig} from './tests/layout-content
 import {config as layoutSetPrototypeWebConfig} from './tests/layout-set-prototype-web/config';
 import {config as layoutTaglib} from './tests/layout-taglib/config';
 import {config as lockedItemsConfig} from './tests/locked-items-web/config';
+import {config as loginWebConfig} from './tests/login-web/config';
 import {config as objectWebConfig} from './tests/object-web/config';
 import {config as osbFaroWebConfig} from './tests/osb-faro-web/config';
-import {config as portalWebConfig} from './tests/portal-web/config';
+import {config as portalSearchWebConfig} from './tests/portal-search-web/config';
+import {config as portalSecurityScriptManagementWeb} from './tests/portal-security-script-management-web/config';
 import {config as portalWorkflowKaleoDesignerWebConfig} from './tests/portal-workflow-kaleo-designer-web/config';
 import {config as productNavigationControlMenuWebConfig} from './tests/product-navigation-control-menu-web/config';
 import {config as productNavigationProductMenuWebConfig} from './tests/product-navigation-product-menu-web/config';
@@ -37,6 +41,8 @@ import {config as productNavigationUserPersonalBarWebConfig} from './tests/produ
 import {config as stableConfig} from './tests/stable/config';
 import {config as stylebookConfig} from './tests/style-book-web/config';
 import {config as usersAdminWebConfig} from './tests/users-admin-web/config';
+
+const setupProjects = [wemSiteSetup, wemSiteTeardown];
 
 export default defineConfig({
 	expect: {
@@ -54,6 +60,7 @@ export default defineConfig({
 		clientExtensionWebConfig,
 		commerceConfig,
 		dispatchWebConfig,
+		dynamicDataMappingFormWebConfig,
 		documentLibraryWebConfig,
 		exportImportWebConfig,
 		frontendDataSetViewsWebConfig,
@@ -66,9 +73,11 @@ export default defineConfig({
 		layoutSetPrototypeWebConfig,
 		layoutTaglib,
 		lockedItemsConfig,
+		loginWebConfig,
 		objectWebConfig,
 		osbFaroWebConfig,
-		portalWebConfig,
+		portalSearchWebConfig,
+		portalSecurityScriptManagementWeb,
 		portalWorkflowKaleoDesignerWebConfig,
 		productNavigationControlMenuWebConfig,
 		productNavigationProductMenuWebConfig,
@@ -76,6 +85,7 @@ export default defineConfig({
 		stableConfig,
 		stylebookConfig,
 		usersAdminWebConfig,
+		...setupProjects,
 	],
 	reporter: [
 		[

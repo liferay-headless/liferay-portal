@@ -40,7 +40,7 @@ renderResponse.setTitle(blogsEditEntryDisplayContext.getPageTitle(resourceBundle
 			<liferay-ui:error exception="<%= EntryDescriptionException.class %>" message="please-enter-a-valid-abstract" />
 			<liferay-ui:error exception="<%= EntryTitleException.class %>" message="please-enter-a-valid-title" />
 			<liferay-ui:error exception="<%= EntryUrlTitleException.class %>" message="please-enter-a-valid-url-title" />
-			<liferay-ui:error exception="<%= FriendlyURLCategoryException.class %>" message="the-url-title-cannot-contain-slashes-or-categories" />
+			<liferay-ui:error exception="<%= FriendlyURLCategoryException.class %>" message="the-url-title-cannot-contain-slashes-and-categories" />
 
 			<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
 				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(FileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
@@ -174,44 +174,67 @@ renderResponse.setTitle(blogsEditEntryDisplayContext.getPageTitle(resourceBundle
 						/>
 					</aui:fieldset>
 
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="configuration">
+					<%
+					Portlet portlet = PortletLocalServiceUtil.getPortletById(BlogsPortletKeys.BLOGS);
 
-						<%
-						Portlet portlet = PortletLocalServiceUtil.getPortletById(BlogsPortletKeys.BLOGS);
-						%>
+					boolean automaticURL = false;
 
-						<div class="clearfix form-group">
+					if (entry == null) {
+						automaticURL = Validator.isNull(blogsEditEntryDisplayContext.getURLTitle());
+					}
+					else {
+						automaticURL = blogsEditEntryDisplayContext.isAutomaticURL();
+					}
+					%>
 
-							<%
-							boolean automaticURL;
-
-							if (entry == null) {
-								automaticURL = Validator.isNull(blogsEditEntryDisplayContext.getURLTitle());
-							}
-							else {
-								String uniqueUrlTitle = BlogsEntryLocalServiceUtil.getUniqueUrlTitle(entry);
-
-								automaticURL = uniqueUrlTitle.equals(blogsEditEntryDisplayContext.getURLTitle());
-							}
-							%>
-
-							<label><liferay-ui:message key="url" /></label>
-
-							<div class="form-group" id="<portlet:namespace />urlOptions">
-								<aui:input checked="<%= automaticURL %>" helpMessage="the-url-will-be-based-on-the-entry-title" label="automatic" name="automaticURL" type="radio" value="<%= true %>" />
-
-								<aui:input checked="<%= !automaticURL %>" label="custom" name="automaticURL" type="radio" value="<%= false %>" />
+					<c:if test='<%= FeatureFlagManagerUtil.isEnabled("LPD-11147") %>'>
+						<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="friendly-url">
+							<div class="form-group">
+								<react:component
+									module="{AssetCategoriesFriendlyUrlSelector} from blogs-web"
+									props='<%=
+										HashMapBuilder.<String, Object>put(
+											"automaticURL", automaticURL
+										).put(
+											"customFriendlyURL", blogsEditEntryDisplayContext.getFriendlyURL()
+										).put(
+											"friendlyUrlInfo", LanguageUtil.format(request, "there-is-a-limit-of-x-characters-in-encoded-format-for-friendly-urls-(e.g.-x)", new String[] {String.valueOf(250), "/blogs"}, false)
+										).put(
+											"friendlyURLSeparatorCompanyConfigurationURL", blogsEditEntryDisplayContext.getFriendlyURLSeparatorCompanyConfigurationURL()
+										).put(
+											"inputAddon", StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping()) + StringPool.SLASH
+										).put(
+											"selectCategoryURL", blogsEditEntryDisplayContext.getAssetCategorySelectorURL()
+										).put(
+											"selectedCategories", blogsEditEntryDisplayContext.getFriendlyURLAssetCategoriesJSONArray()
+										).build()
+									%>'
+								/>
 							</div>
+						</aui:fieldset>
+					</c:if>
 
-							<liferay-friendly-url:input
-								className="<%= BlogsEntry.class.getName() %>"
-								classPK="<%= blogsEditEntryDisplayContext.getEntryId() %>"
-								disabled="<%= automaticURL %>"
-								inputAddon='<%= StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH %>'
-								localizable="<%= false %>"
-								name="urlTitle"
-							/>
-						</div>
+					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="configuration">
+						<c:if test='<%= !FeatureFlagManagerUtil.isEnabled("LPD-11147") %>'>
+							<div class="clearfix form-group">
+								<label><liferay-ui:message key="url" /></label>
+
+								<div class="form-group" id="<portlet:namespace />urlOptions">
+									<aui:input checked="<%= automaticURL %>" helpMessage="the-url-will-be-based-on-the-entry-title" label="automatic" name="automaticURL" type="radio" value="<%= true %>" />
+
+									<aui:input checked="<%= !automaticURL %>" label="custom" name="automaticURL" type="radio" value="<%= false %>" />
+								</div>
+
+								<liferay-friendly-url:input
+									className="<%= BlogsEntry.class.getName() %>"
+									classPK="<%= blogsEditEntryDisplayContext.getEntryId() %>"
+									disabled="<%= automaticURL %>"
+									inputAddon='<%= StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH %>'
+									localizable="<%= false %>"
+									name="urlTitle"
+								/>
+							</div>
+						</c:if>
 
 						<div class="clearfix form-group">
 							<label><liferay-ui:message key="abstract" /> <liferay-ui:icon-help message="an-abstract-is-a-brief-summary-of-a-blog-entry" /></label>

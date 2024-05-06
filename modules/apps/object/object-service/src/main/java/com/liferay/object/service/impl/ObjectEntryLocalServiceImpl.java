@@ -32,6 +32,8 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.entry.ObjectEntryContext;
+import com.liferay.object.entry.contributor.ObjectEntryValuesContributor;
 import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.DuplicateObjectEntryExternalReferenceCodeException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
@@ -69,6 +71,8 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.filter.factory.FilterFactory;
+import com.liferay.object.scope.CompanyScoped;
+import com.liferay.object.scope.ObjectDefinitionScoped;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -87,6 +91,8 @@ import com.liferay.object.tree.Edge;
 import com.liferay.object.tree.Node;
 import com.liferay.object.tree.Tree;
 import com.liferay.object.tree.TreeFactory;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.sql.dsl.Column;
@@ -223,6 +229,7 @@ import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -259,6 +266,8 @@ public class ObjectEntryLocalServiceImpl
 		_fillDefaultValue(
 			_objectFieldLocalService.getObjectFields(objectDefinitionId),
 			values);
+
+		_contributeValues(groupId, objectDefinition, userId, values);
 
 		long objectEntryId = counterLocalService.increment();
 
@@ -741,7 +750,7 @@ public class ObjectEntryLocalServiceImpl
 				objectDefinition.getObjectDefinitionId());
 
 		Expression<?>[] selectExpressions = _getSelectExpressions(
-			extensionDynamicObjectDefinitionTable);
+			extensionDynamicObjectDefinitionTable, null);
 
 		List<Object[]> rows = _list(
 			_getExtensionDynamicObjectDefinitionTableSelectDSLQuery(
@@ -749,13 +758,14 @@ public class ObjectEntryLocalServiceImpl
 				selectExpressions),
 			objectDefinition.getObjectDefinitionId(), selectExpressions);
 
-		if (rows.isEmpty()) {
-			return new HashMap<>();
+		Object[] row = null;
+
+		if (!rows.isEmpty()) {
+			row = rows.get(0);
 		}
 
 		Map<String, Serializable> values = _getValues(
-			objectDefinition.getObjectDefinitionId(), rows.get(0),
-			selectExpressions);
+			objectDefinition.getObjectDefinitionId(), row, selectExpressions);
 
 		values.remove(objectDefinition.getPKObjectFieldName());
 
@@ -1108,9 +1118,10 @@ public class ObjectEntryLocalServiceImpl
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			_getSelectExpressions(dynamicObjectDefinitionLocalizationTable),
-			_getSelectExpressions(dynamicObjectDefinitionTable),
+			_getSelectExpressions(dynamicObjectDefinitionTable, null),
 			ArrayUtil.remove(
-				_getSelectExpressions(extensionDynamicObjectDefinitionTable),
+				_getSelectExpressions(
+					extensionDynamicObjectDefinitionTable, null),
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()));
 
 		List<Object[]> rows = _list(
@@ -1153,8 +1164,8 @@ public class ObjectEntryLocalServiceImpl
 	@Override
 	public List<Map<String, Serializable>> getValuesList(
 			long groupId, long companyId, long userId, long objectDefinitionId,
-			Predicate predicate, String search, int start, int end,
-			Sort[] sorts)
+			String[] selectedObjectFieldNames, Predicate predicate,
+			String search, int start, int end, Sort[] sorts)
 		throws PortalException {
 
 		DynamicObjectDefinitionLocalizationTable
@@ -1172,9 +1183,12 @@ public class ObjectEntryLocalServiceImpl
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			_getSelectExpressions(dynamicObjectDefinitionLocalizationTable),
-			_getSelectExpressions(dynamicObjectDefinitionTable),
+			_getSelectExpressions(
+				dynamicObjectDefinitionTable, selectedObjectFieldNames),
 			ArrayUtil.remove(
-				_getSelectExpressions(extensionDynamicObjectDefinitionTable),
+				_getSelectExpressions(
+					extensionDynamicObjectDefinitionTable,
+					selectedObjectFieldNames),
 				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
 			_EXPRESSIONS);
 
@@ -1484,6 +1498,9 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
+		_contributeValues(
+			objectEntry.getGroupId(), objectDefinition, userId, values);
+
 		_validateValues(
 			objectEntry, user.isGuestUser(), objectEntry.getGroupId(),
 			objectDefinition, objectEntryId, serviceContext, userId, values);
@@ -1618,6 +1635,17 @@ public class ObjectEntryLocalServiceImpl
 			new InclusionOperatorsObjectFilterParser(),
 			ObjectFilterConstants.TYPE_EXCLUDES,
 			ObjectFilterConstants.TYPE_INCLUDES);
+
+		_serviceTrackerList = ServiceTrackerListFactory.open(
+			bundleContext, ObjectEntryValuesContributor.class);
+	}
+
+	@Deactivate
+	@Override
+	protected void deactivate() {
+		super.deactivate();
+
+		_serviceTrackerList.close();
 	}
 
 	@Modified
@@ -1781,13 +1809,6 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			long primaryKey = GetterUtil.getLong(
-				values.get(objectField.getName()));
-
-			if (primaryKey == 0) {
-				continue;
-			}
-
 			ObjectRelationship objectRelationship =
 				_objectRelationshipPersistence.fetchByObjectFieldId2(
 					objectField.getObjectFieldId());
@@ -1799,6 +1820,9 @@ public class ObjectEntryLocalServiceImpl
 			if (objectDefinition == null) {
 				continue;
 			}
+
+			long primaryKey = GetterUtil.getLong(
+				values.get(objectField.getName()));
 
 			String objectRelationshipERCObjectFieldName =
 				ObjectFieldSettingUtil.getValue(
@@ -1830,13 +1854,52 @@ public class ObjectEntryLocalServiceImpl
 			ObjectEntry objectEntry = objectEntryPersistence.fetchByPrimaryKey(
 				primaryKey);
 
-			if (objectEntry == null) {
-				continue;
+			String externalReferenceCode = StringPool.BLANK;
+
+			if (objectEntry != null) {
+				externalReferenceCode = objectEntry.getExternalReferenceCode();
 			}
 
 			values.put(
-				objectRelationshipERCObjectFieldName,
-				objectEntry.getExternalReferenceCode());
+				objectRelationshipERCObjectFieldName, externalReferenceCode);
+		}
+	}
+
+	private void _contributeValues(
+		long groupId, ObjectDefinition objectDefinition, long userId,
+		Map<String, Serializable> values) {
+
+		for (ObjectEntryValuesContributor objectEntryValuesContributor :
+				_serviceTrackerList) {
+
+			if (objectEntryValuesContributor instanceof CompanyScoped) {
+				CompanyScoped companyScoped =
+					(CompanyScoped)objectEntryValuesContributor;
+
+				if (!companyScoped.isAllowedCompany(
+						objectDefinition.getCompanyId())) {
+
+					continue;
+				}
+			}
+
+			if (objectEntryValuesContributor instanceof
+					ObjectDefinitionScoped) {
+
+				ObjectDefinitionScoped objectDefinitionScoped =
+					(ObjectDefinitionScoped)objectEntryValuesContributor;
+
+				if (!objectDefinitionScoped.isAllowedObjectDefinition(
+						objectDefinition.getName())) {
+
+					continue;
+				}
+			}
+
+			objectEntryValuesContributor.contribute(
+				new ObjectEntryContext(
+					groupId, objectDefinition.getObjectDefinitionId(), userId,
+					values));
 		}
 	}
 
@@ -3050,13 +3113,26 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private Expression<?>[] _getSelectExpressions(
-			DynamicObjectDefinitionTable dynamicObjectDefinitionTable)
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+			String[] selectedObjectFieldNames)
 		throws PortalException {
 
 		List<Expression<?>> selectExpressions = new ArrayList<>();
 
 		for (Column<DynamicObjectDefinitionTable, ?> column :
 				dynamicObjectDefinitionTable.getColumns()) {
+
+			if ((selectedObjectFieldNames != null) &&
+				!ArrayUtil.contains(
+					selectedObjectFieldNames,
+					StringUtil.removeLast(
+						column.getName(), StringPool.UNDERLINE)) &&
+				!Objects.equals(
+					column.getName(),
+					dynamicObjectDefinitionTable.getPrimaryKeyColumnName())) {
+
+				continue;
+			}
 
 			selectExpressions.add(column);
 		}
@@ -3070,6 +3146,13 @@ public class ObjectEntryLocalServiceImpl
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
 				!objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+				continue;
+			}
+
+			if ((selectedObjectFieldNames != null) &&
+				!ArrayUtil.contains(
+					selectedObjectFieldNames, objectField.getName())) {
 
 				continue;
 			}
@@ -3201,6 +3284,12 @@ public class ObjectEntryLocalServiceImpl
 			String columnName = null;
 			Class<?> javaTypeClass = null;
 
+			Object object = null;
+
+			if (objects != null) {
+				object = objects[i];
+			}
+
 			if (selectExpression instanceof Alias) {
 				Alias<?> alias = (Alias<?>)selectExpression;
 
@@ -3230,13 +3319,12 @@ public class ObjectEntryLocalServiceImpl
 					_objectFieldLocalService.fetchObjectField(
 						objectDefinitionId, columnName);
 
-				if ((objectField != null) &&
+				if ((object != null) && (objectField != null) &&
 					objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_ENCRYPTED)) {
 
 					try {
-						objects[i] = _encryptor.decrypt(
-							_getKey(), (String)objects[i]);
+						object = _encryptor.decrypt(_getKey(), (String)object);
 					}
 					catch (IllegalArgumentException illegalArgumentException) {
 						throw new IllegalArgumentException(
@@ -3251,7 +3339,7 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 
-			_putValue(javaTypeClass, columnName, objects[i], values);
+			_putValue(javaTypeClass, columnName, object, values);
 		}
 
 		return values;
@@ -4864,6 +4952,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	private ServiceTrackerList<ObjectEntryValuesContributor>
+		_serviceTrackerList;
 
 	@Reference
 	private Sorts _sorts;

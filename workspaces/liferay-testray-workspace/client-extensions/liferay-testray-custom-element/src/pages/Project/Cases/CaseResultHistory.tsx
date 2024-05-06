@@ -4,6 +4,7 @@
  */
 
 import {useParams} from 'react-router-dom';
+import {getTruncateText} from '~/util/getTruncateText';
 
 import Code from '../../../components/Code';
 import JiraLink from '../../../components/JiraLink';
@@ -29,6 +30,7 @@ const CaseResultHistory: React.FC<CaseResultHistoryProps> = ({
 	return (
 		<ListView
 			initialContext={{
+				pageSize: 200,
 				sort: {
 					direction: 'DESC',
 					key: 'dateCreated',
@@ -106,7 +108,11 @@ const CaseResultHistory: React.FC<CaseResultHistoryProps> = ({
 					{
 						key: 'errors',
 						render: (errors: string) =>
-							errors && <Code>{errors}</Code>,
+							errors && (
+								<Code title={errors as string}>
+									{getTruncateText(errors)}
+								</Code>
+							),
 						size: 'xl',
 						value: i18n.translate('errors'),
 					},

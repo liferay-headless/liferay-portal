@@ -14,9 +14,11 @@ export default {
 	'account-name': 'Account Name',
 	'accounts': 'Accounts',
 	'activation-status': 'Activation Status',
+	'active': 'Active',
 	'add-packages': 'Add Package(s)',
 	'additional-apps-requested': 'Additional Apps Requested',
 	'address': 'Address',
+	'all-orders': 'All Orders',
 	'all-published-apps': 'All Published Apps',
 	'amount': 'Amount',
 	'an-administrator-of-the-marketplace-will-review-your-request-shortly-if-you-have-questions-regarding-your-submission-please-email':
@@ -32,6 +34,7 @@ export default {
 		'apply to your use of this service. The name on your Liferay account will be used in this Liferay Marketplace Publisher Profile. It may appear where you contribute and be changed at any time',
 	'apps': 'Apps',
 	'aprove': 'Aprove',
+	'available': 'Available',
 	'back': 'Back',
 	'back-to-apps': 'Back to Apps',
 	'back-to-my-apps': 'Back to My Apps',
@@ -45,6 +48,9 @@ export default {
 		'By requesting a Publisher account, you agree to the',
 	'cancel': 'Cancel',
 	'cash': 'Cash',
+	'categories': 'Categories',
+	'choose-the-marketplace-category-that-most-accurately-describes-what-your-solution-does-users-looking-for-specific-types-of-solutions-will-often-browse-categories-by-searching-on-a-specific-category-name-in-the-main-marketplace-home-page-having-your-solution-listed-under-the-appropriate-category-will-help-them-find-your-solution':
+		'Choose the Marketplace category that most accurately describes what your solution does. Users looking for specific types of solutions will often browse categories by searching on a specific category name in the main Marketplace home page. Having your solution listed under the appropriate category will help them find your solution.',
 	'click-on-add-apps-to-start': "Click on 'Add Apps' to start.",
 	'client-extensions': 'Client Extensions',
 	'cloud-apps-must-state-resource-requirements-if-your-app-has-no-additional-cpu-or-ram-requirements-please-enter-0':
@@ -52,6 +58,7 @@ export default {
 	'cloud-compatible': 'Cloud Compatible?',
 	'cloud-upload': 'Cloud Upload',
 	'comments': 'Comments',
+	'company-profile': 'Company Profile',
 	'compatible-offering': 'Compatible Offering',
 	'complete-publisher-account-request': 'Complete Publisher Account Request',
 	'confirm': 'Confirm',
@@ -60,9 +67,11 @@ export default {
 	'contact-publisher': 'Contact Publisher',
 	'contact-sales': 'Contact Sales',
 	'contact-support': 'Contact Support',
+	'contact-us': 'Contact Us',
 	'content-policy': 'Content policy',
 	'continue': 'Continue',
 	'coupon-code': 'Coupon Code',
+	'create': 'Create',
 	'create-a-cloud-app-to-be-delivered-as-a-live-service':
 		'Create a Cloud App to be delivered as a Live Service',
 	'create-a-dxp-app-to-be-delivered-as-a-download':
@@ -70,15 +79,31 @@ export default {
 	'create-license-key': 'Create License Key',
 	'create-new-licenses-and-they-will-show-up-here':
 		'Create new licenses and they will show up here.',
+	'create-template': 'Create template',
 	'created-at': 'Created At',
 	'customer-account': 'Customer Account',
 	'customer-dashboard': 'Customer Dashboard',
 	'customer-roject': 'Customer Project',
+	'customers-of-the-marketplace-will-see-this-as-the-name-of-the-solution-please-use-a-title-of-no-longer-than-50-characters-titles-longer-than-18-characters-may-be-truncated-the-solution-title-may-contain-the-word-liferay-to-describe-its-use-or-intent-as-long-as-the-name-does-not-imply-official-certification-or-validation-from-liferay-inc-an-example-of-permissible-names-would-be-exchange-connector-for-liferay-or-integration-connector-kit-for-liferay-while-liferay-mail-solution-or-liferay-management-console-would-not-be-permitted-without-explicit-approval-please-refer-to-our-trademark-policy':
+		'Customers of the marketplace will see this as the name of the solution. Please use a title of no longer than 50 characters. Titles longer than 18 characters may be truncated. The Solution title may contain the word "Liferay" to describe its use or intent as long as the name does not imply official certification or validation from Liferay, Inc. An example of permissible names would be "Exchange Connector for Liferay" or "Integration Connector Kit for Liferay" while "Liferay Mail Solution" or "Liferay Management Console" would not be permitted without explicit approval. Please refer to our trademark policy.',
+	'customize-solution-header': 'Customize solution header',
+	'customize-storefront-solutions-details':
+		'Customize storefront solutions details',
 	'dashboard': 'Dashboard',
 	'deactivate': 'Deactivate',
+	'deactivated': 'Deactivated',
 	'decline': 'Decline',
+	'define-contact-us-information-for-your-solution-this-will-inform-users-about-this-versions-updates-on-the-storefront':
+		'Define contact us information for your solution. This will inform users about this version’s updates on the storefront.',
+	'define-profile-company-information-for-your-solution-this-will-inform-users-about-this-versions-updates-on-the-storefront':
+		'Define profile company information for your solution. This will inform users about this version’s updates on the storefront.',
+	'define-the-solution-profile': 'Define the solution profile',
 	'delete': 'Delete',
 	'description': 'Description',
+	'design-the-storefront-for-your-solution-this-will-set-the-information-displayed-on-the-solutions-page-this-section-is-dedicated-to-creating-the-solutions-detail-content':
+		'Design the storefront for your solution. This will set the information displayed on the solution’s page. This section is dedicated to creating the solution’s detail content.',
+	'design-the-storefront-for-your-solution-this-will-set-the-information-displayed-on-the-solutions-page-this-section-is-dedicated-to-creating-the-solutions-header':
+		'Design the storefront for your solution. This will set the information displayed on the solution’s page. This section is dedicated to creating the solution’s header.',
 	'details': 'Details',
 	'discover-and-customize': 'Discover and customize',
 	'download-app': 'Download App',
@@ -87,6 +112,7 @@ export default {
 	'drag-and-drop-to-upload-or': 'Drag and drop to upload or',
 	'dxp-module-based-apps-are-not-supported-on-liferay-experience-cloud-lxc':
 		'DXP module-based apps are not supported on Liferay SaaS.',
+	'each': 'each',
 	'edit': 'Edit',
 	'email': 'Email',
 	'end-user-license-agreement': 'End User License Agreement',
@@ -103,9 +129,13 @@ export default {
 		'Enter the required RAM (0 is a valid value)',
 	'enter-your-contact-details-in-the-fields-below-in-the-request-description-enter-the-name-and-a-brief-description-of-the-app-you-would-like-to-submit-we-will-be-in-contact-regarding-your-request':
 		'Enter your contact details in the fields below. In the Request Description, enter the name and a brief description of the app you would like to submit. We will be in contact regarding your request.',
+	'enter-your-solution-details-this-information-will-be-used-for-submission-presentation-customer-support-and-search-capabilities':
+		'Enter your solution details. This information will be used for submission, presentation, customer support, and search capabilities.',
 	'environment': 'Environment',
 	'environment-type': 'Environment Type',
+	'exit': 'Exit',
 	'expiration-date': 'Expiration Date',
+	'expired': 'Expired',
 	'explore-over-800-apps-available-in-the-liferay-marketplace-from-a-variety-of-publishers-apps-allow-you-to-accelerate-your-liferay-development-get-to-market-faster':
 		'Explore over 800 apps available in the Liferay Marketplace from a variety of publishers. Apps allow you to accelerate your Liferay development get to market faster.',
 	'extension-optional': 'Extension (optional)',
@@ -118,6 +148,7 @@ export default {
 	'go-to-console': 'Go to Console',
 	'go-to-dxp': 'Go to DXP',
 	'go-to-marketplace': 'Go to Marketplace',
+	'go-to-trial': 'Go to Trial',
 	'host-name': 'Host Name',
 	'i-certify-that-the-instances-activated-with-the-selected-activation-keys-have-been-shut-down-and-that-there-is-no-liferay-software-installed-deployed-used-or-executed-that-is-activated-with-the-selected-activation-key':
 		'I certify that the instances activated with the selected activation keys have been shut down and that there is no Liferay software installed, deployed, used or executed that is activated with the selected activation key.',
@@ -148,7 +179,9 @@ export default {
 		'Learn more about App Resource Requirements',
 	'learn-more-about-becoming-a-liferay-customer':
 		'Learn more about becoming a Liferay Customer',
+	'license': 'License',
 	'license-price': 'License Price',
+	'license-prices': 'License Prices',
 	'license-type': 'License Type',
 	'licenses': 'Licenses',
 	'liferay-learn': 'Liferay Learn',
@@ -174,6 +207,7 @@ export default {
 	'no-results-found': 'No results found',
 	'not-seeing-a-specific-project': 'Not seeing a specific Project?',
 	'number-of-cpus': 'Number of CPUs',
+	'on-hold': 'On Hold',
 	'only-jar-war-files-are-allowed-max-file-size-is-500mb':
 		'Only JAR, WAR files are allowed. Max file size is 500MB.',
 	'only-zip-files-are-allowed-max-file-size-is-500-mb':
@@ -188,8 +222,13 @@ export default {
 	'please-be-sure-to-specify-liferay-compatibility-through-the-appropriate-properties-or-xml-files-in-your-plugin':
 		'Please be sure to specify Liferay compatibility through the appropriate properties or XML files in your plugin.',
 	'please-fill-in-a-valid-email': 'Please fill in a valid email',
+	'please-review-before-submitting-once-sent-you-will-not-be-able-to-edit-any-information-until-this-submission-is-completely-reviewed-by-liferay':
+		'Please, review before submitting. Once sent, you will not be able to edit any information until this submission is completely reviewed by Liferay.',
 	'privacy-policy': 'Privacy Policy',
+	'profile': 'Profile',
 	'provide-app-build': 'Provide app build',
+	'provide-company-profile-details': 'Provide company profile details',
+	'provide-contact-us-details': 'Provide contact us details',
 	'publish-apps-and-they-will-show-up-here':
 		'Publish apps and they will show up here',
 	'publish-apps-to-the-liferay-marketplace':
@@ -206,6 +245,7 @@ export default {
 	'ram': 'RAM',
 	'ram-in-gbs': 'RAM in GBs',
 	'recent-published-apps': 'Recent Published Apps',
+	'recent-trials': 'Recent Trials',
 	'remove-a-version': 'Remove a Version',
 	'request-a-marketplace-publisher-account':
 		'Request a Marketplace Publisher Account',
@@ -215,7 +255,11 @@ export default {
 	'request-sent-successfully': 'Request sent successfully',
 	'requester': 'Requester',
 	'resource-requirements': 'Resource Requirements',
+	'resources': 'Resources',
 	'return-to-marketplace': 'Return to Marketplace',
+	'review-and-accept-the-legal-agreement-between-you-and-liferay-before-proceeding-you-are-about-to-create-a-new-solution-submission':
+		'Review and accept the legal agreement between you and Liferay before proceeding, You are about to create a new solution submission.',
+	'review-and-submit-solution': 'Review and submit solution',
 	'review-the-new-publisher-info-and-the-liferay-marketplace-terms-before-proceeding':
 		'Review the new publisher info and the Liferay Marketplace terms before proceeding',
 	'search': 'Search',
@@ -230,15 +274,22 @@ export default {
 	'self-managed': 'Self-Managed',
 	'send-request': 'Send Request',
 	'sign-in-with-a-different-account': 'Sign in with a different Account',
+	'solution-details': 'Solution Details',
+	'solution-header': 'Solution Header',
 	'solutions': 'Solutions',
+	'solutions-info': 'Solutions Info',
 	'sorry-there-are-no-results-found': 'Sorry, there are no results found',
 	'start-date': 'Start Date',
 	'start-trial': 'Start Trial',
 	'status': 'Status',
+	'submit': 'Submit',
 	'subtotal': 'Subtotal',
 	'subtotal-discount': 'Subtotal Discount',
 	'success': 'success',
 	'summary': 'Summary',
+	'tags': 'Tags',
+	'tags-help-to-describe-your-solution-in-the-marketplace-select-the-tags-most-relevant-to-your-solution-they-can-be-changed-if-needed':
+		'Tags help to describe your solution in the Marketplace. Select the tags most relevant to your solution. They can be changed if needed.',
 	'tax-vat': 'Tax/VAT',
 	'terms-of-service': 'Terms of Service',
 	'thank-you-for-your': 'Thank you for your',
@@ -272,9 +323,14 @@ export default {
 	'this-order-must-be-completed-before-downloading-this-app.':
 		'This order must be completed before downloading this app.',
 	'total': 'Total',
+	'trial': 'Trial',
+	'trial-resources': 'Trial Resources',
+	'trial-status': 'Trial Status',
+	'trials': 'Trials',
 	'type': 'Type',
 	'unable-to-download-your-license-file-please-try-again-and-or-contact-support-via-the-manage-menu-on-the-dashboard':
 		'Unable to download your license file.  Please try again and/or contact support via the manage menu on the dashboard.',
+	'upload-image': 'Upload image',
 	'upload-liferay-plugin-packages': 'Upload Liferay Plugin Packages',
 	'upload-zip-files': 'Upload ZIP Files',
 	'use-any-build-from-any-available-liferay-experience-cloud-account-requires-lxc-account':
@@ -299,7 +355,11 @@ export default {
 	'we-are-happy-to-have-you-interested-in-the-liferay-marketplace-at-the-moment-we-are-working-on-enhancing-the-experience-for-our-publishers-in-the-marketplace-if-you-are-an-existing-liferay-developer-or-partner-you-can-choose-to-join-our-pilot-group-of-publishers-to-submit-apps-to-the-marketplace-continue-to-request-a-publisher-account':
 		'We are happy to have you interested in the Liferay Marketplace. At the moment, we are working on enhancing the experience for our publishers in the Marketplace.  If you are an existing Liferay developer or partner, you can choose to join our pilot group of publishers to submit apps to the Marketplace.  Continue to request a publisher account.',
 	'x-is-required': '{0} is required',
+	'x-saved-as-a-draft-successfully':
+		'<b>{0}</b> saved as a <b>draft</b> successfully',
 	'yes': 'Yes',
+	'you-can-put-anything-you-want-here-but-a-good-guideline-is-no-more-than-4-5-paragraphs-this-field-does-not-allow-any-markup-tags-its-just-text-please-do-not-use-misleading-names-information-or-icons-descriptions-should-be-as-concise-as-possible-ensure-your-icons-images-descriptions-and-tags-are-free-of-profanity-or-other-offensive-material':
+		'You can put anything you want here, but a good guideline is no more than 4-5 paragraphs. This field does not allow any markup tags - it’s just text Please do not use misleading names, information, or icons. Descriptions should be as concise as possible. Ensure your icons, images, descriptions, and tags are free of profanity or other offensive material.',
 	'you-can-upload-one-or-many-zip-files-max-total-size-is-500-mb':
 		'You can upload one or many ZIP files. Max total size is 500MB.',
 	'your-request-completed-successfully':

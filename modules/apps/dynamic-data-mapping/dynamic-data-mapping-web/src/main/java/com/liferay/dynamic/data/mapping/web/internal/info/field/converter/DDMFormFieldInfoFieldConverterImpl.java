@@ -28,6 +28,7 @@ import com.liferay.info.field.type.URLInfoFieldType;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.localized.bundle.FunctionInfoLocalizedValue;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class DDMFormFieldInfoFieldConverterImpl
 		InfoFieldType infoFieldType = _getInfoFieldType(ddmFormField);
 		LocalizedValue label = ddmFormField.getLabel();
 
-		return _addAttributes(
+		InfoField.FinalStep finalStep = _addAttributes(
 			ddmFormField,
 			InfoField.builder(
 			).infoFieldType(
@@ -70,7 +71,13 @@ public class DDMFormFieldInfoFieldConverterImpl
 			ddmFormField.isLocalizable()
 		).required(
 			ddmFormField.isRequired()
-		).build();
+		);
+
+		if (FeatureFlagManagerUtil.isEnabled("LPD-11377")) {
+			finalStep = finalStep.repeatable(ddmFormField.isRepeatable());
+		}
+
+		return finalStep.build();
 	}
 
 	private InfoField.FinalStep _addAttributes(

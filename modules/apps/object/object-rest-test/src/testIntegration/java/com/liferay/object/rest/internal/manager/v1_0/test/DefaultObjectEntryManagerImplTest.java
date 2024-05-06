@@ -40,6 +40,7 @@ import com.liferay.object.field.builder.DecimalObjectFieldBuilder;
 import com.liferay.object.field.builder.IntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.LongIntegerObjectFieldBuilder;
 import com.liferay.object.field.builder.LongTextObjectFieldBuilder;
+import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PrecisionDecimalObjectFieldBuilder;
 import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
@@ -359,6 +360,15 @@ public class DefaultObjectEntryManagerImplTest
 					true
 				).name(
 					"localizedLongTextObjectFieldName"
+				).build(),
+				new MultiselectPicklistObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).listTypeDefinitionId(
+					listTypeDefinition.getListTypeDefinitionId()
+				).name(
+					"multiselectPicklistObjectFieldName"
 				).build(),
 				new PicklistObjectFieldBuilder(
 				).indexed(
@@ -2892,6 +2902,9 @@ public class DefaultObjectEntryManagerImplTest
 							ObjectFieldValidationConstants.
 								BUSINESS_TYPE_LONG_VALUE_MAX)
 					).put(
+						"multiselectPicklistObjectFieldName",
+						Collections.singletonList(_addListTypeEntry())
+					).put(
 						"precisionDecimalObjectFieldName",
 						new BigDecimal(
 							String.valueOf(RandomTestUtil.randomDouble()))
@@ -2917,6 +2930,25 @@ public class DefaultObjectEntryManagerImplTest
 				"integerObjectFieldName", 25
 			).put(
 				"longIntegerObjectFieldName", 200L
+			).put(
+				"multiselectPicklistObjectFieldName",
+				() -> {
+					ListTypeEntry listTypeEntry =
+						_listTypeEntryLocalService.addListTypeEntry(
+							null, adminUser.getUserId(),
+							listTypeDefinition.getListTypeDefinitionId(),
+							RandomTestUtil.randomString(),
+							Collections.singletonMap(
+								LocaleUtil.US, RandomTestUtil.randomString()));
+
+					return Collections.singletonList(
+						new ListEntry() {
+							{
+								key = listTypeEntry.getKey();
+								name = listTypeEntry.getName(LocaleUtil.US);
+							}
+						});
+				}
 			).put(
 				"precisionDecimalObjectFieldName",
 				new BigDecimal("0.8755445767")
@@ -3813,21 +3845,46 @@ public class DefaultObjectEntryManagerImplTest
 			long objectEntryId)
 		throws Exception {
 
-		_user.setLanguageId(languageId);
-
-		_user = _userLocalService.updateUser(_user);
+		// DTOConverterContext#getLocale
 
 		assertEquals(
 			_defaultObjectEntryManager.getObjectEntry(
 				new DefaultDTOConverterContext(
 					false, Collections.emptyMap(), dtoConverterRegistry, null,
-					LocaleUtil.getDefault(), null, _user),
+					LocaleUtil.fromLanguageId(languageId), null, _user),
 				_objectDefinition2, objectEntryId),
 			new ObjectEntry() {
 				{
 					properties = expectedLocalizedValues;
 				}
 			});
+
+		// User#getLanguageId
+
+		String originalLanguageId = _user.getLanguageId();
+
+		try {
+			_user.setLanguageId(languageId);
+
+			_user = _userLocalService.updateUser(_user);
+
+			assertEquals(
+				_defaultObjectEntryManager.getObjectEntry(
+					new DefaultDTOConverterContext(
+						false, Collections.emptyMap(), dtoConverterRegistry,
+						null, null, null, _user),
+					_objectDefinition2, objectEntryId),
+				new ObjectEntry() {
+					{
+						properties = expectedLocalizedValues;
+					}
+				});
+		}
+		finally {
+			_user.setLanguageId(originalLanguageId);
+
+			_user = _userLocalService.updateUser(_user);
+		}
 	}
 
 	private void _assertObjectEntriesSize1(long size) throws Exception {

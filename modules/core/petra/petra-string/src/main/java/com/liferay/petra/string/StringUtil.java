@@ -168,25 +168,26 @@ public class StringUtil {
 	}
 
 	public static <T> String merge(
-		Collection<T> col, Function<T, String> toStringFunction,
+		Collection<T> collection, Function<T, String> toStringFunction,
 		String delimiter) {
 
-		if (col instanceof List && col instanceof RandomAccess) {
+		if (collection instanceof List && collection instanceof RandomAccess) {
 			return merge(
-				(List<T> & RandomAccess)col, toStringFunction, delimiter);
+				(List<T> & RandomAccess)collection, toStringFunction,
+				delimiter);
 		}
 
-		if (col == null) {
+		if (collection == null) {
 			return null;
 		}
 
-		if (col.isEmpty()) {
+		if (collection.isEmpty()) {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(2 * col.size());
+		StringBundler sb = new StringBundler(2 * collection.size());
 
-		for (T t : col) {
+		for (T t : collection) {
 			sb.append(toStringFunction.apply(t));
 			sb.append(delimiter);
 		}
@@ -196,8 +197,8 @@ public class StringUtil {
 		return sb.toString();
 	}
 
-	public static <T> String merge(Collection<T> col, String delimiter) {
-		return merge(col, String::valueOf, delimiter);
+	public static <T> String merge(Collection<T> collection, String delimiter) {
+		return merge(collection, String::valueOf, delimiter);
 	}
 
 	public static String merge(double[] array, String delimiter) {

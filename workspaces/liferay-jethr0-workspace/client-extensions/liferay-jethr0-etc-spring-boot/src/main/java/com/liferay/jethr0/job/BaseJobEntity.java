@@ -7,8 +7,9 @@ package com.liferay.jethr0.job;
 
 import com.liferay.jethr0.bui1d.BuildEntity;
 import com.liferay.jethr0.entity.BaseEntity;
-import com.liferay.jethr0.git.branch.GitBranchEntity;
+import com.liferay.jethr0.git.commit.GitCommitEntity;
 import com.liferay.jethr0.jenkins.cohort.JenkinsCohortEntity;
+import com.liferay.jethr0.routine.RoutineEntity;
 import com.liferay.jethr0.task.TaskEntity;
 import com.liferay.jethr0.testsuite.TestSuiteEntity;
 import com.liferay.jethr0.util.StringUtil;
@@ -47,16 +48,6 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	@Override
 	public void addBuildEntity(BuildEntity buildEntity) {
 		addRelatedEntity(buildEntity);
-	}
-
-	@Override
-	public void addGitBranchEntities(Set<GitBranchEntity> gitBranchEntities) {
-		addRelatedEntities(gitBranchEntities);
-	}
-
-	@Override
-	public void addGitBranchEntity(GitBranchEntity gitBranchEntity) {
-		addRelatedEntity(gitBranchEntity);
 	}
 
 	@Override
@@ -99,8 +90,13 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	}
 
 	@Override
-	public Set<GitBranchEntity> getGitBranchEntities() {
-		return getRelatedEntities(GitBranchEntity.class);
+	public GitCommitEntity getGitCommitEntity() {
+		return _gitCommitEntity;
+	}
+
+	@Override
+	public long getGitCommitEntityId() {
+		return _gitCommitEntityId;
 	}
 
 	@Override
@@ -152,6 +148,10 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 		).put(
 			"priority", getPriority()
 		).put(
+			"r_gitCommitToJobs_c_gitCommitId", getGitCommitEntityId()
+		).put(
+			"r_routineToJobs_c_routineId", getRoutineEntityId()
+		).put(
 			"startDate", StringUtil.toString(getStartDate())
 		).put(
 			"state", state.getJSONObject()
@@ -180,6 +180,16 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	@Override
 	public int getPriority() {
 		return _priority;
+	}
+
+	@Override
+	public RoutineEntity getRoutineEntity() {
+		return _routineEntity;
+	}
+
+	@Override
+	public long getRoutineEntityId() {
+		return _routineEntityId;
 	}
 
 	@Override
@@ -215,18 +225,6 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	@Override
 	public void removeBuildEntity(BuildEntity buildEntity) {
 		removeRelatedEntity(buildEntity);
-	}
-
-	@Override
-	public void removeGitBranchEntities(
-		Set<GitBranchEntity> gitBranchEntities) {
-
-		removeRelatedEntities(gitBranchEntities);
-	}
-
-	@Override
-	public void removeGitBranchEntity(GitBranchEntity gitBranchEntity) {
-		removeRelatedEntity(gitBranchEntity);
 	}
 
 	@Override
@@ -266,6 +264,18 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	}
 
 	@Override
+	public void setGitCommitEntity(GitCommitEntity gitCommitEntity) {
+		_gitCommitEntity = gitCommitEntity;
+
+		if (_gitCommitEntity != null) {
+			_gitCommitEntityId = _gitCommitEntity.getId();
+		}
+		else {
+			_gitCommitEntityId = 0;
+		}
+	}
+
+	@Override
 	public void setJenkinsBranchURL(URL jenkinsBranchURL) {
 		setParameterValue("jenkinsBranchURL", String.valueOf(jenkinsBranchURL));
 	}
@@ -274,9 +284,12 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	public void setJSONObject(JSONObject jsonObject) {
 		super.setJSONObject(jsonObject);
 
+		_gitCommitEntityId = jsonObject.optLong(
+			"r_gitCommitToJobs_c_gitCommitId");
 		_name = jsonObject.getString("name");
 		_parameters = new HashMap<>();
 		_priority = jsonObject.optInt("priority");
+		_routineEntityId = jsonObject.optLong("r_routineToJobs_c_routineId");
 		_startDate = StringUtil.toDate(jsonObject.optString("startDate"));
 		_state = State.get(jsonObject.get("state"));
 		_type = Type.get(jsonObject.get("type"));
@@ -312,6 +325,13 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	}
 
 	@Override
+	public void setParameters(Map<String, String> parameters) {
+		_parameters.clear();
+
+		_parameters.putAll(parameters);
+	}
+
+	@Override
 	public void setParameterValue(String name, String value) {
 		_parameters.put(name, value);
 	}
@@ -319,6 +339,18 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 	@Override
 	public void setPriority(int priority) {
 		_priority = priority;
+	}
+
+	@Override
+	public void setRoutineEntity(RoutineEntity routineEntity) {
+		_routineEntity = routineEntity;
+
+		if (_routineEntity != null) {
+			_routineEntityId = _routineEntity.getId();
+		}
+		else {
+			_routineEntityId = 0;
+		}
 	}
 
 	@Override
@@ -516,9 +548,13 @@ public abstract class BaseJobEntity extends BaseEntity implements JobEntity {
 		"https://github.com/(?<userName>[^/]+)/(?<repositoryName>[^/]+)/tree/" +
 			"(?<branchName>[^/]+)");
 
+	private GitCommitEntity _gitCommitEntity;
+	private long _gitCommitEntityId;
 	private String _name;
 	private Map<String, String> _parameters;
 	private int _priority;
+	private RoutineEntity _routineEntity;
+	private long _routineEntityId;
 	private Date _startDate;
 	private State _state;
 	private Type _type;

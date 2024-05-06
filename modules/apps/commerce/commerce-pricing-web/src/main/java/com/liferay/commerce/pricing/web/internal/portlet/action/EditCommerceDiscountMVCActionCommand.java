@@ -5,9 +5,11 @@
 
 package com.liferay.commerce.pricing.web.internal.portlet.action;
 
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.exception.CommerceDiscountCouponCodeException;
 import com.liferay.commerce.discount.exception.CommerceDiscountMaxPriceValueException;
+import com.liferay.commerce.discount.exception.CommerceDiscountMinPriceValueException;
 import com.liferay.commerce.discount.exception.CommerceDiscountRuleTypeSettingsException;
 import com.liferay.commerce.discount.exception.NoSuchDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
@@ -15,7 +17,6 @@ import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
@@ -71,7 +72,9 @@ public class EditCommerceDiscountMVCActionCommand extends BaseMVCActionCommand {
 				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 			else if (throwable instanceof
-						CommerceDiscountMaxPriceValueException) {
+						CommerceDiscountMaxPriceValueException ||
+					 throwable instanceof
+						 CommerceDiscountMinPriceValueException) {
 
 				hideDefaultErrorMessage(actionRequest);
 				hideDefaultSuccessMessage(actionRequest);
@@ -158,33 +161,15 @@ public class EditCommerceDiscountMVCActionCommand extends BaseMVCActionCommand {
 		boolean usePercentage = ParamUtil.getBoolean(
 			actionRequest, "usePercentage");
 
-		BigDecimal maximumDiscountAmount = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "maximumDiscountAmount", BigDecimal.ZERO);
-
 		String level = ParamUtil.getString(actionRequest, "level");
 
-		BigDecimal amount = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "amount", BigDecimal.ZERO);
-
-		BigDecimal[] discountLevels = _getDiscountLevels(level, amount);
+		BigDecimal[] discountLevels = _getDiscountLevels(
+			level, _commercePriceFormatter.parse(actionRequest, "amount"));
 
 		int limitationTimes = ParamUtil.getInteger(
 			actionRequest, "limitationTimes");
 		int limitationTimesPerAccount = ParamUtil.getInteger(
 			actionRequest, "limitationTimesPerAccount");
-		boolean rulesConjunction = ParamUtil.getBoolean(
-			actionRequest, "rulesConjunction");
-
-		boolean active = ParamUtil.getBoolean(actionRequest, "active");
-
-		int displayDateMonth = ParamUtil.getInteger(
-			actionRequest, "displayDateMonth");
-
-		int displayDateDay = ParamUtil.getInteger(
-			actionRequest, "displayDateDay");
-
-		int displayDateYear = ParamUtil.getInteger(
-			actionRequest, "displayDateYear");
 
 		int displayDateHour = ParamUtil.getInteger(
 			actionRequest, "displayDateHour");
@@ -196,18 +181,6 @@ public class EditCommerceDiscountMVCActionCommand extends BaseMVCActionCommand {
 			displayDateHour += 12;
 		}
 
-		int displayDateMinute = ParamUtil.getInteger(
-			actionRequest, "displayDateMinute");
-
-		int expirationDateMonth = ParamUtil.getInteger(
-			actionRequest, "expirationDateMonth");
-
-		int expirationDateDay = ParamUtil.getInteger(
-			actionRequest, "expirationDateDay");
-
-		int expirationDateYear = ParamUtil.getInteger(
-			actionRequest, "expirationDateYear");
-
 		int expirationDateHour = ParamUtil.getInteger(
 			actionRequest, "expirationDateHour");
 
@@ -218,32 +191,37 @@ public class EditCommerceDiscountMVCActionCommand extends BaseMVCActionCommand {
 			expirationDateHour += 12;
 		}
 
-		int expirationDateMinute = ParamUtil.getInteger(
-			actionRequest, "expirationDateMinute");
-
-		String externalReferenceCode = ParamUtil.getString(
-			actionRequest, "externalReferenceCode");
-
-		boolean neverExpire = ParamUtil.getBoolean(
-			actionRequest, "neverExpire");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CommerceDiscount.class.getName(), actionRequest);
-
 		return _commerceDiscountService.addOrUpdateCommerceDiscount(
-			externalReferenceCode, commerceDiscountId, title, target,
-			useCouponCode, couponCode, usePercentage, maximumDiscountAmount,
+			ParamUtil.getString(actionRequest, "externalReferenceCode"),
+			commerceDiscountId, title, target, useCouponCode, couponCode,
+			usePercentage,
+			_commercePriceFormatter.parse(
+				actionRequest, "maximumDiscountAmount"),
 			level, discountLevels[0], discountLevels[1], discountLevels[2],
 			discountLevels[3],
 			_getLimitationType(limitationTimes, limitationTimesPerAccount),
-			limitationTimes, limitationTimesPerAccount, rulesConjunction,
-			active, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, serviceContext);
+			limitationTimes, limitationTimesPerAccount,
+			ParamUtil.getBoolean(actionRequest, "rulesConjunction"),
+			ParamUtil.getBoolean(actionRequest, "active"),
+			ParamUtil.getInteger(actionRequest, "displayDateMonth"),
+			ParamUtil.getInteger(actionRequest, "displayDateDay"),
+			ParamUtil.getInteger(actionRequest, "displayDateYear"),
+			displayDateHour,
+			ParamUtil.getInteger(actionRequest, "displayDateMinute"),
+			ParamUtil.getInteger(actionRequest, "expirationDateMonth"),
+			ParamUtil.getInteger(actionRequest, "expirationDateDay"),
+			ParamUtil.getInteger(actionRequest, "expirationDateYear"),
+			expirationDateHour,
+			ParamUtil.getInteger(actionRequest, "expirationDateMinute"),
+			ParamUtil.getBoolean(actionRequest, "neverExpire"),
+			ServiceContextFactory.getInstance(
+				CommerceDiscount.class.getName(), actionRequest));
 	}
 
 	@Reference
 	private CommerceDiscountService _commerceDiscountService;
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 }

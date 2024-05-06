@@ -1,12 +1,13 @@
 Bundle-Name: ${manifest.bundle.name}
 Bundle-SymbolicName: ${manifest.bundle.symbolic.name}
-Bundle-Version: 24.3.0
+Bundle-Version: 24.3.1
 Export-Package:\
 	com.liferay.portal.kernel.dao.db.test,\
 	com.liferay.portal.kernel.test,\
 	com.liferay.portal.kernel.test.constants,\
 	com.liferay.portal.kernel.test.context,\
 	com.liferay.portal.kernel.test.junit,\
+	com.liferay.portal.kernel.test.performance,\
 	com.liferay.portal.kernel.test.portlet,\
 	com.liferay.portal.kernel.test.randomizerbumpers,\
 	com.liferay.portal.kernel.test.rule,\

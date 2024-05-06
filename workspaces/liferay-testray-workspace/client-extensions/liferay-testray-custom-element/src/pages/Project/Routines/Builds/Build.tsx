@@ -20,6 +20,7 @@ import {
 	TestrayCaseResult,
 	testrayCaseResultImpl,
 } from '~/services/rest';
+import {getTruncateText} from '~/util/getTruncateText';
 
 import useBuildTestActions from './useBuildTestActions';
 
@@ -189,7 +190,11 @@ const Build = () => {
 						{
 							key: 'errors',
 							render: (errors: string) =>
-								errors && <Code>{errors}</Code>,
+								errors && (
+									<Code title={errors as string}>
+										{getTruncateText(errors)}
+									</Code>
+								),
 							size: 'xl',
 							truncate: true,
 							value: i18n.translate('errors'),

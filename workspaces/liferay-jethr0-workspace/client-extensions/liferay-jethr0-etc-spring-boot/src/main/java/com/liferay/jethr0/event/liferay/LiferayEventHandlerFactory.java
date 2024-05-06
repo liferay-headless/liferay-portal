@@ -41,15 +41,33 @@ public class LiferayEventHandlerFactory extends BaseEventHandlerFactory {
 				"objectActionTriggerKey");
 
 			if (objectActionTriggerKey.equals("onAfterDelete")) {
-				return new JobDeleteLiferayEventHandler(
+				return new DeleteJobLiferayEventHandler(
 					eventHandlerContext, messageJSONObject);
 			}
 			else if (objectActionTriggerKey.equals("onAfterUpdate")) {
-				return new JobUpdateLiferayEventHandler(
+				return new UpdateJobLiferayEventHandler(
 					eventHandlerContext, messageJSONObject);
 			}
 
-			return new JobAddLiferayEventHandler(
+			return new AddJobLiferayEventHandler(
+				eventHandlerContext, messageJSONObject);
+		}
+		else if (entityType.equals("Routine")) {
+			EventHandlerContext eventHandlerContext = getEventHandlerContext();
+
+			String objectActionTriggerKey = messageJSONObject.optString(
+				"objectActionTriggerKey");
+
+			if (objectActionTriggerKey.equals("onAfterDelete")) {
+				return new DeleteRoutineLiferayEventHandler(
+					eventHandlerContext, messageJSONObject);
+			}
+			else if (objectActionTriggerKey.equals("onAfterUpdate")) {
+				return new UpdateRoutineLiferayEventHandler(
+					eventHandlerContext, messageJSONObject);
+			}
+
+			return new AddRoutineLiferayEventHandler(
 				eventHandlerContext, messageJSONObject);
 		}
 

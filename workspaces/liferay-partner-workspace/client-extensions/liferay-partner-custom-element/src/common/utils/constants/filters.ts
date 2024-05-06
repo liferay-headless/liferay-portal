@@ -9,13 +9,14 @@ const todayDate = new Date();
 const currentYear = todayDate.getFullYear();
 
 const currentFiscalYearEnd = `${currentYear}-12-31`;
-const currentFiscalYearStart = `${currentYear}-01-01`;
-const previousFiscalYearStart = `${currentYear - 1}-01-01`;
+export const currentFiscalYearStart = `${currentYear}-01-01`;
+export const previousFiscalYearStart = `${currentYear - 1}-01-01`;
 
 const fiscalYearFilterCloseDate = `closeDate ge ${currentFiscalYearStart} and closeDate le ${currentFiscalYearEnd}`;
 const fiscalYearFilterCreatedDate = `createdDate ge ${currentFiscalYearStart}T00:00:00Z and createdDate le ${currentFiscalYearEnd}T23:59:59Z`;
 const fiscalYearFilterSubmitDate = `submitDate ge ${currentFiscalYearStart}T00:00:00Z and submitDate le ${currentFiscalYearEnd}T23:59:59Z`;
 const previousToCurrentYearFilterSubmitDate = `submitDate ge ${previousFiscalYearStart}T00:00:00Z and submitDate le ${currentFiscalYearEnd}T23:59:59Z`;
+export const REFERENCE_DEAL_SUBMITTED_DATE = '2023-01-01T00:00:00Z';
 
 const mdfRequestOpenListStatus = [
 	'Approved',
@@ -76,7 +77,7 @@ export const Filters = {
 	},
 	DEAL_LISTING: {
 		rejected: `${fiscalYearFilterCreatedDate} and leadType eq 'Partner Qualified Lead (PQL)' and leadStatus eq 'CAM rejected'`,
-		submitted: `createdDate ge 2023-01-01T00:00:00Z and leadType eq 'Partner Qualified Lead (PQL)' and isConverted eq false and leadStatus ne 'CAM rejected'`,
+		submitted: `createdDate ge ${REFERENCE_DEAL_SUBMITTED_DATE} and leadType eq 'Partner Qualified Lead (PQL)' and isConverted eq false and leadStatus ne 'CAM rejected'`,
 	},
 	LEVEL_DASHBOARD: {
 		opportunities: `${fiscalYearFilterCloseDate} and stage eq 'Closed Won'`,

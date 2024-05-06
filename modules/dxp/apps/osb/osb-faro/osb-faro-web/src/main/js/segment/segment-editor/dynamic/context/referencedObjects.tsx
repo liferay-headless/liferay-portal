@@ -24,6 +24,7 @@ export const ACTION_TYPES: {[key: string]: ActionType} = {
 export enum EntityType {
 	Assets = 'assets',
 	Attributes = 'attributes',
+	CustomEvents = 'custom-events',
 	Groups = 'groups',
 	Organizations = 'organizations',
 	Roles = 'roles',
@@ -84,7 +85,10 @@ export const referencedPropertiesReducer = (
 					payload
 				);
 			} else if (payload.propertyKey === 'event') {
-				return state.setIn([payload.propertyKey, payload.id], payload);
+				return state.setIn(
+					[payload.propertyKey, payload.name],
+					payload
+				);
 			}
 
 			return state;
@@ -127,6 +131,9 @@ const createReferencedEntitiesIMapFromSegment = (
 		[EntityType.Attributes]: referencedObjects.get(
 			EntityType.Attributes,
 			Map({})
+		),
+		[EntityType.CustomEvents]: referencedObjects.get(
+			EntityType.CustomEvents
 		),
 		[EntityType.Groups]: referencedObjects.get(EntityType.Groups),
 		[EntityType.Organizations]: referencedObjects.get(

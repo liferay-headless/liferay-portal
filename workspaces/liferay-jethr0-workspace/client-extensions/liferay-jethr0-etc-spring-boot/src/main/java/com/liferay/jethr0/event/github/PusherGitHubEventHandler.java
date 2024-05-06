@@ -5,16 +5,25 @@
 
 package com.liferay.jethr0.event.github;
 
+import com.liferay.jethr0.bui1d.BuildEntity;
+import com.liferay.jethr0.bui1d.queue.BuildQueue;
+import com.liferay.jethr0.bui1d.repository.BuildEntityRepository;
 import com.liferay.jethr0.event.EventHandlerContext;
 import com.liferay.jethr0.event.github.commit.GitHubCommit;
 import com.liferay.jethr0.event.github.repository.GitHubRepository;
 import com.liferay.jethr0.event.github.user.GitHubUser;
 import com.liferay.jethr0.git.branch.GitBranchEntity;
-import com.liferay.jethr0.git.branch.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.commit.GitCommitEntity;
+import com.liferay.jethr0.git.repository.GitBranchEntityRepository;
+import com.liferay.jethr0.git.repository.GitCommitEntityRepository;
+import com.liferay.jethr0.jenkins.JenkinsQueue;
 import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.job.MergeCentralSubrepositoryJobEntity;
 import com.liferay.jethr0.job.RepositoryArchiveJobEntity;
 import com.liferay.jethr0.job.repository.JobEntityRepository;
+import com.liferay.jethr0.routine.RoutineEntity;
+import com.liferay.jethr0.routine.UpstreamBranchRoutineEntity;
+import com.liferay.jethr0.util.JobUtil;
 import com.liferay.jethr0.util.StringUtil;
 
 import java.io.IOException;
@@ -26,6 +35,9 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.json.JSONObject;
 
@@ -59,12 +71,11 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 
 		String jobName = StringUtil.combine(
 			"Merge Central Subrepository (",
-			gitBranchEntity.getRepositoryName(), "/",
-			gitBranchEntity.getBranchName(), "[",
-			gitBranchEntity.getShortBranchSHA(), "])");
+			gitBranchEntity.getRepositoryName(), "/", gitBranchEntity.getName(),
+			"[", gitBranchEntity.getShortLatestSHA(), "])");
 
 		JobEntity jobEntity = jobEntityRepository.create(
-			jobName, 3, null, JobEntity.State.OPENED,
+			null, jobName, null, 3, null, JobEntity.State.OPENED,
 			JobEntity.Type.MERGE_CENTRAL_SUBREPOSITORY);
 
 		if (!(jobEntity instanceof MergeCentralSubrepositoryJobEntity)) {
@@ -75,7 +86,7 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 			(MergeCentralSubrepositoryJobEntity)jobEntity;
 
 		mergeCentralSubrepositoryJobEntity.setPortalUpstreamBranchName(
-			gitBranchEntity.getUpstreamBranchName());
+			gitBranchEntity.getName());
 
 		jobEntityRepository.update(mergeCentralSubrepositoryJobEntity);
 
@@ -150,7 +161,9 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 	private boolean _isUpstreamGitBranchEntity() throws InvalidJSONException {
 		GitBranchEntity gitBranchEntity = _getGitBranchEntity();
 
-		if (gitBranchEntity.getType() != GitBranchEntity.Type.UPSTREAM) {
+		if ((gitBranchEntity == null) ||
+			(gitBranchEntity.getType() != GitBranchEntity.Type.UPSTREAM)) {
+
 			return false;
 		}
 
@@ -158,9 +171,13 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 	}
 
 	private void _syncCentralSubrepository() throws InvalidJSONException {
+		if (!_isUpstreamGitBranchEntity()) {
+			return;
+		}
+
 		GitBranchEntity gitBranchEntity = _getGitBranchEntity();
 
-		Matcher matcher = _pattern.matcher(gitBranchEntity.getBranchName());
+		Matcher matcher = _pattern.matcher(gitBranchEntity.getName());
 
 		if (!matcher.matches()) {
 			return;
@@ -192,8 +209,80 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 
 		GitHubCommit headGitHubCommit = _getHeadGitHubCommit();
 
-		gitBranchEntity.setBranchSHA(headGitHubCommit.getSHA());
-		gitBranchEntity.setUpstreamBranchSHA(headGitHubCommit.getSHA());
+		gitBranchEntity.setLatestSHA(headGitHubCommit.getSHA());
+
+		GitCommitEntityRepository gitCommitEntityRepository =
+			getGitCommitEntityRepository();
+
+		GitCommitEntity latestGitCommitEntity =
+			gitCommitEntityRepository.createGitCommitEntity(
+				gitBranchEntity, headGitHubCommit.getSHA());
+
+		for (RoutineEntity routineEntity :
+				gitBranchEntity.getRoutineEntities()) {
+
+			if (routineEntity.getType() != RoutineEntity.Type.UPSTREAM_BRANCH) {
+				continue;
+			}
+
+			UpstreamBranchRoutineEntity upstreamBranchRoutineEntity =
+				(UpstreamBranchRoutineEntity)routineEntity;
+
+			GitCommitEntity previousGitCommitEntity =
+				upstreamBranchRoutineEntity.getPreviousGitCommitEntity();
+
+			if ((latestGitCommitEntity == null) ||
+				((previousGitCommitEntity != null) &&
+				 Objects.equals(
+					 latestGitCommitEntity.getSHA(),
+					 previousGitCommitEntity.getSHA()))) {
+
+				continue;
+			}
+
+			upstreamBranchRoutineEntity.setPreviousGitCommitEntity(
+				latestGitCommitEntity);
+
+			BuildEntityRepository buildEntityRepository =
+				getBuildEntityRepository();
+
+			JobEntityRepository jobEntityRepository = getJobEntityRepository();
+
+			JobEntity jobEntity = jobEntityRepository.create(
+				routineEntity,
+				JobUtil.getUpdateJobEntityName(routineEntity.getJobName()),
+				routineEntity.getJobParameters(),
+				routineEntity.getJobPriority(), null, JobEntity.State.QUEUED,
+				routineEntity.getJobType());
+
+			try {
+				for (JSONObject initialBuildJSONObject :
+						jobEntity.getInitialBuildJSONObjects()) {
+
+					BuildEntity buildEntity = buildEntityRepository.create(
+						jobEntity, initialBuildJSONObject);
+
+					buildEntity.setJobEntity(jobEntity);
+
+					jobEntity.addBuildEntity(buildEntity);
+				}
+
+				if (jobEntity.getState() == JobEntity.State.QUEUED) {
+					BuildQueue buildQueue = getBuildQueue();
+
+					buildQueue.addJobEntity(jobEntity);
+
+					JenkinsQueue jenkinsQueue = getJenkinsQueue();
+
+					jenkinsQueue.invoke();
+				}
+			}
+			catch (Exception exception) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(exception);
+				}
+			}
+		}
 
 		GitBranchEntityRepository gitBranchEntityRepository =
 			getGitBranchEntityRepository();
@@ -214,10 +303,11 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 		JobEntityRepository jobEntityRepository = getJobEntityRepository();
 
 		JobEntity jobEntity = jobEntityRepository.create(
+			null,
 			StringUtil.combine(
 				"Repository Archive (", gitBranchEntity.getRepositoryName(),
-				"/", gitBranchEntity.getBranchName(), ")"),
-			1, new Date(), JobEntity.State.OPENED,
+				"/", gitBranchEntity.getName(), ")"),
+			null, 1, new Date(), JobEntity.State.OPENED,
 			JobEntity.Type.REPOSITORY_ARCHIVE);
 
 		if (!(jobEntity instanceof RepositoryArchiveJobEntity)) {
@@ -232,6 +322,9 @@ public class PusherGitHubEventHandler extends BaseGitHubEventHandler {
 
 		invokeJobEntity(repositoryArchiveJobEntity);
 	}
+
+	private static final Log _log = LogFactory.getLog(
+		PusherGitHubEventHandler.class);
 
 	private static final Pattern _pattern = Pattern.compile("7\\.\\d\\.x");
 

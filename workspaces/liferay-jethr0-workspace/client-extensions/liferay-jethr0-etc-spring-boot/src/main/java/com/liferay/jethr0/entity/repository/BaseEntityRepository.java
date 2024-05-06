@@ -40,6 +40,15 @@ public abstract class BaseEntityRepository<T extends Entity>
 	}
 
 	@Override
+	public boolean contains(long id) {
+		if (_entitiesMap.containsKey(id)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public T create(JSONObject jsonObject) {
 		EntityDALO<T> entityDALO = getEntityDALO();
 
@@ -121,7 +130,11 @@ public abstract class BaseEntityRepository<T extends Entity>
 	}
 
 	protected T add(T entity) {
-		addAll(Collections.singleton(entity));
+		Set<T> entities = new HashSet<>();
+
+		entities.add(entity);
+
+		addAll(entities);
 
 		return entity;
 	}

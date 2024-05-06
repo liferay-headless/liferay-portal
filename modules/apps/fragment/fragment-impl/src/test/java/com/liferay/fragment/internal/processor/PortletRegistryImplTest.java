@@ -8,15 +8,16 @@ package com.liferay.fragment.internal.processor;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.util.JS;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 /**
  * @author Lourdes Fernández Besada
@@ -49,6 +51,8 @@ public class PortletRegistryImplTest {
 
 		ReflectionTestUtil.setFieldValue(
 			_portletRegistry, "_portletLocalService", _portletLocalService);
+
+		_setUpPortal();
 	}
 
 	@Test
@@ -110,7 +114,7 @@ public class PortletRegistryImplTest {
 			PortletIdCodec.encode(
 				PortletIdCodec.decodePortletName(portletName),
 				PortletIdCodec.decodeUserId(portletName),
-				StringBundler.concat(namespace, StringPool.DASH, instanceId)));
+				namespace + instanceId));
 	}
 
 	@Test
@@ -195,6 +199,31 @@ public class PortletRegistryImplTest {
 				PortletIdCodec.decodeUserId(portletName), null));
 	}
 
+	@Test
+	public void testGetFragmentEntryLinkPortletIdsWithSpecialCharacters() {
+		String instanceId = RandomTestUtil.randomString();
+		String namespace = RandomTestUtil.randomString();
+		String portletName = RandomTestUtil.randomString();
+		String specialCharacters = "-. ";
+
+		_assertGetFragmentEntryLinkPortletIds(
+			_getFragmentEntryLink(
+				StringBundler.concat(
+					"<div class=\"fragment_1\">", RandomTestUtil.randomString(),
+					"[@liferay_portlet[\"runtime\"]",
+					RandomTestUtil.randomString(),
+					" instanceId=\"fragmentEntryLinkNamespace-", instanceId,
+					specialCharacters, "\"", RandomTestUtil.randomString(),
+					" portletName=\"", portletName, "\"",
+					RandomTestUtil.randomString(), "/]",
+					RandomTestUtil.randomString(), "</div>"),
+				namespace),
+			PortletIdCodec.encode(
+				PortletIdCodec.decodePortletName(portletName),
+				PortletIdCodec.decodeUserId(portletName),
+				namespace + instanceId));
+	}
+
 	private void _assertGetFragmentEntryLinkPortletIds(
 		FragmentEntryLink fragmentEntryLink, String... portletIds) {
 
@@ -242,6 +271,25 @@ public class PortletRegistryImplTest {
 		);
 
 		return fragmentEntryLink;
+	}
+
+	private void _setUpPortal() {
+		Portal portal = Mockito.mock(Portal.class);
+
+		Mockito.when(
+			portal.getClassName(Mockito.anyLong())
+		).thenReturn(
+			RandomTestUtil.randomString()
+		);
+
+		Mockito.when(
+			portal.getJsSafePortletId(Mockito.anyString())
+		).thenAnswer(
+			(Answer<String>)invocationOnMock -> JS.getSafeName(
+				invocationOnMock.getArgument(0, String.class))
+		);
+
+		ReflectionTestUtil.setFieldValue(_portletRegistry, "_portal", portal);
 	}
 
 	private PortletLocalService _portletLocalService;

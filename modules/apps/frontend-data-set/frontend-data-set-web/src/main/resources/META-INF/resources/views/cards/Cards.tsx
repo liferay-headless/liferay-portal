@@ -58,7 +58,9 @@ const Card = ({item, schema}: {item: any; schema: ICardSchema}) => {
 		?.value;
 	const localizedTitle = getLocalizedValue(item, schema.title)?.value || '';
 	const selectedItemKey = selectedItemsKey && item[selectedItemsKey];
-	const formattedActions = filterItemActions(actionsRef.current, item) as any;
+	const formattedActions =
+		actionsRef.current &&
+		(filterItemActions(actionsRef.current, item) as any);
 
 	return (
 		<ClayCardWithInfo
@@ -103,6 +105,10 @@ const Cards = ({items, schema}: {items: Array<any>; schema: ICardSchema}) => {
 	const {selectedItemsKey, style}: IFrontendDataSetContext = useContext(
 		FrontendDataSetContext
 	);
+
+	if (!items?.length) {
+		return null;
+	}
 
 	return (
 		<div

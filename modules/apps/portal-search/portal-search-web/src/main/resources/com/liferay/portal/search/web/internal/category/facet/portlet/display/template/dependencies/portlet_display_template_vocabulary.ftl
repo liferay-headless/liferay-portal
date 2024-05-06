@@ -11,14 +11,15 @@
 	<li class="treeview-item" role="none">
 		<#if name?has_content>
 			<div
-				aria-controls="${namespace}treeItem${id}"
+				aria-controls="${(termDisplayContexts?has_content)?then(namespace + 'treeItem' + id, '')}"
 				aria-expanded="true"
 				class="treeview-link ${cssClassTreeItem}"
 				data-target="#${namespace}treeItem${id}"
 				data-toggle="collapse"
 				onClick="${namespace}toggleTreeItem('${namespace}treeItem${id}');"
+				onKeyPress="${namespace}toggleTreeItemKeypress(event);"
 				role="treeitem"
-				tabindex="0"
+				tabindex="${(termDisplayContexts?has_content)?then(0, -1)}"
 			>
 				<span class="c-inner" tabindex="-2">
 					<span class="autofit-row">
@@ -27,6 +28,7 @@
 								<@clay.button
 									aria\-controls="${namespace}treeItem${id}"
 									aria\-expanded="true"
+									aria\-label="${languageUtil.get(locale, 'toggle')}"
 									cssClass="btn btn-monospaced component-expander"
 									data\-target="#${namespace}treeItem${id}"
 									data\-toggle="collapse"
@@ -50,7 +52,6 @@
 								<div class="custom-checkbox custom-control">
 									<label>
 										<input
-											autocomplete="off"
 											${selected?then("checked", "")}
 											class="custom-control-input facet-term"
 											data-term-id=${id}
@@ -147,7 +148,7 @@
 					<@treeview_item
 						cssClassTreeItem="tree-item-vocabulary"
 						frequencyVisible=false
-						id=vocabularyName + vocabularyName?index
+						id=vocabularyName?replace("[^\\w]|_", '', 'r') + vocabularyName?index
 						name="${(vocabularyNames?size == 1)?then('', htmlUtil.escape(vocabularyName))}"
 						termDisplayContexts=assetCategoriesSearchFacetDisplayContext.getBucketDisplayContexts(vocabularyName)
 					/>
@@ -183,6 +184,14 @@
 			else {
 				subtreeCategoryTreeElement.classList.add('show');
 			}
+		}
+	}
+
+	function ${namespace}toggleTreeItemKeypress(event) {
+		event.preventDefault();
+
+		if (event.code === 'Enter' || event.code === 'Space') {
+			${namespace}toggleTreeItem(event.target.getAttribute('aria-controls'));
 		}
 	}
 </@>

@@ -41,15 +41,30 @@ const options = [
 const SelectAssignment = ({section, setSection, setSections}) => {
 	const {
 		allowScriptContentToBeExecutedOrIncluded,
-		hasGroovyScript,
+		hadGroovyOrJavaScriptBefore,
+		hasGroovyOrJavaScript,
 		scriptManagementConfigurationPortletURL,
 	} = useContext(DefinitionBuilderContext);
+
+	const getAssignmentTypeOptions = () => {
+		if (
+			Liferay.FeatureFlags['LPD-11179'] &&
+			!allowScriptContentToBeExecutedOrIncluded &&
+			!hadGroovyOrJavaScriptBefore
+		) {
+			return options.filter(
+				(option) => option.assignmentType !== 'scriptedAssignment'
+			);
+		}
+
+		return options;
+	};
 
 	return (
 		<>
 			{Liferay.FeatureFlags['LPD-11179'] &&
 				!allowScriptContentToBeExecutedOrIncluded &&
-				hasGroovyScript && (
+				hasGroovyOrJavaScript && (
 					<DisabledGroovyScriptAlert
 						scriptManagementConfigurationPortletURL={
 							scriptManagementConfigurationPortletURL
@@ -85,7 +100,7 @@ const SelectAssignment = ({section, setSection, setSections}) => {
 							setSections([{identifier: `${Date.now()}-0`}]);
 						}}
 					>
-						{options.map((item) => (
+						{getAssignmentTypeOptions().map((item) => (
 							<ClaySelect.Option
 								disabled={item?.disabled}
 								key={item.assignmentType}

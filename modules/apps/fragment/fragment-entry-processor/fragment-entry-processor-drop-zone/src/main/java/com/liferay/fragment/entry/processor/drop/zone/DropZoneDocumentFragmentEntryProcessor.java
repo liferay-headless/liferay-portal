@@ -10,12 +10,14 @@ import com.liferay.fragment.processor.DocumentFragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.renderer.FragmentDropZoneRenderer;
 import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.form.InfoForm;
 import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.structure.FragmentDropZoneLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -88,12 +90,6 @@ public class DropZoneDocumentFragmentEntryProcessor
 
 		if (layoutStructureItem == null) {
 			return;
-		}
-
-		if (httpServletRequest != null) {
-			httpServletRequest.setAttribute(
-				InfoDisplayWebKeys.INFO_FORM,
-				fragmentEntryProcessorContext.getInfoForm());
 		}
 
 		List<String> dropZoneItemIds = layoutStructureItem.getChildrenItemIds();
@@ -174,24 +170,45 @@ public class DropZoneDocumentFragmentEntryProcessor
 			return;
 		}
 
-		for (int i = 0; i < elements.size(); i++) {
-			Element element = elements.get(i);
-
-			String dropZoneHTML = _fragmentDropZoneRenderer.renderDropZone(
-				fragmentEntryProcessorContext.getHttpServletRequest(),
-				fragmentEntryProcessorContext.getHttpServletResponse(),
-				dropZoneItemIds.get(i), fragmentEntryProcessorContext.getMode(),
-				true);
-
-			Element dropZoneElement = new Element("div");
-
-			dropZoneElement.html(dropZoneHTML);
-
-			element.replaceWith(dropZoneElement);
-		}
+		InfoForm originalInfoForm = null;
 
 		if (httpServletRequest != null) {
-			httpServletRequest.removeAttribute(InfoDisplayWebKeys.INFO_FORM);
+			originalInfoForm = (InfoForm)httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_FORM);
+
+			httpServletRequest.setAttribute(
+				InfoDisplayWebKeys.INFO_FORM,
+				fragmentEntryProcessorContext.getInfoForm());
+		}
+
+		try {
+			for (int i = 0; i < elements.size(); i++) {
+				Element element = elements.get(i);
+
+				String dropZoneHTML = StringPool.BLANK;
+
+				if (ListUtil.isNotEmpty(dropZoneItemIds) &&
+					(i < dropZoneItemIds.size())) {
+
+					dropZoneHTML = _fragmentDropZoneRenderer.renderDropZone(
+						fragmentEntryProcessorContext.getHttpServletRequest(),
+						fragmentEntryProcessorContext.getHttpServletResponse(),
+						dropZoneItemIds.get(i),
+						fragmentEntryProcessorContext.getMode(), true);
+				}
+
+				Element dropZoneElement = new Element("div");
+
+				dropZoneElement.html(dropZoneHTML);
+
+				element.replaceWith(dropZoneElement);
+			}
+		}
+		finally {
+			if (httpServletRequest != null) {
+				httpServletRequest.setAttribute(
+					InfoDisplayWebKeys.INFO_FORM, originalInfoForm);
+			}
 		}
 	}
 

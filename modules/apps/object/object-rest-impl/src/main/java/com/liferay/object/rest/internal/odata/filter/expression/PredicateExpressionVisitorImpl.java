@@ -371,11 +371,14 @@ public class PredicateExpressionVisitorImpl
 		ObjectDefinition objectDefinition) {
 
 		FieldPredicateProvider fieldPredicateProvider =
-			_serviceTrackerMap.getService(String.valueOf(fieldName));
+			_getFieldPredicateProvider(
+				String.valueOf(fieldName), objectDefinition);
 
 		if (fieldPredicateProvider != null) {
 			return fieldPredicateProvider.getContainsPredicate(
-				name -> _getColumn(name, objectDefinition), fieldValue);
+				name -> _getColumn(name, objectDefinition),
+				String.valueOf(fieldName),
+				_getValue(fieldName, objectDefinition, fieldValue));
 		}
 
 		return _contains(
@@ -429,15 +432,35 @@ public class PredicateExpressionVisitorImpl
 		return entityModel.getEntityFieldsMap();
 	}
 
+	private FieldPredicateProvider _getFieldPredicateProvider(
+		String fieldName, ObjectDefinition objectDefinition) {
+
+		FieldPredicateProvider fieldPredicateProvider =
+			_serviceTrackerMap.getService(fieldName);
+
+		if (fieldPredicateProvider != null) {
+			return fieldPredicateProvider;
+		}
+
+		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+			objectDefinition.getObjectDefinitionId(), fieldName);
+
+		if (objectField != null) {
+			return _serviceTrackerMap.getService(objectField.getBusinessType());
+		}
+
+		return null;
+	}
+
 	private Predicate _getInPredicate(
 		Object left, ObjectDefinition objectDefinition, List<Object> rights) {
 
 		FieldPredicateProvider fieldPredicateProvider =
-			_serviceTrackerMap.getService(String.valueOf(left));
+			_getFieldPredicateProvider(String.valueOf(left), objectDefinition);
 
 		if (fieldPredicateProvider != null) {
 			return fieldPredicateProvider.getInPredicate(
-				name -> _getColumn(name, objectDefinition), rights);
+				name -> _getColumn(name, objectDefinition), left, rights);
 		}
 
 		return _getColumn(
@@ -586,27 +609,15 @@ public class PredicateExpressionVisitorImpl
 				Predicate.withParentheses((Predicate)right));
 		}
 		else {
-			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
-				objectDefinition.getObjectDefinitionId(), String.valueOf(left));
+			FieldPredicateProvider fieldPredicateProvider =
+				_getFieldPredicateProvider(
+					String.valueOf(left), objectDefinition);
 
-			if (objectField == null) {
-				FieldPredicateProvider fieldPredicateProvider =
-					_serviceTrackerMap.getService(String.valueOf(left));
-
-				if (fieldPredicateProvider != null) {
-					predicate =
-						fieldPredicateProvider.getBinaryExpressionPredicate(
-							name -> _getColumn(name, objectDefinition), left,
-							objectDefinition.getObjectDefinitionId(), operation,
-							right);
-				}
-			}
-			else if (StringUtil.equals(
-						objectField.getBusinessType(),
-						ObjectFieldConstants.
-							BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
-
-				predicate = _contains(left, right, objectDefinition);
+			if (fieldPredicateProvider != null) {
+				predicate = fieldPredicateProvider.getBinaryExpressionPredicate(
+					name -> _getColumn(name, objectDefinition), left,
+					objectDefinition.getObjectDefinitionId(), operation,
+					_getValue(left, objectDefinition, right));
 			}
 		}
 
@@ -746,11 +757,13 @@ public class PredicateExpressionVisitorImpl
 		ObjectDefinition objectDefinition) {
 
 		FieldPredicateProvider fieldPredicateProvider =
-			_serviceTrackerMap.getService(String.valueOf(fieldName));
+			_getFieldPredicateProvider(
+				String.valueOf(fieldName), objectDefinition);
 
 		if (fieldPredicateProvider != null) {
 			return fieldPredicateProvider.getStartsWithPredicate(
-				name -> _getColumn(name, objectDefinition), fieldValue);
+				name -> _getColumn(name, objectDefinition),
+				String.valueOf(fieldName), fieldValue);
 		}
 
 		return _startsWith(

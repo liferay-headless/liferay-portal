@@ -4,6 +4,8 @@
  */
 
 import {
+	FDS_ARRAY_FIELD_NAME_DELIMITER,
+	FDS_ARRAY_FIELD_NAME_PARENT_SUFFIX,
 	FDS_NESTED_FIELD_NAME_DELIMITER,
 	FDS_NESTED_FIELD_NAME_PARENT_SUFFIX,
 } from '@liferay/frontend-data-set-web';
@@ -20,6 +22,7 @@ const LOCALIZABLE_PROPERTY_SUFFIX = '_i18n';
 
 interface IProperty {
 	$ref?: string;
+	extensions?: any;
 	format?: EFieldFormat;
 	items?: any;
 	type: EFieldType;
@@ -49,47 +52,88 @@ function getValidFields({
 
 	const properties: IProperties = schemas[schemaName]?.properties;
 
-	Object.keys(properties).map((propertyKey) => {
-		const propertyValue = properties[propertyKey];
+	properties &&
+		Object.keys(properties).map((propertyKey) => {
+			const propertyValue = properties[propertyKey];
 
-		if (INVALID_FIELDS.includes(propertyKey)) {
-			return;
-		}
-
-		if (propertyKey.includes(LOCALIZABLE_PROPERTY_SUFFIX)) {
-			return;
-		}
-
-		const type = propertyValue.type;
-
-		if (type === EFieldType.ARRAY) {
-			if (propertyValue.items && propertyValue.items.$ref) {
+			if (INVALID_FIELDS.includes(propertyKey)) {
 				return;
 			}
-		}
 
-		if (propertyValue.$ref) {
+			if (propertyKey.includes(LOCALIZABLE_PROPERTY_SUFFIX)) {
+				return;
+			}
+
+			const type = propertyValue.type;
+
+			if (propertyValue.items?.$ref) {
+				fields.push({
+					children: getValidFields({
+						contextPath: `${contextPath}${propertyKey}${FDS_ARRAY_FIELD_NAME_DELIMITER}`,
+						schemaName: propertyValue.items.$ref.replace(
+							/^.*\//,
+							''
+						),
+						schemas,
+					}),
+					label: propertyKey,
+					name: `${contextPath}${propertyKey}${FDS_ARRAY_FIELD_NAME_PARENT_SUFFIX}`,
+					type: type ? type : 'array',
+				});
+
+				return;
+			}
+
+			if (propertyValue.$ref) {
+				fields.push({
+					children: getValidFields({
+						contextPath: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_DELIMITER}`,
+						schemaName: propertyValue.$ref.replace(/^.*\//, ''),
+						schemas,
+					}),
+					label: propertyKey,
+					name: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_PARENT_SUFFIX}`,
+					type: type ? type : 'object',
+				});
+
+				return;
+			}
+
+			if (
+				propertyValue.extensions &&
+				propertyValue.extensions['x-parent-map'] === 'properties'
+			) {
+				const schemaNames = Object.keys(schemas);
+				const parentSchemaName = schemaNames.filter((schemaName) => {
+					return (
+						schemaName.toLowerCase() ===
+						propertyKey.toLocaleLowerCase()
+					);
+				});
+
+				if (parentSchemaName.length) {
+					fields.push({
+						children: getValidFields({
+							contextPath: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_DELIMITER}`,
+							schemaName: parentSchemaName[0],
+							schemas,
+						}),
+						label: propertyKey,
+						name: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_PARENT_SUFFIX}`,
+						type: schemas[parentSchemaName[0]]?.type || 'object',
+					});
+
+					return;
+				}
+			}
+
 			fields.push({
-				children: getValidFields({
-					contextPath: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_DELIMITER}`,
-					schemaName: propertyValue.$ref.replace(/^.*\//, ''),
-					schemas,
-				}),
+				format: propertyValue.format,
 				label: propertyKey,
-				name: `${contextPath}${propertyKey}${FDS_NESTED_FIELD_NAME_PARENT_SUFFIX}`,
-				type: type ? type : 'object',
+				name: `${contextPath}${propertyKey}`,
+				type,
 			});
-
-			return;
-		}
-
-		fields.push({
-			format: propertyValue.format,
-			label: propertyKey,
-			name: `${contextPath}${propertyKey}`,
-			type,
 		});
-	});
 
 	return fields;
 }

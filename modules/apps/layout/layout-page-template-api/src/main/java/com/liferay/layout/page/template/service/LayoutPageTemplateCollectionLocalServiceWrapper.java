@@ -54,15 +54,32 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 
 	@Override
 	public LayoutPageTemplateCollection addLayoutPageTemplateCollection(
-			long userId, long groupId, long parentLayoutPageTemplateCollection,
-			String name, String description, int type,
+			String externalReferenceCode, long userId, long groupId,
+			long parentLayoutPageTemplateCollectionId, String name,
+			String description, int type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutPageTemplateCollectionLocalService.
 			addLayoutPageTemplateCollection(
-				userId, groupId, parentLayoutPageTemplateCollection, name,
-				description, type, serviceContext);
+				externalReferenceCode, userId, groupId,
+				parentLayoutPageTemplateCollectionId, name, description, type,
+				serviceContext);
+	}
+
+	@Override
+	public LayoutPageTemplateCollection copyLayoutPageTemplateCollection(
+			long userId, long groupId,
+			long sourceLayoutPageTemplateCollectionId,
+			long layoutParentPageTemplateCollectionId, boolean copyPermissions,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws Exception {
+
+		return _layoutPageTemplateCollectionLocalService.
+			copyLayoutPageTemplateCollection(
+				userId, groupId, sourceLayoutPageTemplateCollectionId,
+				layoutParentPageTemplateCollectionId, copyPermissions,
+				serviceContext);
 	}
 
 	/**
@@ -129,6 +146,15 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 
 		return _layoutPageTemplateCollectionLocalService.
 			deleteLayoutPageTemplateCollection(layoutPageTemplateCollectionId);
+	}
+
+	@Override
+	public LayoutPageTemplateCollection deleteLayoutPageTemplateCollection(
+			String externalReferenceCode, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPageTemplateCollectionLocalService.
+			deleteLayoutPageTemplateCollection(externalReferenceCode, groupId);
 	}
 
 	/**
@@ -267,6 +293,16 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 	}
 
 	@Override
+	public LayoutPageTemplateCollection
+		fetchLayoutPageTemplateCollectionByExternalReferenceCode(
+			String externalReferenceCode, long groupId) {
+
+		return _layoutPageTemplateCollectionLocalService.
+			fetchLayoutPageTemplateCollectionByExternalReferenceCode(
+				externalReferenceCode, groupId);
+	}
+
+	@Override
 	public LayoutPageTemplateCollection fetchLayoutPageTemplateCollectionByName(
 		long groupId, String name, int type) {
 
@@ -330,6 +366,17 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 
 		return _layoutPageTemplateCollectionLocalService.
 			getLayoutPageTemplateCollection(layoutPageTemplateCollectionId);
+	}
+
+	@Override
+	public LayoutPageTemplateCollection
+			getLayoutPageTemplateCollectionByExternalReferenceCode(
+				String externalReferenceCode, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPageTemplateCollectionLocalService.
+			getLayoutPageTemplateCollectionByExternalReferenceCode(
+				externalReferenceCode, groupId);
 	}
 
 	/**
@@ -406,6 +453,16 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 		return _layoutPageTemplateCollectionLocalService.
 			getLayoutPageTemplateCollections(
 				groupId, layoutPageTemplateCollectionId);
+	}
+
+	@Override
+	public java.util.List<LayoutPageTemplateCollection>
+		getLayoutPageTemplateCollections(
+			long groupId, long layoutPageTemplateCollectionId, int type) {
+
+		return _layoutPageTemplateCollectionLocalService.
+			getLayoutPageTemplateCollections(
+				groupId, layoutPageTemplateCollectionId, type);
 	}
 
 	@Override
@@ -508,10 +565,11 @@ public class LayoutPageTemplateCollectionLocalServiceWrapper
 
 	@Override
 	public String getUniqueLayoutPageTemplateCollectionName(
-		long groupId, String name, int type) {
+		long groupId, String sourceName, int type) {
 
 		return _layoutPageTemplateCollectionLocalService.
-			getUniqueLayoutPageTemplateCollectionName(groupId, name, type);
+			getUniqueLayoutPageTemplateCollectionName(
+				groupId, sourceName, type);
 	}
 
 	@Override

@@ -6,8 +6,6 @@
 import ClayButton from '@clayui/button';
 import {Text} from '@clayui/core';
 
-import arrowNorth from '../../assets/icons/arrow_north_icon.svg';
-import arrowSouth from '../../assets/icons/arrow_south_icon.svg';
 import {Tooltip} from '../Tooltip/Tooltip';
 import {UploadedFile} from './FileList';
 
@@ -17,18 +15,18 @@ import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 
-import {useAppContext} from '../../manage-app-state/AppManageState';
-import {TYPES} from '../../manage-app-state/actionTypes';
 import CircularProgress from '../CircularProgress';
 
 type ImageFileItemProps = {
 	index: number;
 	isProcessing: boolean;
 	onArrowClick: (index: number, direction: string) => void;
+	onChangeInput: (newImagesInputs: UploadedFile[]) => void;
 	onDelete: (id: string, versionName?: string) => void;
 	position: number;
 	tooltip?: string;
 	uploadedFile: UploadedFile;
+	uploadedImages: any;
 	versionName?: string;
 };
 
@@ -36,14 +34,14 @@ export function ImageFileItem({
 	index,
 	isProcessing,
 	onArrowClick,
+	onChangeInput,
 	onDelete,
 	position,
 	tooltip,
 	uploadedFile,
+	uploadedImages,
 	versionName,
 }: ImageFileItemProps) {
-	const [{appStorefrontImages}, dispatch] = useAppContext();
-
 	const showProgress =
 		isProcessing && !uploadedFile.uploaded && uploadedFile.progress > 0;
 
@@ -55,10 +53,10 @@ export function ImageFileItem({
 					displayType="unstyled"
 					onClick={() => onArrowClick(index, 'up')}
 				>
-					<img
-						alt="Arrow Up"
+					<ClayIcon
+						aria-label="Arrow Up"
 						className="image-file-item-arrow-icon"
-						src={arrowNorth}
+						symbol="order-arrow-up"
 					/>
 				</ClayButton>
 
@@ -67,10 +65,10 @@ export function ImageFileItem({
 					displayType="unstyled"
 					onClick={() => onArrowClick(index, 'down')}
 				>
-					<img
-						alt="Arrow South"
+					<ClayIcon
+						aria-label="Arrow South"
 						className="image-file-item-arrow-icon"
-						src={arrowSouth}
+						symbol="order-arrow-down"
 					/>
 				</ClayButton>
 			</div>
@@ -132,20 +130,15 @@ export function ImageFileItem({
 				<div className="align-items-center d-flex">
 					<ClayInput
 						onChange={({target}) => {
-							appStorefrontImages[index].imageDescription =
+							uploadedImages[index].imageDescription =
 								target.value;
 
-							appStorefrontImages[index].changed = true;
+							uploadedImages[index].changed = true;
 
-							dispatch({
-								payload: {
-									files: appStorefrontImages,
-								},
-								type: TYPES.UPLOAD_APP_STOREFRONT_IMAGES,
-							});
+							onChangeInput(uploadedImages);
 						}}
 						placeholder="Image description"
-						value={appStorefrontImages[index].imageDescription}
+						value={uploadedImages[index].imageDescription}
 					/>
 
 					{tooltip && (

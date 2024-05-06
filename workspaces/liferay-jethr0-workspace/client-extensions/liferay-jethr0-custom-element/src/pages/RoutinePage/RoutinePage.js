@@ -146,6 +146,21 @@ function RoutineInformation({routine}) {
 					fieldType="DATE"
 					fieldValue={routine.dateModified}
 				/>
+				{routine?.upstreamGitBranch && (
+					<Jethr0InformationField
+						fieldLabel="Upstream Branch"
+						fieldType="URL"
+						fieldURLValue={
+							'/#/upstream-branches/' +
+							routine.upstreamGitBranch.id
+						}
+						fieldValue={
+							routine.upstreamGitBranch.repositoryName +
+							'/' +
+							routine.upstreamGitBranch.name
+						}
+					/>
+				)}
 				{jobDefinition.jobDefinitionParameters &&
 					jobParameters?.map((jobParameter) => {
 						let parameter;
@@ -160,14 +175,16 @@ function RoutineInformation({routine}) {
 							}
 						}
 
-						return (
-							<Jethr0InformationField
-								fieldLabel={parameter.label}
-								fieldType={parameter.type.name}
-								fieldValue={jobParameter.value}
-								key={jobParameter.key}
-							/>
-						);
+						if (parameter) {
+							return (
+								<Jethr0InformationField
+									fieldLabel={parameter.label}
+									fieldType={parameter.type.name}
+									fieldValue={jobParameter.value}
+									key={jobParameter.key}
+								/>
+							);
+						}
 					})}
 			</ClayPanel.Body>
 		</ClayPanel>

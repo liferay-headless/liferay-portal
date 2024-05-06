@@ -56,7 +56,7 @@ public class ReportController extends BaseFaroController {
 
 	@GET
 	@Path("/export/csv/{type}")
-	public Object getCsv(
+	public Object getCSV(
 			@QueryParam("assetId") String assetId,
 			@QueryParam("assetTitle") String assetTitle,
 			@QueryParam("assetType") String assetType,
@@ -71,11 +71,109 @@ public class ReportController extends BaseFaroController {
 			@PathParam("type") String type)
 		throws Exception {
 
+		Object result = _buildQueryParameters(
+			assetId, assetType, channelId, fromDateString,
+			orderByFieldsFaroParam, query, rangeKey, toDateString, type);
+
+		Map<String, List<String>> queryParameters;
+
+		if (result instanceof Map<?, ?>) {
+			queryParameters = (Map<String, List<String>>)result;
+		}
+		else {
+			return result;
+		}
+
+		StreamingOutput streamingOutput = outputStream -> {
+			try {
+				FaroThreadLocal.setCacheEnabled(false);
+
+				contactsEngineClient.getToOutputStream(
+					faroProjectLocalService.getFaroProjectByGroupId(groupId),
+					HashMapBuilder.put(
+						"Accept", "application/octet-stream, */*"
+					).build(),
+					String.format("/reports/export/csv/%s", type),
+					queryParameters, outputStream);
+			}
+			catch (Exception exception) {
+				_log.error(exception);
+			}
+
+			outputStream.flush();
+		};
+
+		String fileName = null;
+
+		if (StringUtil.equals(type, "individual") &&
+			Validator.isNotNull(assetTitle) && Validator.isNotNull(assetType)) {
+
+			fileName = String.format(
+				"analytics-cloud-%s-known-individuals-%s",
+				StringUtil.lowerCase(
+					assetTitle.replaceAll(
+						_ESCAPED_CHARACTERS_REGEX, StringPool.DASH)),
+				LocalDate.now());
+		}
+		else if (StringUtil.equals(type, "journal")) {
+			fileName = String.format(
+				"analytics-cloud-web-contents-list-%s", type, LocalDate.now());
+		}
+		else {
+			fileName = String.format(
+				"analytics-cloud-%ss-list-%s", type, LocalDate.now());
+		}
+
+		return Response.ok(
+			streamingOutput, "application/csv"
+		).header(
+			HttpHeaders.CONTENT_DISPOSITION,
+			String.format("filename=\"%s.csv\"", fileName, LocalDate.now())
+		).build();
+	}
+
+	@GET
+	@Path("/export/csv/{type}/count")
+	public Object getCSVCount(
+			@QueryParam("assetId") String assetId,
+			@QueryParam("assetType") String assetType,
+			@QueryParam("channelId") String channelId,
+			@QueryParam("fromDate") String fromDateString,
+			@PathParam("groupId") long groupId,
+			@QueryParam("query") String query,
+			@QueryParam("rangeKey") String rangeKey,
+			@QueryParam("toDate") String toDateString,
+			@PathParam("type") String type)
+		throws Exception {
+
+		Object result = _buildQueryParameters(
+			assetId, assetType, channelId, fromDateString, null, query,
+			rangeKey, toDateString, type);
+
+		if (!(result instanceof Map<?, ?>)) {
+			return result;
+		}
+
+		Map<String, List<String>> queryParameters =
+			(Map<String, List<String>>)result;
+
+		return contactsEngineClient.getReportsExportCSVCount(
+			faroProjectLocalService.getFaroProjectByGroupId(groupId),
+			String.format("/reports/export/csv/%s/count", type),
+			queryParameters);
+	}
+
+	private Object _buildQueryParameters(
+		String assetId, String assetType, String channelId,
+		String fromDateString,
+		FaroParam<List<OrderByField>> orderByFieldsFaroParam, String query,
+		String rangeKey, String toDateString, String type) {
+
 		if (!_csvExportTypes.contains(type)) {
 			return _reportControllerResponseFactory.create(
 				"The \"type\" query parameter must be either \"blog\", " +
-					"\"document\", \"form\", \"individual\", \"journal\", or " +
-						"\"page\".",
+					"\"document\", \"event\", \"form\", \"individual\", " +
+						"\"journal\", or \"page\".",
 				Response.Status.BAD_REQUEST);
 		}
 
@@ -168,54 +266,7 @@ public class ReportController extends BaseFaroController {
 			}
 		}
 
-		Map<String, List<String>> queryParameters = hashMapWrapper.build();
-
-		StreamingOutput streamingOutput = outputStream -> {
-			try {
-				FaroThreadLocal.setCacheEnabled(false);
-
-				contactsEngineClient.getToOutputStream(
-					faroProjectLocalService.getFaroProjectByGroupId(groupId),
-					HashMapBuilder.put(
-						"Accept", "application/octet-stream, */*"
-					).build(),
-					String.format("/reports/export/csv/%s", type),
-					queryParameters, outputStream);
-			}
-			catch (Exception exception) {
-				_log.error(exception);
-			}
-
-			outputStream.flush();
-		};
-
-		String fileName = null;
-
-		if (StringUtil.equals(type, "individual") &&
-			Validator.isNotNull(assetTitle) && Validator.isNotNull(assetType)) {
-
-			fileName = String.format(
-				"analytics-cloud-%s-known-individuals-%s",
-				StringUtil.lowerCase(
-					assetTitle.replaceAll(
-						_ESCAPED_CHARACTERS_REGEX, StringPool.DASH)),
-				LocalDate.now());
-		}
-		else if (StringUtil.equals(type, "journal")) {
-			fileName = String.format(
-				"analytics-cloud-web-contents-list-%s", type, LocalDate.now());
-		}
-		else {
-			fileName = String.format(
-				"analytics-cloud-%ss-list-%s", type, LocalDate.now());
-		}
-
-		return Response.ok(
-			streamingOutput, "application/csv"
-		).header(
-			HttpHeaders.CONTENT_DISPOSITION,
-			String.format("filename=\"%s.csv\"", fileName, LocalDate.now())
-		).build();
+		return hashMapWrapper.build();
 	}
 
 	private LocalDateTime _toUTCLocalDateTime(
@@ -238,7 +289,7 @@ public class ReportController extends BaseFaroController {
 		ReportController.class);
 
 	private static final Set<String> _csvExportTypes = SetUtil.fromArray(
-		"blog", "document", "form", "individual", "journal", "page");
+		"blog", "document", "event", "form", "individual", "journal", "page");
 	private static final DateTimeFormatter _dateDateTimeFormatter =
 		DateTimeFormatter.ofPattern(_ISO_8601_DATE_FORMAT);
 	private static final DateTimeFormatter _dateTimeDateTimeFormatter =

@@ -58,7 +58,9 @@ type LicenseTypePayload = {
 		ipAddresses: string;
 		macAddresses: string;
 		orderId: string;
+		productId?: string;
 		productPurchaseKey: string;
+		productVersion: string;
 	};
 	skuId: number;
 	type: string;
@@ -69,6 +71,7 @@ export type SubscriptionsType = {
 	name: string;
 	perpetual: boolean;
 	productPurchasedKey: string;
+	productVersion: string;
 	provisionedCount: number;
 	purchasedCount: number;
 	startDate: string;
@@ -160,6 +163,23 @@ export default class MarketplaceSpringBootOAuth2 extends OAuth2Client {
 		);
 
 		return response.json();
+	}
+
+	async getTrialAvailability(): Promise<Availability> {
+		try {
+			const response = await this.oAuth2Client.fetch(
+				'/trial/availability'
+			);
+
+			return response.json();
+		}
+		catch {
+			return {
+				active: false,
+				available: 0,
+				max: 0,
+			};
+		}
 	}
 
 	async getSubscriptions(orderId: number): Promise<SubscriptionsType[]> {

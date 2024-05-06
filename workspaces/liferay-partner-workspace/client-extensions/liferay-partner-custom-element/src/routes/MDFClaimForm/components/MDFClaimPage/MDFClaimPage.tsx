@@ -14,6 +14,7 @@ import InputMultipleFilesListing from '../../../../common/components/PRMForm/com
 import PRMFormik from '../../../../common/components/PRMFormik';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
 import ResumeCard from '../../../../common/components/ResumeCard';
+import useSetTouchedOnForms from '../../../../common/hooks/useSetTouchedOnForms';
 import MDFRequestDTO from '../../../../common/interfaces/dto/mdfRequestDTO';
 import LiferayFile from '../../../../common/interfaces/liferayFile';
 import MDFClaim from '../../../../common/interfaces/mdfClaim';
@@ -46,6 +47,8 @@ const MDFClaimPage = ({
 		...formikHelpers
 	} = useFormikContext<MDFClaim>();
 
+	const errors = formikHelpers.errors;
+
 	useActivitiesAmount(
 		values.activities,
 		useCallback(
@@ -59,6 +62,11 @@ const MDFClaimPage = ({
 	);
 
 	const {companiesEntries, fieldEntries} = useDynamicFieldEntries();
+
+	const {isButtonClicked, setIsButtonClicked} = useSetTouchedOnForms(
+		useCallback(() => Boolean(values.id), [values.id]),
+		formikHelpers
+	);
 
 	const claimsFiltered = mdfRequest.mdfReqToMDFClms?.filter(
 		(mdfRequestToMdfClaim) => {
@@ -76,8 +84,8 @@ const MDFClaimPage = ({
 
 	const isDisplayableMDFActivityClaim = (activity: MDFClaimActivity) => {
 		const claimableActivityByStatus =
-			activity.activityStatus?.key !== Status.EXPIRED.key &&
 			activity.activityStatus?.key !== Status.CANCELED.key &&
+			activity.activityStatus?.key !== Status.EXPIRED.key &&
 			!activity.claimed;
 
 		const editableClaimActivityByStatus =
@@ -90,12 +98,30 @@ const MDFClaimPage = ({
 		return isDisplayable;
 	};
 
+	const availableMDFActivities = values.activities?.filter((activity) =>
+		isDisplayableMDFActivityClaim(activity)
+	).length;
+
+	const getCreateClaimDenialMessage = () => {
+		if (mdfRequest.mdfRequestStatus?.key !== Status.APPROVED.key) {
+			return 'Waiting for Manager approval.';
+		}
+		else if (claimsFiltered && claimsFiltered >= 2 && !values.id) {
+			return 'You already submitted 2 claims.';
+		}
+		else if (!availableMDFActivities) {
+			return "You don't have activities available to claim.";
+		}
+	};
+
 	const getClaimPage = () => {
 		if (!fieldEntries || !companiesEntries) {
 			return <ClayLoadingIndicator />;
 		}
 
-		if (claimsFiltered && claimsFiltered >= 2 && !values.id) {
+		const createClaimDenialMessage = getCreateClaimDenialMessage();
+
+		if (createClaimDenialMessage) {
 			return (
 				<PRMForm name="New" title="Reimbursement Claim">
 					<div className="d-flex justify-content-center mt-4">
@@ -104,7 +130,7 @@ const MDFClaimPage = ({
 							displayType="info"
 							title="Info:"
 						>
-							You already submitted 2 claims.
+							{createClaimDenialMessage}
 						</ClayAlert>
 					</div>
 
@@ -123,33 +149,17 @@ const MDFClaimPage = ({
 			);
 		}
 
-		if (mdfRequest.mdfRequestStatus?.key !== 'approved') {
-			return (
-				<PRMForm name="New" title="Reimbursement Claim">
-					<div className="d-flex justify-content-center mt-4">
-						<ClayAlert
-							className="m-0 w-100"
-							displayType="info"
-							title="Info:"
-						>
-							Waiting for Manager approval
-						</ClayAlert>
-					</div>
+		const handleOnClick = () => {
+			setIsButtonClicked(true);
+			window.scrollTo({
+				behavior: (isValid ? 'instant' : 'smooth') as ScrollBehavior,
+				top: 0,
+			});
+		};
 
-					<PRMForm.Footer>
-						<div className="d-flex mr-auto">
-							<ClayButton
-								className="mr-4"
-								displayType="secondary"
-								onClick={() => onCancel()}
-							>
-								Cancel
-							</ClayButton>
-						</div>
-					</PRMForm.Footer>
-				</PRMForm>
-			);
-		}
+		const isButtonDisabled =
+			((!isValid || isSubmitting || submitted) && isButtonClicked) ||
+			(Boolean(values.id) && !isValid);
 
 		return (
 			<PRMForm name="New" title="Reimbursement Claim">
@@ -168,9 +178,12 @@ const MDFClaimPage = ({
 								<ActivityClaimPanel
 									activity={activity}
 									activityIndex={index}
+									errors={errors}
 									hasPermissionEditClaimActivity={
 										hasPermissionShowForm
 									}
+									isButtonClicked={isButtonClicked}
+									isEdit={!!values.id}
 									key={`${activity.id}-${index}`}
 									overallCampaignDescription={
 										mdfRequest.overallCampaignDescription
@@ -179,6 +192,17 @@ const MDFClaimPage = ({
 								/>
 							)
 					)}
+
+					{errors?.activities &&
+						typeof errors.activities === 'string' &&
+						(isButtonClicked || Boolean(values.id)) && (
+							<ClayAlert
+								displayType="danger"
+								hideCloseIcon={true}
+							>
+								{errors.activities}
+							</ClayAlert>
+						)}
 				</PRMForm.Section>
 
 				<PRMForm.Section
@@ -252,7 +276,10 @@ const MDFClaimPage = ({
 
 						<ClayButton
 							className="inline-item inline-item-after"
-							disabled={!isValid || isSubmitting || submitted}
+							disabled={isButtonDisabled}
+							onClick={() => {
+								handleOnClick();
+							}}
 							type="submit"
 						>
 							Submit

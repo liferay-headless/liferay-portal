@@ -116,85 +116,6 @@
 			}
 		},
 		{
-			"externalReferenceCode": "GitBranch",
-			"label": {
-				"en_US": "Git Branch"
-			},
-			"name": "GitBranch",
-			"objectFields": [
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"label": {
-						"en_US": "Branch SHA"
-					},
-					"name": "branchSHA",
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"label": {
-						"en_US": "Branch URL"
-					},
-					"name": "branchURL",
-					"required": true,
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Picklist",
-					"label": {
-						"en_US": "Type"
-					},
-					"listTypeDefinitionExternalReferenceCode": "gitHubBranchType",
-					"name": "type",
-					"required": true,
-					"state": false,
-					"type": "String"
-				},
-				{
-					"DBType": "Boolean",
-					"businessType": "Boolean",
-					"label": {
-						"en_US": "Rebased"
-					},
-					"name": "rebased",
-					"type": "Boolean"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"label": {
-						"en_US": "Upstream Branch SHA"
-					},
-					"name": "upstreamBranchSHA",
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"label": {
-						"en_US": "Upstream Branch URL"
-					},
-					"name": "upstreamBranchURL",
-					"required": true,
-					"type": "String"
-				}
-			],
-			"panelCategoryKey": "",
-			"pluralLabel": {
-				"en_US": "Git Branches"
-			},
-			"portlet": false,
-			"scope": "company",
-			"status": {
-				"code": 0,
-				"label": "approved",
-				"label_i18n": "Approved"
-			}
-		},
-		{
 			"externalReferenceCode": "JenkinsNode",
 			"label": {
 				"en_US": "Jenkins Node"
@@ -956,13 +877,13 @@
 					"conditionExpression": "",
 					"description": "",
 					"errorMessage": {
-						"en_US": "Unable to trigger Jethr0EtcSpringBootJobAdd"
+						"en_US": "Unable to trigger Jethr0EtcSpringBootAddJob"
 					},
 					"label": {
-						"en_US": "Jethr0 Etc Spring Boot Job Add"
+						"en_US": "Jethr0 Etc Spring Boot Add Job"
 					},
-					"name": "Jethr0EtcSpringBootJobAdd",
-					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-job-action",
+					"name": "Jethr0EtcSpringBootAddJob",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
 					"objectActionTriggerKey": "standalone",
 					"parameters": {
 					}
@@ -972,10 +893,10 @@
 					"conditionExpression": "",
 					"description": "",
 					"label": {
-						"en_US": "Jethr0 Etc Spring Boot Job Delete"
+						"en_US": "Jethr0 Etc Spring Boot Delete Job"
 					},
-					"name": "Jethr0EtcSpringBootJobDelete",
-					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-job-action",
+					"name": "Jethr0EtcSpringBootDeleteJob",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
 					"objectActionTriggerKey": "onAfterDelete",
 					"parameters": {
 					}
@@ -985,10 +906,10 @@
 					"conditionExpression": "",
 					"description": "",
 					"label": {
-						"en_US": "Jethr0 Etc Spring Boot Job Update"
+						"en_US": "Jethr0 Etc Spring Boot Update Job"
 					},
-					"name": "Jethr0EtcSpringBootJobUpdate",
-					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-job-action",
+					"name": "Jethr0EtcSpringBootUpdateJob",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
 					"objectActionTriggerKey": "onAfterUpdate",
 					"parameters": {
 					}
@@ -1085,16 +1006,6 @@
 				{
 					"deletionType": "disassociate",
 					"label": {
-						"en_US": "Jobs to Git Branches"
-					},
-					"name": "jobsToGitBranches",
-					"objectDefinitionExternalReferenceCode1": "Job",
-					"objectDefinitionExternalReferenceCode2": "GitBranch",
-					"type": "manyToMany"
-				},
-				{
-					"deletionType": "disassociate",
-					"label": {
 						"en_US": "Jobs to Jenkins Cohorts"
 					},
 					"name": "jobsToJenkinsCohorts",
@@ -1131,6 +1042,50 @@
 				"en_US": "Routine"
 			},
 			"name": "Routine",
+			"objectActions": [
+				{
+					"active": true,
+					"conditionExpression": "",
+					"description": "",
+					"errorMessage": {
+						"en_US": "Unable to trigger Jethr0EtcSpringBootAddRoutine"
+					},
+					"label": {
+						"en_US": "Jethr0 Etc Spring Boot Add Routine"
+					},
+					"name": "Jethr0EtcSpringBootAddRoutine",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
+					"objectActionTriggerKey": "standalone",
+					"parameters": {
+					}
+				},
+				{
+					"active": true,
+					"conditionExpression": "",
+					"description": "",
+					"label": {
+						"en_US": "Jethr0 Etc Spring Boot Delete Routine"
+					},
+					"name": "Jethr0EtcSpringBootDeleteRoutine",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
+					"objectActionTriggerKey": "onAfterDelete",
+					"parameters": {
+					}
+				},
+				{
+					"active": true,
+					"conditionExpression": "",
+					"description": "",
+					"label": {
+						"en_US": "Jethr0 Etc Spring Boot Update Routine"
+					},
+					"name": "Jethr0EtcSpringBootUpdateRoutine",
+					"objectActionExecutorKey": "function#liferay-jethr0-etc-spring-boot-object-actions",
+					"objectActionTriggerKey": "onAfterUpdate",
+					"parameters": {
+					}
+				}
+			],
 			"objectFields": [
 				{
 					"DBType": "String",
@@ -1139,8 +1094,16 @@
 						"en_US": "Cron"
 					},
 					"name": "cron",
-					"required": true,
 					"type": "String"
+				},
+				{
+					"DBType": "Boolean",
+					"businessType": "Boolean",
+					"label": {
+						"en_US": "Enabled"
+					},
+					"name": "enabled",
+					"type": "Boolean"
 				},
 				{
 					"DBType": "String",
@@ -1159,7 +1122,6 @@
 						"en_US": "Job Name"
 					},
 					"name": "jobName",
-					"required": true,
 					"type": "String"
 				},
 				{
@@ -1179,7 +1141,6 @@
 						"en_US": "Job Priority"
 					},
 					"name": "jobPriority",
-					"required": false,
 					"type": "Integer"
 				},
 				{
@@ -1190,7 +1151,6 @@
 					},
 					"listTypeDefinitionExternalReferenceCode": "jobType",
 					"name": "jobType",
-					"required": true,
 					"state": false,
 					"type": "String"
 				},
@@ -1217,21 +1177,260 @@
 					"objectDefinitionExternalReferenceCode1": "Routine",
 					"objectDefinitionExternalReferenceCode2": "Job",
 					"type": "oneToMany"
-				},
-				{
-					"deletionType": "disassociate",
-					"label": {
-						"en_US": "Routines to Git Branches"
-					},
-					"name": "routinesToGitBranches",
-					"objectDefinitionExternalReferenceCode1": "Routine",
-					"objectDefinitionExternalReferenceCode2": "GitBranch",
-					"type": "manyToMany"
 				}
 			],
 			"panelCategoryKey": "control_panel.object",
 			"pluralLabel": {
 				"en_US": "Routines"
+			},
+			"portlet": true,
+			"scope": "company",
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"externalReferenceCode": "GitCommit",
+			"label": {
+				"en_US": "Git Commit"
+			},
+			"name": "GitCommit",
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"label": {
+						"en_US": "SHA"
+					},
+					"name": "sha",
+					"type": "String"
+				}
+			],
+			"objectRelationships": [
+				{
+					"deletionType": "disassociate",
+					"label": {
+						"en_US": "Git Commit to Jobs"
+					},
+					"name": "gitCommitToJobs",
+					"objectDefinitionExternalReferenceCode1": "GitCommit",
+					"objectDefinitionExternalReferenceCode2": "Job",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "disassociate",
+					"label": {
+						"en_US": "Previous Git Commit to Routines"
+					},
+					"name": "previousGitCommitToRoutines",
+					"objectDefinitionExternalReferenceCode1": "GitCommit",
+					"objectDefinitionExternalReferenceCode2": "Routine",
+					"type": "oneToMany"
+				}
+			],
+			"panelCategoryKey": "control_panel.object",
+			"pluralLabel": {
+				"en_US": "Git Commits"
+			},
+			"portlet": true,
+			"scope": "company",
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"externalReferenceCode": "GitPullRequest",
+			"label": {
+				"en_US": "Git Pull Request"
+			},
+			"name": "GitPullRequest",
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"label": {
+						"en_US": "URL"
+					},
+					"name": "url",
+					"required": true,
+					"type": "String"
+				}
+			],
+			"objectRelationships": [
+				{
+					"deletionType": "disassociate",
+					"label": {
+						"en_US": "Git Pull Request to Jobs"
+					},
+					"name": "gitPullRequestToJobs",
+					"objectDefinitionExternalReferenceCode1": "GitPullRequest",
+					"objectDefinitionExternalReferenceCode2": "Job",
+					"type": "oneToMany"
+				}
+			],
+			"panelCategoryKey": "control_panel.object",
+			"pluralLabel": {
+				"en_US": "Git Pull Requests"
+			},
+			"portlet": true,
+			"scope": "company",
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"externalReferenceCode": "GitBranch",
+			"label": {
+				"en_US": "Git Branch"
+			},
+			"name": "GitBranch",
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"label": {
+						"en_US": "Latest SHA"
+					},
+					"name": "latestSHA",
+					"required": false,
+					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Picklist",
+					"label": {
+						"en_US": "Type"
+					},
+					"listTypeDefinitionExternalReferenceCode": "gitBranchType",
+					"name": "type",
+					"required": true,
+					"state": false,
+					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"label": {
+						"en_US": "URL"
+					},
+					"name": "url",
+					"required": true,
+					"type": "String"
+				}
+			],
+			"objectRelationships": [
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Base Git Branch to Git Pull Requests"
+					},
+					"name": "baseGitBranchToGitPullRequests",
+					"objectDefinitionExternalReferenceCode1": "GitBranch",
+					"objectDefinitionExternalReferenceCode2": "GitPullRequest",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Git Branch to Git Commits"
+					},
+					"name": "gitBranchToGitCommits",
+					"objectDefinitionExternalReferenceCode1": "GitBranch",
+					"objectDefinitionExternalReferenceCode2": "GitCommit",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "disassociate",
+					"label": {
+						"en_US": "Git Branch to Routines"
+					},
+					"name": "gitBranchToRoutines",
+					"objectDefinitionExternalReferenceCode1": "GitBranch",
+					"objectDefinitionExternalReferenceCode2": "Routine",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Head Git Branch to Git Pull Requests"
+					},
+					"name": "headGitBranchToGitPullRequests",
+					"objectDefinitionExternalReferenceCode1": "GitBranch",
+					"objectDefinitionExternalReferenceCode2": "GitPullRequest",
+					"type": "oneToMany"
+				}
+			],
+			"panelCategoryKey": "control_panel.object",
+			"pluralLabel": {
+				"en_US": "Git Branches"
+			},
+			"portlet": true,
+			"scope": "company",
+			"status": {
+				"code": 0,
+				"label": "approved",
+				"label_i18n": "Approved"
+			}
+		},
+		{
+			"externalReferenceCode": "GitUser",
+			"label": {
+				"en_US": "Git User"
+			},
+			"name": "GitUser",
+			"objectFields": [
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"label": {
+						"en_US": "URL"
+					},
+					"name": "url",
+					"required": true,
+					"type": "String"
+				}
+			],
+			"objectRelationships": [
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Git User to Git Branch"
+					},
+					"name": "gitUserToGitBranches",
+					"objectDefinitionExternalReferenceCode1": "GitUser",
+					"objectDefinitionExternalReferenceCode2": "GitBranch",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Receiver Git User to Git Pull Request"
+					},
+					"name": "receiverGitUserToGitPullRequests",
+					"objectDefinitionExternalReferenceCode1": "GitUser",
+					"objectDefinitionExternalReferenceCode2": "GitPullRequest",
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "cascade",
+					"label": {
+						"en_US": "Sender Git User to Git Pull Request"
+					},
+					"name": "senderGitUserToGitPullRequests",
+					"objectDefinitionExternalReferenceCode1": "GitUser",
+					"objectDefinitionExternalReferenceCode2": "GitPullRequest",
+					"type": "oneToMany"
+				}
+			],
+			"panelCategoryKey": "control_panel.object",
+			"pluralLabel": {
+				"en_US": "Git Users"
 			},
 			"portlet": true,
 			"scope": "company",

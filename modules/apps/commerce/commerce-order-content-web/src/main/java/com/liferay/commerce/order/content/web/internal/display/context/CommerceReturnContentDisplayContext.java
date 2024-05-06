@@ -121,18 +121,34 @@ public class CommerceReturnContentDisplayContext {
 	}
 
 	public String getAPIURL() {
+		long accountEntryId = getCommerceAccountEntryId();
 		long commerceChannelId = getCommerceChannelId();
 
-		if (commerceChannelId == 0) {
+		if ((accountEntryId == 0) || (commerceChannelId == 0)) {
 			return StringPool.BLANK;
 		}
 
 		String encodedFilter = URLCodec.encodeURL(
 			StringBundler.concat(
-				"'channelId' eq '", commerceChannelId, StringPool.APOSTROPHE),
+				"'channelId' eq '", commerceChannelId, "' and '",
+				"r_accountToCommerceReturns_accountEntryId' eq '",
+				accountEntryId, StringPool.APOSTROPHE),
 			true);
 
 		return "/o/commerce-returns?filter=" + encodedFilter;
+	}
+
+	public long getCommerceAccountEntryId() {
+		try {
+			AccountEntry accountEntry = _commerceContext.getAccountEntry();
+
+			return accountEntry.getAccountEntryId();
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException);
+		}
+
+		return 0;
 	}
 
 	public long getCommerceChannelId() {

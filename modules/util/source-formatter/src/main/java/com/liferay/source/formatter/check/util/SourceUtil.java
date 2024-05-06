@@ -117,6 +117,28 @@ public class SourceUtil {
 		return annotationsBlocks;
 	}
 
+	public static int getColumnIndex(
+		String tablesSQLContent, String tableName, String columnName) {
+
+		String tableSQL = _getTableSQL(tablesSQLContent, tableName);
+
+		if (tableSQL == null) {
+			return -1;
+		}
+
+		Pattern pattern = Pattern.compile(
+			StringBundler.concat(
+				"(?i)\n\\s*", columnName, "_?\\s+([\\w\\(\\)]+)[\\s,]"));
+
+		Matcher matcher = pattern.matcher(tableSQL);
+
+		if (matcher.find()) {
+			return matcher.start();
+		}
+
+		return -1;
+	}
+
 	public static String getIndent(String s) {
 		StringBundler sb = new StringBundler(s.length());
 
@@ -363,6 +385,26 @@ public class SourceUtil {
 		}
 
 		return annotations;
+	}
+
+	private static String _getTableSQL(
+		String tablesSQLContent, String tableName) {
+
+		Pattern pattern = Pattern.compile("create table " + tableName + "_? ");
+
+		Matcher matcher = pattern.matcher(tablesSQLContent);
+
+		if (!matcher.find()) {
+			return null;
+		}
+
+		int x = tablesSQLContent.indexOf(");", matcher.start());
+
+		if (x == -1) {
+			return null;
+		}
+
+		return tablesSQLContent.substring(matcher.start(), x + 1);
 	}
 
 	private static final Pattern _annotationMemberValuePairPattern =

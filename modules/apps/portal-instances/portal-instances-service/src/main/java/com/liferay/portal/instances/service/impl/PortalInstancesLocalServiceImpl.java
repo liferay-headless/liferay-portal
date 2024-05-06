@@ -148,6 +148,8 @@ public class PortalInstancesLocalServiceImpl
 
 			_layoutLocalService.deleteLayouts(
 				group.getGroupId(), false, new ServiceContext());
+			_layoutLocalService.deleteLayouts(
+				group.getGroupId(), true, new ServiceContext());
 
 			siteInitializer.initialize(group.getGroupId());
 		}

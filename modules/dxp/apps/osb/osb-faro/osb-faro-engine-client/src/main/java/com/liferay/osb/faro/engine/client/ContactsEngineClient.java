@@ -407,6 +407,8 @@ public interface ContactsEngineClient {
 		String ownerType, String name, String query, String expand, int cur,
 		int delta, List<OrderByField> orderByFields);
 
+	public Date getLastSeenDate(FaroProject faroProject);
+
 	public Results<PageVisited> getPagesVisited(
 		FaroProject faroProject, String channelId, String ownerId,
 		String ownerType, String query, String interestName, Date startDate,
@@ -414,6 +416,11 @@ public interface ContactsEngineClient {
 		List<OrderByField> orderByFields);
 
 	public PageVisited getPageVisited(FaroProject faroProject, String id);
+
+	public long getReportsExportCSVCount(
+			FaroProject faroProject, String path,
+			Map<String, List<String>> queryParameters)
+		throws Exception;
 
 	public Results<String> getSessionValues(
 		FaroProject faroProject, String channelId, String fieldName,

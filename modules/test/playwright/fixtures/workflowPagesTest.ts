@@ -5,27 +5,41 @@
 
 import {test} from '@playwright/test';
 
+import {ScriptManagementPage} from '../pages/portal-security-script-management-web/ScriptManagementPage';
+import {ActionPage} from '../pages/portal-workflow-kaleo-designer-web/ActionPage';
 import {ActionReassignmentPage} from '../pages/portal-workflow-kaleo-designer-web/ActionReassignmentPage';
+import {ConditionNode} from '../pages/portal-workflow-kaleo-designer-web/ConditionNodePage';
 import {DiagramViewPage} from '../pages/portal-workflow-kaleo-designer-web/DiagramViewPage';
 import {NodePropertiesSidebarPage} from '../pages/portal-workflow-kaleo-designer-web/NodePropertiesSidebarPage';
+import {NotificationPage} from '../pages/portal-workflow-kaleo-designer-web/NotificationPage';
+import {NotificationSectionPage} from '../pages/portal-workflow-kaleo-designer-web/NotificationSectionPage';
 import {ProcessBuilderPage} from '../pages/portal-workflow-kaleo-designer-web/ProcessBuilderPage';
-import {SourceViewPage} from '../pages/portal-workflow-kaleo-designer-web/SourceViewPage';
 import {TimerPage} from '../pages/portal-workflow-kaleo-designer-web/TimerPage';
 import {WorkflowTasksPage} from '../tests/portal-workflow-task-web/pages/WorkflowTasksPage';
 import {WorkflowPage} from '../tests/portal-workflow-web/pages/WorkflowPage';
 
 const workflowPagesTest = test.extend<{
+	actionPage: ActionPage;
 	actionReassignmentPage: ActionReassignmentPage;
+	conditionNode: ConditionNode;
 	diagramViewPage: DiagramViewPage;
 	nodePropertiesSidebarPage: NodePropertiesSidebarPage;
+	notificationPage: NotificationPage;
+	notificationSectionPage: NotificationSectionPage;
 	processBuilderPage: ProcessBuilderPage;
-	sourceViewPage: SourceViewPage;
+	scriptManagementPage: ScriptManagementPage;
 	timerPage: TimerPage;
 	workflowPage: WorkflowPage;
 	workflowTasksPage: WorkflowTasksPage;
 }>({
+	actionPage: async ({page}, use) => {
+		await use(new ActionPage(page));
+	},
 	actionReassignmentPage: async ({page}, use) => {
 		await use(new ActionReassignmentPage(page));
+	},
+	conditionNode: async ({page}, use) => {
+		await use(new ConditionNode(page));
 	},
 	diagramViewPage: async ({page}, use) => {
 		await use(new DiagramViewPage(page));
@@ -33,8 +47,17 @@ const workflowPagesTest = test.extend<{
 	nodePropertiesSidebarPage: async ({page}, use) => {
 		await use(new NodePropertiesSidebarPage(page));
 	},
+	notificationPage: async ({page}, use) => {
+		await use(new NotificationPage(page));
+	},
+	notificationSectionPage: async ({page}, use) => {
+		await use(new NotificationSectionPage(page, 0));
+	},
 	processBuilderPage: async ({page}, use) => {
 		await use(new ProcessBuilderPage(page));
+	},
+	scriptManagementPage: async ({page}, use) => {
+		await use(new ScriptManagementPage(page));
 	},
 	timerPage: async ({page}, use) => {
 		await use(new TimerPage(page));

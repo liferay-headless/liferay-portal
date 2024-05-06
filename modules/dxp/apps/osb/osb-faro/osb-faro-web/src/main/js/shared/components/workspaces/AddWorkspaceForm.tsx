@@ -269,7 +269,7 @@ const AddWorkspaceForm: React.FC<IAddWorkspaceFormProps> = ({
 									{/* <p class="extra-instruction text-secondary">
 											{sub(
 												Liferay.Language.get(
-													'cant-find-the-right-server?-send-us-a-x'
+													'cannot-find-the-right-server?-send-us-a-x'
 												),
 												[
 													// TODO: This should in the future direct to a

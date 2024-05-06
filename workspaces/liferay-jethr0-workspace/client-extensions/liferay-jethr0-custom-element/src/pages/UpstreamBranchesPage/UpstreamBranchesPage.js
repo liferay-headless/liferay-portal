@@ -27,10 +27,6 @@ function UpstreamBranches() {
 		return <div>Loading...</div>;
 	}
 
-	const gitHubURLRegExp = new RegExp(
-		'https://github.com/([^/]+)/([^/]+)/tree/([^/]+)'
-	);
-
 	return (
 		<Jethr0Table>
 			<thead>
@@ -46,15 +42,6 @@ function UpstreamBranches() {
 			</thead>
 			<tbody>
 				{upstreamGitBranches?.map((upstreamGitBranch) => {
-					const gitHubURLMatch = upstreamGitBranch.branchURL.match(
-						gitHubURLRegExp
-					);
-
-					const gitBranchName = gitHubURLMatch[3];
-					const gitBranchRepositoryName = gitHubURLMatch[2];
-					const gitBranchUserName = gitHubURLMatch[1];
-					const gitBranchSHA = upstreamGitBranch.branchSHA;
-
 					return (
 						<tr key={upstreamGitBranch.id}>
 							<th className="font-weight-semi-bold">
@@ -69,44 +56,49 @@ function UpstreamBranches() {
 								</Link>
 							</th>
 							<td>
-								<Link to={upstreamGitBranch.branchURL}>
-									{gitBranchName}
+								<Link to={upstreamGitBranch.url}>
+									{upstreamGitBranch.name}
 								</Link>
+							</td>
+							<td>
+								{upstreamGitBranch.latestSHA && (
+									<Link
+										to={
+											'https://github.com/' +
+											upstreamGitBranch.userName +
+											'/' +
+											upstreamGitBranch.repositoryName +
+											'/commit/' +
+											upstreamGitBranch.latestSHA
+										}
+									>
+										{upstreamGitBranch.latestSHA.substring(
+											0,
+											7
+										)}
+									</Link>
+								)}
 							</td>
 							<td>
 								<Link
 									to={
 										'https://github.com/' +
-										gitBranchUserName +
+										upstreamGitBranch.userName +
 										'/' +
-										gitBranchRepositoryName +
-										'/commit/' +
-										gitBranchSHA
+										upstreamGitBranch.repositoryName
 									}
 								>
-									{gitBranchSHA.substring(0, 7)}
+									{upstreamGitBranch.repositoryName}
 								</Link>
 							</td>
 							<td>
 								<Link
 									to={
 										'https://github.com/' +
-										gitBranchUserName +
-										'/' +
-										gitBranchRepositoryName
+										upstreamGitBranch.userName
 									}
 								>
-									{gitBranchRepositoryName}
-								</Link>
-							</td>
-							<td>
-								<Link
-									to={
-										'https://github.com/' +
-										gitBranchUserName
-									}
-								>
-									{gitBranchUserName}
+									{upstreamGitBranch.userName}
 								</Link>
 							</td>
 							<td>

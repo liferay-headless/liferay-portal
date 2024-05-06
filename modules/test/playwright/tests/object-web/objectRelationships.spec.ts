@@ -12,8 +12,6 @@ import {getRandomInt} from '../../utils/getRandomInt';
 
 export const test = mergeTests(apiHelpersTest, loginTest(), objectPagesTest);
 
-const objectRelationshipRandomNumber = Math.floor(Math.random() * 99);
-
 test.describe('Manage object relationships through Model Builder', () => {
 	test('can create relationship by dragging node handles', async ({
 		apiHelpers,
@@ -24,13 +22,17 @@ test.describe('Manage object relationships through Model Builder', () => {
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
 		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition(
-				objectFolder.externalReferenceCode
-			);
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				status: {code: 0},
+			});
 		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition(
-				objectFolder.externalReferenceCode
-			);
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				status: {code: 0},
+			});
 
 		await viewObjectDefinitionsPage.goto();
 
@@ -61,14 +63,14 @@ test.describe('Manage object relationships through Model Builder', () => {
 		).toBeVisible();
 
 		await modelBuilderPage.clickObjectDefinitionShowAllFieldsButton(
-			objectDefinition2.name
+			objectDefinition2.label['en_US']
 		);
 
 		await modelBuilderPage.clickFitViewButton();
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes
-				.filter({hasText: objectDefinition2.name})
+				.filter({hasText: objectDefinition2.label['en_US']})
 				.getByText(objectRelationshipLabel)
 		).toBeVisible();
 
@@ -100,17 +102,22 @@ test.describe('Manage object relationships through Model Builder', () => {
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
 		const objectDefinition1 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition(
-				objectFolder.externalReferenceCode
-			);
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				status: {code: 0},
+			});
 
 		const objectDefinition2 =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+			});
 
 		const objectRelationshipLabel =
 			'objectRelationshipLabel' + getRandomInt();
 		const objectRelationshipName =
-			'objectRelationshipName' + objectRelationshipRandomNumber;
+			'objectRelationshipName' + Math.floor(Math.random() * 99);
 
 		const objectRelationshipData: Partial<ObjectRelationship> = {
 			label: {
@@ -147,7 +154,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes.filter({
-				hasText: objectDefinition2.name,
+				hasText: objectDefinition2.label['en_US'],
 			})
 		).toBeVisible();
 
@@ -165,7 +172,7 @@ test.describe('Manage object relationships through Model Builder', () => {
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes.filter({
-				hasText: objectDefinition2.name,
+				hasText: objectDefinition2.label['en_US'],
 			})
 		).not.toBeVisible();
 

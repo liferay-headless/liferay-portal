@@ -2,14 +2,13 @@ import * as breadcrumbs from 'shared/util/breadcrumbs';
 import BasePage from 'shared/components/base-page';
 import BundleRouter from 'route-middleware/BundleRouter';
 import DownloadCSVReport from 'shared/components/download-report/DownloadCSVReport';
-import DownloadPDFReport, {
-	Containers
-} from 'shared/components/download-report/DownloadPDFReport';
+import DownloadPDFReport from 'shared/components/download-report/DownloadPDFReport';
 import Filter from '../hocs/Filter';
 import getCN from 'classnames';
 import Loading from 'shared/components/Loading';
 import React, {lazy, Suspense, useState} from 'react';
 import RouteNotFound from 'shared/components/RouteNotFound';
+import {CSVType} from 'shared/components/download-report/utils';
 import {ENABLE_GLOBAL_FILTER} from 'shared/util/constants';
 import {getMatchedRoute, Routes} from 'shared/util/router';
 import {pickBy} from 'lodash';
@@ -100,13 +99,6 @@ const DocumentAndMedia: React.FC<{
 				<BasePage.SubHeader>
 					<div className='d-flex justify-content-end w-100'>
 						<DownloadPDFReport
-							containers={[
-								Containers.VisitorsBehaviorCard,
-								Containers.AudienceCard,
-								Containers.DownloadsByLocationCard,
-								Containers.DownloadsByTechnologyCard,
-								Containers.AssetAppearsOnCard
-							]}
 							disabled={dataSourceStates.empty}
 							subtitle={selectedChannel?.name}
 							title={
@@ -127,10 +119,8 @@ const DocumentAndMedia: React.FC<{
 							assetId={assetId}
 							assetType='document'
 							disabled={dataSourceStates.empty}
-							type='individual'
-							typeLang={Liferay.Language.get(
-								'documents-and-media'
-							)}
+							type={CSVType.Individual}
+							typeLang={Liferay.Language.get('known-individuals')}
 						/>
 					</div>
 				</BasePage.SubHeader>

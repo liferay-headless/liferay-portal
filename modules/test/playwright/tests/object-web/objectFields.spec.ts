@@ -25,7 +25,10 @@ test.describe('Manage object fields through Model Builder', () => {
 			await apiHelpers.listTypeAdmin.postRandomListTypeDefinition();
 
 		const objectDefinition =
-			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode: 'default',
+				status: {code: 0},
+			});
 
 		await viewObjectDefinitionsPage.goto();
 
@@ -45,7 +48,7 @@ test.describe('Manage object fields through Model Builder', () => {
 
 		await expect(
 			modelBuilderPage.objectDefinitionNodes
-				.filter({hasText: objectDefinition.name})
+				.filter({hasText: objectDefinition.label['en_US']})
 				.getByText(objectFieldLabel)
 		).toBeVisible();
 

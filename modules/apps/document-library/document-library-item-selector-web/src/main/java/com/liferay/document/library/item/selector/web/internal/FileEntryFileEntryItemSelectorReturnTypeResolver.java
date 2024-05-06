@@ -11,6 +11,7 @@ import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -52,22 +53,6 @@ public class FileEntryFileEntryItemSelectorReturnTypeResolver
 	public String getValue(FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String previewURL = null;
-
-		long repositoryId = fileEntry.getRepositoryId();
-
-		if (RepositoryUtil.isExternalRepository(repositoryId) ||
-			(fileEntry.getGroupId() == repositoryId)) {
-
-			previewURL = _dlURLHelper.getImagePreviewURL(
-				fileEntry, fileEntry.getFileVersion(), themeDisplay,
-				StringPool.BLANK, false, false);
-		}
-		else {
-			previewURL = _portletFileRepository.getPortletFileEntryURL(
-				themeDisplay, fileEntry, "&imagePreview=1", false);
-		}
-
 		return JSONUtil.put(
 			"classNameId", _portal.getClassNameId(FileEntry.class)
 		).put(
@@ -79,15 +64,19 @@ public class FileEntryFileEntryItemSelectorReturnTypeResolver
 		).put(
 			"html",
 			() -> {
-				if (ArrayUtil.contains(
-						PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES,
-						fileEntry.getMimeType()) ||
+				DLVideoRenderer dlVideoRenderer =
+					_dlVideoRendererSnapshot.get();
+
+				if (((dlVideoRenderer != null) &&
+					 ArrayUtil.contains(
+						 PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES,
+						 fileEntry.getMimeType())) ||
 					Objects.equals(
 						ContentTypes.
 							APPLICATION_VND_LIFERAY_VIDEO_EXTERNAL_SHORTCUT_HTML,
 						fileEntry.getMimeType())) {
 
-					return _dlVideoRenderer.renderHTML(
+					return dlVideoRenderer.renderHTML(
 						fileEntry.getFileVersion(), themeDisplay.getRequest());
 				}
 
@@ -100,17 +89,33 @@ public class FileEntryFileEntryItemSelectorReturnTypeResolver
 		).put(
 			"type", "document"
 		).put(
-			"url", previewURL
+			"url",
+			() -> {
+				long repositoryId = fileEntry.getRepositoryId();
+
+				if (RepositoryUtil.isExternalRepository(repositoryId) ||
+					(fileEntry.getGroupId() == repositoryId)) {
+
+					return _dlURLHelper.getImagePreviewURL(
+						fileEntry, fileEntry.getFileVersion(), themeDisplay,
+						StringPool.BLANK, false, false);
+				}
+
+				return _portletFileRepository.getPortletFileEntryURL(
+					themeDisplay, fileEntry, "&imagePreview=1", false);
+			}
 		).put(
 			"uuid", fileEntry.getUuid()
 		).toString();
 	}
 
-	@Reference
-	private DLURLHelper _dlURLHelper;
+	private static final Snapshot<DLVideoRenderer> _dlVideoRendererSnapshot =
+		new Snapshot<>(
+			FileEntryFileEntryItemSelectorReturnTypeResolver.class,
+			DLVideoRenderer.class, null, true);
 
 	@Reference
-	private DLVideoRenderer _dlVideoRenderer;
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private Portal _portal;

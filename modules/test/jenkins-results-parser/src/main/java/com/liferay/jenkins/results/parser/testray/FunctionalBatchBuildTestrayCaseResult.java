@@ -63,7 +63,7 @@ public class FunctionalBatchBuildTestrayCaseResult
 			}
 
 			if (result.equals("ABORTED")) {
-				return "Aborted prior to running test";
+				return build.getJobName() + " timed out after 2 hours";
 			}
 
 			if (result.equals("SUCCESS") || result.equals("UNSTABLE")) {

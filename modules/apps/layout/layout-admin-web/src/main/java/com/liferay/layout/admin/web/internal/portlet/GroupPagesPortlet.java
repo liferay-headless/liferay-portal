@@ -7,6 +7,7 @@ package com.liferay.layout.admin.web.internal.portlet;
 
 import com.liferay.application.list.GroupProvider;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
+import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
 import com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException;
@@ -15,6 +16,7 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.configuration.LayoutUtilityPageThumbnailConfiguration;
 import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
+import com.liferay.layout.admin.web.internal.display.context.LayoutUtilityPageEntryDisplayContext;
 import com.liferay.layout.admin.web.internal.display.context.LayoutsAdminDisplayContext;
 import com.liferay.layout.admin.web.internal.display.context.MillerColumnsDisplayContext;
 import com.liferay.layout.admin.web.internal.display.context.SelectLayoutCollectionDisplayContext;
@@ -241,6 +243,10 @@ public class GroupPagesPortlet extends MVCPortlet {
 					_portal.getLiferayPortletRequest(renderRequest),
 					_portal.getLiferayPortletResponse(renderResponse)));
 			renderRequest.setAttribute(
+				LayoutUtilityPageEntryDisplayContext.class.getName(),
+				new LayoutUtilityPageEntryDisplayContext(
+					renderRequest, renderResponse));
+			renderRequest.setAttribute(
 				TranslationURLProvider.class.getName(),
 				_translationURLProvider);
 
@@ -256,6 +262,7 @@ public class GroupPagesPortlet extends MVCPortlet {
 	@Override
 	protected boolean isSessionErrorException(Throwable throwable) {
 		if (throwable instanceof AssetCategoryException ||
+			throwable instanceof AssetTagException ||
 			throwable instanceof DDMFormValuesValidationException ||
 			throwable instanceof DuplicateFriendlyURLEntryException ||
 			throwable instanceof

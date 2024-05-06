@@ -110,10 +110,10 @@ public abstract class BaseEntityDALO<T extends Entity>
 		return entity;
 	}
 
-	protected Set<T> getAll(String filter, String search, String sort) {
+	protected Set<T> getAll(String filterString, String search, String sort) {
 		Set<T> entities = new HashSet<>();
 
-		for (JSONObject jsonObject : _get(filter, search, sort)) {
+		for (JSONObject jsonObject : _get(filterString, search, sort)) {
 			T entity = newEntity(jsonObject);
 
 			entities.add(entity);
@@ -301,7 +301,9 @@ public abstract class BaseEntityDALO<T extends Entity>
 		return retryable.executeWithRetries();
 	}
 
-	private Set<JSONObject> _get(String filter, String search, String sort) {
+	private Set<JSONObject> _get(
+		String filterString, String search, String sort) {
+
 		Set<JSONObject> jsonObjects = new HashSet<>();
 
 		int currentPage = 1;
@@ -328,8 +330,9 @@ public abstract class BaseEntityDALO<T extends Entity>
 										"page",
 										String.valueOf(finalCurrentPage));
 
-									if (filter != null) {
-										uriBuilder.queryParam("filter", filter);
+									if (filterString != null) {
+										uriBuilder.queryParam(
+											"filter", filterString);
 									}
 
 									if (search != null) {

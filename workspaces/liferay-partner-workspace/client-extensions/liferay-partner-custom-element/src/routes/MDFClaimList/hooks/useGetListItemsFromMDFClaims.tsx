@@ -18,11 +18,13 @@ import getMDFClaimAmountClaimedInfo from '../utils/getMDFBudgetInfos';
 export default function useGetListItemsFromMDFClaims(
 	page: number,
 	pageSize: number,
-	filtersTerm: string
+	urlParams: URLSearchParams
 ) {
 	const swrResponse = useGet<LiferayItems<MDFClaimDTO[]>>(
-		filtersTerm &&
-			`/o/${LiferayAPIs.OBJECT}/mdfclaims?&filter=${filtersTerm}&page=${page}&pageSize=${pageSize}&sort=dateCreated:desc`
+		urlParams &&
+			`/o/${
+				LiferayAPIs.OBJECT
+			}/mdfclaims?${urlParams.toString()}&page=${page}&pageSize=${pageSize}`
 	);
 
 	const listItems = useMemo(
@@ -33,7 +35,7 @@ export default function useGetListItemsFromMDFClaims(
 				),
 				[MDFClaimColumnKey.CLAIM_ID]: String(item.id),
 				[MDFClaimColumnKey.PARTNER]: item.companyName,
-				[MDFClaimColumnKey.STATUS]: item.mdfClaimStatus.name,
+				[MDFClaimColumnKey.CLAIM_STATUS]: item.mdfClaimStatus.name,
 				[MDFClaimColumnKey.TYPE]: item.partial ? 'Partial' : 'Full',
 				...getMDFClaimAmountClaimedInfo(
 					item.totalClaimAmount,

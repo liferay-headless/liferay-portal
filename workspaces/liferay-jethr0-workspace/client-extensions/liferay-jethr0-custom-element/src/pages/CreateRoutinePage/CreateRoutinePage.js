@@ -15,6 +15,7 @@ import Jethr0Input from '../../components/Jethr0Input/Jethr0Input';
 import Jethr0JobParameterFields from '../../components/Jethr0JobParameterFields/Jethr0JobParameterFields';
 import Jethr0NavigationBar from '../../components/Jethr0NavigationBar/Jethr0NavigationBar';
 import Jethr0SelectWithOption from '../../components/Jethr0SelectWithOption/Jethr0SelectWithOption';
+import {getUpstreamGitBranches} from '../../objects/gitbranches/GitBranchUtil';
 import {getJobDefinitions} from '../../objects/jobdefinitions/JobDefinitionUtil';
 import {
 	createRoutine,
@@ -31,6 +32,10 @@ function CreateRoutinePage() {
 	const [routineName, setRoutineName] = useState(null);
 	const [routineTypeKey, setRoutineTypeKey] = useState('manual');
 	const [routineTypes, setRoutineTypes] = useState(null);
+	const [upstreamGitBranchURL, setUpstreamGitBranchURL] = useState(
+		'https://github.com/liferay/liferay-portal/tree/master'
+	);
+	const [upstreamGitBranches, setUpstreamGitBranches] = useState(null);
 
 	function redirectToRoutinePage(data) {
 		if (data !== null && data.id !== null) {
@@ -46,6 +51,12 @@ function CreateRoutinePage() {
 
 	if (!routineTypes) {
 		getRoutineTypes({setRoutineTypes});
+
+		return;
+	}
+
+	if (!upstreamGitBranches) {
+		getUpstreamGitBranches({setUpstreamGitBranches});
 
 		return;
 	}
@@ -113,6 +124,27 @@ function CreateRoutinePage() {
 		});
 	}
 
+	let upstreamGitBranch = null;
+
+	for (const candidateUpstreamGitBranch of upstreamGitBranches) {
+		if (candidateUpstreamGitBranch.url === upstreamGitBranchURL) {
+			upstreamGitBranch = candidateUpstreamGitBranch;
+		}
+	}
+
+	let upstreamGitBranchOptions = [];
+
+	if (upstreamGitBranches) {
+		upstreamGitBranchOptions = upstreamGitBranches.map(
+			(upstreamGitBranch) => {
+				return {
+					label: upstreamGitBranch.url,
+					value: upstreamGitBranch.url,
+				};
+			}
+		);
+	}
+
 	const routineData = {
 		cron: routineCron,
 		jobName,
@@ -120,7 +152,9 @@ function CreateRoutinePage() {
 		jobPriority,
 		jobType: jobDefinition.key,
 		name: routineName,
+		r_gitBranchToRoutines_c_gitBranchId: upstreamGitBranch.id,
 		type: routineTypeKey,
+		upstreamGitBranch,
 	};
 
 	return (
@@ -148,19 +182,40 @@ function CreateRoutinePage() {
 					/>
 				</ClayForm.Group>
 
-				<ClayForm.Group>
-					<label htmlFor="routineCron">Routine Cron</label>
+				{(routineTypeKey === 'cron' ||
+					routineTypeKey === 'upstreamBranchCron') && (
+					<ClayForm.Group>
+						<label htmlFor="routineCron">Routine Cron</label>
 
-					<Jethr0Input
-						id="routineCron"
-						onChange={(event) => {
-							setRoutineCron(event.target.value);
-						}}
-						placeholder="Insert your cron here (e.g. 5 4 * * *)"
-						type="text"
-						value={routineCron}
-					/>
-				</ClayForm.Group>
+						<Jethr0Input
+							id="routineCron"
+							onChange={(event) => {
+								setRoutineCron(event.target.value);
+							}}
+							placeholder="Insert your cron here (e.g. 5 4 * * *)"
+							type="text"
+							value={routineCron}
+						/>
+					</ClayForm.Group>
+				)}
+
+				{routineTypeKey === 'upstreamBranchCron' && (
+					<ClayForm.Group>
+						<label htmlFor="upstreamGitBranchURL">
+							Upstream Branch
+						</label>
+
+						<Jethr0SelectWithOption
+							aria-label="Upstream Git Branch"
+							id="upstreamGitBranchURL"
+							onChange={(event) => {
+								setUpstreamGitBranchURL(event.target.value);
+							}}
+							options={upstreamGitBranchOptions}
+							value={upstreamGitBranchURL}
+						/>
+					</ClayForm.Group>
+				)}
 
 				<ClayForm.Group>
 					<label htmlFor="routineType">Routine Type</label>

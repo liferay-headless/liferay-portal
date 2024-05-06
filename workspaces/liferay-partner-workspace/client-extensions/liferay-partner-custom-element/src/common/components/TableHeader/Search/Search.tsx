@@ -10,9 +10,10 @@ import {memo, useState} from 'react';
 interface IProps {
 	initialSearchTerm?: string;
 	onSearchSubmit: (term: string) => void;
+	urlParams?: URLSearchParams;
 }
 
-const Search = ({initialSearchTerm, onSearchSubmit}: IProps) => {
+const Search = ({initialSearchTerm, onSearchSubmit, urlParams}: IProps) => {
 	const [term, setTerm] = useState(
 		initialSearchTerm ? initialSearchTerm : ''
 	);
@@ -25,12 +26,26 @@ const Search = ({initialSearchTerm, onSearchSubmit}: IProps) => {
 			onSearchSubmit(term);
 			setSearching(false);
 
+			if (urlParams) {
+				if (term) {
+					urlParams.set('search', term);
+
+					return;
+				}
+
+				urlParams.delete('search');
+			}
+
 			return;
 		}
 
 		setTerm('');
 		onSearchSubmit('');
 		setSearching(true);
+
+		if (urlParams) {
+			urlParams.delete('search');
+		}
 	};
 
 	return (

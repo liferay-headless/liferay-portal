@@ -2197,6 +2197,11 @@ public class PropsValues {
 	public static String SOCIAL_ACTIVITY_SETS_SELECTOR = GetterUtil.getString(
 		PropsUtil.get(PropsKeys.SOCIAL_ACTIVITY_SETS_SELECTOR));
 
+	public static boolean SPRING_BEANFACTORY_STRICT_LIFECYCLE_ENABLED =
+		GetterUtil.getBoolean(
+			PropsUtil.get(
+				PropsKeys.SPRING_BEANFACTORY_STRICT_LIFECYCLE_ENABLED));
+
 	public static final String[] SPRING_CONFIGS = PropsUtil.getArray(
 		PropsKeys.SPRING_CONFIGS);
 
@@ -2324,9 +2329,6 @@ public class PropsValues {
 
 	public static int THREAD_DUMP_SPEED_THRESHOLD = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.THREAD_DUMP_SPEED_THRESHOLD));
-
-	public static int TRANSACTION_ISOLATION_COUNTER = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.TRANSACTION_ISOLATION_COUNTER));
 
 	public static int TRANSACTION_ISOLATION_PORTAL = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.TRANSACTION_ISOLATION_PORTAL));

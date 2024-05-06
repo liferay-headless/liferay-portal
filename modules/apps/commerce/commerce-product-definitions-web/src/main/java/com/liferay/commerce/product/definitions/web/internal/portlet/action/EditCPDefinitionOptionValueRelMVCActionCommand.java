@@ -5,6 +5,7 @@
 
 package com.liferay.commerce.product.definitions.web.internal.portlet.action;
 
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.exception.CPDefinitionOptionValueRelCPInstanceException;
 import com.liferay.commerce.product.exception.CPDefinitionOptionValueRelKeyException;
@@ -14,6 +15,7 @@ import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
 import com.liferay.commerce.product.model.CPInstanceUnitOfMeasure;
 import com.liferay.commerce.product.service.CPDefinitionOptionValueRelService;
 import com.liferay.commerce.product.service.CPInstanceUnitOfMeasureLocalService;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
@@ -33,8 +35,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
-
-import java.math.BigDecimal;
 
 import java.util.Locale;
 import java.util.Map;
@@ -210,18 +210,14 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 			cpInstanceId = ParamUtil.getLong(actionRequest, "cpInstanceId");
 		}
 
-		boolean preselected = ParamUtil.getBoolean(
-			actionRequest, "preselected");
-		BigDecimal price = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "price", BigDecimal.ZERO);
-		BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "quantity", BigDecimal.ZERO);
-
 		return _cpDefinitionOptionValueRelService.
 			updateCPDefinitionOptionValueRel(
 				cpDefinitionOptionValueRelId, cpInstanceId, key, nameMap,
-				preselected, price, priority, quantity, unitOfMeasureKey,
-				serviceContext);
+				ParamUtil.getBoolean(actionRequest, "preselected"),
+				_commercePriceFormatter.parse(actionRequest, "price"), priority,
+				_commerceOrderItemQuantityFormatter.parse(
+					actionRequest, "quantity"),
+				unitOfMeasureKey, serviceContext);
 	}
 
 	private CPDefinitionOptionValueRel _updatePreselected(
@@ -248,6 +244,13 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditCPDefinitionOptionValueRelMVCActionCommand.class);
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CPDefinitionOptionValueRelService

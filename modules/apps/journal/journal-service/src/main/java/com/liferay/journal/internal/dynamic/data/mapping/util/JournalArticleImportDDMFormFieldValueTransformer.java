@@ -22,8 +22,10 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Eudaldo Alonso
@@ -68,15 +70,32 @@ public class JournalArticleImportDDMFormFieldValueTransformer
 
 			JournalArticle journalArticle = null;
 
+			long originalArticlePrimaryKey = jsonObject.getLong(
+				"articlePrimaryKey");
+
 			long articlePrimaryKey = GetterUtil.getLong(
 				_portletDataContext.getNewPrimaryKey(
 					JournalArticle.class + ".primaryKey",
-					jsonObject.getLong("articlePrimaryKey")));
+					originalArticlePrimaryKey));
 
 			if (articlePrimaryKey != 0) {
 				journalArticle =
 					_journalArticleLocalService.fetchJournalArticle(
 						articlePrimaryKey);
+			}
+
+			long originalClassPK = jsonObject.getLong("classPK");
+
+			if ((journalArticle == null) && (originalClassPK != 0)) {
+				Map<Long, Long> primaryKeys =
+					(Map<Long, Long>)_portletDataContext.getNewPrimaryKeysMap(
+						JournalArticle.class);
+
+				articlePrimaryKey = MapUtil.getLong(
+					primaryKeys, originalClassPK);
+
+				journalArticle = _journalArticleLocalService.fetchLatestArticle(
+					articlePrimaryKey);
 			}
 
 			if (journalArticle == null) {
@@ -86,8 +105,19 @@ public class JournalArticleImportDDMFormFieldValueTransformer
 							articlePrimaryKey);
 				}
 
-				_portletDataContext.removePrimaryKey(
-					ExportImportPathUtil.getModelPath(_stagedModel));
+				if ((originalArticlePrimaryKey != 0) ||
+					(originalClassPK != 0)) {
+
+					Map<String, String> postProcessArticleUuids =
+						(Map<String, String>)
+							_portletDataContext.getNewPrimaryKeysMap(
+								JournalArticle.class +
+									".postProcessArticleUuid");
+
+					postProcessArticleUuids.computeIfAbsent(
+						_stagedModel.getUuid(),
+						key -> ExportImportPathUtil.getModelPath(_stagedModel));
+				}
 
 				continue;
 			}

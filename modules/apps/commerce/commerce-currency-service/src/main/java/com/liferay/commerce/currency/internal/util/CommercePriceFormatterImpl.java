@@ -15,13 +15,18 @@ import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.ActionRequest;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -81,6 +86,40 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 			"%2s %s", StringPool.PLUS, decimalFormat.format(relativePrice));
 	}
 
+	@Override
+	public BigDecimal parse(ActionRequest actionRequest, String param)
+		throws Exception {
+
+		String price = ParamUtil.getString(
+			actionRequest, param, BigDecimal.ZERO.toString());
+
+		if (param.equals("rate")) {
+			price = ParamUtil.getString(actionRequest, "rate");
+
+			if (Validator.isNull(price)) {
+				price = BigDecimal.ONE.toString();
+			}
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return new BigDecimal(parse(price, themeDisplay.getLocale()));
+	}
+
+	@Override
+	public String parse(String price, Locale locale) throws Exception {
+		if (Validator.isNull(price)) {
+			price = BigDecimal.ZERO.toString();
+		}
+
+		DecimalFormat decimalFormat = _getDecimalFormat(null, locale);
+
+		return decimalFormat.parse(
+			price
+		).toString();
+	}
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -122,6 +161,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 
 		decimalFormat.setMaximumFractionDigits(maxFractionDigits);
 		decimalFormat.setMinimumFractionDigits(minFractionDigits);
+		decimalFormat.setParseBigDecimal(true);
 		decimalFormat.setRoundingMode(roundingMode.ordinal());
 
 		return decimalFormat;

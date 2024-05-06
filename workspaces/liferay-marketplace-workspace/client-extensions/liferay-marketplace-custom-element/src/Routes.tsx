@@ -3,38 +3,53 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import AdministratorDashboardRouter from './pages/AdministratorDashboard/AdministratorDashboardRouter';
-import CustomerDashboardRouter from './pages/CustomerDashboard/CustomerDashboardRouter';
-import {CustomerGatePage} from './pages/CustomerGatePage/CustomerGatePage';
-import GetAppRouter from './pages/GetApp/GetAppRouter';
-import GetSolutionRouter from './pages/GetSolution/GetSolutionRouter';
-import {NextSteps} from './pages/NextSteps';
-import PublisherDashboardRouter from './pages/PublisherDashboard/PublisherDashboardRouter';
-import PublisherGateRouter from './pages/PublisherGate/PublisheGateRouter';
+import React, {Suspense} from 'react';
 
-const Routes = {
-	'administrator-dashboard': AdministratorDashboardRouter,
-	'customer-gate': CustomerGatePage,
-	'get-app': GetAppRouter,
-	'next-steps': NextSteps,
-	'published-apps': PublisherDashboardRouter,
-	'publisher-gate': PublisherGateRouter,
-	'purchased-apps': CustomerDashboardRouter,
-	'purchased-solutions': GetSolutionRouter,
+import Loading from './components/Loading';
+
+const lazyRoutes = {
+	'administrator-dashboard': React.lazy(
+		() =>
+			import(
+				'./pages/AdministratorDashboard/AdministratorDashboardRouter'
+			)
+	),
+	'customer-gate': React.lazy(() => import('./pages/CustomerGate')),
+	'get-app': React.lazy(() => import('./pages/GetApp/GetAppRouter')),
+	'next-steps': React.lazy(() => import('./pages/NextSteps')),
+	'published-apps': React.lazy(
+		() => import('./pages/PublisherDashboard/PublisherDashboardRouter')
+	),
+	'publisher-gate': React.lazy(
+		() => import('./pages/PublisherGate/PublisheGateRouter')
+	),
+	'purchased-apps': React.lazy(
+		() => import('./pages/CustomerDashboard/CustomerDashboardRouter')
+	),
+	'purchased-solutions': React.lazy(
+		() => import('./pages/GetSolution/GetSolutionRouter')
+	),
 } as const;
 
-export type RouteType = keyof typeof Routes;
+export type RouteType = keyof typeof lazyRoutes;
 
 type AppRoutesProps = {
 	path: RouteType;
+	properties: DefaultProperties;
 };
 
-export default function AppRoutes({path}: AppRoutesProps) {
-	const Route = Routes[path];
+export default function Routes({path, properties}: AppRoutesProps) {
+	const Route = lazyRoutes[path] as React.FC<{properties: DefaultProperties}>;
 
 	if (!Route) {
 		return <h1>Page not found</h1>;
 	}
 
-	return <Route />;
+	return (
+		<Suspense
+			fallback={<Loading displayType="secondary" shape="squares" />}
+		>
+			<Route properties={properties} />
+		</Suspense>
+	);
 }

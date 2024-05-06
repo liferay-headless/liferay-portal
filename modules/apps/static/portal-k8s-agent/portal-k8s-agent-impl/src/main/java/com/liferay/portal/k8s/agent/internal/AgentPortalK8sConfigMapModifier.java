@@ -528,7 +528,7 @@ public class AgentPortalK8sConfigMapModifier
 			ObjectMeta objectMeta)
 		throws Exception {
 
-		Map<String, String> labels = objectMeta.getLabels();
+		Map<String, String> labels = _getMap(objectMeta.getLabels());
 
 		String virtualInstanceId = labels.get(
 			"dxp.lxc.liferay.com/virtualInstanceId");
@@ -589,6 +589,8 @@ public class AgentPortalK8sConfigMapModifier
 					Configuration.ConfigurationAttribute.READ_ONLY);
 			}
 
+			Map<String, String> annotations = _getMap(
+				objectMeta.getAnnotations());
 			Dictionary<String, Object> properties = config.getProperties();
 
 			for (PortalK8sConfigurationPropertiesMutator
@@ -597,7 +599,7 @@ public class AgentPortalK8sConfigMapModifier
 
 				portalK8sConfigurationPropertiesMutator.
 					mutateConfigurationProperties(
-						objectMeta.getAnnotations(), labels, properties);
+						annotations, labels, properties);
 			}
 
 			properties.put(".k8s.config.key", virtualInstancePid);
@@ -708,7 +710,7 @@ public class AgentPortalK8sConfigMapModifier
 				TimeUnit.MILLISECONDS);
 		}
 		else {
-			if (_log.isDebugEnabled()) {
+			if ((localClusterNode != null) && _log.isDebugEnabled()) {
 				_log.debug(
 					"Execute on master node " +
 						localClusterNode.getClusterNodeId());

@@ -18,7 +18,9 @@ export default function useTranslationProgress({
 	const [defaultLanguageId, setDefaultLanguageId] = useState(
 		initialDefaultLanguageId
 	);
-	const [fields, setFields] = useState(initialFields);
+	const [fields, setFields] = useState({
+		titleMapAsXML: initialFields.titleMapAsXML,
+	} as Record<string, Field>);
 	const [translations, setTranslations] = useState(
 		fieldToTranslations(initialFields)
 	);
@@ -41,7 +43,10 @@ export default function useTranslationProgress({
 						`[type="hidden"][data-field-name="${fieldName}"]`
 					)
 				)
-					.filter((input) => input.value)
+					.filter(
+						(input) =>
+							input.value || input.getAttribute('data-translated')
+					)
 					.map(
 						(input) =>
 							input.dataset.languageid as Liferay.Language.Locale
@@ -144,12 +149,22 @@ export default function useTranslationProgress({
 		};
 	}, [defaultLocaleChangeHandler, localeChangeHandler]);
 
-	return {
-		defaultLanguageId,
-		selectedLanguageId,
-		translationProgress,
-		updateTranslations,
-	};
+	return useMemo(
+		() => ({
+			defaultLanguageId,
+			selectedLanguageId,
+			translationProgress,
+			translations,
+			updateTranslations,
+		}),
+		[
+			defaultLanguageId,
+			selectedLanguageId,
+			translationProgress,
+			translations,
+			updateTranslations,
+		]
+	);
 }
 
 export function fieldToTranslations(fields: Record<string, Field>) {

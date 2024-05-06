@@ -15,6 +15,7 @@ import com.liferay.commerce.discount.exception.CommerceDiscountDisplayDateExcept
 import com.liferay.commerce.discount.exception.CommerceDiscountExpirationDateException;
 import com.liferay.commerce.discount.exception.CommerceDiscountLimitationTypeException;
 import com.liferay.commerce.discount.exception.CommerceDiscountMaxPriceValueException;
+import com.liferay.commerce.discount.exception.CommerceDiscountMinPriceValueException;
 import com.liferay.commerce.discount.exception.CommerceDiscountRuleTypeSettingsException;
 import com.liferay.commerce.discount.exception.CommerceDiscountTargetException;
 import com.liferay.commerce.discount.exception.CommerceDiscountTitleException;
@@ -2008,6 +2009,19 @@ public class CommerceDiscountLocalServiceImpl
 			((level4 != null) && (level4.compareTo(maxValue) > 0))) {
 
 			throw new CommerceDiscountMaxPriceValueException();
+		}
+
+		BigDecimal minValue = BigDecimal.valueOf(
+			GetterUtil.getDouble(CommercePriceConstants.PRICE_VALUE_MIN));
+
+		if (((maxDiscountAmount != null) &&
+			 (maxDiscountAmount.compareTo(minValue) < 0)) ||
+			((level1 != null) && (level1.compareTo(minValue) < 0)) ||
+			((level2 != null) && (level2.compareTo(minValue) < 0)) ||
+			((level3 != null) && (level3.compareTo(minValue) < 0)) ||
+			((level4 != null) && (level4.compareTo(minValue) < 0))) {
+
+			throw new CommerceDiscountMinPriceValueException();
 		}
 
 		if (commerceDiscountId > 0) {

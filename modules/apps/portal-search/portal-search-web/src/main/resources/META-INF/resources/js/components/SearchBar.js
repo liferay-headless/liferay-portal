@@ -13,18 +13,20 @@ import getCN from 'classnames';
 import {addParams, fetch, navigate} from 'frontend-js-web';
 import React, {useCallback, useRef, useState} from 'react';
 
+import {FacetUtil} from '../FacetUtil';
 import useDebounceCallback from '../hooks/useDebounceCallback';
 import cleanSuggestionsContributorConfiguration from '../utils/clean_suggestions_contributor_configuration';
 
 export default function SearchBar({
 	destinationFriendlyURL,
 	emptySearchEnabled,
+	initialKeywords = '',
 	isDXP = true,
 	isSearchExperiencesSupported = true,
-	keywords = '',
 	keywordsParameterName = 'q',
 	letUserChooseScope = false,
 	paginationStartParameterName,
+	retainFacetSelections,
 	scopeParameterName,
 	scopeParameterStringCurrentSite,
 	scopeParameterStringEverything,
@@ -41,7 +43,7 @@ export default function SearchBar({
 
 	const [active, setActive] = useState(false);
 	const [autocompleteSearchValue, setAutocompleteSearchValue] = useState('');
-	const [inputValue, setInputValue] = useState(keywords);
+	const [inputValue, setInputValue] = useState(initialKeywords);
 	const [loading, setLoading] = useState(false);
 	const [scope, setScope] = useState(
 		selectedEverythingSearchScope
@@ -171,7 +173,22 @@ export default function SearchBar({
 		event.stopPropagation();
 
 		if (!!inputValue.trim().length || emptySearchEnabled) {
-			const queryString = _updateQueryString(document.location.search);
+			const keywords = inputValue.trim();
+			let queryString = _updateQueryString(document.location.search);
+
+			/*
+			 * Refer to LPD-19994 for acceptance criteria regarding
+			 * retaining facet selections across searches. Default behavior
+			 * is to clear all facet selections after searching a new
+			 * keyword.
+			 */
+
+			if (
+				(initialKeywords !== keywords || keywords === '') &&
+				!retainFacetSelections
+			) {
+				queryString = FacetUtil.removeAllFacetParameters(queryString);
+			}
 
 			navigate(searchURL + queryString);
 		}

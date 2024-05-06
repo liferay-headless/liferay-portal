@@ -10,8 +10,11 @@ import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.testray.rest.dto.v1_0.TestrayRunComparison;
+import com.liferay.testray.rest.dto.v1_0.TestrayStatusMetric;
 import com.liferay.testray.rest.resource.v1_0.TestrayRunComparisonResource;
+import com.liferay.testray.rest.resource.v1_0.TestrayStatusMetricResource;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -40,17 +43,24 @@ public class Query {
 			testrayRunComparisonResourceComponentServiceObjects;
 	}
 
+	public static void setTestrayStatusMetricResourceComponentServiceObjects(
+		ComponentServiceObjects<TestrayStatusMetricResource>
+			testrayStatusMetricResourceComponentServiceObjects) {
+
+		_testrayStatusMetricResourceComponentServiceObjects =
+			testrayStatusMetricResourceComponentServiceObjects;
+	}
+
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayRunComparison(testrayCasePriorities: ___, testrayRunId1: ___, testrayRunId2: ___, testrayTeamId: ___){results, testrayCasePriorities, testrayTeamId}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayRunComparison(filter: ___, testrayRunId1: ___, testrayRunId2: ___){results, testrayCaseResultComparisons}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public TestrayRunComparison testrayRunComparison(
 			@GraphQLName("testrayRunId1") Long testrayRunId1,
 			@GraphQLName("testrayRunId2") Long testrayRunId2,
-			@GraphQLName("testrayCasePriorities") String testrayCasePriorities,
-			@GraphQLName("testrayTeamId") Long testrayTeamId)
+			@GraphQLName("filter") String filterString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -58,8 +68,155 @@ public class Query {
 			this::_populateResourceContext,
 			testrayRunComparisonResource ->
 				testrayRunComparisonResource.getTestrayRunComparison(
-					testrayRunId1, testrayRunId2, testrayCasePriorities,
-					testrayTeamId));
+					testrayRunId1, testrayRunId2,
+					_filterBiFunction.apply(
+						testrayRunComparisonResource, filterString)));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayRunComparisonDetail(filter: ___, testrayCaseResultError1: ___, testrayCaseResultError2: ___, testrayCaseResultIssue1: ___, testrayCaseResultIssue2: ___, testrayCaseResultStatus1: ___, testrayCaseResultStatus2: ___, testrayRunId1: ___, testrayRunId2: ___){results, testrayCaseResultComparisons}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public TestrayRunComparison testrayRunComparisonDetail(
+			@GraphQLName("testrayRunId1") Long testrayRunId1,
+			@GraphQLName("testrayRunId2") Long testrayRunId2,
+			@GraphQLName("testrayCaseResultError1") String
+				testrayCaseResultError1,
+			@GraphQLName("testrayCaseResultError2") String
+				testrayCaseResultError2,
+			@GraphQLName("testrayCaseResultIssue1") String
+				testrayCaseResultIssue1,
+			@GraphQLName("testrayCaseResultIssue2") String
+				testrayCaseResultIssue2,
+			@GraphQLName("testrayCaseResultStatus1") String
+				testrayCaseResultStatus1,
+			@GraphQLName("testrayCaseResultStatus2") String
+				testrayCaseResultStatus2,
+			@GraphQLName("filter") String filterString)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_testrayRunComparisonResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			testrayRunComparisonResource ->
+				testrayRunComparisonResource.getTestrayRunComparisonDetail(
+					testrayRunId1, testrayRunId2, testrayCaseResultError1,
+					testrayCaseResultError2, testrayCaseResultIssue1,
+					testrayCaseResultIssue2, testrayCaseResultStatus1,
+					testrayCaseResultStatus2,
+					_filterBiFunction.apply(
+						testrayRunComparisonResource, filterString)));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayCaseTypesMetrics(page: ___, pageSize: ___, testrayBuildId: ___, testrayCasePriorities: ___, testrayTeamIds: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public TestrayStatusMetricPage
+			testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayCaseTypesMetrics(
+				@GraphQLName("testrayBuildId") Long testrayBuildId,
+				@GraphQLName("testrayCasePriorities") String
+					testrayCasePriorities,
+				@GraphQLName("testrayTeamIds") String testrayTeamIds,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_testrayStatusMetricResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			testrayStatusMetricResource -> new TestrayStatusMetricPage(
+				testrayStatusMetricResource.
+					getTestrayStatusMetricByTestrayBuildIdTestrayBuildTestrayCaseTypesMetricsPage(
+						testrayBuildId, testrayCasePriorities, testrayTeamIds,
+						Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayComponentsMetrics(page: ___, pageSize: ___, testrayBuildId: ___, testrayCasePriorities: ___, testrayCaseTypes: ___, testrayTeamIds: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public TestrayStatusMetricPage
+			testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayComponentsMetrics(
+				@GraphQLName("testrayBuildId") Long testrayBuildId,
+				@GraphQLName("testrayCasePriorities") String
+					testrayCasePriorities,
+				@GraphQLName("testrayCaseTypes") String testrayCaseTypes,
+				@GraphQLName("testrayTeamIds") String testrayTeamIds,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_testrayStatusMetricResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			testrayStatusMetricResource -> new TestrayStatusMetricPage(
+				testrayStatusMetricResource.
+					getTestrayStatusMetricByTestrayBuildIdTestrayBuildTestrayComponentsMetricsPage(
+						testrayBuildId, testrayCasePriorities, testrayCaseTypes,
+						testrayTeamIds, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayRunsMetrics(page: ___, pageSize: ___, testrayBuildId: ___, testrayCasePriorities: ___, testrayCaseTypes: ___, testrayTeamIds: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public TestrayStatusMetricPage
+			testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayRunsMetrics(
+				@GraphQLName("testrayBuildId") Long testrayBuildId,
+				@GraphQLName("testrayCasePriorities") String
+					testrayCasePriorities,
+				@GraphQLName("testrayCaseTypes") String testrayCaseTypes,
+				@GraphQLName("testrayTeamIds") String testrayTeamIds,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_testrayStatusMetricResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			testrayStatusMetricResource -> new TestrayStatusMetricPage(
+				testrayStatusMetricResource.
+					getTestrayStatusMetricByTestrayBuildIdTestrayBuildTestrayRunsMetricsPage(
+						testrayBuildId, testrayCasePriorities, testrayCaseTypes,
+						testrayTeamIds, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayTeamsMetrics(page: ___, pageSize: ___, testrayBuildId: ___, testrayCasePriorities: ___, testrayCaseTypes: ___, testrayRunId: ___, testrayTeamIds: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public TestrayStatusMetricPage
+			testrayStatusMetricByTestrayBuildIdTestrayBuildTestrayTeamsMetrics(
+				@GraphQLName("testrayBuildId") Long testrayBuildId,
+				@GraphQLName("testrayCasePriorities") String
+					testrayCasePriorities,
+				@GraphQLName("testrayCaseTypes") String testrayCaseTypes,
+				@GraphQLName("testrayRunId") Long testrayRunId,
+				@GraphQLName("testrayTeamIds") String testrayTeamIds,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_testrayStatusMetricResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			testrayStatusMetricResource -> new TestrayStatusMetricPage(
+				testrayStatusMetricResource.
+					getTestrayStatusMetricByTestrayBuildIdTestrayBuildTestrayTeamsMetricsPage(
+						testrayBuildId, testrayCasePriorities, testrayCaseTypes,
+						testrayRunId, testrayTeamIds,
+						Pagination.of(page, pageSize))));
 	}
 
 	@GraphQLName("TestrayRunComparisonPage")
@@ -80,6 +237,39 @@ public class Query {
 
 		@GraphQLField
 		protected java.util.Collection<TestrayRunComparison> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
+	@GraphQLName("TestrayStatusMetricPage")
+	public class TestrayStatusMetricPage {
+
+		public TestrayStatusMetricPage(Page testrayStatusMetricPage) {
+			actions = testrayStatusMetricPage.getActions();
+
+			items = testrayStatusMetricPage.getItems();
+			lastPage = testrayStatusMetricPage.getLastPage();
+			page = testrayStatusMetricPage.getPage();
+			pageSize = testrayStatusMetricPage.getPageSize();
+			totalCount = testrayStatusMetricPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map<String, String>> actions;
+
+		@GraphQLField
+		protected java.util.Collection<TestrayStatusMetric> items;
 
 		@GraphQLField
 		protected long lastPage;
@@ -130,8 +320,26 @@ public class Query {
 		testrayRunComparisonResource.setRoleLocalService(_roleLocalService);
 	}
 
+	private void _populateResourceContext(
+			TestrayStatusMetricResource testrayStatusMetricResource)
+		throws Exception {
+
+		testrayStatusMetricResource.setContextAcceptLanguage(_acceptLanguage);
+		testrayStatusMetricResource.setContextCompany(_company);
+		testrayStatusMetricResource.setContextHttpServletRequest(
+			_httpServletRequest);
+		testrayStatusMetricResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		testrayStatusMetricResource.setContextUriInfo(_uriInfo);
+		testrayStatusMetricResource.setContextUser(_user);
+		testrayStatusMetricResource.setGroupLocalService(_groupLocalService);
+		testrayStatusMetricResource.setRoleLocalService(_roleLocalService);
+	}
+
 	private static ComponentServiceObjects<TestrayRunComparisonResource>
 		_testrayRunComparisonResourceComponentServiceObjects;
+	private static ComponentServiceObjects<TestrayStatusMetricResource>
+		_testrayStatusMetricResourceComponentServiceObjects;
 
 	private AcceptLanguage _acceptLanguage;
 	private com.liferay.portal.kernel.model.Company _company;

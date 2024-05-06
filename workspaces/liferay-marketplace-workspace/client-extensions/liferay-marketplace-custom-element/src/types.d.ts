@@ -108,6 +108,17 @@ type CustomField = {
 	name: string;
 };
 
+type ActionMap<M extends {[index: string]: any}> = {
+	[Key in keyof M]: M[Key] extends undefined
+		? {
+				type: Key;
+		  }
+		: {
+				payload: M[Key];
+				type: Key;
+		  };
+};
+
 type AccountBrief = {
 	customFields?: any;
 	externalReferenceCode: string;
@@ -159,6 +170,12 @@ type AccountRole = {
 	id: number;
 	name: string;
 	roleId: number;
+};
+
+type Availability = {
+	active: boolean;
+	available: number;
+	max: number;
 };
 
 type BillingAddress = {
@@ -264,7 +281,9 @@ type DefaultProperties = {
 	cloudBaseURL: string;
 	contactSupportUrl: string;
 	eulaBaseURL: string;
+	featureFlags?: string[];
 	marketoFormId: string;
+	trialProductId: string;
 };
 
 interface CommerceAccount extends Omit<Account, 'description'> {

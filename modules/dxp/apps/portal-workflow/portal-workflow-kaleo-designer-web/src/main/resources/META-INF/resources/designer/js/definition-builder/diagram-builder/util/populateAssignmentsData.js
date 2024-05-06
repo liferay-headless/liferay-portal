@@ -14,7 +14,7 @@ import {getAssignmentType} from '../components/sidebar/sections/assignments/util
 const verifySectionsData = (
 	initialElements,
 	sectionsData,
-	setBlockingErrors,
+	setBlockingError,
 	setElements,
 	taskNode
 ) => {
@@ -35,41 +35,32 @@ const verifySectionsData = (
 		if (taskNode.data.assignments.emailAddress) {
 			delete taskNode.data.assignments.emailAddress;
 
-			setBlockingErrors((prev) => {
-				return {
-					...prev,
-					errorMessage: Liferay.Language.get(
-						'please-enter-a-valid-email-address'
-					),
-					errorType: 'assignment',
-				};
-			});
+			setBlockingError(() => ({
+				errorMessage: Liferay.Language.get(
+					'please-enter-a-valid-email-address'
+				),
+				errorType: 'assignment',
+			}));
 		}
 		else if (taskNode.data.assignments.screenName) {
 			delete taskNode.data.assignments.screenName;
 
-			setBlockingErrors((prev) => {
-				return {
-					...prev,
-					errorMessage: Liferay.Language.get(
-						'please-enter-a-valid-screen-name'
-					),
-					errorType: 'assignment',
-				};
-			});
+			setBlockingError(() => ({
+				errorMessage: Liferay.Language.get(
+					'please-enter-a-valid-screen-name'
+				),
+				errorType: 'assignment',
+			}));
 		}
 		else if (taskNode.data.assignments.userId) {
 			delete taskNode.data.assignments.userId;
 
-			setBlockingErrors((prev) => {
-				return {
-					...prev,
-					errorMessage: Liferay.Language.get(
-						'please-enter-a-valid-user-id'
-					),
-					errorType: 'assignment',
-				};
-			});
+			setBlockingError(() => ({
+				errorMessage: Liferay.Language.get(
+					'please-enter-a-valid-user-id'
+				),
+				errorType: 'assignment',
+			}));
 		}
 	}
 };
@@ -78,7 +69,7 @@ const populateAssignmentsData = (
 	accountEntryId,
 	initialElements,
 	setElements,
-	setBlockingErrors
+	setBlockingError
 ) => {
 	const taskNodes = initialElements.filter((item) => item.type === 'task');
 
@@ -176,7 +167,7 @@ const populateAssignmentsData = (
 					verifySectionsData(
 						initialElements,
 						sectionsData,
-						setBlockingErrors,
+						setBlockingError,
 						setElements,
 						taskNode
 					)

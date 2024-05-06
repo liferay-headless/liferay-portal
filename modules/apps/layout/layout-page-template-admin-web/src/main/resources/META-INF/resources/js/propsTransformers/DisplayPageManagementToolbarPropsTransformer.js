@@ -13,6 +13,27 @@ import {
 import openDeletePageTemplateModal from '../commands/openDeletePageTemplateModal';
 
 export default function propsTransformer({portletNamespace, ...otherProps}) {
+	const copySelectedEntries = (itemData) => {
+		const form = document.getElementById(
+			`${portletNamespace}actionEntriesFm`
+		);
+
+		setFormValues(form, {
+			layoutPageTemplateCollectionsIds: getCheckedCheckboxes(
+				document.getElementById(`${portletNamespace}fm`),
+				'',
+				`${portletNamespace}rowIdsLayoutPageTemplateCollection`
+			),
+			layoutPageTemplateEntriesIds: getCheckedCheckboxes(
+				document.getElementById(`${portletNamespace}fm`),
+				'',
+				`${portletNamespace}rowIds`
+			),
+		});
+
+		submitForm(form, itemData?.copySelectedEntriesURL);
+	};
+
 	const deleteSelectedEntries = (itemData) => {
 		openDeletePageTemplateModal({
 			onDelete: () => {
@@ -26,12 +47,25 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 		});
 	};
 
-	const exportDisplayPages = (itemData) => {
-		const form = document.getElementById(`${portletNamespace}fm`);
+	const exportSelectedEntries = (itemData) => {
+		const form = document.getElementById(
+			`${portletNamespace}actionEntriesFm`
+		);
 
-		if (form) {
-			submitForm(form, itemData?.exportDisplayPageURL);
-		}
+		setFormValues(form, {
+			layoutPageTemplateCollectionsIds: getCheckedCheckboxes(
+				document.getElementById(`${portletNamespace}fm`),
+				'',
+				`${portletNamespace}rowIdsLayoutPageTemplateCollection`
+			),
+			layoutPageTemplateEntriesIds: getCheckedCheckboxes(
+				document.getElementById(`${portletNamespace}fm`),
+				'',
+				`${portletNamespace}rowIds`
+			),
+		});
+
+		submitForm(form, itemData?.exportSelectedEntriesURL);
 	};
 
 	const moveSelectedEntries = (itemData) => {
@@ -39,7 +73,7 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			height: '70vh',
 			onSelect: (selectedItem) => {
 				const form = document.getElementById(
-					`${portletNamespace}moveEntriesFm`
+					`${portletNamespace}actionEntriesFm`
 				);
 
 				setFormValues(form, {
@@ -73,11 +107,14 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 
 			const action = data?.action;
 
-			if (action === 'deleteSelectedEntries') {
+			if (action === 'copySelectedEntries') {
+				copySelectedEntries(data);
+			}
+			else if (action === 'deleteSelectedEntries') {
 				deleteSelectedEntries(data);
 			}
-			else if (action === 'exportDisplayPages') {
-				exportDisplayPages(data);
+			else if (action === 'exportSelectedEntries') {
+				exportSelectedEntries(data);
 			}
 			else if (action === 'moveSelectedEntries') {
 				moveSelectedEntries(data);

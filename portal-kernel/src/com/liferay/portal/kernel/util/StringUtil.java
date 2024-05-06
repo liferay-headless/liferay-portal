@@ -1759,36 +1759,36 @@ public class StringUtil {
 	 * Merges the elements of the collection by returning a string representing
 	 * a comma delimited list of its values.
 	 *
-	 * @param  col the collection of objects
+	 * @param  collection the collection of objects
 	 * @return the merged collection elements, or <code>null</code> if the
 	 *         collection is <code>null</code>
 	 */
-	public static String merge(Collection<?> col) {
-		return merge(col, StringPool.COMMA);
+	public static String merge(Collection<?> collection) {
+		return merge(collection, StringPool.COMMA);
 	}
 
 	/**
 	 * Merges the elements of the collection by returning a string representing
 	 * a delimited list of its values.
 	 *
-	 * @param  col the collection of objects
+	 * @param  collection the collection of objects
 	 * @param  delimiter the string whose last index in the string marks where
 	 *         to begin the substring
 	 * @return the merged collection elements, or <code>null</code> if the
 	 *         collection is <code>null</code>
 	 */
-	public static String merge(Collection<?> col, String delimiter) {
-		if (col == null) {
+	public static String merge(Collection<?> collection, String delimiter) {
+		if (collection == null) {
 			return null;
 		}
 
-		if (col.isEmpty()) {
+		if (collection.isEmpty()) {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(2 * col.size());
+		StringBundler sb = new StringBundler(2 * collection.size());
 
-		for (Object object : col) {
+		for (Object object : collection) {
 			String objectString = String.valueOf(object);
 
 			sb.append(objectString.trim());

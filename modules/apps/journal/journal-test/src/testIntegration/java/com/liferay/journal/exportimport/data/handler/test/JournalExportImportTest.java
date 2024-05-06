@@ -10,6 +10,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.data.engine.rest.dto.v2_0.DataDefinition;
 import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
+import com.liferay.data.engine.rest.test.util.DataDefinitionTestUtil;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -18,6 +19,7 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.UserIdStrategy;
@@ -30,16 +32,24 @@ import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.journal.util.JournalContent;
+import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -52,12 +62,19 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.zip.ZipReaderFactory;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -112,6 +129,113 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 		exportImportJournalArticle(true);
 	}
 
+	/**
+	 * LPD-6808: AC15-AC16
+	 */
+	@FeatureFlags("LPS-199086")
+	@Test
+	public void testExportImportJournalArticleWithLayoutURLLayoutDoesNotExistOnImportSide()
+		throws Exception {
+
+		_configurationProvider.saveCompanyConfiguration(
+			StagingConfiguration.class, CompanyThreadLocal.getCompanyId(),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"publishParentLayoutsByDefault", false
+			).build());
+
+		long groupId = group.getGroupId();
+
+		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(group);
+
+		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+			group, parentLayout.getPlid());
+
+		String content = StringUtil.replace(
+			_read("journal_article_content.xml"),
+			new String[] {"[$GROUP_NAME$]", "[[$LAYOUT_FRIENDLY_URL$]$]"},
+			new String[] {
+				StringUtil.toLowerCase(group.getName("en_US")),
+				StringUtil.toLowerCase(childLayout.getFriendlyURL())
+			});
+
+		DataDefinition dataDefinition =
+			DataDefinitionTestUtil.addDataDefinition(
+				"journal", _dataDefinitionResourceFactory, groupId,
+				_read("data_definition.json"), TestPropsValues.getUser());
+
+		JournalTestUtil.addArticleWithXMLContent(
+			groupId, content, dataDefinition.getDataDefinitionKey(), null);
+
+		exportPortlet(JournalPortletKeys.JOURNAL, parentLayout);
+
+		_layoutService.deleteLayout(
+			groupId, parentLayout.isPrivateLayout(), parentLayout.getLayoutId(),
+			ServiceContextThreadLocal.getServiceContext());
+
+		try {
+			importPortlet(JournalPortletKeys.JOURNAL, parentLayout);
+		}
+		catch (MissingReferenceException missingReferenceException) {
+			Assert.assertEquals(
+				missingReferenceException.getClass(),
+				MissingReferenceException.class);
+		}
+	}
+
+	/**
+	 * LPD-6808: AC15-AC17
+	 */
+	@FeatureFlags("LPS-199086")
+	@Test
+	public void testExportImportJournalArticleWithLayoutURLLayoutExistOnImportSide()
+		throws Exception {
+
+		_configurationProvider.saveCompanyConfiguration(
+			StagingConfiguration.class, CompanyThreadLocal.getCompanyId(),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"publishParentLayoutsByDefault", false
+			).build());
+
+		long groupId = group.getGroupId();
+
+		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(group);
+
+		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+			group, parentLayout.getPlid());
+
+		String content = StringUtil.replace(
+			_read("journal_article_content.xml"),
+			new String[] {"[$GROUP_NAME$]", "[[$LAYOUT_FRIENDLY_URL$]$]"},
+			new String[] {
+				StringUtil.toLowerCase(group.getName("en_US")),
+				StringUtil.toLowerCase(childLayout.getFriendlyURL())
+			});
+
+		DataDefinition dataDefinition =
+			DataDefinitionTestUtil.addDataDefinition(
+				"journal", _dataDefinitionResourceFactory, groupId,
+				_read("data_definition.json"), TestPropsValues.getUser());
+
+		JournalArticle article = JournalTestUtil.addArticleWithXMLContent(
+			groupId, content, dataDefinition.getDataDefinitionKey(), null);
+
+		exportPortlet(JournalPortletKeys.JOURNAL, parentLayout);
+
+		importPortlet(JournalPortletKeys.JOURNAL, parentLayout);
+
+		Assert.assertEquals(
+			1,
+			JournalArticleLocalServiceUtil.getArticlesCount(
+				importedGroup.getGroupId()));
+
+		JournalArticle groupArticle =
+			JournalArticleLocalServiceUtil.fetchJournalArticleByUuidAndGroupId(
+				article.getUuid(), importedGroup.getGroupId());
+
+		Assert.assertNotNull(groupArticle);
+		Assert.assertEquals(content, groupArticle.getContent());
+	}
+
 	@Test
 	public void testExportImportJournalArticleWithoutVersionHistory()
 		throws Exception {
@@ -146,6 +270,113 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	}
 
 	@Test
+	public void testExportImportJournalArticleWithRepeatableWebContentField()
+		throws Exception {
+
+		DataDefinition dataDefinition = DataDefinition.toDTO(
+			_readFileToString(
+				"dependencies" +
+					"/repeatable_journal_article_field_data_definition.json"));
+
+		dataDefinition.setName(
+			HashMapBuilder.<String, Object>put(
+				String.valueOf(LocaleUtil.US), "TestDataDef"
+			).build());
+
+		DataDefinitionResource.Builder dataDefinitionResourcedBuilder =
+			_dataDefinitionResourceFactory.create();
+
+		DataDefinitionResource dataDefinitionResource =
+			dataDefinitionResourcedBuilder.user(
+				TestPropsValues.getUser()
+			).build();
+
+		dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				group.getGroupId(), "journal", dataDefinition);
+
+		String xml = _readFileToString(
+			"dependencies" +
+				"/repeatable_journal_article_field_journal_content.xml");
+
+		JournalArticle referencedArticle1 = JournalTestUtil.addArticle(
+			group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		JournalArticle referencedArticle2 = JournalTestUtil.addArticle(
+			group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		JournalArticle article = JournalTestUtil.addArticleWithXMLContent(
+			group.getGroupId(), JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
+			StringUtil.replace(
+				xml,
+				new String[] {
+					"[$JOURNAL_REF_JSON_1$]", "[$JOURNAL_REF_JSON_2$]"
+				},
+				new String[] {
+					_getArticleReferenceJSONObject(
+						referencedArticle1
+					).toString(),
+					_getArticleReferenceJSONObject(
+						referencedArticle2
+					).toString()
+				}),
+			dataDefinition.getDataDefinitionKey(), null, LocaleUtil.US);
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.journal.internal.dynamic.data.mapping.util." +
+					"JournalArticleImportDDMFormFieldValueTransformer",
+				LoggerTestUtil.WARN)) {
+
+			exportImportPortlet(JournalPortletKeys.JOURNAL);
+
+			List<LogEntry> logEntries = logCapture.getLogEntries();
+
+			int count = 0;
+
+			for (LogEntry logEntry : logEntries) {
+				String message = logEntry.getMessage();
+
+				if (message.startsWith(
+						"Unable to get journal article with primary key")) {
+
+					count++;
+				}
+			}
+
+			Assert.assertTrue("Unexpected log messages: " + count, count <= 1);
+		}
+
+		article =
+			JournalArticleLocalServiceUtil.fetchJournalArticleByUuidAndGroupId(
+				article.getUuid(), importedGroup.getGroupId());
+
+		Assert.assertNotNull(article);
+
+		referencedArticle1 =
+			JournalArticleLocalServiceUtil.fetchJournalArticleByUuidAndGroupId(
+				referencedArticle1.getUuid(), importedGroup.getGroupId());
+
+		Assert.assertNotNull(referencedArticle1);
+
+		referencedArticle2 =
+			JournalArticleLocalServiceUtil.fetchJournalArticleByUuidAndGroupId(
+				referencedArticle2.getUuid(), importedGroup.getGroupId());
+
+		Assert.assertNotNull(referencedArticle2);
+
+		String content = article.getContent();
+
+		_assertContains(
+			content,
+			"\"classPK\":\"" + referencedArticle1.getResourcePrimKey() + "\"");
+		_assertContains(
+			content,
+			"\"classPK\":\"" + referencedArticle2.getResourcePrimKey() + "\"");
+	}
+
+	@Test
 	public void testExportImportStructuredJournalArticle() throws Exception {
 		exportImportJournalArticle(false);
 	}
@@ -176,7 +407,7 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 				group.getGroupId(), "journal", dataDefinition);
 
 		String xml = _readFileToString(
-			"dependencies/complex_journal_content.xml");
+			"dependencies/complex_journal_article_content.xml");
 
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), group.getGroupId(),
@@ -527,9 +758,43 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 		}
 	}
 
+	private void _assertContains(String string, String substring) {
+		Assert.assertTrue(
+			StringBundler.concat(
+				"The string \"", string, "\" should contain the substring \"",
+				substring, "\""),
+			string.contains(substring));
+	}
+
+	private JSONObject _getArticleReferenceJSONObject(JournalArticle article)
+		throws Exception {
+
+		AssetEntry assetEntry = getAssetEntry(article);
+
+		return JSONUtil.put(
+			"assetEntryId", assetEntry.getEntryId()
+		).put(
+			"className", JournalArticle.class.getName()
+		).put(
+			"classNameId", PortalUtil.getClassNameId(JournalArticle.class)
+		).put(
+			"classPK", article.getResourcePrimKey()
+		).put(
+			"type", "Web Content Article"
+		);
+	}
+
+	private String _read(String fileName) throws Exception {
+		return new String(
+			FileUtil.getBytes(getClass(), "dependencies/" + fileName));
+	}
+
 	private String _readFileToString(String s) throws Exception {
 		return new String(FileUtil.getBytes(getClass(), s));
 	}
+
+	@Inject
+	private static ConfigurationProvider _configurationProvider;
 
 	@Inject
 	private DataDefinitionResource.Factory _dataDefinitionResourceFactory;
@@ -545,5 +810,11 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 
 	@Inject
 	private JSONFactory _jsonFactory;
+
+	@Inject
+	private LayoutService _layoutService;
+
+	@Inject
+	private ZipReaderFactory _zipReaderFactory;
 
 }

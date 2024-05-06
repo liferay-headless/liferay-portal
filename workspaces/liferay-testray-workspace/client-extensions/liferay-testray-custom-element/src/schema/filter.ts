@@ -242,12 +242,13 @@ const filterSchema = {
 	buildCaseTypes: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'caseTypeToCases/priority',
+				isCustomFilter: true,
+				name: 'testrayCasePriorities',
 				removeQuoteMark: true,
 			}),
 			overrides(baseFilters.team, {
-				name:
-					'caseTypeToCases/componentToCases/r_teamToComponents_c_teamId',
+				isCustomFilter: true,
+				name: 'testrayTeamIds',
 				type: 'multiselect',
 			}),
 		] as RendererFields[],
@@ -256,18 +257,23 @@ const filterSchema = {
 	buildComponents: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'componentToCases/priority',
+				isCustomFilter: true,
+				name: 'testrayCasePriorities',
 				removeQuoteMark: true,
 				type: 'select',
 			}),
 			overrides(baseFilters.caseType, {
-				name: 'componentToCases/caseTypeId',
+				isCustomFilter: true,
+				name: 'testrayCaseTypes',
 			}),
 			overrides(baseFilters.team, {
+				isCustomFilter: true,
+				name: 'testrayTeamIds',
 				type: 'multiselect',
 			}),
 			overrides(baseFilters.run, {
-				name: 'componentToCaseResult/r_runToCaseResult_c_runId',
+				isCustomFilter: true,
+				name: 'testrayRunId',
 				transformData(item) {
 					return dataToOptions(
 						transformData<TestrayRun>(item),
@@ -433,16 +439,19 @@ const filterSchema = {
 	buildRuns: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'runToCaseResult/caseToCaseResult/priority',
+				isCustomFilter: true,
+				name: 'testrayCasePriorities',
 				removeQuoteMark: true,
 				type: 'multiselect',
 			}),
 			overrides(baseFilters.caseType, {
-				name: 'runToCaseResult/caseToCaseResult/caseTypeToCases/id',
+				isCustomFilter: true,
+				name: 'testrayCaseTypes',
 			}),
 			overrides(baseFilters.team, {
-				name:
-					'runToCaseResult/componentToCaseResult/r_teamToComponents_c_teamId',
+				isCustomFilter: true,
+				name: 'testrayTeamIds',
+				type: 'multiselect',
 			}),
 		] as RendererFields[],
 		name: 'buildRuns',
@@ -450,16 +459,22 @@ const filterSchema = {
 	buildTeams: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'teamToComponents/componentToCases/priority',
+				isCustomFilter: true,
+				name: 'testrayCasePriorities',
 				removeQuoteMark: true,
 			}),
 			overrides(baseFilters.caseType, {
-				name: 'teamToComponents/componentToCases/caseTypeToCases/id',
+				isCustomFilter: true,
+				name: 'testrayCaseTypes',
 			}),
-			overrides(baseFilters.team, {name: 'id', type: 'multiselect'}),
+			overrides(baseFilters.team, {
+				isCustomFilter: true,
+				name: 'testrayTeamIds',
+				type: 'multiselect',
+			}),
 			overrides(baseFilters.run, {
-				name:
-					'teamToComponents/componentToCaseResult/runToCaseResult/id',
+				isCustomFilter: true,
+				name: 'testrayRunId',
 			}),
 		] as RendererFields[],
 		name: 'buildTeams',
@@ -591,88 +606,144 @@ const filterSchema = {
 	compareRunsCases: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'priority',
+				name: 'caseToCaseResult/priority',
 				removeQuoteMark: true,
 				type: 'multiselect',
 			}),
 			overrides(baseFilters.team, {
-				disabled: true,
-				name: 'componentToCaseResult/r_teamToComponents_c_teamId',
-				type: 'multiselect',
+				label: 'Teams',
+				name: 'componentToCaseResult/teamToComponents/name',
+				resource: ({runA, runB}) => {
+					const filter = `${SearchBuilder.eq(
+						'teamToComponents/componentToCaseResult/r_runToCaseResult_c_runId',
+						runA as string
+					)} or ${SearchBuilder.eq(
+						'teamToComponents/componentToCaseResult/r_runToCaseResult_c_runId',
+						runB as string
+					)}`;
+
+					return `/teams?filter=${filter}&pageSize=100&sort=name:asc`;
+				},
+				type: 'select',
 			}),
 			overrides(baseFilters.component, {
-				disabled: true,
-				name: 'componentToCaseResult/id',
+				label: 'Components',
+				name: 'componentToCaseResult/name',
+				resource: ({runA, runB}) => {
+					const filter = `${SearchBuilder.eq(
+						'componentToCaseResult/r_runToCaseResult_c_runId',
+						runA as string
+					)} or ${SearchBuilder.eq(
+						'componentToCaseResult/r_runToCaseResult_c_runId',
+						runB as string
+					)}`;
+
+					return `/components?filter=${filter}&pageSize=100&sort=name:asc`;
+				},
 				type: 'multiselect',
 			}),
 			{
 				label: i18n.translate('case-name'),
-				name: 'name',
+				name: 'caseToCaseResult/name',
 				operator: 'contains',
 				type: 'text',
 			},
-			overrides(baseFilters.dueStatus, {
-				disabled: true,
+			{
+				isCustomFilter: true,
 				label: i18n.sub('status-in-x', 'run-a'),
+				name: 'testrayCaseResultStatus1',
+				operator: 'eq',
+				optionalOperator: 'ne',
 				options: [
 					{
-						label: i18n.translate('blocked'),
-						value: CaseResultStatuses.BLOCKED,
+						label: i18n.translate('passed'),
+						value: CaseResultStatuses.PASSED,
 					},
 					{
 						label: i18n.translate('failed'),
 						value: CaseResultStatuses.FAILED,
 					},
 					{
-						label: i18n.translate('in-progress'),
-						value: CaseResultStatuses.IN_PROGRESS,
-					},
-					{
-						label: i18n.translate('passed'),
-						value: CaseResultStatuses.PASSED,
+						label: i18n.translate('blocked'),
+						value: CaseResultStatuses.BLOCKED,
 					},
 					{
 						label: i18n.translate('test-fix'),
 						value: CaseResultStatuses.TEST_FIX,
 					},
 					{
-						label: i18n.translate('untested'),
-						value: CaseResultStatuses.UNTESTED,
+						label: i18n.translate('dnr'),
+						value: CaseResultStatuses.DID_NOT_RUN,
 					},
 				],
+				requestOperator: 'dueStatus',
 				type: 'select',
-			}),
-			overrides(baseFilters.dueStatus, {
-				disabled: true,
+			},
+			{
+				isCustomFilter: true,
 				label: i18n.sub('status-in-x', 'run-b'),
+				name: 'testrayCaseResultStatus2',
+				operator: 'eq',
+				optionalOperator: 'ne',
 				options: [
 					{
-						label: i18n.translate('blocked'),
-						value: CaseResultStatuses.BLOCKED,
+						label: i18n.translate('passed'),
+						value: CaseResultStatuses.PASSED,
 					},
 					{
 						label: i18n.translate('failed'),
 						value: CaseResultStatuses.FAILED,
 					},
 					{
-						label: i18n.translate('in-progress'),
-						value: CaseResultStatuses.IN_PROGRESS,
-					},
-					{
-						label: i18n.translate('passed'),
-						value: CaseResultStatuses.PASSED,
+						label: i18n.translate('blocked'),
+						value: CaseResultStatuses.BLOCKED,
 					},
 					{
 						label: i18n.translate('test-fix'),
 						value: CaseResultStatuses.TEST_FIX,
 					},
 					{
-						label: i18n.translate('untested'),
-						value: CaseResultStatuses.UNTESTED,
+						label: i18n.translate('dnr'),
+						value: CaseResultStatuses.DID_NOT_RUN,
 					},
 				],
+				requestOperator: 'dueStatus',
 				type: 'select',
-			}),
+			},
+			{
+				isCustomFilter: true,
+				label: i18n.sub('issues-in-x', 'run-a'),
+				name: 'testrayCaseResultIssue1',
+				operator: 'contains',
+				optionalOperator: 'ne',
+				requestOperator: 'issues',
+				type: 'textarea',
+			},
+			{
+				isCustomFilter: true,
+				label: i18n.sub('issues-in-x', 'run-b'),
+				name: 'testrayCaseResultIssue2',
+				operator: 'contains',
+				optionalOperator: 'ne',
+				requestOperator: 'issues',
+				type: 'textarea',
+			},
+			{
+				isCustomFilter: true,
+				label: i18n.sub('error-in-x', 'run-a'),
+				name: 'testrayCaseResultError1',
+				operator: 'contains',
+				requestOperator: 'errors',
+				type: 'text',
+			},
+			{
+				isCustomFilter: true,
+				label: i18n.sub('error-in-x', 'run-b'),
+				name: 'testrayCaseResultError2',
+				operator: 'contains',
+				requestOperator: 'errors',
+				type: 'text',
+			},
 		] as RendererFields[],
 
 		name: 'compareRunsCases',
@@ -680,12 +751,12 @@ const filterSchema = {
 	compareRunsTeamsAndComponents: {
 		fields: [
 			overrides(baseFilters.priority, {
-				name: 'testrayCasePriorities',
+				name: 'caseToCaseResult/priority',
 				removeQuoteMark: true,
 				type: 'multiselect',
 			}),
 			overrides(baseFilters.team, {
-				name: 'testrayTeamId',
+				name: 'componentToCaseResult/teamId',
 				resource: ({runA, runB}) => {
 					const filter = `${SearchBuilder.eq(
 						'teamToComponents/componentToCaseResult/r_runToCaseResult_c_runId',
@@ -768,7 +839,7 @@ const filterSchema = {
 				name:
 					'requiremenToRequirementsCases/caseToRequirementsCases/name',
 				operator: 'contains',
-				optionalOperators: 'ne',
+				optionalOperator: 'ne',
 				type: 'textarea',
 			},
 		] as RendererFields[],

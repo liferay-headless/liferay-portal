@@ -80,6 +80,22 @@ else {
 	>
 		<%= latestFileVersion.getTitle() %>
 	</aui:a>
+
+	<span>
+
+		<%
+		DLViewEntriesDisplayContext dlViewEntriesDisplayContext = new DLViewEntriesDisplayContext(liferayPortletRequest, liferayPortletResponse);
+		%>
+
+		<c:if test='<%= FeatureFlagManagerUtil.isEnabled(latestFileVersion.getCompanyId(), "LPD-16311") && !dlViewEntriesDisplayContext.hasGuestViewPermission(fileEntry) %>'>
+			<clay:icon
+				aria-label="<%= LanguageUtil.get(request, "not-visible-to-guest-users") %>"
+				cssClass="c-ml-2 c-mt-1 lfr-portal-tooltip text-4 text-secondary"
+				data-title="<%= LanguageUtil.get(request, "not-visible-to-guest-users") %>"
+				symbol="password-policies"
+			/>
+		</c:if>
+	</span>
 </h2>
 
 <span>

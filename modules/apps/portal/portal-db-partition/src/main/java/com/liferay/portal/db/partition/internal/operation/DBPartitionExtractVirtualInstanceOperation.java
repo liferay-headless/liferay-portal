@@ -7,6 +7,8 @@ package com.liferay.portal.db.partition.internal.operation;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.db.partition.internal.configuration.DBPartitionExtractVirtualInstanceConfiguration;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 
 import java.util.Map;
@@ -27,6 +29,12 @@ import org.osgi.service.component.annotations.Reference;
 public class DBPartitionExtractVirtualInstanceOperation
 	extends BaseVirtualInstanceOperation {
 
+	@Override
+	public String getOperationCompletedMessage(long companyId) {
+		return "Virtual instance with company ID " + companyId +
+			" extracted successfully";
+	}
+
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		onVirtualInstance(
@@ -43,6 +51,10 @@ public class DBPartitionExtractVirtualInstanceOperation
 						partitionCompanyId();
 
 				if (_companyLocalService.fetchCompany(companyId) == null) {
+					_log.error(
+						"Virtual instance with company ID " + companyId +
+							" does not exist");
+
 					return null;
 				}
 
@@ -51,6 +63,9 @@ public class DBPartitionExtractVirtualInstanceOperation
 			},
 			properties);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DBPartitionExtractVirtualInstanceOperation.class);
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

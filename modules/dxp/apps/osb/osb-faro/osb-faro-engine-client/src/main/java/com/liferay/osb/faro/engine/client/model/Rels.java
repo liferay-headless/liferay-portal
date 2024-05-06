@@ -187,6 +187,12 @@ public interface Rels {
 	public static final String PREVIEW_DISABLED_SEGMENTS =
 		"preview-disabled-segments";
 
+	public static final String PROJECTS_LAST_SEEN_DATE =
+		"projects-last-seen-date";
+
+	public static final String REPORTS_EXPORT_CSV_COUNT =
+		"reports-export-csv-count";
+
 	public static final String SESSION_VALUES = "session-values";
 
 	public static final String WORKSPACE = "workspace";

@@ -17,6 +17,7 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -206,7 +207,7 @@ public class EditCommerceShipmentItemMVCActionCommand
 
 	private CommerceShipmentItem _updateCommerceShipmentItem(
 			ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			CommerceShipmentItem.class.getName(), actionRequest);
@@ -251,7 +252,7 @@ public class EditCommerceShipmentItemMVCActionCommand
 					commerceShipmentId, commerceOrderItemId,
 					commerceInventoryWarehouseId);
 
-			BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
+			BigDecimal quantity = _commerceOrderItemQuantityFormatter.parse(
 				actionRequest, commerceInventoryWarehouseId + "_quantity");
 
 			if ((initialCommerceShipmentItem != null) &&
@@ -315,6 +316,10 @@ public class EditCommerceShipmentItemMVCActionCommand
 	@Reference
 	private CommerceInventoryWarehouseLocalService
 		_commerceInventoryWarehouseLocalService;
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;

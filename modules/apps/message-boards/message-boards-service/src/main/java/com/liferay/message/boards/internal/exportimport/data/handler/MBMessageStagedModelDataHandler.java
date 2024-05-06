@@ -22,6 +22,7 @@ import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBDiscussionLocalService;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -129,6 +130,13 @@ public class MBMessageStagedModelDataHandler
 	protected void doExportStagedModel(
 			PortletDataContext portletDataContext, MBMessage message)
 		throws Exception {
+
+		if (message.isAnonymous()) {
+			message.setUserId(0);
+			message.setUserName(StringPool.BLANK);
+			message.setStatusByUserId(0);
+			message.setStatusByUserName(StringPool.BLANK);
+		}
 
 		if (message.isDiscussion()) {
 			MBDiscussion discussion = _mbDiscussionLocalService.getDiscussion(

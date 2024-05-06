@@ -1,0 +1,20 @@
+[
+	{
+		"assetEntrySubtypeId": "[$DDM_STRUCTURE_ID:SAMPLE$]",
+		"title": "Samples",
+		"unicodeProperties": {
+			"anyClassType": "anyClassTypeJournalArticleAssetRendererFactory",
+			"classNameIds": "com.liferay.journal.model.JournalArticle",
+			"classTypeIds": "classTypeIdsJournalArticleAssetRendererFactory"
+		}
+	},
+	{
+		"assetEntrySubtypeId": "[$DDM_STRUCTURE_ID:ANIMAL$]",
+		"title": "Animals",
+		"unicodeProperties": {
+			"anyClassType": "anyClassTypeJournalArticleAssetRendererFactory",
+			"classNameIds": "com.liferay.journal.model.JournalArticle",
+			"classTypeIds": "classTypeIdsJournalArticleAssetRendererFactory"
+		}
+	}
+]

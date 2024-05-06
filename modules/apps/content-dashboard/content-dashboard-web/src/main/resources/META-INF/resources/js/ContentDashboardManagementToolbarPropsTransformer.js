@@ -60,13 +60,19 @@ const _handleOnSelect = ({data, portletNamespace, selection}) => {
 		selection = Object.values(selection).filter((item) => !item.unchecked);
 	}
 
-	navigate(
+	const url = new URL(
 		_getRedirectURLWithParams({
 			data,
 			portletNamespace,
 			selection,
 		})
 	);
+
+	const resetCurParam = `_${url.searchParams.get('p_p_id')}_resetCur`;
+
+	url.searchParams.set(resetCurParam, 'true');
+
+	navigate(url.href);
 };
 
 export default function propsTransformer({portletNamespace, ...otherProps}) {
@@ -90,7 +96,15 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 						);
 					});
 
-					navigate(redirectURL);
+					const url = new URL(redirectURL);
+
+					const resetCurParam = `_${url.searchParams.get(
+						'p_p_id'
+					)}_resetCur`;
+
+					url.searchParams.set(resetCurParam, 'true');
+
+					navigate(url.href);
 				}
 			},
 			selectEventName: `${portletNamespace}selectedAuthorItem`,
@@ -135,7 +149,15 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 					);
 				});
 
-				navigate(redirectURL);
+				const url = new URL(redirectURL);
+
+				const resetCurParam = `_${url.searchParams.get(
+					'p_p_id'
+				)}_resetCur`;
+
+				url.searchParams.set(resetCurParam, 'true');
+
+				navigate(url.href);
 			},
 			selectEventName: `${portletNamespace}selectedContentDashboardItemSubtype`,
 			size: 'md',
@@ -149,12 +171,20 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			height: '70vh',
 			id: `${portletNamespace}selectedScopeIdItem`,
 			onSelect: (selectedItem) => {
-				navigate(
-					addParams(
-						`${portletNamespace}scopeId=${selectedItem.groupid}`,
-						itemData?.redirectURL
-					)
+				const redirectURL = addParams(
+					`${portletNamespace}scopeId=${selectedItem.groupid}`,
+					itemData?.redirectURL
 				);
+
+				const url = new URL(redirectURL);
+
+				const resetCurParam = `_${url.searchParams.get(
+					'p_p_id'
+				)}_resetCur`;
+
+				url.searchParams.set(resetCurParam, 'true');
+
+				navigate(url.href);
 			},
 			selectEventName: `${portletNamespace}selectedScopeIdItem`,
 			size: 'lg',
@@ -168,7 +198,7 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 		onFilterDropdownItemClick(_event, {item = {}}) {
 			const {data} = item;
 
-			if (!Object.keys(data).length) {
+			if (!data || !Object.keys(data).length) {
 				return;
 			}
 

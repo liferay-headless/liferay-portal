@@ -25,6 +25,13 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocal
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.layout.utility.page.service.LayoutUtilityPageEntryLocalService;
+import com.liferay.list.type.model.ListTypeDefinition;
+import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -34,6 +41,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Organization;
@@ -41,6 +49,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
@@ -50,6 +59,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReader;
@@ -95,17 +105,22 @@ public class SiteInitializerSerializerImpl
 		try {
 			ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
 
+			_serializeDDMStructures(groupId, zipWriter);
+			_serializeDDMTemplates(groupId, zipWriter);
 			_serializeDocuments(
 				groupId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				"documents/group", zipWriter);
-			_serializeDDMStructures(groupId, zipWriter);
-			_serializeDDMTemplates(groupId, zipWriter);
 			_serializeJournalArticles(
 				groupId, JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				"journal-articles", zipWriter);
 			_serializeLayoutPageTemplates(groupId, zipWriter);
 			_serializeLayoutUtilityPageEntries(groupId, zipWriter);
 			_serializeLayouts(groupId, "layouts", zipWriter);
+
+			Group group = _groupLocalService.getGroup(groupId);
+
+			_serializeObjectDefinitions(group.getCompanyId(), zipWriter);
+
 			_serializeStyleBookEntries(groupId, zipWriter);
 			_serializeUserAccounts(groupId, zipWriter);
 
@@ -501,6 +516,97 @@ public class SiteInitializerSerializerImpl
 		}
 	}
 
+	private void _serializeObjectDefinition(
+			ObjectDefinition objectDefinition, ZipWriter zipWriter)
+		throws Exception {
+
+		JSONArray objectFieldsJSONArray = JSONUtil.toJSONArray(
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition.getObjectDefinitionId()),
+			objectField -> {
+				if (StringUtil.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+					return null;
+				}
+
+				return JSONUtil.put(
+					"businessType", objectField.getBusinessType()
+				).put(
+					"DBType", objectField.getDBType()
+				).put(
+					"indexedAsKeyword", objectField.isIndexedAsKeyword()
+				).put(
+					"label",
+					JSONUtil.put("en_US", objectField.getLabel(LocaleUtil.US))
+				).put(
+					"listTypeDefinitionId",
+					() -> {
+						ListTypeDefinition listTypeDefinition =
+							_listTypeDefinitionLocalService.
+								fetchListTypeDefinition(
+									objectField.getListTypeDefinitionId());
+
+						if (listTypeDefinition == null) {
+							return "0";
+						}
+
+						String name = _normalize(
+							listTypeDefinition.getName(LocaleUtil.US));
+
+						return "[$LIST_TYPE_DEFINITION_ID:" + name + "$]";
+					}
+				).put(
+					"name", objectField.getName()
+				).put(
+					"objectFieldSettings",
+					JSONUtil.toJSONArray(
+						objectField.getObjectFieldSettings(),
+						objectFieldSetting -> JSONUtil.put(
+							"name", objectFieldSetting.getName()
+						).put(
+							"value", objectFieldSetting.getValue()
+						))
+				).put(
+					"required", objectField.isRequired()
+				).put(
+					"state", objectField.isState()
+				);
+			});
+
+		_addZipEntry(
+			"object-definitions/" +
+				_normalize(objectDefinition.getLabel(LocaleUtil.US)),
+			JSONUtil.put(
+				"label",
+				JSONUtil.put("en_US", objectDefinition.getLabel(LocaleUtil.US))
+			).put(
+				"name",
+				StringUtil.removeSubstring(objectDefinition.getName(), "C_")
+			).put(
+				"objectFields", objectFieldsJSONArray
+			).put(
+				"pluralLabel", objectDefinition.getPluralLabel(LocaleUtil.US)
+			).put(
+				"scope", objectDefinition.getScope()
+			),
+			zipWriter);
+	}
+
+	private void _serializeObjectDefinitions(
+			long companyId, ZipWriter zipWriter)
+		throws Exception {
+
+		for (ObjectDefinition objectDefinition :
+				_objectDefinitionLocalService.getObjectDefinitions(
+					companyId, true, false,
+					WorkflowConstants.STATUS_APPROVED)) {
+
+			_serializeObjectDefinition(objectDefinition, zipWriter);
+		}
+	}
+
 	private void _serializeOrganization(
 		JSONArray jsonArray, Organization organization) {
 
@@ -705,6 +811,9 @@ public class SiteInitializerSerializerImpl
 	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Reference
@@ -726,6 +835,15 @@ public class SiteInitializerSerializerImpl
 	@Reference
 	private LayoutUtilityPageEntryLocalService
 		_layoutUtilityPageEntryLocalService;
+
+	@Reference
+	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

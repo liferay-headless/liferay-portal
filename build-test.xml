@@ -5731,6 +5731,8 @@ ${custom.upgrade.properties}</echo>
 								</elseif>
 							</if>
 
+							<lstopwatch action="start" name="rebuild-database-${database.type}" />
+
 							<execute>
 								<![CDATA[
 									chmod 755 ${create.sh.file.path} ${create.sql.file.path}
@@ -5741,6 +5743,8 @@ ${custom.upgrade.properties}</echo>
 									docker exec ${database.host} /bin/bash /tmp/create.sh
 								]]>
 							</execute>
+
+							<lstopwatch action="total" name="rebuild-database-${database.type}" />
 
 							<delete file="${create.sh.file.path}" />
 						</then>
@@ -6914,6 +6918,7 @@ go</echo>
 					<matches pattern="\d{4}.q\d+.\d+" string="@{liferay.portal.bundle}" />
 				</or>
 				<then>
+					<var name="app.server.classes.portal.dir" value="${app.server.parent.dir}/tomcat/webapps/ROOT/WEB-INF/classes" />
 					<var name="app.server.tomcat.dir" value="${app.server.parent.dir}/tomcat" />
 					<var name="app.server.tomcat.bin.dir" value="${app.server.parent.dir}/tomcat/bin" />
 					<var name="app.server.tomcat.classes.portal.dir" value="${app.server.parent.dir}/tomcat/webapps/ROOT/WEB-INF/classes" />
@@ -11917,18 +11922,7 @@ mail.session.jndi.name=
 memory.scheduler.org.quartz.threadPool.threadCount=1
 persisted.scheduler.org.quartz.threadPool.threadCount=1
 virtual.hosts.default.site.name=
-virtual.hosts.valid.hosts=\
-	localhost,\
-	127.0.0.1,\
-	[::1],\
-	[0:0:0:0:0:0:0:1],\
-	${env.HOSTNAME},\
-	www.able.com,\
-	www.baker.com,\
-	www.charlie.com,\
-	www.dog.com,\
-	www.easy.com,\
-	www.fox.com
+virtual.hosts.valid.hosts=*
 com.liferay.portal.servlet.filters.strip.StripFilter=true
 web.server.http.port=8080
 admin.email.from.address=test@liferay.com
@@ -12573,6 +12567,9 @@ mail.session.mail.smtp.port=25000</echo>
 auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-deploy</echo>
 			</then>
 		</if>
+
+		<echo append="true" file="portal-impl/src/portal-ext.properties">
+captcha.enforce.disabled=true</echo>
 
 		<apply-portal-ext-properties />
 	</target>
@@ -16933,13 +16930,13 @@ CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.managemen
 						jar="${liferay.home}/tools/portal-tools-db-partition-schema-validator/com.liferay.portal.tools.db.partition.schema.validator.jar"
 						output="${liferay.home}/validateoutput.txt"
 					>
-						<arg line="-d ${database.mysql.schema}" />
-						<arg line="-j ${database.mysql.url}" />
-						<arg value="-p" />
+						<arg line="--db-name ${database.mysql.schema}" />
+						<arg line="--db-type mysql" />
+						<arg line="--jdbc-url ${database.mysql.url}" />
+						<arg value="--password" />
 						<arg value="&quot;${database.mysql.password}&quot;" />
-						<arg line="-s ${schema.name.prefix}" />
-						<arg line="-t mysql" />
-						<arg line="-u ${database.mysql.username}" />
+						<arg line="--schema-prefix ${schema.name.prefix}" />
+						<arg line="--user ${database.mysql.username}" />
 					</java>
 				</then>
 				<elseif>
@@ -16950,13 +16947,13 @@ CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.managemen
 							jar="${liferay.home}/tools/portal-tools-db-partition-schema-validator/com.liferay.portal.tools.db.partition.schema.validator.jar"
 							output="${liferay.home}/validateoutput.txt"
 						>
-							<arg line="-d ${database.postgresql.schema}" />
-							<arg line="-j ${database.postgresql.url}" />
-							<arg value="-p" />
+							<arg line="--db-name ${database.postgresql.schema}" />
+							<arg line="--db-type postgresql" />
+							<arg line="--jdbc-url ${database.postgresql.url}" />
+							<arg value="--password" />
 							<arg value="&quot;${database.postgresql.password}&quot;" />
-							<arg line="-s ${schema.name.prefix}" />
-							<arg line="-t postgresql" />
-							<arg line="-u ${database.postgresql.username}" />
+							<arg line="--schema-prefix ${schema.name.prefix}" />
+							<arg line="--user ${database.postgresql.username}" />
 						</java>
 					</then>
 				</elseif>

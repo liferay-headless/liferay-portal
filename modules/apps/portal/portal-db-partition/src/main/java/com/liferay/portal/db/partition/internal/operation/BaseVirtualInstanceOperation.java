@@ -23,6 +23,8 @@ import java.util.concurrent.Callable;
  */
 public abstract class BaseVirtualInstanceOperation {
 
+	public abstract String getOperationCompletedMessage(long companyId);
+
 	public void onVirtualInstance(
 		Callable<Company> callable, Map<String, Object> properties) {
 
@@ -33,6 +35,11 @@ public abstract class BaseVirtualInstanceOperation {
 				_deleteConfiguration(
 					"com.liferay.portal.instances.internal.configuration." +
 						"PortalInstancesConfiguration~" + company.getWebId());
+
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						getOperationCompletedMessage(company.getCompanyId()));
+				}
 			}
 		}
 		catch (Exception exception) {

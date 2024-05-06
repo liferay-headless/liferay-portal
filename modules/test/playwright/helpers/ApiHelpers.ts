@@ -19,6 +19,7 @@ import {HeadlessChangeTrackingApiHelper} from './HeadlessChangeTrackingApiHelper
 import {HeadlessCommerceAdminCatalogApiHelper} from './HeadlessCommerceAdminCatalogApiHelper';
 import {HeadlessCommerceAdminChannelApiHelper} from './HeadlessCommerceAdminChannelApiHelper';
 import {HeadlessCommerceAdminInventoryApiHelper} from './HeadlessCommerceAdminInventoryApiHelper';
+import {HeadlessCommerceAdminOrderApiHelper} from './HeadlessCommerceAdminOrderApiHelper';
 import {HeadlessCommerceAdminPaymentApiHelper} from './HeadlessCommerceAdminPaymentApiHelper';
 import {HeadlessCommerceDeliveryCartApiHelper} from './HeadlessCommerceDeliveryCartApiHelper';
 import {HeadlessCommerceDeliveryCatalogApiHelper} from './HeadlessCommerceDeliveryCatalogApiHelper';
@@ -41,6 +42,13 @@ type TDataApiHelpersData = {
 	type: string;
 };
 
+interface PostOptions<T> {
+	data?: T;
+	failOnStatusCode?: boolean;
+	headers?: {[key: string]: string};
+	multipart?: {[key: string]: any};
+}
+
 export class ApiHelpers {
 	readonly apiBuilder: ApiBuilderHelper;
 	readonly baseUrl: string;
@@ -54,6 +62,7 @@ export class ApiHelpers {
 	readonly headlessCommerceAdminCatalog: HeadlessCommerceAdminCatalogApiHelper;
 	readonly headlessCommerceAdminChannel: HeadlessCommerceAdminChannelApiHelper;
 	readonly headlessCommerceAdminInventoryApiHelper: HeadlessCommerceAdminInventoryApiHelper;
+	readonly headlessCommerceAdminOrder: HeadlessCommerceAdminOrderApiHelper;
 	readonly headlessCommerceAdminPaymentApiHelper: HeadlessCommerceAdminPaymentApiHelper;
 	readonly headlessCommerceDeliveryCatalog: HeadlessCommerceDeliveryCatalogApiHelper;
 	readonly headlessCommerceDeliveryCart: HeadlessCommerceDeliveryCartApiHelper;
@@ -92,6 +101,8 @@ export class ApiHelpers {
 			new HeadlessCommerceAdminChannelApiHelper(this);
 		this.headlessCommerceAdminInventoryApiHelper =
 			new HeadlessCommerceAdminInventoryApiHelper(this);
+		this.headlessCommerceAdminOrder =
+			new HeadlessCommerceAdminOrderApiHelper(this);
 		this.headlessCommerceAdminPaymentApiHelper =
 			new HeadlessCommerceAdminPaymentApiHelper(this);
 		this.headlessCommerceDeliveryCatalog =
@@ -117,31 +128,20 @@ export class ApiHelpers {
 		this.page = page;
 	}
 
-	async postResponse(
+	async postResponse<T>(
 		url: string,
-		data: DataObject | any[] | string,
-		failOnStatusCode?: boolean,
-		headers?: {[key: string]: string}
+		{data, failOnStatusCode, headers, multipart}: PostOptions<T> = {}
 	) {
 		return await this.page.request.post(url, {
 			data,
 			failOnStatusCode: failOnStatusCode || false,
 			headers: headers || (await this.getHeader()),
+			multipart,
 		});
 	}
 
-	async post(
-		url: string,
-		data?: DataObject | any[] | string,
-		failOnStatusCode?: boolean,
-		headers?: {[key: string]: string}
-	) {
-		const response = await this.postResponse(
-			url,
-			data,
-			failOnStatusCode,
-			headers
-		);
+	async post<T>(url: string, options: PostOptions<T> = {}) {
+		const response = await this.postResponse(url, options);
 
 		if (response.status() === 204) {
 			return;
@@ -202,18 +202,18 @@ export class ApiHelpers {
 		return {
 			'Authorization': ApiHelpers._authorization,
 			'Content-Type': 'application/x-www-form-urlencoded',
-			...(await this._getCSRFTokenHeader()),
+			...(await this.getCSRFTokenHeader()),
 		};
 	}
 
 	async getHeader() {
 		return {
 			'Content-Type': 'application/json',
-			...(await this._getCSRFTokenHeader()),
+			...(await this.getCSRFTokenHeader()),
 		};
 	}
 
-	async _getCSRFTokenHeader() {
+	async getCSRFTokenHeader() {
 		const authToken = await this.page.evaluate(() => Liferay.authToken);
 
 		return {
@@ -234,6 +234,10 @@ export class DataApiHelpers extends ApiHelpers {
 	async clearData() {
 		for await (const item of this.data.reverse()) {
 			switch (item.type) {
+				case 'account':
+					await this.headlessAdminUser.deleteAccount(item.id);
+
+					break;
 				case 'catalog':
 					await this.headlessCommerceAdminCatalog.deleteCatalog(
 						item.id
@@ -252,6 +256,22 @@ export class DataApiHelpers extends ApiHelpers {
 					);
 
 					break;
+				case 'optionCategory':
+					await this.headlessCommerceAdminCatalog.deleteOptionCategory(
+						item.id
+					);
+
+					break;
+				case 'order':
+					await this.headlessCommerceAdminOrder.deleteOrder(item.id);
+
+					break;
+				case 'payment':
+					await this.headlessCommerceAdminPaymentApiHelper.deletePayment(
+						item.id
+					);
+
+					break;
 				case 'product':
 					await this.headlessCommerceAdminCatalog.deleteProduct(
 						item.id
@@ -264,6 +284,18 @@ export class DataApiHelpers extends ApiHelpers {
 					break;
 				case 'skuUnitOfMeasure':
 					await this.headlessCommerceAdminCatalog.deleteSkuUnitOfMeasure(
+						item.id
+					);
+
+					break;
+				case 'specification':
+					await this.headlessCommerceAdminCatalog.deleteSpecification(
+						item.id
+					);
+
+					break;
+				case 'warehouse':
+					await this.headlessCommerceAdminInventoryApiHelper.deleteWarehouse(
 						item.id
 					);
 

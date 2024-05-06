@@ -5,6 +5,7 @@
 
 package com.liferay.commerce.product.definitions.web.internal.portlet.action;
 
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.price.list.constants.CommercePriceListConstants;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
 import com.liferay.commerce.price.list.model.CommercePriceList;
@@ -233,19 +234,15 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 		boolean purchasable = ParamUtil.getBoolean(
 			actionRequest, "purchasable");
 		boolean published = ParamUtil.getBoolean(actionRequest, "published");
-
 		double width = ParamUtil.getDouble(actionRequest, "width");
 		double height = ParamUtil.getDouble(actionRequest, "height");
 		double depth = ParamUtil.getDouble(actionRequest, "depth");
 		double weight = ParamUtil.getDouble(actionRequest, "weight");
-
-		BigDecimal price = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "price", BigDecimal.ZERO);
-		BigDecimal promoPrice = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "promoPrice", BigDecimal.ZERO);
-		BigDecimal cost = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "cost", BigDecimal.ZERO);
-
+		BigDecimal price = _commercePriceFormatter.parse(
+			actionRequest, "price");
+		BigDecimal promoPrice = _commercePriceFormatter.parse(
+			actionRequest, "promoPrice");
+		BigDecimal cost = _commercePriceFormatter.parse(actionRequest, "cost");
 		int displayDateMonth = ParamUtil.getInteger(
 			actionRequest, "displayDateMonth");
 		int displayDateDay = ParamUtil.getInteger(
@@ -521,6 +518,9 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CommercePriceEntryLocalService _commercePriceEntryLocalService;
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CommercePriceListLocalService _commercePriceListLocalService;

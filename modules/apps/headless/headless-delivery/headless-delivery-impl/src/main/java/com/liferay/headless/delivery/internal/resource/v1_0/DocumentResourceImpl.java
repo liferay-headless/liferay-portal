@@ -50,7 +50,6 @@ import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.events.ServicePreAction;
 import com.liferay.portal.events.ThemeServicePreAction;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -116,7 +115,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/document.properties",
 	scope = ServiceScope.PROTOTYPE, service = DocumentResource.class
 )
-@CTAware
 public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 
 	@Override
@@ -736,7 +734,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 			for (DLFileEntryType dlFileEntryType :
 					_dlFileEntryTypeLocalService.getFolderFileEntryTypes(
 						_siteConnectedGroupGroupProvider.
-							getAncestorSiteAndDepotGroupIds(groupId, true),
+							getCurrentAndAncestorSiteAndDepotGroupIds(
+								groupId, true),
 						documentFolderId, true)) {
 
 				if (name.equals(

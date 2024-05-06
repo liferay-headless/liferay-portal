@@ -651,7 +651,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 			if (layoutPageTemplateCollection == null) {
 				return _layoutPageTemplateCollectionService.
 					addLayoutPageTemplateCollection(
-						groupId,
+						null, groupId,
 						LayoutPageTemplateConstants.
 							PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 						pageTemplateCollection.getName(),
@@ -666,7 +666,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 
 			return _layoutPageTemplateCollectionService.
 				addLayoutPageTemplateCollection(
-					groupId,
+					null, groupId,
 					LayoutPageTemplateConstants.
 						PARENT_LAYOUT_PAGE_TEMPLATE_COLLECTION_ID_DEFAULT,
 					_layoutPageTemplateCollectionLocalService.
@@ -749,13 +749,16 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 				continue;
 			}
 
-			if (!FeatureFlagManagerUtil.isEnabled("LPD-6378") &&
-				((utilityPageTemplate.getType() ==
-					UtilityPageTemplate.Type.CREATE_ACCOUNT) ||
+			if ((!FeatureFlagManagerUtil.isEnabled("LPD-6378") &&
+				 ((utilityPageTemplate.getType() ==
+					 UtilityPageTemplate.Type.CREATE_ACCOUNT) ||
+				  (utilityPageTemplate.getType() ==
+					  UtilityPageTemplate.Type.FORGOT_PASSWORD) ||
+				  (utilityPageTemplate.getType() ==
+					  UtilityPageTemplate.Type.LOGIN))) ||
+				(!FeatureFlagManagerUtil.isEnabled("LPD-10588") &&
 				 (utilityPageTemplate.getType() ==
-					 UtilityPageTemplate.Type.FORGOT_PASSWORD) ||
-				 (utilityPageTemplate.getType() ==
-					 UtilityPageTemplate.Type.LOGIN))) {
+					 UtilityPageTemplate.Type.COOKIE_POLICY))) {
 
 				continue;
 			}

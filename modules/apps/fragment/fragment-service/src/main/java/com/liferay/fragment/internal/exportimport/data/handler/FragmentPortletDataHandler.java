@@ -7,6 +7,7 @@ package com.liferay.fragment.internal.exportimport.data.handler;
 
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
@@ -15,13 +16,19 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
+import com.liferay.fragment.configuration.FragmentServiceConfiguration;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.layout.util.LayoutServiceContextHelper;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.List;
 
@@ -161,9 +168,37 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 
 		List<Element> fragmentEntryElements = fragmentEntriesElement.elements();
 
-		for (Element fragmentEntryElement : fragmentEntryElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, fragmentEntryElement);
+		if (ListUtil.isEmpty(fragmentEntryElements)) {
+			return null;
+		}
+
+		FragmentServiceConfiguration fragmentServiceConfiguration =
+			_configurationProvider.getCompanyConfiguration(
+				FragmentServiceConfiguration.class,
+				portletDataContext.getCompanyId());
+
+		if (!fragmentServiceConfiguration.propagateChanges() ||
+			(ExportImportThreadLocal.isStagingInProcess() &&
+			 _stagingGroupHelper.isStagedPortlet(
+				 portletDataContext.getGroupId(), getPortletId()))) {
+
+			for (Element fragmentEntryElement : fragmentEntryElements) {
+				StagedModelDataHandlerUtil.importStagedModel(
+					portletDataContext, fragmentEntryElement);
+			}
+
+			return null;
+		}
+
+		try (AutoCloseable autoCloseable =
+				_layoutServiceContextHelper.getServiceContextAutoCloseable(
+					_companyLocalService.getCompany(
+						portletDataContext.getCompanyId()))) {
+
+			for (Element fragmentEntryElement : fragmentEntryElements) {
+				StagedModelDataHandlerUtil.importStagedModel(
+					portletDataContext, fragmentEntryElement);
+			}
 		}
 
 		return null;
@@ -201,6 +236,12 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 		fragmentEntryExportActionableDynamicQuery.performCount();
 	}
 
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
 	@Reference(
 		target = "(model.class.name=com.liferay.fragment.model.FragmentCollection)",
 		unbind = "-"
@@ -215,6 +256,9 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 	private StagedModelRepository<FragmentEntry>
 		_fragmentEntryStagedModelRepository;
 
+	@Reference
+	private LayoutServiceContextHelper _layoutServiceContextHelper;
+
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
 	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
@@ -223,5 +267,8 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 
 	@Reference
 	private Staging _staging;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 }

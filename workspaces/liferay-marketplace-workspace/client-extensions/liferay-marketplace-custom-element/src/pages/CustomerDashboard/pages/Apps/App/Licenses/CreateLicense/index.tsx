@@ -13,10 +13,12 @@ import {z} from 'zod';
 
 import FooterButtons from '../../../../../../../components/FooterButtons';
 import {useMarketplaceContext} from '../../../../../../../context/MarketplaceContext';
+import {Analytics} from '../../../../../../../core/Analytics';
 import useGetProductByOrderId from '../../../../../../../hooks/useGetProductByOrderId';
 import useMarketplaceSpringBootOAuth2 from '../../../../../../../hooks/useMarketplaceSpringBootOAuth2';
 import {Liferay} from '../../../../../../../liferay/liferay';
 import zodSchema from '../../../../../../../schema/zod';
+import {getValueFromDeliverySpecifications} from '../../../../../../../utils/util';
 import ProductCard from '../../../../../../GetApp/components/ProductCard/ProductCard';
 import StepWizard from '../../../../../../GetApp/components/StepWizard/StepWizard';
 import {formatDate} from '../../../../../../PublisherDashboard/PublisherDashboardPageUtil';
@@ -130,9 +132,13 @@ const CreateLicense = () => {
 		register,
 		required: true,
 	};
+
 	const handleNextButton = useCallback(
 		async (form: z.infer<typeof zodSchema.generateLicenseKey>) => {
 			setLoading(true);
+
+			const producSpecifications =
+				(product as DeliveryProduct)?.productSpecifications || [];
 
 			try {
 				const licenseKey = await marketplaceSpringBootOAuth2.createLicenseKey(
@@ -143,8 +149,20 @@ const CreateLicense = () => {
 							ipAddresses: form.ipAddress,
 							macAddresses: form.macAddress,
 							orderId: orderId as string,
+							productId:
+								getValueFromDeliverySpecifications(
+									producSpecifications,
+									'app-entry-uuid'
+								) || undefined,
 							productPurchaseKey: form.subscription
 								?.productPurchasedKey as string,
+							productVersion:
+								form.subscription?.productVersion ||
+								getValueFromDeliverySpecifications(
+									producSpecifications,
+									'latest-version'
+								) ||
+								'1.0.0',
 						},
 						skuId: form.subscription?.skuId as number,
 						type: form.subscription?.name as string,
@@ -156,9 +174,22 @@ const CreateLicense = () => {
 					type: 'success',
 				});
 
+				Analytics.track('CREATE_LICENSE_KEY', {
+					licenseType: licenseKey.licenseType,
+					productName: product?.name,
+					type: form.subscription?.name,
+				});
+
 				navigate(`/order/${orderId}/licenses`);
 
-				marketplaceSpringBootOAuth2.downloadLicenseKey(licenseKey.id);
+				await marketplaceSpringBootOAuth2.downloadLicenseKey(
+					licenseKey.id
+				);
+
+				Analytics.track('DOWNLOAD_LICENSE_KEY', {
+					licenseType: licenseKey.licenseType,
+					productName: product?.name,
+				});
 			}
 			catch {
 				Liferay.Util.openToast({
@@ -169,7 +200,7 @@ const CreateLicense = () => {
 
 			setLoading(false);
 		},
-		[navigate, orderId, marketplaceSpringBootOAuth2]
+		[marketplaceSpringBootOAuth2, orderId, product, navigate]
 	);
 
 	const buttonsInfo = useMemo(

@@ -89,8 +89,18 @@ export const getSafeDisplayValue = (
 	defaultValue: string | number = '-'
 ): string | number => (isBlank(value) ? defaultValue : value);
 
-export const getSafeTouchpoint = (touchpoint: string) =>
-	touchpoint !== 'Any' ? decodeURIComponent(touchpoint) : null;
+export const getSafeTouchpoint = (touchpoint: string) => {
+	if (!touchpoint) return null;
+
+	try {
+		const url = new URL(decodeURIComponent(touchpoint));
+		const remainingUrl = url.href.replace(url.origin, '');
+
+		return remainingUrl === '/' ? url.origin : url.origin + remainingUrl;
+	} catch (e) {
+		return touchpoint !== 'Any' ? decodeURIComponent(touchpoint) : null;
+	}
+};
 
 /**
  * Create a Blob object from data string and temporarily attach

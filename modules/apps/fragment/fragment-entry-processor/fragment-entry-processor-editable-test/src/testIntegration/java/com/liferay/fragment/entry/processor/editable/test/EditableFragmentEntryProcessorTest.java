@@ -736,10 +736,12 @@ public class EditableFragmentEntryProcessorTest {
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			labelMap, RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_STANDALONE,
 			UnicodePropertiesBuilder.put(
-				"script", "println 'Action Executed'"
+				"secret", "standalone"
+			).put(
+				"url", "https://standalone.com"
 			).build(),
 			false);
 
@@ -1177,8 +1179,8 @@ public class EditableFragmentEntryProcessorTest {
 
 		FragmentCollection fragmentCollection =
 			_fragmentCollectionService.addFragmentCollection(
-				_group.getGroupId(), "Fragment Collection", StringPool.BLANK,
-				serviceContext);
+				null, _group.getGroupId(), "Fragment Collection",
+				StringPool.BLANK, serviceContext);
 
 		return _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),

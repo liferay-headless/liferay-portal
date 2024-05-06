@@ -843,6 +843,10 @@
 			<category name="Bug Prevention" />
 			<description name="Performs several checks on `alter` calls in Upgrade classes." />
 		</check>
+		<check name="JavaUpgradeAlterColumnCallsOrderCheck">
+			<category name="Styling" />
+			<description name="Sorts method calls for altering table columns." />
+		</check>
 		<check name="JavaUpgradeClassCheck">
 			<category name="Bug Prevention" />
 			<description name="Performs several checks on Upgrade classes." />
@@ -858,16 +862,17 @@
 		</check>
 		<check name="JavaUpgradeEmptyLinesCheck">
 			<category name="Styling" />
-			<description name="Finds missing and unnecessary empty lines in Upgrade classes." />
+			<description name="Finds missing and unnecessary empty lines in upgrade classes." />
 		</check>
 		<check name="JavaUpgradeIndexCheck">
 			<category name="Bug Prevention" />
 			<description name="Finds cases where the service builder indexes are updated manually in Upgrade classes. This is not needed because Liferay takes care of it." />
 			<property name="enabled" value="false" />
 		</check>
-		<check name="JavaUpgradeProcessFactoryCheck">
-			<category name="Styling" />
-			<description name="Sorts and groups method calls." />
+		<check name="JavaUpgradeMissingTestCheck">
+			<category name="Bug Prevention" />
+			<description name="Finds missing integration tests for upgrade classes." />
+			<property name="enabled" value="false" />
 		</check>
 		<check name="JavaUpgradeVersionCheck">
 			<category name="Bug Prevention" />

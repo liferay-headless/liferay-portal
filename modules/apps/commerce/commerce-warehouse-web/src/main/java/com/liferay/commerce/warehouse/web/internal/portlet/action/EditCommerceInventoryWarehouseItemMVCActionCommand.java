@@ -9,8 +9,8 @@ import com.liferay.commerce.exception.NoSuchWarehouseItemException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseItemService;
 import com.liferay.commerce.product.constants.CPPortletKeys;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -68,37 +68,35 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 
 	private CommerceInventoryWarehouseItem
 			_updateCommerceInventoryWarehouseItem(ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		CommerceInventoryWarehouseItem commerceInventoryWarehouseItem = null;
 
 		long commerceInventoryWarehouseItemId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseItemId");
 
-		BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "quantity", BigDecimal.ZERO);
+		BigDecimal quantity = _commerceOrderItemQuantityFormatter.parse(
+			actionRequest, "quantity");
 		String unitOfMeasureKey = ParamUtil.getString(
 			actionRequest, "unitOfMeasureKey");
 
 		if (commerceInventoryWarehouseItemId > 0) {
-			long mvccVersion = ParamUtil.getLong(actionRequest, "mvccVersion");
-
 			commerceInventoryWarehouseItem =
 				_commerceInventoryWarehouseItemService.
 					updateCommerceInventoryWarehouseItem(
-						commerceInventoryWarehouseItemId, mvccVersion, quantity,
-						unitOfMeasureKey);
+						commerceInventoryWarehouseItemId,
+						ParamUtil.getLong(actionRequest, "mvccVersion"),
+						quantity, unitOfMeasureKey);
 		}
 		else {
-			long commerceInventoryWarehouseId = ParamUtil.getLong(
-				actionRequest, "commerceInventoryWarehouseId");
-			String sku = ParamUtil.getString(actionRequest, "sku");
-
 			commerceInventoryWarehouseItem =
 				_commerceInventoryWarehouseItemService.
 					addCommerceInventoryWarehouseItem(
-						StringPool.BLANK, commerceInventoryWarehouseId,
-						quantity, sku, unitOfMeasureKey);
+						StringPool.BLANK,
+						ParamUtil.getLong(
+							actionRequest, "commerceInventoryWarehouseId"),
+						quantity, ParamUtil.getString(actionRequest, "sku"),
+						unitOfMeasureKey);
 		}
 
 		return commerceInventoryWarehouseItem;
@@ -107,5 +105,9 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 	@Reference
 	private CommerceInventoryWarehouseItemService
 		_commerceInventoryWarehouseItemService;
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
 
 }

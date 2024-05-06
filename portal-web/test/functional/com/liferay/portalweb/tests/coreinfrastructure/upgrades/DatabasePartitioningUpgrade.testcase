@@ -127,4 +127,65 @@ definition {
 		ValidateDatabasePartitioningUpgrade.viewUpgradeDBPartition();
 	}
 
+	@priority = 5
+	test ExtractAndAddDBPartitionCompaniesWithUpgradedDB {
+		property data.archive.type = "data-archive-portal-partition";
+		property portal.version = "7.4.13.u33";
+		property test.assert.warning.exceptions = "false";
+
+		task ("Validate www.able.com and www.baker.com partitions") {
+			User.loginPG(
+				nodePort = 8080,
+				password = "test",
+				userEmailAddress = "test@liferay.com");
+
+			SearchAdministration.executeReindex();
+
+			ValidateDatabasePartitioningUpgrade.viewUpgradeDBPartition();
+
+			SignOut.signOutOfSpecificURL(url = "http://www.able.com:8080");
+
+			SignOut.signOutOfSpecificURL(url = "http://www.baker.com:8080");
+		}
+
+		task ("Extract www.able.com and www.baker.com partitions and shutdown the server") {
+			DBPartition.extractDBPartition(partitionCompanyId = 42638);
+
+			DBPartition.extractDBPartition(partitionCompanyId = 44913);
+
+			Portlet.shutdownServer();
+		}
+
+		task ("Create an empty database") {
+			AntCommands.runCommand("build-test.xml", "rebuild-database -Ddatabase.type=mysql -Dsql.dir=sql/create-bare/ -Dsql.file=create-bare-mysql.sql");
+
+			Portlet.startServer(deleteLiferayHome = "false");
+		}
+
+		task ("Add previously extracted partitions into new database") {
+			DBPartition.insertDBPartition(partitionCompanyId = 42638);
+
+			DBPartition.insertDBPartition(partitionCompanyId = 44913);
+		}
+
+		task ("Ensure that portal main functionalities work correctly") {
+			SignIn.signInTestSetup();
+
+			Smoke.runSmoke();
+
+			SignOut.signOut();
+		}
+
+		task ("Ensure that both www.able.com and www.baker.com are accessible") {
+			User.loginPG(
+				nodePort = 8080,
+				password = "test",
+				userEmailAddress = "test@liferay.com");
+
+			SearchAdministration.executeReindex();
+
+			ValidateDatabasePartitioningUpgrade.viewUpgradeDBPartition();
+		}
+	}
+
 }

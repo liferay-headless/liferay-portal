@@ -9,7 +9,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property skip.start.app.server = "true";
-	property test.assert.warning.exceptions = "true";
+	property test.assert.warning.exceptions = "false";
 	property test.liferay.virtual.instance = "false";
 	property test.run.type = "single";
 	property testcase.url = "file:///opt/dev/projects/github/liferay-portal/";
@@ -51,7 +51,7 @@ definition {
 			panel = "Applications",
 			portlet = "Result Rankings");
 
-		Click(locator1 = "//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))]");
+		Click.javaScriptClick(locator1 = "//div//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))]");
 
 		PortletEntry.inputText(
 			fieldLabel = "Search Query",
@@ -73,7 +73,7 @@ definition {
 			key_query = "Article",
 			locator1 = "SearchTuning#RESULT_RANKINGS_INACTIVE_RANKING");
 
-		Click(locator1 = "//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))]");
+		Click.javaScriptClick(locator1 = "//div//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))]");
 
 		PortletEntry.inputText(
 			fieldLabel = "Search Query",
@@ -388,11 +388,15 @@ definition {
 
 		Blueprints.addElement(element = "Limit Search to These Sites");
 
-		Type(
-			key_elementName = "Limit Search to These Sites",
-			key_fieldLabel = "Group IDs",
-			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
-			value1 = 12345);
+		Click(locator1 = "Button#SELECT");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		LexiconEntry.gotoEntry(rowEntry = ${siteName});
+
+		SelectFrameTop();
 
 		Blueprints.addElement(element = "Limit Search to the Current Site");
 

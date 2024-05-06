@@ -8,8 +8,9 @@ import {useResource} from '@clayui/data-provider';
 import ClayForm, {ClayInput, ClaySelect} from '@clayui/form';
 import {MultipleSelect} from '@liferay/object-js-components-web';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
+import {DefinitionBuilderContext} from '../../../../../DefinitionBuilderContext';
 import {contextUrl} from '../../../../../constants';
 import {
 	headers,
@@ -86,6 +87,10 @@ const BaseNotificationsInfo = ({
 	userRecipientUpdateSelectedItem,
 	...restProps
 }) => {
+	const {
+		allowScriptContentToBeExecutedOrIncluded,
+		hadGroovyScriptBefore,
+	} = useContext(DefinitionBuilderContext);
 	const [networkStatus, setNetworkStatus] = useState(4);
 	const {resource} = useResource({
 		fetchOptions: {
@@ -144,6 +149,20 @@ const BaseNotificationsInfo = ({
 			value: 'velocity',
 		},
 	];
+
+	const getRecipientTypeOptions = () => {
+		if (
+			Liferay.FeatureFlags['LPD-11179'] &&
+			!allowScriptContentToBeExecutedOrIncluded &&
+			!hadGroovyScriptBefore
+		) {
+			return recipientTypeOptions.filter(
+				({value}) => value !== 'scriptedRecipient'
+			);
+		}
+
+		return recipientTypeOptions;
+	};
 
 	const getUpdateSelectedItem = (recipientType) => {
 		let updateSelectedItem;
@@ -348,7 +367,7 @@ const BaseNotificationsInfo = ({
 					}}
 					value={recipientType}
 				>
-					{recipientTypeOptions.map((item) => (
+					{getRecipientTypeOptions().map((item) => (
 						<ClaySelect.Option
 							disabled={item.disabled}
 							key={item.value}

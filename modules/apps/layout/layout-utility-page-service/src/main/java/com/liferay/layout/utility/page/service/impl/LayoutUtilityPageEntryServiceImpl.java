@@ -9,6 +9,8 @@ import com.liferay.layout.utility.page.constants.LayoutUtilityPageActionKeys;
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.layout.utility.page.service.base.LayoutUtilityPageEntryServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
+import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -112,8 +114,7 @@ public class LayoutUtilityPageEntryServiceImpl
 	public List<LayoutUtilityPageEntry> getLayoutUtilityPageEntries(
 		long groupId) {
 
-		return layoutUtilityPageEntryLocalService.getLayoutUtilityPageEntries(
-			groupId);
+		return layoutUtilityPageEntryPersistence.filterFindByGroupId(groupId);
 	}
 
 	@Override
@@ -121,7 +122,7 @@ public class LayoutUtilityPageEntryServiceImpl
 		long groupId, int start, int end,
 		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
 
-		return layoutUtilityPageEntryLocalService.getLayoutUtilityPageEntries(
+		return layoutUtilityPageEntryPersistence.filterFindByGroupId(
 			groupId, start, end, orderByComparator);
 	}
 
@@ -130,8 +131,19 @@ public class LayoutUtilityPageEntryServiceImpl
 		long groupId, String type, int start, int end,
 		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
 
-		return layoutUtilityPageEntryLocalService.getLayoutUtilityPageEntries(
+		return layoutUtilityPageEntryPersistence.filterFindByG_T(
 			groupId, type, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<LayoutUtilityPageEntry> getLayoutUtilityPageEntries(
+		long groupId, String keyword, String[] types, int start, int end,
+		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
+
+		return layoutUtilityPageEntryPersistence.filterFindByG_LikeN_T(
+			groupId,
+			_customSQL.keywords(keyword, false, WildcardMode.SURROUND)[0],
+			types, start, end, orderByComparator);
 	}
 
 	@Override
@@ -139,20 +151,29 @@ public class LayoutUtilityPageEntryServiceImpl
 		long groupId, String[] types, int start, int end,
 		OrderByComparator<LayoutUtilityPageEntry> orderByComparator) {
 
-		return layoutUtilityPageEntryLocalService.getLayoutUtilityPageEntries(
+		return layoutUtilityPageEntryPersistence.filterFindByG_T(
 			groupId, types, start, end, orderByComparator);
 	}
 
 	@Override
 	public int getLayoutUtilityPageEntriesCount(long groupId) {
-		return layoutUtilityPageEntryLocalService.
-			getLayoutUtilityPageEntriesCount(groupId);
+		return layoutUtilityPageEntryPersistence.filterCountByGroupId(groupId);
+	}
+
+	@Override
+	public int getLayoutUtilityPageEntriesCount(
+		long groupId, String keyword, String[] types) {
+
+		return layoutUtilityPageEntryPersistence.filterCountByG_LikeN_T(
+			groupId,
+			_customSQL.keywords(keyword, false, WildcardMode.SURROUND)[0],
+			types);
 	}
 
 	@Override
 	public int getLayoutUtilityPageEntriesCount(long groupId, String[] types) {
-		return layoutUtilityPageEntryLocalService.
-			getLayoutUtilityPageEntriesCount(groupId, types);
+		return layoutUtilityPageEntryPersistence.filterCountByG_T(
+			groupId, types);
 	}
 
 	@Override
@@ -223,9 +244,16 @@ public class LayoutUtilityPageEntryServiceImpl
 			long layoutUtilityPageEntryId, String name)
 		throws PortalException {
 
+		_layoutUtilityPageEntryModelResourcePermission.check(
+			getPermissionChecker(), layoutUtilityPageEntryId,
+			ActionKeys.UPDATE);
+
 		return layoutUtilityPageEntryLocalService.updateLayoutUtilityPageEntry(
 			layoutUtilityPageEntryId, name);
 	}
+
+	@Reference
+	private CustomSQL _customSQL;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.layout.utility.page.model.LayoutUtilityPageEntry)"

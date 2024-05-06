@@ -47,14 +47,14 @@
 				<div class="align-items-baseline d-flex justify-content-between mb-3">
 					<ul
 						aria-label="breadcrumb navigation"
-						class="article-breadcrumb"
+						class="learn-article-breadcrumb"
 						role="navigation"
 					>
 						<li>
 							<a href="/"><@clay["icon"] symbol="home-full" /></a>
 						</li>
 
-						<#if breadcrumbJSONArray?has_content>
+						<#if breadcrumbJSONArray.length() gt 0>
 							<#list breadcrumbJSONArray.length()-1..0 as i>
 								<li>
 									<a href='${breadcrumbJSONArray.getJSONObject(i).getString("url")}'>${breadcrumbJSONArray.getJSONObject(i).getString("title")}</a>
@@ -87,10 +87,15 @@
 				</#if>
 
 				<#if showChildrenCards && childrenJSONArray.length() gt 0>
-					<#list childrenJSONArray.length()-1..0 as i>
-						<a href='${childrenJSONArray.getJSONObject(i).getString("url")}'>${childrenJSONArray.getJSONObject(i).getString("title")}</a>
-					</#list>
+					<div class="learn-card-container">
+						<#list 0..childrenJSONArray.length()-1 as i>
+							<a class="learn-card" href="${childrenJSONArray.getJSONObject(i).getString("url")}">
+								<h4>${childrenJSONArray.getJSONObject(i).getString("title")}</h4>
+							</a>
+						</#list>
+					</div>
 				</#if>
+
 				<div class="learn-article-categories-tags">
 					<#list taxonomyVocabularies as vocabulary>
 						<div class="align-items-baseline d-flex mt-2">

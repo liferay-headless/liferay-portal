@@ -173,7 +173,7 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 		}
 
 		for (String currentBranchRenamedFileName :
-				_getCurrentBranchRenamedFileNames(sourceFormatterArgs)) {
+				sourceFormatterArgs.getCurrentBranchRenamedFileNames()) {
 
 			if (absolutePath.endsWith(currentBranchRenamedFileName)) {
 				return;
@@ -764,22 +764,6 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 		return _bundleSymbolicNamesMap;
 	}
 
-	private synchronized List<String> _getCurrentBranchRenamedFileNames(
-			SourceFormatterArgs sourceFormatterArgs)
-		throws Exception {
-
-		if (_currentBranchRenamedFileNames != null) {
-			return _currentBranchRenamedFileNames;
-		}
-
-		_currentBranchRenamedFileNames =
-			GitUtil.getCurrentBranchRenamedFileNames(
-				sourceFormatterArgs.getBaseDirName(),
-				sourceFormatterArgs.getGitWorkingBranchName());
-
-		return _currentBranchRenamedFileNames;
-	}
-
 	private String _getExpectedServiceAttributeValue(
 		List<String> implementedClassNames) {
 
@@ -975,7 +959,6 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 		Pattern.compile("\\s(\\w+) = \\{");
 	private static final Pattern _attributePattern = Pattern.compile(
 		"\\W(\\w+)\\s*=");
-	private static List<String> _currentBranchRenamedFileNames;
 
 	private Map<String, String> _bundleSymbolicNamesMap;
 	private String _rootDirName;

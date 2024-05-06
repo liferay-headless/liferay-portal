@@ -14,7 +14,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,50 +33,50 @@ public class LayoutStructureRulesHelperImpl
 
 		Set<String> displayedItemIds = new HashSet<>();
 		Set<String> hiddenItemIds = new HashSet<>();
+		LayoutStructureRulesContext layoutStructureRulesContext =
+			new LayoutStructureRulesContext(
+				groupId, permissionChecker, segmentsEntryIds);
 
-		List<LayoutStructureRule> layoutStructureRules =
-			layoutStructure.getLayoutStructureRules();
+		for (LayoutStructureRule layoutStructureRule :
+				layoutStructure.getLayoutStructureRules()) {
 
-		for (LayoutStructureRule layoutStructureRule : layoutStructureRules) {
-			if (_isLayoutStructureRuleActive(
-					groupId, layoutStructureRule, permissionChecker,
-					segmentsEntryIds)) {
+			if (!_isLayoutStructureRuleActive(
+					layoutStructureRule, layoutStructureRulesContext)) {
 
-				_processActions(
-					layoutStructureRule.getActionsJSONArray(), displayedItemIds,
-					hiddenItemIds);
+				continue;
 			}
+
+			_processActions(
+				layoutStructureRule.getActionsJSONArray(), displayedItemIds,
+				hiddenItemIds);
 		}
 
 		return new LayoutStructureRulesResult(displayedItemIds, hiddenItemIds);
 	}
 
 	private boolean _isConditionActive(
-		long groupId, JSONObject conditionJSONObject,
-		PermissionChecker permissionChecker, long[] segmentsEntryIds) {
+		JSONObject conditionJSONObject,
+		LayoutStructureRulesContext layoutStructureRulesContext) {
 
 		long value = conditionJSONObject.getLong("value");
 
 		if (Objects.equals(
-				conditionJSONObject.getString("condition"), "role") &&
-			ArrayUtil.contains(
-				permissionChecker.getRoleIds(
-					permissionChecker.getUserId(), groupId),
-				value)) {
+				conditionJSONObject.getString("condition"), "role")) {
 
-			return true;
+			return ArrayUtil.contains(
+				layoutStructureRulesContext.getRoleIds(), value);
 		}
 
 		if (Objects.equals(
-				conditionJSONObject.getString("condition"), "segment") &&
-			ArrayUtil.contains(segmentsEntryIds, value)) {
+				conditionJSONObject.getString("condition"), "segment")) {
 
-			return true;
+			return ArrayUtil.contains(
+				layoutStructureRulesContext.getSegmentsEntryIds(), value);
 		}
 
 		if (Objects.equals(
 				conditionJSONObject.getString("condition"), "user") &&
-			Objects.equals(permissionChecker.getUserId(), value)) {
+			Objects.equals(layoutStructureRulesContext.getUserId(), value)) {
 
 			return true;
 		}
@@ -86,8 +85,8 @@ public class LayoutStructureRulesHelperImpl
 	}
 
 	private boolean _isLayoutStructureRuleActive(
-		long groupId, LayoutStructureRule layoutStructureRule,
-		PermissionChecker permissionChecker, long[] segmentsEntryIds) {
+		LayoutStructureRule layoutStructureRule,
+		LayoutStructureRulesContext layoutStructureRulesContext) {
 
 		JSONArray conditionsJSONArray =
 			layoutStructureRule.getConditionsJSONArray();
@@ -97,8 +96,7 @@ public class LayoutStructureRulesHelperImpl
 				i);
 
 			boolean conditionActive = _isConditionActive(
-				groupId, conditionJSONObject, permissionChecker,
-				segmentsEntryIds);
+				conditionJSONObject, layoutStructureRulesContext);
 
 			if (conditionActive) {
 				if (Objects.equals(
@@ -131,6 +129,47 @@ public class LayoutStructureRulesHelperImpl
 				hiddenItemIds.add(actionsJSONObject.getString("itemId"));
 			}
 		}
+	}
+
+	private class LayoutStructureRulesContext {
+
+		public long getGroupId() {
+			return _groupId;
+		}
+
+		public long[] getRoleIds() {
+			if (_roleIds != null) {
+				return _roleIds;
+			}
+
+			_roleIds = _permissionChecker.getRoleIds(
+				_permissionChecker.getUserId(), _groupId);
+
+			return _roleIds;
+		}
+
+		public long[] getSegmentsEntryIds() {
+			return _segmentsEntryIds;
+		}
+
+		public long getUserId() {
+			return _permissionChecker.getUserId();
+		}
+
+		private LayoutStructureRulesContext(
+			long groupId, PermissionChecker permissionChecker,
+			long[] segmentsEntryIds) {
+
+			_groupId = groupId;
+			_permissionChecker = permissionChecker;
+			_segmentsEntryIds = segmentsEntryIds;
+		}
+
+		private final long _groupId;
+		private final PermissionChecker _permissionChecker;
+		private long[] _roleIds;
+		private final long[] _segmentsEntryIds;
+
 	}
 
 }

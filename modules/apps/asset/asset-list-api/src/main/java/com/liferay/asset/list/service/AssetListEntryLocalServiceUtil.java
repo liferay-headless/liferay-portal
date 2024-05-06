@@ -10,6 +10,7 @@ import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.Serializable;
@@ -70,40 +71,47 @@ public class AssetListEntryLocalServiceUtil {
 	}
 
 	public static AssetListEntry addAssetListEntry(
-			long userId, long groupId, String title, int type,
+			String externalReferenceCode, long userId, long groupId,
+			String title, int type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addAssetListEntry(
-			userId, groupId, title, type, serviceContext);
+			externalReferenceCode, userId, groupId, title, type,
+			serviceContext);
 	}
 
 	public static AssetListEntry addAssetListEntry(
-			long userId, long groupId, String title, int type,
-			String typeSettings,
+			String externalReferenceCode, long userId, long groupId,
+			String title, int type, String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addAssetListEntry(
-			userId, groupId, title, type, typeSettings, serviceContext);
+			externalReferenceCode, userId, groupId, title, type, typeSettings,
+			serviceContext);
 	}
 
 	public static AssetListEntry addDynamicAssetListEntry(
-			long userId, long groupId, String title, String typeSettings,
+			String externalReferenceCode, long userId, long groupId,
+			String title, String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addDynamicAssetListEntry(
-			userId, groupId, title, typeSettings, serviceContext);
+			externalReferenceCode, userId, groupId, title, typeSettings,
+			serviceContext);
 	}
 
 	public static AssetListEntry addManualAssetListEntry(
-			long userId, long groupId, String title, long[] assetEntryIds,
+			String externalReferenceCode, long userId, long groupId,
+			String title, long[] assetEntryIds,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addManualAssetListEntry(
-			userId, groupId, title, assetEntryIds, serviceContext);
+			externalReferenceCode, userId, groupId, title, assetEntryIds,
+			serviceContext);
 	}
 
 	/**
@@ -175,6 +183,14 @@ public class AssetListEntryLocalServiceUtil {
 
 		return getService().deleteAssetListEntry(
 			assetListEntryId, segmentsEntryId);
+	}
+
+	public static AssetListEntry deleteAssetListEntry(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().deleteAssetListEntry(
+			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -276,6 +292,13 @@ public class AssetListEntryLocalServiceUtil {
 		return getService().fetchAssetListEntry(assetListEntryId);
 	}
 
+	public static AssetListEntry fetchAssetListEntryByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		return getService().fetchAssetListEntryByExternalReferenceCode(
+			externalReferenceCode, groupId);
+	}
+
 	/**
 	 * Returns the asset list entry matching the UUID and group.
 	 *
@@ -373,6 +396,14 @@ public class AssetListEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getAssetListEntry(groupId, assetListEntryKey);
+	}
+
+	public static AssetListEntry getAssetListEntryByExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return getService().getAssetListEntryByExternalReferenceCode(
+			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -473,13 +504,12 @@ public class AssetListEntryLocalServiceUtil {
 	}
 
 	public static AssetListEntryLocalService getService() {
-		return _service;
+		return _serviceSnapshot.get();
 	}
 
-	public static void setService(AssetListEntryLocalService service) {
-		_service = service;
-	}
-
-	private static volatile AssetListEntryLocalService _service;
+	private static final Snapshot<AssetListEntryLocalService> _serviceSnapshot =
+		new Snapshot<>(
+			AssetListEntryLocalServiceUtil.class,
+			AssetListEntryLocalService.class);
 
 }

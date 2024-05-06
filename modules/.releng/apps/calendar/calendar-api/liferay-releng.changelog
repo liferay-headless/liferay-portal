@@ -157,3 +157,8 @@ bf6a1fc9925cfac4e38ffcea5e50c012c3c4c59b^..3573c36fbc6ffe7eeaadca634d4d2ff2231e2
 # Bundle Version 11.3.0
 #
 3573c36fbc6ffe7eeaadca634d4d2ff2231e2c2c^..aca338e2b43ff10d1c2e5cf38b591078ef50acec=LPD-20495
+
+#
+# Bundle Version 12.0.0
+#
+aca338e2b43ff10d1c2e5cf38b591078ef50acec^..c2042118de261ec5649768aa97d4be683096a00f=LPD-21824 LPD-24745

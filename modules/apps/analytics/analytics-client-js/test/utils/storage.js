@@ -5,9 +5,7 @@
 
 import {
 	getItem,
-	getItemFromCookiesOrLocalStorage,
 	getStorageSizeInKb,
-	removeItem,
 	setItem,
 	verifyStorageLimitForKey,
 } from '../../src/utils/storage';
@@ -15,17 +13,15 @@ import {
 const STORAGE_KEY = 'some-key';
 
 describe('Storage Utils', () => {
-	window.Analytics.getCookieManager = jest.fn();
-
 	beforeEach(() => {
-		removeItem(STORAGE_KEY);
+		localStorage.removeItem(STORAGE_KEY);
 	});
 
 	describe('getItem', () => {
-		it('Retrieves an item from Cookie', () => {
+		it('Retrieves an item from localStorage', () => {
 			const expected = {name: 'foo'};
 
-			setItem(STORAGE_KEY, expected);
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(expected));
 
 			expect(getItem(STORAGE_KEY)).toEqual(expected);
 		});
@@ -34,23 +30,24 @@ describe('Storage Utils', () => {
 	describe('getStorageSizeInKb', () => {
 		it('Calculates the kilobyte size of a string', () => {
 			const expected = 0.0234375;
-
 			expect(getStorageSizeInKb('0123456789')).toEqual(expected);
 		});
 	});
 
 	describe('setItem', () => {
-		it('Sets an item in Cookie', () => {
+		it('Sets an item in localStorage', () => {
 			const expected = {name: 'foo'};
 
 			setItem(STORAGE_KEY, expected);
 
-			expect(getItem(STORAGE_KEY)).toEqual(expected);
+			expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toEqual(
+				expected
+			);
 		});
 	});
 
 	describe('verifyStorageLimitForKey', () => {
-		it('Removes items in a Cookie queue if the storage limit is exceeded', async () => {
+		it('Removes items in a localStorage queue if the storage limit is exceeded', async () => {
 			const queue = [{name: 'foo'}, {name: 'bar'}, {name: 'baz'}];
 			const mockStorageLimit = 0.05;
 
@@ -63,7 +60,7 @@ describe('Storage Utils', () => {
 			);
 		});
 
-		it('Does not change items in a Cookie queue if the storage limit is not exceeded', async () => {
+		it('Does not change items in a localStorage queue if the storage limit is not exceeded', async () => {
 			const queue = [{name: 'foo'}, {name: 'bar'}, {name: 'baz'}];
 			const mockStorageLimit = 100;
 
@@ -72,69 +69,6 @@ describe('Storage Utils', () => {
 			await verifyStorageLimitForKey(STORAGE_KEY, mockStorageLimit);
 
 			expect(getItem(STORAGE_KEY)).toEqual(expect.arrayContaining(queue));
-		});
-	});
-
-	describe('3rd party cookie manager', () => {
-		it('Retrieves, set and remove items from a 3rd party cookie manager', () => {
-			const storage = {name: 'foo'};
-
-			const spy = jest.fn();
-
-			window.Analytics.getCookieManager = () => ({
-				actions: {
-					getItem: (key) => {
-						spy();
-
-						return storage[key];
-					},
-					removeItem: (key) => {
-						spy();
-
-						delete storage[key];
-					},
-					setItem: (key, value) => {
-						spy();
-
-						storage[key] = value;
-					},
-				},
-			});
-
-			setItem(STORAGE_KEY, storage);
-
-			const result = getItem(STORAGE_KEY);
-
-			expect(result).toEqual(storage);
-
-			removeItem('name');
-
-			expect(spy.mock.calls).toHaveLength(3);
-		});
-
-		it('Retrieves items from local storage from a 3rd party cookie manager', () => {
-			const storage = {name: 'foo'};
-
-			const spy = jest.fn();
-
-			window.Analytics.getCookieManager = () => ({
-				actions: {
-					getItem: () => {
-						return;
-					},
-					getItemFromLocalStorage: (key) => {
-						spy();
-
-						return storage[key];
-					},
-				},
-			});
-
-			const result = getItemFromCookiesOrLocalStorage('name');
-
-			expect(result).toEqual('foo');
-
-			expect(spy.mock.calls).toHaveLength(1);
 		});
 	});
 });

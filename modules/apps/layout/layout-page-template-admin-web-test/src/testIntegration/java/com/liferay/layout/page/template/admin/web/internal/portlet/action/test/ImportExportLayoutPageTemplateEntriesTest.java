@@ -1322,7 +1322,8 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 		throws PortalException {
 
 		return _assetListEntryLocalService.addAssetListEntry(
-			TestPropsValues.getUserId(), groupId, RandomTestUtil.randomString(),
+			null, TestPropsValues.getUserId(), groupId,
+			RandomTestUtil.randomString(),
 			AssetListEntryTypeConstants.TYPE_MANUAL,
 			ServiceContextTestUtil.getServiceContext(groupId));
 	}
@@ -1362,7 +1363,7 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 
 		FragmentCollection fragmentCollection =
 			_fragmentCollectionLocalService.addFragmentCollection(
-				TestPropsValues.getUserId(), groupId, "Test Collection",
+				null, TestPropsValues.getUserId(), groupId, "Test Collection",
 				StringPool.BLANK, serviceContext);
 
 		return _fragmentEntryLocalService.addFragmentEntry(
@@ -1406,10 +1407,12 @@ public class ImportExportLayoutPageTemplateEntriesTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_STANDALONE,
 			UnicodePropertiesBuilder.put(
-				"script", StringPool.BLANK
+				"secret", "standalone"
+			).put(
+				"url", "https://standalone.com"
 			).build(),
 			false);
 	}

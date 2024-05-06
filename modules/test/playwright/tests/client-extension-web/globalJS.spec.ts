@@ -11,9 +11,9 @@ import {ViewClientExtensionPage} from './pages/ViewClientExtensionPage';
 export const test = mergeTests(loginTest());
 
 const SAMPLE = {
-	erc: 'LXC:liferay-sample-global-js',
+	erc: 'LXC:liferay-sample-global-js-1',
 	name: 'Liferay Sample Global JS',
-	url: '/o/liferay-sample-global-js/global.7d2b9f54c4f8f75ba0c6.js',
+	url: '/o/liferay-sample-global-js-1/global.7d2b9f54c4f8f75ba0c6.js',
 };
 
 test(`${SAMPLE.name} is registered`, async ({page}) => {
@@ -25,7 +25,9 @@ test(`${SAMPLE.name} is registered`, async ({page}) => {
 	await viewClientExtensionPage.goto();
 
 	expect(viewClientExtensionPage.nameLocator).toHaveValue(SAMPLE.name);
-	expect(viewClientExtensionPage.fieldLocator('JavaScript URL')).toHaveValue(SAMPLE.url);
+	expect(viewClientExtensionPage.fieldLocator('JavaScript URL')).toHaveValue(
+		SAMPLE.url
+	);
 });
 
 test(`${SAMPLE.name}'s .js file can be downloaded`, async ({page}) => {

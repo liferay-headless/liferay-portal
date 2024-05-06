@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"@clayui/button": "3.113.0",
-		"@clayui/core": "3.113.0",
+		"@clayui/core": "3.114.0",
 		"@clayui/form": "3.113.0",
 		"@clayui/layout": "3.111.0",
 		"@clayui/popover": "3.113.0",
@@ -24,5 +24,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "1.0.28"
+	"version": "1.0.29"
 }

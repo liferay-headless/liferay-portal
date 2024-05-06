@@ -11,6 +11,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import PRMForm from '../../../../common/components/PRMForm';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
+import useSetTouchedOnForms from '../../../../common/hooks/useSetTouchedOnForms';
 import MDFRequest from '../../../../common/interfaces/mdfRequest';
 import isObjectEmpty from '../../../../common/utils/isObjectEmpty';
 import {StepType} from '../../enums/stepType';
@@ -32,7 +33,6 @@ const Activities = ({
 	onSaveAsDraft,
 }: PRMFormikPageProps & MDFRequestStepProps & IProps) => {
 	const {
-		errors,
 		isSubmitting,
 		isValid,
 		setFieldValue,
@@ -40,6 +40,8 @@ const Activities = ({
 		values,
 		...formikHelpers
 	} = useFormikContext<MDFRequest>();
+
+	const errors = formikHelpers.errors;
 
 	const [currentActivityIndex, setCurrentActivityIndex] = useState<
 		number | undefined
@@ -90,6 +92,17 @@ const Activities = ({
 		totalMDFRequestAmount,
 	]);
 
+	const {isButtonClicked, setIsButtonClicked} = useSetTouchedOnForms(
+		useCallback(
+			(currentIsButtonClicked) =>
+				(!isObjectEmpty(activityErrors) && currentIsButtonClicked) ||
+				(!isObjectEmpty(activityErrors) &&
+					currentActivityIndexEdit !== undefined),
+			[activityErrors, currentActivityIndexEdit]
+		),
+		formikHelpers
+	);
+
 	const onEdit = (index: number) => {
 		arrayHelpers.push(values.activities[index]);
 
@@ -98,6 +111,8 @@ const Activities = ({
 	};
 
 	const onPreviousForm = useCallback(() => {
+		setIsButtonClicked(false);
+
 		if (currentActivityIndex !== undefined) {
 			arrayHelpers.remove(currentActivityIndex);
 
@@ -105,7 +120,7 @@ const Activities = ({
 		}
 
 		setCurrentActivityIndexEdit(undefined);
-	}, [arrayHelpers, currentActivityIndex]);
+	}, [arrayHelpers, currentActivityIndex, setIsButtonClicked]);
 
 	const onContinueForm = () => {
 		if (currentActivityIndex === undefined) {
@@ -119,7 +134,7 @@ const Activities = ({
 
 	const onRemove = (index: number) => {
 		setFieldValue(`activities[${index}].removed`, true);
-		
+
 		arrayHelpers.remove(index);
 	};
 
@@ -139,6 +154,33 @@ const Activities = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isDraft]);
 
+	const handleOnClick = () => {
+		setIsButtonClicked(true);
+		window.scrollTo({
+			behavior: (isValid ? 'instant' : 'smooth') as ScrollBehavior,
+			top: 0,
+		});
+		if (
+			(isObjectEmpty(activityErrors as Object) && isButtonClicked) ||
+			isObjectEmpty(activityErrors as Object)
+		) {
+			setIsButtonClicked(false);
+			onContinueForm();
+		}
+	};
+
+	const isEditFormWithError =
+		!isObjectEmpty(activityErrors as Object) &&
+		currentActivityIndexEdit !== undefined;
+
+	const isNewFormWithError =
+		!isObjectEmpty(activityErrors as Object) && isButtonClicked;
+
+	const isDisabledSubmittedButton =
+		currentActivityIndex !== undefined
+			? isNewFormWithError || isEditFormWithError
+			: !isValid;
+
 	return (
 		<PRMForm
 			className={classNames({
@@ -155,6 +197,7 @@ const Activities = ({
 					currency={values.currency}
 					currentActivity={values.activities[currentActivityIndex]}
 					currentActivityIndex={currentActivityIndex}
+					isButtonClicked={isButtonClicked}
 					setFieldValue={setFieldValue}
 				/>
 			) : (
@@ -210,12 +253,8 @@ const Activities = ({
 
 					<Button
 						className="inline-item inline-item-after"
-						disabled={
-							currentActivityIndex !== undefined
-								? !isObjectEmpty(activityErrors as Object)
-								: !isValid
-						}
-						onClick={onContinueForm}
+						disabled={isDisabledSubmittedButton}
+						onClick={() => handleOnClick()}
 					>
 						Continue
 						{isSubmitting && (

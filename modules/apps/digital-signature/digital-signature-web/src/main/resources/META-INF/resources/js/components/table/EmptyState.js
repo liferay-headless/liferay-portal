@@ -30,8 +30,8 @@ const EmptyState = ({
 			description={description}
 			imgSrc={
 				className === DEFAULT_EMPTY.search.className
-					? `${themeDisplay.getPathThemeImages()}/states/search_state.gif`
-					: `${themeDisplay.getPathThemeImages()}/states/empty_state.gif`
+					? `${themeDisplay.getPathThemeImages()}/states/search_state.svg`
+					: `${themeDisplay.getPathThemeImages()}/states/empty_state.svg`
 			}
 			title={title}
 		>

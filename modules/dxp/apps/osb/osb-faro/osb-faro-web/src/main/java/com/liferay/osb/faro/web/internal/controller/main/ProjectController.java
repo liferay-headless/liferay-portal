@@ -60,9 +60,11 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -318,13 +320,16 @@ public class ProjectController extends BaseFaroController {
 			@DefaultValue("true") @QueryParam("deleteData") boolean deleteData)
 		throws Exception {
 
+		FaroProject faroProject =
+			_faroProjectLocalService.fetchFaroProjectByGroupId(groupId);
+
+		_validateLastSeenDate(faroProject);
+
 		_contactsCardTemplateLocalService.deleteContactsCardTemplates(groupId);
 		_contactsLayoutTemplateLocalService.deleteContactsLayoutTemplates(
 			groupId);
 
-		contactsEngineClient.deleteProject(
-			_faroProjectLocalService.fetchFaroProjectByGroupId(groupId),
-			deleteData);
+		contactsEngineClient.deleteProject(faroProject, deleteData);
 
 		return new ProjectDisplay(
 			_faroProjectLocalService.deleteFaroProjectByGroupId(groupId));
@@ -541,7 +546,9 @@ public class ProjectController extends BaseFaroController {
 	@PATCH
 	@Path("/{groupId}")
 	@RolesAllowed(RoleConstants.SITE_ADMINISTRATOR)
-	public void patchTimeZone(
+	public void patch(
+			@DefaultValue(StringPool.BLANK) @FormParam("corpProjectUuid") String
+				corpProjectUuid,
 			@PathParam("groupId") long groupId,
 			@DefaultValue(StringPool.BLANK) @FormParam("timeZoneId") String
 				timeZoneId)
@@ -550,7 +557,13 @@ public class ProjectController extends BaseFaroController {
 		FaroProject faroProject =
 			faroProjectLocalService.getFaroProjectByGroupId(groupId);
 
-		if (!Objects.equals(faroProject.getTimeZoneId(), timeZoneId)) {
+		if (!Validator.isBlank(corpProjectUuid)) {
+			faroProject.setCorpProjectUuid(corpProjectUuid);
+		}
+
+		if (!Validator.isBlank(timeZoneId) &&
+			!Objects.equals(faroProject.getTimeZoneId(), timeZoneId)) {
+
 			_validateTimeZoneId(timeZoneId);
 
 			_sendTimeZoneNotification(groupId);
@@ -558,8 +571,12 @@ public class ProjectController extends BaseFaroController {
 			cerebroEngineClient.updateTimeZone(faroProject);
 
 			faroProject.setTimeZoneId(timeZoneId);
+		}
 
-			faroProjectLocalService.updateFaroProject(faroProject);
+		faroProjectLocalService.updateFaroProject(faroProject);
+
+		if (!Validator.isBlank(corpProjectUuid)) {
+			get(groupId, true, true);
 		}
 	}
 
@@ -840,6 +857,16 @@ public class ProjectController extends BaseFaroController {
 		return new ProjectDisplay(
 			_faroProjectLocalService.updateFaroProject(faroProject),
 			friendlyURL);
+	}
+
+	private String _getDeletionFailedErrorMessage(User user) {
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", user.getLocale(), getClass());
+
+		return language.get(
+			resourceBundle,
+			"the-workspace-cannot-be-deleted-because-it-has-received-data-" +
+				"recently");
 	}
 
 	private String _getEmailAddressDomainsErrorMessage(
@@ -1182,6 +1209,25 @@ public class ProjectController extends BaseFaroController {
 					"incidentReportEmailAddresses",
 					_getIncidentReportEmailAddressesErrorMessage());
 			}
+		}
+	}
+
+	private void _validateLastSeenDate(FaroProject faroProject) {
+		Date lastSeenDate = contactsEngineClient.getLastSeenDate(faroProject);
+
+		if (Objects.isNull(lastSeenDate)) {
+			return;
+		}
+
+		Calendar calendar = new GregorianCalendar();
+
+		calendar.setTime(new Date());
+
+		calendar.add(Calendar.DATE, -3);
+
+		if (lastSeenDate.after(calendar.getTime())) {
+			throw new FaroValidationException(
+				"lastSeenDate", _getDeletionFailedErrorMessage(getUser()));
 		}
 	}
 

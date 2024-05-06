@@ -19,6 +19,19 @@ public class RoutineEntityFactory extends BaseEntityFactory<RoutineEntity> {
 
 	@Override
 	public RoutineEntity newEntity(JSONObject jsonObject) {
+		RoutineEntity.Type type = RoutineEntity.Type.get(
+			jsonObject.get("type"));
+
+		if (type == RoutineEntity.Type.CRON) {
+			return new DefaultCronRoutineEntity(jsonObject);
+		}
+		else if (type == RoutineEntity.Type.UPSTREAM_BRANCH) {
+			return new DefaultUpstreamBranchRoutineEntity(jsonObject);
+		}
+		else if (type == RoutineEntity.Type.UPSTREAM_BRANCH_CRON) {
+			return new DefaultUpstreamBranchCronRoutineEntity(jsonObject);
+		}
+
 		return new ManualRoutineEntity(jsonObject);
 	}
 

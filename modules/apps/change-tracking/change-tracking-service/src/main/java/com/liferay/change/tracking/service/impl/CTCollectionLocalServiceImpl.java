@@ -574,7 +574,7 @@ public class CTCollectionLocalServiceImpl
 
 		List<CTEntry> ctEntries = new ArrayList<>();
 
-		Map<Long, List<CTEntry>> relateCTEntriesMap = _getRelateCTEntriesMap(
+		Map<Long, List<CTEntry>> relateCTEntriesMap = _getRelatedCTEntriesMap(
 			ctCollection, modelClassNameId, modelClassPK);
 
 		for (Map.Entry<Long, List<CTEntry>> entry :
@@ -594,6 +594,8 @@ public class CTCollectionLocalServiceImpl
 					ctEntries, ctEntry -> _uidFactory.getUID(ctEntry)),
 				indexer.isCommitImmediately());
 		}
+
+		_ctClosureFactory.clearCache(ctCollection.getCtCollectionId());
 	}
 
 	@Override
@@ -696,7 +698,7 @@ public class CTCollectionLocalServiceImpl
 
 		for (CTEntry ctEntry : ctEntries) {
 			Map<Long, List<CTEntry>> relatedCTEntriesMap =
-				_getRelateCTEntriesMap(
+				_getRelatedCTEntriesMap(
 					ctCollection, ctEntry.getModelClassNameId(),
 					ctEntry.getModelClassPK());
 
@@ -713,7 +715,7 @@ public class CTCollectionLocalServiceImpl
 			long ctCollectionId, long modelClassNameId, long modelClassPK)
 		throws PortalException {
 
-		return _getRelateCTEntriesMap(
+		return _getRelatedCTEntriesMap(
 			ctCollectionPersistence.findByPrimaryKey(ctCollectionId),
 			modelClassNameId, modelClassPK);
 	}
@@ -851,7 +853,7 @@ public class CTCollectionLocalServiceImpl
 					" is read only");
 		}
 
-		Map<Long, List<CTEntry>> relatedCTEntriesMap = _getRelateCTEntriesMap(
+		Map<Long, List<CTEntry>> relatedCTEntriesMap = _getRelatedCTEntriesMap(
 			fromCTCollection, modelClassNameId, modelClassPK);
 
 		List<CTEntry> ctEntries = new ArrayList<>();
@@ -877,7 +879,7 @@ public class CTCollectionLocalServiceImpl
 				toCTCollectionId, entry.getKey(), entry.getValue());
 		}
 
-		relatedCTEntriesMap = _getRelateCTEntriesMap(
+		relatedCTEntriesMap = _getRelatedCTEntriesMap(
 			toCTCollection, modelClassNameId, modelClassPK);
 
 		ctEntries = new ArrayList<>();
@@ -894,6 +896,9 @@ public class CTCollectionLocalServiceImpl
 		if (!conflictInfoMap.isEmpty()) {
 			throw new CTPublishConflictException("Conflict detected");
 		}
+
+		_ctClosureFactory.clearCache(fromCTCollectionId);
+		_ctClosureFactory.clearCache(toCTCollectionId);
 	}
 
 	@Override
@@ -1212,7 +1217,7 @@ public class CTCollectionLocalServiceImpl
 		}
 	}
 
-	private Map<Long, List<CTEntry>> _getRelateCTEntriesMap(
+	private Map<Long, List<CTEntry>> _getRelatedCTEntriesMap(
 			CTCollection ctCollection, long modelClassNameId, long modelClassPK)
 		throws PortalException {
 

@@ -39,3 +39,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "review-change"));
 		/>
 	</div>
 </div>
+
+<aui:script>
+	function <%= viewChangesDisplayContext.getMyWorkflowTaskPortletNamespace() %>refreshPortlet() {
+		Liferay.fire('<portlet:namespace />workflowTaskUpdated');
+	}
+</aui:script>

@@ -6,6 +6,7 @@
 package com.liferay.commerce.shipping.engine.fixed.web.internal.portlet.action;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.CommerceShippingMethodService;
 import com.liferay.commerce.shipping.engine.fixed.exception.CommerceShippingFixedOptionKeyException;
@@ -151,13 +152,13 @@ public class EditCommerceShippingFixedOptionMVCActionCommand
 
 	private CommerceShippingFixedOption _updateCommerceShippingFixedOption(
 			ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		long commerceShippingFixedOptionId = ParamUtil.getLong(
 			actionRequest, "commerceShippingFixedOptionId");
 
-		BigDecimal amount = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "amount", BigDecimal.ZERO);
+		BigDecimal amount = _commercePriceFormatter.parse(
+			actionRequest, "amount");
 		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
 			actionRequest, "description");
 		String key = ParamUtil.getString(actionRequest, "key");
@@ -192,6 +193,9 @@ public class EditCommerceShippingFixedOptionMVCActionCommand
 
 		return commerceShippingFixedOption;
 	}
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CommerceShippingFixedOptionService

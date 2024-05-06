@@ -12,11 +12,13 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateCollectionLocalServiceBaseImpl;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -48,9 +51,9 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 	@Override
 	public LayoutPageTemplateCollection addLayoutPageTemplateCollection(
-			long userId, long groupId, long parentLayoutPageTemplateCollection,
-			String name, String description, int type,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long userId, long groupId,
+			long parentLayoutPageTemplateCollectionId, String name,
+			String description, int type, ServiceContext serviceContext)
 		throws PortalException {
 
 		// Layout page template collection
@@ -66,6 +69,8 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 				layoutPageTemplateId);
 
 		layoutPageTemplateCollection.setUuid(serviceContext.getUuid());
+		layoutPageTemplateCollection.setExternalReferenceCode(
+			externalReferenceCode);
 		layoutPageTemplateCollection.setGroupId(groupId);
 		layoutPageTemplateCollection.setCompanyId(user.getCompanyId());
 		layoutPageTemplateCollection.setUserId(user.getUserId());
@@ -75,7 +80,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 		layoutPageTemplateCollection.setModifiedDate(
 			serviceContext.getModifiedDate(new Date()));
 		layoutPageTemplateCollection.setParentLayoutPageTemplateCollectionId(
-			parentLayoutPageTemplateCollection);
+			parentLayoutPageTemplateCollectionId);
 		layoutPageTemplateCollection.setLayoutPageTemplateCollectionKey(
 			_generateLayoutPageTemplateCollectionKey(groupId, name, type));
 		layoutPageTemplateCollection.setName(name);
@@ -92,6 +97,83 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 			layoutPageTemplateCollection, serviceContext);
 
 		return layoutPageTemplateCollection;
+	}
+
+	@Override
+	public LayoutPageTemplateCollection copyLayoutPageTemplateCollection(
+			long userId, long groupId,
+			long sourceLayoutPageTemplateCollectionId,
+			long layoutParentPageTemplateCollectionId, boolean copyPermissions,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		LayoutPageTemplateCollection sourceLayoutPageTemplateCollection =
+			layoutPageTemplateCollectionPersistence.findByPrimaryKey(
+				sourceLayoutPageTemplateCollectionId);
+
+		LayoutPageTemplateCollection targetLayoutPageTemplateCollection =
+			addLayoutPageTemplateCollection(
+				null, userId, sourceLayoutPageTemplateCollection.getGroupId(),
+				layoutParentPageTemplateCollectionId,
+				getUniqueLayoutPageTemplateCollectionName(
+					groupId, sourceLayoutPageTemplateCollection.getName(),
+					sourceLayoutPageTemplateCollection.getType()),
+				sourceLayoutPageTemplateCollection.getDescription(),
+				sourceLayoutPageTemplateCollection.getType(), serviceContext);
+
+		if (copyPermissions) {
+			_resourceLocalService.deleteResource(
+				targetLayoutPageTemplateCollection.getCompanyId(),
+				LayoutPageTemplateCollection.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				targetLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId());
+
+			_resourceLocalService.copyModelResources(
+				sourceLayoutPageTemplateCollection.getCompanyId(),
+				LayoutPageTemplateCollection.class.getName(),
+				sourceLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId(),
+				targetLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId());
+		}
+
+		List<LayoutPageTemplateEntry> layoutPageTemplateEntries =
+			_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntries(
+				sourceLayoutPageTemplateCollection.getGroupId(),
+				sourceLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId());
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				layoutPageTemplateEntries) {
+
+			_layoutPageTemplateEntryLocalService.copyLayoutPageTemplateEntry(
+				userId, groupId,
+				targetLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId(),
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+				copyPermissions, serviceContext);
+		}
+
+		List<LayoutPageTemplateCollection> layoutPageTemplateCollections =
+			getLayoutPageTemplateCollections(
+				sourceLayoutPageTemplateCollection.getGroupId(),
+				sourceLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId());
+
+		for (LayoutPageTemplateCollection layoutPageTemplateCollection :
+				layoutPageTemplateCollections) {
+
+			copyLayoutPageTemplateCollection(
+				userId, groupId,
+				layoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId(),
+				targetLayoutPageTemplateCollection.
+					getLayoutPageTemplateCollectionId(),
+				copyPermissions, serviceContext);
+		}
+
+		return targetLayoutPageTemplateCollection;
 	}
 
 	@Override
@@ -157,6 +239,16 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 	}
 
 	@Override
+	public LayoutPageTemplateCollection deleteLayoutPageTemplateCollection(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		return deleteLayoutPageTemplateCollection(
+			getLayoutPageTemplateCollectionByExternalReferenceCode(
+				externalReferenceCode, groupId));
+	}
+
+	@Override
 	public LayoutPageTemplateCollection fetchLayoutPageTemplateCollection(
 		long layoutPageTemplateCollectionId) {
 
@@ -214,6 +306,14 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 	@Override
 	public List<LayoutPageTemplateCollection> getLayoutPageTemplateCollections(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
+		return layoutPageTemplateCollectionPersistence.findByG_P_T(
+			groupId, layoutPageTemplateCollectionId, type);
+	}
+
+	@Override
+	public List<LayoutPageTemplateCollection> getLayoutPageTemplateCollections(
 		long groupId, String name, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateCollection> orderByComparator) {
 
@@ -249,30 +349,26 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 	@Override
 	public String getUniqueLayoutPageTemplateCollectionName(
-		long groupId, String name, int type) {
+		long groupId, String sourceName, int type) {
 
-		LayoutPageTemplateCollection layoutPageTemplateCollection =
-			layoutPageTemplateCollectionPersistence.fetchByG_N_T(
-				groupId, name, type);
+		String copy = _language.get(LocaleUtil.getSiteDefault(), "copy");
 
-		if (layoutPageTemplateCollection == null) {
-			return name;
-		}
+		String name = StringUtil.appendParentheticalSuffix(sourceName, copy);
 
-		int count = 1;
-
-		while (true) {
-			String newName = StringUtil.appendParentheticalSuffix(
-				name, count++);
-
-			layoutPageTemplateCollection =
+		for (int i = 1;; i++) {
+			LayoutPageTemplateCollection layoutPageTemplateCollection =
 				layoutPageTemplateCollectionPersistence.fetchByG_N_T(
-					groupId, newName, type);
+					groupId, name, type);
 
 			if (layoutPageTemplateCollection == null) {
-				return newName;
+				break;
 			}
+
+			name = StringUtil.appendParentheticalSuffix(
+				sourceName, copy + StringPool.SPACE + i);
 		}
+
+		return name;
 	}
 
 	@Override
@@ -408,6 +504,9 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 	@Reference
 	private CustomSQL _customSQL;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

@@ -6,10 +6,11 @@
 import ClayButton from '@clayui/button';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import {useState} from 'react';
-import {useOutletContext} from 'react-router-dom';
+import {useNavigate, useOutletContext} from 'react-router-dom';
 import useSWR from 'swr';
 
 import Page from '../../../../components/Page';
+import {useMarketplaceContext} from '../../../../context/MarketplaceContext';
 import SearchBuilder from '../../../../core/SearchBuilder';
 import {useAccount} from '../../../../hooks/data/useAccounts';
 import HeadlessCommerceAdminCatalogImpl from '../../../../services/rest/HeadlessCommerceAdminCatalog';
@@ -19,6 +20,8 @@ const Solutions = () => {
 	const [page, setPage] = useState(1);
 	const {catalogId} = useOutletContext<any>();
 	const {data: supplierAccount} = useAccount();
+	const navigate = useNavigate();
+	const {properties} = useMarketplaceContext();
 
 	const {
 		data: publishedSolutionsTable = {},
@@ -56,9 +59,14 @@ const Solutions = () => {
 			description="Manage and publish solutions on the Marketplace"
 			pageRendererProps={{error, isLoading}}
 			rightButton={
-				<ClayButton disabled={!(catalogId && catalogId > 0)}>
-					New Solution Template
-				</ClayButton>
+				properties.featureFlags?.includes('LPD-20229') && (
+					<ClayButton
+						disabled={!(catalogId && catalogId > 0)}
+						onClick={() => navigate('/solutions/publisher')}
+					>
+						New Solution Template
+					</ClayButton>
+				)
 			}
 			title="Solutions"
 		>

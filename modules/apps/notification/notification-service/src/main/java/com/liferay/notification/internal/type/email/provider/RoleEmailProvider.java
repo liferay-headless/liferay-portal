@@ -5,10 +5,12 @@
 
 package com.liferay.notification.internal.type.email.provider;
 
+import com.liferay.account.constants.AccountRoleConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryOrganizationRel;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
+import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.notification.constants.NotificationRecipientSettingConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.object.model.ObjectDefinition;
@@ -18,14 +20,16 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -46,20 +50,26 @@ public class RoleEmailProvider implements EmailProvider {
 		AccountEntryLocalService accountEntryLocalService,
 		AccountEntryOrganizationRelLocalService
 			accountEntryOrganizationRelLocalService,
+		AccountEntryUserRelLocalService accountEntryUserRelLocalService,
+		GroupLocalService groupLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		OrganizationLocalService organizationLocalService,
 		RoleLocalService roleLocalService,
-		UserGroupRoleLocalService userGroupRoleLocalService) {
+		UserGroupRoleLocalService userGroupRoleLocalService,
+		UserLocalService userLocalService) {
 
 		_accountEntryLocalService = accountEntryLocalService;
 		_accountEntryOrganizationRelLocalService =
 			accountEntryOrganizationRelLocalService;
+		_accountEntryUserRelLocalService = accountEntryUserRelLocalService;
+		_groupLocalService = groupLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_organizationLocalService = organizationLocalService;
 		_roleLocalService = roleLocalService;
 		_userGroupRoleLocalService = userGroupRoleLocalService;
+		_userLocalService = userLocalService;
 	}
 
 	@Override
@@ -139,8 +149,7 @@ public class RoleEmailProvider implements EmailProvider {
 	}
 
 	private String _getEmailAddresses(
-			long companyId, Map<Integer, long[]> groupIdsMap, Object value)
-		throws PortalException {
+		long companyId, Map<Integer, long[]> groupIdsMap, Object value) {
 
 		Set<String> emailAddresses = new HashSet<>();
 
@@ -152,20 +161,64 @@ public class RoleEmailProvider implements EmailProvider {
 
 			if ((role == null) ||
 				((role.getType() != RoleConstants.TYPE_ACCOUNT) &&
-				 (role.getType() != RoleConstants.TYPE_ORGANIZATION))) {
+				 (role.getType() != RoleConstants.TYPE_ORGANIZATION) &&
+				 (role.getType() != RoleConstants.TYPE_REGULAR))) {
+
+				continue;
+			}
+
+			if (role.getType() == RoleConstants.TYPE_REGULAR) {
+				ListUtil.isNotEmptyForEach(
+					_userLocalService.getRoleUsers(
+						role.getRoleId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+						null),
+					user -> emailAddresses.add(user.getEmailAddress()));
 
 				continue;
 			}
 
 			for (long groupId : groupIdsMap.get(role.getType())) {
-				for (UserGroupRole userGroupRole :
+				String roleName = role.getName();
+
+				if (roleName.equals(
+						AccountRoleConstants.
+							REQUIRED_ROLE_NAME_ACCOUNT_MEMBER)) {
+
+					Group group = _groupLocalService.fetchGroup(groupId);
+
+					ListUtil.isNotEmptyForEach(
+						_accountEntryUserRelLocalService.
+							getAccountEntryUserRelsByAccountEntryId(
+								group.getClassPK()),
+						accountEntryUserRel -> {
+							User user = accountEntryUserRel.fetchUser();
+
+							if (user != null) {
+								emailAddresses.add(user.getEmailAddress());
+							}
+						});
+				}
+				else if (roleName.equals(RoleConstants.ORGANIZATION_USER)) {
+					Group group = _groupLocalService.fetchGroup(groupId);
+
+					ListUtil.isNotEmptyForEach(
+						_userLocalService.getOrganizationUsers(
+							group.getClassPK()),
+						user -> emailAddresses.add(user.getEmailAddress()));
+				}
+				else {
+					ListUtil.isNotEmptyForEach(
 						_userGroupRoleLocalService.
 							getUserGroupRolesByGroupAndRole(
-								groupId, role.getRoleId())) {
+								groupId, role.getRoleId()),
+						userGroupRole -> {
+							User user = _userLocalService.fetchUser(
+								userGroupRole.getUserId());
 
-					User user = userGroupRole.getUser();
-
-					emailAddresses.add(user.getEmailAddress());
+							if (user != null) {
+								emailAddresses.add(user.getEmailAddress());
+							}
+						});
 				}
 			}
 		}
@@ -176,10 +229,14 @@ public class RoleEmailProvider implements EmailProvider {
 	private final AccountEntryLocalService _accountEntryLocalService;
 	private final AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
+	private final AccountEntryUserRelLocalService
+		_accountEntryUserRelLocalService;
+	private final GroupLocalService _groupLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final OrganizationLocalService _organizationLocalService;
 	private final RoleLocalService _roleLocalService;
 	private final UserGroupRoleLocalService _userGroupRoleLocalService;
+	private final UserLocalService _userLocalService;
 
 }

@@ -1,15 +1,15 @@
-import CardWithRangeKey from 'shared/hoc/CardWithRangeKey';
+import BaseCard from 'shared/components/base-card';
 import React from 'react';
 import SearchTermsQuery from 'shared/queries/SearchTermsQuery';
 import URLConstants from 'shared/util/url-constants';
 import {compositionListColumns} from 'shared/util/table-columns';
 import {CompositionTypes} from 'shared/util/constants';
-import {Containers} from 'shared/components/download-report/DownloadPDFReport';
 import {
 	getMapResultToProps,
 	mapCardPropsToOptions
 } from './mappers/composition-query';
 import {graphql} from '@apollo/react-hoc';
+import {ReportContainer} from 'shared/components/download-report/DownloadPDFReport';
 import {useParams} from 'react-router-dom';
 import {withTableData} from 'shared/hoc';
 
@@ -61,11 +61,11 @@ const SearchTermsCard = props => {
 	const {channelId, id} = useParams();
 
 	return (
-		<CardWithRangeKey
+		<BaseCard
 			className='search-terms-card-root'
-			id={Containers.SearchTermsCard}
 			label={Liferay.Language.get('search-terms')}
 			legacyDropdownRangeKey={false}
+			reportContainer={ReportContainer.SearchTermsCard}
 		>
 			{({rangeSelectors}) => (
 				<TableWithData
@@ -76,7 +76,7 @@ const SearchTermsCard = props => {
 					rowBordered={false}
 				/>
 			)}
-		</CardWithRangeKey>
+		</BaseCard>
 	);
 };
 

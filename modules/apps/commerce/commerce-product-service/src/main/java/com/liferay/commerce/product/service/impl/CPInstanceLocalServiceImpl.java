@@ -11,6 +11,7 @@ import com.liferay.commerce.product.exception.CPInstanceDeliverySubscriptionLeng
 import com.liferay.commerce.product.exception.CPInstanceDisplayDateException;
 import com.liferay.commerce.product.exception.CPInstanceExpirationDateException;
 import com.liferay.commerce.product.exception.CPInstanceMaxPriceValueException;
+import com.liferay.commerce.product.exception.CPInstanceMinPriceValueException;
 import com.liferay.commerce.product.exception.CPInstanceReplacementCPInstanceUuidException;
 import com.liferay.commerce.product.exception.CPInstanceSkuException;
 import com.liferay.commerce.product.exception.DuplicateCPInstanceException;
@@ -1224,6 +1225,15 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 			(promoPrice.compareTo(maxValue) > 0)) {
 
 			throw new CPInstanceMaxPriceValueException();
+		}
+
+		BigDecimal minValue = BigDecimal.valueOf(
+			GetterUtil.getDouble(CommercePriceConstants.PRICE_VALUE_MIN));
+
+		if ((cost.compareTo(minValue) < 0) || (price.compareTo(minValue) < 0) ||
+			(promoPrice.compareTo(minValue) < 0)) {
+
+			throw new CPInstanceMinPriceValueException();
 		}
 
 		CPInstance cpInstance = cpInstancePersistence.findByPrimaryKey(

@@ -1,13 +1,8 @@
 import AttributeConjunctionInput from './components/attribute-conjunction-input';
 import DateFilterConjunctionInput from './components/DateFilterConjunctionInput';
-import EventAttributeDefinitionsQuery, {
-	EventAttributeDefinitionsData,
-	EventAttributeDefinitionsVariables
-} from 'event-analysis/queries/EventAttributeDefinitionsQuery';
 import Form from 'shared/components/form';
 import OccurenceConjunctionInput from './components/OccurenceConjunctionInput';
 import React, {useEffect} from 'react';
-import {AttributeTypes} from 'event-analysis/utils/types';
 import {Criterion, ISegmentEditorCustomInputBase} from '../utils/types';
 import {CustomValue} from 'shared/util/records';
 import {fromJS, Map} from 'immutable';
@@ -16,11 +11,8 @@ import {
 	getFilterCriterionIMap,
 	getIndexFromPropertyName
 } from '../utils/custom-inputs';
-import {isBoolean, isNil} from 'lodash';
-import {NAME} from 'shared/util/pagination';
-import {OrderByDirections} from 'shared/util/constants';
+import {isBoolean, isNil, isNull} from 'lodash';
 import {SafeResults} from 'shared/hoc/util';
-import {useQuery} from '@apollo/react-hooks';
 
 type Touched = {
 	attribute: boolean;
@@ -46,7 +38,7 @@ const EventInput: React.FC<IEventInputProps> = ({
 	id,
 	onChange,
 	operatorRenderer: OperatorDropdown,
-	property: {entityName, id: eventDefinitionId, type},
+	property: {entityName, options, type},
 	touched,
 	valid,
 	value: valueIMap
@@ -71,22 +63,14 @@ const EventInput: React.FC<IEventInputProps> = ({
 		}
 	}, [valid]);
 
-	const result = useQuery<
-		EventAttributeDefinitionsData,
-		EventAttributeDefinitionsVariables
-	>(EventAttributeDefinitionsQuery, {
-		variables: {
-			eventDefinitionId,
-			keyword: '',
-			page: 0,
-			size: 25,
-			sort: {
-				column: NAME,
-				type: OrderByDirections.Ascending
-			},
-			type: AttributeTypes.Global
-		}
-	});
+	// TODO: useEffect below is temporary. Remove it when LPD-23023 is merged and before sending LPD-23024.
+
+	useEffect(() => {
+		onChange({
+			touched: {attribute: true, attributeValue: true},
+			valid: {attribute: true, attributeValue: true}
+		});
+	}, []);
 
 	const getConjunctionDateFilterIMap = value => {
 		const conjunctionDateFilterIndex = getIndexFromPropertyName(
@@ -117,11 +101,11 @@ const EventInput: React.FC<IEventInputProps> = ({
 	const handleDateFilterConjunctionChange = criterion => {
 		onChange({
 			touched: {...touched, dateFilter: criterion && criterion.touched},
-			valid: {...valid, dateFilter: isNil(criterion) || criterion.valid},
-			value: isNil(criterion)
-				? valueIMap.deleteIn(['criterionGroup', 'items', 2])
+			valid: {...valid, dateFilter: isNull(criterion) || criterion.valid},
+			value: isNull(criterion)
+				? valueIMap.deleteIn(['criterionGroup', 'items', 1])
 				: valueIMap.mergeIn(
-						['criterionGroup', 'items', 2],
+						['criterionGroup', 'items', 1],
 						fromJS(criterion)
 				  )
 		});
@@ -180,9 +164,22 @@ const EventInput: React.FC<IEventInputProps> = ({
 		getConjunctionDateFilterIMap(valueIMap) || Map({propertyName: 'day'})
 	).toJS();
 
+	if (
+		options.length &&
+		options.some(option => option.label === 'hidden' && option.value)
+	) {
+		return (
+			<div className='criteria-statement'>
+				<b className='non-existent-property-message'>
+					{Liferay.Language.get('custom-event-no-longer-exists')}
+				</b>
+			</div>
+		);
+	}
+
 	return (
 		<div className='criteria-statement'>
-			<SafeResults {...result} page={false} pageDisplay={false}>
+			<SafeResults page={false} pageDisplay={false}>
 				{data => {
 					const attributes =
 						data?.eventAttributeDefinitions
@@ -191,6 +188,14 @@ const EventInput: React.FC<IEventInputProps> = ({
 					return (
 						<>
 							<Form.Group autoFit>
+								<Form.GroupItem
+									className='font-weight-semibold text-secondary'
+									label
+									shrink
+								>
+									{Liferay.Language.get('individual')}
+								</Form.GroupItem>
+
 								<OperatorDropdown />
 
 								<Form.GroupItem
@@ -230,32 +235,39 @@ const EventInput: React.FC<IEventInputProps> = ({
 								/>
 							</Form.Group>
 
-							<Form.Group autoFit>
-								<Form.GroupItem
-									className='conjunction'
-									label
-									shrink
-								>
-									{Liferay.Language.get('where-fragment')}
-								</Form.GroupItem>
+							{/* TODO: !type below is temporary. Remove it when LPD-23023 is merged and before sending LPD-23024. */}
 
-								<AttributeConjunctionInput
-									attributes={attributes}
-									conjunctionCriterion={getFilterCriterionIMap(
-										valueIMap,
-										1
-									).toJS()}
-									onChange={handleAttributeConjunctionChange}
-									touched={{
-										attribute: touched.attribute,
-										attributeValue: touched.attributeValue
-									}}
-									valid={{
-										attribute: valid.attribute,
-										attributeValue: valid.attributeValue
-									}}
-								/>
-							</Form.Group>
+							{!type && (
+								<Form.Group autoFit>
+									<Form.GroupItem
+										className='conjunction'
+										label
+										shrink
+									>
+										{Liferay.Language.get('where-fragment')}
+									</Form.GroupItem>
+
+									<AttributeConjunctionInput
+										attributes={attributes}
+										conjunctionCriterion={getFilterCriterionIMap(
+											valueIMap,
+											1
+										).toJS()}
+										onChange={
+											handleAttributeConjunctionChange
+										}
+										touched={{
+											attribute: touched.attribute,
+											attributeValue:
+												touched.attributeValue
+										}}
+										valid={{
+											attribute: valid.attribute,
+											attributeValue: valid.attributeValue
+										}}
+									/>
+								</Form.Group>
+							)}
 						</>
 					);
 				}}

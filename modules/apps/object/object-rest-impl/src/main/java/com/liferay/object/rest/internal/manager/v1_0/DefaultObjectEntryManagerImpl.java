@@ -392,6 +392,22 @@ public class DefaultObjectEntryManagerImpl
 			}
 		}
 
+		String[] selectedObjectFieldNames = null;
+
+		UriInfo uriInfo = dtoConverterContext.getUriInfo();
+
+		if (uriInfo != null) {
+			MultivaluedMap<String, String> queryParameters =
+				uriInfo.getQueryParameters();
+
+			String fields = queryParameters.getFirst("fields");
+
+			if (fields != null) {
+				selectedObjectFieldNames = StringUtil.split(
+					fields, StringPool.COMMA);
+			}
+		}
+
 		return Page.of(
 			HashMapBuilder.put(
 				"create",
@@ -439,8 +455,9 @@ public class DefaultObjectEntryManagerImpl
 			TransformUtil.transform(
 				objectEntryLocalService.getValuesList(
 					groupId, companyId, dtoConverterContext.getUserId(),
-					objectDefinition.getObjectDefinitionId(), predicate, search,
-					start, end, sorts),
+					objectDefinition.getObjectDefinitionId(),
+					selectedObjectFieldNames, predicate, search, start, end,
+					sorts),
 				values -> _getObjectEntry(
 					dtoConverterContext, objectDefinition, values)),
 			pagination,
@@ -728,20 +745,20 @@ public class DefaultObjectEntryManagerImpl
 			dtoConverterContext, objectDefinition, objectEntryId);
 
 		if (objectEntry.getDateCreated() != null) {
-			existingObjectEntry.setDateCreated(objectEntry.getDateCreated());
+			existingObjectEntry.setDateCreated(objectEntry::getDateCreated);
 		}
 
 		if (objectEntry.getDateModified() != null) {
-			existingObjectEntry.setDateModified(objectEntry.getDateModified());
+			existingObjectEntry.setDateModified(objectEntry::getDateModified);
 		}
 
 		if (objectEntry.getExternalReferenceCode() != null) {
 			existingObjectEntry.setExternalReferenceCode(
-				objectEntry.getExternalReferenceCode());
+				objectEntry::getExternalReferenceCode);
 		}
 
 		if (objectEntry.getKeywords() != null) {
-			existingObjectEntry.setKeywords(objectEntry.getKeywords());
+			existingObjectEntry.setKeywords(objectEntry::getKeywords);
 		}
 
 		if (objectEntry.getProperties() != null) {
@@ -750,16 +767,16 @@ public class DefaultObjectEntryManagerImpl
 
 			properties.putAll(objectEntry.getProperties());
 
-			existingObjectEntry.setProperties(properties);
+			existingObjectEntry.setProperties(() -> properties);
 		}
 
 		if (objectEntry.getStatus() != null) {
-			existingObjectEntry.setStatus(objectEntry.getStatus());
+			existingObjectEntry.setStatus(objectEntry::getStatus);
 		}
 
 		if (objectEntry.getTaxonomyCategoryIds() != null) {
 			existingObjectEntry.setTaxonomyCategoryIds(
-				objectEntry.getTaxonomyCategoryIds());
+				objectEntry::getTaxonomyCategoryIds);
 		}
 
 		return updateObjectEntry(
@@ -1420,8 +1437,8 @@ public class DefaultObjectEntryManagerImpl
 				objectField.getObjectFieldId(), serviceContext);
 		}
 
-		fileEntry.setFileBase64((String)null);
-		fileEntry.setId(serviceBuilderFileEntry.getFileEntryId());
+		fileEntry.setFileBase64(() -> (String)null);
+		fileEntry.setId(serviceBuilderFileEntry::getFileEntryId);
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
@@ -1581,6 +1598,23 @@ public class DefaultObjectEntryManagerImpl
 					serviceBuilderObjectEntry, dtoConverterContext.getUriInfo())
 			).build();
 
+			String methodName = null;
+
+			boolean scopeSite = Objects.equals(
+				objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+			if (scopeSite) {
+				methodName =
+					"putScopeScopeKeyByExternalReferenceCodeObjectAction" +
+						"ObjectActionName";
+			}
+			else {
+				methodName =
+					"putByExternalReferenceCodeObjectEntryExternal" +
+						"ReferenceCodeObjectActionObjectActionName";
+			}
+
 			for (ObjectAction objectAction :
 					_objectActionLocalService.getObjectActions(
 						objectDefinition.getObjectDefinitionId(),
@@ -1589,15 +1623,35 @@ public class DefaultObjectEntryManagerImpl
 				actions.put(
 					objectAction.getName(),
 					_addAction(
-						objectAction.getName(),
-						"putByExternalReferenceCodeObjectEntryExternal" +
-							"ReferenceCodeObjectActionObjectActionName",
+						objectAction.getName(), methodName,
 						serviceBuilderObjectEntry,
 						HashMapBuilder.put(
-							"objectActionName", objectAction.getName()
+							() -> {
+								if (scopeSite) {
+									return "scopeKey";
+								}
+
+								return null;
+							},
+							() -> {
+								if (scopeSite) {
+									return String.valueOf(
+										serviceBuilderObjectEntry.getGroupId());
+								}
+
+								return null;
+							}
 						).put(
-							"objectEntryExternalReferenceCode",
+							() -> {
+								if (scopeSite) {
+									return "externalReferenceCode";
+								}
+
+								return "objectEntryExternalReferenceCode";
+							},
 							serviceBuilderObjectEntry.getExternalReferenceCode()
+						).put(
+							"objectActionName", objectAction.getName()
 						).build(),
 						dtoConverterContext.getUriInfo()));
 			}

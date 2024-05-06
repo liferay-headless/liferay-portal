@@ -8,6 +8,7 @@ import {useEffect, useState} from 'react';
 import {Filters} from '../../../common/utils/constants/filters';
 import getSearchFilterTerm from '../../../common/utils/getSearchFilterTerm';
 import {INITIAL_FILTER} from '../utils/constants/initialFilter';
+import getDateSubmittedFilterTerm from '../utils/getDateSubmittedFilterTerm';
 
 export default function useFilters(submittedDealsFilter?: boolean) {
 	const [filters, setFilters] = useState(
@@ -32,6 +33,7 @@ export default function useFilters(submittedDealsFilter?: boolean) {
 	);
 
 	useEffect(() => {
+		let hasFilter = false;
 		let initialFilter = '';
 
 		if (dealsInitialFilter) {
@@ -46,8 +48,27 @@ export default function useFilters(submittedDealsFilter?: boolean) {
 				: getSearchFilterTerm(filters.searchTerm);
 		}
 
+		if (
+			filters.dataSubmitted?.dates.endDate ||
+			filters.dataSubmitted?.dates.startDate
+		) {
+			hasFilter = true;
+			initialFilter = getDateSubmittedFilterTerm(
+				initialFilter,
+				filters.dataSubmitted
+			);
+		}
+		onFilter({
+			hasValue: hasFilter,
+		});
+
 		setFilterTerm(initialFilter);
-	}, [dealsInitialFilter, filters.searchTerm, setFilters]);
+	}, [
+		dealsInitialFilter,
+		filters.searchTerm,
+		setFilters,
+		filters.dataSubmitted,
+	]);
 
 	return {filters, filtersTerm, onFilter};
 }

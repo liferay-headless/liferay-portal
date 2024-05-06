@@ -47,6 +47,7 @@ boolean propertyVisibleWithUpdatePermission = GetterUtil.getBoolean(unicodePrope
 int propertyWidth = GetterUtil.getInteger(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_WIDTH));
 
 String propertyDisplayType = ParamUtil.getString(request, "displayType", ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_INPUT_FIELD);
+boolean readOnly = false;
 
 if (expandoColumn != null) {
 	propertyDisplayType = GetterUtil.getString(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE));
@@ -54,12 +55,14 @@ if (expandoColumn != null) {
 	if (Validator.isNull(propertyDisplayType)) {
 		propertyDisplayType = ExpandoColumnConstants.getDefaultDisplayTypeProperty(type, unicodeProperties);
 	}
+
+	readOnly = !ExpandoColumnPermissionUtil.contains(permissionChecker, expandoColumn, ActionKeys.UPDATE);
 }
 
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
-).setMVCPath(
-	"/view_attributes.jsp"
+).setMVCRenderCommandName(
+	"/expando/view_attributes"
 ).setRedirect(
 	redirect
 ).setParameter(
@@ -138,31 +141,43 @@ else {
 				<%= LanguageUtil.format(request, expandoColumn != null ? "edit-x" : "new-x", new Object[] {propertyDisplayType}) %>
 			</h2>
 
-			<aui:field-wrapper cssClass="form-group lfr-input-text-container">
-				<c:choose>
-					<c:when test="<%= expandoColumn != null %>">
-						<aui:input name="name" type="hidden" value="<%= expandoColumn.getName() %>" />
+			<liferay-frontend:fieldset
+				disabled="<%= readOnly %>"
+			>
+				<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+					<c:choose>
+						<c:when test="<%= expandoColumn != null %>">
+							<aui:input name="name" type="hidden" value="<%= expandoColumn.getName() %>" />
 
-						<aui:input label="field-name" name="key" type="resource" value="<%= expandoColumn.getName() %>" />
-					</c:when>
-					<c:otherwise>
-						<aui:input label="field-name" maxlength='<%= ModelHintsUtil.getMaxLength(ExpandoColumn.class.getName(), "name") %>' name="name" required="<%= true %>" />
-					</c:otherwise>
-				</c:choose>
+							<aui:input label="field-name" name="key" type="resource" value="<%= expandoColumn.getName() %>" />
+						</c:when>
+						<c:otherwise>
+							<aui:input label="field-name" maxlength='<%= ModelHintsUtil.getMaxLength(ExpandoColumn.class.getName(), "name") %>' name="name" required="<%= true %>" />
+						</c:otherwise>
+					</c:choose>
 
-				<div class="form-text">
-					<liferay-ui:message arguments="&lt;liferay-expando:custom-attribute /&gt;" key="custom-field-key-help" translateArguments="<%= false %>" />
-				</div>
-			</aui:field-wrapper>
+					<div class="form-text">
+						<liferay-ui:message arguments="&lt;liferay-expando:custom-attribute /&gt;" key="custom-field-key-help" translateArguments="<%= false %>" />
+					</div>
+				</aui:field-wrapper>
 
-			<%@ include file="/edit/default_value_input.jspf" %>
+				<%@ include file="/edit/default_value_input.jspf" %>
+			</liferay-frontend:fieldset>
 
-			<%@ include file="/edit/advanced_properties.jspf" %>
+			<liferay-frontend:fieldset
+				collapsed="<%= !readOnly %>"
+				collapsible="<%= !readOnly %>"
+				disabled="<%= readOnly %>"
+				label="advanced-properties"
+			>
+				<%@ include file="/edit/advanced_properties.jspf" %>
+			</liferay-frontend:fieldset>
 		</liferay-frontend:edit-form-body>
 
 		<liferay-frontend:edit-form-footer>
 			<liferay-frontend:edit-form-buttons
 				redirect="<%= redirect %>"
+				submitDisabled="<%= readOnly %>"
 			/>
 		</liferay-frontend:edit-form-footer>
 	</liferay-frontend:edit-form>

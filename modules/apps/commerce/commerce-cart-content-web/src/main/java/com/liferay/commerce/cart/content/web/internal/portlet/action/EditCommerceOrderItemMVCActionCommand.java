@@ -12,16 +12,14 @@ import com.liferay.commerce.exception.CommerceOrderValidatorException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
-
-import java.math.BigDecimal;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -63,21 +61,18 @@ public class EditCommerceOrderItemMVCActionCommand
 					commerceOrderItemId, commerceContext);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
-				BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
-					actionRequest, "quantity", BigDecimal.ZERO);
-
 				CommerceOrderItem commerceOrderItem =
 					_commerceOrderItemService.getCommerceOrderItem(
 						commerceOrderItemId);
 
-				ServiceContext serviceContext =
-					ServiceContextFactory.getInstance(
-						CommerceOrderItem.class.getName(), actionRequest);
-
 				_commerceOrderItemService.updateCommerceOrderItem(
 					commerceOrderItem.getCommerceOrderItemId(),
-					commerceOrderItem.getJson(), quantity, commerceContext,
-					serviceContext);
+					commerceOrderItem.getJson(),
+					_commerceOrderItemQuantityFormatter.parse(
+						actionRequest, "quantity"),
+					commerceContext,
+					ServiceContextFactory.getInstance(
+						CommerceOrderItem.class.getName(), actionRequest));
 			}
 		}
 		catch (CommerceOrderValidatorException
@@ -100,6 +95,10 @@ public class EditCommerceOrderItemMVCActionCommand
 			}
 		}
 	}
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;

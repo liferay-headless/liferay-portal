@@ -436,6 +436,41 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	}
 
 	@Override
+	public Layout fetchFirstLayout(
+		long groupId, boolean privateLayout, boolean published) {
+
+		// Eensure that virtual layouts are merged. See LPD-24277.
+
+		List<Layout> layouts = layoutLocalService.getLayouts(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			true, 0, 1);
+
+		if (layouts.isEmpty()) {
+			return null;
+		}
+
+		Layout layout = layouts.get(0);
+
+		boolean viewPermission = _hasViewPermission(layout);
+
+		if ((!published || layout.isPublished()) && viewPermission) {
+			return layout;
+		}
+
+		Layout firstLayout = _getFirstLayout(groupId, privateLayout, published);
+
+		if (firstLayout != null) {
+			return firstLayout;
+		}
+
+		if (viewPermission) {
+			return layout;
+		}
+
+		return null;
+	}
+
+	@Override
 	public Layout fetchLayout(
 			long groupId, boolean privateLayout, long layoutId)
 		throws PortalException {
@@ -545,8 +580,6 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			return LayoutConstants.DEFAULT_PLID;
 		}
 
-		PermissionChecker permissionChecker = getPermissionChecker();
-
 		String scopeGroupLayoutUuid = null;
 
 		Group scopeGroup = _groupLocalService.getGroup(scopeGroupId);
@@ -585,10 +618,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 				continue;
 			}
 
-			if (!LayoutPermissionUtil.contains(
-					permissionChecker, layout, ActionKeys.VIEW) ||
-				!layout.isTypePortlet()) {
-
+			if (!_hasViewPermission(layout) || !layout.isTypePortlet()) {
 				continue;
 			}
 
@@ -1602,15 +1632,11 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		}
 	}
 
-	protected List<Layout> filterLayouts(List<Layout> layouts)
-		throws PortalException {
-
+	protected List<Layout> filterLayouts(List<Layout> layouts) {
 		List<Layout> filteredLayouts = new ArrayList<>();
 
 		for (Layout layout : layouts) {
-			if (LayoutPermissionUtil.contains(
-					getPermissionChecker(), layout, ActionKeys.VIEW)) {
-
+			if (_hasViewPermission(layout)) {
 				filteredLayouts.add(layout);
 			}
 		}
@@ -1649,6 +1675,57 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			(LayoutTypePortlet)clonedLayout.getLayoutType();
 
 		return layoutTypePortlet.getPortletIds();
+	}
+
+	private Layout _getFirstLayout(
+		long groupId, boolean privateLayout, boolean published) {
+
+		boolean hasNext = true;
+
+		int start = 1;
+		int end = 0;
+		int interval = 5;
+
+		while (hasNext) {
+			end = start + interval;
+
+			List<Layout> layouts = layoutLocalService.getLayouts(
+				groupId, privateLayout,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, true, start, end);
+
+			for (Layout layout : layouts) {
+				if ((!published || layout.isPublished()) &&
+					_hasViewPermission(layout)) {
+
+					return layout;
+				}
+			}
+
+			start = start + interval;
+
+			if (layouts.size() < interval) {
+				hasNext = false;
+			}
+		}
+
+		return null;
+	}
+
+	private boolean _hasViewPermission(Layout layout) {
+		try {
+			if (LayoutPermissionUtil.contains(
+					getPermissionChecker(), layout, ActionKeys.VIEW)) {
+
+				return true;
+			}
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

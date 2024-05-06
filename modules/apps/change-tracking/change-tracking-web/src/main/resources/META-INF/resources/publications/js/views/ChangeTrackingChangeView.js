@@ -400,6 +400,7 @@ export default function ChangeTrackingChangeView({
 								handleNavigation={(nodeId) => navigate(nodeId)}
 								initialDataURL={getDataURL(initialNode)}
 								moveChangesURL={getMoveChangesURL(initialNode)}
+								namespace={namespace}
 								parentEntries={initialNode.parents}
 								showDropdown={initialNode.modelClassNameId}
 								showWorkflow={initialNode.showWorkflow}
@@ -414,7 +415,7 @@ export default function ChangeTrackingChangeView({
 									description={Liferay.Language.get(
 										'no-changes-were-found'
 									)}
-									imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
+									imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.svg`}
 									title={Liferay.Language.get(
 										'no-results-found'
 									)}

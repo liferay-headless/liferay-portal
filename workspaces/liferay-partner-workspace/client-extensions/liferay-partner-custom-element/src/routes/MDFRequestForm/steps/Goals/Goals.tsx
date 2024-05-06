@@ -13,6 +13,7 @@ import PRMFormik from '../../../../common/components/PRMFormik';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
 import {LiferayPicklistName} from '../../../../common/enums/liferayPicklistName';
 import useCompanyOptions from '../../../../common/hooks/useCompanyOptions';
+import useSetTouchedOnForms from '../../../../common/hooks/useSetTouchedOnForms';
 import MDFRequest from '../../../../common/interfaces/mdfRequest';
 import getPicklistOptions from '../../../../common/utils/getPicklistOptions';
 import isObjectEmpty from '../../../../common/utils/isObjectEmpty';
@@ -27,7 +28,6 @@ const Goals = ({
 	onSaveAsDraft,
 }: PRMFormikPageProps & MDFRequestStepProps) => {
 	const {
-		errors,
 		isSubmitting,
 		isValid,
 		setFieldValue,
@@ -38,6 +38,8 @@ const Goals = ({
 	const {companiesEntries, fieldEntries} = useDynamicFieldEntries(
 		disableCompany
 	);
+
+	const errors = formikHelpers.errors;
 
 	const {companyOptions, onCompanySelected} = useCompanyOptions(
 		useCallback(
@@ -83,6 +85,31 @@ const Goals = ({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [values.liferayBusinessSalesGoals]);
+
+	const {isButtonClicked, setIsButtonClicked} = useSetTouchedOnForms(
+		useCallback(() => Boolean(values.id), [values.id]),
+		formikHelpers
+	);
+
+	const handleOnClick = () => {
+		setIsButtonClicked(true);
+
+		window.scrollTo({
+			behavior: (!isValid ? 'instant' : 'smooth') as ScrollBehavior,
+			top: 0,
+		});
+
+		onContinue?.(formikHelpers, StepType.ACTIVITIES);
+	};
+
+	const hasError = !isValid && !isObjectEmpty(goalsErrors);
+
+	const isEditForm = Boolean(values.id);
+
+	const isDisabledContinueButton =
+		(hasError && (isButtonClicked || isEditForm)) ||
+		isSubmitting ||
+		submitted;
 
 	const getRequestPage = () => {
 		if (!fieldEntries) {
@@ -205,14 +232,8 @@ const Goals = ({
 
 						<Button
 							className="inline-item inline-item-after"
-							disabled={
-								(!isValid && !isObjectEmpty(goalsErrors)) ||
-								isSubmitting ||
-								submitted
-							}
-							onClick={() =>
-								onContinue?.(formikHelpers, StepType.ACTIVITIES)
-							}
+							disabled={isDisabledContinueButton}
+							onClick={() => handleOnClick()}
 						>
 							Continue
 							{isSubmitting && (

@@ -443,7 +443,8 @@ public class Main {
 							structuredContent.getFriendlyUrlPath());
 
 					structuredContent.setPermissions(
-						_getPermissions(fileName, structuredContent.getId()));
+						() -> _getPermissions(
+							fileName, structuredContent.getId()));
 
 					importedStructuredContent =
 						_structuredContentResource.
@@ -547,6 +548,10 @@ public class Main {
 	private JSONArray _getBreadcrumbJSONArray(File file) throws Exception {
 		JSONArray breadcrumbJSONArray = new JSONArray();
 
+		if (file == null) {
+			return breadcrumbJSONArray;
+		}
+
 		File parentMarkdownFile = null;
 
 		while ((parentMarkdownFile = _getParentMarkdownFile(file)) != null) {
@@ -561,6 +566,10 @@ public class Main {
 
 	private JSONArray _getChildrenJSONArray(File file) throws Exception {
 		JSONArray childrenJSONArray = new JSONArray();
+
+		if (file == null) {
+			return childrenJSONArray;
+		}
 
 		SnakeYamlFrontMatterVisitor snakeYamlFrontMatterVisitor =
 			new SnakeYamlFrontMatterVisitor();
@@ -731,6 +740,10 @@ public class Main {
 		throws Exception {
 
 		JSONObject navigationItemJSONObject = new JSONObject();
+
+		if (file == null) {
+			return navigationItemJSONObject;
+		}
 
 		navigationItemJSONObject.put(
 			"title",
@@ -1055,6 +1068,24 @@ public class Main {
 
 		List<Long> taxonomyCategoryIds = new ArrayList<>();
 
+		try {
+			TaxonomyVocabulary taxonomyVocabulary =
+				_taxonomyVocabularyResource.
+					getSiteTaxonomyVocabularyByExternalReferenceCode(
+						_liferaySiteId, "RESOURCE_TYPE");
+
+			TaxonomyCategory taxonomyCategory =
+				_taxonomyCategoryResource.
+					getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+						taxonomyVocabulary.getId(), "OFFICIAL_DOCUMENTATION");
+
+			taxonomyCategoryIds.add(
+				GetterUtil.getLong(taxonomyCategory.getId()));
+		}
+		catch (Exception exception) {
+			_error(exception.getMessage());
+		}
+
 		for (Object taxonomyCategoryNameObject :
 				(ArrayList)taxonomyCategoryNames) {
 
@@ -1221,6 +1252,29 @@ public class Main {
 		).build();
 	}
 
+	private boolean _isShowChildrenCards(File file) throws Exception {
+		SnakeYamlFrontMatterVisitor snakeYamlFrontMatterVisitor =
+			new SnakeYamlFrontMatterVisitor();
+
+		snakeYamlFrontMatterVisitor.visit(
+			_parser.parse(
+				FileUtils.readFileToString(file, StandardCharsets.UTF_8)));
+
+		Map<String, Object> data = snakeYamlFrontMatterVisitor.getData();
+
+		if ((data == null) || !data.containsKey("show-children-cards") ||
+			!StringUtil.equals(
+				data.get(
+					"show-children-cards"
+				).toString(),
+				"false")) {
+
+			return true;
+		}
+
+		return GetterUtil.getBoolean(data.get("show-children-cards"));
+	}
+
 	private void _loadTaxonomyCategories(
 			Map<String, String> existingTaxonomyCategories,
 			JSONObject jsonObject, String parentTaxonomyCategoryId,
@@ -1241,8 +1295,9 @@ public class Main {
 			if (!existingTaxonomyCategories.containsKey(name)) {
 				TaxonomyCategory taxonomyCategory = new TaxonomyCategory();
 
-				taxonomyCategory.setName(name);
-				taxonomyCategory.setTaxonomyVocabularyId(taxonomyVocabularyId);
+				taxonomyCategory.setName(() -> name);
+				taxonomyCategory.setTaxonomyVocabularyId(
+					() -> taxonomyVocabularyId);
 
 				if (parentTaxonomyCategoryId != null) {
 					taxonomyCategory =
@@ -1336,7 +1391,7 @@ public class Main {
 				TaxonomyVocabulary taxonomyVocabulary =
 					new TaxonomyVocabulary();
 
-				taxonomyVocabulary.setName(name);
+				taxonomyVocabulary.setName(() -> name);
 
 				taxonomyVocabulary =
 					_taxonomyVocabularyResource.postSiteTaxonomyVocabulary(
@@ -1407,6 +1462,14 @@ public class Main {
 							_getNavigationJSONObject(englishFile)));
 				}
 			};
+		ContentFieldValue englishShowChildrenCardsContentFieldValue =
+			new ContentFieldValue() {
+				{
+					setData(
+						() -> String.valueOf(
+							_isShowChildrenCards(englishFile)));
+				}
+			};
 		String englishTitle = _getTitle(englishText);
 
 		File japaneseFile = new File(
@@ -1417,7 +1480,7 @@ public class Main {
 				japaneseFile, StandardCharsets.UTF_8);
 
 			structuredContent.setContentFields(
-				new ContentField[] {
+				() -> new ContentField[] {
 					new ContentField() {
 						{
 							setContentFieldValue(
@@ -1477,23 +1540,46 @@ public class Main {
 								).build());
 							setName(() -> "navigation");
 						}
+					},
+					new ContentField() {
+						{
+							setContentFieldValue(
+								() ->
+									englishShowChildrenCardsContentFieldValue);
+							setContentFieldValue_i18n(
+								() -> HashMapBuilder.put(
+									"en-US",
+									englishShowChildrenCardsContentFieldValue
+								).put(
+									"ja-JP",
+									new ContentFieldValue() {
+										{
+											setData(
+												() -> String.valueOf(
+													_isShowChildrenCards(
+														japaneseFile)));
+										}
+									}
+								).build());
+							setName(() -> "showChildrenCards");
+						}
 					}
 				});
 			structuredContent.setDescription_i18n(
-				HashMapBuilder.put(
+				() -> HashMapBuilder.put(
 					"en-US", _getDescription(englishText)
 				).put(
 					"ja-JP", _getDescription(japaneseText)
 				).build());
 
 			structuredContent.setFriendlyUrlPath_i18n(
-				HashMapBuilder.put(
+				() -> HashMapBuilder.put(
 					"en-US", _toFriendlyURLPath(englishFile)
 				).put(
 					"ja-JP", _toFriendlyURLPath(japaneseFile)
 				).build());
 			structuredContent.setTitle_i18n(
-				HashMapBuilder.put(
+				() -> HashMapBuilder.put(
 					"en-US", englishTitle
 				).put(
 					"ja-JP", _getTitle(japaneseText)
@@ -1501,7 +1587,7 @@ public class Main {
 		}
 		else {
 			structuredContent.setContentFields(
-				new ContentField[] {
+				() -> new ContentField[] {
 					new ContentField() {
 						{
 							setContentFieldValue(
@@ -1524,23 +1610,26 @@ public class Main {
 						}
 					}
 				});
-			structuredContent.setDescription(_getDescription(englishText));
+			structuredContent.setDescription(
+				() -> _getDescription(englishText));
 		}
 
-		structuredContent.setContentStructureId(_liferayContentStructureId);
-		structuredContent.setExternalReferenceCode(_getUuid(englishText));
-		structuredContent.setFriendlyUrlPath(_toFriendlyURLPath(englishFile));
+		structuredContent.setContentStructureId(
+			() -> _liferayContentStructureId);
+		structuredContent.setExternalReferenceCode(() -> _getUuid(englishText));
+		structuredContent.setFriendlyUrlPath(
+			() -> _toFriendlyURLPath(englishFile));
 		structuredContent.setTaxonomyCategoryIds(
-			_getTaxonomyCategoryIds(englishText));
+			() -> _getTaxonomyCategoryIds(englishText));
 
 		if (!_offline) {
 			structuredContent.setStructuredContentFolderId(
-				_getStructuredContentFolderId(
+				() -> _getStructuredContentFolderId(
 					FilenameUtils.getPathNoEndSeparator(
 						fileName.substring(_docsDirName.length()))));
 		}
 
-		structuredContent.setTitle(englishTitle);
+		structuredContent.setTitle(() -> englishTitle);
 
 		return structuredContent;
 	}

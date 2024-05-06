@@ -16,6 +16,7 @@ import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -96,23 +96,18 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 					httpServletRequest);
 			}
 
-			BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
-				actionRequest, "quantity", BigDecimal.ZERO);
-			String unitOfMeasureKey = ParamUtil.getString(
-				actionRequest, "unitOfMeasureKey");
-
-			CommerceContext commerceContext =
-				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT);
-
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				CommerceOrderItem.class.getName(), httpServletRequest);
-
 			CommerceOrderItem commerceOrderItem =
 				_commerceOrderItemService.addOrUpdateCommerceOrderItem(
 					commerceOrder.getCommerceOrderId(), cpInstanceId,
-					formFieldValues, quantity, 0, BigDecimal.ZERO,
-					unitOfMeasureKey, commerceContext, serviceContext);
+					formFieldValues,
+					_commerceOrderItemQuantityFormatter.parse(
+						actionRequest, "quantity"),
+					0, BigDecimal.ZERO,
+					ParamUtil.getString(actionRequest, "unitOfMeasureKey"),
+					(CommerceContext)httpServletRequest.getAttribute(
+						CommerceWebKeys.COMMERCE_CONTEXT),
+					ServiceContextFactory.getInstance(
+						CommerceOrderItem.class.getName(), httpServletRequest));
 
 			jsonObject.put(
 				"commerceOrderItemId",
@@ -192,6 +187,10 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
+
+	@Reference
+	private CommerceOrderItemQuantityFormatter
+		_commerceOrderItemQuantityFormatter;
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;

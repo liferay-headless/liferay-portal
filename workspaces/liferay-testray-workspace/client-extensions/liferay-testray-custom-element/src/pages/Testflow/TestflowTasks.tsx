@@ -38,6 +38,7 @@ import {
 import {testraySubTaskImpl} from '~/services/rest/TestraySubtask';
 import {StatusesProgressScore, chartClassNames} from '~/util/constants';
 import {getTimeFromNow} from '~/util/date';
+import {getTruncateText} from '~/util/getTruncateText';
 import {SubTaskStatuses} from '~/util/statuses';
 
 import SubtaskCompleteModal from './Subtask/SubtaskCompleteModal';
@@ -341,7 +342,11 @@ const TestFlowTasks = () => {
 							},
 							{
 								key: 'errors',
-								render: (value) => <Code>{value}</Code>,
+								render: (value) => (
+									<Code title={value as string}>
+										{getTruncateText(value)}
+									</Code>
+								),
 								size: 'xl',
 								value: i18n.translate('errors'),
 							},

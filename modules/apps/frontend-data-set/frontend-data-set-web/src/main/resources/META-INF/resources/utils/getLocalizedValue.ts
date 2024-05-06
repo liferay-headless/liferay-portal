@@ -4,9 +4,12 @@
  */
 
 import {
+	FDS_ARRAY_FIELD_NAME_DELIMITER,
+	FDS_ARRAY_FIELD_NAME_PARENT_SUFFIX,
 	FDS_NESTED_FIELD_NAME_DELIMITER,
 	FDS_NESTED_FIELD_NAME_PARENT_SUFFIX,
 } from '../constants';
+import {getItemField} from './getItemField';
 export interface ILocalizedItemDetails {
 	rootPropertyName: string;
 	value: string;
@@ -35,46 +38,54 @@ function getLanguageKey(data: any): string {
 	return languageKey;
 }
 
-function resolveField(path: string | Array<string>, item: any) {
+function getFieldName(
+	fieldname: string | Array<string>
+): string | Array<string> {
 	if (
-		Array.isArray(path) ||
-		!path.includes(FDS_NESTED_FIELD_NAME_DELIMITER)
+		Array.isArray(fieldname) ||
+		!!(
+			!fieldname.includes(FDS_ARRAY_FIELD_NAME_DELIMITER) &&
+			!fieldname.includes(FDS_NESTED_FIELD_NAME_DELIMITER)
+		)
 	) {
-		const rootPropertyName = typeof path === 'string' ? path : path[0];
-
-		return {resolvedFieldname: path, resolvedItem: item, rootPropertyName};
+		return fieldname;
 	}
+	else {
+		const itemPath = fieldname
+			.replace(/\[\]/g, '.')
+			.split(FDS_NESTED_FIELD_NAME_DELIMITER);
 
-	const itemPath = path.split(FDS_NESTED_FIELD_NAME_DELIMITER);
+		if (
+			fieldname.includes(FDS_ARRAY_FIELD_NAME_PARENT_SUFFIX) ||
+			fieldname.includes(FDS_NESTED_FIELD_NAME_PARENT_SUFFIX)
+		) {
+			itemPath.pop();
+		}
 
-	if (path.includes(FDS_NESTED_FIELD_NAME_PARENT_SUFFIX)) {
-		itemPath.pop();
+		return itemPath[itemPath.length - 1];
 	}
+}
 
-	return {
-		resolvedFieldname: itemPath[itemPath.length - 1],
-		resolvedItem:
-			itemPath.length > 1
-				? itemPath
-						.slice(0, -1)
-						.reduce((prev, curr) => prev?.[curr], item) || {}
-				: item,
-		rootPropertyName: itemPath[0],
-	};
+function getRootPropertyName(fieldname: string | Array<string>): string {
+	return Array.isArray(fieldname)
+		? fieldname[0]
+		: fieldname
+				.replace(/\[\]/g, '.')
+				.split(FDS_NESTED_FIELD_NAME_DELIMITER)[0];
 }
 
 export function getLocalizedValue(
 	item: any,
-	fieldName: string | Array<string>
+	fieldname: string | Array<string>
 ): ILocalizedItemDetails | null {
-	if (!fieldName) {
+	if (!fieldname) {
 		return null;
 	}
 
-	const {resolvedFieldname, resolvedItem, rootPropertyName} = resolveField(
-		fieldName,
-		item
-	);
+	const resolvedFieldname = getFieldName(fieldname);
+	const resolvedItem: any =
+		typeof fieldname === 'string' ? getItemField(fieldname, item) : item;
+	const rootPropertyName = getRootPropertyName(fieldname);
 
 	const i18nFieldName = `${resolvedFieldname}_i18n`;
 	let navigatedValue = resolvedItem;
@@ -133,10 +144,17 @@ export function getLocalizedValue(
 	}
 	else {
 		valuePath.push(resolvedFieldname);
-		navigatedValue = navigatedValue[resolvedFieldname];
+		if (Array.isArray(navigatedValue)) {
+			navigatedValue = navigatedValue.map(
+				(value) => getLocalizedValue(value, resolvedFieldname)?.value
+			);
+		}
+		else {
+			navigatedValue = navigatedValue[resolvedFieldname];
+		}
 	}
 
-	if (fieldName !== resolvedFieldname) {
+	if (fieldname !== resolvedFieldname) {
 		valuePath.unshift(rootPropertyName);
 	}
 

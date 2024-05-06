@@ -4,7 +4,9 @@
  */
 
 import Form from '..';
-import React, {memo, useMemo, useState} from 'react';
+import React, {memo, useEffect, useMemo, useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import useQueryParams from '~/hooks/useQueryParams';
 
 import {Operators} from '../../../core/SearchBuilder';
 import i18n from '../../../i18n';
@@ -14,6 +16,7 @@ type RenderedFieldOptions = string[] | {label: string; value: string}[];
 
 export type RendererFields = {
 	disabled?: boolean;
+	isCustomFilter?: boolean;
 	label: string;
 	name: string;
 	operator?: Operators;
@@ -21,6 +24,7 @@ export type RendererFields = {
 	options?: RenderedFieldOptions;
 	placeholder?: string;
 	removeQuoteMark?: boolean;
+	requestOperator?: string;
 	type:
 		| 'autocomplete'
 		| 'checkbox'
@@ -58,6 +62,19 @@ const Renderer: React.FC<RendererProps> = ({
 	onChange,
 }) => {
 	const [fieldDisabled, setFieldDisabled] = useState({});
+	const [searchParams] = useSearchParams();
+
+	const {filterInitialContext} = useQueryParams();
+
+	useEffect(() => {
+		if (searchParams.get('filter')) {
+			for (const key in form) {
+				if (filterInitialContext.filter[key] && form[key] === '') {
+					form[key] = filterInitialContext.filter[key];
+				}
+			}
+		}
+	}, [filterInitialContext.filter, form, searchParams]);
 
 	const fieldsMemoized = useMemo(() => fields, [fields]);
 

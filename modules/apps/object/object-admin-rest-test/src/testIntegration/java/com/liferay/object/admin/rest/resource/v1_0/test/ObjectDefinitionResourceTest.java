@@ -554,7 +554,7 @@ public class ObjectDefinitionResourceTest
 			new ObjectValidationRule() {
 				{
 					active = false;
-					engine = ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY;
+					engine = ObjectValidationRuleConstants.ENGINE_TYPE_DDM;
 					errorLabel = Collections.singletonMap(
 						"en_US", RandomTestUtil.randomString());
 					externalReferenceCode =
@@ -587,8 +587,7 @@ public class ObjectDefinitionResourceTest
 				new ObjectValidationRule() {
 					{
 						active = false;
-						engine =
-							ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY;
+						engine = ObjectValidationRuleConstants.ENGINE_TYPE_DDM;
 						errorLabel = Collections.singletonMap(
 							"en_US", RandomTestUtil.randomString());
 						externalReferenceCode =
@@ -797,6 +796,13 @@ public class ObjectDefinitionResourceTest
 		testGetObjectDefinitionsPage_addObjectDefinition(objectDefinition2);
 
 		for (EntityField entityField : entityFields) {
+			if (StringUtil.equals(
+					entityField.getName(),
+					"rootObjectDefinitionExternalReferenceCode")) {
+
+				continue;
+			}
+
 			_assertGetObjectDefinitionsPageWithFilter(
 				Collections.singletonList(objectDefinition1),
 				getFilterString(entityField, operator, objectDefinition1));

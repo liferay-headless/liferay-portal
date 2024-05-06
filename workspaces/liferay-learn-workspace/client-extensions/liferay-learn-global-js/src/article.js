@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import DropdownProvider from './DropdownProvider';
+
 function initArticle() {
 
 	// Table of contents reading indicator
@@ -10,11 +12,10 @@ function initArticle() {
 	const headings = document.querySelectorAll('.learn-article-content h2');
 
 	let activeIndex;
+	const articleTOC = document.getElementById('articleTOC');
 	const targets = [];
 
-	if (headings) {
-		const articleTOC = document.getElementById('articleTOC');
-
+	if (headings && !!headings.length) {
 		if (articleTOC) {
 			articleTOC.innerHTML = '';
 		}
@@ -25,7 +26,7 @@ function initArticle() {
 			if (articleTOC) {
 				articleTOC.innerHTML += `
 				<li class="learn-article-nav-item">
-					<a href="#${id}" class=" liferay-nav-item" id="toc-${id}">
+					<a href="#${id}" id="toc-${id}">
 						${heading.innerText}
 					</a>
 				</li>`;
@@ -33,6 +34,9 @@ function initArticle() {
 
 			targets.push({id, isIntersecting: false});
 		});
+	}
+	else if (articleTOC) {
+		articleTOC.closest('.learn-article-page-nav').classList.add('hide');
 	}
 
 	const callback = (entries) => {
@@ -66,14 +70,14 @@ function initArticle() {
 			const node = document.getElementById(`toc-${target.id}`);
 
 			if (node) {
-				node.classList.remove('active');
+				node.classList.remove('selected');
 			}
 		});
 
 		const activeNode = document.getElementById(`toc-${id}`);
 
 		if (activeNode) {
-			activeNode.classList.add('active');
+			activeNode.classList.add('selected');
 		}
 	};
 
@@ -84,6 +88,13 @@ function initArticle() {
 			observer.observe(node);
 		}
 	});
+
+	new DropdownProvider(
+		'.learn-dropdown',
+		'.learn-dropdown-menu',
+		'show',
+		true
+	);
 }
 
 document.addEventListener('DOMContentLoaded', initArticle);

@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.ldap.configuration.BaseConfigurationProvider;
 import com.liferay.portal.security.ldap.configuration.ConfigurationProvider;
 import com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration;
@@ -23,8 +24,10 @@ import com.liferay.portal.security.ldap.constants.LDAPConstants;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
@@ -399,12 +402,44 @@ public class LDAPServerConfigurationProviderImpl
 				configuration = objectValuePair.getKey();
 			}
 
+			if (_isCustomMappingModified(
+					configuration, LDAPConstants.CONTACT_CUSTOM_MAPPINGS,
+					properties) ||
+				_isCustomMappingModified(
+					configuration, LDAPConstants.USER_CUSTOM_MAPPINGS,
+					properties)) {
+
+				properties.put(
+					LDAPConstants.MODIFIED_DATE, String.valueOf(new Date()));
+			}
+
 			configuration.update(properties);
 		}
 		catch (IOException ioException) {
 			throw new SystemException(
 				"Unable to update configuration", ioException);
 		}
+	}
+
+	private boolean _isCustomMappingModified(
+		Configuration configuration, String key,
+		Dictionary<String, Object> properties) {
+
+		if (Validator.isNull(configuration.getProperties())) {
+			return false;
+		}
+
+		Dictionary<String, Object> oldProperties =
+			configuration.getProperties();
+
+		if (Arrays.equals(
+				GetterUtil.getStringValues(oldProperties.get(key)),
+				GetterUtil.getStringValues(properties.get(key)))) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

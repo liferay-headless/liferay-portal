@@ -194,7 +194,7 @@ const useQueryParams = (customFilterFields?: CustomFilterFieldsProps) => {
 	};
 
 	useEffect(() => {
-		if (customFilterFields && serializedFilter) {
+		if (serializedFilter || customFilterFields?.key) {
 			getFilterWithOptions();
 		}
 	}, [customFilterFields, getFilterWithOptions, serializedFilter]);
@@ -211,7 +211,7 @@ const useQueryParams = (customFilterFields?: CustomFilterFieldsProps) => {
 					label: i18n.translate(filteredField.label),
 					name: filteredField.name,
 					value: Array.isArray(filterValueOptions)
-						? filterValueOptions.map(({label}) => label)
+						? filterValueOptions?.map(({label}) => label)
 						: filterValue,
 				};
 			}) || [],

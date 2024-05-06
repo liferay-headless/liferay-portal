@@ -6,6 +6,7 @@
 package com.liferay.commerce.shipping.engine.fixed.web.internal.portlet.action;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
+import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.CommerceShippingMethodService;
 import com.liferay.commerce.shipping.engine.fixed.exception.NoSuchShippingFixedOptionRelException;
@@ -99,7 +100,7 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 
 	private void _updateCommerceShippingFixedOptionRel(
 			ActionRequest actionRequest)
-		throws PortalException {
+		throws Exception {
 
 		long commerceShippingFixedOptionRelId = ParamUtil.getLong(
 			actionRequest, "commerceShippingFixedOptionRelId");
@@ -111,10 +112,10 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 		String zip = ParamUtil.getString(actionRequest, "zip");
 		double weightFrom = ParamUtil.getDouble(actionRequest, "weightFrom");
 		double weightTo = ParamUtil.getDouble(actionRequest, "weightTo");
-		BigDecimal fixedPrice = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "fixedPrice", BigDecimal.ZERO);
-		BigDecimal rateUnitWeightPrice = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "rateUnitWeightPrice", BigDecimal.ZERO);
+		BigDecimal fixedPrice = _commercePriceFormatter.parse(
+			actionRequest, "fixedPrice");
+		BigDecimal rateUnitWeightPrice = _commercePriceFormatter.parse(
+			actionRequest, "rateUnitWeightPrice");
 		double ratePercentage = ParamUtil.getDouble(
 			actionRequest, "ratePercentage");
 
@@ -129,8 +130,6 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 		else {
 			long commerceShippingMethodId = ParamUtil.getLong(
 				actionRequest, "commerceShippingMethodId");
-			long commerceShippingFixedOptionId = ParamUtil.getLong(
-				actionRequest, "commerceShippingFixedOptionId");
 
 			CommerceShippingMethod commerceShippingMethod =
 				_commerceShippingMethodService.getCommerceShippingMethod(
@@ -140,11 +139,16 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 				addCommerceShippingFixedOptionRel(
 					commerceShippingMethod.getGroupId(),
 					commerceShippingMethod.getCommerceShippingMethodId(),
-					commerceShippingFixedOptionId, commerceInventoryWarehouseId,
-					countryId, regionId, zip, weightFrom, weightTo, fixedPrice,
-					rateUnitWeightPrice, ratePercentage);
+					ParamUtil.getLong(
+						actionRequest, "commerceShippingFixedOptionId"),
+					commerceInventoryWarehouseId, countryId, regionId, zip,
+					weightFrom, weightTo, fixedPrice, rateUnitWeightPrice,
+					ratePercentage);
 		}
 	}
+
+	@Reference
+	private CommercePriceFormatter _commercePriceFormatter;
 
 	@Reference
 	private CommerceShippingFixedOptionRelService
