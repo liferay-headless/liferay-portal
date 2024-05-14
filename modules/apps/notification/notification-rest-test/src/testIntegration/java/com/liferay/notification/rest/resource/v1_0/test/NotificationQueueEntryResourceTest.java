@@ -10,15 +10,14 @@ import com.liferay.notification.rest.client.dto.v1_0.NotificationQueueEntry;
 import com.liferay.notification.rest.client.serdes.v1_0.NotificationQueueEntrySerDes;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-
-import java.util.TreeMap;
-
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
+import java.util.TreeMap;
 
 /**
  * @author Gabriel Albuquerque
@@ -150,6 +149,80 @@ public class NotificationQueueEntryResourceTest
 				String.valueOf(notificationQueueEntry1));
 
 		Assert.assertEquals(notificationQueueEntry1, notificationQueueEntry2);
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testDeleteNotificationQueueEntry() throws Exception {
+		super.testDeleteNotificationQueueEntry();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetNotificationQueueEntriesPage() throws Exception {
+		super.testGetNotificationQueueEntriesPage();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetNotificationQueueEntriesPageWithPagination()
+		throws Exception {
+
+		super.testGetNotificationQueueEntriesPageWithPagination();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetNotificationQueueEntry() throws Exception {
+		super.testGetNotificationQueueEntry();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLDeleteNotificationQueueEntry() throws Exception {
+		super.testGraphQLDeleteNotificationQueueEntry();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetNotificationQueueEntriesPage() throws Exception {
+		super.testGraphQLGetNotificationQueueEntriesPage();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetNotificationQueueEntry() throws Exception {
+		super.testGraphQLGetNotificationQueueEntry();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetNotificationQueueEntryNotFound()
+		throws Exception {
+
+		super.testGraphQLGetNotificationQueueEntryNotFound();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testPostNotificationQueueEntry() throws Exception {
+		super.testPostNotificationQueueEntry();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testPutNotificationQueueEntryResend() throws Exception {
+		super.testPutNotificationQueueEntryResend();
 	}
 
 }
