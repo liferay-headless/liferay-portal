@@ -359,6 +359,48 @@ public class NotificationQueueEntrySerDes {
 		}
 
 		@Override
+		protected boolean parseMaps(String jsonParserFieldName) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				return true;
+			}
+			else if (Objects.equals(jsonParserFieldName, "body")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "fromName")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "id")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "recipients")) {
+				return true;
+			}
+			else if (Objects.equals(jsonParserFieldName, "recipientsSummary")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "sentDate")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "status")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "subject")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "triggerBy")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "type")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "typeLabel")) {
+				return false;
+			}
+
+			return false;
+		}
+
+		@Override
 		protected void setField(
 			NotificationQueueEntry notificationQueueEntry,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
@@ -366,8 +408,7 @@ public class NotificationQueueEntrySerDes {
 			if (Objects.equals(jsonParserFieldName, "actions")) {
 				if (jsonParserFieldValue != null) {
 					notificationQueueEntry.setActions(
-						(Map)NotificationQueueEntrySerDes.toMap(
-							(String)jsonParserFieldValue));
+						(Map<String, Map<String, String>>)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "body")) {
@@ -468,7 +509,6 @@ public class NotificationQueueEntrySerDes {
 
 			Object value = entry.getValue();
 
-
 			sb.append(_toJSON(value));
 
 			if (iterator.hasNext()) {
@@ -482,17 +522,17 @@ public class NotificationQueueEntrySerDes {
 	}
 
 	private static String _toJSON(Object value) {
-
 		if (value instanceof Map) {
 			return _toJSON((Map)value);
 		}
-		else if (value.getClass().isArray()) {
+		else if (value.getClass(
+				).isArray()) {
+
 			StringBuilder sb = new StringBuilder("[");
 
 			Object[] values = (Object[])value;
 
 			for (int i = 0; i < values.length; i++) {
-
 				sb.append(_toJSON(values[i]));
 
 				if ((i + 1) < values.length) {
@@ -505,12 +545,11 @@ public class NotificationQueueEntrySerDes {
 			return sb.toString();
 		}
 		else if (value instanceof String) {
-			return ("\"") + _escape(value)
-			+ ("\"");
+			return "\"" + _escape(value) + "\"";
 		}
-
 		else {
 			return String.valueOf(value);
 		}
 	}
+
 }
