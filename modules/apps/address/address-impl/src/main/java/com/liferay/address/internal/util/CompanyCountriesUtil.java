@@ -199,7 +199,7 @@ public class CompanyCountriesUtil {
 			for (int i = 0; i < regionsJSONArray.length(); i++) {
 				JSONObject regionJSONObject = regionsJSONArray.getJSONObject(i);
 
-				long regionId = startRegionId + i + 1;
+				long regionId = startRegionId + i;
 
 				_addRegionBatch(
 					regionPreparedStatement, country.getCompanyId(),
@@ -244,7 +244,7 @@ public class CompanyCountriesUtil {
 					regionLocalizationPreparedStatement, country.getCompanyId(),
 					regionLocalizationData._languageId,
 					regionLocalizationData._regionId,
-					++startRegionLocalizationId, regionLocalizationData._title);
+					startRegionLocalizationId++, regionLocalizationData._title);
 			}
 
 			regionPreparedStatement.executeBatch();
