@@ -470,7 +470,11 @@ public class ProductSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < product.getTags().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(product.getTags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < product.getTags().length) {
 					sb.append(", ");

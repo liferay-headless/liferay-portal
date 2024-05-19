@@ -67,8 +67,12 @@ public class PageFragmentInstanceDefinitionSerDes {
 				 i < pageFragmentInstanceDefinition.getCssClasses().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(pageFragmentInstanceDefinition.getCssClasses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						pageFragmentInstanceDefinition.getCssClasses().length) {

@@ -87,8 +87,12 @@ public class UserAccountFullNameDefinitionFieldSerDes {
 				 i < userAccountFullNameDefinitionField.getValues().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(userAccountFullNameDefinitionField.getValues()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						userAccountFullNameDefinitionField.getValues().length) {

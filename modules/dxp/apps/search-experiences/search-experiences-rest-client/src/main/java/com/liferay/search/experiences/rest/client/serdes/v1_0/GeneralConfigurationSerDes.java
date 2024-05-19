@@ -61,10 +61,14 @@ public class GeneralConfigurationSerDes {
 						 getClauseContributorsExcludes().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						generalConfiguration.getClauseContributorsExcludes()
 							[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < generalConfiguration.
 						getClauseContributorsExcludes().length) {
@@ -91,10 +95,14 @@ public class GeneralConfigurationSerDes {
 						 getClauseContributorsIncludes().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						generalConfiguration.getClauseContributorsIncludes()
 							[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < generalConfiguration.
 						getClauseContributorsIncludes().length) {
@@ -177,8 +185,12 @@ public class GeneralConfigurationSerDes {
 				 i < generalConfiguration.getSearchableAssetTypes().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(generalConfiguration.getSearchableAssetTypes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						generalConfiguration.getSearchableAssetTypes().length) {

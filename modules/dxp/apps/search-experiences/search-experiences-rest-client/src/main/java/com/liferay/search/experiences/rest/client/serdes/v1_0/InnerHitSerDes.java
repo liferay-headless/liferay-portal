@@ -88,7 +88,11 @@ public class InnerHitSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < innerHit.getSorts().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(innerHit.getSorts()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < innerHit.getSorts().length) {
 					sb.append(", ");

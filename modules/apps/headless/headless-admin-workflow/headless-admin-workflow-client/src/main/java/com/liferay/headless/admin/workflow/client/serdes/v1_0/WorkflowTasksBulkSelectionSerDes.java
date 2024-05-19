@@ -118,8 +118,12 @@ public class WorkflowTasksBulkSelectionSerDes {
 			for (int i = 0;
 				 i < workflowTasksBulkSelection.getAssetTypes().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(workflowTasksBulkSelection.getAssetTypes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						workflowTasksBulkSelection.getAssetTypes().length) {
@@ -266,9 +270,13 @@ public class WorkflowTasksBulkSelectionSerDes {
 				 i < workflowTasksBulkSelection.getWorkflowTaskNames().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						workflowTasksBulkSelection.getWorkflowTaskNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						workflowTasksBulkSelection.

@@ -79,9 +79,13 @@ public class ContactConfigurationSerDes {
 				 i < contactConfiguration.getSyncedAccountGroupIds().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						contactConfiguration.getSyncedAccountGroupIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						contactConfiguration.
@@ -107,9 +111,13 @@ public class ContactConfigurationSerDes {
 				 i < contactConfiguration.getSyncedOrganizationIds().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						contactConfiguration.getSyncedOrganizationIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						contactConfiguration.
@@ -134,8 +142,12 @@ public class ContactConfigurationSerDes {
 			for (int i = 0;
 				 i < contactConfiguration.getSyncedUserGroupIds().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(contactConfiguration.getSyncedUserGroupIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						contactConfiguration.getSyncedUserGroupIds().length) {

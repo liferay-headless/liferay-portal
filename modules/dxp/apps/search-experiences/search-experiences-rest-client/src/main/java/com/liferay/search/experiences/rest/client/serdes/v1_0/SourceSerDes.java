@@ -54,7 +54,11 @@ public class SourceSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < source.getExcludes().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(source.getExcludes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < source.getExcludes().length) {
 					sb.append(", ");
@@ -84,7 +88,11 @@ public class SourceSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < source.getIncludes().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(source.getIncludes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < source.getIncludes().length) {
 					sb.append(", ");

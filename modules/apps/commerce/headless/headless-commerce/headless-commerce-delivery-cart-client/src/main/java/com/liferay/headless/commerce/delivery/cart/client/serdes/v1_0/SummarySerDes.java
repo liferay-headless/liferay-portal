@@ -82,7 +82,11 @@ public class SummarySerDes {
 			for (int i = 0; i < summary.getShippingDiscountPercentages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(summary.getShippingDiscountPercentages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < summary.getShippingDiscountPercentages().length) {
 					sb.append(", ");
@@ -187,7 +191,11 @@ public class SummarySerDes {
 			for (int i = 0; i < summary.getSubtotalDiscountPercentages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(summary.getSubtotalDiscountPercentages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < summary.getSubtotalDiscountPercentages().length) {
 					sb.append(", ");
@@ -281,7 +289,11 @@ public class SummarySerDes {
 			for (int i = 0; i < summary.getTotalDiscountPercentages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(summary.getTotalDiscountPercentages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < summary.getTotalDiscountPercentages().length) {
 					sb.append(", ");

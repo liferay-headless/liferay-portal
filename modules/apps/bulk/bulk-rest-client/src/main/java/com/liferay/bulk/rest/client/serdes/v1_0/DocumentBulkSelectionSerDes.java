@@ -58,7 +58,11 @@ public class DocumentBulkSelectionSerDes {
 			for (int i = 0; i < documentBulkSelection.getDocumentIds().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(documentBulkSelection.getDocumentIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < documentBulkSelection.getDocumentIds().length) {
 					sb.append(", ");

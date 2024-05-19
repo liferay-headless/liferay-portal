@@ -75,8 +75,12 @@ public class DisplayPageTemplateSerDes {
 			for (int i = 0;
 				 i < displayPageTemplate.getAvailableLanguages().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(displayPageTemplate.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						displayPageTemplate.getAvailableLanguages().length) {

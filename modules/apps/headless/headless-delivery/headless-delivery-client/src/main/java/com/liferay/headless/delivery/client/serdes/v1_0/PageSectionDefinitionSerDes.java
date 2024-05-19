@@ -111,7 +111,11 @@ public class PageSectionDefinitionSerDes {
 			for (int i = 0; i < pageSectionDefinition.getCssClasses().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(pageSectionDefinition.getCssClasses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < pageSectionDefinition.getCssClasses().length) {
 					sb.append(", ");

@@ -64,8 +64,12 @@ public class NavigationMenuItemSerDes {
 			for (int i = 0;
 				 i < navigationMenuItem.getAvailableLanguages().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(navigationMenuItem.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						navigationMenuItem.getAvailableLanguages().length) {

@@ -112,8 +112,12 @@ public class TaxonomyVocabularySerDes {
 			for (int i = 0;
 				 i < taxonomyVocabulary.getAvailableLanguages().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(taxonomyVocabulary.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						taxonomyVocabulary.getAvailableLanguages().length) {

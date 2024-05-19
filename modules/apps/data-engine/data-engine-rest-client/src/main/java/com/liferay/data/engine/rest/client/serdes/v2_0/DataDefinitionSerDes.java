@@ -66,7 +66,11 @@ public class DataDefinitionSerDes {
 			for (int i = 0; i < dataDefinition.getAvailableLanguageIds().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(dataDefinition.getAvailableLanguageIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < dataDefinition.getAvailableLanguageIds().length) {
 					sb.append(", ");

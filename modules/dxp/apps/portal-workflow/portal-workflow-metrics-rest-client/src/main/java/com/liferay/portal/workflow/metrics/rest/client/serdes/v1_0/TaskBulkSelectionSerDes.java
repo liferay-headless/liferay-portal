@@ -112,7 +112,11 @@ public class TaskBulkSelectionSerDes {
 			for (int i = 0; i < taskBulkSelection.getSlaStatuses().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(taskBulkSelection.getSlaStatuses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < taskBulkSelection.getSlaStatuses().length) {
 					sb.append(", ");
@@ -132,7 +136,11 @@ public class TaskBulkSelectionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < taskBulkSelection.getTaskNames().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(taskBulkSelection.getTaskNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < taskBulkSelection.getTaskNames().length) {
 					sb.append(", ");

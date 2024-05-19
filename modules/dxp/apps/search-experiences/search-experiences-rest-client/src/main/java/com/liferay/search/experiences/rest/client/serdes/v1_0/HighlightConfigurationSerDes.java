@@ -89,7 +89,11 @@ public class HighlightConfigurationSerDes {
 			for (int i = 0; i < highlightConfiguration.getPost_tags().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(highlightConfiguration.getPost_tags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < highlightConfiguration.getPost_tags().length) {
 					sb.append(", ");
@@ -111,7 +115,11 @@ public class HighlightConfigurationSerDes {
 			for (int i = 0; i < highlightConfiguration.getPre_tags().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(highlightConfiguration.getPre_tags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < highlightConfiguration.getPre_tags().length) {
 					sb.append(", ");

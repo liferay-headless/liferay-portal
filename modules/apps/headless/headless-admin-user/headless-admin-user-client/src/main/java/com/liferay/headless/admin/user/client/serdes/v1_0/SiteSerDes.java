@@ -54,7 +54,11 @@ public class SiteSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < site.getAvailableLanguages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(site.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < site.getAvailableLanguages().length) {
 					sb.append(", ");

@@ -180,7 +180,11 @@ public class SkuOptionSerDes {
 			for (int i = 0; i < skuOption.getSkuOptionValueNames().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(skuOption.getSkuOptionValueNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < skuOption.getSkuOptionValueNames().length) {
 					sb.append(", ");

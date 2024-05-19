@@ -103,8 +103,12 @@ public class StructuredContentSerDes {
 			for (int i = 0;
 				 i < structuredContent.getAvailableLanguages().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(structuredContent.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						structuredContent.getAvailableLanguages().length) {
@@ -324,7 +328,11 @@ public class StructuredContentSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < structuredContent.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(structuredContent.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < structuredContent.getKeywords().length) {
 					sb.append(", ");

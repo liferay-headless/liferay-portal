@@ -170,8 +170,12 @@ public class AssigneeMetricBulkSelectionSerDes {
 			for (int i = 0;
 				 i < assigneeMetricBulkSelection.getTaskNames().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(assigneeMetricBulkSelection.getTaskNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						assigneeMetricBulkSelection.getTaskNames().length) {

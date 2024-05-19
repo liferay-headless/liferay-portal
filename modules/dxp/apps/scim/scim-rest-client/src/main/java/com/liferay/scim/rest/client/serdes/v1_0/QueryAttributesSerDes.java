@@ -56,7 +56,11 @@ public class QueryAttributesSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < queryAttributes.getAttributes().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(queryAttributes.getAttributes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < queryAttributes.getAttributes().length) {
 					sb.append(", ");
@@ -88,7 +92,11 @@ public class QueryAttributesSerDes {
 			for (int i = 0; i < queryAttributes.getExcludedAttributes().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(queryAttributes.getExcludedAttributes()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < queryAttributes.getExcludedAttributes().length) {
 					sb.append(", ");

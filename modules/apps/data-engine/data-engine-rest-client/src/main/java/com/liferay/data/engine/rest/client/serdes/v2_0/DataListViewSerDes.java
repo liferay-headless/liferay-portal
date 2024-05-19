@@ -112,7 +112,11 @@ public class DataListViewSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < dataListView.getFieldNames().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(dataListView.getFieldNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < dataListView.getFieldNames().length) {
 					sb.append(", ");

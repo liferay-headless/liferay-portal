@@ -66,7 +66,11 @@ public class DataLayoutColumnSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < dataLayoutColumn.getFieldNames().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(dataLayoutColumn.getFieldNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < dataLayoutColumn.getFieldNames().length) {
 					sb.append(", ");

@@ -321,7 +321,11 @@ public class DocumentSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < document.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(document.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < document.getKeywords().length) {
 					sb.append(", ");

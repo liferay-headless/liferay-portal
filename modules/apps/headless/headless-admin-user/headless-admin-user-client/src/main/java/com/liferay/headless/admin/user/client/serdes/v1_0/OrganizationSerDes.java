@@ -215,7 +215,11 @@ public class OrganizationSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < organization.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(organization.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < organization.getKeywords().length) {
 					sb.append(", ");

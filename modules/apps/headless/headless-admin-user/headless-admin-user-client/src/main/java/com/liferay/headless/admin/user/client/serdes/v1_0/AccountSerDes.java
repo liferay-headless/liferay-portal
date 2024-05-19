@@ -186,7 +186,11 @@ public class AccountSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < account.getDomains().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(account.getDomains()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < account.getDomains().length) {
 					sb.append(", ");

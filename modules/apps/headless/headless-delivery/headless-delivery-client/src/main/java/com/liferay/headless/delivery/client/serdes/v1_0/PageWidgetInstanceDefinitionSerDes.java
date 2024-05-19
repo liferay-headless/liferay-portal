@@ -64,8 +64,12 @@ public class PageWidgetInstanceDefinitionSerDes {
 			for (int i = 0;
 				 i < pageWidgetInstanceDefinition.getCssClasses().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(pageWidgetInstanceDefinition.getCssClasses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						pageWidgetInstanceDefinition.getCssClasses().length) {

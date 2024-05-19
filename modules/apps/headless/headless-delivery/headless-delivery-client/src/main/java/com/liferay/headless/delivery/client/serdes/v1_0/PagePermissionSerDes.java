@@ -56,7 +56,11 @@ public class PagePermissionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < pagePermission.getActionKeys().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(pagePermission.getActionKeys()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < pagePermission.getActionKeys().length) {
 					sb.append(", ");

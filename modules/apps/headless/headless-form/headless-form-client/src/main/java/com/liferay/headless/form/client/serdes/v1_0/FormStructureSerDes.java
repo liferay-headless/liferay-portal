@@ -65,7 +65,11 @@ public class FormStructureSerDes {
 			for (int i = 0; i < formStructure.getAvailableLanguages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(formStructure.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < formStructure.getAvailableLanguages().length) {
 					sb.append(", ");

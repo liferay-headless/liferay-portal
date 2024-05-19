@@ -113,7 +113,11 @@ public class PageTemplateSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < pageTemplate.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(pageTemplate.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < pageTemplate.getKeywords().length) {
 					sb.append(", ");

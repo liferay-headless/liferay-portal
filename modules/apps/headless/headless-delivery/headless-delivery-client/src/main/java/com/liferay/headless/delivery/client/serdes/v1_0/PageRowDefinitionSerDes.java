@@ -59,7 +59,11 @@ public class PageRowDefinitionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < pageRowDefinition.getCssClasses().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(pageRowDefinition.getCssClasses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < pageRowDefinition.getCssClasses().length) {
 					sb.append(", ");

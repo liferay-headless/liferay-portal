@@ -86,7 +86,11 @@ public class PlacedOrderItemSerDes {
 			for (int i = 0; i < placedOrderItem.getErrorMessages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(placedOrderItem.getErrorMessages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < placedOrderItem.getErrorMessages().length) {
 					sb.append(", ");
@@ -356,7 +360,11 @@ public class PlacedOrderItemSerDes {
 			for (int i = 0; i < placedOrderItem.getVirtualItemURLs().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(placedOrderItem.getVirtualItemURLs()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < placedOrderItem.getVirtualItemURLs().length) {
 					sb.append(", ");

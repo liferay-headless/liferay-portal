@@ -206,7 +206,11 @@ public class AttachmentUrlSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < attachmentUrl.getTags().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(attachmentUrl.getTags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < attachmentUrl.getTags().length) {
 					sb.append(", ");

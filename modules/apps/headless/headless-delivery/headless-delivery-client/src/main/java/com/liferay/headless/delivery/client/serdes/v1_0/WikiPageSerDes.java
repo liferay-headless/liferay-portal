@@ -223,7 +223,11 @@ public class WikiPageSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < wikiPage.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(wikiPage.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < wikiPage.getKeywords().length) {
 					sb.append(", ");

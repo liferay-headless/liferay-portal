@@ -237,7 +237,11 @@ public class MessageBoardThreadSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < messageBoardThread.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(messageBoardThread.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < messageBoardThread.getKeywords().length) {
 					sb.append(", ");

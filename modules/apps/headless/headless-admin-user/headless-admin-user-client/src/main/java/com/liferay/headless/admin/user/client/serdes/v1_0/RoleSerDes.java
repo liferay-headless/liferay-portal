@@ -71,7 +71,11 @@ public class RoleSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < role.getAvailableLanguages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(role.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < role.getAvailableLanguages().length) {
 					sb.append(", ");

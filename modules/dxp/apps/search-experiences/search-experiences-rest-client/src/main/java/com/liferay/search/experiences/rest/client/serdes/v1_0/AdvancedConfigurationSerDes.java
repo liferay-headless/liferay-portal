@@ -78,7 +78,11 @@ public class AdvancedConfigurationSerDes {
 			for (int i = 0; i < advancedConfiguration.getStored_fields().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(advancedConfiguration.getStored_fields()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < advancedConfiguration.getStored_fields().length) {
 					sb.append(", ");

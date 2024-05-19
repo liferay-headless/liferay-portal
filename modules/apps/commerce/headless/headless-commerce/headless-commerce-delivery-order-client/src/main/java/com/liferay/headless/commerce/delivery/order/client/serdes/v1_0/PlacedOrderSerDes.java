@@ -165,7 +165,11 @@ public class PlacedOrderSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < placedOrder.getErrorMessages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(placedOrder.getErrorMessages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < placedOrder.getErrorMessages().length) {
 					sb.append(", ");

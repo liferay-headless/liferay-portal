@@ -224,7 +224,11 @@ public class AttachmentBase64SerDes {
 			sb.append("[");
 
 			for (int i = 0; i < attachmentBase64.getTags().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(attachmentBase64.getTags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < attachmentBase64.getTags().length) {
 					sb.append(", ");

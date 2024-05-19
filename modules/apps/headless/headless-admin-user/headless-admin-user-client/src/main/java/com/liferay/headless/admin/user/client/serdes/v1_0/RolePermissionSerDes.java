@@ -56,7 +56,11 @@ public class RolePermissionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < rolePermission.getActionIds().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(rolePermission.getActionIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < rolePermission.getActionIds().length) {
 					sb.append(", ");

@@ -114,7 +114,11 @@ public class FacetConfigurationSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < facetConfiguration.getValues().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(facetConfiguration.getValues()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < facetConfiguration.getValues().length) {
 					sb.append(", ");

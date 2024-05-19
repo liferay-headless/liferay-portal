@@ -78,7 +78,11 @@ public class DDMOptionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < ddmOption.getValue().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(ddmOption.getValue()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < ddmOption.getValue().length) {
 					sb.append(", ");

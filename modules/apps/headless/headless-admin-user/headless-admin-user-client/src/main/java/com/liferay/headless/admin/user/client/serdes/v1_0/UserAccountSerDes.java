@@ -351,7 +351,11 @@ public class UserAccountSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(userAccount.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < userAccount.getKeywords().length) {
 					sb.append(", ");

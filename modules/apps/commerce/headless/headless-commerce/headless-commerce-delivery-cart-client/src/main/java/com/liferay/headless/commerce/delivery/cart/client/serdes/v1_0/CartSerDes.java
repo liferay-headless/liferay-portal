@@ -202,7 +202,11 @@ public class CartSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < cart.getErrorMessages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(cart.getErrorMessages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < cart.getErrorMessages().length) {
 					sb.append(", ");

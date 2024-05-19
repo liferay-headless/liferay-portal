@@ -88,7 +88,11 @@ public class ContentTemplateSerDes {
 			for (int i = 0; i < contentTemplate.getAvailableLanguages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(contentTemplate.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < contentTemplate.getAvailableLanguages().length) {
 					sb.append(", ");

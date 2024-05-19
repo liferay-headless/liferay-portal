@@ -60,7 +60,11 @@ public class PageFormDefinitionSerDes {
 			for (int i = 0; i < pageFormDefinition.getCssClasses().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(pageFormDefinition.getCssClasses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < pageFormDefinition.getCssClasses().length) {
 					sb.append(", ");

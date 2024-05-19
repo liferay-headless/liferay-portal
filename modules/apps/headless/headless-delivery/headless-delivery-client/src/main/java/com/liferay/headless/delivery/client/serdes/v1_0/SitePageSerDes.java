@@ -83,7 +83,11 @@ public class SitePageSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < sitePage.getAvailableLanguages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(sitePage.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < sitePage.getAvailableLanguages().length) {
 					sb.append(", ");
@@ -222,7 +226,11 @@ public class SitePageSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < sitePage.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(sitePage.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < sitePage.getKeywords().length) {
 					sb.append(", ");

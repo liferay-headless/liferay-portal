@@ -114,7 +114,7 @@ public class NotificationQueueEntrySerDes {
 
 				sb.append("\"");
 
-				sb.append(_escape(notificationQueueEntry.getRecipients()[i]));
+				sb.append(_toJSON(notificationQueueEntry.getRecipients()[i]));
 
 				sb.append("\"");
 

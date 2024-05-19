@@ -56,7 +56,11 @@ public class WidgetPermissionSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < widgetPermission.getActionKeys().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(widgetPermission.getActionKeys()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < widgetPermission.getActionKeys().length) {
 					sb.append(", ");

@@ -96,9 +96,13 @@ public class EmbeddingProviderConfigurationSerDes {
 				 i < embeddingProviderConfiguration.getLanguageIds().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						embeddingProviderConfiguration.getLanguageIds()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						embeddingProviderConfiguration.
@@ -124,10 +128,14 @@ public class EmbeddingProviderConfigurationSerDes {
 				 i < embeddingProviderConfiguration.getModelClassNames().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						embeddingProviderConfiguration.getModelClassNames()
 							[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < embeddingProviderConfiguration.
 						getModelClassNames().length) {

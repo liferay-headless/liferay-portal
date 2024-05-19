@@ -249,7 +249,11 @@ public class KnowledgeBaseArticleSerDes {
 			for (int i = 0; i < knowledgeBaseArticle.getKeywords().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(knowledgeBaseArticle.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < knowledgeBaseArticle.getKeywords().length) {
 					sb.append(", ");

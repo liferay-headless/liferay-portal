@@ -260,7 +260,11 @@ public class MessageBoardMessageSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < messageBoardMessage.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(messageBoardMessage.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < messageBoardMessage.getKeywords().length) {
 					sb.append(", ");

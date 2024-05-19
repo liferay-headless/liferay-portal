@@ -92,7 +92,11 @@ public class BaseScimSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < baseScim.getSchemas().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(baseScim.getSchemas()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < baseScim.getSchemas().length) {
 					sb.append(", ");

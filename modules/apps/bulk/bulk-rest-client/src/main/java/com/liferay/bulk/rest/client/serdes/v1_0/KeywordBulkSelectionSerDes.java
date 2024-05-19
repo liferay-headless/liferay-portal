@@ -70,7 +70,11 @@ public class KeywordBulkSelectionSerDes {
 			for (int i = 0; i < keywordBulkSelection.getKeywordsToAdd().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(keywordBulkSelection.getKeywordsToAdd()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < keywordBulkSelection.getKeywordsToAdd().length) {
 					sb.append(", ");
@@ -92,8 +96,12 @@ public class KeywordBulkSelectionSerDes {
 			for (int i = 0;
 				 i < keywordBulkSelection.getKeywordsToRemove().length; i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(keywordBulkSelection.getKeywordsToRemove()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) <
 						keywordBulkSelection.getKeywordsToRemove().length) {

@@ -554,7 +554,11 @@ public class OrderItemSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < orderItem.getVirtualItemURLs().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(orderItem.getVirtualItemURLs()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < orderItem.getVirtualItemURLs().length) {
 					sb.append(", ");

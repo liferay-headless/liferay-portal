@@ -237,7 +237,11 @@ public class AttachmentSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < attachment.getTags().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(attachment.getTags()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < attachment.getTags().length) {
 					sb.append(", ");

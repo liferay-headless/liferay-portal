@@ -158,7 +158,11 @@ public class UserSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < user.getRoles().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(user.getRoles()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < user.getRoles().length) {
 					sb.append(", ");

@@ -59,7 +59,11 @@ public class DocumentTypeSerDes {
 			for (int i = 0; i < documentType.getAvailableLanguages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(documentType.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < documentType.getAvailableLanguages().length) {
 					sb.append(", ");

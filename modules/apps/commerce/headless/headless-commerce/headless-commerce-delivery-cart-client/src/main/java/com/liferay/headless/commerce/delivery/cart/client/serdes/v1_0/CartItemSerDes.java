@@ -100,7 +100,11 @@ public class CartItemSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < cartItem.getErrorMessages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(cartItem.getErrorMessages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < cartItem.getErrorMessages().length) {
 					sb.append(", ");

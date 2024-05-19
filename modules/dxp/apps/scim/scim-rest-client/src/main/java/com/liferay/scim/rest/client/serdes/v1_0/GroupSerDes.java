@@ -127,7 +127,11 @@ public class GroupSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < group.getSchemas().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(group.getSchemas()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < group.getSchemas().length) {
 					sb.append(", ");

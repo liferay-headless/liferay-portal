@@ -65,7 +65,11 @@ public class UserSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < user.getAddresses().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(user.getAddresses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < user.getAddresses().length) {
 					sb.append(", ");
@@ -357,7 +361,11 @@ public class UserSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < user.getSchemas().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(user.getSchemas()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < user.getSchemas().length) {
 					sb.append(", ");

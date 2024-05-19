@@ -87,7 +87,11 @@ public class SkuSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < sku.getAllowedOrderQuantities().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(sku.getAllowedOrderQuantities()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < sku.getAllowedOrderQuantities().length) {
 					sb.append(", ");

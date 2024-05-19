@@ -279,7 +279,11 @@ public class BlogPostingSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < blogPosting.getKeywords().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(blogPosting.getKeywords()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < blogPosting.getKeywords().length) {
 					sb.append(", ");

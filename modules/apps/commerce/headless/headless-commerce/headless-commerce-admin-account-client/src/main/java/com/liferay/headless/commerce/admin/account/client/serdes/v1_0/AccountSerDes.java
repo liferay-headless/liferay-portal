@@ -192,7 +192,11 @@ public class AccountSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < account.getEmailAddresses().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(account.getEmailAddresses()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < account.getEmailAddresses().length) {
 					sb.append(", ");

@@ -79,7 +79,11 @@ public class ContentStructureSerDes {
 			for (int i = 0; i < contentStructure.getAvailableLanguages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(contentStructure.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < contentStructure.getAvailableLanguages().length) {
 					sb.append(", ");

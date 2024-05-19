@@ -75,7 +75,11 @@ public class TaxonomyCategorySerDes {
 			for (int i = 0; i < taxonomyCategory.getAvailableLanguages().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(taxonomyCategory.getAvailableLanguages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < taxonomyCategory.getAvailableLanguages().length) {
 					sb.append(", ");

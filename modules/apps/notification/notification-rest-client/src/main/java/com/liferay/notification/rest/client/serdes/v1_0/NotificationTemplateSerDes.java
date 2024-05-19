@@ -78,11 +78,15 @@ public class NotificationTemplateSerDes {
 					 getAttachmentObjectFieldExternalReferenceCodes().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(
 					_toJSON(
 						notificationTemplate.
 							getAttachmentObjectFieldExternalReferenceCodes()
 							[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < notificationTemplate.
 						getAttachmentObjectFieldExternalReferenceCodes().
@@ -295,7 +299,11 @@ public class NotificationTemplateSerDes {
 			for (int i = 0; i < notificationTemplate.getRecipients().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(notificationTemplate.getRecipients()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < notificationTemplate.getRecipients().length) {
 					sb.append(", ");

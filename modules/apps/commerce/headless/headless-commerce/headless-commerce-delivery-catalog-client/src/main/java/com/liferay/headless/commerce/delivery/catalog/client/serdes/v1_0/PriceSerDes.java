@@ -96,7 +96,11 @@ public class PriceSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < price.getDiscountPercentages().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(price.getDiscountPercentages()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < price.getDiscountPercentages().length) {
 					sb.append(", ");

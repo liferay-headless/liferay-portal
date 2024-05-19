@@ -84,7 +84,11 @@ public class WorkflowInstanceSerDes {
 			for (int i = 0; i < workflowInstance.getCurrentNodeNames().length;
 				 i++) {
 
+				sb.append("\"");
+
 				sb.append(_toJSON(workflowInstance.getCurrentNodeNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < workflowInstance.getCurrentNodeNames().length) {
 					sb.append(", ");

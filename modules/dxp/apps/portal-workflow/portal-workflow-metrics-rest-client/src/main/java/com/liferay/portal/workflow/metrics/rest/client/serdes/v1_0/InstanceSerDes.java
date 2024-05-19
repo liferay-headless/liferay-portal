@@ -308,7 +308,11 @@ public class InstanceSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < instance.getTaskNames().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(instance.getTaskNames()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < instance.getTaskNames().length) {
 					sb.append(", ");

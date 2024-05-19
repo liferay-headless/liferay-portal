@@ -106,7 +106,11 @@ public class FieldSerDes {
 			sb.append("[");
 
 			for (int i = 0; i < field.getUnsupportedFormats().length; i++) {
+				sb.append("\"");
+
 				sb.append(_toJSON(field.getUnsupportedFormats()[i]));
+
+				sb.append("\"");
 
 				if ((i + 1) < field.getUnsupportedFormats().length) {
 					sb.append(", ");
