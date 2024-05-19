@@ -108,21 +108,21 @@ public class ${schemaName}SerDes {
 						sb.append(${schemaVarName}.get${capitalizedPropertyName}());
 					}
 				<#else>
-					<#if propertyType?contains("[]")>
+<#if propertyType?contains("[]")>
 						sb.append("[");
 
 						for (int i = 0; i < ${schemaVarName}.get${capitalizedPropertyName}().length; i++) {
-							<#if stringUtil.equals(propertyType, "Date[]") || enumSchemas?keys?seq_contains(propertyType)>
-								sb.append("\"");
+<#if stringUtil.equals(propertyType, "Date[]") || stringUtil.equals(propertyType, "Object[]") || stringUtil.equals(propertyType, "String[]") || enumSchemas?keys?seq_contains(propertyType)>
+sb.append("\"");
 
-								<#if stringUtil.equals(propertyType, "Date[]")>
-									sb.append(liferayToJSONDateFormat.format(${schemaVarName}.get${capitalizedPropertyName}()[i]));
+<#if stringUtil.equals(propertyType, "Date[]")>
+sb.append(liferayToJSONDateFormat.format(${schemaVarName}.get${capitalizedPropertyName}()[i]));
 								<#else>
-									sb.append(${schemaVarName}.get${capitalizedPropertyName}()[i]);
+									sb.append(_toJSON(${schemaVarName}.get${capitalizedPropertyName}()[i]));
 								</#if>
 
 								sb.append("\"");
-							<#elseif stringUtil.startsWith(propertyType, "Map<") || stringUtil.equals(propertyType, "Object[]") || stringUtil.equals(propertyType, "String[]")>
+							<#elseif stringUtil.startsWith(propertyType, "Map<")>
 								sb.append(_toJSON(${schemaVarName}.get${capitalizedPropertyName}()[i]));
 							<#elseif allSchemas[propertyType?remove_ending("[]")]??>
 								sb.append(String.valueOf(${schemaVarName}.get${capitalizedPropertyName}()[i]));
@@ -131,8 +131,8 @@ public class ${schemaName}SerDes {
 							</#if>
 
 							if ((i + 1) < ${schemaVarName}.get${capitalizedPropertyName}().length) {
-								sb.append(", ");
-							}
+sb.append(", ");
+}
 						}
 
 						sb.append("]");
