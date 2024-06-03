@@ -27,6 +27,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -167,6 +169,53 @@ public class ObjectDefinitionGraphQLTest {
 	public void tearDown() throws PortalException {
 		ObjectEntryLocalServiceUtil.deleteObjectEntry(_childObjectEntry);
 		ObjectEntryLocalServiceUtil.deleteObjectEntry(_parentObjectEntry);
+	}
+
+	@Test
+	public void testAddDraftObjectEntry() throws Exception {
+		_parentObjectDefinition.setEnableObjectEntryDraft(true);
+
+		_parentObjectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_parentObjectDefinition);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		String value = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			value,
+			JSONUtil.getValueAsString(
+				_invoke(
+					new GraphQLField(
+						"mutation",
+						new GraphQLField(
+							"c",
+							new GraphQLField(
+								"create" + _parentObjectDefinitionName,
+								HashMapBuilder.<String, Object>put(
+									_parentObjectDefinitionName,
+									StringBundler.concat(
+										"{", _objectFieldName, ": \"", value,
+										"\", ", _listFieldName, ": {key: \"",
+										_listFieldValueKey, "\"}}")
+								).build(),
+								new GraphQLField(_objectFieldName),
+								new GraphQLField(_listFieldName + " {key}"))))),
+				"JSONObject/data", "JSONObject/c",
+				"JSONObject/create" + _parentObjectDefinitionName,
+				"Object/" + _objectFieldName));
+
+		_parentObjectDefinition.setEnableObjectEntryDraft(false);
+
+		_parentObjectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_parentObjectDefinition);
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 	}
 
 	@Test
