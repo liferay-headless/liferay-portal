@@ -1,0 +1,110 @@
+components:
+    schemas:
+        BasePageTemplate:
+            # @review
+            description:
+                Represents a base page template, containing the common properties of both a content page template and a
+                widget page template.
+            properties:
+                name:
+                    # @review
+                    description:
+                        The page template's name.
+                    type: string
+                type:
+                    enum:
+                        - ContentPageTemplate
+                        - WidgetPageTemplate
+                    type: string
+            type: object
+        ContentPageTemplate:
+            allOf:
+                - $ref: "#/components/schemas/BasePageTemplate"
+            # @review
+            description:
+                Represents a content page template.
+            type: object
+        PageTemplate:
+            oneOf:
+                - $ref: "#/components/schemas/ContentPageTemplate"
+                - $ref: "#/components/schemas/WidgetPageTemplate"
+            type: object
+        WidgetPageTemplate:
+            allOf:
+                - $ref: "#/components/schemas/BasePageTemplate"
+                - properties:
+                      active:
+                          # @review
+                          description:
+                              A flag that indicates whether the widget page template is active.
+                          type: boolean
+            # @review
+            description:
+                Represents a widget page template.
+            type: object
+info:
+    description:
+        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
+        'com.liferay.headless.admin.site.client', and version '1.0.0'."
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+    title: Liferay Admin Sites Headless API
+    version: v1.0
+openapi: 3.0.1
+paths:
+    "/sites/{siteExternalReferenceCode}/page-templates":
+        get:
+            description:
+                Retrieves the page templates of the site.
+            operationId: getSitePageTemplatesPage
+            parameters:
+                - in: path
+                  name: siteExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PageTemplate"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PageTemplate"
+                                type: array
+            tags: ["PageTemplate"]
+        post:
+            description:
+                Adds a new page template.
+            parameters:
+                - in: path
+                  name: siteExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PageTemplate"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/PageTemplate"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PageTemplate"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/PageTemplate"
+                    description:
+                        default response
+            # @review
+            tags: ["PageTemplate"]
