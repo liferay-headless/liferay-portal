@@ -36,7 +36,8 @@ export class WebContentDisplayPage {
 		});
 		this.selectWebContentButton = this.modalIFrame
 			.frameLocator('iframe[title="Select Web Content"]')
-			.locator('*[data-qa-id="row"]');
+			.locator('*[data-qa-id="row"]')
+			.first();
 		this.uiElementsPage = new UIElementsPage(page);
 		this.webContentDisplay = page
 			.getByText('Select web content to make it visible')

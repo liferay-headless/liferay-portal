@@ -15,6 +15,7 @@ export class JournalPage {
 	readonly newButton: Locator;
 	readonly permissionsFrameLocator: FrameLocator;
 	readonly publishButton: Locator;
+	readonly selectAndConfirmPublishButton: Locator;
 	readonly templatesLink: Locator;
 	readonly webContentTitleBox: Locator;
 	readonly webContentBodyIFrame: FrameLocator;
@@ -31,7 +32,10 @@ export class JournalPage {
 			'iframe[title="Permissions"]'
 		);
 		this.templatesLink = page.getByRole('link', {name: 'Templates'});
-		this.publishButton = page.getByRole('button', {name: 'Publish'});
+		this.publishButton = page.getByRole('menuitem', {name: 'Publish'});
+		this.selectAndConfirmPublishButton = page.getByLabel(
+			'Select and Confirm Publish Settings'
+		);
 		this.webContentTitleBox = page
 			.locator('xpath=//input[contains(@id,"title")]')
 			.first();
@@ -58,7 +62,16 @@ export class JournalPage {
 		await this.webContentBodyTextBox.press('Backspace');
 		await this.webContentTitleBox.click({button: 'left'});
 		await this.webContentTitleBox.press('Backspace');
-		await this.publishButton.click();
+		await this.selectAndConfirmPublishButton.waitFor();
+		await this.page
+			.getByLabel('Select and Confirm Publish Settings')
+			.click();
+		await this.page
+			.getByRole('menuitem', {name: 'Publish With Permissions'})
+			.click();
+		await this.page
+			.getByRole('button', {exact: true, name: 'Publish'})
+			.click();
 		await this.page
 			.locator(
 				'[id="_com_liferay_journal_web_portlet_JournalPortlet_successMessageWithLink"]'

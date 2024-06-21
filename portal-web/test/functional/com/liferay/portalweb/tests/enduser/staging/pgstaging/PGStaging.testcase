@@ -215,7 +215,7 @@ definition {
 			webContentContent = "Web Content Content",
 			webContentTitle = "Web Content Title");
 
-		PortletEntry.publish();
+		WebContent.publishWithPermissions();
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -645,7 +645,7 @@ definition {
 			imageSourceURL = ${dmDocumentURL},
 			navTab = "URL");
 
-		PortletEntry.publish();
+		WebContent.publish();
 
 		JSONStaging.enableLocalStaging(
 			branchingPrivate = "true",
@@ -728,7 +728,7 @@ definition {
 			pageName = "Staging Test Page",
 			pageType = "Pages");
 
-		PortletEntry.publish();
+		WebContent.publish();
 
 		Navigator.openStagingSiteURL(siteName = "Site Name");
 

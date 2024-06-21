@@ -381,7 +381,7 @@ definition {
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
-			Button.clickPublish();
+			WebContent.publish();
 
 			ExportImport.viewValidationMessage(
 				url = "/dl/XYZ123",
@@ -411,7 +411,7 @@ definition {
 
 			ExportImport.addSourceContent(content = '''<p><a href="${portalURL}/dl/XYZ123">${portalURL}/dl/XYZ123</a></p>''');
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 	}
 

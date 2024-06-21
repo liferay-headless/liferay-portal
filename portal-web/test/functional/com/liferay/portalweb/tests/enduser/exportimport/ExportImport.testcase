@@ -249,7 +249,7 @@ definition {
 				entryExternalURL = ${entryExternalURL},
 				fieldLabel = "Content");
 
-			Button.clickPublish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("Then: The publish process fails with corresponding error message") {
@@ -396,7 +396,7 @@ definition {
 				webContentContent = "WC WebContent Content",
 				webContentTitle = "WC WebContent Title");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("Then: Site can be exported then published") {
@@ -590,7 +590,7 @@ definition {
 				webContentLinkToPage = "Page B",
 				webContentTitle = "Web Content Title A");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a new WC which is based on the WC template and structure and linked to the first page, then publish it") {
@@ -604,7 +604,7 @@ definition {
 				webContentLinkToPage = "Page C",
 				webContentTitle = "Web Content Title B");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a WCD portlet to the first page and second then add a WC to each WCD") {
@@ -742,7 +742,7 @@ definition {
 				webContentLinkToPage = "Site Child Page",
 				webContentTitle = "WC WebContent Title 1");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a second WC based on the new structure and template and linked to the child page of the child page then publish it") {
@@ -756,7 +756,7 @@ definition {
 				webContentLinkToPage = "Site Child Child Page",
 				webContentTitle = "WC WebContent Title 2");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("When: User adds a WCD portlet to the site and select the second WC to it") {
@@ -1152,7 +1152,7 @@ definition {
 <p>Test: <a href="/web/test-site-name/test-site-name">Link</a></p>
 ''');
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("Add the second web content") {
@@ -1164,7 +1164,7 @@ definition {
 				webContentContent = "WC WebContent Content",
 				webContentTitle = "WC WebContent 2");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("Select display the second Web Content article in WCD") {
@@ -1279,7 +1279,7 @@ definition {
 				webContentText = "Web Content Text",
 				webContentTitle = "Web Content Title");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 
 			WebContent.viewTitle(webContentTitle = "Web Content Title");
 		}
@@ -1559,7 +1559,7 @@ definition {
 				templateName = "WC Template Name",
 				webContentTitle = "WC WebContent Title 1");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a second WC based on the WC template and structure, pointing to the first WC then publish it") {
@@ -1573,7 +1573,7 @@ definition {
 				webContentTitle = "WC WebContent Title 2",
 				webContentWebContent = "WC WebContent Title 1");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("When: User edit the first WC then export the site") {
@@ -1731,7 +1731,7 @@ definition {
 
 			CKEditor.addSourceContent(content = '''<a href="${editDocumentURL}jpg">Link to Document</a>''');
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("When: User export with default settings") {
@@ -1864,7 +1864,7 @@ definition {
 				webContentLinkToPage = "Page B",
 				webContentTitle = "WC WebContent Title 1");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a second WC based on the second structure and second template, with a reference to the first WC") {
@@ -1878,7 +1878,7 @@ definition {
 				webContentTitle = "WC WebContent Title 2",
 				webContentWebContent = "WC WebContent Title 1");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 
 		task ("And: Add a WCD widget on the first page and select the first WC on it") {
@@ -2078,7 +2078,7 @@ definition {
 				entryExternalURL = ${entryExternalURL},
 				fieldLabel = "Content");
 
-			PortletEntry.publish();
+			WebContent.publishWithPermissions();
 		}
 	}
 

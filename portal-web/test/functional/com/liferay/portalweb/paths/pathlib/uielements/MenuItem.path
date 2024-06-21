@@ -86,6 +86,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PUBLISH_MENU_ITEM</td>
+	<td>//div[contains(@class, 'dropdown-menu') and contains(@class, 'show')]//ul[@role='menu']//li[@role='presentation'][1]//button[contains(@class, 'dropdown-item') and contains(text(), 'Publish')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SEARCH_FIELD</td>
 	<td>//div[contains(@class,'dropdown-menu show')]//input[.//following-sibling::span//*[name()='svg'][contains(@class,'icon-search')]]</td>
 	<td></td>
@@ -93,6 +98,11 @@
 <tr>
 	<td>SPACING_VALUE</td>
 	<td>//div[contains(@class,'dropdown-menu') and contains(@class,'show')]//button[.//span[normalize-space(text())='${key_tokenName}']]//span[contains(@class,'semi-bold')][contains(@class,'text-truncate')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBMIT_MENU_ITEM</td>
+	<td>//div[contains(@class, 'dropdown-menu') and contains(@class, 'show')]//ul[@role='menu']//li[@role='presentation'][1]//button[contains(@class, 'dropdown-item') and contains(text(), 'Submit')]</td>
 	<td></td>
 </tr>
 </tbody>
