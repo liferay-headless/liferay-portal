@@ -187,16 +187,24 @@ definition {
 		}
 
 		task ("Then Student entries 'aabc', 'abc', 'bbbabc', 'zzzz' are listed in the endpoint response") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Object",
-				panel = "Control Panel",
-				portlet = "API Builder");
+			var response = FilterAPI.getAPIFilters();
 
-			APIApplicationEndpoint.assertCorrectItemInResponse(
-				baseURL = "my-app",
-				expectedValue = "aabc,abc,bbbabc,zzzz",
-				jsonObject = "student_name",
-				path = "/testendpoint");
+			var actualValue = JSONUtil.getWithJSONPath(${response}, "$.items");
+
+			TestUtils.assertEquals(
+				actual = ${actualValue},
+				expected = "");
+
+			APIExplorer.navigateToOpenAPI(customObjectPlural = "my-app");
+
+			APIExplorer.executeAPIMethod(
+				method = "getTestendpointPage",
+				service = "testSchema");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "OpenAPI#RESPONSE_BODY",
+				method = "getTestendpointPage",
+				value1 = "\"items\": [     {       \"student_name\": \"aabc\",       \"subject_name\": []     },     {       \"student_name\": \"abc\",       \"subject_name\": [         \"abc\"       ]     },     {       \"student_name\": \"bbbabc\",       \"subject_name\": [         \"zzzz\"       ]     },     {       \"student_name\": \"zzzz\",       \"subject_name\": [         \"bbbabc\"       ]     }   ]");
 		}
 	}
 

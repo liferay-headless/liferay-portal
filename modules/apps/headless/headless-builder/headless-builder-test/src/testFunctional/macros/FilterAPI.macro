@@ -42,4 +42,13 @@ definition {
 		return ${response};
 	}
 
+	@summary = "Default summary"
+	macro getAPIFilters(filterValue = null, endpointERC = null, virtualHost = null) {
+		var curl = FilterAPI._curlAPIFilter(virtualHost = ${virtualHost});
+
+		var response = JSONCurlUtil.get(${curl});
+
+		return ${response};
+	}
+
 }
