@@ -9,93 +9,175 @@
 			"importStrategy": "ON_ERROR_FAIL",
 			"updateStrategy": "UPDATE"
 		},
-		"taskItemDelegateName": "DEFAULT",
-		"userId": 0,
-		"version": "v1.0"
+		"taskItemDelegateName": "DEFAULT"
 	},
 	"items": [
 		{
 			"enableCategorization": true,
-			"externalReferenceCode": "L_API_SORT",
+			"externalReferenceCode": "L_API_APPLICATION",
 			"label": {
-				"en_US": "API Sort"
+				"en_US": "API Application"
 			},
 			"modifiable": true,
-			"name": "APISort",
+			"name": "APIApplication",
 			"objectFields": [
 				{
-					"DBType": "Clob",
-					"businessType": "LongText",
-					"externalReferenceCode": "ODATA_SORT",
+					"DBType": "String",
+					"businessType": "Picklist",
+					"defaultValue": "unpublished",
+					"externalReferenceCode": "APPLICATION_STATUS",
 					"indexed": true,
 					"indexedAsKeyword": false,
 					"label": {
-						"en_US": "OData Sort"
+						"en_US": "Application Status"
 					},
-					"name": "oDataSort",
+					"listTypeDefinitionExternalReferenceCode": "APPLICATION_STATUS_PICKLIST",
+					"name": "applicationStatus",
 					"objectFieldSettings": [
 						{
-							"name": "showCounter",
-							"value": true
-						},
+							"name": "stateFlow",
+							"value": {
+								"objectStates": [
+									{
+										"key": "published",
+										"objectStateTransitions": [
+											{
+												"key": "unpublished"
+											}
+										]
+									},
+									{
+										"key": "unpublished",
+										"objectStateTransitions": [
+											{
+												"key": "published"
+											}
+										]
+									}
+								]
+							}
+						}
+					],
+					"required": true,
+					"state": true,
+					"system": true,
+					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"externalReferenceCode": "BASE_URL",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "",
+					"label": {
+						"en_US": "Base URL"
+					},
+					"name": "baseURL",
+					"objectFieldSettings": [
 						{
-							"name": "maxLength",
-							"value": 1000
+							"name": "uniqueValues",
+							"value": true
 						}
 					],
 					"required": true,
 					"state": false,
 					"system": true,
 					"type": "String"
-				}
-			],
-			"pluralLabel": {
-				"en_US": "API Sorts"
-			},
-			"portlet": false,
-			"scope": "company",
-			"status": {
-				"code": 0
-			},
-			"system": true
-		},
-		{
-			"enableCategorization": true,
-			"externalReferenceCode": "L_API_FILTER",
-			"label": {
-				"en_US": "API Filter"
-			},
-			"modifiable": true,
-			"name": "APIFilter",
-			"objectFields": [
+				},
 				{
-					"DBType": "Clob",
-					"businessType": "LongText",
-					"externalReferenceCode": "ODATA_FILTER",
+					"DBType": "String",
+					"businessType": "Text",
+					"externalReferenceCode": "DESCRIPTION",
 					"indexed": true,
 					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
 					"label": {
-						"en_US": "OData Filter"
+						"en_US": "Description"
 					},
-					"name": "oDataFilter",
+					"name": "description",
+					"required": false,
+					"state": false,
+					"system": true,
+					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"externalReferenceCode": "TITLE",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Title"
+					},
+					"name": "title",
 					"objectFieldSettings": [
 						{
-							"name": "showCounter",
+							"name": "uniqueValues",
 							"value": true
-						},
-						{
-							"name": "maxLength",
-							"value": 1000
 						}
 					],
 					"required": true,
 					"state": false,
 					"system": true,
 					"type": "String"
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
+					"externalReferenceCode": "VERSION",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"indexedLanguageId": "en_US",
+					"label": {
+						"en_US": "Version"
+					},
+					"name": "version",
+					"required": false,
+					"state": false,
+					"system": true,
+					"type": "String"
 				}
 			],
+			"objectRelationships": [
+				{
+					"deletionType": "cascade",
+					"externalReferenceCode": "L_API_APPLICATION_TO_API_ENDPOINTS",
+					"label": {
+						"en_US": "API Application to API Endpoints"
+					},
+					"name": "apiApplicationToAPIEndpoints",
+					"objectDefinitionExternalReferenceCode1": "L_API_APPLICATION",
+					"objectDefinitionExternalReferenceCode2": "L_API_ENDPOINT",
+					"objectDefinitionName2": "APIEndpoint",
+					"parameterObjectFieldId": 0,
+					"parameterObjectFieldName": "",
+					"reverse": false,
+					"system": true,
+					"type": "oneToMany"
+				},
+				{
+					"deletionType": "cascade",
+					"externalReferenceCode": "L_API_APPLICATION_TO_API_SCHEMAS",
+					"label": {
+						"en_US": "API Application to API Schemas"
+					},
+					"name": "apiApplicationToAPISchemas",
+					"objectDefinitionExternalReferenceCode1": "L_API_APPLICATION",
+					"objectDefinitionExternalReferenceCode2": "L_API_SCHEMA",
+					"objectDefinitionName2": "APISchema",
+					"parameterObjectFieldId": 0,
+					"parameterObjectFieldName": "",
+					"reverse": false,
+					"system": true,
+					"type": "oneToMany"
+				}
+			],
+			"panelCategoryKey": "",
+			"parameterRequired": false,
 			"pluralLabel": {
-				"en_US": "API Filters"
+				"en_US": "API Applications"
 			},
 			"portlet": false,
 			"scope": "company",
@@ -363,6 +445,51 @@
 		},
 		{
 			"enableCategorization": true,
+			"externalReferenceCode": "L_API_FILTER",
+			"label": {
+				"en_US": "API Filter"
+			},
+			"modifiable": true,
+			"name": "APIFilter",
+			"objectFields": [
+				{
+					"DBType": "Clob",
+					"businessType": "LongText",
+					"externalReferenceCode": "ODATA_FILTER",
+					"indexed": true,
+					"indexedAsKeyword": false,
+					"label": {
+						"en_US": "OData Filter"
+					},
+					"name": "oDataFilter",
+					"objectFieldSettings": [
+						{
+							"name": "showCounter",
+							"value": true
+						},
+						{
+							"name": "maxLength",
+							"value": 1000
+						}
+					],
+					"required": true,
+					"state": false,
+					"system": true,
+					"type": "String"
+				}
+			],
+			"pluralLabel": {
+				"en_US": "API Filters"
+			},
+			"portlet": false,
+			"scope": "company",
+			"status": {
+				"code": 0
+			},
+			"system": true
+		},
+		{
+			"enableCategorization": true,
 			"enableComments": false,
 			"externalReferenceCode": "L_API_PROPERTY",
 			"label": {
@@ -598,170 +725,41 @@
 		},
 		{
 			"enableCategorization": true,
-			"externalReferenceCode": "L_API_APPLICATION",
+			"externalReferenceCode": "L_API_SORT",
 			"label": {
-				"en_US": "API Application"
+				"en_US": "API Sort"
 			},
 			"modifiable": true,
-			"name": "APIApplication",
+			"name": "APISort",
 			"objectFields": [
 				{
-					"DBType": "String",
-					"businessType": "Picklist",
-					"defaultValue": "unpublished",
-					"externalReferenceCode": "APPLICATION_STATUS",
+					"DBType": "Clob",
+					"businessType": "LongText",
+					"externalReferenceCode": "ODATA_SORT",
 					"indexed": true,
 					"indexedAsKeyword": false,
 					"label": {
-						"en_US": "Application Status"
+						"en_US": "OData Sort"
 					},
-					"listTypeDefinitionExternalReferenceCode": "APPLICATION_STATUS_PICKLIST",
-					"name": "applicationStatus",
+					"name": "oDataSort",
 					"objectFieldSettings": [
 						{
-							"name": "stateFlow",
-							"value": {
-								"objectStates": [
-									{
-										"key": "published",
-										"objectStateTransitions": [
-											{
-												"key": "unpublished"
-											}
-										]
-									},
-									{
-										"key": "unpublished",
-										"objectStateTransitions": [
-											{
-												"key": "published"
-											}
-										]
-									}
-								]
-							}
-						}
-					],
-					"required": true,
-					"state": true,
-					"system": true,
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"externalReferenceCode": "BASE_URL",
-					"indexed": true,
-					"indexedAsKeyword": false,
-					"indexedLanguageId": "",
-					"label": {
-						"en_US": "Base URL"
-					},
-					"name": "baseURL",
-					"objectFieldSettings": [
-						{
-							"name": "uniqueValues",
+							"name": "showCounter",
 							"value": true
-						}
-					],
-					"required": true,
-					"state": false,
-					"system": true,
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"externalReferenceCode": "DESCRIPTION",
-					"indexed": true,
-					"indexedAsKeyword": false,
-					"indexedLanguageId": "en_US",
-					"label": {
-						"en_US": "Description"
-					},
-					"name": "description",
-					"required": false,
-					"state": false,
-					"system": true,
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"externalReferenceCode": "TITLE",
-					"indexed": true,
-					"indexedAsKeyword": false,
-					"indexedLanguageId": "en_US",
-					"label": {
-						"en_US": "Title"
-					},
-					"name": "title",
-					"objectFieldSettings": [
+						},
 						{
-							"name": "uniqueValues",
-							"value": true
+							"name": "maxLength",
+							"value": 1000
 						}
 					],
 					"required": true,
-					"state": false,
-					"system": true,
-					"type": "String"
-				},
-				{
-					"DBType": "String",
-					"businessType": "Text",
-					"externalReferenceCode": "VERSION",
-					"indexed": true,
-					"indexedAsKeyword": false,
-					"indexedLanguageId": "en_US",
-					"label": {
-						"en_US": "Version"
-					},
-					"name": "version",
-					"required": false,
 					"state": false,
 					"system": true,
 					"type": "String"
 				}
 			],
-			"objectRelationships": [
-				{
-					"deletionType": "cascade",
-					"externalReferenceCode": "L_API_APPLICATION_TO_API_ENDPOINTS",
-					"label": {
-						"en_US": "API Application to API Endpoints"
-					},
-					"name": "apiApplicationToAPIEndpoints",
-					"objectDefinitionExternalReferenceCode1": "L_API_APPLICATION",
-					"objectDefinitionExternalReferenceCode2": "L_API_ENDPOINT",
-					"objectDefinitionName2": "APIEndpoint",
-					"parameterObjectFieldId": 0,
-					"parameterObjectFieldName": "",
-					"reverse": false,
-					"system": true,
-					"type": "oneToMany"
-				},
-				{
-					"deletionType": "cascade",
-					"externalReferenceCode": "L_API_APPLICATION_TO_API_SCHEMAS",
-					"label": {
-						"en_US": "API Application to API Schemas"
-					},
-					"name": "apiApplicationToAPISchemas",
-					"objectDefinitionExternalReferenceCode1": "L_API_APPLICATION",
-					"objectDefinitionExternalReferenceCode2": "L_API_SCHEMA",
-					"objectDefinitionName2": "APISchema",
-					"parameterObjectFieldId": 0,
-					"parameterObjectFieldName": "",
-					"reverse": false,
-					"system": true,
-					"type": "oneToMany"
-				}
-			],
-			"panelCategoryKey": "",
-			"parameterRequired": false,
 			"pluralLabel": {
-				"en_US": "API Applications"
+				"en_US": "API Sorts"
 			},
 			"portlet": false,
 			"scope": "company",
