@@ -19,6 +19,9 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.SQLStateAcceptor;
+import com.liferay.portal.kernel.spring.aop.Property;
+import com.liferay.portal.kernel.spring.aop.Retry;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -287,6 +290,15 @@ public interface DispatchLogLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public DispatchLog updateDispatchLog(DispatchLog dispatchLog);
 
+	@Retry(
+		acceptor = SQLStateAcceptor.class,
+		properties = {
+			@Property(
+				name = SQLStateAcceptor.SQLSTATE,
+				value = SQLStateAcceptor.SQLSTATE_TRANSACTION_ROLLBACK
+			)
+		}
+	)
 	public DispatchLog updateDispatchLog(
 			long dispatchLogId, Date endDate, String error, String output,
 			DispatchTaskStatus dispatchTaskStatus)
