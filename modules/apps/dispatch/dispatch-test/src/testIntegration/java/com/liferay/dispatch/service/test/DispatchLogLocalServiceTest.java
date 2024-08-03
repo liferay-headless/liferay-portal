@@ -18,26 +18,37 @@ import com.liferay.dispatch.service.DispatchTriggerLocalService;
 import com.liferay.dispatch.service.test.util.DispatchLogTestUtil;
 import com.liferay.dispatch.service.test.util.DispatchTriggerTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.BaseModelListener;
+import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.hibernate.exception.LockAcquisitionException;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Igor Beslic
@@ -289,6 +300,37 @@ public class DispatchLogLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateDispatchLogDbDeadlockRetry() throws Exception {
+		User user = UserTestUtil.addUser();
+
+		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
+			DispatchTriggerTestUtil.randomDispatchTrigger(
+				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
+				1));
+
+		DispatchLog expectedDispatchLog = DispatchLogTestUtil.randomDispatchLog(
+			user, DispatchTaskStatus.IN_PROGRESS);
+
+		DispatchLog dispatchLog = _dispatchLogLocalService.addDispatchLog(
+			user.getUserId(), dispatchTrigger.getDispatchTriggerId(), null,
+			null, null, expectedDispatchLog.getStartDate(),
+			DispatchTaskStatus.valueOf(expectedDispatchLog.getStatus()));
+
+		try (AutoCloseable autoCloseable =
+				_registerDispatchLogModelListener()) {
+
+			dispatchLog = _dispatchLogLocalService.updateDispatchLog(
+				dispatchLog.getDispatchLogId(),
+				expectedDispatchLog.getEndDate(), null, null,
+				DispatchTaskStatus.SUCCESSFUL);
+
+			Assert.assertEquals(
+				DispatchTaskStatus.SUCCESSFUL,
+				DispatchTaskStatus.valueOf(dispatchLog.getStatus()));
+		}
+	}
+
+	@Test
 	public void testUpdateDispatchLogExceptions() throws Exception {
 		User user = UserTestUtil.addUser();
 
@@ -408,6 +450,47 @@ public class DispatchLogLocalServiceTest {
 				"Latest dispatch log start date",
 				currentStartDate.getTime() >= startDate.getTime());
 		}
+	}
+
+	private AutoCloseable _registerDispatchLogModelListener() {
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+
+		ServiceRegistration<?> serviceRegistration =
+			bundleContext.registerService(
+				(Class<ModelListener<DispatchLog>>)
+					(Class<?>)ModelListener.class,
+				new BaseModelListener<DispatchLog>() {
+
+					@Override
+					public void onBeforeUpdate(
+						DispatchLog originalDispatchLog,
+						DispatchLog dispatchLog) {
+
+						if (_tries < _MAX_TRIES) {
+							++_tries;
+
+							SQLException sqlException = new SQLException(
+								_DEADLOCK_MESSAGE, _DEADLOCK_SQLSTATE);
+
+							throw new LockAcquisitionException(
+								_DEADLOCK_MESSAGE, sqlException);
+						}
+					}
+
+					private static final String _DEADLOCK_MESSAGE =
+						"Deadlock found when trying to get lock; try " +
+							"restarting transaction";
+
+					private static final String _DEADLOCK_SQLSTATE = "40";
+
+					private static final int _MAX_TRIES = 3;
+
+					private int _tries;
+
+				},
+				new HashMapDictionary<>());
+
+		return serviceRegistration::unregister;
 	}
 
 	@Inject
