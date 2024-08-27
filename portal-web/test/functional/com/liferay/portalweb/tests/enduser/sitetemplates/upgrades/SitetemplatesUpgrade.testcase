@@ -268,6 +268,12 @@ definition {
 		property database.types = "db2,mysql,oracle,postgresql";
 		property portal.version = "7.2.10.1";
 
+		// LPD-34640 testing pause that will remove later
+
+		Pause(value1 = 10000);
+
+		takeScreenshot();
+
 		task ("Verify that the AP Widget is still present on the Site Name page") {
 			Navigator.gotoSitePage(
 				pageName = "Home",
