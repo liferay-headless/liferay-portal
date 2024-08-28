@@ -8406,7 +8406,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
-            tags: ["PageSpecification"]
+            tags: ["UtilityPage"]
     "/sites/{siteExternalReferenceCode}/utility-pages/{utilityPageExternalReferenceCode}/permissions":
         get:
             parameters:
