@@ -1291,76 +1291,6 @@ public class Mutation {
 	}
 
 	@GraphQLField(
-		description = "Adds a new page specification in draft status to a page template."
-	)
-	public ContentPageSpecification
-			createSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
-				@GraphQLName("siteExternalReferenceCode") String
-					siteExternalReferenceCode,
-				@GraphQLName("pageTemplateExternalReferenceCode") String
-					pageTemplateExternalReferenceCode,
-				@GraphQLName("contentPageSpecification")
-					ContentPageSpecification contentPageSpecification)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_pageSpecificationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			pageSpecificationResource ->
-				pageSpecificationResource.
-					postSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
-						siteExternalReferenceCode,
-						pageTemplateExternalReferenceCode,
-						contentPageSpecification));
-	}
-
-	@GraphQLField(description = "Adds a new page specification to a site page.")
-	public ContentPageSpecification
-			createSiteSiteByExternalReferenceCodeSitePagePageSpecification(
-				@GraphQLName("siteExternalReferenceCode") String
-					siteExternalReferenceCode,
-				@GraphQLName("sitePageExternalReferenceCode") String
-					sitePageExternalReferenceCode,
-				@GraphQLName("contentPageSpecification")
-					ContentPageSpecification contentPageSpecification)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_pageSpecificationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			pageSpecificationResource ->
-				pageSpecificationResource.
-					postSiteSiteByExternalReferenceCodeSitePagePageSpecification(
-						siteExternalReferenceCode,
-						sitePageExternalReferenceCode,
-						contentPageSpecification));
-	}
-
-	@GraphQLField(
-		description = "Adds a new page specification to a utility page."
-	)
-	public ContentPageSpecification
-			createSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
-				@GraphQLName("siteExternalReferenceCode") String
-					siteExternalReferenceCode,
-				@GraphQLName("utilityPageExternalReferenceCode") String
-					utilityPageExternalReferenceCode,
-				@GraphQLName("contentPageSpecification")
-					ContentPageSpecification contentPageSpecification)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_pageSpecificationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			pageSpecificationResource ->
-				pageSpecificationResource.
-					postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
-						siteExternalReferenceCode,
-						utilityPageExternalReferenceCode,
-						contentPageSpecification));
-	}
-
-	@GraphQLField(
 		description = "Adds a new page template in draft status to a page template set."
 	)
 	public PageTemplate
@@ -1481,6 +1411,30 @@ public class Mutation {
 					putSiteSiteByExternalReferenceCodePageTemplate(
 						siteExternalReferenceCode,
 						pageTemplateExternalReferenceCode, pageTemplate));
+	}
+
+	@GraphQLField(
+		description = "Adds a new page specification in draft status to a page template."
+	)
+	public ContentPageSpecification
+			createSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
+				@GraphQLName("siteExternalReferenceCode") String
+					siteExternalReferenceCode,
+				@GraphQLName("pageTemplateExternalReferenceCode") String
+					pageTemplateExternalReferenceCode,
+				@GraphQLName("contentPageSpecification")
+					ContentPageSpecification contentPageSpecification)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_pageTemplateResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			pageTemplateResource ->
+				pageTemplateResource.
+					postSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
+						siteExternalReferenceCode,
+						pageTemplateExternalReferenceCode,
+						contentPageSpecification));
 	}
 
 	@GraphQLField
@@ -1728,6 +1682,28 @@ public class Mutation {
 					sitePage));
 	}
 
+	@GraphQLField(description = "Adds a new page specification to a site page.")
+	public ContentPageSpecification
+			createSiteSiteByExternalReferenceCodeSitePagePageSpecification(
+				@GraphQLName("siteExternalReferenceCode") String
+					siteExternalReferenceCode,
+				@GraphQLName("sitePageExternalReferenceCode") String
+					sitePageExternalReferenceCode,
+				@GraphQLName("contentPageSpecification")
+					ContentPageSpecification contentPageSpecification)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_sitePageResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			sitePageResource ->
+				sitePageResource.
+					postSiteSiteByExternalReferenceCodeSitePagePageSpecification(
+						siteExternalReferenceCode,
+						sitePageExternalReferenceCode,
+						contentPageSpecification));
+	}
+
 	@GraphQLField
 	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
 			updateSiteSiteExternalReferenceCodeSitePagePermissionsPage(
@@ -1850,6 +1826,30 @@ public class Mutation {
 					putSiteSiteByExternalReferenceCodeUtilityPage(
 						siteExternalReferenceCode,
 						utilityPageExternalReferenceCode, utilityPage));
+	}
+
+	@GraphQLField(
+		description = "Adds a new page specification to a utility page."
+	)
+	public ContentPageSpecification
+			createSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
+				@GraphQLName("siteExternalReferenceCode") String
+					siteExternalReferenceCode,
+				@GraphQLName("utilityPageExternalReferenceCode") String
+					utilityPageExternalReferenceCode,
+				@GraphQLName("contentPageSpecification")
+					ContentPageSpecification contentPageSpecification)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_utilityPageResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			utilityPageResource ->
+				utilityPageResource.
+					postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
+						siteExternalReferenceCode,
+						utilityPageExternalReferenceCode,
+						contentPageSpecification));
 	}
 
 	@GraphQLField

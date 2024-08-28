@@ -5,7 +5,6 @@
 
 package com.liferay.headless.admin.site.resource.v1_0;
 
-import com.liferay.headless.admin.site.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.dto.v1_0.PageSpecification;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -96,37 +95,16 @@ public interface PageSpecificationResource {
 				String pageTemplateExternalReferenceCode)
 		throws Exception;
 
-	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
-				String siteExternalReferenceCode,
-				String pageTemplateExternalReferenceCode,
-				ContentPageSpecification contentPageSpecification)
-		throws Exception;
-
 	public Page<PageSpecification>
 			getSiteSiteByExternalReferenceCodeSitePagePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
-	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeSitePagePageSpecification(
-				String siteExternalReferenceCode,
-				String sitePageExternalReferenceCode,
-				ContentPageSpecification contentPageSpecification)
-		throws Exception;
-
 	public Page<PageSpecification>
 			getSiteSiteByExternalReferenceCodeUtilityPagePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode)
-		throws Exception;
-
-	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
-				String siteExternalReferenceCode,
-				String utilityPageExternalReferenceCode,
-				ContentPageSpecification contentPageSpecification)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

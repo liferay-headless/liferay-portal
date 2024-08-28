@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.admin.site.client.dto.v1_0.ContentPageSpecification;
 import com.liferay.headless.admin.site.client.dto.v1_0.ContentPageTemplate;
 import com.liferay.headless.admin.site.client.dto.v1_0.PageTemplate;
 import com.liferay.headless.admin.site.client.dto.v1_0.WidgetPageTemplate;
@@ -1092,6 +1093,13 @@ public abstract class BasePageTemplateResourceTestCase {
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
+	@Test
+	public void testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification()
+		throws Exception {
+
+		Assert.assertTrue(true);
+	}
+
 	protected void assertContains(
 		PageTemplate pageTemplate, List<PageTemplate> pageTemplates) {
 
@@ -1136,6 +1144,16 @@ public abstract class BasePageTemplateResourceTestCase {
 
 			assertEquals(pageTemplate1, pageTemplate2);
 		}
+	}
+
+	protected void assertEquals(
+		ContentPageSpecification contentPageSpecification1,
+		ContentPageSpecification contentPageSpecification2) {
+
+		Assert.assertTrue(
+			contentPageSpecification1 + " does not equal " +
+				contentPageSpecification2,
+			equals(contentPageSpecification1, contentPageSpecification2));
 	}
 
 	protected void assertEqualsIgnoringOrder(
@@ -1434,7 +1452,35 @@ public abstract class BasePageTemplateResourceTestCase {
 		}
 	}
 
+	protected void assertValid(
+		ContentPageSpecification contentPageSpecification) {
+
+		boolean valid = true;
+
+		for (String additionalAssertFieldName :
+				getAdditionalContentPageSpecificationAssertFieldNames()) {
+
+			if (Objects.equals("pageExperiences", additionalAssertFieldName)) {
+				if (contentPageSpecification.getPageExperiences() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
+	}
+
 	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
+	protected String[] getAdditionalContentPageSpecificationAssertFieldNames() {
 		return new String[0];
 	}
 
@@ -1831,6 +1877,36 @@ public abstract class BasePageTemplateResourceTestCase {
 		}
 
 		return false;
+	}
+
+	protected boolean equals(
+		ContentPageSpecification contentPageSpecification1,
+		ContentPageSpecification contentPageSpecification2) {
+
+		if (contentPageSpecification1 == contentPageSpecification2) {
+			return true;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalContentPageSpecificationAssertFieldNames()) {
+
+			if (Objects.equals("pageExperiences", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						contentPageSpecification1.getPageExperiences(),
+						contentPageSpecification2.getPageExperiences())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
 	}
 
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
@@ -2381,6 +2457,15 @@ public abstract class BasePageTemplateResourceTestCase {
 
 	protected PageTemplate randomPatchPageTemplate() throws Exception {
 		return randomPageTemplate();
+	}
+
+	protected ContentPageSpecification randomContentPageSpecification()
+		throws Exception {
+
+		return new ContentPageSpecification() {
+			{
+			}
+		};
 	}
 
 	protected PageTemplateResource pageTemplateResource;

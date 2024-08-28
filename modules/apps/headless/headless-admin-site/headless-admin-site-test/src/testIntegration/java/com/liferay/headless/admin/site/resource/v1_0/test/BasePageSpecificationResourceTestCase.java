@@ -657,59 +657,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 	}
 
 	@Test
-	public void testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification()
-		throws Exception {
-
-		PageSpecification randomPageSpecification = randomPageSpecification();
-
-		PageSpecification postPageSpecification =
-			testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification_addPageSpecification(
-				randomPageSpecification);
-
-		assertEquals(randomPageSpecification, postPageSpecification);
-		assertValid(postPageSpecification);
-
-		ContentPageSpecification contentPageSpecification =
-			new ContentPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("ContentPageSpecification");
-				}
-			};
-
-		assertEquals(
-			contentPageSpecification,
-			testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification_addPageSpecification(
-				contentPageSpecification));
-
-		WidgetPageSpecification widgetPageSpecification =
-			new WidgetPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("WidgetPageSpecification");
-				}
-			};
-
-		assertEquals(
-			widgetPageSpecification,
-			testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification_addPageSpecification(
-				widgetPageSpecification));
-	}
-
-	protected PageSpecification
-			testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification_addPageSpecification(
-				PageSpecification pageSpecification)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testGetSiteSiteByExternalReferenceCodeSitePagePageSpecificationsPage()
 		throws Exception {
 
@@ -833,59 +780,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 		throws Exception {
 
 		return null;
-	}
-
-	@Test
-	public void testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification()
-		throws Exception {
-
-		PageSpecification randomPageSpecification = randomPageSpecification();
-
-		PageSpecification postPageSpecification =
-			testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification_addPageSpecification(
-				randomPageSpecification);
-
-		assertEquals(randomPageSpecification, postPageSpecification);
-		assertValid(postPageSpecification);
-
-		ContentPageSpecification contentPageSpecification =
-			new ContentPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("ContentPageSpecification");
-				}
-			};
-
-		assertEquals(
-			contentPageSpecification,
-			testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification_addPageSpecification(
-				contentPageSpecification));
-
-		WidgetPageSpecification widgetPageSpecification =
-			new WidgetPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("WidgetPageSpecification");
-				}
-			};
-
-		assertEquals(
-			widgetPageSpecification,
-			testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification_addPageSpecification(
-				widgetPageSpecification));
-	}
-
-	protected PageSpecification
-			testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification_addPageSpecification(
-				PageSpecification pageSpecification)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1016,80 +910,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 		return null;
 	}
 
-	@Test
-	public void testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification()
-		throws Exception {
-
-		PageSpecification randomPageSpecification = randomPageSpecification();
-
-		PageSpecification postPageSpecification =
-			testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification_addPageSpecification(
-				randomPageSpecification);
-
-		assertEquals(randomPageSpecification, postPageSpecification);
-		assertValid(postPageSpecification);
-
-		ContentPageSpecification contentPageSpecification =
-			new ContentPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("ContentPageSpecification");
-				}
-			};
-
-		assertEquals(
-			contentPageSpecification,
-			testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification_addPageSpecification(
-				contentPageSpecification));
-
-		WidgetPageSpecification widgetPageSpecification =
-			new WidgetPageSpecification() {
-				{
-					externalReferenceCode = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-
-					type = Type.create("WidgetPageSpecification");
-				}
-			};
-
-		assertEquals(
-			widgetPageSpecification,
-			testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification_addPageSpecification(
-				widgetPageSpecification));
-	}
-
-	protected PageSpecification
-			testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification_addPageSpecification(
-				PageSpecification pageSpecification)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testPostSiteSiteByExternalReferenceCodePageTemplatePageSpecification()
-		throws Exception {
-
-		Assert.assertTrue(true);
-	}
-
-	@Test
-	public void testPostSiteSiteByExternalReferenceCodeSitePagePageSpecification()
-		throws Exception {
-
-		Assert.assertTrue(true);
-	}
-
-	@Test
-	public void testPostSiteSiteByExternalReferenceCodeUtilityPagePageSpecification()
-		throws Exception {
-
-		Assert.assertTrue(true);
-	}
-
 	protected void assertContains(
 		PageSpecification pageSpecification,
 		List<PageSpecification> pageSpecifications) {
@@ -1139,16 +959,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 
 			assertEquals(pageSpecification1, pageSpecification2);
 		}
-	}
-
-	protected void assertEquals(
-		ContentPageSpecification contentPageSpecification1,
-		ContentPageSpecification contentPageSpecification2) {
-
-		Assert.assertTrue(
-			contentPageSpecification1 + " does not equal " +
-				contentPageSpecification2,
-			equals(contentPageSpecification1, contentPageSpecification2));
 	}
 
 	protected void assertEqualsIgnoringOrder(
@@ -1291,35 +1101,7 @@ public abstract class BasePageSpecificationResourceTestCase {
 		}
 	}
 
-	protected void assertValid(
-		ContentPageSpecification contentPageSpecification) {
-
-		boolean valid = true;
-
-		for (String additionalAssertFieldName :
-				getAdditionalContentPageSpecificationAssertFieldNames()) {
-
-			if (Objects.equals("pageExperiences", additionalAssertFieldName)) {
-				if (contentPageSpecification.getPageExperiences() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid additional assert field name " +
-					additionalAssertFieldName);
-		}
-
-		Assert.assertTrue(valid);
-	}
-
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[0];
-	}
-
-	protected String[] getAdditionalContentPageSpecificationAssertFieldNames() {
 		return new String[0];
 	}
 
@@ -1495,36 +1277,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 		}
 
 		return false;
-	}
-
-	protected boolean equals(
-		ContentPageSpecification contentPageSpecification1,
-		ContentPageSpecification contentPageSpecification2) {
-
-		if (contentPageSpecification1 == contentPageSpecification2) {
-			return true;
-		}
-
-		for (String additionalAssertFieldName :
-				getAdditionalContentPageSpecificationAssertFieldNames()) {
-
-			if (Objects.equals("pageExperiences", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						contentPageSpecification1.getPageExperiences(),
-						contentPageSpecification2.getPageExperiences())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid additional assert field name " +
-					additionalAssertFieldName);
-		}
-
-		return true;
 	}
 
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
@@ -1745,15 +1497,6 @@ public abstract class BasePageSpecificationResourceTestCase {
 		throws Exception {
 
 		return randomPageSpecification();
-	}
-
-	protected ContentPageSpecification randomContentPageSpecification()
-		throws Exception {
-
-		return new ContentPageSpecification() {
-			{
-			}
-		};
 	}
 
 	protected PageSpecificationResource pageSpecificationResource;

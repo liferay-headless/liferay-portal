@@ -414,21 +414,6 @@ public class ServletDataImpl implements ServletData {
 							PageSpecificationResourceImpl.class,
 							"postSiteSiteByExternalReferenceCodePageSpecificationPublish"));
 					put(
-						"mutation#createSiteSiteByExternalReferenceCodePageTemplatePageSpecification",
-						new ObjectValuePair<>(
-							PageSpecificationResourceImpl.class,
-							"postSiteSiteByExternalReferenceCodePageTemplatePageSpecification"));
-					put(
-						"mutation#createSiteSiteByExternalReferenceCodeSitePagePageSpecification",
-						new ObjectValuePair<>(
-							PageSpecificationResourceImpl.class,
-							"postSiteSiteByExternalReferenceCodeSitePagePageSpecification"));
-					put(
-						"mutation#createSiteSiteByExternalReferenceCodeUtilityPagePageSpecification",
-						new ObjectValuePair<>(
-							PageSpecificationResourceImpl.class,
-							"postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification"));
-					put(
 						"mutation#createSiteSiteByExternalReferenceCodePageTemplateSetPageTemplate",
 						new ObjectValuePair<>(
 							PageTemplateResourceImpl.class,
@@ -458,6 +443,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							PageTemplateResourceImpl.class,
 							"putSiteSiteByExternalReferenceCodePageTemplate"));
+					put(
+						"mutation#createSiteSiteByExternalReferenceCodePageTemplatePageSpecification",
+						new ObjectValuePair<>(
+							PageTemplateResourceImpl.class,
+							"postSiteSiteByExternalReferenceCodePageTemplatePageSpecification"));
 					put(
 						"mutation#updateSiteSiteExternalReferenceCodePageTemplatePermissionsPage",
 						new ObjectValuePair<>(
@@ -519,6 +509,11 @@ public class ServletDataImpl implements ServletData {
 							SitePageResourceImpl.class,
 							"putSiteSiteByExternalReferenceCodeSitePage"));
 					put(
+						"mutation#createSiteSiteByExternalReferenceCodeSitePagePageSpecification",
+						new ObjectValuePair<>(
+							SitePageResourceImpl.class,
+							"postSiteSiteByExternalReferenceCodeSitePagePageSpecification"));
+					put(
 						"mutation#updateSiteSiteExternalReferenceCodeSitePagePermissionsPage",
 						new ObjectValuePair<>(
 							SitePageResourceImpl.class,
@@ -548,6 +543,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							UtilityPageResourceImpl.class,
 							"putSiteSiteByExternalReferenceCodeUtilityPage"));
+					put(
+						"mutation#createSiteSiteByExternalReferenceCodeUtilityPagePageSpecification",
+						new ObjectValuePair<>(
+							UtilityPageResourceImpl.class,
+							"postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification"));
 					put(
 						"mutation#updateSiteSiteExternalReferenceCodeUtilityPagePermissionsPage",
 						new ObjectValuePair<>(
