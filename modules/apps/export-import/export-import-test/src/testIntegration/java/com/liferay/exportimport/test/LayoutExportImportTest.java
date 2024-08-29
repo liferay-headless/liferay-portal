@@ -657,7 +657,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 					"$GROUP_ID", "$LAYOUT_ID", "$LAYOUT_UUID", "$TITLE"
 				},
 				new String[] {
-					String.valueOf(childLayout.getGroupId()),
+					String.valueOf(parentLayout.getGroupId()),
 					String.valueOf(childLayout.getLayoutId()),
 					childLayout.getUuid(), childLayout.getName("en_US")
 				}),
