@@ -56,6 +56,7 @@ import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.links.Link;
 import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -1124,6 +1125,45 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 					}
 
 					return arraySchema;
+				}
+
+				if (type.equals("Composed")) {
+					ComposedSchema composedSchema = new ComposedSchema();
+
+					composedSchema.setDescription(dtoProperty.getDescription());
+					composedSchema.setExtensions(dtoProperty.getExtensions());
+					composedSchema.setName(dtoProperty.getName());
+					composedSchema.setType("composed");
+
+					List<DTOProperty> dtoProperties =
+						dtoProperty.getDTOProperties();
+
+					if (ListUtil.isNotEmpty(dtoProperties)) {
+						for (DTOProperty childDTOProperty : dtoProperties) {
+							String childType = childDTOProperty.getType();
+
+							if (childType.equals("AnyOf")) {
+								ArrayList<Schema> anyOfSchemas =
+									new ArrayList<>();
+
+								for (DTOProperty anyOfDTOProperties :
+										childDTOProperty.getDTOProperties()) {
+
+									anyOfSchemas.add(
+										_addSchema(anyOfDTOProperties));
+								}
+
+								composedSchema.setAnyOf(anyOfSchemas);
+							}
+							else {
+								composedSchema.addProperties(
+									childDTOProperty.getName(),
+									_addSchema(childDTOProperty));
+							}
+						}
+					}
+
+					return composedSchema;
 				}
 
 				Schema<Object> schema = new Schema<>();
