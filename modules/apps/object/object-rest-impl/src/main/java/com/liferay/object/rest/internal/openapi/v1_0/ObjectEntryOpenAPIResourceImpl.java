@@ -309,8 +309,7 @@ public class ObjectEntryOpenAPIResourceImpl
 		openAPISchemaFilter.setApplicationPath(
 			objectDefinition.getRESTContextPath());
 
-		DTOProperty dtoProperty = new DTOProperty(
-			new HashMap<>(), "ObjectEntry", "Object");
+		boolean hasRelationship = false;
 
 		List<DTOProperty> dtoProperties = new ArrayList<>();
 
@@ -337,36 +336,57 @@ public class ObjectEntryOpenAPIResourceImpl
 					objectField.getRelationshipType(),
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
+				hasRelationship = true;
+
 				ObjectRelationship objectRelationship =
 					_objectRelationshipLocalService.
 						fetchObjectRelationshipByObjectFieldId2(
 							objectField.getObjectFieldId());
 
 				dtoProperties.add(
-					new DTOProperty(
-						Collections.singletonMap("x-parent-map", "properties"),
-						objectRelationship.getName(),
-						String.class.getSimpleName()) {
-
+					new DTOProperty(null, "anyOf", "AnyOf") {
 						{
-							setRequired(objectField.isRequired());
-						}
-					});
+							setDTOProperties(
+								Arrays.asList(
+									new DTOProperty(
+										Collections.singletonMap(
+											"x-parent-map", "properties"),
+										objectRelationship.getName(),
+										String.class.getSimpleName()) {
 
-				dtoProperties.add(
-					new DTOProperty(
-						Collections.singletonMap("x-parent-map", "properties"),
-						ObjectFieldSettingUtil.getValue(
-							ObjectFieldSettingConstants.
-								NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
-							objectField),
-						String.class.getSimpleName()) {
+										{
+											setRequired(
+												objectField.isRequired());
+										}
+									},
+									new DTOProperty(
+										Collections.singletonMap(
+											"x-parent-map", "properties"),
+										ObjectFieldSettingUtil.getValue(
+											ObjectFieldSettingConstants.
+												NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+											objectField),
+										String.class.getSimpleName()) {
 
-						{
-							setRequired(objectField.isRequired());
+										{
+											setRequired(
+												objectField.isRequired());
+										}
+									}));
 						}
 					});
 			}
+		}
+
+		DTOProperty dtoProperty = null;
+
+		if (hasRelationship) {
+			dtoProperty = new DTOProperty(
+				new HashMap<>(), "ObjectEntry", "Composed");
+		}
+		else {
+			dtoProperty = new DTOProperty(
+				new HashMap<>(), "ObjectEntry", "Object");
 		}
 
 		dtoProperty.setDTOProperties(dtoProperties);
