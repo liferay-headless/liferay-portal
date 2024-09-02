@@ -1050,12 +1050,39 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 						continue;
 					}
 
+					if (Objects.equals(dtoProperty.getType(), "Composed")) {
+						ComposedSchema composedSchema = new ComposedSchema();
+
+						composedSchema.setName(schema.getName());
+						composedSchema.setType("composed");
+						composedSchema.setProperties(schema.getProperties());
+						composedSchema.setXml(schema.getXml());
+
+						schema = composedSchema;
+					}
+
 					for (DTOProperty childDTOProperty :
 							dtoProperty.getDTOProperties()) {
 
-						schema.addProperties(
-							childDTOProperty.getName(),
-							_addSchema(childDTOProperty));
+						if (Objects.equals(
+								childDTOProperty.getType(), "AnyOf")) {
+
+							ArrayList<Schema> anyOfSchemas = new ArrayList<>();
+
+							for (DTOProperty anyOfDTOProperties :
+									childDTOProperty.getDTOProperties()) {
+
+								anyOfSchemas.add(
+									_addSchema(anyOfDTOProperties));
+							}
+
+							((ComposedSchema)schema).setAnyOf(anyOfSchemas);
+						}
+						else {
+							schema.addProperties(
+								childDTOProperty.getName(),
+								_addSchema(childDTOProperty));
+						}
 
 						if (childDTOProperty.isRequired()) {
 							schema.addRequiredItem(childDTOProperty.getName());
