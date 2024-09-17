@@ -51,7 +51,7 @@ public class ExtensionsOpenAPIContributor implements OpenAPIContributor {
 			return;
 		}
 
-		Map<String, EntityField> entityFieldsMap = _getEntityModelFromJaxrs(
+		Map<String, EntityField> entityFieldsMap = getEntityModelFromJaxrs(
 			openAPIContext.getPath());
 
 		if ((entityFieldsMap == null) || entityFieldsMap.isEmpty()) {
@@ -82,39 +82,7 @@ public class ExtensionsOpenAPIContributor implements OpenAPIContributor {
 		_serviceTrackerMap.close();
 	}
 
-	private String _findApplicationName(String path) {
-		try {
-			String applicationBase = StringUtil.removeFirst(path, "/o");
-
-			applicationBase = StringUtil.replaceLast(applicationBase, '/', "");
-
-			String filter =
-				"(osgi.jaxrs.application.base=" + applicationBase + ")";
-
-			Collection<ServiceReference<Application>> serviceReferences =
-				_bundleContext.getServiceReferences(Application.class, filter);
-
-			if ((serviceReferences != null) && !serviceReferences.isEmpty()) {
-				for (ServiceReference<Application> serviceReference :
-						serviceReferences) {
-
-					return (String)serviceReference.getProperty(
-						"osgi.jaxrs.name");
-				}
-			}
-		}
-		catch (InvalidSyntaxException invalidSyntaxException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(invalidSyntaxException);
-			}
-
-			return null;
-		}
-
-		return null;
-	}
-
-	private Map<String, EntityField> _getEntityModelFromJaxrs(String path)
+	protected Map<String, EntityField> getEntityModelFromJaxrs(String path)
 		throws Exception {
 
 		String applicationName = _findApplicationName(path);
@@ -144,6 +112,38 @@ public class ExtensionsOpenAPIContributor implements OpenAPIContributor {
 					}
 				}
 			}
+		}
+
+		return null;
+	}
+
+	private String _findApplicationName(String path) {
+		try {
+			String applicationBase = StringUtil.removeFirst(path, "/o");
+
+			applicationBase = StringUtil.replaceLast(applicationBase, '/', "");
+
+			String filter =
+				"(osgi.jaxrs.application.base=" + applicationBase + ")";
+
+			Collection<ServiceReference<Application>> serviceReferences =
+				_bundleContext.getServiceReferences(Application.class, filter);
+
+			if ((serviceReferences != null) && !serviceReferences.isEmpty()) {
+				for (ServiceReference<Application> serviceReference :
+						serviceReferences) {
+
+					return (String)serviceReference.getProperty(
+						"osgi.jaxrs.name");
+				}
+			}
+		}
+		catch (InvalidSyntaxException invalidSyntaxException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(invalidSyntaxException);
+			}
+
+			return null;
 		}
 
 		return null;
