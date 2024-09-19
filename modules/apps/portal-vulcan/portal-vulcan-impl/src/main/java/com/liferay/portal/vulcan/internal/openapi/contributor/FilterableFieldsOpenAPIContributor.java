@@ -6,8 +6,11 @@
 package com.liferay.portal.vulcan.internal.openapi.contributor;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
@@ -22,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -43,6 +48,10 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 	@Override
 	public void contribute(OpenAPI openAPI, OpenAPIContext openAPIContext)
 		throws Exception {
+
+		if (openAPIContext == null) {
+			return;
+		}
 
 		Map<String, Schema> schemas = openAPI.getComponents(
 		).getSchemas();
@@ -70,18 +79,88 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		_bundleContext = bundleContext;
 	}
 
-	private String _createApplicationFilter(String applicationBase) {
-		return String.format(
-			"(osgi.jaxrs.application.base=%s)", applicationBase);
-	}
-
-	private Map<String, EntityField> _extractEntityFieldsFromResources(
-			List<EntityModelResource> resources)
+	private Map<String, EntityField> _fetchEntityFieldsMap(String path)
 		throws Exception {
 
+		String trimmedPath = StringUtil.removeFirst(path, "/o");
+
+		String applicationBase = StringUtil.replaceLast(trimmedPath, '/', "");
+
+		String applicationFilter = String.format(
+			"(osgi.jaxrs.application.base=%s)", applicationBase);
+
+		Collection<ServiceReference<Application>>
+			bundleContextServiceReferences =
+			_bundleContext.getServiceReferences(
+				Application.class, applicationFilter);
+
+		if (CollectionUtils.isEmpty(bundleContextServiceReferences)) {
+			return Collections.emptyMap();
+		}
+
+		boolean objects = false;
+
+		List<EntityModelResource> resources = new ArrayList<>();
+
+		for (ServiceReference<Application> applicationServiceReference :
+			bundleContextServiceReferences) {
+
+			String applicationName =
+				(String)applicationServiceReference.getProperty(
+					"osgi.jaxrs.name");
+
+			if (applicationName.isEmpty()) {
+				continue;
+			}
+
+			Object objectsObject = applicationServiceReference.getProperty(
+				"liferay.objects");
+
+			if (objectsObject != null) {
+				objects = (boolean)objectsObject;
+			}
+
+			String resourceFilter = StringBundler.concat(
+				"(&(osgi.jaxrs.resource=true)(osgi.jaxrs.application.select=\\",
+				"(osgi.jaxrs.name=", applicationName, "\\)))");
+
+			ServiceReference<?>[] resourceServiceReferences =
+				_bundleContext.getServiceReferences(
+					(String)null, resourceFilter);
+
+			List<EntityModelResource> entityModelResources = new ArrayList<>();
+
+			for (ServiceReference<?> serviceReference :
+				resourceServiceReferences) {
+
+				Object service = _bundleContext.getService(serviceReference);
+
+				if (!(service instanceof EntityModelResource)) {
+					continue;
+				}
+
+				entityModelResources.add((EntityModelResource)service);
+			}
+
+			resources.addAll(entityModelResources);
+		}
+
+		MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
+
 		for (EntityModelResource resource : resources) {
-			EntityModel entityModel = resource.getEntityModel(
-				new MultivaluedHashMap<>());
+			if (objects) {
+				HttpServletRequest httpServletRequest =
+					_getHttpServletRequestFromServiceContext();
+
+				if (httpServletRequest != null) {
+					long companyId = (long)httpServletRequest.getAttribute(
+						WebKeys.COMPANY_ID);
+
+					params.putSingle("companyId", String.valueOf(companyId));
+				}
+			}
+
+			EntityModel entityModel = resource.getEntityModel(params);
 
 			if (entityModel == null) {
 				continue;
@@ -93,58 +172,19 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		return Collections.emptyMap();
 	}
 
-	private Map<String, EntityField> _fetchEntityFieldsMap(String path)
-		throws Exception {
+	private HttpServletRequest _getHttpServletRequestFromServiceContext() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
-		List<EntityModelResource> resources = _findEntityModelResources(path);
+		if (serviceContext != null) {
+			HttpServletRequest httpServletRequest = serviceContext.getRequest();
 
-		return _extractEntityFieldsFromResources(resources);
-	}
-
-	private List<EntityModelResource> _findEntityModelResources(String path)
-		throws Exception {
-
-		String trimmedPath = StringUtil.removeFirst(path, "/o");
-
-		String applicationBase = StringUtil.replaceLast(trimmedPath, '/', "");
-
-		String applicationFilter = _createApplicationFilter(applicationBase);
-
-		Collection<ServiceReference<Application>> serviceReferences =
-			_bundleContext.getServiceReferences(
-				Application.class, applicationFilter);
-
-		if (CollectionUtils.isEmpty(serviceReferences)) {
-			return Collections.emptyList();
-		}
-
-		return _retrieveResourcesFromApplications(serviceReferences);
-	}
-
-	private List<EntityModelResource> _getResourcesForApplication(
-			String applicationName)
-		throws Exception {
-
-		String resourceFilter = StringBundler.concat(
-			"(&(osgi.jaxrs.resource=true)(osgi.jaxrs.application.select=\\",
-			"(osgi.jaxrs.name=", applicationName, "\\)))");
-
-		ServiceReference<?>[] serviceReferences =
-			_bundleContext.getServiceReferences((String)null, resourceFilter);
-
-		List<EntityModelResource> resources = new ArrayList<>();
-
-		for (ServiceReference<?> serviceReference : serviceReferences) {
-			Object service = _bundleContext.getService(serviceReference);
-
-			if (!(service instanceof EntityModelResource)) {
-				continue;
+			if (httpServletRequest != null) {
+				return httpServletRequest;
 			}
-
-			resources.add((EntityModelResource)service);
 		}
 
-		return resources;
+		return null;
 	}
 
 	private void _processSchemaProperties(
@@ -165,32 +205,6 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 				propertySchema.addExtension("x-filterable", true);
 			}
 		}
-	}
-
-	private List<EntityModelResource> _retrieveResourcesFromApplications(
-			Collection<ServiceReference<Application>> serviceReferences)
-		throws Exception {
-
-		List<EntityModelResource> resources = new ArrayList<>();
-
-		for (ServiceReference<Application> applicationServiceReference :
-				serviceReferences) {
-
-			String applicationName =
-				(String)applicationServiceReference.getProperty(
-					"osgi.jaxrs.name");
-
-			if (applicationName.isEmpty()) {
-				continue;
-			}
-
-			List<EntityModelResource> applicationResources =
-				_getResourcesForApplication(applicationName);
-
-			resources.addAll(applicationResources);
-		}
-
-		return resources;
 	}
 
 	private BundleContext _bundleContext;
