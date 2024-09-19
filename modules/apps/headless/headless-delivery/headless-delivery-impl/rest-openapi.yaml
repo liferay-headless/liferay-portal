@@ -1796,6 +1796,11 @@ components:
                     format: int64
                     readOnly: true
                     type: integer
+            required:
+                - availableLanguages
+                - dataDefinitionFields
+                - dataLayout
+                - name
             type: object
         DocumentShortcut:
             description:
