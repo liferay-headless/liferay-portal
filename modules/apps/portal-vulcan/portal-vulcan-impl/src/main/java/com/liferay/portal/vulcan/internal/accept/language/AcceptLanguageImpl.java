@@ -9,6 +9,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -112,6 +113,17 @@ public class AcceptLanguageImpl implements AcceptLanguage {
 		List<Locale> locales = getLocales();
 
 		if (ListUtil.isNotEmpty(locales)) {
+			if (locales.size() == 1) {
+				return locales.get(0);
+			}
+
+			String acceptLanguage = _httpServletRequest.getHeader(
+				HttpHeaders.ACCEPT_LANGUAGE);
+
+			if (LanguageUtil.isAvailableLanguageCode(acceptLanguage)) {
+				return LocaleUtil.fromLanguageId(acceptLanguage);
+			}
+
 			return locales.get(0);
 		}
 
