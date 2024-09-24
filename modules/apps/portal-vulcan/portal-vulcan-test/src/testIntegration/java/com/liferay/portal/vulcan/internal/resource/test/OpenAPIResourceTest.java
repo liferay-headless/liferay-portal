@@ -9,18 +9,35 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.InputStream;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Carlos Correa
@@ -32,6 +49,26 @@ public class OpenAPIResourceTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
+
+	@Test
+	public void testGetOpenAPIFilterableFields() throws Exception {
+		Map<String, EntityField> entityFieldsMap =
+			_getStructuredContentEntityFieldsMap();
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			StringPool.BLANK, "/headless-delivery/v1.0/openapi.json",
+			Http.Method.GET);
+
+		Set<String> expectedFilterableFields = entityFieldsMap.keySet();
+
+		Set<String> actualFilterableFields = _getFilterableFieldsFromOpenAPI(
+			jsonObject);
+
+		Assert.assertEquals(
+			"Mismatch between entity model filterable fields and OpenAPI x-filterable " +
+				"fields",
+			expectedFilterableFields, actualFilterableFields);
+	}
 
 	@Test
 	public void testGetOpenAPIServerURL() throws Exception {
@@ -55,6 +92,40 @@ public class OpenAPIResourceTest {
 		}
 	}
 
+	private Set<String> _getFilterableFieldsFromOpenAPI(
+		JSONObject openAPIJSONObject) {
+
+		Set<String> filterableFields = new HashSet<>();
+
+		JSONObject propertiesJSONObject = openAPIJSONObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"StructuredContent"
+		).getJSONObject(
+			"properties"
+		);
+
+		for (String propertyName : propertiesJSONObject.keySet()) {
+			JSONObject propertyJSONObject = propertiesJSONObject.getJSONObject(
+				propertyName);
+
+			if ((propertyJSONObject != null) &&
+				propertyJSONObject.has("x-filterable")) {
+
+				boolean filterable = propertyJSONObject.getBoolean(
+					"x-filterable");
+
+				if (filterable) {
+					filterableFields.add(propertyName);
+				}
+			}
+		}
+
+		return filterableFields;
+	}
+
 	private String _getPath(InputStream inputStream, String path)
 		throws Exception {
 
@@ -63,6 +134,32 @@ public class OpenAPIResourceTest {
 		jsonNode = jsonNode.at(path);
 
 		return jsonNode.asText();
+	}
+
+	private Map<String, EntityField> _getStructuredContentEntityFieldsMap()
+		throws Exception {
+
+		Map<String, EntityField> entityFieldsMap = Collections.emptyMap();
+
+		Bundle bundle = FrameworkUtil.getBundle(OpenAPIResourceTest.class);
+
+		ServiceTrackerMap<String, ?> serviceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundle.getBundleContext(), null, "entity.class.name");
+
+		Object structuredContentResource = serviceTrackerMap.getService(
+			"com.liferay.headless.delivery.dto.v1_0.StructuredContent");
+
+		if (structuredContentResource instanceof EntityModelResource) {
+			EntityModelResource entityModelResource =
+				(EntityModelResource)structuredContentResource;
+
+			EntityModel entityModel = entityModelResource.getEntityModel(null);
+
+			entityFieldsMap = entityModel.getEntityFieldsMap();
+		}
+
+		return entityFieldsMap;
 	}
 
 	private final ObjectMapper _objectMapper = new ObjectMapper();
