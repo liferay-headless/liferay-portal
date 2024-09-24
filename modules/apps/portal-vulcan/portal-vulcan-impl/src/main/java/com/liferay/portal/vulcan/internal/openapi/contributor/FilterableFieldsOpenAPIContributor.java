@@ -91,8 +91,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 		Collection<ServiceReference<Application>>
 			bundleContextServiceReferences =
-			_bundleContext.getServiceReferences(
-				Application.class, applicationFilter);
+				_bundleContext.getServiceReferences(
+					Application.class, applicationFilter);
 
 		if (CollectionUtils.isEmpty(bundleContextServiceReferences)) {
 			return Collections.emptyMap();
@@ -103,7 +103,7 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		List<EntityModelResource> resources = new ArrayList<>();
 
 		for (ServiceReference<Application> applicationServiceReference :
-			bundleContextServiceReferences) {
+				bundleContextServiceReferences) {
 
 			String applicationName =
 				(String)applicationServiceReference.getProperty(
@@ -131,7 +131,7 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			List<EntityModelResource> entityModelResources = new ArrayList<>();
 
 			for (ServiceReference<?> serviceReference :
-				resourceServiceReferences) {
+					resourceServiceReferences) {
 
 				Object service = _bundleContext.getService(serviceReference);
 
