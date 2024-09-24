@@ -65,8 +65,8 @@ public class OpenAPIResourceTest {
 			jsonObject);
 
 		Assert.assertEquals(
-			"Mismatch between entity model filterable fields and OpenAPI x-filterable " +
-				"fields",
+			"Mismatch between entity model filterable fields and OpenAPI " +
+				"x-filterable fields",
 			expectedFilterableFields, actualFilterableFields);
 	}
 
