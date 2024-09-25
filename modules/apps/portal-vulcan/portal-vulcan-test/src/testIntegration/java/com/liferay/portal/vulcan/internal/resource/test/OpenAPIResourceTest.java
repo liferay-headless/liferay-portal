@@ -12,6 +12,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
@@ -63,7 +64,8 @@ public class OpenAPIResourceTest {
 			StringPool.BLANK, "/headless-delivery/v1.0/openapi.json",
 			Http.Method.GET);
 
-		Set<String> expectedFilterableFields = entityFieldsMap.keySet();
+		Set<String> expectedFilterableFields = new HashSet<>(
+			entityFieldsMap.keySet());
 
 		expectedFilterableFields.removeAll(
 			Arrays.asList("creatorId", "assetLibraryId"));
@@ -75,6 +77,55 @@ public class OpenAPIResourceTest {
 			"Mismatch between entity model filterable fields and OpenAPI " +
 				"x-filterable fields",
 			expectedFilterableFields, actualFilterableFields);
+
+		Set<String> schemaLevelFilterableFields =
+			_getSchemaLevelFilterableFields(jsonObject);
+
+		Set<String> missingFields = new HashSet<>(expectedFilterableFields);
+
+		missingFields.removeAll(schemaLevelFilterableFields);
+
+		Set<String> unexpectedFields = new HashSet<>(
+			schemaLevelFilterableFields);
+
+		unexpectedFields.removeAll(expectedFilterableFields);
+		unexpectedFields.remove("creator");
+
+		StringBuilder errorMessage = new StringBuilder();
+
+		if (!missingFields.isEmpty()) {
+			errorMessage.append(
+				"Missing fields: "
+			).append(
+				missingFields
+			).append(
+				"\n"
+			);
+		}
+
+		if (!unexpectedFields.isEmpty()) {
+			errorMessage.append(
+				"Unexpected fields: "
+			).append(
+				unexpectedFields
+			).append(
+				"\n"
+			);
+		}
+
+		try {
+			if (errorMessage.length() > 0) {
+				errorMessage.insert(
+					0,
+					"Mismatch between expected and actual filterable fields." +
+						"\n");
+
+				Assert.fail(errorMessage.toString());
+			}
+		}
+		catch (AssertionError error) {
+			throw error;
+		}
 	}
 
 	@Test
@@ -141,6 +192,30 @@ public class OpenAPIResourceTest {
 		jsonNode = jsonNode.at(path);
 
 		return jsonNode.asText();
+	}
+
+	private Set<String> _getSchemaLevelFilterableFields(
+		JSONObject openAPIJSONObject) {
+
+		Set<String> filterableFields = new HashSet<>();
+
+		JSONObject schemaJSONObject = openAPIJSONObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"StructuredContent"
+		);
+
+		if (schemaJSONObject.has("x-filterable")) {
+			JSONArray jsonArray = schemaJSONObject.getJSONArray("x-filterable");
+
+			for (int i = 0; i < jsonArray.length(); i++) {
+				filterableFields.add(jsonArray.getString(i));
+			}
+		}
+
+		return filterableFields;
 	}
 
 	private Map<String, EntityField> _getStructuredContentEntityFieldsMap()
