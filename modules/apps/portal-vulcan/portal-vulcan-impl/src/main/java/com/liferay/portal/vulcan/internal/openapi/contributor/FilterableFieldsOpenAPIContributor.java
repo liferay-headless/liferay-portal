@@ -6,8 +6,11 @@
 package com.liferay.portal.vulcan.internal.openapi.contributor;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
@@ -23,6 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -97,6 +102,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 		List<EntityModelResource> resources = new ArrayList<>();
 
+		boolean objects = false;
+
 		for (ServiceReference<Application> applicationServiceReference :
 				bundleContextServiceReferences) {
 
@@ -106,6 +113,13 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 			if (applicationName.isEmpty()) {
 				continue;
+			}
+
+			Object objectsObject = applicationServiceReference.getProperty(
+				"liferay.objects");
+
+			if (objectsObject != null) {
+				objects = (boolean)objectsObject;
 			}
 
 			String resourceFilter = StringBundler.concat(
@@ -138,6 +152,18 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
 
 		for (EntityModelResource resource : resources) {
+			if (objects) {
+				HttpServletRequest httpServletRequest =
+					_getHttpServletRequestFromServiceContext();
+
+				if (httpServletRequest != null) {
+					companyId = (long)httpServletRequest.getAttribute(
+						WebKeys.COMPANY_ID);
+
+					params.putSingle("companyId", String.valueOf(companyId));
+				}
+			}
+
 			params.putSingle("companyId", String.valueOf(companyId));
 
 			EntityModel entityModel = resource.getEntityModel(params);
@@ -155,6 +181,21 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		}
 
 		return entityFieldsMap;
+	}
+
+	private HttpServletRequest _getHttpServletRequestFromServiceContext() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext != null) {
+			HttpServletRequest httpServletRequest = serviceContext.getRequest();
+
+			if (httpServletRequest != null) {
+				return httpServletRequest;
+			}
+		}
+
+		return null;
 	}
 
 	private void _processSchemaProperties(
