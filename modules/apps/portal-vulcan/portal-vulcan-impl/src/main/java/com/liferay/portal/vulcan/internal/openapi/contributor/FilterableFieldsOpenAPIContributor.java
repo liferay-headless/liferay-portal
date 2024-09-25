@@ -207,6 +207,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			return;
 		}
 
+		List<String> filterableFields = new ArrayList<>();
+
 		for (Map.Entry<String, Schema> propertyEntry : properties.entrySet()) {
 			String propertyName = propertyEntry.getKey();
 
@@ -214,8 +216,12 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 				Schema propertySchema = propertyEntry.getValue();
 
 				propertySchema.addExtension("x-filterable", true);
+
+				filterableFields.add(propertyName);
 			}
 		}
+
+		schema.addExtension("x-filterable", filterableFields);
 	}
 
 	private BundleContext _bundleContext;
