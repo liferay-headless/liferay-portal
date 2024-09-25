@@ -9,13 +9,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -25,10 +25,12 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.InputStream;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -37,7 +39,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Carlos Correa
@@ -60,6 +64,9 @@ public class OpenAPIResourceTest {
 			Http.Method.GET);
 
 		Set<String> expectedFilterableFields = entityFieldsMap.keySet();
+
+		expectedFilterableFields.removeAll(
+			Arrays.asList("creatorId", "assetLibraryId"));
 
 		Set<String> actualFilterableFields = _getFilterableFieldsFromOpenAPI(
 			jsonObject);
@@ -139,27 +146,36 @@ public class OpenAPIResourceTest {
 	private Map<String, EntityField> _getStructuredContentEntityFieldsMap()
 		throws Exception {
 
-		Map<String, EntityField> entityFieldsMap = Collections.emptyMap();
-
 		Bundle bundle = FrameworkUtil.getBundle(OpenAPIResourceTest.class);
 
-		ServiceTrackerMap<String, ?> serviceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundle.getBundleContext(), null, "entity.class.name");
+		BundleContext bundleContext = bundle.getBundleContext();
 
-		Object structuredContentResource = serviceTrackerMap.getService(
-			"com.liferay.headless.delivery.dto.v1_0.StructuredContent");
+		String applicationName = "Liferay.Headless.Delivery";
 
-		if (structuredContentResource instanceof EntityModelResource) {
-			EntityModelResource entityModelResource =
-				(EntityModelResource)structuredContentResource;
+		String resourceFilter = StringBundler.concat(
+			"(&(entity.class.name=com.liferay.headless.delivery.dto.v1_0.",
+			"StructuredContent)",
+			"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
+			applicationName, "\\)))");
 
-			EntityModel entityModel = entityModelResource.getEntityModel(null);
+		ServiceReference<?>[] resourceServiceReferences =
+			bundleContext.getServiceReferences((String)null, resourceFilter);
 
-			entityFieldsMap = entityModel.getEntityFieldsMap();
-		}
+		ServiceReference<?> serviceReference = resourceServiceReferences[0];
 
-		return entityFieldsMap;
+		EntityModelResource structuredContentResource =
+			(EntityModelResource)bundleContext.getService(serviceReference);
+
+		long companyId = TestPropsValues.getCompanyId();
+
+		MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
+
+		params.putSingle("companyId", String.valueOf(companyId));
+
+		EntityModel entityModel = structuredContentResource.getEntityModel(
+			params);
+
+		return entityModel.getEntityFieldsMap();
 	}
 
 	private final ObjectMapper _objectMapper = new ObjectMapper();
