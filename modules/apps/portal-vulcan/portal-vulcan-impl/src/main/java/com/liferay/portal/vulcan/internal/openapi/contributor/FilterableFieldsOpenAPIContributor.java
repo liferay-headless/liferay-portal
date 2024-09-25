@@ -6,11 +6,8 @@
 package com.liferay.portal.vulcan.internal.openapi.contributor;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
@@ -23,10 +20,9 @@ import io.swagger.v3.oas.models.media.Schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -61,7 +57,7 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		}
 
 		Map<String, EntityField> entityFieldsMap = _fetchEntityFieldsMap(
-			openAPIContext.getPath());
+			openAPIContext.getPath(), openAPIContext.getCompanyId());
 
 		if (MapUtil.isEmpty(entityFieldsMap)) {
 			return;
@@ -79,7 +75,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		_bundleContext = bundleContext;
 	}
 
-	private Map<String, EntityField> _fetchEntityFieldsMap(String path)
+	private Map<String, EntityField> _fetchEntityFieldsMap(
+			String path, long companyId)
 		throws Exception {
 
 		String trimmedPath = StringUtil.removeFirst(path, "/o");
@@ -98,8 +95,6 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			return Collections.emptyMap();
 		}
 
-		boolean objects = false;
-
 		List<EntityModelResource> resources = new ArrayList<>();
 
 		for (ServiceReference<Application> applicationServiceReference :
@@ -111,13 +106,6 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 			if (applicationName.isEmpty()) {
 				continue;
-			}
-
-			Object objectsObject = applicationServiceReference.getProperty(
-				"liferay.objects");
-
-			if (objectsObject != null) {
-				objects = (boolean)objectsObject;
 			}
 
 			String resourceFilter = StringBundler.concat(
@@ -145,20 +133,12 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			resources.addAll(entityModelResources);
 		}
 
+		Map<String, EntityField> entityFieldsMap = new HashMap<>();
+
 		MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
 
 		for (EntityModelResource resource : resources) {
-			if (objects) {
-				HttpServletRequest httpServletRequest =
-					_getHttpServletRequestFromServiceContext();
-
-				if (httpServletRequest != null) {
-					long companyId = (long)httpServletRequest.getAttribute(
-						WebKeys.COMPANY_ID);
-
-					params.putSingle("companyId", String.valueOf(companyId));
-				}
-			}
+			params.putSingle("companyId", String.valueOf(companyId));
 
 			EntityModel entityModel = resource.getEntityModel(params);
 
@@ -166,25 +146,15 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 				continue;
 			}
 
-			return entityModel.getEntityFieldsMap();
-		}
+			Map<String, EntityField> currentEntityFieldsMap =
+				entityModel.getEntityFieldsMap();
 
-		return Collections.emptyMap();
-	}
-
-	private HttpServletRequest _getHttpServletRequestFromServiceContext() {
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		if (serviceContext != null) {
-			HttpServletRequest httpServletRequest = serviceContext.getRequest();
-
-			if (httpServletRequest != null) {
-				return httpServletRequest;
+			if (currentEntityFieldsMap != null) {
+				entityFieldsMap.putAll(currentEntityFieldsMap);
 			}
 		}
 
-		return null;
+		return entityFieldsMap;
 	}
 
 	private void _processSchemaProperties(
