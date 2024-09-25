@@ -263,6 +263,8 @@ public class OpenAPIResourceTest {
 
 		expectedFilterableFields = entityFieldsMap.keySet();
 
+		expectedFilterableFields.remove("object1Id");
+
 		openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
 			null,
 			relatedObjectDefinition.getRESTContextPath() + "/openapi.json",
