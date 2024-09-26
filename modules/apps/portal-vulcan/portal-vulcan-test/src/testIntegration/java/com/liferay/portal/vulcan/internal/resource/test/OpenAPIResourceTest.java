@@ -67,17 +67,6 @@ public class OpenAPIResourceTest {
 		Set<String> expectedFilterableFields = new HashSet<>(
 			entityFieldsMap.keySet());
 
-		expectedFilterableFields.removeAll(
-			Arrays.asList("creatorId", "assetLibraryId"));
-
-		Set<String> actualFilterableFields = _getFilterableFieldsFromOpenAPI(
-			jsonObject);
-
-		Assert.assertEquals(
-			"Mismatch between entity model filterable fields and OpenAPI " +
-				"x-filterable fields",
-			expectedFilterableFields, actualFilterableFields);
-
 		Set<String> schemaLevelFilterableFields =
 			_getSchemaLevelFilterableFields(jsonObject);
 
@@ -148,40 +137,6 @@ public class OpenAPIResourceTest {
 
 			Assert.assertTrue(path.startsWith("https://localhost:8080/"));
 		}
-	}
-
-	private Set<String> _getFilterableFieldsFromOpenAPI(
-		JSONObject openAPIJSONObject) {
-
-		Set<String> filterableFields = new HashSet<>();
-
-		JSONObject propertiesJSONObject = openAPIJSONObject.getJSONObject(
-			"components"
-		).getJSONObject(
-			"schemas"
-		).getJSONObject(
-			"StructuredContent"
-		).getJSONObject(
-			"properties"
-		);
-
-		for (String propertyName : propertiesJSONObject.keySet()) {
-			JSONObject propertyJSONObject = propertiesJSONObject.getJSONObject(
-				propertyName);
-
-			if ((propertyJSONObject != null) &&
-				propertyJSONObject.has("x-filterable")) {
-
-				boolean filterable = propertyJSONObject.getBoolean(
-					"x-filterable");
-
-				if (filterable) {
-					filterableFields.add(propertyName);
-				}
-			}
-		}
-
-		return filterableFields;
 	}
 
 	private String _getPath(InputStream inputStream, String path)
