@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -253,17 +252,29 @@ public class OpenAPIResourceTest {
 		Set<String> actualFilterableFields = _getFilterableFieldsFromOpenAPI(
 			openAPIJSONObject);
 
+		Arrays.asList(
+			"userId", "creatorId"
+		).forEach(
+			expectedFilterableFields::remove
+		);
+
 		Assert.assertEquals(
 			"Mismatch between entity model filterable fields and OpenAPI " +
 				"x-filterable fields",
 			expectedFilterableFields, actualFilterableFields);
 
+		Set<String> schemaLevelFilterableFields =
+			_getSchemaLevelXFilterableFields(openAPIJSONObject);
+
+		Assert.assertEquals(
+			"Mismatch between entity model filterable fields and OpenAPI " +
+				"schema-level x-filterable fields",
+			expectedFilterableFields, schemaLevelFilterableFields);
+
 		entityFieldsMap = _getObjectDefinitionEntityFieldsMap(
 			relatedObjectDefinition);
 
 		expectedFilterableFields = entityFieldsMap.keySet();
-
-		expectedFilterableFields.remove("object1Id");
 
 		openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
 			null,
@@ -273,10 +284,24 @@ public class OpenAPIResourceTest {
 		actualFilterableFields = _getFilterableFieldsFromOpenAPI(
 			openAPIJSONObject);
 
+		Arrays.asList(
+			"userId", "creatorId", "object1Id"
+		).forEach(
+			expectedFilterableFields::remove
+		);
+
 		Assert.assertEquals(
 			"Mismatch between entity model filterable fields and OpenAPI " +
 				"x-filterable fields",
 			expectedFilterableFields, actualFilterableFields);
+
+		schemaLevelFilterableFields = _getSchemaLevelXFilterableFields(
+			openAPIJSONObject);
+
+		Assert.assertEquals(
+			"Mismatch between entity model filterable fields and OpenAPI " +
+				"schema-level x-filterable fields",
+			expectedFilterableFields, schemaLevelFilterableFields);
 	}
 
 	@Test
@@ -433,19 +458,11 @@ public class OpenAPIResourceTest {
 	private Set<String> _getFilterableFieldsFromOpenAPI(JSONObject jsonObject) {
 		Set<String> filterableFields = new HashSet<>();
 
-		JSONObject componentsJSONObject = jsonObject.getJSONObject(
-			"components");
-
-		if (componentsJSONObject == null) {
-			return filterableFields;
-		}
-
-		JSONObject schemasJSONObject = componentsJSONObject.getJSONObject(
-			"schemas");
-
-		if (schemasJSONObject == null) {
-			return filterableFields;
-		}
+		JSONObject schemasJSONObject = jsonObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		);
 
 		for (String schemaName : schemasJSONObject.keySet()) {
 			JSONObject schemaJSONObject = schemasJSONObject.getJSONObject(
@@ -453,10 +470,6 @@ public class OpenAPIResourceTest {
 
 			JSONObject propertiesJSONObject = schemaJSONObject.getJSONObject(
 				"properties");
-
-			if (propertiesJSONObject == null) {
-				continue;
-			}
 
 			for (String propertyName : propertiesJSONObject.keySet()) {
 				JSONObject propertyJSONObject =
@@ -469,17 +482,6 @@ public class OpenAPIResourceTest {
 						"x-filterable");
 
 					if (filterable) {
-						if (schemaName.equals("UserGroupBrief") &&
-							propertyName.equals("id")) {
-
-							propertyName = Field.USER_ID;
-						}
-						else if (schemaName.equals("Creator") &&
-								 propertyName.equals("id")) {
-
-							propertyName = "creatorId";
-						}
-
 						filterableFields.add(propertyName);
 					}
 				}
@@ -525,6 +527,36 @@ public class OpenAPIResourceTest {
 		}
 
 		return objectEntityFieldsMap;
+	}
+
+	private Set<String> _getSchemaLevelXFilterableFields(
+		JSONObject jsonObject) {
+
+		Set<String> schemaFilterableFields = new HashSet<>();
+
+		JSONObject schemasJSONObject = jsonObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		);
+
+		for (String schemaName : schemasJSONObject.keySet()) {
+			JSONObject schemaJSONObject = schemasJSONObject.getJSONObject(
+				schemaName);
+
+			if (schemaJSONObject.has("x-filterable")) {
+				JSONArray jsonArray = schemaJSONObject.getJSONArray(
+					"x-filterable");
+
+				for (int i = 0; i < jsonArray.length(); i++) {
+					String filterableField = jsonArray.getString(i);
+
+					schemaFilterableFields.add(filterableField);
+				}
+			}
+		}
+
+		return schemaFilterableFields;
 	}
 
 	@Inject
