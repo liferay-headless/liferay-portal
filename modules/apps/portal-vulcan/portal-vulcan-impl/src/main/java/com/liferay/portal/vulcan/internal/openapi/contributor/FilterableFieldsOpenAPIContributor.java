@@ -149,8 +149,9 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 					GetterUtil.get(openAPIContext.getVersion(), "v1.0"),
 					")(osgi.jaxrs.resource=true)",
 					"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
-					jaxRsApplicationName, "\\))(entity.class.name=", className,
-					"))"));
+					jaxRsApplicationName, "\\))(|(entity.class.name=",
+					className, ")(entity.class.name=", className, "#",
+					jaxRsApplicationName, ")))"));
 
 		if (resourceServiceReferences == null) {
 			return null;
