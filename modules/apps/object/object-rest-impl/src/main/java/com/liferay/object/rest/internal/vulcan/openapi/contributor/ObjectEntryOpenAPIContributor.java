@@ -140,6 +140,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 					if (_addRelatedSchemas) {
 						_addObjectRelationshipSchema(
+							openAPIContext.getCompanyId(),
 							relatedObjectDefinition, openAPI,
 							relatedSchemaName);
 					}
@@ -253,7 +254,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 	}
 
 	private void _addObjectRelationshipSchema(
-			ObjectDefinition objectDefinition, OpenAPI openAPI,
+			long companyId, ObjectDefinition objectDefinition, OpenAPI openAPI,
 			String schemaName)
 		throws Exception {
 
@@ -278,7 +279,8 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 					getObjectEntryOpenAPIResource(objectDefinition);
 
 			if (objectEntryOpenAPIResource != null) {
-				sourceSchemas = objectEntryOpenAPIResource.getSchemas();
+				sourceSchemas = objectEntryOpenAPIResource.getSchemas(
+					companyId);
 			}
 			else {
 				sourceSchemas = new HashMap<>();
