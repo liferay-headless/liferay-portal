@@ -9,8 +9,10 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
@@ -23,8 +25,10 @@ import io.swagger.v3.oas.models.media.Schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -70,8 +74,21 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 				continue;
 			}
 
+			Set<EntityField> processedEntityFields = new HashSet<>();
+
+			Set<String> filterableFieldNames = new HashSet<>();
+
+			for (Map.Entry<String, EntityField> entry :
+					entityFieldsMap.entrySet()) {
+
+				filterableFieldNames.addAll(
+					_getFilterableFieldNames(
+						entry.getValue(), entry.getKey(),
+						processedEntityFields));
+			}
+
 			schema.addExtension(
-				"x-filterable", new ArrayList<>(entityFieldsMap.keySet()));
+				"x-filterable", new ArrayList<>(filterableFieldNames));
 		}
 	}
 
@@ -185,6 +202,37 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		}
 
 		return resources;
+	}
+
+	private Set<String> _getFilterableFieldNames(
+		EntityField entityField, String fieldName,
+		Set<EntityField> processedEntityFields) {
+
+		if (!processedEntityFields.add(entityField)) {
+			return new HashSet<>();
+		}
+
+		if (!(entityField instanceof ComplexEntityField)) {
+			return SetUtil.fromArray(fieldName);
+		}
+
+		ComplexEntityField complexEntityField = (ComplexEntityField)entityField;
+
+		Map<String, EntityField> entityFieldsMap =
+			complexEntityField.getEntityFieldsMap();
+
+		Set<String> filterableFieldNames = new HashSet<>();
+
+		for (Map.Entry<String, EntityField> entry :
+				entityFieldsMap.entrySet()) {
+
+			filterableFieldNames.addAll(
+				_getFilterableFieldNames(
+					entry.getValue(), fieldName + "/" + entry.getKey(),
+					processedEntityFields));
+		}
+
+		return filterableFieldNames;
 	}
 
 	private String _getJaxRsApplicationName(OpenAPIContext openAPIContext)
