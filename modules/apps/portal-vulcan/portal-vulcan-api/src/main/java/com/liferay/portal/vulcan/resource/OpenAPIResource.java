@@ -24,12 +24,8 @@ import javax.ws.rs.core.UriInfo;
  */
 public interface OpenAPIResource {
 
-	public Response getOpenAPI(
-			HttpServletRequest httpServletRequest,
-			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
-		throws Exception;
-
 	public default Response getOpenAPI(
+			HttpServletRequest httpServletRequest,
 			OpenAPIContributor openAPIContributor,
 			OpenAPISchemaFilter openAPISchemaFilter,
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
@@ -37,6 +33,11 @@ public interface OpenAPIResource {
 
 		return null;
 	}
+
+	public Response getOpenAPI(
+			HttpServletRequest httpServletRequest,
+			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
+		throws Exception;
 
 	public default Response getOpenAPI(
 			Set<Class<?>> resourceClasses, String type)

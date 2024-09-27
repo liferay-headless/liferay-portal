@@ -96,7 +96,7 @@ public class ObjectEntryOpenAPIResourceImpl
 			_objectDefinition);
 
 		Response response = _getOpenAPI(
-			true,
+			true,null,
 			_getOpenAPISchemaFilter(objectEntryDTOProperty, _objectDefinition),
 			"json", uriInfo);
 
@@ -158,7 +158,7 @@ public class ObjectEntryOpenAPIResourceImpl
 		throws Exception {
 
 		return _getOpenAPI(
-			true,
+			true, httpServletRequest,
 			_getOpenAPISchemaFilter(
 				_getObjectEntryDTOProperty(_objectDefinition),
 				_objectDefinition),
@@ -168,7 +168,7 @@ public class ObjectEntryOpenAPIResourceImpl
 	@Override
 	public Map<String, Schema> getSchemas() throws Exception {
 		Response response = _getOpenAPI(
-			false,
+			false, null,
 			_getOpenAPISchemaFilter(
 				_getObjectEntryDTOProperty(_objectDefinition),
 				_objectDefinition),
@@ -432,11 +432,12 @@ public class ObjectEntryOpenAPIResourceImpl
 	}
 
 	private Response _getOpenAPI(
-			boolean addRelatedSchemas, OpenAPISchemaFilter openAPISchemaFilter,
+			boolean addRelatedSchemas, HttpServletRequest httpServletRequest,
+			OpenAPISchemaFilter openAPISchemaFilter,
 			String type, UriInfo uriInfo)
 		throws Exception {
 
-		return _openAPIResource.getOpenAPI(
+		return _openAPIResource.getOpenAPI(httpServletRequest,
 			new ObjectEntryOpenAPIContributor(
 				addRelatedSchemas, _bundleContext, _dtoConverterRegistry,
 				_objectActionLocalService, _objectDefinition,

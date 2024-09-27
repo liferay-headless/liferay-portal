@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -113,6 +114,19 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 	@Override
 	public Response getOpenAPI(
 			HttpServletRequest httpServletRequest,
+			OpenAPIContributor openAPIContributor,
+			OpenAPISchemaFilter openAPISchemaFilter,
+			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
+		throws Exception {
+
+		return _getOpenAPI(
+			httpServletRequest, openAPIContributor, openAPISchemaFilter,
+			resourceClasses, type, uriInfo);
+	}
+
+	@Override
+	public Response getOpenAPI(
+			HttpServletRequest httpServletRequest,
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
 		throws Exception {
 
@@ -121,22 +135,10 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 	}
 
 	@Override
-	public Response getOpenAPI(
-			OpenAPIContributor openAPIContributor,
-			OpenAPISchemaFilter openAPISchemaFilter,
-			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
-		throws Exception {
-
-		return _getOpenAPI(
-			null, openAPIContributor, openAPISchemaFilter, resourceClasses,
-			type, uriInfo);
-	}
-
-	@Override
 	public Response getOpenAPI(Set<Class<?>> resourceClasses, String type)
 		throws Exception {
 
-		return getOpenAPI(resourceClasses, type, null);
+		return getOpenAPI(resourceClasses, type, (UriInfo)null);
 	}
 
 	@Override
@@ -144,7 +146,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			Set<Class<?>> resourceClasses, String type, UriInfo uriInfo)
 		throws Exception {
 
-		return getOpenAPI(null, null, resourceClasses, type, uriInfo);
+		return getOpenAPI(null, null, null, resourceClasses, type, uriInfo);
 	}
 
 	@Override
@@ -747,6 +749,12 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			openAPIContext = new OpenAPIContext();
 
 			openAPIContext.setBaseURL(uri.toString());
+
+			if (httpServletRequest != null) {
+				openAPIContext.setCompanyId(
+					_portal.getCompanyId(httpServletRequest));
+			}
+
 			openAPIContext.setPath(uri.getPath());
 			openAPIContext.setUriInfo(uriInfo);
 			openAPIContext.setVersion(
@@ -1437,6 +1445,9 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 	@Reference
 	private ExtensionProviderRegistry _extensionProviderRegistry;
+
+	@Reference
+	private Portal _portal;
 
 	private ServiceTrackerMap<String, String> _serviceTrackerMap;
 	private ServiceTrackerList<OpenAPIContributor> _trackedOpenAPIContributors;
