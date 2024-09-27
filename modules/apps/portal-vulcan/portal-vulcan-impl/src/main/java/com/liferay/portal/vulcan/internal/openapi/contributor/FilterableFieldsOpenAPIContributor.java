@@ -87,10 +87,9 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			Schema schema)
 		throws Exception {
 
-		Schema xClassNameSchema = (Schema)schema.getProperties(
-		).get(
-			"x-class-name"
-		);
+		Map<String, Schema> properties = schema.getProperties();
+
+		Schema xClassNameSchema = properties.get("x-class-name");
 
 		if (xClassNameSchema == null) {
 			return null;
@@ -102,9 +101,18 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			return null;
 		}
 
+		Schema xSchemaNameSchema = properties.get("x-schema-name");
+
+		String xSchemaName = null;
+
+		if (xSchemaNameSchema != null) {
+			xSchemaName = (String)xSchemaNameSchema.getDefault();
+		}
+
 		List<EntityModelResource> entityModelResources =
 			_getEntityModelResources(
-				xClassNameDefault, jaxRsApplicationName, openAPIContext);
+				xClassNameDefault, jaxRsApplicationName, openAPIContext,
+				xSchemaName);
 
 		if (ListUtil.isEmpty(entityModelResources)) {
 			return null;
@@ -138,8 +146,19 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 	private List<EntityModelResource> _getEntityModelResources(
 			String className, String jaxRsApplicationName,
-			OpenAPIContext openAPIContext)
+			OpenAPIContext openAPIContext, String schemaName)
 		throws Exception {
+
+		String filterString = null;
+
+		if (schemaName != null) {
+			filterString = StringBundler.concat(
+				"(entity.class.name=", className, "#",
+				StringUtil.toLowerCase(schemaName), ")");
+		}
+		else {
+			filterString = "(entity.class.name=" + className + ")";
+		}
 
 		ServiceReference<?>[] resourceServiceReferences =
 			_bundleContext.getServiceReferences(
@@ -149,9 +168,7 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 					GetterUtil.get(openAPIContext.getVersion(), "v1.0"),
 					")(osgi.jaxrs.resource=true)",
 					"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
-					jaxRsApplicationName, "\\))(|(entity.class.name=",
-					className, ")(entity.class.name=", className, "#",
-					jaxRsApplicationName, ")))"));
+					jaxRsApplicationName, "\\))", filterString, ")"));
 
 		if (resourceServiceReferences == null) {
 			return null;
