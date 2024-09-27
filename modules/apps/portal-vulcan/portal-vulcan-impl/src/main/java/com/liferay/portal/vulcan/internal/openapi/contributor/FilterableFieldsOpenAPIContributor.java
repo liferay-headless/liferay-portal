@@ -70,7 +70,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 				continue;
 			}
 
-			_processSchemaProperties(schema, entityFieldsMap);
+			schema.addExtension(
+				"x-filterable", new ArrayList<>(entityFieldsMap.keySet()));
 		}
 	}
 
@@ -253,17 +254,6 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		}
 
 		return null;
-	}
-
-	private void _processSchemaProperties(
-		Schema schema, Map<String, EntityField> entityFieldsMap) {
-
-		List<String> filterableFields = new ArrayList<>(
-			entityFieldsMap.keySet());
-
-		if (!filterableFields.isEmpty()) {
-			schema.addExtension("x-filterable", filterableFields);
-		}
 	}
 
 	private BundleContext _bundleContext;
