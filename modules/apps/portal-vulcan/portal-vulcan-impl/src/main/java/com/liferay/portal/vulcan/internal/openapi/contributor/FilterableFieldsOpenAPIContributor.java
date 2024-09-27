@@ -6,6 +6,7 @@
 package com.liferay.portal.vulcan.internal.openapi.contributor;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -81,24 +82,6 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		_bundleContext = bundleContext;
 	}
 
-	private String _createResourceFilter(
-		String apiVersion, String className, String jaxRsApplicationName) {
-
-		if (Validator.isBlank(apiVersion)) {
-			return StringBundler.concat(
-				"(&(!(api.version=*))(osgi.jaxrs.resource=true)",
-				"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
-				jaxRsApplicationName, "\\))(entity.class.name=", className,
-				"))");
-		}
-
-		return StringBundler.concat(
-			"(&(api.version=", apiVersion,
-			")(osgi.jaxrs.resource=true)(osgi.jaxrs.application.select=\\",
-			"(osgi.jaxrs.name=", jaxRsApplicationName,
-			"\\))(entity.class.name=", className, "))");
-	}
-
 	private Map<String, EntityField> _getEntityFieldsMap(
 			String jaxRsApplicationName, OpenAPIContext openAPIContext,
 			Schema schema)
@@ -158,11 +141,16 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			OpenAPIContext openAPIContext)
 		throws Exception {
 
-		String resourceFilter = _createResourceFilter(
-			openAPIContext.getVersion(), className, jaxRsApplicationName);
-
 		ServiceReference<?>[] resourceServiceReferences =
-			_bundleContext.getServiceReferences((String)null, resourceFilter);
+			_bundleContext.getServiceReferences(
+				(String)null,
+				StringBundler.concat(
+					"(&(api.version=",
+					GetterUtil.get(openAPIContext.getVersion(), "v1.0"),
+					")(osgi.jaxrs.resource=true)",
+					"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
+					jaxRsApplicationName, "\\))(entity.class.name=", className,
+					"))"));
 
 		if (resourceServiceReferences == null) {
 			return null;
