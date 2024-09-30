@@ -637,3 +637,8 @@ ad0bd926a1428387ec4f8aed5b7759de5d3a5bd2^..79ed20f4d43ecec3ba0b0760cbff2fd4f7227
 # Bundle Version 11.1.1
 #
 c353d41b98d66767bf2ebdd91229285c8a0d34ca^..12c0841b9eb2bbb2dccd16fc27a5edaf03d91943=LPD-35394
+
+#
+# Bundle Version 11.1.2
+#
+12c0841b9eb2bbb2dccd16fc27a5edaf03d91943^..19eef1cddaf4c29af5df891d0d6497692f9fb371=LPD-35388 LPD-36353

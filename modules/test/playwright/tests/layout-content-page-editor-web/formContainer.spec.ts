@@ -20,6 +20,7 @@ import {
 import getFormContainerDefinition from './utils/getFormContainerDefinition';
 import getFragmentDefinition from './utils/getFragmentDefinition';
 import getPageDefinition from './utils/getPageDefinition';
+import getWidgetDefinition from './utils/getWidgetDefinition';
 
 const test = mergeTests(
 	apiHelpersTest,
@@ -31,6 +32,105 @@ const test = mergeTests(
 	pageEditorPagesTest,
 	pageManagementSiteTest
 );
+
+test.describe('Form Configuration', () => {
+	test(
+		'Show success message only one time',
+		{
+			tag: '@LPD-37435',
+		},
+		async ({apiHelpers, page, pageEditorPage, pageManagementSite}) => {
+
+			// Create a page with a Form fragment and a widget
+
+			const formId = getRandomString();
+
+			const formDefinition = getFormContainerDefinition({
+				id: formId,
+			});
+
+			const widgetId = getRandomString();
+
+			const widgetDefinition = getWidgetDefinition({
+				id: widgetId,
+				widgetName:
+					'com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet',
+			});
+
+			const layout = await apiHelpers.headlessDelivery.createSitePage({
+				pageDefinition: getPageDefinition([
+					formDefinition,
+					widgetDefinition,
+				]),
+				siteId: pageManagementSite.id,
+				title: getRandomString(),
+			});
+
+			// Go to edit mode and change form configuration
+
+			await pageEditorPage.goto(
+				layout,
+				pageManagementSite.friendlyUrlPath
+			);
+
+			await pageEditorPage.mapFormFragment(formId, 'Lemon', [
+				'Lemon Size',
+				'Lemon Basket to Lemons',
+			]);
+
+			await pageEditorPage.selectFragment(formId);
+
+			await page
+				.getByLabel('Success Action', {exact: true})
+				.selectOption({label: 'Stay in Page'});
+
+			await page
+				.getByLabel('Show Notification After Submit', {exact: true})
+				.check();
+
+			await page
+				.getByLabel('Success Notification Text', {exact: true})
+				.fill('Request received correctly');
+
+			await pageEditorPage.publishPage();
+
+			// Go to view mode and check picklist values
+
+			await page.goto(
+				`/web${pageManagementSite.friendlyUrlPath}${layout.friendlyUrlPath}`
+			);
+
+			// Submit form
+
+			await page.getByRole('button', {name: 'Submit'}).click();
+
+			// Wait for the first alert
+
+			await page.getByText('Request received correctly').waitFor();
+
+			// Verify that the first alert disappears without any more alerts being displayed
+
+			let moreAlertsAppear = false;
+			let firstAlertDisappears = false;
+
+			await expect(async () => {
+				const alerts = await page
+					.getByText('Request received correctly')
+					.all();
+
+				if (alerts.length > 1) {
+					moreAlertsAppear = true;
+				}
+				else if (!alerts.length) {
+					firstAlertDisappears = true;
+				}
+
+				expect(firstAlertDisappears).toBe(true);
+				expect(moreAlertsAppear).toBe(false);
+			}).toPass();
+		}
+	);
+});
 
 test.describe('Picklist input field', () => {
 	test('Shows correct options in picklist field selected as title in related object', async ({

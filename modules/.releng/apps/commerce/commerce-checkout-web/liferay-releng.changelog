@@ -467,3 +467,8 @@ f98889b1bb54e489cb302784d693ed97ab5ed072^..a4be1db4959fcf28ab6a16b42badd7f188e0c
 # Bundle Version 5.0.95
 #
 a4be1db4959fcf28ab6a16b42badd7f188e0c77c^..5e7316de4bb158c3ed4b240c65bcda3a6c0cabee=LPD-31022 LPD-33244 LPD-33397 LPD-34409
+
+#
+# Bundle Version 5.0.96
+#
+5e7316de4bb158c3ed4b240c65bcda3a6c0cabee^..cc1e8a552948d17eef1e68e6a6a905c019667a4f=LPD-32227

@@ -5,6 +5,7 @@
 
 package com.liferay.testray.rest.internal.manager;
 
+import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -73,6 +75,68 @@ import org.w3c.dom.NodeList;
  */
 @Component(service = TestrayManager.class)
 public class TestrayManagerImpl implements TestrayManager {
+
+	public int createTestraySubtasks(
+			long companyId, long testrayBuildId, long testrayTaskId,
+			long userId)
+		throws Exception {
+
+		StringBundler sb = new StringBundler(9);
+
+		sb.append("select cr.errors_ , sum(c.priority_) as score from ");
+		sb.append("O_[%COMPANY_ID%]_CaseResult cr, O_[%COMPANY_ID%]_Case c ");
+		sb.append("where cr.errors_ is not null and cr.errors_ != '' and ");
+		sb.append("cr.r_caseToCaseResult_c_caseId = c.c_caseId_ and ");
+		sb.append("cr.r_buildToCaseResult_c_buildId = ? group by cr.errors_ ");
+		sb.append("order by score desc");
+
+		List<Map<String, Object>> values = TestrayUtil.executeQuery(
+			StringUtil.replace(
+				sb.toString(), "[%COMPANY_ID%]", String.valueOf(companyId)),
+			ListUtil.fromArray(GetterUtil.getLong(testrayBuildId)));
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				companyId, "C_Subtask");
+		int testraySubtasksAmount = 0;
+
+		for (Map<String, Object> value : values) {
+			testraySubtasksAmount++;
+
+			ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
+				userId, 0, objectDefinition.getObjectDefinitionId(),
+				HashMapBuilder.<String, Serializable>put(
+					"dueStatus", "OPEN"
+				).put(
+					"errors", String.valueOf(value.get("errors_"))
+				).put(
+					"name", "ST-" + testraySubtasksAmount
+				).put(
+					"number", testraySubtasksAmount
+				).put(
+					"r_taskToSubtasks_c_taskId", testrayTaskId
+				).put(
+					"score", String.valueOf(value.get("score"))
+				).build(),
+				_serviceContextHelper.getServiceContext());
+
+			sb = new StringBundler();
+
+			sb.append("update O_[%COMPANY_ID%]_CaseResult set ");
+			sb.append("r_subtaskToCaseResults_c_subtaskId = ? where ");
+			sb.append("r_buildToCaseResult_c_buildId = ? and errors_ = ?");
+
+			TestrayUtil.executeUpdate(
+				StringUtil.replace(
+					sb.toString(), "[%COMPANY_ID%]", String.valueOf(companyId)),
+				ListUtil.fromArray(
+					objectEntry.getObjectEntryId(),
+					GetterUtil.getLong(testrayBuildId),
+					String.valueOf(value.get("errors_"))));
+		}
+
+		return testraySubtasksAmount;
+	}
 
 	@Override
 	public Map<String, Object> fetchTestrayCaseFlakyParameters(
@@ -202,6 +266,49 @@ public class TestrayManagerImpl implements TestrayManager {
 
 			updateTestrayBuildSummary(
 				companyId, testrayCache.getTestrayBuildId(), userId);
+
+			Map<String, Serializable> values =
+				_objectEntryLocalService.getValues(
+					testrayCache.getTestrayRoutineId());
+
+			if (!GetterUtil.getBoolean(values.get("autoanalyze"))) {
+				return;
+			}
+
+			ObjectEntry objectEntry = _addObjectEntry(
+				"Task", serviceContext, testrayCache, userId,
+				HashMapBuilder.<String, Serializable>put(
+					"dueStatus", "INANALYSIS"
+				).put(
+					"name", testrayCache.getTestrayBuildName()
+				).put(
+					"r_buildToTasks_c_buildId", testrayCache.getTestrayBuildId()
+				).build());
+
+			if (_testrayLeadUserIds == null) {
+				_testrayLeadUserIds = _userLocalService.getRoleUserIds(
+					_roleLocalService.getRole(
+						companyId, "Testray Lead"
+					).getRoleId());
+			}
+
+			for (long testrayLeadUserId : _testrayLeadUserIds) {
+				_addObjectEntry(
+					"TasksUsers", serviceContext, testrayCache, userId,
+					HashMapBuilder.<String, Serializable>put(
+						"name",
+						objectEntry.getObjectEntryId() + "-" + testrayLeadUserId
+					).put(
+						"r_taskToTasksUsers_c_taskId",
+						objectEntry.getObjectEntryId()
+					).put(
+						"r_userToTasksUsers_userId", testrayLeadUserId
+					).build());
+			}
+
+			createTestraySubtasks(
+				companyId, testrayCache.getTestrayBuildId(),
+				objectEntry.getObjectEntryId(), userId);
 		}
 	}
 
@@ -229,12 +336,17 @@ public class TestrayManagerImpl implements TestrayManager {
 				companyId, serviceContext, testrayCache, testrayProjectId,
 				propertiesMap.get("testray.build.type"), userId);
 
+			testrayCache.setTestrayRoutineId(testrayRoutineId);
+
 			long testrayBuildId = _getTestrayBuildId(
 				companyId, propertiesMap, serviceContext,
 				propertiesMap.get("testray.build.name"), testrayCache,
 				testrayProjectId, testrayRoutineId, userId);
 
 			testrayCache.setTestrayBuildId(testrayBuildId);
+
+			testrayCache.setTestrayBuildName(
+				propertiesMap.get("testray.build.name"));
 
 			long testrayRunId = _getTestrayRunId(
 				companyId, element, serviceContext, propertiesMap,
@@ -1473,6 +1585,14 @@ public class TestrayManagerImpl implements TestrayManager {
 
 	@Reference(target = "(object.entry.manager.storage.type=default)")
 	private ObjectEntryManager _objectEntryManager;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private ServiceContextHelper _serviceContextHelper;
+
+	private long[] _testrayLeadUserIds;
 
 	@Reference
 	private UserLocalService _userLocalService;

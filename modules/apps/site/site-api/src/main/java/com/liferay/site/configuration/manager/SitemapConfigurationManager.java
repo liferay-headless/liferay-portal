@@ -36,13 +36,17 @@ public interface SitemapConfigurationManager {
 		throws ConfigurationException;
 
 	public void saveSitemapCompanyConfiguration(
-			long companyId, boolean includeCategories, boolean includePages,
-			boolean includeWebContent, long[] companySitemapGroupIds)
+			long companyId, long[] companySitemapGroupIds,
+			boolean includeCategories, boolean includePages,
+			boolean includeWebContent, boolean xmlSitemapIndexEnabled)
 		throws ConfigurationException;
 
 	public void saveSitemapGroupConfiguration(
 			long groupId, boolean includeCategories, boolean includePages,
 			boolean includeWebContent)
+		throws ConfigurationException;
+
+	public boolean xmlSitemapIndexCompanyEnabled(long companyId)
 		throws ConfigurationException;
 
 }

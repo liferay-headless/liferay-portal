@@ -43,6 +43,9 @@ import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.object.tree.Node;
+import com.liferay.object.tree.Tree;
+import com.liferay.object.tree.TreeFactory;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
@@ -52,6 +55,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -79,6 +83,7 @@ import java.io.Serializable;
 
 import java.sql.Connection;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -898,7 +903,7 @@ public class ObjectRelationshipLocalServiceImpl
 						ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
 
 					_registerRelatedInfoItemCollectionProvider(
-						objectDefinition1, objectDefinition2,
+						objectDefinition2, objectDefinition1,
 						objectRelationshipLocalService.getObjectRelationship(
 							objectRelationship.getObjectDefinitionId2(),
 							objectRelationship.getName()));
@@ -1015,7 +1020,9 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getObjectFieldId2(), false);
 		}
 
-		if (edge && !objectRelationship.isEdge()) {
+		if (edge && !objectRelationship.isEdge() &&
+			FeatureFlagManagerUtil.isEnabled("LPS-187142")) {
+
 			_bindObjectDefinitions(objectRelationship);
 		}
 
@@ -1295,8 +1302,10 @@ public class ObjectRelationshipLocalServiceImpl
 		String objectDefinition1PreviousRESTContextPath =
 			objectDefinition1.getRESTContextPath();
 
-		objectDefinition1.setRootObjectDefinitionId(
-			objectDefinition1.getObjectDefinitionId());
+		if (objectDefinition1.getRootObjectDefinitionId() == 0) {
+			objectDefinition1.setRootObjectDefinitionId(
+				objectDefinition1.getObjectDefinitionId());
+		}
 
 		ObjectDefinitionLocalService objectDefinitionLocalService =
 			_objectDefinitionLocalServiceSnapshot.get();
@@ -1308,40 +1317,68 @@ public class ObjectRelationshipLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectRelationship.getObjectDefinitionId2());
 
-		String objectDefinition2PreviousRESTContextPath =
-			objectDefinition2.getRESTContextPath();
-
-		objectDefinition2.setPortlet(false);
-
-		if (!objectDefinition1.isApproved() && objectDefinition2.isApproved()) {
-			objectDefinition2.setPortlet(true);
-		}
-
 		if (objectDefinition1.isApproved() == objectDefinition2.isApproved()) {
-			objectDefinition2.setRootObjectDefinitionId(
-				objectDefinition1.getObjectDefinitionId());
+			if (objectDefinition1.isApproved()) {
+				if (!objectDefinition1.isRootNode()) {
+					ObjectDefinition rootObjectDefinition1 =
+						_objectDefinitionPersistence.findByPrimaryKey(
+							objectDefinition1.getRootObjectDefinitionId());
+
+					objectDefinitionLocalService.deployObjectDefinition(
+						rootObjectDefinition1);
+				}
+
+				objectDefinition1.setPreviousRESTContextPath(
+					objectDefinition1PreviousRESTContextPath);
+
+				objectDefinitionLocalService.deployObjectDefinition(
+					objectDefinition1);
+			}
+
+			Tree tree = _treeFactory.createObjectDefinitionTree(
+				objectDefinition2.getObjectDefinitionId(),
+				objectDefinitionLocalService::getObjectDefinition);
+
+			Iterator<Node> iterator = tree.iterator();
+
+			while (iterator.hasNext()) {
+				Node node = iterator.next();
+
+				ObjectDefinition nodeObjectDefinition =
+					objectDefinitionLocalService.fetchObjectDefinition(
+						node.getPrimaryKey());
+
+				String nodeObjectDefinitionPreviousRESTContextPath =
+					nodeObjectDefinition.getRESTContextPath();
+
+				nodeObjectDefinition.setRootObjectDefinitionId(
+					objectDefinition1.getRootObjectDefinitionId());
+				nodeObjectDefinition.setPortlet(false);
+
+				nodeObjectDefinition =
+					objectDefinitionLocalService.updateObjectDefinition(
+						nodeObjectDefinition);
+
+				if (nodeObjectDefinition.isApproved() &&
+					objectDefinition1.isApproved()) {
+
+					nodeObjectDefinition.setPreviousRESTContextPath(
+						nodeObjectDefinitionPreviousRESTContextPath);
+
+					objectDefinitionLocalService.deployObjectDefinition(
+						nodeObjectDefinition);
+				}
+			}
 		}
 		else {
+			if (objectDefinition2.isRootNode()) {
+				return;
+			}
+
 			objectDefinition2.setRootObjectDefinitionId(
 				objectDefinition2.getObjectDefinitionId());
-		}
 
-		objectDefinition2 = objectDefinitionLocalService.updateObjectDefinition(
-			objectDefinition2);
-
-		if (objectDefinition1.isApproved()) {
-			objectDefinition1.setPreviousRESTContextPath(
-				objectDefinition1PreviousRESTContextPath);
-
-			objectDefinitionLocalService.deployObjectDefinition(
-				objectDefinition1);
-		}
-
-		if (objectDefinition1.isApproved() && objectDefinition2.isApproved()) {
-			objectDefinition2.setPreviousRESTContextPath(
-				objectDefinition2PreviousRESTContextPath);
-
-			objectDefinitionLocalService.deployObjectDefinition(
+			objectDefinitionLocalService.updateObjectDefinition(
 				objectDefinition2);
 		}
 	}
@@ -1426,6 +1463,12 @@ public class ObjectRelationshipLocalServiceImpl
 			ObjectRelationship objectRelationship)
 		throws PortalException {
 
+		if (!objectDefinition1.isApproved() ||
+			!objectDefinition2.isApproved()) {
+
+			return;
+		}
+
 		RelatedInfoItemCollectionProvider relatedInfoItemCollectionProvider =
 			_relatedInfoCollectionProviderFactory.create(
 				objectDefinition1, objectDefinition2, objectRelationship);
@@ -1478,7 +1521,7 @@ public class ObjectRelationshipLocalServiceImpl
 			boolean edge, ObjectRelationship objectRelationship)
 		throws PortalException {
 
-		if (!edge) {
+		if (!edge || !FeatureFlagManagerUtil.isEnabled("LPS-187142")) {
 			return;
 		}
 
@@ -1833,6 +1876,9 @@ public class ObjectRelationshipLocalServiceImpl
 	@Reference
 	private SystemObjectDefinitionManagerRegistry
 		_systemObjectDefinitionManagerRegistry;
+
+	@Reference
+	private TreeFactory _treeFactory;
 
 	@Reference
 	private UserLocalService _userLocalService;

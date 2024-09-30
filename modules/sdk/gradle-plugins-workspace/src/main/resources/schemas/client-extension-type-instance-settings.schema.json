@@ -75,6 +75,23 @@
 		},
 		{
 			"properties": {
+				"enabled": {
+					"default": false,
+					"description": "Enable postprocessing of all legacy markup in fragments, web content, and blogs so that Adaptive Media is able to work with it. Enabling this option may impact the performance of your sites.",
+					"type": "boolean"
+				},
+				"pid": {
+					"const": "com.liferay.adaptive.media.image.content.transformer.backwards.compatibility.internal.configuration.AMBackwardsCompatibilityHtmlContentTransformerConfiguration",
+					"title": "Backwards Compatibility HTML Content Transformer"
+				}
+			},
+			"required": [
+				"pid"
+			],
+			"title": "Backwards Compatibility HTML Content Transformer"
+		},
+		{
+			"properties": {
 				"imageVariants": {
 					"items": {
 						"type": "string"
@@ -3715,6 +3732,11 @@
 				"pid": {
 					"const": "com.liferay.site.internal.configuration.SitemapCompanyConfiguration",
 					"title": "XML Sitemap"
+				},
+				"xmlSitemapIndexEnabled": {
+					"default": true,
+					"title": "XML Sitemap Index Enabled",
+					"type": "boolean"
 				}
 			},
 			"required": [
@@ -3966,6 +3988,7 @@
 			"enum": [
 				"com.liferay.account.configuration.AccountEntryEmailConfiguration",
 				"com.liferay.account.configuration.AccountEntryEmailDomainsConfiguration",
+				"com.liferay.adaptive.media.image.content.transformer.backwards.compatibility.internal.configuration.AMBackwardsCompatibilityHtmlContentTransformerConfiguration",
 				"com.liferay.adaptive.media.image.internal.configuration.AMImageCompanyConfiguration",
 				"com.liferay.ai.creator.openai.configuration.AICreatorOpenAICompanyConfiguration",
 				"com.liferay.analytics.settings.configuration.AnalyticsConfiguration",

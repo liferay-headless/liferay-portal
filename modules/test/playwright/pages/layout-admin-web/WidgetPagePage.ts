@@ -11,6 +11,7 @@ export class WidgetPagePage {
 	readonly page: Page;
 
 	readonly addButton: Locator;
+	readonly addPanelBody: Locator;
 	readonly contentTab: Locator;
 	readonly toggleControlsButton: Locator;
 	readonly widgetsTab: Locator;
@@ -55,7 +56,7 @@ export class WidgetPagePage {
 		);
 	}
 
-	async addPortlet(portletName: string) {
+	async addPortlet(portletName: string, category: string = undefined) {
 		await this.openAddPanel();
 
 		await this.widgetsTab.click();
@@ -64,12 +65,30 @@ export class WidgetPagePage {
 			.getByRole('textbox', {name: 'Search Form'})
 			.fill(portletName);
 
-		await this.page
-			.locator('.sidebar-body__add-panel__tab-item')
-			.filter({hasText: portletName})
-			.getByRole('button', {name: 'Add Content'})
-			.first()
-			.click();
+		if (category) {
+			const categoryPanel = this.page.locator(
+				'.add-content-menu .panel',
+				{
+					has: this.page
+						.locator('.panel-header')
+						.getByText(category, {exact: true}),
+				}
+			);
+
+			categoryPanel
+				.locator('.panel-body')
+				.filter({hasText: portletName})
+				.getByRole('button', {name: 'Add Content'})
+				.click();
+		}
+		else {
+			await this.page
+				.locator('.sidebar-body__add-panel__tab-item')
+				.filter({hasText: portletName})
+				.getByRole('button', {name: 'Add Content'})
+				.first()
+				.click();
+		}
 
 		await waitForSuccessAlert(
 			this.page,

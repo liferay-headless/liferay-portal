@@ -10,6 +10,7 @@ import {Dispatch, useState} from 'react';
 import {useNavigate, useOutletContext, useParams} from 'react-router-dom';
 import {KeyedMutator} from 'swr';
 import JiraLink from '~/components/JiraLink';
+import {useFetch} from '~/hooks/useFetch';
 import {taskSidebarRefresh} from '~/hooks/useSidebarTask';
 
 import FloatingBox from '../../../components/FloatingBox';
@@ -21,13 +22,15 @@ import useMutate from '../../../hooks/useMutate';
 import i18n from '../../../i18n';
 import {Liferay} from '../../../services/liferay';
 import {
+	APIResponse,
 	TestrayCaseResult,
 	TestraySubtask,
-	TestraySubtaskCaseResult,
 	testraySubtaskImpl,
 } from '../../../services/rest';
 import {testraySubtaskCaseResultImpl} from '../../../services/rest/TestraySubtaskCaseResults';
 import {SubtaskStatuses} from '../../../util/statuses';
+
+let totalItems: TestrayCaseResult[] = [];
 
 type SubtasksCaseResultsProps = {
 	forceRefetch: number;
@@ -54,18 +57,19 @@ const SubtasksCaseResults: React.FC<SubtasksCaseResultsProps> = ({
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setTaskSidebarRefresh] = useAtom(taskSidebarRefresh);
 
+	const {data: response} = useFetch<APIResponse<TestrayCaseResult>>(
+		`/subtasks/${subtaskId}/subtaskToCaseResults?pageSize=1&fields=id`
+	);
+
 	const {
 		data: {buildId, projectId, routineId, testraySubtask},
 		mutate: {mutateSubtask},
 	} = useOutletContext<OutletContext>();
 
-	const getFloatingBoxAlerts = (
-		subtasksCaseResults: TestraySubtaskCaseResult[],
-		selectRows: number[]
-	) => {
+	const getFloatingBoxAlerts = (selectRows: number[]) => {
 		const alerts = [];
 
-		if (subtasksCaseResults.length === selectRows.length) {
+		if (selectRows.length === response?.totalCount) {
 			alerts.push({
 				text: i18n.translate(
 					'you-cannot-split-all-case-results-from-a-subtask'
@@ -122,6 +126,8 @@ const SubtasksCaseResults: React.FC<SubtasksCaseResultsProps> = ({
 			Number(subtaskId),
 			Number(taskId)
 		);
+
+		totalItems = [];
 
 		mutateSubtask(currentSubtask);
 
@@ -257,15 +263,20 @@ const SubtasksCaseResults: React.FC<SubtasksCaseResultsProps> = ({
 			}
 		>
 			{({items}, {dispatch, listViewContext: {selectedRows}, mutate}) => {
-				const alerts = getFloatingBoxAlerts(items, selectedRows);
+				const alerts = getFloatingBoxAlerts(selectedRows);
 
-				const selectedCaseResults: TestrayCaseResult[] =
-					selectedRows.map((rowId) =>
-						items.find(
-							({testrayCaseResultId}) =>
-								rowId === testrayCaseResultId
-						)
-					);
+				totalItems = totalItems.concat(
+					items.filter(
+						(pageItem) =>
+							!totalItems.some((item) => item.id === pageItem.id)
+					)
+				);
+
+				const selectedCaseResults = selectedRows.map((rowId) =>
+					totalItems.find(
+						({testrayCaseResultId}) => rowId === testrayCaseResultId
+					)
+				);
 
 				return (
 					<FloatingBox
@@ -281,7 +292,7 @@ const SubtasksCaseResults: React.FC<SubtasksCaseResultsProps> = ({
 							onSplitSubtasks(
 								dispatch,
 								mutate,
-								selectedCaseResults
+								selectedCaseResults as TestrayCaseResult[]
 							)
 						}
 						primaryButtonProps={{

@@ -14,7 +14,14 @@ import getCN from 'classnames';
 import {PropTypes} from 'prop-types';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {ASSET_CATEGORY_ID, GROUP_ID} from '../../utils/constants';
+import {
+	ASSET_CATEGORY_ID,
+	ASSET_CATEGORY_IDS,
+	GROUP_EXTERNAL_REFERENCE_CODE,
+	GROUP_EXTERNAL_REFERENCE_CODES,
+	GROUP_ID,
+	GROUP_IDS,
+} from '../../utils/constants';
 import {DEFAULT_SXP_ELEMENT_ICON} from '../../utils/data';
 import isDefined from '../../utils/functions/is_defined';
 import cleanUIConfiguration from '../../utils/sxp_element/clean_ui_configuration';
@@ -195,7 +202,7 @@ function SXPElement({
 					/>
 				);
 			case INPUT_TYPES.MULTISELECT:
-				if (config.name === `${ASSET_CATEGORY_ID}s`) {
+				if (config.name === ASSET_CATEGORY_IDS) {
 					return (
 						<CategorySelectorInput
 							disabled={disabled}
@@ -210,7 +217,10 @@ function SXPElement({
 					);
 				}
 
-				if (config.name.includes(`${GROUP_ID}s`)) {
+				if (
+					config.name.includes(GROUP_IDS) ||
+					config.name.includes(GROUP_EXTERNAL_REFERENCE_CODES)
+				) {
 					return (
 						<SiteSelectorInput
 							disabled={disabled}
@@ -336,6 +346,21 @@ function SXPElement({
 					/>
 				);
 			default:
+				if (config.name.includes(GROUP_EXTERNAL_REFERENCE_CODE)) {
+					return (
+						<SiteSelectorInput
+							disabled={disabled}
+							id={inputId}
+							label={config.labelLocalized || config.label}
+							multiple={false}
+							name={inputName}
+							setFieldTouched={setFieldTouched}
+							setFieldValue={setFieldValue}
+							value={uiConfigurationValues[config.name]}
+						/>
+					);
+				}
+
 				return (
 					<TextInput
 						disabled={disabled}

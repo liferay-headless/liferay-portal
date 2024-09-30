@@ -115,8 +115,9 @@ public class SitemapConfigurationManagerImpl
 
 	@Override
 	public void saveSitemapCompanyConfiguration(
-			long companyId, boolean includeCategories, boolean includePages,
-			boolean includeWebContent, long[] companySitemapGroupIds)
+			long companyId, long[] companySitemapGroupIds,
+			boolean includeCategories, boolean includePages,
+			boolean includeWebContent, boolean xmlSitemapIndexEnabled)
 		throws ConfigurationException {
 
 		_configurationProvider.saveCompanyConfiguration(
@@ -129,6 +130,8 @@ public class SitemapConfigurationManagerImpl
 				"includePages", includePages
 			).put(
 				"includeWebContent", includeWebContent
+			).put(
+				"xmlSitemapIndexEnabled", xmlSitemapIndexEnabled
 			).build());
 	}
 
@@ -147,6 +150,17 @@ public class SitemapConfigurationManagerImpl
 			).put(
 				"includeWebContent", includeWebContent
 			).build());
+	}
+
+	@Override
+	public boolean xmlSitemapIndexCompanyEnabled(long companyId)
+		throws ConfigurationException {
+
+		SitemapCompanyConfiguration sitemapCompanyConfiguration =
+			_configurationProvider.getCompanyConfiguration(
+				SitemapCompanyConfiguration.class, companyId);
+
+		return sitemapCompanyConfiguration.xmlSitemapIndexEnabled();
 	}
 
 	@Reference

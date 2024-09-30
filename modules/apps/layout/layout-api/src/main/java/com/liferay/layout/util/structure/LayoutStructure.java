@@ -477,27 +477,65 @@ public class LayoutStructure {
 					" cannot be selected as parent item"));
 		}
 
-		List<LayoutStructureItem> copiedLayoutStructureItems =
-			new ArrayList<>();
-
 		int position = 0;
 
 		if (parentLayoutStructureItem instanceof
-				FormStepContainerStyledLayoutStructureItem ||
-			parentLayoutStructureItem instanceof
-				FragmentStyledLayoutStructureItem ||
-			parentLayoutStructureItem instanceof RowStyledLayoutStructureItem) {
+				CollectionStyledLayoutStructureItem) {
+
+			List<String> childrenItemIds =
+				parentLayoutStructureItem.getChildrenItemIds();
+
+			if (ListUtil.isEmpty(childrenItemIds)) {
+				throw new UnsupportedOperationException(
+					"Unable to copy items because collection does not have " +
+						"collection items");
+			}
+
+			parentItemId = childrenItemIds.get(0);
+
+			position = -1;
+		}
+		else if (parentLayoutStructureItem instanceof
+					FormStepContainerStyledLayoutStructureItem ||
+				 parentLayoutStructureItem instanceof
+					 RowStyledLayoutStructureItem) {
 
 			parentItemId = parentLayoutStructureItem.getParentItemId();
 
 			position = -1;
 		}
+		else if (parentLayoutStructureItem instanceof
+					FragmentStyledLayoutStructureItem) {
+
+			String oldParentItemId = parentItemId;
+
+			parentItemId = parentLayoutStructureItem.getParentItemId();
+
+			LayoutStructureItem newParentLayoutStructureItem =
+				_layoutStructureItems.get(parentItemId);
+
+			List<String> childrenItemIds =
+				newParentLayoutStructureItem.getChildrenItemIds();
+
+			position = childrenItemIds.indexOf(oldParentItemId) + 1;
+		}
+
+		List<LayoutStructureItem> copiedLayoutStructureItems =
+			new ArrayList<>();
 
 		for (String itemId : itemIds) {
 			if (Objects.equals(itemId, parentItemId)) {
-				throw new UnsupportedOperationException(
-					"Unable to copy items because item ID and parent item ID " +
-						"cannot be the same item");
+				String oldParentItemId = parentItemId;
+
+				parentItemId = parentLayoutStructureItem.getParentItemId();
+
+				LayoutStructureItem newParentLayoutStructureItem =
+					_layoutStructureItems.get(parentItemId);
+
+				List<String> childrenItemIds =
+					newParentLayoutStructureItem.getChildrenItemIds();
+
+				position = childrenItemIds.indexOf(oldParentItemId) + 1;
 			}
 
 			List<String> childrenItemIds =

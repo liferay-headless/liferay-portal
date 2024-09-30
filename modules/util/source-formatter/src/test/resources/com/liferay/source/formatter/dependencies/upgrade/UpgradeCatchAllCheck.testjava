@@ -51,6 +51,7 @@ public class UpgradeCatchAllCheck implements ConfigurationBeanDeclaration {
 		}
 
 		HtmlUtil.extractText(null);
+		HtmlUtil.getHTML();
 
 		_http.hasProxyConfig();
 		_http.addParameter(null, null, null);
@@ -716,6 +717,11 @@ public class UpgradeCatchAllCheck implements ConfigurationBeanDeclaration {
 		_journalConverter.getContent(ddmStructure, ddmFields);
 	}
 
+	public void method(Group group, LayoutSet layoutSet) {
+		group.getPrivateLayoutSet().getVirtualHostname();
+		layoutSet.getVirtualHostname();
+	}
+
 	public void method(HttpServletRequest httpServletRequest) {
 		_commerceAccountHelper.getCurrentCommerceAccount(httpServletRequest);
 		_commerceAccountHelper.getCurrentCommerceAccount(null);
@@ -1184,6 +1190,18 @@ public class UpgradeCatchAllCheck implements ConfigurationBeanDeclaration {
 
 		indexableActionableDynamicQuery.setSearchEngineId("test123");
 		indexableActionableDynamicQuery.setSearchEngineId(searchEngineId);
+	}
+
+	public void method(String externalReferenceCode, long companyId) {
+		CommercePriceListLocalServiceUtil.fetchByExternalReferenceCode(externalReferenceCode, companyId);
+		_commercePriceListLocalService.fetchByExternalReferenceCode("test123", 123);
+		_commercePriceListLocalService.fetchByExternalReferenceCode(externalReferenceCode, companyId);
+
+		CPInstanceLocalServiceUtil.fetchByExternalReferenceCode("test123", 123);
+		CPInstanceLocalServiceUtil.fetchByExternalReferenceCode(externalReferenceCode, companyId);
+		CPInstanceServiceUtil.fetchByExternalReferenceCode(externalReferenceCode, companyId);
+		_cpInstanceLocalService.fetchByExternalReferenceCode(externalReferenceCode, companyId);
+		_cpInstanceService.fetchByExternalReferenceCode(externalReferenceCode, companyId);
 	}
 
 	public void method(

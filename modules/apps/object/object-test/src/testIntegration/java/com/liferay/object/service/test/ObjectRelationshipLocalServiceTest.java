@@ -6,6 +6,7 @@
 package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -37,6 +38,8 @@ import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.test.util.TreeTestUtil;
 import com.liferay.object.tree.TreeFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -458,14 +461,79 @@ public class ObjectRelationshipLocalServiceTest {
 	public void testBindDraftObjectDefinitionAndPublishedObjectDefinition()
 		throws Exception {
 
+		// Bind a draft object definition as a child node in a published object
+		// definition tree
+
 		ObjectDefinition objectDefinitionAA =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA");
+			_addAndPublishCustomObjectDefinition("AA");
+		ObjectDefinition objectDefinitionAAA =
+			_addAndPublishCustomObjectDefinition("AAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAA.getObjectDefinitionId(),
+			objectDefinitionAAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAAA,
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAAA"),
+			(objectDefinition1, objectDefinition2) -> {
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition2.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+			});
+
+		// Bind a draft object definition as a parent node in a published
+		// object definition tree
 
 		_testBindObjectDefinitions(
 			ObjectDefinitionTestUtil.addCustomObjectDefinition("A"),
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				objectDefinitionAA.getObjectDefinitionId()),
+			objectDefinitionAA,
+			(objectDefinition1, objectDefinition2) -> {
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition2.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+			});
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind a draft object definition to a published object definition
+
+		_testBindObjectDefinitions(
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("A"),
+			_addAndPublishCustomObjectDefinition("AA"),
 			(objectDefinition1, objectDefinition2) -> {
 				TreeTestUtil.assertObjectDefinitionTree(
 					LinkedHashMapBuilder.put(
@@ -484,10 +552,204 @@ public class ObjectRelationshipLocalServiceTest {
 						_objectDefinitionLocalService::getObjectDefinition),
 					_objectDefinitionLocalService);
 			});
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService, new String[] {"C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind a draft object definition tree to a published object definition
+		// tree
+
+		ObjectDefinition objectDefinitionA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
+		objectDefinitionAA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			"AA");
+
+		_bindObjectDefinitions(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId());
+
+		objectDefinitionAAA = _addAndPublishCustomObjectDefinition("AAA");
+		ObjectDefinition objectDefinitionAAAA =
+			_addAndPublishCustomObjectDefinition("AAAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAAA.getObjectDefinitionId(),
+			objectDefinitionAAAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAA, objectDefinitionAAA,
+			(objectDefinition1, objectDefinition2) -> {
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition2.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+			});
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind a published object definition to a draft object definition tree
+
+		objectDefinitionA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			"A");
+		objectDefinitionAA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			"AA");
+
+		_bindObjectDefinitions(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAA, _addAndPublishCustomObjectDefinition("AAA"),
+			(objectDefinition1, objectDefinition2) -> {
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition2.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService);
+			});
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAA", "C_AA", "C_A"}, _objectEntryLocalService);
 	}
 
 	@Test
 	public void testBindDraftObjectDefinitions() throws Exception {
+
+		// Bind a draft object definition as a child node in a draft object
+		// definition tree
+
+		ObjectDefinition objectDefinitionAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA");
+		ObjectDefinition objectDefinitionAAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAA.getObjectDefinitionId(),
+			objectDefinitionAAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAAA,
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAAA"),
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		// Bind a draft object definition as a parent node in a draft object
+		// definition tree
+
+		_testBindObjectDefinitions(
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("A"),
+			objectDefinitionAA,
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind two draft object definition trees
+
+		ObjectDefinition objectDefinitionA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
+		objectDefinitionAA = ObjectDefinitionTestUtil.addCustomObjectDefinition(
+			"AA");
+
+		_bindObjectDefinitions(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId());
+
+		objectDefinitionAAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAA");
+		ObjectDefinition objectDefinitionAAAA =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition("AAAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAAA.getObjectDefinitionId(),
+			objectDefinitionAAAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAA, objectDefinitionAAA,
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind two draft object definitions
+
 		_testBindObjectDefinitions(
 			ObjectDefinitionTestUtil.addCustomObjectDefinition("A"),
 			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA"),
@@ -502,22 +764,117 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition1.getObjectDefinitionId(),
 						_objectDefinitionLocalService::getObjectDefinition),
 					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService, new String[] {"C_AA", "C_A"},
+			_objectEntryLocalService);
 	}
 
 	@Test
 	public void testBindPublishedObjectDefinitions() throws Exception {
-		ObjectDefinition objectDefinitionA =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition("A");
+
+		// Bind a published object definition as a child node in a published
+		// object definition tree
+
 		ObjectDefinition objectDefinitionAA =
-			ObjectDefinitionTestUtil.addCustomObjectDefinition("AA");
+			_addAndPublishCustomObjectDefinition("AA");
+		ObjectDefinition objectDefinitionAAA =
+			_addAndPublishCustomObjectDefinition("AAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAA.getObjectDefinitionId(),
+			objectDefinitionAAA.getObjectDefinitionId());
+
+		ObjectDefinition objectDefinitionAAAA =
+			_addAndPublishCustomObjectDefinition("AAAA");
 
 		_testBindObjectDefinitions(
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				objectDefinitionA.getObjectDefinitionId()),
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				objectDefinitionAA.getObjectDefinitionId()),
+			objectDefinitionAAA, objectDefinitionAAAA,
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		// Bind a published object definition as a parent node in a published
+		// object definition tree
+
+		_testBindObjectDefinitions(
+			_addAndPublishCustomObjectDefinition("A"), objectDefinitionAA,
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind two published object definition trees
+
+		ObjectDefinition objectDefinitionA =
+			_addAndPublishCustomObjectDefinition("A");
+		objectDefinitionAA = _addAndPublishCustomObjectDefinition("AA");
+
+		_bindObjectDefinitions(
+			objectDefinitionA.getObjectDefinitionId(),
+			objectDefinitionAA.getObjectDefinitionId());
+
+		objectDefinitionAAA = _addAndPublishCustomObjectDefinition("AAA");
+		objectDefinitionAAAA = _addAndPublishCustomObjectDefinition("AAAA");
+
+		_bindObjectDefinitions(
+			objectDefinitionAAA.getObjectDefinitionId(),
+			objectDefinitionAAAA.getObjectDefinitionId());
+
+		_testBindObjectDefinitions(
+			objectDefinitionAA, objectDefinitionAAA,
+			(objectDefinition1, objectDefinition2) ->
+				TreeTestUtil.assertObjectDefinitionTree(
+					LinkedHashMapBuilder.put(
+						"A", new String[] {"AA"}
+					).put(
+						"AA", new String[] {"AAA"}
+					).put(
+						"AAA", new String[] {"AAAA"}
+					).put(
+						"AAAA", new String[0]
+					).build(),
+					_treeFactory.createObjectDefinitionTree(
+						objectDefinition1.getRootObjectDefinitionId(),
+						_objectDefinitionLocalService::getObjectDefinition),
+					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService,
+			new String[] {"C_AAAA", "C_AAA", "C_AA", "C_A"},
+			_objectEntryLocalService);
+
+		// Bind two published object definitions
+
+		_testBindObjectDefinitions(
+			_addAndPublishCustomObjectDefinition("A"),
+			_addAndPublishCustomObjectDefinition("AA"),
 			(objectDefinition1, objectDefinition2) ->
 				TreeTestUtil.assertObjectDefinitionTree(
 					LinkedHashMapBuilder.put(
@@ -529,6 +886,10 @@ public class ObjectRelationshipLocalServiceTest {
 						objectDefinition1.getObjectDefinitionId(),
 						_objectDefinitionLocalService::getObjectDefinition),
 					_objectDefinitionLocalService));
+
+		TreeTestUtil.deleteObjectDefinitionHierarchy(
+			_objectDefinitionLocalService, new String[] {"C_AA", "C_A"},
+			_objectEntryLocalService);
 	}
 
 	@Test
@@ -589,6 +950,76 @@ public class ObjectRelationshipLocalServiceTest {
 
 		_objectRelationshipLocalService.deleteObjectRelationship(
 			systemObjectRelationship);
+	}
+
+	@Test
+	public void testRegisterObjectRelationshipsRelatedInfoItemCollectionProviders()
+		throws Exception {
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				ObjectDefinitionTestUtil.getRandomName());
+		ObjectDefinition objectDefinition2 =
+			ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				ObjectDefinitionTestUtil.getRandomName());
+
+		_objectRelationshipLocalService.addObjectRelationship(
+			null, TestPropsValues.getUserId(),
+			objectDefinition1.getObjectDefinitionId(),
+			objectDefinition2.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			StringUtil.randomId(), false,
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+
+		_objectRelationshipLocalService.
+			registerObjectRelationshipsRelatedInfoCollectionProviders(
+				objectDefinition1, _objectDefinitionLocalService);
+
+		Bundle bundle = FrameworkUtil.getBundle(
+			ObjectRelationshipLocalServiceTest.class);
+
+		ServiceTrackerMap<String, RelatedInfoItemCollectionProvider>
+			serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+				bundle.getBundleContext(),
+				RelatedInfoItemCollectionProvider.class, "item.class.name");
+
+		Assert.assertNull(
+			serviceTrackerMap.getService(objectDefinition1.getClassName()));
+		Assert.assertNull(
+			serviceTrackerMap.getService(objectDefinition2.getClassName()));
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition1.getObjectDefinitionId());
+
+		Assert.assertNull(
+			serviceTrackerMap.getService(objectDefinition1.getClassName()));
+		Assert.assertNull(
+			serviceTrackerMap.getService(objectDefinition2.getClassName()));
+
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			objectDefinition2.getObjectDefinitionId());
+
+		RelatedInfoItemCollectionProvider relatedInfoItemCollectionProvider =
+			serviceTrackerMap.getService(objectDefinition1.getClassName());
+
+		Assert.assertEquals(
+			objectDefinition1.getClassName(),
+			relatedInfoItemCollectionProvider.getSourceItemClassName());
+
+		relatedInfoItemCollectionProvider = serviceTrackerMap.getService(
+			objectDefinition2.getClassName());
+
+		Assert.assertEquals(
+			objectDefinition2.getClassName(),
+			relatedInfoItemCollectionProvider.getSourceItemClassName());
+
+		serviceTrackerMap.close();
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition2);
 	}
 
 	@Test
@@ -863,9 +1294,16 @@ public class ObjectRelationshipLocalServiceTest {
 	private ObjectDefinition _addAndPublishCustomObjectDefinition()
 		throws Exception {
 
+		return _addAndPublishCustomObjectDefinition(
+			ObjectDefinitionTestUtil.getRandomName());
+	}
+
+	private ObjectDefinition _addAndPublishCustomObjectDefinition(String name)
+		throws Exception {
+
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition(
-				false,
+				0, false, name,
 				Arrays.asList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -927,6 +1365,26 @@ public class ObjectRelationshipLocalServiceTest {
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+	}
+
+	private ObjectRelationship _bindObjectDefinitions(
+			long objectDefinitionId1, long objectDefinitionId2)
+		throws Exception {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.addObjectRelationship(
+				StringUtil.randomId(), TestPropsValues.getUserId(),
+				objectDefinitionId1, objectDefinitionId2, 0,
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				StringUtil.randomId(), false,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+
+		return _objectRelationshipLocalService.updateObjectRelationship(
+			objectRelationship.getExternalReferenceCode(),
+			objectRelationship.getObjectRelationshipId(), 0,
+			objectRelationship.getDeletionType(), true,
+			objectRelationship.getLabelMap(), null);
 	}
 
 	private boolean _hasColumn(String tableName, String columnName)
@@ -1123,22 +1581,9 @@ public class ObjectRelationshipLocalServiceTest {
 				biConsumer)
 		throws Exception {
 
-		ObjectRelationship objectRelationship =
-			_objectRelationshipLocalService.addObjectRelationship(
-				StringUtil.randomId(), TestPropsValues.getUserId(),
-				objectDefinition1.getObjectDefinitionId(),
-				objectDefinition2.getObjectDefinitionId(), 0,
-				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), false,
-				ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
-
-		objectRelationship =
-			_objectRelationshipLocalService.updateObjectRelationship(
-				objectRelationship.getExternalReferenceCode(),
-				objectRelationship.getObjectRelationshipId(), 0,
-				objectRelationship.getDeletionType(), true,
-				objectRelationship.getLabelMap(), null);
+		ObjectRelationship objectRelationship = _bindObjectDefinitions(
+			objectDefinition1.getObjectDefinitionId(),
+			objectDefinition2.getObjectDefinitionId());
 
 		Assert.assertTrue(objectRelationship.isEdge());
 		Assert.assertEquals(
@@ -1155,10 +1600,6 @@ public class ObjectRelationshipLocalServiceTest {
 				objectDefinition1.getObjectDefinitionId()),
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectDefinition2.getObjectDefinitionId()));
-
-		TreeTestUtil.deleteObjectDefinitionHierarchy(
-			_objectDefinitionLocalService, new String[] {"C_AA", "C_A"},
-			_objectEntryLocalService);
 	}
 
 	private void _testCreateManyToManyObjectRelationshipTable(

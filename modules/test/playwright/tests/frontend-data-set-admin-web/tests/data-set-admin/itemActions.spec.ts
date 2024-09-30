@@ -55,6 +55,28 @@ test.afterEach(async ({dataSetManagerApiHelpers}) => {
 	await dataSetManagerApiHelpers.deleteDataSet({erc: dataSetERC});
 });
 
+async function assertTableCellContent({actionData, page, rowIndex = 0}) {
+	await test.step('Assert table cell content', async () => {
+		await page
+			.locator('.orderable-table > tbody > .orderable-table-row')
+			.first()
+			.waitFor();
+
+		const tableRowContent = await page
+			.locator('.orderable-table-row')
+			.nth(rowIndex)
+			.locator('td');
+
+		const expectedRowContent = [
+			actionData.icon,
+			actionData.label,
+			actionData.type,
+		];
+
+		await expect(tableRowContent).toContainText(expectedRowContent);
+	});
+}
+
 test(
 	'Check interactive options in item action form',
 	{tag: '@LPD-11300'},
@@ -1079,6 +1101,131 @@ test(
 			).not.toBeInViewport();
 
 			await expect(actionRow).not.toBeInViewport();
+		});
+	}
+);
+
+test(
+	'Item actions can be reordered',
+	{tag: '@LPD-11300'},
+	async ({actionsPage, dataSetManagerApiHelpers, page}) => {
+		const firstAction = {
+			icon: 'angle-left-double',
+			label: getRandomString(),
+			type: EItemActionType.LINK,
+		};
+		const secondAction = {
+			icon: 'angle-left-small',
+			label: getRandomString(),
+			type: EItemActionType.LINK,
+		};
+		const thirdAction = {
+			icon: 'angle-left',
+			label: getRandomString(),
+			type: EItemActionType.LINK,
+		};
+
+		await test.step('Create some item actions', async () => {
+			await dataSetManagerApiHelpers.createDataSetItemAction({
+				dataSetERC,
+				icon: firstAction.icon,
+				label_i18n: {en_US: firstAction.label},
+				type: firstAction.type,
+			});
+
+			await dataSetManagerApiHelpers.createDataSetItemAction({
+				dataSetERC,
+				icon: secondAction.icon,
+				label_i18n: {en_US: secondAction.label},
+				type: secondAction.type,
+			});
+
+			await dataSetManagerApiHelpers.createDataSetItemAction({
+				dataSetERC,
+				icon: thirdAction.icon,
+				label_i18n: {en_US: thirdAction.label},
+				type: thirdAction.type,
+			});
+		});
+
+		await test.step('Go to item actions tab', async () => {
+			await actionsPage.gotoItemActionsTab({dataSetLabel});
+		});
+
+		await test.step('Check that the item action are in the list', async () => {
+			await expect(actionsPage.itemActionsTab).toBeInViewport();
+
+			assertTableCellContent({
+				actionData: firstAction,
+				page,
+				rowIndex: 0,
+			});
+			assertTableCellContent({
+				actionData: secondAction,
+				page,
+				rowIndex: 1,
+			});
+			assertTableCellContent({
+				actionData: thirdAction,
+				page,
+				rowIndex: 2,
+			});
+		});
+
+		await test.step('Move second item action to the top', async () => {
+			const secondRow = actionsPage.page
+				.locator('.orderable-table-row')
+				.nth(2);
+
+			const firstRow = actionsPage.page
+				.locator('.orderable-table-row')
+				.nth(0);
+
+			await secondRow.dragTo(firstRow);
+		});
+
+		await test.step('Check that the item actions order has changed', async () => {
+			await expect(actionsPage.itemActionsTab).toBeInViewport();
+			assertTableCellContent({
+				actionData: firstAction,
+				page,
+				rowIndex: 1,
+			});
+			assertTableCellContent({
+				actionData: secondAction,
+				page,
+				rowIndex: 2,
+			});
+			assertTableCellContent({
+				actionData: thirdAction,
+				page,
+				rowIndex: 0,
+			});
+		});
+
+		await test.step('Navigate to the "Creation Actions" tab and back to "Item Actions" tab', async () => {
+			await actionsPage.gotoCreationActionsTab({dataSetLabel});
+			await actionsPage.gotoItemActionsTab({dataSetLabel});
+		});
+
+		await test.step('Check that the item actions keep the last order saved', async () => {
+			await expect(actionsPage.itemActionsTab).toBeInViewport();
+
+			assertTableCellContent({
+				actionData: firstAction,
+				page,
+				rowIndex: 1,
+			});
+			assertTableCellContent({
+				actionData: secondAction,
+				page,
+				rowIndex: 2,
+			});
+			assertTableCellContent({
+				actionData: thirdAction,
+				page,
+				rowIndex: 0,
+			});
 		});
 	}
 );
