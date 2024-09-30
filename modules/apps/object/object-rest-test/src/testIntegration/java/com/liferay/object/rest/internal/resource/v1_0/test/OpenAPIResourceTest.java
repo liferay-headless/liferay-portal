@@ -243,7 +243,7 @@ public class OpenAPIResourceTest {
 			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
 		Set<String> expectedFilterableFields = new HashSet<>(
-			_getObjectDefinitionEntityFieldsMap(objectDefinition));
+			_getObjectDefinitionFilterableFields(objectDefinition));
 
 		JSONObject openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
 			null, objectDefinition.getRESTContextPath() + "/openapi.json",
@@ -258,7 +258,7 @@ public class OpenAPIResourceTest {
 			expectedFilterableFields, actualFilterableFields);
 
 		expectedFilterableFields = new HashSet<>(
-			_getObjectDefinitionEntityFieldsMap(relatedObjectDefinition));
+			_getObjectDefinitionFilterableFields(relatedObjectDefinition));
 
 		openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
 			null,
@@ -307,7 +307,7 @@ public class OpenAPIResourceTest {
 						user.getUserId());
 
 				Set<String> expectedFilterableFieldsCompany = new HashSet<>(
-					_getObjectDefinitionEntityFieldsMap(
+					_getObjectDefinitionFilterableFields(
 						companyObjectDefinition));
 
 				JSONObject openAPICOmpanyJSONObject =
@@ -511,7 +511,7 @@ public class OpenAPIResourceTest {
 		return filterableFieldNames;
 	}
 
-	private Set<String> _getObjectDefinitionEntityFieldsMap(
+	private Set<String> _getObjectDefinitionFilterableFields(
 			ObjectDefinition objectDefinition)
 		throws Exception {
 
