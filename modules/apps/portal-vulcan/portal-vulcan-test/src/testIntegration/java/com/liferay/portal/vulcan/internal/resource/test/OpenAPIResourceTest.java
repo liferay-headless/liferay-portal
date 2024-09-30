@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -26,7 +28,6 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.InputStream;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -57,28 +58,22 @@ public class OpenAPIResourceTest {
 
 	@Test
 	public void testGetOpenAPIFilterableFields() throws Exception {
-		Map<String, EntityField> entityFieldsMap =
-			_getStructuredContentEntityFieldsMap();
+		Set<String> expectedFilterableFields = _getFilterableFieldNames();
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
 			StringPool.BLANK, "/headless-delivery/v1.0/openapi.json",
 			Http.Method.GET);
 
-		Set<String> expectedFilterableFields = new HashSet<>(
-			entityFieldsMap.keySet());
-
-		Set<String> schemaLevelFilterableFields =
-			_getSchemaLevelFilterableFields(jsonObject);
+		Set<String> actualFilterableFields = _getSchemaLevelXFilterableFields(
+			jsonObject);
 
 		Set<String> missingFields = new HashSet<>(expectedFilterableFields);
 
-		missingFields.removeAll(schemaLevelFilterableFields);
+		missingFields.removeAll(actualFilterableFields);
 
-		Set<String> unexpectedFields = new HashSet<>(
-			schemaLevelFilterableFields);
+		Set<String> unexpectedFields = new HashSet<>(actualFilterableFields);
 
 		unexpectedFields.removeAll(expectedFilterableFields);
-		unexpectedFields.remove("creator");
 
 		StringBuilder errorMessage = new StringBuilder();
 
@@ -139,42 +134,8 @@ public class OpenAPIResourceTest {
 		}
 	}
 
-	private String _getPath(InputStream inputStream, String path)
-		throws Exception {
-
-		JsonNode jsonNode = _objectMapper.readTree(inputStream);
-
-		jsonNode = jsonNode.at(path);
-
-		return jsonNode.asText();
-	}
-
-	private Set<String> _getSchemaLevelFilterableFields(
-		JSONObject openAPIJSONObject) {
-
-		Set<String> filterableFields = new HashSet<>();
-
-		JSONObject schemaJSONObject = openAPIJSONObject.getJSONObject(
-			"components"
-		).getJSONObject(
-			"schemas"
-		).getJSONObject(
-			"StructuredContent"
-		);
-
-		if (schemaJSONObject.has("x-filterable")) {
-			JSONArray jsonArray = schemaJSONObject.getJSONArray("x-filterable");
-
-			for (int i = 0; i < jsonArray.length(); i++) {
-				filterableFields.add(jsonArray.getString(i));
-			}
-		}
-
-		return filterableFields;
-	}
-
-	private Map<String, EntityField> _getStructuredContentEntityFieldsMap()
-		throws Exception {
+	private Set<String> _getFilterableFieldNames() throws Exception {
+		Set<String> filterableFieldNames = new HashSet<>();
 
 		Bundle bundle = FrameworkUtil.getBundle(OpenAPIResourceTest.class);
 
@@ -205,7 +166,83 @@ public class OpenAPIResourceTest {
 		EntityModel entityModel = structuredContentResource.getEntityModel(
 			params);
 
-		return entityModel.getEntityFieldsMap();
+		Set<EntityField> processedEntityFields = new HashSet<>();
+
+		for (Map.Entry<String, EntityField> entry :
+				entityModel.getEntityFieldsMap(
+				).entrySet()) {
+
+			filterableFieldNames.addAll(
+				_getFilterableFieldNames(
+					entry.getValue(), entry.getKey(), processedEntityFields));
+		}
+
+		return filterableFieldNames;
+	}
+
+	private Set<String> _getFilterableFieldNames(
+		EntityField entityField, String fieldName,
+		Set<EntityField> processedEntityFields) {
+
+		if (!processedEntityFields.add(entityField)) {
+			return new HashSet<>();
+		}
+
+		if (!(entityField instanceof ComplexEntityField)) {
+			return SetUtil.fromArray(fieldName);
+		}
+
+		ComplexEntityField complexEntityField = (ComplexEntityField)entityField;
+
+		Map<String, EntityField> entityFieldsMap =
+			complexEntityField.getEntityFieldsMap();
+
+		Set<String> filterableFieldNames = new HashSet<>();
+
+		for (Map.Entry<String, EntityField> entry :
+				entityFieldsMap.entrySet()) {
+
+			filterableFieldNames.addAll(
+				_getFilterableFieldNames(
+					entry.getValue(), fieldName + "/" + entry.getKey(),
+					processedEntityFields));
+		}
+
+		return filterableFieldNames;
+	}
+
+	private String _getPath(InputStream inputStream, String path)
+		throws Exception {
+
+		JsonNode jsonNode = _objectMapper.readTree(inputStream);
+
+		jsonNode = jsonNode.at(path);
+
+		return jsonNode.asText();
+	}
+
+	private Set<String> _getSchemaLevelXFilterableFields(
+		JSONObject openAPIJSONObject) {
+
+		Set<String> filterableFields = new HashSet<>();
+
+		JSONObject schemaJSONObject = openAPIJSONObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"StructuredContent"
+		);
+
+		if (schemaJSONObject.has("x-filterable")) {
+			JSONArray jsonArray = schemaJSONObject.getJSONArray("x-filterable");
+
+			for (int i = 0; i < jsonArray.length(); i++) {
+				filterableFields.add(jsonArray.getString(i));
+			}
+		}
+
+		return filterableFields;
 	}
 
 	private final ObjectMapper _objectMapper = new ObjectMapper();
