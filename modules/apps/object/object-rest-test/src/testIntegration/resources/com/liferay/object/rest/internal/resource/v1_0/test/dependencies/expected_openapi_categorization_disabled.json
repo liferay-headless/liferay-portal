@@ -227,6 +227,19 @@
 					}
 				},
 				"type": "object",
+				"x-filterable": [
+					"creator",
+					"dateCreated",
+					"keywords",
+					"field",
+					"taxonomyCategoryIds",
+					"creatorId",
+					"dateModified",
+					"id",
+					"userId",
+					"externalReferenceCode",
+					"status"
+				],
 				"xml": {
 					"name": "ObjectEntry"
 				}
