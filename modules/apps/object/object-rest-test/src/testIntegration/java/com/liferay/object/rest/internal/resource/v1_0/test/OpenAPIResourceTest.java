@@ -272,61 +272,6 @@ public class OpenAPIResourceTest {
 			"Mismatch between entity model filterable fields and OpenAPI " +
 				"schema-level x-filterable fields",
 			expectedFilterableFields, actualFilterableFields);
-
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			JSONUtil.put(
-				"domain", "able.com"
-			).put(
-				"portalInstanceId", "able.com"
-			).put(
-				"virtualHost", "www.able.com"
-			).toString(),
-			"headless-portal-instances/v1.0/portal-instances",
-			Http.Method.POST);
-
-		HTTPTestUtil.customize(
-		).withBaseURL(
-			"http://www.able.com:8080"
-		).withCredentials(
-			"test@able.com", PropsValues.DEFAULT_ADMIN_PASSWORD
-		).apply(
-			() -> {
-				User user = UserTestUtil.addUser(
-					_companyLocalService.getCompany(
-						jsonObject.getLong("companyId")));
-
-				ObjectDefinition companyObjectDefinition =
-					ObjectDefinitionTestUtil.publishObjectDefinition(
-						"Object1",
-						Collections.singletonList(
-							ObjectFieldUtil.createObjectField(
-								ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-								ObjectFieldConstants.DB_TYPE_STRING, true, true,
-								null, "ableField", "ableField", false)),
-						ObjectDefinitionConstants.SCOPE_COMPANY,
-						user.getUserId());
-
-				Set<String> expectedFilterableFieldsCompany = new HashSet<>(
-					_getObjectDefinitionFilterableFields(
-						companyObjectDefinition));
-
-				JSONObject openAPICOmpanyJSONObject =
-					HTTPTestUtil.invokeToJSONObject(
-						null,
-						companyObjectDefinition.getRESTContextPath() +
-							"/openapi.json",
-						Http.Method.GET);
-
-				Set<String> actualFilterableFieldsCompany = new HashSet<>(
-					_getSchemaLevelXFilterableFields(openAPICOmpanyJSONObject));
-
-				Assert.assertEquals(
-					"Mismatch between entity model filterable fields and " +
-						"OpenAPI schema-level x-filterable fields",
-					expectedFilterableFieldsCompany,
-					actualFilterableFieldsCompany);
-			}
-		);
 	}
 
 	@Test
@@ -382,6 +327,26 @@ public class OpenAPIResourceTest {
 						companyObjectDefinition.getRESTContextPath() +
 							"/openapi.yaml",
 					jsonArray.get(0));
+
+				Set<String> expectedFilterableFieldsCompany = new HashSet<>(
+					_getObjectDefinitionFilterableFields(
+						companyObjectDefinition));
+
+				JSONObject openAPICOmpanyJSONObject =
+					HTTPTestUtil.invokeToJSONObject(
+						null,
+						companyObjectDefinition.getRESTContextPath() +
+							"/openapi.json",
+						Http.Method.GET);
+
+				Set<String> actualFilterableFieldsCompany = new HashSet<>(
+					_getSchemaLevelXFilterableFields(openAPICOmpanyJSONObject));
+
+				Assert.assertEquals(
+					"Mismatch between entity model filterable fields and " +
+						"OpenAPI schema-level x-filterable fields",
+					expectedFilterableFieldsCompany,
+					actualFilterableFieldsCompany);
 			}
 		);
 	}
