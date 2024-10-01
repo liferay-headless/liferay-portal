@@ -310,6 +310,19 @@
 					}
 				},
 				"type": "object",
+				"x-filterable": [
+					"creator",
+					"field1",
+					"dateCreated",
+					"keywords",
+					"taxonomyCategoryIds",
+					"creatorId",
+					"dateModified",
+					"id",
+					"userId",
+					"externalReferenceCode",
+					"status"
+				],
 				"xml": {
 					"name": "ObjectEntry"
 				}
