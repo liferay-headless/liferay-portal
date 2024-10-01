@@ -106,6 +106,10 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 		Map<String, Schema> properties = schema.getProperties();
 
+		if (properties == null) {
+			return null;
+		}
+
 		Schema xClassNameSchema = properties.get("x-class-name");
 
 		if (xClassNameSchema == null) {
