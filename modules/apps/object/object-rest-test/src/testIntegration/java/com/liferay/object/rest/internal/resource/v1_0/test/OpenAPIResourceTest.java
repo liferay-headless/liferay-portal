@@ -219,7 +219,7 @@ public class OpenAPIResourceTest {
 
 		ObjectDefinition relatedObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
-				"Object2",
+				"Object5",
 				Collections.singletonList(
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -231,14 +231,14 @@ public class OpenAPIResourceTest {
 			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("relationship1"), "relationship1",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
 			LocalizedMapUtil.getLocalizedMap("relationship2"), "relationship2",
 			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 
@@ -349,6 +349,8 @@ public class OpenAPIResourceTest {
 					actualFilterableFieldsCompany);
 			}
 		);
+
+		_companyLocalService.deleteCompany(jsonObject.getLong("companyId"));
 	}
 
 	@FeatureFlags("LPS-180090")
