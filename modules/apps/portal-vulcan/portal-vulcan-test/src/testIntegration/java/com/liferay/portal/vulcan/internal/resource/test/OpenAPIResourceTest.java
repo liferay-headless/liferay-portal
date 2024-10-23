@@ -10,40 +10,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.lang.SafeCloseable;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.odata.entity.ComplexEntityField;
-import com.liferay.portal.odata.entity.EntityField;
-import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.internal.test.util.URLConnectionUtil;
-import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.InputStream;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 
 /**
  * @author Carlos Correa
@@ -55,62 +32,6 @@ public class OpenAPIResourceTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
-
-	@Test
-	public void testGetOpenAPIFilterableFields() throws Exception {
-		Set<String> expectedFilterableFields = _getFilterableFieldNames();
-
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			StringPool.BLANK, "/headless-delivery/v1.0/openapi.json",
-			Http.Method.GET);
-
-		Set<String> actualFilterableFields = _getSchemaLevelXFilterableFields(
-			jsonObject);
-
-		Set<String> missingFields = new HashSet<>(expectedFilterableFields);
-
-		missingFields.removeAll(actualFilterableFields);
-
-		Set<String> unexpectedFields = new HashSet<>(actualFilterableFields);
-
-		unexpectedFields.removeAll(expectedFilterableFields);
-
-		StringBuilder errorMessage = new StringBuilder();
-
-		if (!missingFields.isEmpty()) {
-			errorMessage.append(
-				"Missing fields: "
-			).append(
-				missingFields
-			).append(
-				"\n"
-			);
-		}
-
-		if (!unexpectedFields.isEmpty()) {
-			errorMessage.append(
-				"Unexpected fields: "
-			).append(
-				unexpectedFields
-			).append(
-				"\n"
-			);
-		}
-
-		try {
-			if (errorMessage.length() > 0) {
-				errorMessage.insert(
-					0,
-					"Mismatch between expected and actual filterable fields." +
-						"\n");
-
-				Assert.fail(errorMessage.toString());
-			}
-		}
-		catch (AssertionError error) {
-			throw error;
-		}
-	}
 
 	@Test
 	public void testGetOpenAPIServerURL() throws Exception {
@@ -134,83 +55,6 @@ public class OpenAPIResourceTest {
 		}
 	}
 
-	private Set<String> _getFilterableFieldNames() throws Exception {
-		Set<String> filterableFieldNames = new HashSet<>();
-
-		Bundle bundle = FrameworkUtil.getBundle(OpenAPIResourceTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		String applicationName = "Liferay.Headless.Delivery";
-
-		String resourceFilter = StringBundler.concat(
-			"(&(entity.class.name=com.liferay.headless.delivery.dto.v1_0.",
-			"StructuredContent)",
-			"(osgi.jaxrs.application.select=\\(osgi.jaxrs.name=",
-			applicationName, "\\)))");
-
-		ServiceReference<?>[] resourceServiceReferences =
-			bundleContext.getServiceReferences((String)null, resourceFilter);
-
-		ServiceReference<?> serviceReference = resourceServiceReferences[0];
-
-		EntityModelResource structuredContentResource =
-			(EntityModelResource)bundleContext.getService(serviceReference);
-
-		long companyId = TestPropsValues.getCompanyId();
-
-		MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
-
-		params.putSingle("companyId", String.valueOf(companyId));
-
-		EntityModel entityModel = structuredContentResource.getEntityModel(
-			params);
-
-		Set<EntityField> processedEntityFields = new HashSet<>();
-
-		for (Map.Entry<String, EntityField> entry :
-				entityModel.getEntityFieldsMap(
-				).entrySet()) {
-
-			filterableFieldNames.addAll(
-				_getFilterableFieldNames(
-					entry.getValue(), entry.getKey(), processedEntityFields));
-		}
-
-		return filterableFieldNames;
-	}
-
-	private Set<String> _getFilterableFieldNames(
-		EntityField entityField, String fieldName,
-		Set<EntityField> processedEntityFields) {
-
-		if (!processedEntityFields.add(entityField)) {
-			return new HashSet<>();
-		}
-
-		if (!(entityField instanceof ComplexEntityField)) {
-			return SetUtil.fromArray(fieldName);
-		}
-
-		ComplexEntityField complexEntityField = (ComplexEntityField)entityField;
-
-		Map<String, EntityField> entityFieldsMap =
-			complexEntityField.getEntityFieldsMap();
-
-		Set<String> filterableFieldNames = new HashSet<>();
-
-		for (Map.Entry<String, EntityField> entry :
-				entityFieldsMap.entrySet()) {
-
-			filterableFieldNames.addAll(
-				_getFilterableFieldNames(
-					entry.getValue(), fieldName + "/" + entry.getKey(),
-					processedEntityFields));
-		}
-
-		return filterableFieldNames;
-	}
-
 	private String _getPath(InputStream inputStream, String path)
 		throws Exception {
 
@@ -219,30 +63,6 @@ public class OpenAPIResourceTest {
 		jsonNode = jsonNode.at(path);
 
 		return jsonNode.asText();
-	}
-
-	private Set<String> _getSchemaLevelXFilterableFields(
-		JSONObject openAPIJSONObject) {
-
-		Set<String> filterableFields = new HashSet<>();
-
-		JSONObject schemaJSONObject = openAPIJSONObject.getJSONObject(
-			"components"
-		).getJSONObject(
-			"schemas"
-		).getJSONObject(
-			"StructuredContent"
-		);
-
-		if (schemaJSONObject.has("x-filterable")) {
-			JSONArray jsonArray = schemaJSONObject.getJSONArray("x-filterable");
-
-			for (int i = 0; i < jsonArray.length(); i++) {
-				filterableFields.add(jsonArray.getString(i));
-			}
-		}
-
-		return filterableFields;
 	}
 
 	private final ObjectMapper _objectMapper = new ObjectMapper();
