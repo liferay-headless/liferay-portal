@@ -6,10 +6,16 @@
 package com.liferay.portal.tools.rest.builder.test.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.util.Http;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +40,31 @@ public class OpenAPIResourceTest {
 				null, "test/v1.0/openapi.json", Http.Method.GET
 			).toString(),
 			false);
+	}
+
+	@Test
+	public void testGetOpenAPIFilterableFields() throws Exception {
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, "test/v1.0/openapi.json", Http.Method.GET);
+
+		JSONArray xFilterableArray = jsonObject.getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TestEntity"
+		).getJSONArray(
+			"x-filterable"
+		);
+
+		List<String> expectedFilterableFields = Arrays.asList(
+			"companyId", "creatorId", "customFields/customAttribute1",
+			"customFields/customAttribute2", "customFields/customFlag",
+			"dateModified", "description", "expirationDate", "folderId",
+			"friendlyUrl", "id", "keywords", "priority", "published",
+			"statusCode", "title", "viewCount");
+
+		Assert.assertEquals(expectedFilterableFields, xFilterableArray);
 	}
 
 }
