@@ -3,20 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {expect, mergeTests} from '@playwright/test';
+import { expect, mergeTests } from '@playwright/test';
 
 import {
 	ObjectAdminRestClient,
 	ObjectDefinition,
 } from '../../../../apps/object/object-admin-rest-client-js/src/main/resources/META-INF/resources/node';
-import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
-import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
-import {headlessDiscoveryPagesTest} from '../../fixtures/headlessDiscoveryWebPagesTest';
-import {loginTest} from '../../fixtures/loginTest';
-import {headlessBuilderPagesTest} from './fixtures/headlessBuilderPagesTest';
+import { dataApiHelpersTest } from '../../fixtures/dataApiHelpersTest';
+import { headlessDiscoveryPagesTest } from '../../fixtures/headlessDiscoveryWebPagesTest';
+import { loginTest } from '../../fixtures/loginTest';
+import { headlessBuilderPagesTest } from './fixtures/headlessBuilderPagesTest';
 
 export const test = mergeTests(
-	apiHelpersTest,
 	dataApiHelpersTest,
 	loginTest(),
 	headlessBuilderPagesTest(),
@@ -65,6 +63,10 @@ test('can associate and disassociate schema', async ({
 		'headless-builder/endpoints'
 	);
 
+	apiHelpers.data.push({ id: application.id, type: 'apiApplication' });
+
+	apiHelpers.data.unshift({ id: endpoint.id, type: 'apiEndpoint' });
+
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
 	await applicationPage.goToEndpointsTab();
@@ -73,10 +75,10 @@ test('can associate and disassociate schema', async ({
 
 	await page.getByLabel('Response Body Schema').click();
 	await expect(
-		page.getByRole('menuitem', {name: 'Not Selected'})
+		page.getByRole('menuitem', { name: 'Not Selected' })
 	).toBeVisible();
 
-	await page.getByRole('menuitem', {name: 'Not Selected'}).click();
+	await page.getByRole('menuitem', { name: 'Not Selected' }).click();
 
 	await applicationPage.publishButton.click();
 
@@ -92,11 +94,6 @@ test('can associate and disassociate schema', async ({
 		.textContent();
 
 	await expect(responseBodySchemaContent).toEqual('Select a Schema');
-
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
-	);
 });
 
 test('can see available path parameter properties of a singleElement endpoint', async ({
@@ -108,17 +105,21 @@ test('can see available path parameter properties of a singleElement endpoint', 
 	const objectDefinition =
 		(await apiHelpers.objectAdmin.postRandomObjectDefinition({
 			objectFolderExternalReferenceCode: 'default',
-			status: {code: 0},
+			status: { code: 0 },
 		})) as ObjectDefinition;
 
-	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+	apiHelpers.data.push({ id: objectDefinition.id, type: 'objectDefinition' });
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.addNewApplicationButton.click();
 	await headlessBuilderPage.newApplicationTitleBox.fill('My-app');
 	await headlessBuilderPage.createApplicationButton.click();
 
+	const id = (await (await apiHelpers.apiBuilder.getApiApplicationPage()).json()).items[0].id;
+	apiHelpers.data.unshift({ id: id, type: 'apiApplication' });
+
 	await applicationPage.goToSchemasTab();
+
 	await applicationPage.addSchemaButton.click();
 	await applicationPage.schemaNameTextBox.fill('API Application schema');
 	await applicationPage.setSchemaMainObjectDefinition('objectDefinition');
@@ -134,14 +135,11 @@ test('can see available path parameter properties of a singleElement endpoint', 
 		'API Application schema'
 	);
 
-	await page.getByRole('button', {name: 'Select an Option'}).click();
+	await page.getByRole('button', { name: 'Select an Option' }).click();
 	await expect(
-		page.getByRole('menuitem', {name: 'External Reference Code'})
+		page.getByRole('menuitem', { name: 'External Reference Code' })
 	).toBeVisible();
-	await expect(page.getByRole('menuitem', {name: 'ID'})).toBeVisible();
-
-	await headlessBuilderPage.goto();
-	await headlessBuilderPage.deleteApplication('My-app');
+	await expect(page.getByRole('menuitem', { name: 'ID' })).toBeVisible();
 });
 
 test('can see path parameter property with map details', async ({
@@ -153,10 +151,10 @@ test('can see path parameter property with map details', async ({
 	const objectDefinition =
 		(await apiHelpers.objectAdmin.postRandomObjectDefinition({
 			objectFolderExternalReferenceCode: 'default',
-			status: {code: 0},
+			status: { code: 0 },
 		})) as ObjectDefinition;
 
-	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+	apiHelpers.data.push({ id: objectDefinition.id, type: 'objectDefinition' });
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.addNewApplicationButton.click();
@@ -169,6 +167,9 @@ test('can see path parameter property with map details', async ({
 	await applicationPage.setSchemaMainObjectDefinition('objectDefinition');
 	await applicationPage.createButton.click();
 
+	const id = (await (await apiHelpers.apiBuilder.getApiApplicationPage()).json()).items[0].id;
+	apiHelpers.data.unshift({ id: id, type: 'apiApplication' });
+
 	await applicationPage.createSingleElementEndpoint(
 		'Company',
 		'gettest',
@@ -180,7 +181,7 @@ test('can see path parameter property with map details', async ({
 	);
 
 	await expect(
-		page.getByRole('button', {name: 'Select an Option'})
+		page.getByRole('button', { name: 'Select an Option' })
 	).toBeVisible();
 	await expect(
 		page.getByPlaceholder('Add a description here.')
@@ -190,9 +191,6 @@ test('can see path parameter property with map details', async ({
 			'This property from the schema will be mapped to path Parameter: {entryid}.'
 		)
 	).toBeVisible();
-
-	await headlessBuilderPage.goto();
-	await headlessBuilderPage.deleteApplication('My-app');
 });
 
 test('can see schema unique fields as path parameter properties', async ({
@@ -237,24 +235,23 @@ test('can see schema unique fields as path parameter properties', async ({
 		'headless-builder/endpoints'
 	);
 
+	apiHelpers.data.push({ id: application.id, type: 'apiApplication' });
+
+	apiHelpers.data.unshift({ id: endpoint.id, type: 'apiEndpoint' });
+
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
 	await applicationPage.goToEndpointsTab();
 	await applicationPage.goToEditEndpoint(endpoint.path);
 	await applicationPage.goToEndpointConfigurationTab();
 
-	await page.getByRole('button', {name: 'Select an Option'}).click();
-	await expect(page.getByRole('menuitem', {name: 'Base URL'})).toBeVisible();
+	await page.getByRole('button', { name: 'Select an Option' }).click();
+	await expect(page.getByRole('menuitem', { name: 'Base URL' })).toBeVisible();
 	await expect(
-		page.getByRole('menuitem', {name: 'External Reference Code'})
+		page.getByRole('menuitem', { name: 'External Reference Code' })
 	).toBeVisible();
-	await expect(page.getByRole('menuitem', {name: 'ID'})).toBeVisible();
-	await expect(page.getByRole('menuitem', {name: 'Title'})).toBeVisible();
-
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
-	);
+	await expect(page.getByRole('menuitem', { name: 'ID' })).toBeVisible();
+	await expect(page.getByRole('menuitem', { name: 'Title' })).toBeVisible();
 });
 
 test('can list site scoped endpoint', async ({
@@ -334,6 +331,10 @@ test('can list site scoped endpoint', async ({
 		'headless-builder/applications'
 	);
 
+	apiHelpers.data.push({ id: studentSiteDefinition.id, type: 'objectDefinition' });
+
+	apiHelpers.data.unshift({ id: studentApplication.id, type: 'apiApplication' });
+
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(studentApplication.title);
 	await applicationPage.createSingleElementEndpoint(
@@ -349,21 +350,12 @@ test('can list site scoped endpoint', async ({
 			name: studentApplication.apiApplicationToAPISchemas[0].name,
 		})
 		.click();
-	await page.getByRole('button', {name: 'Select an Option'}).click();
-	await page.getByRole('menuitem', {name: 'External Reference Code'}).click();
+	await page.getByRole('button', { name: 'Select an Option' }).click();
+	await page.getByRole('menuitem', { name: 'External Reference Code' }).click();
 	await applicationPage.publishButton.click();
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(studentApplication.title);
 	await applicationPage.goToEndpointsTab();
 	await applicationPage.goToEditEndpoint('/gettest/{entryerc}/');
-
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		studentApplication.externalReferenceCode
-	);
-
-	await objectAdminRestClient.objectDefinition.deleteObjectDefinition({
-		objectDefinitionId: studentSiteDefinition.id,
-	});
 });

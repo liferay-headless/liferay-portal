@@ -363,6 +363,9 @@ export class DataApiHelpers extends ApiHelpers {
 			else if (item.type === 'apiApplication') {
 				await this.apiBuilder.deleteApiApplication(item.id);
 			}
+			else if (item.type === 'apiEndpoint') {
+				await this.apiBuilder.deleteApiEndpoint(item.id);
+			}
 			else if (item.type === 'catalog') {
 				await this.headlessCommerceAdminCatalog.deleteCatalog(item.id);
 			}
@@ -395,6 +398,14 @@ export class DataApiHelpers extends ApiHelpers {
 				);
 				await objectAdminRESTClient.objectFolder.deleteObjectFolder({
 					objectFolderId: item.id,
+				});
+			}
+			else if (item.type === 'objectRelationship') {
+				const objectAdminRESTClient = await this.buildRestClient(
+					ObjectAdminRestClient
+				);
+				await objectAdminRESTClient.objectRelationship.deleteObjectRelationship({
+					objectRelationshipId: item.id,
 				});
 			}
 			else if (item.type === 'option') {

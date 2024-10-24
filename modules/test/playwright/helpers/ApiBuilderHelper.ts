@@ -58,4 +58,10 @@ export class ApiBuilderHelper {
 			`${this.apiHelpers.baseUrl}${this.basePath}/applications/${apiApplicationId}`
 		);
 	}
+
+	async deleteApiEndpoint(apiEndpointId: number) {
+		return this.apiHelpers.delete(
+			`${this.apiHelpers.baseUrl}${this.basePath}/endpoints/${apiEndpointId}`
+		);
+	}
 }
