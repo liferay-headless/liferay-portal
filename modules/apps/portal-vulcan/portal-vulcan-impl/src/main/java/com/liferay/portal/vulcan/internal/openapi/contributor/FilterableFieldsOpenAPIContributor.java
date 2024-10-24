@@ -24,11 +24,13 @@ import io.swagger.v3.oas.models.media.Schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -76,7 +78,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 			Set<EntityField> processedEntityFields = new HashSet<>();
 
-			Set<String> filterableFieldNames = new HashSet<>();
+			List<String> filterableFieldNames = new ArrayList<>(
+				Collections.emptyList());
 
 			for (Map.Entry<String, EntityField> entry :
 					entityFieldsMap.entrySet()) {
@@ -88,7 +91,12 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			}
 
 			schema.addExtension(
-				"x-filterable", new ArrayList<>(filterableFieldNames));
+				"x-filterable",
+				filterableFieldNames.stream(
+				).sorted(
+				).collect(
+					Collectors.toList()
+				));
 		}
 	}
 
