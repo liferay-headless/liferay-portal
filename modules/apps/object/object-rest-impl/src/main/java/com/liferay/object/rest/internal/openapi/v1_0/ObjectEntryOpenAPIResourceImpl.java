@@ -96,7 +96,7 @@ public class ObjectEntryOpenAPIResourceImpl
 			_objectDefinition);
 
 		Response response = _getOpenAPI(
-			true,null,
+			true, null,
 			_getOpenAPISchemaFilter(objectEntryDTOProperty, _objectDefinition),
 			"json", uriInfo);
 
@@ -433,11 +433,12 @@ public class ObjectEntryOpenAPIResourceImpl
 
 	private Response _getOpenAPI(
 			boolean addRelatedSchemas, HttpServletRequest httpServletRequest,
-			OpenAPISchemaFilter openAPISchemaFilter,
-			String type, UriInfo uriInfo)
+			OpenAPISchemaFilter openAPISchemaFilter, String type,
+			UriInfo uriInfo)
 		throws Exception {
 
-		return _openAPIResource.getOpenAPI(httpServletRequest,
+		return _openAPIResource.getOpenAPI(
+			httpServletRequest,
 			new ObjectEntryOpenAPIContributor(
 				addRelatedSchemas, _bundleContext, _dtoConverterRegistry,
 				_objectActionLocalService, _objectDefinition,
