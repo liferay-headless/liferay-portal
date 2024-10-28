@@ -12,6 +12,7 @@ import com.liferay.gradle.plugins.node.task.DownloadNodeModuleTask;
 import com.liferay.gradle.plugins.node.task.DownloadNodeTask;
 import com.liferay.gradle.plugins.node.task.ExecuteNodeTask;
 import com.liferay.gradle.plugins.node.task.ExecutePackageManagerTask;
+import com.liferay.gradle.plugins.node.task.FixNodeSymlinksTask;
 import com.liferay.gradle.plugins.node.task.NpmInstallTask;
 import com.liferay.gradle.plugins.node.task.NpmShrinkwrapTask;
 import com.liferay.gradle.plugins.node.task.PackageRunBuildTask;
@@ -74,6 +75,8 @@ public class NodePlugin implements Plugin<Project> {
 
 	public static final String EXTENSION_NAME = "node";
 
+	public static final String FIX_NODE_SYMLINKS_TASK_NAME = "fixNodeSymlinks";
+
 	public static final String NPM_INSTALL_TASK_NAME = "npmInstall";
 
 	public static final String NPM_PACKAGE_LOCK_TASK_NAME = "npmPackageLock";
@@ -94,8 +97,11 @@ public class NodePlugin implements Plugin<Project> {
 
 		Delete cleanNpmTask = _addTaskCleanNpm(project, nodeExtension);
 
-		final DownloadNodeTask downloadNodeTask = _addTaskDownloadNode(
+		FixNodeSymlinksTask fixNodeSymlinksTask = _addTaskFixNodeSymlinks(
 			project, nodeExtension);
+
+		final DownloadNodeTask downloadNodeTask = _addTaskDownloadNode(
+			project, fixNodeSymlinksTask, nodeExtension);
 
 		NpmInstallTask npmInstallTask = _addTaskNpmInstall(
 			project, cleanNpmTask);
@@ -130,7 +136,7 @@ public class NodePlugin implements Plugin<Project> {
 				@Override
 				public void execute(Project project) {
 					_configureTaskDownloadNodeGlobal(
-						downloadNodeTask, nodeExtension);
+						downloadNodeTask, fixNodeSymlinksTask, nodeExtension);
 					_configureTasksExecutePackageManagerArgs(
 						project, nodeExtension);
 					_configureTasksNpmInstall(project, nodeExtension);
@@ -178,14 +184,18 @@ public class NodePlugin implements Plugin<Project> {
 	}
 
 	private DownloadNodeTask _addTaskDownloadNode(
-		Project project, NodeExtension nodeExtension) {
+		Project project, FixNodeSymlinksTask fixNodeSymlinksTask,
+		NodeExtension nodeExtension) {
 
 		return _addTaskDownloadNode(
-			project, DOWNLOAD_NODE_TASK_NAME, nodeExtension);
+			project, DOWNLOAD_NODE_TASK_NAME, fixNodeSymlinksTask,
+			nodeExtension);
 	}
 
 	private DownloadNodeTask _addTaskDownloadNode(
-		Project project, String taskName, final NodeExtension nodeExtension) {
+		Project project, String taskName,
+		FixNodeSymlinksTask fixNodeSymlinksTask,
+		final NodeExtension nodeExtension) {
 
 		DownloadNodeTask downloadNodeTask = GradleUtil.addTask(
 			project, taskName, DownloadNodeTask.class);
@@ -230,6 +240,8 @@ public class NodePlugin implements Plugin<Project> {
 
 			});
 
+		downloadNodeTask.finalizedBy(fixNodeSymlinksTask);
+
 		downloadNodeTask.onlyIf(
 			new Spec<Task>() {
 
@@ -244,6 +256,25 @@ public class NodePlugin implements Plugin<Project> {
 			"Downloads Node.js in the project build directory.");
 
 		return downloadNodeTask;
+	}
+
+	private FixNodeSymlinksTask _addTaskFixNodeSymlinks(
+		Project project, NodeExtension nodeExtension) {
+
+		FixNodeSymlinksTask fixNodeSymlinksTask = GradleUtil.addTask(
+			project, FIX_NODE_SYMLINKS_TASK_NAME, FixNodeSymlinksTask.class);
+
+		fixNodeSymlinksTask.setNodeDir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return nodeExtension.getNodeDir();
+				}
+
+			});
+
+		return fixNodeSymlinksTask;
 	}
 
 	private NpmInstallTask _addTaskNpmInstall(
@@ -439,7 +470,8 @@ public class NodePlugin implements Plugin<Project> {
 	}
 
 	private void _configureTaskDownloadNodeGlobal(
-		DownloadNodeTask downloadNodeTask, NodeExtension nodeExtension) {
+		DownloadNodeTask downloadNodeTask,
+		FixNodeSymlinksTask fixNodeSymlinksTask, NodeExtension nodeExtension) {
 
 		Project project = downloadNodeTask.getProject();
 
@@ -479,7 +511,7 @@ public class NodePlugin implements Plugin<Project> {
 			}
 
 			rootDownloadNodeTask = _addTaskDownloadNode(
-				rootProject, taskName, nodeExtension);
+				rootProject, taskName, fixNodeSymlinksTask, nodeExtension);
 		}
 
 		downloadNodeTask.setActions(Collections.emptyList());

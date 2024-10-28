@@ -9,15 +9,11 @@ import com.liferay.gradle.plugins.node.internal.NodeExecutor;
 import com.liferay.gradle.plugins.node.internal.util.FileUtil;
 import com.liferay.gradle.plugins.node.internal.util.GradleUtil;
 import com.liferay.gradle.plugins.node.internal.util.NodePluginUtil;
-import com.liferay.gradle.util.OSDetector;
 import com.liferay.gradle.util.Validator;
 import com.liferay.gradle.util.copy.StripPathSegmentsAction;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,20 +117,6 @@ public class DownloadNodeTask extends DefaultTask {
 					}
 
 				});
-		}
-
-		if (!OSDetector.isWindows()) {
-			File binDir = new File(nodeDir, "bin");
-
-			Path binDirPath = binDir.toPath();
-
-			Path linkPath = binDirPath.resolve("npm");
-
-			Files.deleteIfExists(linkPath);
-
-			File linkTargetFile = new File(npmDir, "bin/npm-cli.js");
-
-			Files.createSymbolicLink(linkPath, linkTargetFile.toPath());
 		}
 	}
 
