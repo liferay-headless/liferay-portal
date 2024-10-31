@@ -5,14 +5,16 @@
 
 import {mergeTests} from '@playwright/test';
 
-import {apiHelpersTest} from '../../fixtures/apiHelpersTest';
+import { dataApiHelpersTest } from '../../fixtures/dataApiHelpersTest';
 import {headlessDiscoveryPagesTest} from '../../fixtures/headlessDiscoveryWebPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {headlessBuilderTest} from './fixtures/headlessBuilderTest';
+import {headlessBuilderPagesTest} from './fixtures/headlessBuilderPagesTest';
 
 export const test = mergeTests(
-	apiHelpersTest,
+	dataApiHelpersTest,
 	headlessBuilderTest(),
+	headlessBuilderPagesTest(),
 	headlessDiscoveryPagesTest,
 	loginTest()
 );
@@ -50,7 +52,14 @@ test('can see filter and sort parameters for collection endpoints', async ({
 	apiHelpers,
 	page,
 }) => {
-	await apiHelpers.objectEntry.postObjectEntry(
+	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
+		application,
+		'headless-builder/applications'
+	);
+
+	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+
+	const collectionEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
 			...application,
 			apiApplicationToAPIEndpoints: [
@@ -68,17 +77,13 @@ test('can see filter and sort parameters for collection endpoints', async ({
 		'headless-builder/applications'
 	);
 
+	apiHelpers.data.unshift({ id: collectionEndpoint.id, type: 'apiEndpoint' });
+
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
-	await apiExplorerPage.expectEndpointWithParameters('/collection-endpoint', [
-		'filter',
-		'sort',
-	]);
-
-	await page.goto('/');
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
+	await apiExplorerPage.expectEndpointWithParameters(
+		collectionEndpoint.path,
+		['filter', 'sort']
 	);
 });
 
@@ -87,7 +92,14 @@ test('can see get endpoint path with erc parameter', async ({
 	apiHelpers,
 	page,
 }) => {
-	await apiHelpers.objectEntry.postObjectEntry(
+	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
+		application,
+		'headless-builder/applications'
+	);
+
+	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+
+	const singleElementEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
 			...application,
 			apiApplicationToAPIEndpoints: [
@@ -108,6 +120,8 @@ test('can see get endpoint path with erc parameter', async ({
 		'headless-builder/applications'
 	);
 
+	apiHelpers.data.unshift({ id: singleElementEndpoint.id, type: 'apiEndpoint' });
+
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
 	await apiExplorerPage.expectEndpointWithParameters(
@@ -118,12 +132,6 @@ test('can see get endpoint path with erc parameter', async ({
 	await apiExplorerPage.getEndpointLocator('/single-element-endpoint/{erc}', {
 		hasText: '{erc}',
 	});
-
-	await page.goto('/');
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
-	);
 });
 
 test('can see get endpoint path with id parameter', async ({
@@ -131,13 +139,19 @@ test('can see get endpoint path with id parameter', async ({
 	apiHelpers,
 	page,
 }) => {
-	await apiHelpers.objectEntry.postObjectEntry(
-		{
-			...application,
-			apiApplicationToAPIEndpoints: [singleElementIdEndpoint],
-		},
+	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
+		application,
 		'headless-builder/applications'
 	);
+
+	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+
+	const endpointEntry = await apiHelpers.objectEntry.postObjectEntry(
+		singleElementIdEndpoint,
+		'headless-builder/endpoints'
+	);
+
+	apiHelpers.data.unshift({ id: endpointEntry.id, type: 'apiEndpoint' });
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
@@ -149,12 +163,6 @@ test('can see get endpoint path with id parameter', async ({
 	await apiExplorerPage.getEndpointLocator(singleElementIdEndpoint.path, {
 		hasText: '{id}',
 	});
-
-	await page.goto('/');
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
-	);
 });
 
 test('cannot see filter and sort parameters for singleElement endpoints', async ({
@@ -162,24 +170,24 @@ test('cannot see filter and sort parameters for singleElement endpoints', async 
 	apiHelpers,
 	page,
 }) => {
-	await apiHelpers.objectEntry.postObjectEntry(
-		{
-			...application,
-			apiApplicationToAPIEndpoints: [singleElementIdEndpoint],
-		},
+	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
+		application,
 		'headless-builder/applications'
 	);
+
+	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+
+	const endpointEntry = await apiHelpers.objectEntry.postObjectEntry(
+		singleElementIdEndpoint,
+		'headless-builder/endpoints'
+	);
+
+	apiHelpers.data.unshift({ id: endpointEntry.id, type: 'apiEndpoint' });
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
 	await apiExplorerPage.expectEndpointWithoutParameters(
 		singleElementIdEndpoint.path,
 		['filter', 'sort']
-	);
-
-	await page.goto('/');
-	await apiHelpers.objectEntry.deleteObjectEntryByExternalReferenceCode(
-		'headless-builder/applications',
-		application.externalReferenceCode
 	);
 });
