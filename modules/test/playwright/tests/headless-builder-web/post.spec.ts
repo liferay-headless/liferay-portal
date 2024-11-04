@@ -327,7 +327,6 @@ test('can create post method endpoint with company scope', async ({
 	apiHelpers,
 	applicationPage,
 	headlessBuilderPage,
-	page,
 }) => {
 	const apiApplication = await apiHelpers.objectEntry.postObjectEntry(
 		application,

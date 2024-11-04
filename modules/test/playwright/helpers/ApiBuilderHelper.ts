@@ -14,12 +14,6 @@ export class ApiBuilderHelper {
 		this.basePath = 'headless-builder';
 	}
 
-	async getApplicationPage() {
-		return this.apiHelpers.getResponse(
-			`${this.apiHelpers.baseUrl}${this.basePath}/applications`
-		);
-	}
-
 	async getEndpointPage(endpointURI: string) {
 		return this.apiHelpers.getResponse(
 			`${this.apiHelpers.baseUrl}${endpointURI}`
@@ -56,18 +50,6 @@ export class ApiBuilderHelper {
 	async deleteApiResource(id: number, url: String) {
 		return this.apiHelpers.delete(
 			`${this.apiHelpers.baseUrl}${this.basePath}/${url}/${id}`
-		);
-	}
-
-	async deleteApiApplication(apiApplicationId: number) {
-		return this.apiHelpers.delete(
-			`${this.apiHelpers.baseUrl}${this.basePath}/applications/${apiApplicationId}`
-		);
-	}
-
-	async deleteApiEndpoint(apiEndpointId: number) {
-		return this.apiHelpers.delete(
-			`${this.apiHelpers.baseUrl}${this.basePath}/endpoints/${apiEndpointId}`
 		);
 	}
 }

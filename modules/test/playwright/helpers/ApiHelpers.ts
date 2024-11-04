@@ -360,12 +360,6 @@ export class DataApiHelpers extends ApiHelpers {
 			else if (item.type === 'accountGroup') {
 				await this.headlessAdminUser.deleteAccountGroup(item.id);
 			}
-			else if (item.type === 'apiApplication') {
-				await this.apiBuilder.deleteApiApplication(item.id);
-			}
-			else if (item.type === 'apiEndpoint') {
-				await this.apiBuilder.deleteApiEndpoint(item.id);
-			}
 			else if (item.type === 'catalog') {
 				await this.headlessCommerceAdminCatalog.deleteCatalog(item.id);
 			}
