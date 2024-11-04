@@ -262,7 +262,7 @@ testFeatureFlagsDisabled(
 			'headless-builder/applications'
 		);
 
-		apiHelpers.data.unshift({id: application.id, type: 'apiApplication'});
+		apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 
 		await headlessBuilderPage.goto();
 		await headlessBuilderPage.goToEditApplication(application.title);
@@ -302,7 +302,7 @@ testFeatureFlagsDisabled(
 			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
-		apiHelpers.data.unshift({id: application.id, type: 'apiApplication'});
+		apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 
 		await headlessBuilderPage.goto();
 		await headlessBuilderPage.goToEditApplication(application.title);
@@ -343,7 +343,7 @@ testFeatureFlagsEnabled(
 			id: objectDefinition.id,
 			type: 'objectDefinition',
 		});
-		apiHelpers.data.unshift({id: application.id, type: 'apiApplication'});
+		apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 
 		await headlessBuilderPage.goto();
 		await headlessBuilderPage.goToEditApplication(application.title);
@@ -408,7 +408,7 @@ testFeatureFlagsDisabled(
 			'headless-builder/applications'
 		);
 
-		apiHelpers.data.unshift({id: application.id, type: 'apiApplication'});
+		apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 		apiHelpers.data.push({
 			id: objectDefinition.id,
 			type: 'objectDefinition',
@@ -539,7 +539,7 @@ testFeatureFlagsEnabled(
 			'headless-builder/applications'
 		);
 
-		apiHelpers.data.unshift({id: application.id, type: 'apiApplication'});
+		apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 		apiHelpers.data.push({
 			id: objectDefinition.id,
 			type: 'objectDefinition',

@@ -83,7 +83,7 @@ test('can create post endpoint and can not disassociate request api schema', asy
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
+	apiHelpers.data.push({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
@@ -116,7 +116,7 @@ test('can create post endpoint and can not edit http method', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
+	apiHelpers.data.push({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
@@ -288,7 +288,7 @@ test('can create post endpoint with different request and response schema', asyn
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
+	apiHelpers.data.push({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(
@@ -333,7 +333,7 @@ test('can create post method endpoint with company scope', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
+	apiHelpers.data.push({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
