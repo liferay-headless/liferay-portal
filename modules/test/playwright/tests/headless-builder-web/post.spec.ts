@@ -6,7 +6,7 @@
 import {expect, mergeTests} from '@playwright/test';
 
 import {ObjectAdminRestClient} from '../../../../apps/object/object-admin-rest-client-js/src/main/resources/META-INF/resources/node';
-import { dataApiHelpersTest } from '../../fixtures/dataApiHelpersTest';
+import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {headlessDiscoveryPagesTest} from '../../fixtures/headlessDiscoveryWebPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {headlessBuilderPagesTest} from './fixtures/headlessBuilderPagesTest';
@@ -83,7 +83,7 @@ test('can create post endpoint and can not disassociate request api schema', asy
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: apiApplication.id, type: 'apiApplication' });
+	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
@@ -116,7 +116,7 @@ test('can create post endpoint and can not edit http method', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: apiApplication.id, type: 'apiApplication' });
+	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);
@@ -276,16 +276,19 @@ test('can create post endpoint with different request and response schema', asyn
 			},
 		});
 
-	apiHelpers.data.push({ id: studentResponse.objectRelationships[0].id, type: 'objectRelationship' });		
-	apiHelpers.data.push({ id: subjectResponse.id, type: 'objectDefinition' });	
-	apiHelpers.data.push({ id: studentResponse.id, type: 'objectDefinition' });	
+	apiHelpers.data.push({
+		id: studentResponse.objectRelationships[0].id,
+		type: 'objectRelationship',
+	});
+	apiHelpers.data.push({id: subjectResponse.id, type: 'objectDefinition'});
+	apiHelpers.data.push({id: studentResponse.id, type: 'objectDefinition'});
 
 	const apiApplication = await apiHelpers.objectEntry.postObjectEntry(
 		studentSubjectsApplication,
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: apiApplication.id, type: 'apiApplication' });
+	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(
@@ -331,7 +334,7 @@ test('can create post method endpoint with company scope', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: apiApplication.id, type: 'apiApplication' });
+	apiHelpers.data.unshift({id: apiApplication.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.goToEditApplication(application.title);

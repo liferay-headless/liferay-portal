@@ -51,7 +51,6 @@ const singleElementIdEndpoint = {
 test('can see filter and sort parameters for collection endpoints', async ({
 	apiExplorerPage,
 	apiHelpers,
-	page,
 }) => {
 	const collectionEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
@@ -84,7 +83,6 @@ test('can see filter and sort parameters for collection endpoints', async ({
 test('can see get endpoint path with erc parameter', async ({
 	apiExplorerPage,
 	apiHelpers,
-	page,
 }) => {
 	const singleElementEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
@@ -127,7 +125,6 @@ test('can see get endpoint path with erc parameter', async ({
 test('can see get endpoint path with id parameter', async ({
 	apiExplorerPage,
 	apiHelpers,
-	page,
 }) => {
 	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
 		application,
@@ -156,7 +153,6 @@ test('can see get endpoint path with id parameter', async ({
 test('cannot see filter and sort parameters for singleElement endpoints', async ({
 	apiExplorerPage,
 	apiHelpers,
-	page,
 }) => {
 	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
 		application,

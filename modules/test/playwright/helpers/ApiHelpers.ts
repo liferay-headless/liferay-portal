@@ -410,9 +410,11 @@ export class DataApiHelpers extends ApiHelpers {
 				const objectAdminRESTClient = await this.buildRestClient(
 					ObjectAdminRestClient
 				);
-				await objectAdminRESTClient.objectRelationship.deleteObjectRelationship({
-					objectRelationshipId: item.id,
-				});
+				await objectAdminRESTClient.objectRelationship.deleteObjectRelationship(
+					{
+						objectRelationshipId: item.id,
+					}
+				);
 			}
 			else if (item.type === 'option') {
 				await this.headlessCommerceAdminCatalog.deleteOption(item.id);

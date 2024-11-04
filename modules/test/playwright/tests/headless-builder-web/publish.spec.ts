@@ -5,7 +5,7 @@
 
 import {expect, mergeTests} from '@playwright/test';
 
-import { dataApiHelpersTest } from '../../fixtures/dataApiHelpersTest';
+import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {headlessDiscoveryPagesTest} from '../../fixtures/headlessDiscoveryWebPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
 import {headlessBuilderPagesTest} from './fixtures/headlessBuilderPagesTest';
@@ -42,7 +42,7 @@ test('can get updated title in response after publish', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.push({ id: application.id, type: 'apiApplication' });
+	apiHelpers.data.push({id: application.id, type: 'apiApplication'});
 
 	await headlessBuilderPage.goto();
 	await headlessBuilderPage.openApplicationActions(application.title);
