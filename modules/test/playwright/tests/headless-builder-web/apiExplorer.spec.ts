@@ -5,11 +5,11 @@
 
 import {mergeTests} from '@playwright/test';
 
-import { dataApiHelpersTest } from '../../fixtures/dataApiHelpersTest';
+import {dataApiHelpersTest} from '../../fixtures/dataApiHelpersTest';
 import {headlessDiscoveryPagesTest} from '../../fixtures/headlessDiscoveryWebPagesTest';
 import {loginTest} from '../../fixtures/loginTest';
-import {headlessBuilderTest} from './fixtures/headlessBuilderTest';
 import {headlessBuilderPagesTest} from './fixtures/headlessBuilderPagesTest';
+import {headlessBuilderTest} from './fixtures/headlessBuilderTest';
 
 export const test = mergeTests(
 	dataApiHelpersTest,
@@ -42,6 +42,7 @@ const singleElementIdEndpoint = {
 	name: 'Basic Single Element API Endpoint',
 	path: '/single-element-endpoint/{id}',
 	pathParameter: 'id',
+	r_apiApplicationToAPIEndpoints_l_apiApplicationERC: 'basic-application',
 	r_responseAPISchemaToAPIEndpoints_l_apiSchemaERC: 'api-application-schema',
 	retrieveType: 'singleElement',
 	scope: 'company',
@@ -52,13 +53,6 @@ test('can see filter and sort parameters for collection endpoints', async ({
 	apiHelpers,
 	page,
 }) => {
-	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
-		application,
-		'headless-builder/applications'
-	);
-
-	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
-
 	const collectionEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
 			...application,
@@ -77,14 +71,14 @@ test('can see filter and sort parameters for collection endpoints', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: collectionEndpoint.id, type: 'apiEndpoint' });
+	apiHelpers.data.push({id: collectionEndpoint.id, type: 'apiApplication'});
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
-	await apiExplorerPage.expectEndpointWithParameters(
-		collectionEndpoint.path,
-		['filter', 'sort']
-	);
+	await apiExplorerPage.expectEndpointWithParameters('/collection-endpoint', [
+		'filter',
+		'sort',
+	]);
 });
 
 test('can see get endpoint path with erc parameter', async ({
@@ -92,13 +86,6 @@ test('can see get endpoint path with erc parameter', async ({
 	apiHelpers,
 	page,
 }) => {
-	const applicationEntry = await apiHelpers.objectEntry.postObjectEntry(
-		application,
-		'headless-builder/applications'
-	);
-
-	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
-
 	const singleElementEndpoint = await apiHelpers.objectEntry.postObjectEntry(
 		{
 			...application,
@@ -120,7 +107,10 @@ test('can see get endpoint path with erc parameter', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.unshift({ id: singleElementEndpoint.id, type: 'apiEndpoint' });
+	apiHelpers.data.push({
+		id: singleElementEndpoint.id,
+		type: 'apiApplication',
+	});
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
@@ -144,14 +134,12 @@ test('can see get endpoint path with id parameter', async ({
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+	apiHelpers.data.push({id: applicationEntry.id, type: 'apiApplication'});
 
-	const endpointEntry = await apiHelpers.objectEntry.postObjectEntry(
+	await apiHelpers.objectEntry.postObjectEntry(
 		singleElementIdEndpoint,
 		'headless-builder/endpoints'
 	);
-
-	apiHelpers.data.unshift({ id: endpointEntry.id, type: 'apiEndpoint' });
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
@@ -175,14 +163,12 @@ test('cannot see filter and sort parameters for singleElement endpoints', async 
 		'headless-builder/applications'
 	);
 
-	apiHelpers.data.push({ id: applicationEntry.id, type: 'apiApplication' });
+	apiHelpers.data.push({id: applicationEntry.id, type: 'apiApplication'});
 
-	const endpointEntry = await apiHelpers.objectEntry.postObjectEntry(
+	await apiHelpers.objectEntry.postObjectEntry(
 		singleElementIdEndpoint,
 		'headless-builder/endpoints'
 	);
-
-	apiHelpers.data.unshift({ id: endpointEntry.id, type: 'apiEndpoint' });
 
 	await apiExplorerPage.goToApplication(`c/${application.baseURL}`);
 
