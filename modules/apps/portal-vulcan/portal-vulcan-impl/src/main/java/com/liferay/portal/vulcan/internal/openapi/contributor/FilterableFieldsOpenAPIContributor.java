@@ -24,10 +24,13 @@ import io.swagger.v3.oas.models.media.Schema;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
@@ -75,8 +78,8 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 			}
 
 			Set<EntityField> processedEntityFields = new HashSet<>();
-
-			Set<String> filterableFieldNames = new HashSet<>();
+			List<String> filterableFieldNames = new ArrayList<>(
+				Collections.emptyList());
 
 			for (Map.Entry<String, EntityField> entry :
 					entityFieldsMap.entrySet()) {
@@ -86,6 +89,10 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 						entry.getValue(), entry.getKey(),
 						processedEntityFields));
 			}
+
+			filterableFieldNames = _filterRedundantFields(filterableFieldNames);
+
+			filterableFieldNames.sort(String::compareTo);
 
 			schema.addExtension(
 				"x-filterable", new ArrayList<>(filterableFieldNames));
@@ -97,6 +104,65 @@ public class FilterableFieldsOpenAPIContributor implements OpenAPIContributor {
 		throws InvalidSyntaxException {
 
 		_bundleContext = bundleContext;
+	}
+
+	private List<String> _filterRedundantFields(
+		List<String> filterableFieldNames) {
+
+		List<String> filteredFields = new ArrayList<>();
+
+		for (String field : filterableFieldNames) {
+			String[] parts = field.split("/");
+			List<String> reducedParts = new ArrayList<>();
+
+			int consecutiveCount = 1;
+			boolean inInitialRedundancy = true;
+
+			for (int i = 0; i < parts.length; i++) {
+				if ((i > 0) && Objects.equals(parts[i], parts[i - 1])) {
+					consecutiveCount++;
+				}
+				else {
+					consecutiveCount = 1;
+				}
+
+				if (inInitialRedundancy && ((consecutiveCount % 2) == 0)) {
+					if (!reducedParts.isEmpty() &&
+						Objects.equals(
+							reducedParts.get(reducedParts.size() - 1),
+							parts[i])) {
+
+						reducedParts.remove(reducedParts.size() - 1);
+					}
+
+					continue;
+				}
+
+				if (!reducedParts.isEmpty() &&
+					Objects.equals(
+						reducedParts.get(reducedParts.size() - 1), parts[i])) {
+
+					continue;
+				}
+
+				reducedParts.add(parts[i]);
+
+				if ((consecutiveCount == 1) && (i > 0)) {
+					inInitialRedundancy = false;
+				}
+			}
+
+			String reducedField = String.join("/", reducedParts);
+
+			filteredFields.add(reducedField);
+		}
+
+		List<String> distinctFields = new ArrayList<>(
+			new LinkedHashSet<>(filteredFields));
+
+		distinctFields.sort(String::compareTo);
+
+		return distinctFields;
 	}
 
 	private Map<String, EntityField> _getEntityFieldsMap(
