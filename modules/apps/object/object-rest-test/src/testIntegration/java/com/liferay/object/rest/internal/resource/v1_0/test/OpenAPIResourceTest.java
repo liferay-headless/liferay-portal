@@ -228,19 +228,24 @@ public class OpenAPIResourceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
-			null, TestPropsValues.getUserId(),
+			null,
+			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
-			LocalizedMapUtil.getLocalizedMap("relationship1"), "relationship1",
-			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
+			LocalizedMapUtil.getLocalizedMap("relationship1"),
+			"relationship1", false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY,
+			null);
+
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
-			null, TestPropsValues.getUserId(),
+			null,
+			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_CASCADE,
-			LocalizedMapUtil.getLocalizedMap("relationship2"), "relationship2",
-			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
+			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
+			LocalizedMapUtil.getLocalizedMap("relationship2"),
+			"relationship2", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
+			null);
 
 		Set<String> expectedFilterableFields = new HashSet<>(
 			_getObjectDefinitionFilterableFields(objectDefinition));
