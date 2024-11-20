@@ -324,16 +324,16 @@
 				"type": "object",
 				"x-filterable": [
 					"creator",
-					"field1",
-					"dateCreated",
-					"keywords",
-					"taxonomyCategoryIds",
 					"creatorId",
+					"dateCreated",
 					"dateModified",
-					"id",
-					"userId",
 					"externalReferenceCode",
-					"status"
+					"field1",
+					"id",
+					"keywords",
+					"status",
+					"taxonomyCategoryIds",
+					"userId"
 				],
 				"xml": {
 					"name": "ObjectEntry"

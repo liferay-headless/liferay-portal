@@ -256,16 +256,16 @@
 				"type": "object",
 				"x-filterable": [
 					"creator",
-					"dateCreated",
-					"keywords",
-					"field",
-					"taxonomyCategoryIds",
 					"creatorId",
+					"dateCreated",
 					"dateModified",
-					"id",
-					"userId",
 					"externalReferenceCode",
-					"status"
+					"field",
+					"id",
+					"keywords",
+					"status",
+					"taxonomyCategoryIds",
+					"userId"
 				],
 				"xml": {
 					"name": "ObjectEntry"
