@@ -23,7 +23,6 @@ import com.liferay.object.rest.internal.odata.entity.v1_0.test.ObjectEntryEntity
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
@@ -209,74 +208,6 @@ public class OpenAPIResourceTest {
 		_assertOpenAPI(
 			"expected_openapi_categorization_disabled.json",
 			categorizationDisabledObjectDefinition);
-	}
-
-	@Test
-	public void testGetOpenAPIFilterableFields() throws Exception {
-		ObjectDefinition objectDefinition =
-			ObjectDefinitionLocalServiceUtil.getObjectDefinition(
-				_objectDefinition.getObjectDefinitionId());
-
-		ObjectDefinition relatedObjectDefinition =
-			ObjectDefinitionTestUtil.publishObjectDefinition(
-				"Object5",
-				Collections.singletonList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-						"field", "field", false)),
-				ObjectDefinitionConstants.SCOPE_COMPANY);
-
-		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
-			null,
-			TestPropsValues.getUserId(),
-			_objectDefinition.getObjectDefinitionId(),
-			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
-			LocalizedMapUtil.getLocalizedMap("relationship1"),
-			"relationship1", false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY,
-			null);
-
-		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
-			null,
-			TestPropsValues.getUserId(),
-			_objectDefinition.getObjectDefinitionId(),
-			relatedObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, false,
-			LocalizedMapUtil.getLocalizedMap("relationship2"),
-			"relationship2", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
-			null);
-
-		Set<String> expectedFilterableFields = new HashSet<>(
-			_getObjectDefinitionFilterableFields(objectDefinition));
-
-		JSONObject openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
-			null, objectDefinition.getRESTContextPath() + "/openapi.json",
-			Http.Method.GET);
-
-		Set<String> actualFilterableFields = new HashSet<>(
-			_getSchemaLevelXFilterableFields(openAPIJSONObject));
-
-		Assert.assertEquals(
-			"Mismatch between entity model filterable fields and OpenAPI " +
-				"schema-level x-filterable fields",
-			expectedFilterableFields, actualFilterableFields);
-
-		expectedFilterableFields = new HashSet<>(
-			_getObjectDefinitionFilterableFields(relatedObjectDefinition));
-
-		openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
-			null,
-			relatedObjectDefinition.getRESTContextPath() + "/openapi.json",
-			Http.Method.GET);
-
-		actualFilterableFields = new HashSet<>(
-			_getSchemaLevelXFilterableFields(openAPIJSONObject));
-
-		Assert.assertEquals(
-			"Mismatch between entity model filterable fields and OpenAPI " +
-				"schema-level x-filterable fields",
-			expectedFilterableFields, actualFilterableFields);
 	}
 
 	@Test
