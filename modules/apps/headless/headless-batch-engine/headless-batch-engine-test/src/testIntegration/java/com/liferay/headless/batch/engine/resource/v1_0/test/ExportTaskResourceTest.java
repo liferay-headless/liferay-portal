@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -311,10 +312,9 @@ public class ExportTaskResourceTest {
 	/**
 	 * Modify the value of _testableClassNames to test specific class names.
 	 */
-	private static Collection<String> _testableClassNames = Arrays.asList(
-		//"com.liferay.data.engine.rest.dto.v2_0.DataDefinition",
-		//"com.liferay.data.engine.rest.dto.v2_0.DataDefinitionFieldLink"
-	);
+	private static Collection<String> _testableClassNames =
+		Collections.singleton(
+			"com.liferay.headless.admin.site.dto.v1_0.SitePage");
 
 	private static final List<String> _untestableDTOClassNames = Arrays.asList(
 		"com.liferay.headless.admin.user.dto.v1_0.PostalAddress",
