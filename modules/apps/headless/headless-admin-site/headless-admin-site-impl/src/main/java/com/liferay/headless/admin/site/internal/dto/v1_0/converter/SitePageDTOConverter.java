@@ -102,6 +102,7 @@ public class SitePageDTOConverter implements DTOConverter<Layout, SitePage> {
 				setLayoutTemplateId(
 					() -> layout.getTypeSettingsProperty(
 						LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID));
+				setType(Type.WIDGET_PAGE_SETTINGS);
 			}
 		};
 	}
