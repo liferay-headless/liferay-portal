@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
@@ -62,6 +63,7 @@ import org.junit.runner.RunWith;
  * @author Raymond Augé
  * @author Brian Wing Shun Chan
  */
+@FeatureFlags("LPS-35443")
 @RunWith(Arquillian.class)
 public class ExportTaskResourceTest {
 
