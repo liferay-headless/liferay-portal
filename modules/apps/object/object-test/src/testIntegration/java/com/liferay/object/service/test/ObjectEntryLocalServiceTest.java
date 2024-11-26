@@ -3659,7 +3659,7 @@ public class ObjectEntryLocalServiceTest {
 
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.fetchSystemObjectDefinition(
-					"User");
+					CompanyThreadLocal.getCompanyId(), "User");
 
 			User user = UserTestUtil.addUser(
 				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),

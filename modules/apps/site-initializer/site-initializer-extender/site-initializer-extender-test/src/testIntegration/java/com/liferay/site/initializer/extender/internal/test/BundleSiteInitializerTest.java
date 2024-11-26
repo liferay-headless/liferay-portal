@@ -2673,7 +2673,8 @@ public class BundleSiteInitializerTest {
 			).build();
 
 		ObjectDefinition objectDefinition1 =
-			_objectDefinitionLocalService.fetchSystemObjectDefinition("User");
+			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				CompanyThreadLocal.getCompanyId(), "User");
 
 		Page<ObjectRelationship> page1 =
 			objectRelationshipResource.
@@ -2719,7 +2720,7 @@ public class BundleSiteInitializerTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				"AccountEntry");
+				CompanyThreadLocal.getCompanyId(), "AccountEntry");
 
 		Page<ObjectRelationship> page3 =
 			objectRelationshipResource.
@@ -2754,7 +2755,8 @@ public class BundleSiteInitializerTest {
 			).build();
 
 		ObjectDefinition objectDefinition1 =
-			_objectDefinitionLocalService.fetchSystemObjectDefinition("User");
+			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				CompanyThreadLocal.getCompanyId(), "User");
 
 		Page<ObjectRelationship> page1 =
 			objectRelationshipResource.
@@ -2800,7 +2802,7 @@ public class BundleSiteInitializerTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				"AccountEntry");
+				CompanyThreadLocal.getCompanyId(), "AccountEntry");
 
 		Page<ObjectRelationship> page3 =
 			objectRelationshipResource.

@@ -808,6 +808,7 @@ public class ObjectEntryResourceTest {
 
 		_userSystemObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				CompanyThreadLocal.getCompanyId(),
 				_systemObjectDefinitionManager.getName());
 
 		_userSystemObjectField = ObjectFieldTestUtil.addCustomObjectField(
