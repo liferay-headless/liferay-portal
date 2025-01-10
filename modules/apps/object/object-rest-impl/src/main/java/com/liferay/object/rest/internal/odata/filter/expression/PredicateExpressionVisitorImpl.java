@@ -6,8 +6,10 @@
 package com.liferay.object.rest.internal.odata.filter.expression;
 
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -518,13 +520,32 @@ public class PredicateExpressionVisitorImpl
 			objectValuePairs.remove(0);
 
 		try {
+			String adaptedLeft = leftParts.get(leftParts.size() - 1);
+
+			ObjectDefinition relatedObjectDefinition =
+				ObjectRelationshipUtil.getRelatedObjectDefinition(
+					objectValuePair.getValue(), objectValuePair.getKey());
+
+			String objectRelationshipERCObjectFieldName =
+				ObjectFieldSettingUtil.getValue(
+					ObjectFieldSettingConstants.
+						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+					_objectFieldLocalService.getObjectField(
+						relatedObjectDefinition.getObjectDefinitionId(),
+						_getEntityField(
+							adaptedLeft, relatedObjectDefinition
+						).getFilterableName(
+							null
+						)));
+
+			if (adaptedLeft.equals(objectRelationshipERCObjectFieldName)) {
+				adaptedLeft = "externalReferenceCode";
+			}
+
 			return _getObjectRelationshipPredicate(
 				objectValuePair.getValue(), objectValuePairs,
 				objectValuePair.getKey(),
-				unsafeBiFunction.apply(
-					leftParts.get(leftParts.size() - 1),
-					ObjectRelationshipUtil.getRelatedObjectDefinition(
-						objectValuePair.getValue(), objectValuePair.getKey())));
+				unsafeBiFunction.apply(adaptedLeft, relatedObjectDefinition));
 		}
 		catch (InvalidFilterException invalidFilterException) {
 			throw invalidFilterException;
