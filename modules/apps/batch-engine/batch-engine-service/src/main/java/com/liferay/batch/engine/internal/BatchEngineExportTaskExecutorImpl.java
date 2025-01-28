@@ -45,6 +45,7 @@ import com.liferay.portal.vulcan.util.NestedFieldsContextUtil;
 
 import java.io.Serializable;
 
+import java.sql.Blob;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class BatchEngineExportTaskExecutorImpl
 				true, () -> _exportItems(batchEngineExportTask),
 				_userLocalService.getUser(batchEngineExportTask.getUserId()));
 
-			_updateBatchEngineExportTask(
+			_updateBatchEngineExportTaskWithoutContent(
 				BatchEngineTaskExecuteStatus.COMPLETED, batchEngineExportTask,
 				null);
 		}
@@ -127,7 +128,7 @@ public class BatchEngineExportTaskExecutorImpl
 				_filterParserProvider, _sortParserProvider);
 	}
 
-	private void _exportItems(BatchEngineExportTask batchEngineExportTask)
+		private void _exportItems(BatchEngineExportTask batchEngineExportTask)
 		throws Exception {
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
@@ -139,7 +140,7 @@ public class BatchEngineExportTaskExecutorImpl
 		NestedFieldsContext oldNestedFieldsContext = null;
 
 		try (BatchEngineExportTaskItemWriter batchEngineExportTaskItemWriter =
-				_getBatchEngineExportTaskItemWriter(
+				_getBatchEngineExportTaskItemWriterNoZip(
 					batchEngineExportTask, parameters,
 					unsyncByteArrayOutputStream)) {
 
@@ -208,12 +209,55 @@ public class BatchEngineExportTaskExecutorImpl
 
 		byte[] content = unsyncByteArrayOutputStream.toByteArray();
 
+
+		_batchEngineExportTaskLocalService.updateBatchEngineExportTask(batchEngineExportTask);
+
 		batchEngineExportTask.setContent(
 			new OutputBlob(
 				new UnsyncByteArrayInputStream(content), content.length));
 
-		_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
-			batchEngineExportTask);
+	}
+
+	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriterNoZip(
+		BatchEngineExportTask batchEngineExportTask,
+		Map<String, Serializable> parameters,
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
+		throws Exception {
+
+		BatchEngineExportTaskItemWriterBuilder
+			batchEngineExportTaskItemWriterBuilder =
+			new BatchEngineExportTaskItemWriterBuilder();
+
+		BatchEngineTaskContentType batchEngineTaskContentType =
+			BatchEngineTaskContentType.valueOf(
+				batchEngineExportTask.getContentType());
+
+		return batchEngineExportTaskItemWriterBuilder.
+			batchEngineTaskContentType(
+				batchEngineTaskContentType
+			).columnDescriptorProvider(
+				_columnDescriptorProvider
+			).companyId(
+				batchEngineExportTask.getCompanyId()
+			).csvFileColumnDelimiter(
+				GetterUtil.getString(
+					_getCSVFileColumnDelimiter(
+						batchEngineExportTask.getCompanyId()),
+					StringPool.COMMA)
+			).fieldNames(
+				batchEngineExportTask.getFieldNamesList()
+			).itemClass(
+				_itemClassRegistry.getItemClass(
+					batchEngineExportTask.getClassName())
+			).outputStream(
+				unsyncByteArrayOutputStream
+			).parameters(
+				parameters
+			).taskItemDelegateName(
+				batchEngineExportTask.getTaskItemDelegateName()
+			).userId(
+				batchEngineExportTask.getUserId()
+			).build();
 	}
 
 	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriter(
@@ -325,6 +369,32 @@ public class BatchEngineExportTaskExecutorImpl
 			batchEngineExportTask.getCallbackURL(),
 			batchEngineExportTask.getExecuteStatus(),
 			batchEngineExportTask.getBatchEngineExportTaskId());
+	}
+
+
+	private void _updateBatchEngineExportTaskWithoutContent(
+		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus,
+		BatchEngineExportTask batchEngineExportTask, String errorMessage) {
+
+		batchEngineExportTask.setEndTime(new Date());
+		batchEngineExportTask.setErrorMessage(errorMessage);
+		batchEngineExportTask.setExecuteStatus(
+			batchEngineTaskExecuteStatus.toString());
+
+		Blob tmpContent = batchEngineExportTask.getContent();
+
+		batchEngineExportTask.setContent(null);
+
+		batchEngineExportTask =
+			_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
+				batchEngineExportTask);
+
+		BatchEngineTaskCallbackUtil.sendCallback(
+			batchEngineExportTask.getCallbackURL(),
+			batchEngineExportTask.getExecuteStatus(),
+			batchEngineExportTask.getBatchEngineExportTaskId());
+
+		batchEngineExportTask.setContent(tmpContent);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

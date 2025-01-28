@@ -28,11 +28,8 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
-
-import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
-
 import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -180,19 +177,8 @@ public class VulcanBatchEnginePortletDataHandler
 	private byte[] _getBytes(BatchEngineExportTask batchEngineExportTask)
 		throws Exception {
 
-		try (InputStream inputStream =
-				_batchEngineExportTaskService.openContentInputStream(
-					batchEngineExportTask.getBatchEngineExportTaskId())) {
-
-			// TODO LPD-45048
-
-			File batchZipFile = FileUtil.createTempFile(inputStream);
-
-			File tempFolder = FileUtil.createTempFolder();
-
-			FileUtil.unzip(batchZipFile, tempFolder);
-
-			return FileUtil.getBytes(new File(tempFolder, "export.json"));
+		try (InputStream inputStream = batchEngineExportTask.getContent().getBinaryStream()) {
+			return FileUtil.getBytes(inputStream);
 		}
 	}
 
