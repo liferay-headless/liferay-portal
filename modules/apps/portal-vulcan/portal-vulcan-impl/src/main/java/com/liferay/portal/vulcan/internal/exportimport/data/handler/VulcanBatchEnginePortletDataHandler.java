@@ -28,8 +28,11 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
+
 import java.io.InputStream;
 import java.io.Serializable;
+
+import java.sql.Blob;
 import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -115,8 +118,10 @@ public class VulcanBatchEnginePortletDataHandler
 
 		_batchEngineExportTaskExecutor.execute(batchEngineExportTask);
 
+		Blob content = batchEngineExportTask.getContent();
+
 		portletDataContext.addZipEntry(
-			_fileName, _getBytes(batchEngineExportTask));
+			_fileName, content.getBytes(1L, (int)content.length()));
 
 		return getExportDataRootElementString(
 			addExportDataRootElement(portletDataContext));
@@ -172,14 +177,6 @@ public class VulcanBatchEnginePortletDataHandler
 		// TODO LPD-45048
 
 		return 1;
-	}
-
-	private byte[] _getBytes(BatchEngineExportTask batchEngineExportTask)
-		throws Exception {
-
-		try (InputStream inputStream = batchEngineExportTask.getContent().getBinaryStream()) {
-			return FileUtil.getBytes(inputStream);
-		}
 	}
 
 	private byte[] _getBytes(String fileName, InputStream inputStream)
