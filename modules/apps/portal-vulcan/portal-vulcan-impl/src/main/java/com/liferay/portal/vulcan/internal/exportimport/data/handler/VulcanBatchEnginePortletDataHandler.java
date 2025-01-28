@@ -113,6 +113,12 @@ public class VulcanBatchEnginePortletDataHandler
 
 						return null;
 					}
+				).put(
+					"useOnlyMemory",
+					MapUtil.getBoolean(
+						portletDataContext.getParameterMap(),
+						"useOnlyMemory"
+					) ? "true" : null
 				).build(),
 				_taskItemDelegateName);
 

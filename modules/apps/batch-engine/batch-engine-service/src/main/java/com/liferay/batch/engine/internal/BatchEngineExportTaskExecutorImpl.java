@@ -43,9 +43,11 @@ import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 import com.liferay.portal.vulcan.util.NestedFieldsContextUtil;
 
+import java.io.OutputStream;
 import java.io.Serializable;
 
 import java.sql.Blob;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,7 +130,7 @@ public class BatchEngineExportTaskExecutorImpl
 				_filterParserProvider, _sortParserProvider);
 	}
 
-		private void _exportItems(BatchEngineExportTask batchEngineExportTask)
+	private void _exportItems(BatchEngineExportTask batchEngineExportTask)
 		throws Exception {
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
@@ -140,7 +142,7 @@ public class BatchEngineExportTaskExecutorImpl
 		NestedFieldsContext oldNestedFieldsContext = null;
 
 		try (BatchEngineExportTaskItemWriter batchEngineExportTaskItemWriter =
-				_getBatchEngineExportTaskItemWriterNoZip(
+				_getBatchEngineExportTaskItemWriter(
 					batchEngineExportTask, parameters,
 					unsyncByteArrayOutputStream)) {
 
@@ -209,61 +211,19 @@ public class BatchEngineExportTaskExecutorImpl
 
 		byte[] content = unsyncByteArrayOutputStream.toByteArray();
 
-
-		_batchEngineExportTaskLocalService.updateBatchEngineExportTask(batchEngineExportTask);
+		_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
+			batchEngineExportTask);
 
 		batchEngineExportTask.setContent(
 			new OutputBlob(
 				new UnsyncByteArrayInputStream(content), content.length));
-
 	}
 
-	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriterNoZip(
-		BatchEngineExportTask batchEngineExportTask,
-		Map<String, Serializable> parameters,
-		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
-		throws Exception {
-
-		BatchEngineExportTaskItemWriterBuilder
-			batchEngineExportTaskItemWriterBuilder =
-			new BatchEngineExportTaskItemWriterBuilder();
-
-		BatchEngineTaskContentType batchEngineTaskContentType =
-			BatchEngineTaskContentType.valueOf(
-				batchEngineExportTask.getContentType());
-
-		return batchEngineExportTaskItemWriterBuilder.
-			batchEngineTaskContentType(
-				batchEngineTaskContentType
-			).columnDescriptorProvider(
-				_columnDescriptorProvider
-			).companyId(
-				batchEngineExportTask.getCompanyId()
-			).csvFileColumnDelimiter(
-				GetterUtil.getString(
-					_getCSVFileColumnDelimiter(
-						batchEngineExportTask.getCompanyId()),
-					StringPool.COMMA)
-			).fieldNames(
-				batchEngineExportTask.getFieldNamesList()
-			).itemClass(
-				_itemClassRegistry.getItemClass(
-					batchEngineExportTask.getClassName())
-			).outputStream(
-				unsyncByteArrayOutputStream
-			).parameters(
-				parameters
-			).taskItemDelegateName(
-				batchEngineExportTask.getTaskItemDelegateName()
-			).userId(
-				batchEngineExportTask.getUserId()
-			).build();
-	}
-
-	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriter(
-			BatchEngineExportTask batchEngineExportTask,
-			Map<String, Serializable> parameters,
-			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
+	private BatchEngineExportTaskItemWriter
+			_getBatchEngineExportTaskItemWriter(
+				BatchEngineExportTask batchEngineExportTask,
+				Map<String, Serializable> parameters,
+				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
 		throws Exception {
 
 		BatchEngineExportTaskItemWriterBuilder
@@ -274,6 +234,16 @@ public class BatchEngineExportTaskExecutorImpl
 			BatchEngineTaskContentType.valueOf(
 				batchEngineExportTask.getContentType());
 
+		OutputStream outputStream;
+
+		if (parameters.get("useOnlyMemory").equals("true")){
+			outputStream  = unsyncByteArrayOutputStream;
+		}
+		else{
+			outputStream = _getZipOutputStream(
+				batchEngineTaskContentType, unsyncByteArrayOutputStream);
+		}
+
 		return batchEngineExportTaskItemWriterBuilder.
 			batchEngineTaskContentType(
 				batchEngineTaskContentType
@@ -292,8 +262,7 @@ public class BatchEngineExportTaskExecutorImpl
 				_itemClassRegistry.getItemClass(
 					batchEngineExportTask.getClassName())
 			).outputStream(
-				_getZipOutputStream(
-					batchEngineTaskContentType, unsyncByteArrayOutputStream)
+				outputStream
 			).parameters(
 				parameters
 			).taskItemDelegateName(
@@ -370,7 +339,6 @@ public class BatchEngineExportTaskExecutorImpl
 			batchEngineExportTask.getExecuteStatus(),
 			batchEngineExportTask.getBatchEngineExportTaskId());
 	}
-
 
 	private void _updateBatchEngineExportTaskWithoutContent(
 		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus,
