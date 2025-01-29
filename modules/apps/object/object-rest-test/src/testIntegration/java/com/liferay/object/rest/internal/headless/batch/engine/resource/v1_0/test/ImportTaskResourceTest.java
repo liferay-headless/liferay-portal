@@ -9,6 +9,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -19,6 +20,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.util.Http;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,6 +32,32 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  */
 @RunWith(Arquillian.class)
 public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
+
+	@Test
+	public void testDeleteImportTask() throws Exception {
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			objectDefinition, OBJECT_FIELD_NAME_TEXT, "TestObject");
+
+		int objectEntriesCount = ObjectEntryTestUtil.getObjectEntriesCount();
+
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.putAll(
+				JSONFactoryUtil.createJSONObject(
+				).put(
+					"externalReferenceCode",
+					objectEntry.getExternalReferenceCode()
+				)
+			).toString(),
+			StringBundler.concat(
+				"headless-batch-engine/v1.0/import-task",
+				"/com.liferay.object.rest.dto.v1_0.ObjectEntry",
+				"?taskItemDelegateName=", objectDefinition.getName()),
+			Http.Method.DELETE);
+
+		Assert.assertEquals(
+			ObjectEntryTestUtil.getObjectEntriesCount(),
+			objectEntriesCount - 1);
+	}
 
 	@Test
 	public void testPostImportTask() throws Exception {
