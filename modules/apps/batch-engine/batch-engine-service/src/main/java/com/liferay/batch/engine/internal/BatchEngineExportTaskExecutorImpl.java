@@ -86,7 +86,7 @@ public class BatchEngineExportTaskExecutorImpl
 				true, () -> _exportItems(batchEngineExportTask),
 				_userLocalService.getUser(batchEngineExportTask.getUserId()));
 
-			_updateBatchEngineExportTaskWithoutContent(
+			_updateBatchEngineExportTask(
 				BatchEngineTaskExecuteStatus.COMPLETED, batchEngineExportTask,
 				null);
 		}
@@ -217,6 +217,8 @@ public class BatchEngineExportTaskExecutorImpl
 		batchEngineExportTask.setContent(
 			new OutputBlob(
 				new UnsyncByteArrayInputStream(content), content.length));
+
+
 	}
 
 	private BatchEngineExportTaskItemWriter
@@ -236,7 +238,7 @@ public class BatchEngineExportTaskExecutorImpl
 
 		OutputStream outputStream;
 
-		if (parameters.get("useOnlyMemory").equals("true")){
+		if (parameters.get("useOnlyMemory").equals(true)){
 			outputStream  = unsyncByteArrayOutputStream;
 		}
 		else{
@@ -330,28 +332,12 @@ public class BatchEngineExportTaskExecutorImpl
 		batchEngineExportTask.setExecuteStatus(
 			batchEngineTaskExecuteStatus.toString());
 
-		batchEngineExportTask =
-			_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
-				batchEngineExportTask);
-
-		BatchEngineTaskCallbackUtil.sendCallback(
-			batchEngineExportTask.getCallbackURL(),
-			batchEngineExportTask.getExecuteStatus(),
-			batchEngineExportTask.getBatchEngineExportTaskId());
-	}
-
-	private void _updateBatchEngineExportTaskWithoutContent(
-		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus,
-		BatchEngineExportTask batchEngineExportTask, String errorMessage) {
-
-		batchEngineExportTask.setEndTime(new Date());
-		batchEngineExportTask.setErrorMessage(errorMessage);
-		batchEngineExportTask.setExecuteStatus(
-			batchEngineTaskExecuteStatus.toString());
-
 		Blob tmpContent = batchEngineExportTask.getContent();
 
-		batchEngineExportTask.setContent(null);
+		if (_getParameters(
+			batchEngineExportTask).get("useOnlyMemory").equals(true) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
+			batchEngineExportTask.setContent(null);
+		}
 
 		batchEngineExportTask =
 			_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
