@@ -25,7 +25,6 @@ import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 
@@ -115,10 +114,7 @@ public class VulcanBatchEnginePortletDataHandler
 					}
 				).put(
 					"useOnlyMemory",
-					MapUtil.getBoolean(
-						portletDataContext.getParameterMap(),
-						"useOnlyMemory"
-					) ? "true" : null
+					true
 				).build(),
 				_taskItemDelegateName);
 
