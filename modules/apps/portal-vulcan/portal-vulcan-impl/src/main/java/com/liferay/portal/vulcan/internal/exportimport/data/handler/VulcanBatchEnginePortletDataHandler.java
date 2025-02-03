@@ -113,8 +113,8 @@ public class VulcanBatchEnginePortletDataHandler
 						return null;
 					}
 				).put(
-					"useOnlyMemory",
-					true
+					"storeTaskContentInDB",
+					false
 				).build(),
 				_taskItemDelegateName);
 
