@@ -238,7 +238,7 @@ public class BatchEngineExportTaskExecutorImpl
 
 		OutputStream outputStream;
 
-		if (parameters.get("useOnlyMemory").equals(true)){
+		if (parameters.get("storeTaskContentInDB").equals(false)){
 			outputStream  = unsyncByteArrayOutputStream;
 		}
 		else{
@@ -335,7 +335,7 @@ public class BatchEngineExportTaskExecutorImpl
 		Blob tmpContent = batchEngineExportTask.getContent();
 
 		if (_getParameters(
-			batchEngineExportTask).get("useOnlyMemory").equals(true) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
+			batchEngineExportTask).get("storeTaskContentInDB").equals(false) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
 			batchEngineExportTask.setContent(null);
 		}
 
