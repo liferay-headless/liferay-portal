@@ -238,7 +238,7 @@ public class BatchEngineExportTaskExecutorImpl
 
 		OutputStream outputStream;
 
-		if (parameters.get("storeTaskContentInDB").equals(false)){
+		if (Boolean.FALSE.equals(parameters.get("storeTaskContentInDB"))){
 			outputStream  = unsyncByteArrayOutputStream;
 		}
 		else{
