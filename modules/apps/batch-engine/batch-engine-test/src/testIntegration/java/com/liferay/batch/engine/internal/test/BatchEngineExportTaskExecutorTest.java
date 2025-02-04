@@ -255,6 +255,86 @@ public class BatchEngineExportTaskExecutorTest
 	}
 
 	@Test
+	public void testExportImportInstanceLevelSuccess() throws Exception {
+		ObjectEntry objectEntry1;
+		ObjectEntry objectEntry2;
+		ObjectEntry objectEntry3;
+		String _OBJECT_FIELD_NAME_TEXT = "testFieldName";
+		long companyGroupId;
+
+		ObjectDefinition objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
+			ObjectDefinitionTestUtil.getRandomName(),
+			Arrays.asList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_TEXT,
+					Arrays.asList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
+						).value(
+							Boolean.TRUE.toString()
+						).build()),
+					false)),
+			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		objectEntry1 = _addObjectEntry(
+			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		objectEntry2 = _addObjectEntry(
+			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		objectEntry3 = _addObjectEntry(
+			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
+
+		Group companyGroup = _stagingGroupHelper.fetchCompanyGroup(
+			objectDefinition1.getCompanyId());
+
+		companyGroupId = companyGroup.getGroupId();
+
+		_parameters.put("storeTaskContentInDB", false);
+
+		//_exportBlogPostings("JSON", Collections.emptyList(), _parameters);
+
+		_parameters.put("siteId", TestPropsValues.getGroupId());
+
+		_batchEngineExportTask =
+			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
+				null, user.getCompanyId(), user.getUserId(), null,
+				"com.liferay.object.rest.dto.v1_0.ObjectEntry", "JSON",
+				BatchEngineTaskExecuteStatus.INITIAL.name(), Collections.emptyList(),
+				_parameters, objectDefinition1.getName());
+		// task delegate name falata
+
+		_batchEngineExportTaskExecutor.execute(_batchEngineExportTask);
+
+		BatchEngineExportTask batchEngineExportTask =
+			_batchEngineExportTaskLocalService.getBatchEngineExportTask(
+				_batchEngineExportTask.getBatchEngineExportTaskId());
+
+		Assert.assertEquals(
+			BatchEngineTaskExecuteStatus.COMPLETED.toString(),
+			batchEngineExportTask.getExecuteStatus());
+
+		Assert.assertEquals(
+			3,
+			batchEngineExportTask.getProcessedItemsCount());
+		Assert.assertEquals(
+			3,
+			batchEngineExportTask.getTotalItemsCount());
+
+		Assert.assertNull(batchEngineExportTask.getContent());
+
+	}
+
+	@Test
 	public void testExportBlogPostingsToXLSFileWithFieldNames()
 		throws Exception {
 
@@ -487,87 +567,7 @@ public class BatchEngineExportTaskExecutorTest
 			blogsEntries, fieldNames,
 			_readRowValuesList(filterFunction, batchEngineExportTask));
 	}
-	@Test
-	private void testExportImportInstanceLevelSuccess() throws Exception {
-		ObjectEntry objectEntry1;
-		ObjectEntry objectEntry2;
-		ObjectEntry objectEntry3;
-		String _OBJECT_FIELD_NAME_TEXT = "testFieldName";
-		long companyGroupId;
 
-		ObjectDefinition objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(),
-			Arrays.asList(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_TEXT,
-					Arrays.asList(
-						new ObjectFieldSettingBuilder(
-						).name(
-							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
-						).value(
-							Boolean.TRUE.toString()
-						).build()),
-					false)),
-			ObjectDefinitionConstants.SCOPE_COMPANY);
-
-		objectEntry1 = _addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		objectEntry2 = _addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		objectEntry3 = _addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
-
-		Group companyGroup = _stagingGroupHelper.fetchCompanyGroup(
-			objectDefinition1.getCompanyId());
-
-		companyGroupId = companyGroup.getGroupId();
-
-		_parameters.put("storeTaskContentInDB", false);
-
-		_exportBlogPostings("JSON", Collections.emptyList(), _parameters);
-
-		_parameters.put("siteId", TestPropsValues.getGroupId());
-
-		_batchEngineExportTask =
-			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
-				null, user.getCompanyId(), user.getUserId(), null,
-				objectDefinition1.getClassName(), "JSON",
-				BatchEngineTaskExecuteStatus.INITIAL.name(), Collections.emptyList(),
-				_parameters, null);
-		// task delegate name falata
-
-		_batchEngineExportTaskExecutor.execute(_batchEngineExportTask);
-
-		BatchEngineExportTask batchEngineExportTask =
-			_batchEngineExportTaskLocalService.getBatchEngineExportTask(
-				_batchEngineExportTask.getBatchEngineExportTaskId());
-
-		_assertSuccessTask(batchEngineExportTask);
-
-		List<ObjectEntry> objectEntries = _objectMapper.readValue(
-				_batchEngineExportTaskLocalService.openContentInputStream(
-					batchEngineExportTask.getBatchEngineExportTaskId()),
-			new TypeReference<List<ObjectEntry>>() {
-			});
-
-		List<Object[]> rowValuesList = new ArrayList<>();
-
-//		for (ObjectEntry objectEntry : objectEntries) {
-//			rowValuesList.add(filterFunction.apply(objectEntries));
-//		}
-//
-//		_assertExportedValues(blogsEntries, fieldNames, rowValuesList);
-	}
 
 
 	private ObjectEntry _addObjectEntry(
