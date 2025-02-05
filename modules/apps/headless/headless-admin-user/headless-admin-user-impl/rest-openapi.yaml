@@ -686,7 +686,7 @@ components:
                     description:
                         The categories associated with this organization.
                     items:
-                        $ref: "#/components/schemas/TaxonomyCategoryBrief"
+                        $ref: "../../headless-delivery/headless-delivery-impl/rest-openapi.yaml#TaxonomyCategoryBrief"
                     readOnly: true
                     type: array
                 treePath:
