@@ -334,8 +334,8 @@ public class BatchEngineExportTaskExecutorImpl
 
 		Blob tmpContent = batchEngineExportTask.getContent();
 
-		if (_getParameters(
-			batchEngineExportTask).get("storeTaskContentInDB").equals(false) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
+		if (Boolean.FALSE.equals(_getParameters(
+			batchEngineExportTask).get("storeTaskContentInDB")) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
 			batchEngineExportTask.setContent(null);
 		}
 
