@@ -724,6 +724,17 @@ public class HttpImpl implements Http {
 			}
 			else if (method.equals(Http.Method.DELETE)) {
 				requestBuilder = RequestBuilder.delete(location);
+
+				if (location.contains("headless-batch-engine") &&
+					(body != null)) {
+
+					StringEntity stringEntity = new StringEntity(
+						body.getContent(), body.getCharset());
+
+					stringEntity.setContentType(ContentTypes.APPLICATION_JSON);
+
+					requestBuilder.setEntity(stringEntity);
+				}
 			}
 			else if (method.equals(Http.Method.HEAD)) {
 				requestBuilder = RequestBuilder.head(location);
