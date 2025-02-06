@@ -9,7 +9,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -20,7 +19,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.util.Http;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,15 +36,16 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
 			objectDefinition, OBJECT_FIELD_NAME_TEXT, "TestObject");
 
-		int objectEntriesCount = ObjectEntryTestUtil.getObjectEntriesCount();
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, objectDefinition.getRESTContextPath(), Http.Method.GET);
 
-		HTTPTestUtil.invokeToJSONObject(
+		int totalCount = (int)jsonObject.get("totalCount");
+
+		HTTPTestUtil.invokeToHttpCode(
 			JSONUtil.putAll(
-				JSONFactoryUtil.createJSONObject(
-				).put(
+				JSONUtil.put(
 					"externalReferenceCode",
-					objectEntry.getExternalReferenceCode()
-				)
+					objectEntry.getExternalReferenceCode())
 			).toString(),
 			StringBundler.concat(
 				"headless-batch-engine/v1.0/import-task",
@@ -54,9 +53,14 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 				"?taskItemDelegateName=", objectDefinition.getName()),
 			Http.Method.DELETE);
 
-		Assert.assertEquals(
-			ObjectEntryTestUtil.getObjectEntriesCount(),
-			objectEntriesCount - 1);
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"totalCount", totalCount - 1
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				null, objectDefinition.getRESTContextPath(), Http.Method.GET
+			).toString(),
+			JSONCompareMode.LENIENT);
 	}
 
 	@Test
