@@ -24,10 +24,6 @@ import java.util.Map;
  */
 public class ObjectEntryTestUtil {
 
-	public static int getObjectEntriesCount(){
-		return ObjectEntryLocalServiceUtil.getObjectEntriesCount();
-	}
-
 	public static ObjectEntry addObjectEntry(
 			long groupId, ObjectDefinition objectDefinition,
 			Map<String, Serializable> values, String... keywords)
@@ -72,6 +68,10 @@ public class ObjectEntryTestUtil {
 			HashMapBuilder.<String, Serializable>put(
 				objectFieldName, objectFieldValue
 			).build());
+	}
+
+	public static int getObjectEntriesCount() {
+		return ObjectEntryLocalServiceUtil.getObjectEntriesCount();
 	}
 
 }

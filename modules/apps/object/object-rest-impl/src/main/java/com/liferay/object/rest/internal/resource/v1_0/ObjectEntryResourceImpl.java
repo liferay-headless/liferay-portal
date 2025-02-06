@@ -123,15 +123,15 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 	@Override
 	public void delete(
-		Collection<ObjectEntry> objectEntries,
-		Map<String, Serializable> parameters)
+			Collection<ObjectEntry> objectEntries,
+			Map<String, Serializable> parameters)
 		throws Exception {
 
 		for (ObjectEntry objectEntry : objectEntries) {
-			if (objectEntry.getId()!=null) {
+			if (objectEntry.getId() != null) {
 				deleteObjectEntry(objectEntry.getId());
 			}
-			else{
+			else {
 				deleteByExternalReferenceCode(
 					objectEntry.getExternalReferenceCode());
 			}
