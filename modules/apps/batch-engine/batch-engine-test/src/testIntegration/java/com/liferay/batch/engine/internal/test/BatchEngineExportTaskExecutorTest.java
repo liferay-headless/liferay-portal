@@ -8,8 +8,7 @@ package com.liferay.batch.engine.internal.test;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
@@ -22,16 +21,16 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.io.unsync.UnsyncBufferedReader;
 import com.liferay.petra.string.CharPool;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -58,7 +57,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.zip.ZipInputStream;
 
-import com.liferay.staging.StagingGroupHelper;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -255,71 +253,6 @@ public class BatchEngineExportTaskExecutorTest
 	}
 
 	@Test
-	public void testExportImportInstanceLevelWithTaskContentInDB() throws Exception {
-		String _OBJECT_FIELD_NAME_TEXT = "testFieldName";
-
-		ObjectDefinition objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
-			ObjectDefinitionTestUtil.getRandomName(),
-			Arrays.asList(
-				ObjectFieldUtil.createObjectField(
-					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_TEXT,
-					Arrays.asList(
-						new ObjectFieldSettingBuilder(
-						).name(
-							ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
-						).value(
-							Boolean.TRUE.toString()
-						).build()),
-					false)),
-			ObjectDefinitionConstants.SCOPE_COMPANY);
-
-		_addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		_addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		_addObjectEntry(
-			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
-			RandomTestUtil.randomString(), TestPropsValues.getUser());
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
-
-		_parameters.put("storeTaskContentInDB", false);
-
-		_batchEngineExportTask =
-			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
-				null, user.getCompanyId(), user.getUserId(), null,
-				"com.liferay.object.rest.dto.v1_0.ObjectEntry", "JSON",
-				BatchEngineTaskExecuteStatus.INITIAL.name(), Collections.emptyList(),
-				_parameters, objectDefinition1.getName());
-
-		_batchEngineExportTaskExecutor.execute(_batchEngineExportTask);
-
-		BatchEngineExportTask batchEngineExportTask =
-			_batchEngineExportTaskLocalService.getBatchEngineExportTask(
-				_batchEngineExportTask.getBatchEngineExportTaskId());
-
-		Assert.assertEquals(
-			BatchEngineTaskExecuteStatus.COMPLETED.toString(),
-			batchEngineExportTask.getExecuteStatus());
-
-		Assert.assertEquals(
-			3,
-			batchEngineExportTask.getProcessedItemsCount());
-		Assert.assertEquals(
-			3,
-			batchEngineExportTask.getTotalItemsCount());
-
-		Assert.assertNull(batchEngineExportTask.getContent());
-	}
-
-	@Test
 	public void testExportBlogPostingsToXLSFileWithFieldNames()
 		throws Exception {
 
@@ -334,6 +267,71 @@ public class BatchEngineExportTaskExecutorTest
 			true);
 	}
 
+	@Test
+	public void testExportImportInstanceLevelWithTaskContentInDB()
+		throws Exception {
+
+		String object_field_name_text = "testFieldName";
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				ObjectDefinitionTestUtil.getRandomName(),
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+						RandomTestUtil.randomString(), object_field_name_text,
+						Arrays.asList(
+							new ObjectFieldSettingBuilder(
+							).name(
+								ObjectFieldSettingConstants.NAME_UNIQUE_VALUES
+							).value(
+								Boolean.TRUE.toString()
+							).build()),
+						false)),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_addObjectEntry(
+			objectDefinition1, object_field_name_text,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		_addObjectEntry(
+			objectDefinition1, object_field_name_text,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		_addObjectEntry(
+			objectDefinition1, object_field_name_text,
+			RandomTestUtil.randomString(), TestPropsValues.getUser());
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
+
+		_parameters.put("storeTaskContentInDB", false);
+
+		_batchEngineExportTask =
+			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
+				null, user.getCompanyId(), user.getUserId(), null,
+				"com.liferay.object.rest.dto.v1_0.ObjectEntry", "JSON",
+				BatchEngineTaskExecuteStatus.INITIAL.name(),
+				Collections.emptyList(), _parameters,
+				objectDefinition1.getName());
+
+		_batchEngineExportTaskExecutor.execute(_batchEngineExportTask);
+
+		BatchEngineExportTask batchEngineExportTask =
+			_batchEngineExportTaskLocalService.getBatchEngineExportTask(
+				_batchEngineExportTask.getBatchEngineExportTaskId());
+
+		Assert.assertEquals(
+			BatchEngineTaskExecuteStatus.COMPLETED.toString(),
+			batchEngineExportTask.getExecuteStatus());
+
+		Assert.assertEquals(3, batchEngineExportTask.getProcessedItemsCount());
+		Assert.assertEquals(3, batchEngineExportTask.getTotalItemsCount());
+
+		Assert.assertNull(batchEngineExportTask.getContent());
+	}
+
 	public abstract class BlogPostingMixin {
 
 		@JsonProperty(access = JsonProperty.Access.READ_WRITE)
@@ -345,6 +343,19 @@ public class BatchEngineExportTaskExecutorTest
 		@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 		protected Date dateCreated;
 
+	}
+
+	private void _addObjectEntry(
+			ObjectDefinition objectDefinition, String objectFieldName,
+			Serializable objectFieldValue, User user)
+		throws Exception {
+
+		_objectEntryLocalService.addObjectEntry(
+			user.getUserId(), 0L, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				objectFieldName, objectFieldValue
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private void _assertEmptyFieldNames(LogCapture logCapture) {
@@ -553,21 +564,6 @@ public class BatchEngineExportTaskExecutorTest
 			_readRowValuesList(filterFunction, batchEngineExportTask));
 	}
 
-
-
-	private ObjectEntry _addObjectEntry(
-		ObjectDefinition objectDefinition, String objectFieldName,
-		Serializable objectFieldValue, User user)
-		throws Exception {
-
-		return _objectEntryLocalService.addObjectEntry(
-			user.getUserId(), 0L, objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				objectFieldName, objectFieldValue
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-	}
-
 	private void _testExportBlogPostingsToJSONFile(
 			List<String> fieldNames,
 			Function<BlogPosting, Object[]> filterFunction,
@@ -733,12 +729,9 @@ public class BatchEngineExportTaskExecutorTest
 		return new Object[] {values[0], values[1], values[2], values[3]};
 	};
 
-	private Map<String, Serializable> _parameters;
-
-	@Inject
-	private StagingGroupHelper _stagingGroupHelper;
-
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	private Map<String, Serializable> _parameters;
 
 }

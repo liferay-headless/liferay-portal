@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.sql.Blob;
+
 import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -113,8 +114,7 @@ public class VulcanBatchEnginePortletDataHandler
 						return null;
 					}
 				).put(
-					"storeTaskContentInDB",
-					false
+					"storeTaskContentInDB", false
 				).build(),
 				_taskItemDelegateName);
 

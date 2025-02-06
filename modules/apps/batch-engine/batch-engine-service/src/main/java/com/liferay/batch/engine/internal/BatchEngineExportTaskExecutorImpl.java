@@ -211,21 +211,19 @@ public class BatchEngineExportTaskExecutorImpl
 
 		byte[] content = unsyncByteArrayOutputStream.toByteArray();
 
-		_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
-			batchEngineExportTask);
+		batchEngineExportTask =
+			_batchEngineExportTaskLocalService.updateBatchEngineExportTask(
+				batchEngineExportTask);
 
 		batchEngineExportTask.setContent(
 			new OutputBlob(
 				new UnsyncByteArrayInputStream(content), content.length));
-
-
 	}
 
-	private BatchEngineExportTaskItemWriter
-			_getBatchEngineExportTaskItemWriter(
-				BatchEngineExportTask batchEngineExportTask,
-				Map<String, Serializable> parameters,
-				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
+	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriter(
+			BatchEngineExportTask batchEngineExportTask,
+			Map<String, Serializable> parameters,
+			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
 		throws Exception {
 
 		BatchEngineExportTaskItemWriterBuilder
@@ -238,10 +236,10 @@ public class BatchEngineExportTaskExecutorImpl
 
 		OutputStream outputStream;
 
-		if (Boolean.FALSE.equals(parameters.get("storeTaskContentInDB"))){
-			outputStream  = unsyncByteArrayOutputStream;
+		if (Boolean.FALSE.equals(parameters.get("storeTaskContentInDB"))) {
+			outputStream = unsyncByteArrayOutputStream;
 		}
-		else{
+		else {
 			outputStream = _getZipOutputStream(
 				batchEngineTaskContentType, unsyncByteArrayOutputStream);
 		}
@@ -334,8 +332,15 @@ public class BatchEngineExportTaskExecutorImpl
 
 		Blob tmpContent = batchEngineExportTask.getContent();
 
-		if (Boolean.FALSE.equals(_getParameters(
-			batchEngineExportTask).get("storeTaskContentInDB")) && BatchEngineTaskExecuteStatus.COMPLETED == batchEngineTaskExecuteStatus){
+		if (Boolean.FALSE.equals(
+				_getParameters(
+					batchEngineExportTask
+				).get(
+					"storeTaskContentInDB"
+				)) &&
+			(BatchEngineTaskExecuteStatus.COMPLETED ==
+				batchEngineTaskExecuteStatus)) {
+
 			batchEngineExportTask.setContent(null);
 		}
 
