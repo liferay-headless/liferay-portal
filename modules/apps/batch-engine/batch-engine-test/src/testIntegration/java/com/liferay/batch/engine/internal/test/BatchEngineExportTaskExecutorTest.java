@@ -255,12 +255,8 @@ public class BatchEngineExportTaskExecutorTest
 	}
 
 	@Test
-	public void testExportImportInstanceLevelSuccess() throws Exception {
-		ObjectEntry objectEntry1;
-		ObjectEntry objectEntry2;
-		ObjectEntry objectEntry3;
+	public void testExportImportInstanceLevelWithTaskContentInDB() throws Exception {
 		String _OBJECT_FIELD_NAME_TEXT = "testFieldName";
-		long companyGroupId;
 
 		ObjectDefinition objectDefinition1 = ObjectDefinitionTestUtil.publishObjectDefinition(
 			ObjectDefinitionTestUtil.getRandomName(),
@@ -279,31 +275,22 @@ public class BatchEngineExportTaskExecutorTest
 					false)),
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
-		objectEntry1 = _addObjectEntry(
+		_addObjectEntry(
 			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
 			RandomTestUtil.randomString(), TestPropsValues.getUser());
 
-		objectEntry2 = _addObjectEntry(
+		_addObjectEntry(
 			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
 			RandomTestUtil.randomString(), TestPropsValues.getUser());
 
-		objectEntry3 = _addObjectEntry(
+		_addObjectEntry(
 			objectDefinition1, _OBJECT_FIELD_NAME_TEXT,
 			RandomTestUtil.randomString(), TestPropsValues.getUser());
 
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
 
-		Group companyGroup = _stagingGroupHelper.fetchCompanyGroup(
-			objectDefinition1.getCompanyId());
-
-		companyGroupId = companyGroup.getGroupId();
-
 		_parameters.put("storeTaskContentInDB", false);
-
-		//_exportBlogPostings("JSON", Collections.emptyList(), _parameters);
-
-		_parameters.put("siteId", TestPropsValues.getGroupId());
 
 		_batchEngineExportTask =
 			_batchEngineExportTaskLocalService.addBatchEngineExportTask(
@@ -311,7 +298,6 @@ public class BatchEngineExportTaskExecutorTest
 				"com.liferay.object.rest.dto.v1_0.ObjectEntry", "JSON",
 				BatchEngineTaskExecuteStatus.INITIAL.name(), Collections.emptyList(),
 				_parameters, objectDefinition1.getName());
-		// task delegate name falata
 
 		_batchEngineExportTaskExecutor.execute(_batchEngineExportTask);
 
@@ -331,7 +317,6 @@ public class BatchEngineExportTaskExecutorTest
 			batchEngineExportTask.getTotalItemsCount());
 
 		Assert.assertNull(batchEngineExportTask.getContent());
-
 	}
 
 	@Test
