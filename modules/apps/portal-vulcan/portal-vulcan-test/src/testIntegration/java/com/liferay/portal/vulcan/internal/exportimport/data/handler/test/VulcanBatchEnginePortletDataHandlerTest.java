@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -175,8 +174,8 @@ public class VulcanBatchEnginePortletDataHandlerTest {
 	}
 
 	private ObjectEntry _addObjectEntry(
-		ObjectDefinition objectDefinition, String objectFieldName,
-		Serializable objectFieldValue, User user)
+			ObjectDefinition objectDefinition, String objectFieldName,
+			Serializable objectFieldValue, User user)
 		throws Exception {
 
 		return _objectEntryLocalService.addObjectEntry(
@@ -219,7 +218,7 @@ public class VulcanBatchEnginePortletDataHandlerTest {
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_DATA + "_" +
-			_objectDefinition1.getPortletId(),
+				_objectDefinition1.getPortletId(),
 			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
