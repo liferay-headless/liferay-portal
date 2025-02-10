@@ -247,17 +247,12 @@
 
 <tr>
 	<td>SITE_PAGES_VARIATION_MENULIST_NAME</td>
-	<td>xpath=(//ul//li//a[contains(.,'${key_sitePagesVariationName}')])[1]</td>
+	<td>xpath=( (//ul//li[.//span[contains(.,'${key_sitePagesVariationName}')]]//a | //ul//li[.//span[contains(.,'${key_sitePagesVariationName}')]]//button)[1] ) | ( (//ul//li//a[contains(.,'${key_sitePagesVariationName}')])[1] )</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SITE_PAGES_VARIATION_MENULIST_ACTIVE</td>
-	<td>//li[contains(@class,'active')]//div[contains(.,'${key_sitePagesVariationName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
+	<td>xpath=( //li[contains(@class,'active')]//*[self::span or self::div][contains(.,'${key_sitePagesVariationName}')] )</td>
 	<td></td>
 </tr>
 
