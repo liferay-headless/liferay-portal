@@ -34,6 +34,7 @@ import com.liferay.headless.common.spi.odata.entity.EntityFieldsUtil;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextBuilder;
 import com.liferay.headless.delivery.dto.v1_0.ContentField;
+import com.liferay.headless.delivery.dto.v1_0.ContentFieldValue;
 import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.dto.v1_0.RelatedContent;
 import com.liferay.headless.delivery.dto.v1_0.StructuredContent;
@@ -140,7 +141,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Javier Gamarra
  */
@@ -828,6 +829,8 @@ public class StructuredContentResourceImpl
 		long[] assetLinkEntryIds = _getAssetLinkEntryIds(
 			structuredContent.getRelatedContents());
 
+		ContentField[] fixedContentFields = _fixContentFieldsTypes(structuredContent.getContentFields());
+
 		Double priority = structuredContent.getPriority();
 
 		if (priority == null) {
@@ -841,7 +844,7 @@ public class StructuredContentResourceImpl
 				StructuredContentUtil.getJournalArticleContent(
 					_ddm,
 					DDMFormValuesUtil.toDDMFormValues(
-						titleMap.keySet(), structuredContent.getContentFields(),
+						titleMap.keySet(), fixedContentFields,
 						ddmStructure.getDDMForm(), _dlAppService, groupId,
 						_journalArticleService, _layoutLocalService,
 						contextAcceptLanguage.getPreferredLocale(),
@@ -1483,6 +1486,45 @@ public class StructuredContentResourceImpl
 		}
 	}
 
+	private ContentField[] _fixContentFieldsTypes(ContentField[] contentFields) {
+		if (contentFields == null) {
+			return null;
+		}
+
+		for (ContentField contentField : contentFields) {
+			// Get the raw localized map (it might contain LinkedHashMap values)
+			Map<String, ?> rawLocalizedMap = (Map<String, ?>) contentField.getContentFieldValue_i18n();
+
+			if (rawLocalizedMap != null) {
+				Map<String, ContentFieldValue> fixedMap = new HashMap<>();
+
+				for (Map.Entry<String, ?> entry : rawLocalizedMap.entrySet()) {
+					Object rawValue = entry.getValue();
+					ContentFieldValue convertedValue;
+
+					if (rawValue instanceof Map) {
+						convertedValue = _objectMapper.convertValue(rawValue, ContentFieldValue.class);
+					}
+					else if (rawValue instanceof ContentFieldValue) {
+						convertedValue = (ContentFieldValue) rawValue;
+					}
+					else {
+						continue;
+					}
+
+					fixedMap.put(entry.getKey(), convertedValue);
+				}
+
+				contentField.setContentFieldValue_i18n(fixedMap);
+			}
+			if (contentField.getNestedContentFields() != null) {
+				_fixContentFieldsTypes(contentField.getNestedContentFields());
+			}
+		}
+
+		return contentFields;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		StructuredContentResourceImpl.class);
 
@@ -1545,6 +1587,9 @@ public class StructuredContentResourceImpl
 
 	@Reference
 	private EntityFieldsProvider _entityFieldsProvider;
+
+	private static final ObjectMapper _objectMapper = new ObjectMapper();
+
 
 	@Reference
 	private ExpandoBridgeIndexer _expandoBridgeIndexer;
