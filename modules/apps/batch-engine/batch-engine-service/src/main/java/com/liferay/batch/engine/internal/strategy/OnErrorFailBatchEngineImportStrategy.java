@@ -7,6 +7,7 @@ package com.liferay.batch.engine.internal.strategy;
 
 import com.liferay.batch.engine.action.ImportTaskPostAction;
 import com.liferay.batch.engine.action.ImportTaskPreAction;
+import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
 import com.liferay.batch.engine.internal.util.ItemIndexThreadLocal;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.petra.function.UnsafeFunction;
@@ -26,6 +27,12 @@ public class OnErrorFailBatchEngineImportStrategy
 
 		super(
 			batchEngineImportTask, importTaskPostActions, importTaskPreActions);
+	}
+
+	@Override
+	public String getImportStrategyType() {
+		return BatchEngineImportTaskConstants.
+			IMPORT_STRATEGY_STRING_ON_ERROR_FAIL;
 	}
 
 	@Override

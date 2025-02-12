@@ -76,6 +76,8 @@ public abstract class BaseBatchEngineImportStrategy
 		}
 	}
 
+	public abstract String getImportStrategyType();
+
 	protected void addBatchEngineImportTaskError(
 		long companyId, long userId, long batchEngineImportTaskId, String item,
 		int itemIndex, Exception exception) {

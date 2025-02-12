@@ -19,4 +19,6 @@ public interface BatchEngineImportStrategy {
 			UnsafeFunction<T, T, Exception> unsafeFunction)
 		throws Exception;
 
+	public String getImportStrategyType();
+
 }
