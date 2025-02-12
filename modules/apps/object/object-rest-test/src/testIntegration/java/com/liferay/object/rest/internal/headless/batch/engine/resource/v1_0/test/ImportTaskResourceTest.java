@@ -6,6 +6,8 @@
 package com.liferay.object.rest.internal.headless.batch.engine.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.rest.test.util.ObjectEntryTestUtil;
 import com.liferay.petra.string.StringBundler;
@@ -14,11 +16,18 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.util.PropsValues;
 
+import java.util.Objects;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -36,31 +45,29 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
 			objectDefinition, OBJECT_FIELD_NAME_TEXT, "TestObject");
 
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			null, objectDefinition.getRESTContextPath(), Http.Method.GET);
+		int objectEntriesCount = ObjectEntryTestUtil.getObjectEntriesCount();
 
-		int totalCount = (int)jsonObject.get("totalCount");
+		ImportTaskResource importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			"test@liferay.com", PropsValues.DEFAULT_ADMIN_PASSWORD
+		).header(
+			HttpHeaders.ACCEPT, ContentTypes.APPLICATION_JSON
+		).header(
+			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON
+		).parameter(
+			"siteId", String.valueOf(TestPropsValues.getGroupId())
+		).build();
 
-		HTTPTestUtil.invokeToHttpCode(
-			JSONUtil.putAll(
-				JSONUtil.put(
-					"externalReferenceCode",
-					objectEntry.getExternalReferenceCode())
-			).toString(),
-			StringBundler.concat(
-				"headless-batch-engine/v1.0/import-task",
-				"/com.liferay.object.rest.dto.v1_0.ObjectEntry",
-				"?taskItemDelegateName=", objectDefinition.getName()),
-			Http.Method.DELETE);
-
-		JSONAssert.assertEquals(
+		String payload = JSONUtil.putAll(
 			JSONUtil.put(
-				"totalCount", totalCount - 1
-			).toString(),
-			HTTPTestUtil.invokeToJSONObject(
-				null, objectDefinition.getRESTContextPath(), Http.Method.GET
-			).toString(),
-			JSONCompareMode.LENIENT);
+				"externalReferenceCode", objectEntry.getExternalReferenceCode())
+		).toString();
+
+		_executeDeleteImportTask(importTaskResource, payload);
+
+		Assert.assertEquals(
+			ObjectEntryTestUtil.getObjectEntriesCount(),
+			objectEntriesCount - 1);
 	}
 
 	@Test
@@ -440,6 +447,32 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 				objectEntry.getExternalReferenceCode()
 			).toString(),
 			JSONCompareMode.LENIENT);
+	}
+
+	private void _executeDeleteImportTask(
+			ImportTaskResource importTaskResource, String payload)
+		throws Exception {
+
+		ImportTask importTask = importTaskResource.deleteImportTask(
+			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null, null,
+			objectDefinition.getName(), payload);
+
+		while (true) {
+			importTask =
+				importTaskResource.getImportTaskByExternalReferenceCode(
+					importTask.getExternalReferenceCode());
+
+			if (Objects.equals(
+					importTask.getExecuteStatusAsString(), "COMPLETED")) {
+
+				break;
+			}
+			else if (Objects.equals(
+						importTask.getExecuteStatusAsString(), "FAILED")) {
+
+				throw new AssertionError(importTask.getErrorMessage());
+			}
+		}
 	}
 
 	private JSONObject _getJSONObject(String externalReferenceCode)
