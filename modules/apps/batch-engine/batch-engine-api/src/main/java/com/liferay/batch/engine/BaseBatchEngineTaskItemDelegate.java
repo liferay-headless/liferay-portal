@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine;
 
+import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
 import com.liferay.batch.engine.strategy.BatchEngineImportStrategy;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -48,8 +49,23 @@ public abstract class BaseBatchEngineTaskItemDelegate<T>
 			Collection<T> items, Map<String, Serializable> parameters)
 		throws Exception {
 
+		int importStrategy = BatchEngineImportTaskConstants.getImportStrategy(
+			batchEngineImportStrategy.getImportStrategyType());
+
 		for (T item : items) {
-			deleteItem(item, parameters);
+			try {
+				deleteItem(item, parameters);
+			}
+			catch (Exception exception) {
+				if (importStrategy ==
+						BatchEngineImportTaskConstants.
+							IMPORT_STRATEGY_ON_ERROR_CONTINUE) {
+
+					continue;
+				}
+
+				throw exception;
+			}
 		}
 	}
 
