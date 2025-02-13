@@ -5,6 +5,8 @@
 
 package com.liferay.headless.delivery.internal.resource.v1_0;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
@@ -141,7 +143,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Javier Gamarra
  */
@@ -829,7 +831,8 @@ public class StructuredContentResourceImpl
 		long[] assetLinkEntryIds = _getAssetLinkEntryIds(
 			structuredContent.getRelatedContents());
 
-		ContentField[] fixedContentFields = _fixContentFieldsTypes(structuredContent.getContentFields());
+		ContentField[] fixedContentFields = _fixContentFieldsTypes(
+			structuredContent.getContentFields());
 
 		Double priority = structuredContent.getPriority();
 
@@ -916,6 +919,52 @@ public class StructuredContentResourceImpl
 					BooleanClauseOccur.MUST);
 			}
 		};
+	}
+
+	private ContentField[] _fixContentFieldsTypes(
+		ContentField[] contentFields) {
+
+		if (contentFields == null) {
+			return null;
+		}
+
+		for (ContentField contentField : contentFields) {
+
+			// Get the raw localized map (it might contain LinkedHashMap values)
+
+			Map<String, ?> rawLocalizedMap =
+				(Map<String, ?>)contentField.getContentFieldValue_i18n();
+
+			if (rawLocalizedMap != null) {
+				Map<String, ContentFieldValue> fixedMap = new HashMap<>();
+
+				for (Map.Entry<String, ?> entry : rawLocalizedMap.entrySet()) {
+					Object rawValue = entry.getValue();
+					ContentFieldValue convertedValue;
+
+					if (rawValue instanceof Map) {
+						convertedValue = _objectMapper.convertValue(
+							rawValue, ContentFieldValue.class);
+					}
+					else if (rawValue instanceof ContentFieldValue) {
+						convertedValue = (ContentFieldValue)rawValue;
+					}
+					else {
+						continue;
+					}
+
+					fixedMap.put(entry.getKey(), convertedValue);
+				}
+
+				contentField.setContentFieldValue_i18n(() -> fixedMap);
+			}
+
+			if (contentField.getNestedContentFields() != null) {
+				_fixContentFieldsTypes(contentField.getNestedContentFields());
+			}
+		}
+
+		return contentFields;
 	}
 
 	private Long[] _getAssetCategoryIds(
@@ -1486,45 +1535,6 @@ public class StructuredContentResourceImpl
 		}
 	}
 
-	private ContentField[] _fixContentFieldsTypes(ContentField[] contentFields) {
-		if (contentFields == null) {
-			return null;
-		}
-
-		for (ContentField contentField : contentFields) {
-			// Get the raw localized map (it might contain LinkedHashMap values)
-			Map<String, ?> rawLocalizedMap = (Map<String, ?>) contentField.getContentFieldValue_i18n();
-
-			if (rawLocalizedMap != null) {
-				Map<String, ContentFieldValue> fixedMap = new HashMap<>();
-
-				for (Map.Entry<String, ?> entry : rawLocalizedMap.entrySet()) {
-					Object rawValue = entry.getValue();
-					ContentFieldValue convertedValue;
-
-					if (rawValue instanceof Map) {
-						convertedValue = _objectMapper.convertValue(rawValue, ContentFieldValue.class);
-					}
-					else if (rawValue instanceof ContentFieldValue) {
-						convertedValue = (ContentFieldValue) rawValue;
-					}
-					else {
-						continue;
-					}
-
-					fixedMap.put(entry.getKey(), convertedValue);
-				}
-
-				contentField.setContentFieldValue_i18n(fixedMap);
-			}
-			if (contentField.getNestedContentFields() != null) {
-				_fixContentFieldsTypes(contentField.getNestedContentFields());
-			}
-		}
-
-		return contentFields;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		StructuredContentResourceImpl.class);
 
@@ -1548,6 +1558,7 @@ public class StructuredContentResourceImpl
 		).put(
 			"WikiPage", "com.liferay.wiki.model.WikiPage"
 		).build();
+	private static final ObjectMapper _objectMapper = new ObjectMapper();
 
 	@Reference
 	private Aggregations _aggregations;
@@ -1587,9 +1598,6 @@ public class StructuredContentResourceImpl
 
 	@Reference
 	private EntityFieldsProvider _entityFieldsProvider;
-
-	private static final ObjectMapper _objectMapper = new ObjectMapper();
-
 
 	@Reference
 	private ExpandoBridgeIndexer _expandoBridgeIndexer;

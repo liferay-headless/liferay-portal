@@ -666,25 +666,43 @@ public class StructuredContentResourceTest
 		StructuredContent randomStructuredContent1 = _randomStructuredContent(
 			locale);
 
-		String batchEndpoint = "headless-delivery/v1.0/sites/" + testGroup.getGroupId() + "/structured-contents/batch";
+		String batchEndpoint =
+			"headless-delivery/v1.0/sites/" + testGroup.getGroupId() +
+				"/structured-contents/batch";
 
 		JSONObject batchJobJSONObject = HTTPTestUtil.invokeToJSONObject(
-			createBatchBody(randomStructuredContent1.getContentStructureId()).toString() ,batchEndpoint, Http.Method.POST);
+			_createBatchBody(
+				randomStructuredContent1.getContentStructureId()
+			).toString(),
+			batchEndpoint, Http.Method.POST);
 
-		String externalReferenceCode = batchJobJSONObject.getString("externalReferenceCode");
-		Assert.assertNotNull("Batch job externalReferenceCode must be provided", externalReferenceCode);
+		String externalReferenceCode = batchJobJSONObject.getString(
+			"externalReferenceCode");
 
-		String statusEndpoint = "headless-batch-engine/v1.0/import-task/by-external-reference-code/" + externalReferenceCode;
+		Assert.assertNotNull(
+			"Batch job externalReferenceCode must be provided",
+			externalReferenceCode);
+
+		String statusEndpoint =
+			"headless-batch-engine/v1.0/import-task" +
+				"/by-external-reference-code/" + externalReferenceCode;
+
 		JSONObject batchStatusJSONObject = null;
 		int maxRetries = 20;
 		int retry = 0;
 
 		while (retry < maxRetries) {
-			batchStatusJSONObject = HTTPTestUtil.invokeToJSONObject(null, statusEndpoint, Http.Method.GET);
-			String executeStatus = batchStatusJSONObject.getString("executeStatus");
+			batchStatusJSONObject = HTTPTestUtil.invokeToJSONObject(
+				null, statusEndpoint, Http.Method.GET);
 
-			if ("COMPLETED".equals(executeStatus) || "FAILED".equals(executeStatus)) {
+			String executeStatus = batchStatusJSONObject.getString(
+				"executeStatus");
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
 				Assert.assertEquals("COMPLETED", executeStatus);
+
 				break;
 			}
 
@@ -692,71 +710,9 @@ public class StructuredContentResourceTest
 			retry++;
 		}
 
-		Assert.assertNotNull("Batch job status JSON must not be null", batchStatusJSONObject);
+		Assert.assertNotNull(
+			"Batch job status JSON must not be null", batchStatusJSONObject);
 	}
-
-
-
-
-
-	private JSONArray createBatchBody(long structureId) {
-		JSONObject contentFieldValue_i18n = JSONUtil.put(
-			"en_US", JSONUtil.put("data", "1")
-		).put(
-			"es-ES", JSONUtil.put("data", "1 Hindi")
-		);
-
-		JSONObject contentField = JSONUtil.put(
-			"contentFieldValue", JSONUtil.put("data", "1")
-		).put(
-			"contentFieldValue_i18n", contentFieldValue_i18n
-		).put(
-			"dataType", "string"
-		).put(
-			"inputControl", "text"
-		).put(
-			"label", "Text"
-		).put(
-			"name", "MyText"
-		).put(
-			"nestedContentFields", JSONFactoryUtil.createJSONArray()
-		).put(
-			"repeatable", false
-		);
-
-		JSONArray contentFields = JSONFactoryUtil.createJSONArray();
-		contentFields.put(contentField);
-
-		JSONObject title_i18n = JSONUtil.put("en_US", "Section - 2").put("es-ES", "Section - 2 Hindi");
-
-		JSONObject permission = JSONUtil.put("actionIds", JSONUtil.put("VIEW")).put("roleName", "Guest");
-		JSONArray permissions = JSONFactoryUtil.createJSONArray();
-		permissions.put(permission);
-
-		JSONObject structuredContentJSONObject = JSONUtil.put(
-			"availableLanguages", JSONUtil.put("en-US").put("es-ES")
-		).put(
-			"contentFields", contentFields
-		).put(
-			"contentStructureId", structureId
-		).put(
-			"priority", 0
-		).put(
-			"structuredContentFolderId", 0
-		).put(
-			"taxonomyCategoryIds", JSONFactoryUtil.createJSONArray()
-		).put(
-			"title", "Section - 2"
-		).put(
-			"title_i18n", title_i18n
-		).put(
-			"permissions", permissions
-		);
-
-		JSONArray batchPayloadJSONArray = JSONFactoryUtil.createJSONArray();
-		return batchPayloadJSONArray.put(structuredContentJSONObject);
-	}
-
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
@@ -951,6 +907,70 @@ public class StructuredContentResourceTest
 		).header(
 			"X-Accept-All-Languages", "true"
 		).build();
+	}
+
+	private JSONArray _createBatchBody(long structureId) {
+		JSONObject structuredContentJSONObject = JSONUtil.put(
+			"availableLanguages", JSONUtil.putAll("en-US", "es-ES")
+		).put(
+			"contentFields",
+			JSONFactoryUtil.createJSONArray(
+			).put(
+				JSONUtil.put(
+					"contentFieldValue", JSONUtil.put("data", "1")
+				).put(
+					"contentFieldValue_i18n",
+					JSONUtil.put(
+						"en_US", JSONUtil.put("data", "1")
+					).put(
+						"es-ES", JSONUtil.put("data", "1 Hindi")
+					)
+				).put(
+					"dataType", "string"
+				).put(
+					"inputControl", "text"
+				).put(
+					"label", "Text"
+				).put(
+					"name", "MyText"
+				).put(
+					"nestedContentFields", JSONFactoryUtil.createJSONArray()
+				).put(
+					"repeatable", false
+				)
+			)
+		).put(
+			"contentStructureId", structureId
+		).put(
+			"permissions",
+			JSONFactoryUtil.createJSONArray(
+			).put(
+				JSONUtil.put(
+					"actionIds", JSONUtil.put("VIEW")
+				).put(
+					"roleName", "Guest"
+				)
+			)
+		).put(
+			"priority", 0
+		).put(
+			"structuredContentFolderId", 0
+		).put(
+			"taxonomyCategoryIds", JSONFactoryUtil.createJSONArray()
+		).put(
+			"title", "Section - 2"
+		).put(
+			"title_i18n",
+			JSONUtil.put(
+				"en_US", "Section - 2"
+			).put(
+				"es-ES", "Section - 2 Hindi"
+			)
+		);
+
+		JSONArray batchPayloadJSONArray = JSONFactoryUtil.createJSONArray();
+
+		return batchPayloadJSONArray.put(structuredContentJSONObject);
 	}
 
 	private DDMForm _deserialize(String content) {
