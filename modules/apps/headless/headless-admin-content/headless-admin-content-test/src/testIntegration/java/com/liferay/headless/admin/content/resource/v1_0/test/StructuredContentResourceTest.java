@@ -660,7 +660,7 @@ public class StructuredContentResourceTest
 	}
 
 	@Test
-	public void testPostStructuredContent() throws Exception {
+	public void testPostStructuredContentWithBatch() throws Exception {
 		Locale locale = LocaleUtil.getDefault();
 
 		StructuredContent randomStructuredContent1 = _randomStructuredContent(
