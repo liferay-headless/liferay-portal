@@ -198,30 +198,46 @@ public class CustomFieldsUtil {
 
 		Object value = entry.getValue();
 
-		if (_isEmpty(entry.getValue())) {
-			value = expandoBridge.getAttributeDefault(key);
-		}
-
-		return value;
-	}
-
-	private static boolean _isEmpty(Object value) {
 		if (value == null) {
-			return true;
+			return expandoBridge.getAttributeDefault(key);
 		}
 
-		Class<?> clazz = value.getClass();
+		if (value.getClass(
+			).isArray() && (Array.getLength(value) == 0)) {
 
-		if (clazz.isArray() && (Array.getLength(value) == 0)) {
-			return true;
+			int attributeType = expandoBridge.getAttributeType(key);
+
+			for (int type : ExpandoColumnConstants.TYPES) {
+				if (_isArrayType(type) && (type == attributeType)) {
+					return new String[] {"false"};
+				}
+			}
 		}
 
 		if (value instanceof Map) {
 			Map<?, ?> map = (Map<?, ?>)value;
 
 			if (map.isEmpty()) {
-				return true;
+				return new HashMap<>();
 			}
+		}
+
+		return value;
+	}
+
+	private static boolean _isArrayType(int type) {
+		if ((type == ExpandoColumnConstants.BOOLEAN_ARRAY) ||
+			(type == ExpandoColumnConstants.DATE_ARRAY) ||
+			(type == ExpandoColumnConstants.DOUBLE_ARRAY) ||
+			(type == ExpandoColumnConstants.FLOAT_ARRAY) ||
+			(type == ExpandoColumnConstants.INTEGER_ARRAY) ||
+			(type == ExpandoColumnConstants.LONG_ARRAY) ||
+			(type == ExpandoColumnConstants.NUMBER_ARRAY) ||
+			(type == ExpandoColumnConstants.SHORT_ARRAY) ||
+			(type == ExpandoColumnConstants.STRING_ARRAY) ||
+			(type == ExpandoColumnConstants.STRING_ARRAY_LOCALIZED)) {
+
+			return true;
 		}
 
 		return false;
