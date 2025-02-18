@@ -24,8 +24,6 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Array;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 
@@ -192,57 +190,6 @@ public class CustomFieldsUtil {
 		return value;
 	}
 
-	private static Object _getValue(
-		Map.Entry<String, Serializable> entry, ExpandoBridge expandoBridge,
-		String key) {
-
-		Object value = entry.getValue();
-
-		if (value == null) {
-			return expandoBridge.getAttributeDefault(key);
-		}
-
-		if (value.getClass(
-			).isArray() && (Array.getLength(value) == 0)) {
-
-			int attributeType = expandoBridge.getAttributeType(key);
-
-			for (int type : ExpandoColumnConstants.TYPES) {
-				if (_isArrayType(type) && (type == attributeType)) {
-					return new String[] {"false"};
-				}
-			}
-		}
-
-		if (value instanceof Map) {
-			Map<?, ?> map = (Map<?, ?>)value;
-
-			if (map.isEmpty()) {
-				return new HashMap<>();
-			}
-		}
-
-		return value;
-	}
-
-	private static boolean _isArrayType(int type) {
-		if ((type == ExpandoColumnConstants.BOOLEAN_ARRAY) ||
-			(type == ExpandoColumnConstants.DATE_ARRAY) ||
-			(type == ExpandoColumnConstants.DOUBLE_ARRAY) ||
-			(type == ExpandoColumnConstants.FLOAT_ARRAY) ||
-			(type == ExpandoColumnConstants.INTEGER_ARRAY) ||
-			(type == ExpandoColumnConstants.LONG_ARRAY) ||
-			(type == ExpandoColumnConstants.NUMBER_ARRAY) ||
-			(type == ExpandoColumnConstants.SHORT_ARRAY) ||
-			(type == ExpandoColumnConstants.STRING_ARRAY) ||
-			(type == ExpandoColumnConstants.STRING_ARRAY_LOCALIZED)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private static Serializable _parseDate(String data) {
 		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -313,11 +260,15 @@ public class CustomFieldsUtil {
 							setData(
 								() -> _getValue(
 									attributeType, locale,
-									_getValue(entry, expandoBridge, key)));
+									com.liferay.portal.vulcan.dto.customfields.
+										util.CustomFieldsUtil.getValue(
+											entry, expandoBridge, key)));
 							setData_i18n(
 								() -> _getLocalizedValues(
 									acceptAllLanguages, attributeType,
-									_getValue(entry, expandoBridge, key)));
+									com.liferay.portal.vulcan.dto.customfields.
+										util.CustomFieldsUtil.getValue(
+											entry, expandoBridge, key)));
 						}
 					});
 				setDataType(
