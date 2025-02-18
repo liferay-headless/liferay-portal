@@ -566,6 +566,7 @@ components:
                     description:
                         The localized field's values.
                     type: object
+                    x-generic-map-deserializer: true
                 dataType:
                     description:
                         The field type (e.g., image, text, etc.).
