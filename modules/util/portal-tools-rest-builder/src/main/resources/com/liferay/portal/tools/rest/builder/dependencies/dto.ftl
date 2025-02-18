@@ -320,6 +320,9 @@ public <#if schema.discriminator?has_content>abstract</#if> class ${schemaName} 
 		<#if freeMarkerTool.isVersionCompatible(configYAML, 3) && propertySchema.jsonString>
 			@JsonDeserialize(using = JSONStringStdDeserializer.class)
 		</#if>
+		<#if freeMarkerTool.isVersionCompatible(configYAML, 3) && propertySchema.genericMapDeserializer>
+			@JsonDeserialize(using = GenericMapDeserializer.class)
+		</#if>
 		@JsonProperty(
 			<#if propertySchema.readOnly>
 				access = JsonProperty.Access.READ_ONLY
