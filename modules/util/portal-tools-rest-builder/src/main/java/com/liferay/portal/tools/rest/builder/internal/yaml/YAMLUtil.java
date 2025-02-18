@@ -174,6 +174,9 @@ public class YAMLUtil {
 			"x-json-map", boolean.class, "isJsonMap", "setJsonMap");
 
 		schemaTypeDescription.substituteProperty(
+			"x-generic-map-deserializer", boolean.class, "isGenericMapDeserializer", "setGenericMapDeserializer");
+
+		schemaTypeDescription.substituteProperty(
 			"x-json-string", boolean.class, "isJsonString", "setJsonString");
 
 		schemaTypeDescription.substituteProperty(

@@ -118,6 +118,10 @@ public class Schema {
 		return _jsonString;
 	}
 
+	public boolean isGenericMapDeserializer() {
+		return _genericMapDeserializer;
+	}
+
 	public boolean isMergeProperties() {
 		return _mergeProperties;
 	}
@@ -181,6 +185,11 @@ public class Schema {
 	public void setJsonString(boolean jsonString) {
 		_jsonString = jsonString;
 	}
+
+	public void setGenericMapDeserializer(boolean genericMapDeserializer) {
+		_genericMapDeserializer = genericMapDeserializer;
+	}
+
 
 	public void setMaximum(Double maximum) {
 		_maximum = maximum;
@@ -253,6 +262,7 @@ public class Schema {
 	private Items _items;
 	private boolean _jsonMap;
 	private boolean _jsonString;
+	private boolean _genericMapDeserializer;
 	private Double _maximum;
 	private Integer _maxLength;
 	private boolean _mergeProperties = true;
@@ -267,5 +277,6 @@ public class Schema {
 	private String _type;
 	private boolean _writeOnly;
 	private XML _xml;
+
 
 }
