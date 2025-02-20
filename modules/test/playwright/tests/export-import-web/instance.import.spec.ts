@@ -290,4 +290,8 @@ test('can see corresponding elements at instance level', async ({
 	await expect(
 		companyExportImportPage.page.getByText('Comments, Ratings')
 	).not.toBeVisible();
+
+	await expect(
+		companyExportImportPage.page.getByText('C_Test Change')
+	).not.toBeVisible();
 });
