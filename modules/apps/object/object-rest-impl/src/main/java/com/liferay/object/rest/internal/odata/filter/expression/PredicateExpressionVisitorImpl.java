@@ -658,13 +658,7 @@ public class PredicateExpressionVisitorImpl
 			Validator.isNotNull(right)) {
 
 			try {
-				String value = right.toString();
-
-				DateFormat dateFormat =
-					DateFormatFactoryUtil.getSimpleDateFormat(
-						ObjectFieldUtil.getDateTimePattern(value));
-
-				Date date = dateFormat.parse(value);
+				Date date = _toDate(right);
 
 				if (Objects.equals(
 						DBManagerUtil.getDBType(), DBType.POSTGRESQL)) {
@@ -802,6 +796,19 @@ public class PredicateExpressionVisitorImpl
 		return _startsWith(
 			_getColumn(fieldName, objectDefinition),
 			_getValue(fieldName, objectDefinition, fieldValue));
+	}
+
+	private Date _toDate(Object object) throws ParseException {
+		if (object instanceof Date) {
+			return (Date)object;
+		}
+
+		String value = object.toString();
+
+		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			ObjectFieldUtil.getDateTimePattern(value));
+
+		return dateFormat.parse(value);
 	}
 
 	private Predicate _visitCollectionPropertyExpression(
