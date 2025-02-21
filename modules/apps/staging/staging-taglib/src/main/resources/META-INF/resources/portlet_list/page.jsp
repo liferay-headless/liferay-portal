@@ -72,7 +72,23 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 
 		long modelDeletionCount = manifestSummary.getModelDeletionCount(portletDataHandler.getDeletionSystemEventStagedModelTypes());
 
-		boolean displayCounts = (exportModelCount > 0) || (modelDeletionCount > 0);
+		String deletionCssClass = "";
+		boolean displayCounts;
+
+		if (!stagingGroupHelper.isCompanyGroup(group)) {
+			displayCounts = (exportModelCount > 0) || (modelDeletionCount > 0);
+
+			if (!((exportModelCount > 0) || showAllPortlets)) {
+				deletionCssClass = "deletions";
+			}
+		}
+		else {
+			displayCounts = (exportModelCount >= 0) || (modelDeletionCount > 0);
+
+			if (!((exportModelCount >= 0) || showAllPortlets)) {
+				deletionCssClass = "deletions";
+			}
+		}
 
 		if (!type.equals(Constants.EXPORT)) {
 			UnicodeProperties liveGroupTypeSettingsUnicodeProperties = liveGroup.getTypeSettingsProperties();
@@ -87,28 +103,15 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 		boolean showPortletDataInput = MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + portlet.getPortletId(), portletDataHandler.isPublishToLiveByDefault()) || MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PORTLET_DATA_ALL);
 	%>
 
-		<li class="tree-item <%= ((exportModelCount > 0) || showAllPortlets) ? StringPool.BLANK : "deletions" %>">
-			<c:choose>
-				<c:when test="<%= portlet.getRootPortletId().startsWith(ObjectPortletKeys.OBJECT_DEFINITIONS) %>">
-					<liferay-staging:checkbox
-						checked="<%= showPortletDataInput %>"
-						deletions="<%= modelDeletionCount %>"
-						disabled="<%= disableInputs %>"
-						label="<%= portletTitle %>"
-						name="<%= PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + portlet.getPortletId() %>"
-					/>
-				</c:when>
-				<c:otherwise>
-					<liferay-staging:checkbox
-						checked="<%= showPortletDataInput %>"
-						deletions="<%= modelDeletionCount %>"
-						disabled="<%= disableInputs %>"
-						items="<%= exportModelCount %>"
-						label="<%= portletTitle %>"
-						name="<%= PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + portlet.getPortletId() %>"
-					/>
-				</c:otherwise>
-			</c:choose>
+		<li class="tree-item <%= deletionCssClass %>">
+			<liferay-staging:checkbox
+				checked="<%= showPortletDataInput %>"
+				deletions="<%= modelDeletionCount %>"
+				disabled="<%= disableInputs %>"
+				items="<%= exportModelCount %>"
+				label="<%= portletTitle %>"
+				name="<%= PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + portlet.getPortletId() %>"
+			/>
 
 			<%
 			String portletId = portlet.getPortletId();
