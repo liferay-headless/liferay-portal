@@ -19,14 +19,14 @@ import javax.ws.rs.core.UriInfo;
 public interface VulcanBatchEngineImportTaskResource {
 
 	public Object deleteImportTask(
-			String name, String callbackURL, Object object)
+			String name, String callbackURL, String content)
 		throws Exception;
 
 	public Object postImportTask(
-			String name, String callbackURL, String fields, Object object)
+			String name, String callbackURL, String fields, String content)
 		throws Exception;
 
-	public Object putImportTask(String name, String callbackURL, Object object)
+	public Object putImportTask(String name, String callbackURL, String content)
 		throws Exception;
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage);

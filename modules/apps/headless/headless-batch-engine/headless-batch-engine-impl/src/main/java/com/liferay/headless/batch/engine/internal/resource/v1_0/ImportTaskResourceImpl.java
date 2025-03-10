@@ -93,14 +93,14 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	@Override
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String importStrategy, String taskItemDelegateName, String content)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.DELETE, _getBytes(object),
+			BatchEngineTaskOperation.DELETE, _getBytes(content),
 			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
@@ -183,14 +183,14 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			String className, String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, String object)
+			String taskItemDelegateName, String content)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.CREATE, _getBytes(object),
+			BatchEngineTaskOperation.CREATE, _getBytes(content),
 			callbackURL, className, createStrategy,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			fieldNameMapping, importStrategy, taskItemDelegateName, null);
@@ -214,7 +214,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	public ImportTask putImportTask(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
+			String updateStrategy, String object)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
@@ -253,10 +253,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(Object object)
+	private byte[] _getBytes(String content)
 		throws Exception {
-
-			String content = (String)object;
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(

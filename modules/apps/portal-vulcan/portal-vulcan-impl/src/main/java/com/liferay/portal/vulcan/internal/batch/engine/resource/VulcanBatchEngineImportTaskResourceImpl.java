@@ -6,8 +6,14 @@
 package com.liferay.portal.vulcan.internal.batch.engine.resource;
 
 import com.liferay.headless.batch.engine.resource.v1_0.ImportTaskResource;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 
@@ -34,7 +40,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 	@Override
 	public Object deleteImportTask(
-			String name, String callbackURL, Object object)
+			String name, String callbackURL, String object)
 		throws Exception {
 
 		ImportTaskResource importTaskResource = _getImportTaskResource();
@@ -46,7 +52,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 	@Override
 	public Object postImportTask(
-			String name, String callbackURL, String fields, Object object)
+			String name, String callbackURL, String fields, String content)
 		throws Exception {
 
 		ImportTaskResource importTaskResource = _getImportTaskResource();
@@ -54,11 +60,11 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		return importTaskResource.postImportTask(
 			name, null, callbackURL, _getQueryParameterValue("createStrategy"),
 			_getExternalReferenceCode(), fields, _getImportStrategy(),
-			_getTaskItemDelegateName(), _getItemsArray(object));
+			_getTaskItemDelegateName(), _getItemsArray(content));
 	}
 
 	@Override
-	public Object putImportTask(String name, String callbackURL, Object object)
+	public Object putImportTask(String name, String callbackURL, String content)
 		throws Exception {
 
 		ImportTaskResource importTaskResource = _getImportTaskResource();
@@ -66,7 +72,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		return importTaskResource.putImportTask(
 			name, callbackURL, _getExternalReferenceCode(),
 			_getImportStrategy(), _getTaskItemDelegateName(),
-			_getQueryParameterValue("updateStrategy"), object);
+			_getQueryParameterValue("updateStrategy"), content);
 	}
 
 	@Override
@@ -122,14 +128,21 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		).build();
 	}
 
-	private Object _getItemsArray(Object object) {
-		if (!(object instanceof Map)) {
-			return object;
+	private String _getItemsArray(String jsonString) {
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
+
+			if (jsonObject.has("items")) {
+				return jsonObject.get("items").toString();
+			}
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse JSON string", jsonException);
+			}
 		}
 
-		Map<?, ?> map = (Map)object;
-
-		return map.get("items");
+		return jsonString;
 	}
 
 	private String _getQueryParameterValue(String queryParameterName) {
@@ -170,5 +183,8 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private User _contextUser;
 	private final ImportTaskResource.Factory _factory;
 	private String _taskItemDelegateName;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		VulcanBatchEngineImportTaskResourceImpl.class);
 
 }
