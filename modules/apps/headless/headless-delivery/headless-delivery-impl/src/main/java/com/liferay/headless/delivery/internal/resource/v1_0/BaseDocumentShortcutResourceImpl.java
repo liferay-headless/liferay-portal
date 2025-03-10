@@ -1016,9 +1016,14 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 		UnsafeFunction<DocumentShortcut, DocumentShortcut, Exception>
 			documentShortcutUnsafeFunction = documentShortcut -> {
-				deleteDocumentShortcut(documentShortcut.getId());
+				if (documentShortcut.getId() != null) {
+					deleteDocumentShortcut(documentShortcut.getId());
 
-				return documentShortcut;
+					return documentShortcut;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete documentShortcut. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

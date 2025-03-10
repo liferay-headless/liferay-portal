@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -288,6 +290,59 @@ public abstract class BaseExperimentResourceTestCase {
 		throws Exception {
 
 		return testGraphQLExperiment_addExperiment();
+	}
+
+	@Test
+	public void testDeleteExperimentBatch() throws Exception {
+		Experiment experiment1 = testDeleteExperimentBatch_addExperiment();
+
+		testDeleteExperimentBatch_deleteExperiment(
+			"COMPLETED", experiment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			experimentResource.getExperimentHttpResponse(experiment1.getId()));
+	}
+
+	protected Experiment testDeleteExperimentBatch_addExperiment()
+		throws Exception {
+
+		return testDeleteExperiment_addExperiment();
+	}
+
+	protected void testDeleteExperimentBatch_deleteExperiment(
+			String expectedExecuteStatus, String experimentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", experimentId
+		).build();
+		HttpInvoker.HttpResponse response =
+			experimentResource.deleteExperimentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1364,5 +1419,9 @@ public abstract class BaseExperimentResourceTestCase {
 	@Inject
 	private com.liferay.segments.asah.rest.resource.v1_0.ExperimentResource
 		_experimentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 }

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1022,6 +1024,62 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLObjectDefinition_addObjectDefinition();
+	}
+
+	@Test
+	public void testDeleteObjectDefinitionBatch() throws Exception {
+		ObjectDefinition objectDefinition1 =
+			testDeleteObjectDefinitionBatch_addObjectDefinition();
+
+		testDeleteObjectDefinitionBatch_deleteObjectDefinition(
+			"COMPLETED", objectDefinition1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectDefinitionResource.getObjectDefinitionHttpResponse(
+				objectDefinition1.getId()));
+	}
+
+	protected ObjectDefinition
+			testDeleteObjectDefinitionBatch_addObjectDefinition()
+		throws Exception {
+
+		return testDeleteObjectDefinition_addObjectDefinition();
+	}
+
+	protected void testDeleteObjectDefinitionBatch_deleteObjectDefinition(
+			String expectedExecuteStatus, Long objectDefinitionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", objectDefinitionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			objectDefinitionResource.deleteObjectDefinitionBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3702,6 +3760,10 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 	@Inject
 	private com.liferay.object.admin.rest.resource.v1_0.ObjectDefinitionResource
 		_objectDefinitionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

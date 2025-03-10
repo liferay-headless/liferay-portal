@@ -465,9 +465,14 @@ public abstract class BaseDiscountRuleResourceImpl
 
 		UnsafeFunction<DiscountRule, DiscountRule, Exception>
 			discountRuleUnsafeFunction = discountRule -> {
-				deleteDiscountRule(discountRule.getId());
+				if (discountRule.getId() != null) {
+					deleteDiscountRule(discountRule.getId());
 
-				return discountRule;
+					return discountRule;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountRule. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

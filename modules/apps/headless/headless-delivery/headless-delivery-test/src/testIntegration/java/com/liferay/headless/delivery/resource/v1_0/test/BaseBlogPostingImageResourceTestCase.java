@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.BlogPostingImage;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -333,6 +335,62 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 		throws Exception {
 
 		return testGraphQLBlogPostingImage_addBlogPostingImage();
+	}
+
+	@Test
+	public void testDeleteBlogPostingImageBatch() throws Exception {
+		BlogPostingImage blogPostingImage1 =
+			testDeleteBlogPostingImageBatch_addBlogPostingImage();
+
+		testDeleteBlogPostingImageBatch_deleteBlogPostingImage(
+			"COMPLETED", blogPostingImage1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			blogPostingImageResource.getBlogPostingImageHttpResponse(
+				blogPostingImage1.getId()));
+	}
+
+	protected BlogPostingImage
+			testDeleteBlogPostingImageBatch_addBlogPostingImage()
+		throws Exception {
+
+		return testDeleteBlogPostingImage_addBlogPostingImage();
+	}
+
+	protected void testDeleteBlogPostingImageBatch_deleteBlogPostingImage(
+			String expectedExecuteStatus, Long blogPostingImageId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", blogPostingImageId
+		).build();
+		HttpInvoker.HttpResponse response =
+			blogPostingImageResource.deleteBlogPostingImageBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2606,6 +2664,10 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.BlogPostingImageResource
 		_blogPostingImageResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.channel.client.dto.v1_0.Channel;
 import com.liferay.headless.commerce.admin.channel.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.channel.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1083,6 +1085,84 @@ public abstract class BaseChannelResourceTestCase {
 
 	protected Channel testGraphQLDeleteChannel_addChannel() throws Exception {
 		return testGraphQLChannel_addChannel();
+	}
+
+	@Test
+	public void testDeleteChannelBatch() throws Exception {
+		Channel channel1 = testDeleteChannelBatch_addChannel();
+
+		testDeleteChannelBatch_deleteChannel(
+			"COMPLETED", null, channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+
+		Channel channel2 = testDeleteChannelBatch_addChannel();
+
+		testDeleteChannelBatch_deleteChannel(
+			"COMPLETED", channel2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel2.getId()));
+
+		channel1 = testDeleteChannelBatch_addChannel();
+		channel2 = testDeleteChannelBatch_addChannel();
+
+		testDeleteChannelBatch_deleteChannel(
+			"COMPLETED", channel2.getExternalReferenceCode(), channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, channelResource.getChannelHttpResponse(channel2.getId()));
+
+		testDeleteChannelBatch_deleteChannel(
+			"COMPLETED", channel2.getExternalReferenceCode(), channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel2.getId()));
+	}
+
+	protected Channel testDeleteChannelBatch_addChannel() throws Exception {
+		return testDeleteChannel_addChannel();
+	}
+
+	protected void testDeleteChannelBatch_deleteChannel(
+			String expectedExecuteStatus, String channelERC, Long channelId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", channelId
+		).<String, Object>put(
+			"externalReferenceCode", channelERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			channelResource.deleteChannelBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2496,6 +2576,10 @@ public abstract class BaseChannelResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.channel.resource.v1_0.
 			ChannelResource _channelResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserGroup;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1096,6 +1098,93 @@ public abstract class BaseUserGroupResourceTestCase {
 		throws Exception {
 
 		return testGraphQLUserGroup_addUserGroup();
+	}
+
+	@Test
+	public void testDeleteUserGroupBatch() throws Exception {
+		UserGroup userGroup1 = testDeleteUserGroupBatch_addUserGroup();
+
+		testDeleteUserGroupBatch_deleteUserGroup(
+			"COMPLETED", null, userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
+
+		UserGroup userGroup2 = testDeleteUserGroupBatch_addUserGroup();
+
+		testDeleteUserGroupBatch_deleteUserGroup(
+			"COMPLETED", userGroup2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+
+		userGroup1 = testDeleteUserGroupBatch_addUserGroup();
+		userGroup2 = testDeleteUserGroupBatch_addUserGroup();
+
+		testDeleteUserGroupBatch_deleteUserGroup(
+			"COMPLETED", userGroup2.getExternalReferenceCode(),
+			userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+
+		testDeleteUserGroupBatch_deleteUserGroup(
+			"COMPLETED", userGroup2.getExternalReferenceCode(),
+			userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+	}
+
+	protected UserGroup testDeleteUserGroupBatch_addUserGroup()
+		throws Exception {
+
+		return testDeleteUserGroup_addUserGroup();
+	}
+
+	protected void testDeleteUserGroupBatch_deleteUserGroup(
+			String expectedExecuteStatus, String userGroupERC, Long userGroupId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", userGroupId
+		).<String, Object>put(
+			"externalReferenceCode", userGroupERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			userGroupResource.deleteUserGroupBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2514,6 +2603,10 @@ public abstract class BaseUserGroupResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.UserGroupResource
 		_userGroupResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

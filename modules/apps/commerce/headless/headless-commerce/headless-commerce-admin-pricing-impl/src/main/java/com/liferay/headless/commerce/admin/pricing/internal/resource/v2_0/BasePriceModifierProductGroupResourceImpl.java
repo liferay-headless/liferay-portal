@@ -448,11 +448,18 @@ public abstract class BasePriceModifierProductGroupResourceImpl
 			<PriceModifierProductGroup, PriceModifierProductGroup, Exception>
 				priceModifierProductGroupUnsafeFunction =
 					priceModifierProductGroup -> {
-						deletePriceModifierProductGroup(
-							priceModifierProductGroup.
-								getPriceModifierProductGroupId());
+						if (priceModifierProductGroup.
+								getPriceModifierProductGroupId() != null) {
 
-						return priceModifierProductGroup;
+							deletePriceModifierProductGroup(
+								priceModifierProductGroup.
+									getPriceModifierProductGroupId());
+
+							return priceModifierProductGroup;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete priceModifierProductGroup. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

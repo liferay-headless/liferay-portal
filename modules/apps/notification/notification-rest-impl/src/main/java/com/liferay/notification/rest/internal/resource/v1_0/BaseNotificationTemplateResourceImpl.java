@@ -807,9 +807,14 @@ public abstract class BaseNotificationTemplateResourceImpl
 
 		UnsafeFunction<NotificationTemplate, NotificationTemplate, Exception>
 			notificationTemplateUnsafeFunction = notificationTemplate -> {
-				deleteNotificationTemplate(notificationTemplate.getId());
+				if (notificationTemplate.getId() != null) {
+					deleteNotificationTemplate(notificationTemplate.getId());
 
-				return notificationTemplate;
+					return notificationTemplate;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete notificationTemplate. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

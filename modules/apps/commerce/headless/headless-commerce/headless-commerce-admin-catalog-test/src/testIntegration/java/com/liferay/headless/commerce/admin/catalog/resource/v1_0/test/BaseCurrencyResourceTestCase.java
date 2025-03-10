@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Currency;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -911,6 +913,86 @@ public abstract class BaseCurrencyResourceTestCase {
 		throws Exception {
 
 		return testGraphQLCurrency_addCurrency();
+	}
+
+	@Test
+	public void testDeleteCurrencyBatch() throws Exception {
+		Currency currency1 = testDeleteCurrencyBatch_addCurrency();
+
+		testDeleteCurrencyBatch_deleteCurrency(
+			"COMPLETED", null, currency1.getId());
+
+		assertHttpResponseStatusCode(
+			404, currencyResource.getCurrencyHttpResponse(currency1.getId()));
+
+		Currency currency2 = testDeleteCurrencyBatch_addCurrency();
+
+		testDeleteCurrencyBatch_deleteCurrency(
+			"COMPLETED", currency2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, currencyResource.getCurrencyHttpResponse(currency2.getId()));
+
+		currency1 = testDeleteCurrencyBatch_addCurrency();
+		currency2 = testDeleteCurrencyBatch_addCurrency();
+
+		testDeleteCurrencyBatch_deleteCurrency(
+			"COMPLETED", currency2.getExternalReferenceCode(),
+			currency1.getId());
+
+		assertHttpResponseStatusCode(
+			404, currencyResource.getCurrencyHttpResponse(currency1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, currencyResource.getCurrencyHttpResponse(currency2.getId()));
+
+		testDeleteCurrencyBatch_deleteCurrency(
+			"COMPLETED", currency2.getExternalReferenceCode(),
+			currency1.getId());
+
+		assertHttpResponseStatusCode(
+			404, currencyResource.getCurrencyHttpResponse(currency2.getId()));
+	}
+
+	protected Currency testDeleteCurrencyBatch_addCurrency() throws Exception {
+		return testDeleteCurrency_addCurrency();
+	}
+
+	protected void testDeleteCurrencyBatch_deleteCurrency(
+			String expectedExecuteStatus, String currencyERC, Long currencyId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", currencyId
+		).<String, Object>put(
+			"externalReferenceCode", currencyERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			currencyResource.deleteCurrencyBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2249,6 +2331,10 @@ public abstract class BaseCurrencyResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 			CurrencyResource _currencyResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

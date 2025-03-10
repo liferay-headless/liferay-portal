@@ -690,9 +690,14 @@ public abstract class BaseCountryResourceImpl
 
 		UnsafeFunction<Country, Country, Exception> countryUnsafeFunction =
 			country -> {
-				deleteCountry(country.getId());
+				if (country.getId() != null) {
+					deleteCountry(country.getId());
 
-				return country;
+					return country;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete country. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -502,9 +502,14 @@ public abstract class BaseSLAResourceImpl
 		throws Exception {
 
 		UnsafeFunction<SLA, SLA, Exception> slaUnsafeFunction = sla -> {
-			deleteSLA(sla.getId());
+			if (sla.getId() != null) {
+				deleteSLA(sla.getId());
 
-			return sla;
+				return sla;
+			}
+
+			throw new UnsupportedOperationException(
+				"Unable to delete sla. No valid identifier provided.");
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {

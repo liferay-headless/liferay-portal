@@ -502,10 +502,15 @@ public abstract class BaseAccountChannelShippingOptionResourceImpl
 			<AccountChannelShippingOption, AccountChannelShippingOption,
 			 Exception> accountChannelShippingOptionUnsafeFunction =
 				accountChannelShippingOption -> {
-					deleteAccountChannelShippingOption(
-						accountChannelShippingOption.getId());
+					if (accountChannelShippingOption.getId() != null) {
+						deleteAccountChannelShippingOption(
+							accountChannelShippingOption.getId());
 
-					return accountChannelShippingOption;
+						return accountChannelShippingOption;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete accountChannelShippingOption. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -419,10 +419,15 @@ public abstract class BaseWarehouseChannelResourceImpl
 
 		UnsafeFunction<WarehouseChannel, WarehouseChannel, Exception>
 			warehouseChannelUnsafeFunction = warehouseChannel -> {
-				deleteWarehouseChannel(
-					warehouseChannel.getWarehouseChannelId());
+				if (warehouseChannel.getWarehouseChannelId() != null) {
+					deleteWarehouseChannel(
+						warehouseChannel.getWarehouseChannelId());
 
-				return warehouseChannel;
+					return warehouseChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete warehouseChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.site.setting.client.dto.v1_0.MeasurementUnit;
 import com.liferay.headless.commerce.admin.site.setting.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.site.setting.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1531,6 +1533,102 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteMeasurementUnitBatch() throws Exception {
+		MeasurementUnit measurementUnit1 =
+			testDeleteMeasurementUnitBatch_addMeasurementUnit();
+
+		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
+			"COMPLETED", null, measurementUnit1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			measurementUnitResource.getMeasurementUnitHttpResponse(
+				measurementUnit1.getId()));
+
+		MeasurementUnit measurementUnit2 =
+			testDeleteMeasurementUnitBatch_addMeasurementUnit();
+
+		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
+			"COMPLETED", measurementUnit2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			measurementUnitResource.getMeasurementUnitHttpResponse(
+				measurementUnit2.getId()));
+
+		measurementUnit1 = testDeleteMeasurementUnitBatch_addMeasurementUnit();
+		measurementUnit2 = testDeleteMeasurementUnitBatch_addMeasurementUnit();
+
+		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
+			"COMPLETED", measurementUnit2.getExternalReferenceCode(),
+			measurementUnit1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			measurementUnitResource.getMeasurementUnitHttpResponse(
+				measurementUnit1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			measurementUnitResource.getMeasurementUnitHttpResponse(
+				measurementUnit2.getId()));
+
+		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
+			"COMPLETED", measurementUnit2.getExternalReferenceCode(),
+			measurementUnit1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			measurementUnitResource.getMeasurementUnitHttpResponse(
+				measurementUnit2.getId()));
+	}
+
+	protected MeasurementUnit
+			testDeleteMeasurementUnitBatch_addMeasurementUnit()
+		throws Exception {
+
+		return testDeleteMeasurementUnit_addMeasurementUnit();
+	}
+
+	protected void testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
+			String expectedExecuteStatus, String measurementUnitERC,
+			Long measurementUnitId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", measurementUnitId
+		).<String, Object>put(
+			"externalReferenceCode", measurementUnitERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			measurementUnitResource.deleteMeasurementUnitBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
+	}
+
+	@Test
 	public void testGetMeasurementUnit() throws Exception {
 		MeasurementUnit postMeasurementUnit =
 			testGetMeasurementUnit_addMeasurementUnit();
@@ -2776,6 +2874,10 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.site.setting.resource.v1_0.
 		MeasurementUnitResource _measurementUnitResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

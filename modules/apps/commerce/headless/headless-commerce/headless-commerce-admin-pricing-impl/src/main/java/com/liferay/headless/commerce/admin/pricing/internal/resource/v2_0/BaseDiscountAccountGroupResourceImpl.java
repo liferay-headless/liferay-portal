@@ -435,10 +435,15 @@ public abstract class BaseDiscountAccountGroupResourceImpl
 
 		UnsafeFunction<DiscountAccountGroup, DiscountAccountGroup, Exception>
 			discountAccountGroupUnsafeFunction = discountAccountGroup -> {
-				deleteDiscountAccountGroup(
-					discountAccountGroup.getDiscountAccountGroupId());
+				if (discountAccountGroup.getDiscountAccountGroupId() != null) {
+					deleteDiscountAccountGroup(
+						discountAccountGroup.getDiscountAccountGroupId());
 
-				return discountAccountGroup;
+					return discountAccountGroup;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountAccountGroup. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

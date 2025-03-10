@@ -553,9 +553,14 @@ public abstract class BaseDataListViewResourceImpl
 
 		UnsafeFunction<DataListView, DataListView, Exception>
 			dataListViewUnsafeFunction = dataListView -> {
-				deleteDataListView(dataListView.getId());
+				if (dataListView.getId() != null) {
+					deleteDataListView(dataListView.getId());
 
-				return dataListView;
+					return dataListView;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete dataListView. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -634,9 +634,14 @@ public abstract class BaseDataLayoutResourceImpl
 
 		UnsafeFunction<DataLayout, DataLayout, Exception>
 			dataLayoutUnsafeFunction = dataLayout -> {
-				deleteDataLayout(dataLayout.getId());
+				if (dataLayout.getId() != null) {
+					deleteDataLayout(dataLayout.getId());
 
-				return dataLayout;
+					return dataLayout;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete dataLayout. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

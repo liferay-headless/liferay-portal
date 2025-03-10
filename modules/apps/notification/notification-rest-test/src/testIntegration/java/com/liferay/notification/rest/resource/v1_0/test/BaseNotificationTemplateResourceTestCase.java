@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.notification.rest.client.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.client.http.HttpInvoker;
 import com.liferay.notification.rest.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1058,6 +1060,64 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 		throws Exception {
 
 		return testGraphQLNotificationTemplate_addNotificationTemplate();
+	}
+
+	@Test
+	public void testDeleteNotificationTemplateBatch() throws Exception {
+		NotificationTemplate notificationTemplate1 =
+			testDeleteNotificationTemplateBatch_addNotificationTemplate();
+
+		testDeleteNotificationTemplateBatch_deleteNotificationTemplate(
+			"COMPLETED", notificationTemplate1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			notificationTemplateResource.getNotificationTemplateHttpResponse(
+				notificationTemplate1.getId()));
+	}
+
+	protected NotificationTemplate
+			testDeleteNotificationTemplateBatch_addNotificationTemplate()
+		throws Exception {
+
+		return testDeleteNotificationTemplate_addNotificationTemplate();
+	}
+
+	protected void
+			testDeleteNotificationTemplateBatch_deleteNotificationTemplate(
+				String expectedExecuteStatus, Long notificationTemplateId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", notificationTemplateId
+		).build();
+		HttpInvoker.HttpResponse response =
+			notificationTemplateResource.
+				deleteNotificationTemplateBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2930,6 +2990,10 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 	private
 		com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource
 			_notificationTemplateResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

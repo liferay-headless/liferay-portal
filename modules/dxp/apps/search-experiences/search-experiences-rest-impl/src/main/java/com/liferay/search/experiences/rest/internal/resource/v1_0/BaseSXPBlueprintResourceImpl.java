@@ -751,9 +751,14 @@ public abstract class BaseSXPBlueprintResourceImpl
 
 		UnsafeFunction<SXPBlueprint, SXPBlueprint, Exception>
 			sxpBlueprintUnsafeFunction = sxpBlueprint -> {
-				deleteSXPBlueprint(sxpBlueprint.getId());
+				if (sxpBlueprint.getId() != null) {
+					deleteSXPBlueprint(sxpBlueprint.getId());
 
-				return sxpBlueprint;
+					return sxpBlueprint;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete sxpBlueprint. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

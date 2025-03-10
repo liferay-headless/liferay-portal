@@ -813,10 +813,15 @@ public abstract class BaseDocumentDataDefinitionTypeResourceImpl
 			<DocumentDataDefinitionType, DocumentDataDefinitionType, Exception>
 				documentDataDefinitionTypeUnsafeFunction =
 					documentDataDefinitionType -> {
-						deleteDocumentDataDefinitionType(
-							documentDataDefinitionType.getId());
+						if (documentDataDefinitionType.getId() != null) {
+							deleteDocumentDataDefinitionType(
+								documentDataDefinitionType.getId());
 
-						return documentDataDefinitionType;
+							return documentDataDefinitionType;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete documentDataDefinitionType. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

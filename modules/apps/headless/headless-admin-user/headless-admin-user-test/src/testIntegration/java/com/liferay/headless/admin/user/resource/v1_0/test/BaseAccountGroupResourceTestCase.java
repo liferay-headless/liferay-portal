@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.AccountGroup;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1081,6 +1083,101 @@ public abstract class BaseAccountGroupResourceTestCase {
 		throws Exception {
 
 		return testGraphQLAccountGroup_addAccountGroup();
+	}
+
+	@Test
+	public void testDeleteAccountGroupBatch() throws Exception {
+		AccountGroup accountGroup1 =
+			testDeleteAccountGroupBatch_addAccountGroup();
+
+		testDeleteAccountGroupBatch_deleteAccountGroup(
+			"COMPLETED", null, accountGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountGroupResource.getAccountGroupHttpResponse(
+				accountGroup1.getId()));
+
+		AccountGroup accountGroup2 =
+			testDeleteAccountGroupBatch_addAccountGroup();
+
+		testDeleteAccountGroupBatch_deleteAccountGroup(
+			"COMPLETED", accountGroup2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			accountGroupResource.getAccountGroupHttpResponse(
+				accountGroup2.getId()));
+
+		accountGroup1 = testDeleteAccountGroupBatch_addAccountGroup();
+		accountGroup2 = testDeleteAccountGroupBatch_addAccountGroup();
+
+		testDeleteAccountGroupBatch_deleteAccountGroup(
+			"COMPLETED", accountGroup2.getExternalReferenceCode(),
+			accountGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountGroupResource.getAccountGroupHttpResponse(
+				accountGroup1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			accountGroupResource.getAccountGroupHttpResponse(
+				accountGroup2.getId()));
+
+		testDeleteAccountGroupBatch_deleteAccountGroup(
+			"COMPLETED", accountGroup2.getExternalReferenceCode(),
+			accountGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountGroupResource.getAccountGroupHttpResponse(
+				accountGroup2.getId()));
+	}
+
+	protected AccountGroup testDeleteAccountGroupBatch_addAccountGroup()
+		throws Exception {
+
+		return testDeleteAccountGroup_addAccountGroup();
+	}
+
+	protected void testDeleteAccountGroupBatch_deleteAccountGroup(
+			String expectedExecuteStatus, String accountGroupERC,
+			Long accountGroupId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", accountGroupId
+		).<String, Object>put(
+			"externalReferenceCode", accountGroupERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			accountGroupResource.deleteAccountGroupBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2832,6 +2929,10 @@ public abstract class BaseAccountGroupResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.AccountGroupResource
 		_accountGroupResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

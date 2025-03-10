@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardSection;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -330,6 +332,63 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLMessageBoardSection_addMessageBoardSection();
+	}
+
+	@Test
+	public void testDeleteMessageBoardSectionBatch() throws Exception {
+		MessageBoardSection messageBoardSection1 =
+			testDeleteMessageBoardSectionBatch_addMessageBoardSection();
+
+		testDeleteMessageBoardSectionBatch_deleteMessageBoardSection(
+			"COMPLETED", messageBoardSection1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			messageBoardSectionResource.getMessageBoardSectionHttpResponse(
+				messageBoardSection1.getId()));
+	}
+
+	protected MessageBoardSection
+			testDeleteMessageBoardSectionBatch_addMessageBoardSection()
+		throws Exception {
+
+		return testDeleteMessageBoardSection_addMessageBoardSection();
+	}
+
+	protected void testDeleteMessageBoardSectionBatch_deleteMessageBoardSection(
+			String expectedExecuteStatus, Long messageBoardSectionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", messageBoardSectionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			messageBoardSectionResource.
+				deleteMessageBoardSectionBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3443,6 +3502,10 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.MessageBoardSectionResource
 			_messageBoardSectionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

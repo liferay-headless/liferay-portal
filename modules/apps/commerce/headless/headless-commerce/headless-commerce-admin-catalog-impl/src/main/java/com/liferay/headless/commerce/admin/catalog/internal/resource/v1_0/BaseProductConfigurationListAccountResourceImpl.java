@@ -460,11 +460,18 @@ public abstract class BaseProductConfigurationListAccountResourceImpl
 			<ProductConfigurationListAccount, ProductConfigurationListAccount,
 			 Exception> productConfigurationListAccountUnsafeFunction =
 				productConfigurationListAccount -> {
-					deleteProductConfigurationListAccount(
-						productConfigurationListAccount.
-							getProductConfigurationListAccountId());
+					if (productConfigurationListAccount.
+							getProductConfigurationListAccountId() != null) {
 
-					return productConfigurationListAccount;
+						deleteProductConfigurationListAccount(
+							productConfigurationListAccount.
+								getProductConfigurationListAccountId());
+
+						return productConfigurationListAccount;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete productConfigurationListAccount. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

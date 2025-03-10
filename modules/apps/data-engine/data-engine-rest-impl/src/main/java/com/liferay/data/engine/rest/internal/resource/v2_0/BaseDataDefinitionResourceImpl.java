@@ -991,9 +991,14 @@ public abstract class BaseDataDefinitionResourceImpl
 
 		UnsafeFunction<DataDefinition, DataDefinition, Exception>
 			dataDefinitionUnsafeFunction = dataDefinition -> {
-				deleteDataDefinition(dataDefinition.getId());
+				if (dataDefinition.getId() != null) {
+					deleteDataDefinition(dataDefinition.getId());
 
-				return dataDefinition;
+					return dataDefinition;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete dataDefinition. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -335,10 +335,15 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceImpl
 			<SkuVirtualSettingsFileEntry, SkuVirtualSettingsFileEntry,
 			 Exception> skuVirtualSettingsFileEntryUnsafeFunction =
 				skuVirtualSettingsFileEntry -> {
-					deleteSkuVirtualSettingsFileEntry(
-						skuVirtualSettingsFileEntry.getId());
+					if (skuVirtualSettingsFileEntry.getId() != null) {
+						deleteSkuVirtualSettingsFileEntry(
+							skuVirtualSettingsFileEntry.getId());
 
-					return skuVirtualSettingsFileEntry;
+						return skuVirtualSettingsFileEntry;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete skuVirtualSettingsFileEntry. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

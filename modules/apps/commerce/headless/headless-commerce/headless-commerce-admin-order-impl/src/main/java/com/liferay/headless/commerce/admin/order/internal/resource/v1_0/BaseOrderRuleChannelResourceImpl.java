@@ -418,10 +418,15 @@ public abstract class BaseOrderRuleChannelResourceImpl
 
 		UnsafeFunction<OrderRuleChannel, OrderRuleChannel, Exception>
 			orderRuleChannelUnsafeFunction = orderRuleChannel -> {
-				deleteOrderRuleChannel(
-					orderRuleChannel.getOrderRuleChannelId());
+				if (orderRuleChannel.getOrderRuleChannelId() != null) {
+					deleteOrderRuleChannel(
+						orderRuleChannel.getOrderRuleChannelId());
 
-				return orderRuleChannel;
+					return orderRuleChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete orderRuleChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -2018,9 +2018,14 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 		UnsafeFunction<KnowledgeBaseArticle, KnowledgeBaseArticle, Exception>
 			knowledgeBaseArticleUnsafeFunction = knowledgeBaseArticle -> {
-				deleteKnowledgeBaseArticle(knowledgeBaseArticle.getId());
+				if (knowledgeBaseArticle.getId() != null) {
+					deleteKnowledgeBaseArticle(knowledgeBaseArticle.getId());
 
-				return knowledgeBaseArticle;
+					return knowledgeBaseArticle;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete knowledgeBaseArticle. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

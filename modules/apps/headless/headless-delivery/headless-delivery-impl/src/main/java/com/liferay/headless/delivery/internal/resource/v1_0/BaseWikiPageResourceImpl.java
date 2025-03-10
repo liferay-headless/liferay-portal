@@ -1033,9 +1033,14 @@ public abstract class BaseWikiPageResourceImpl
 
 		UnsafeFunction<WikiPage, WikiPage, Exception> wikiPageUnsafeFunction =
 			wikiPage -> {
-				deleteWikiPage(wikiPage.getId());
+				if (wikiPage.getId() != null) {
+					deleteWikiPage(wikiPage.getId());
 
-				return wikiPage;
+					return wikiPage;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete wikiPage. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

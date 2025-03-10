@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Comment;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -723,6 +725,55 @@ public abstract class BaseCommentResourceTestCase {
 
 	protected Comment testGraphQLDeleteComment_addComment() throws Exception {
 		return testGraphQLComment_addComment();
+	}
+
+	@Test
+	public void testDeleteCommentBatch() throws Exception {
+		Comment comment1 = testDeleteCommentBatch_addComment();
+
+		testDeleteCommentBatch_deleteComment("COMPLETED", comment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, commentResource.getCommentHttpResponse(comment1.getId()));
+	}
+
+	protected Comment testDeleteCommentBatch_addComment() throws Exception {
+		return testDeleteComment_addComment();
+	}
+
+	protected void testDeleteCommentBatch_deleteComment(
+			String expectedExecuteStatus, Long commentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", commentId
+		).build();
+		HttpInvoker.HttpResponse response =
+			commentResource.deleteCommentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -4612,6 +4663,10 @@ public abstract class BaseCommentResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.CommentResource
 		_commentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

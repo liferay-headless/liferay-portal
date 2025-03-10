@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.TierPrice;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -892,6 +894,93 @@ public abstract class BaseTierPriceResourceTestCase {
 		throws Exception {
 
 		return testGraphQLTierPrice_addTierPrice();
+	}
+
+	@Test
+	public void testDeleteTierPriceBatch() throws Exception {
+		TierPrice tierPrice1 = testDeleteTierPriceBatch_addTierPrice();
+
+		testDeleteTierPriceBatch_deleteTierPrice(
+			"COMPLETED", null, tierPrice1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			tierPriceResource.getTierPriceHttpResponse(tierPrice1.getId()));
+
+		TierPrice tierPrice2 = testDeleteTierPriceBatch_addTierPrice();
+
+		testDeleteTierPriceBatch_deleteTierPrice(
+			"COMPLETED", tierPrice2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			tierPriceResource.getTierPriceHttpResponse(tierPrice2.getId()));
+
+		tierPrice1 = testDeleteTierPriceBatch_addTierPrice();
+		tierPrice2 = testDeleteTierPriceBatch_addTierPrice();
+
+		testDeleteTierPriceBatch_deleteTierPrice(
+			"COMPLETED", tierPrice2.getExternalReferenceCode(),
+			tierPrice1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			tierPriceResource.getTierPriceHttpResponse(tierPrice1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			tierPriceResource.getTierPriceHttpResponse(tierPrice2.getId()));
+
+		testDeleteTierPriceBatch_deleteTierPrice(
+			"COMPLETED", tierPrice2.getExternalReferenceCode(),
+			tierPrice1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			tierPriceResource.getTierPriceHttpResponse(tierPrice2.getId()));
+	}
+
+	protected TierPrice testDeleteTierPriceBatch_addTierPrice()
+		throws Exception {
+
+		return testDeleteTierPrice_addTierPrice();
+	}
+
+	protected void testDeleteTierPriceBatch_deleteTierPrice(
+			String expectedExecuteStatus, String tierPriceERC, Long tierPriceId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", tierPriceId
+		).<String, Object>put(
+			"externalReferenceCode", tierPriceERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			tierPriceResource.deleteTierPriceBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2455,6 +2544,10 @@ public abstract class BaseTierPriceResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.pricing.resource.v2_0.
 			TierPriceResource _tierPriceResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

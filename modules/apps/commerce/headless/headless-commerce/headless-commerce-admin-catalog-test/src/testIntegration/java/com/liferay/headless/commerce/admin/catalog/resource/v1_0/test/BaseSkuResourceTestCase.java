@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Sku;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1251,6 +1253,83 @@ public abstract class BaseSkuResourceTestCase {
 
 	protected Sku testGraphQLDeleteSku_addSku() throws Exception {
 		return testGraphQLSku_addSku();
+	}
+
+	@Test
+	public void testDeleteSkuBatch() throws Exception {
+		Sku sku1 = testDeleteSkuBatch_addSku();
+
+		testDeleteSkuBatch_deleteSku("COMPLETED", null, sku1.getId());
+
+		assertHttpResponseStatusCode(
+			404, skuResource.getSkuHttpResponse(sku1.getId()));
+
+		Sku sku2 = testDeleteSkuBatch_addSku();
+
+		testDeleteSkuBatch_deleteSku(
+			"COMPLETED", sku2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, skuResource.getSkuHttpResponse(sku2.getId()));
+
+		sku1 = testDeleteSkuBatch_addSku();
+		sku2 = testDeleteSkuBatch_addSku();
+
+		testDeleteSkuBatch_deleteSku(
+			"COMPLETED", sku2.getExternalReferenceCode(), sku1.getId());
+
+		assertHttpResponseStatusCode(
+			404, skuResource.getSkuHttpResponse(sku1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, skuResource.getSkuHttpResponse(sku2.getId()));
+
+		testDeleteSkuBatch_deleteSku(
+			"COMPLETED", sku2.getExternalReferenceCode(), sku1.getId());
+
+		assertHttpResponseStatusCode(
+			404, skuResource.getSkuHttpResponse(sku2.getId()));
+	}
+
+	protected Sku testDeleteSkuBatch_addSku() throws Exception {
+		return testDeleteSku_addSku();
+	}
+
+	protected void testDeleteSkuBatch_deleteSku(
+			String expectedExecuteStatus, String skuERC, Long skuId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", skuId
+		).<String, Object>put(
+			"externalReferenceCode", skuERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			skuResource.deleteSkuBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3666,6 +3745,10 @@ public abstract class BaseSkuResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.catalog.resource.v1_0.SkuResource
 			_skuResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

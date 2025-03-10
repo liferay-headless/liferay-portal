@@ -858,10 +858,15 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 			<MessageBoardAttachment, MessageBoardAttachment, Exception>
 				messageBoardAttachmentUnsafeFunction =
 					messageBoardAttachment -> {
-						deleteMessageBoardAttachment(
-							messageBoardAttachment.getId());
+						if (messageBoardAttachment.getId() != null) {
+							deleteMessageBoardAttachment(
+								messageBoardAttachment.getId());
 
-						return messageBoardAttachment;
+							return messageBoardAttachment;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete messageBoardAttachment. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -349,10 +349,17 @@ public abstract class BaseAccountAddressChannelResourceImpl
 
 		UnsafeFunction<AccountAddressChannel, AccountAddressChannel, Exception>
 			accountAddressChannelUnsafeFunction = accountAddressChannel -> {
-				deleteAccountAddressChannel(
-					accountAddressChannel.getAccountAddressChannelId());
+				if (accountAddressChannel.getAccountAddressChannelId() !=
+						null) {
 
-				return accountAddressChannel;
+					deleteAccountAddressChannel(
+						accountAddressChannel.getAccountAddressChannelId());
+
+					return accountAddressChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete accountAddressChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

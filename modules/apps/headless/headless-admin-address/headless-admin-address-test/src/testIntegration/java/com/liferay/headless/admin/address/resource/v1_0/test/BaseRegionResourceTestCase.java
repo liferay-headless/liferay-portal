@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.address.client.dto.v1_0.Region;
 import com.liferay.headless.admin.address.client.http.HttpInvoker;
 import com.liferay.headless.admin.address.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1062,6 +1064,55 @@ public abstract class BaseRegionResourceTestCase {
 
 	protected Region testGraphQLDeleteRegion_addRegion() throws Exception {
 		return testGraphQLRegion_addRegion();
+	}
+
+	@Test
+	public void testDeleteRegionBatch() throws Exception {
+		Region region1 = testDeleteRegionBatch_addRegion();
+
+		testDeleteRegionBatch_deleteRegion("COMPLETED", region1.getId());
+
+		assertHttpResponseStatusCode(
+			404, regionResource.getRegionHttpResponse(region1.getId()));
+	}
+
+	protected Region testDeleteRegionBatch_addRegion() throws Exception {
+		return testDeleteRegion_addRegion();
+	}
+
+	protected void testDeleteRegionBatch_deleteRegion(
+			String expectedExecuteStatus, Long regionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", regionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			regionResource.deleteRegionBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2207,6 +2258,10 @@ public abstract class BaseRegionResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.address.resource.v1_0.RegionResource
 		_regionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

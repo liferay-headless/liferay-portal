@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.Term;
 import com.liferay.headless.commerce.admin.order.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.order.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -924,6 +926,83 @@ public abstract class BaseTermResourceTestCase {
 
 	protected Term testGraphQLDeleteTerm_addTerm() throws Exception {
 		return testGraphQLTerm_addTerm();
+	}
+
+	@Test
+	public void testDeleteTermBatch() throws Exception {
+		Term term1 = testDeleteTermBatch_addTerm();
+
+		testDeleteTermBatch_deleteTerm("COMPLETED", null, term1.getId());
+
+		assertHttpResponseStatusCode(
+			404, termResource.getTermHttpResponse(term1.getId()));
+
+		Term term2 = testDeleteTermBatch_addTerm();
+
+		testDeleteTermBatch_deleteTerm(
+			"COMPLETED", term2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, termResource.getTermHttpResponse(term2.getId()));
+
+		term1 = testDeleteTermBatch_addTerm();
+		term2 = testDeleteTermBatch_addTerm();
+
+		testDeleteTermBatch_deleteTerm(
+			"COMPLETED", term2.getExternalReferenceCode(), term1.getId());
+
+		assertHttpResponseStatusCode(
+			404, termResource.getTermHttpResponse(term1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, termResource.getTermHttpResponse(term2.getId()));
+
+		testDeleteTermBatch_deleteTerm(
+			"COMPLETED", term2.getExternalReferenceCode(), term1.getId());
+
+		assertHttpResponseStatusCode(
+			404, termResource.getTermHttpResponse(term2.getId()));
+	}
+
+	protected Term testDeleteTermBatch_addTerm() throws Exception {
+		return testDeleteTerm_addTerm();
+	}
+
+	protected void testDeleteTermBatch_deleteTerm(
+			String expectedExecuteStatus, String termERC, Long termId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", termId
+		).<String, Object>put(
+			"externalReferenceCode", termERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			termResource.deleteTermBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2484,6 +2563,10 @@ public abstract class BaseTermResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.order.resource.v1_0.TermResource
 		_termResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

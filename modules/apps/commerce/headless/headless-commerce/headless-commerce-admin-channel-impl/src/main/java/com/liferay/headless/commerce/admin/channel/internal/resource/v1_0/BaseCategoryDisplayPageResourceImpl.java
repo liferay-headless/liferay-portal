@@ -472,9 +472,14 @@ public abstract class BaseCategoryDisplayPageResourceImpl
 
 		UnsafeFunction<CategoryDisplayPage, CategoryDisplayPage, Exception>
 			categoryDisplayPageUnsafeFunction = categoryDisplayPage -> {
-				deleteCategoryDisplayPage(categoryDisplayPage.getId());
+				if (categoryDisplayPage.getId() != null) {
+					deleteCategoryDisplayPage(categoryDisplayPage.getId());
 
-				return categoryDisplayPage;
+					return categoryDisplayPage;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete categoryDisplayPage. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

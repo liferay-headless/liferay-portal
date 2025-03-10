@@ -460,11 +460,18 @@ public abstract class BaseProductConfigurationListChannelResourceImpl
 			<ProductConfigurationListChannel, ProductConfigurationListChannel,
 			 Exception> productConfigurationListChannelUnsafeFunction =
 				productConfigurationListChannel -> {
-					deleteProductConfigurationListChannel(
-						productConfigurationListChannel.
-							getProductConfigurationListChannelId());
+					if (productConfigurationListChannel.
+							getProductConfigurationListChannelId() != null) {
 
-					return productConfigurationListChannel;
+						deleteProductConfigurationListChannel(
+							productConfigurationListChannel.
+								getProductConfigurationListChannelId());
+
+						return productConfigurationListChannel;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete productConfigurationListChannel. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

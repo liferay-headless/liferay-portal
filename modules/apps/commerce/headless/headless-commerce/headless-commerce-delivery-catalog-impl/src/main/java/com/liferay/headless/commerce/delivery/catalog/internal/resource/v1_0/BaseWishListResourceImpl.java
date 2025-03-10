@@ -431,9 +431,14 @@ public abstract class BaseWishListResourceImpl
 
 		UnsafeFunction<WishList, WishList, Exception> wishListUnsafeFunction =
 			wishList -> {
-				deleteWishList(wishList.getId());
+				if (wishList.getId() != null) {
+					deleteWishList(wishList.getId());
 
-				return wishList;
+					return wishList;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete wishList. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

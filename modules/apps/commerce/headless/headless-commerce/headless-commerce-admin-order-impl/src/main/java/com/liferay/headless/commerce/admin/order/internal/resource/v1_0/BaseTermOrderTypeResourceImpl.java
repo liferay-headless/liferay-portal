@@ -407,9 +407,14 @@ public abstract class BaseTermOrderTypeResourceImpl
 
 		UnsafeFunction<TermOrderType, TermOrderType, Exception>
 			termOrderTypeUnsafeFunction = termOrderType -> {
-				deleteTermOrderType(termOrderType.getTermOrderTypeId());
+				if (termOrderType.getTermOrderTypeId() != null) {
+					deleteTermOrderType(termOrderType.getTermOrderTypeId());
 
-				return termOrderType;
+					return termOrderType;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete termOrderType. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

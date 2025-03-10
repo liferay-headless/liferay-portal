@@ -401,10 +401,15 @@ public abstract class BasePriceListDiscountResourceImpl
 
 		UnsafeFunction<PriceListDiscount, PriceListDiscount, Exception>
 			priceListDiscountUnsafeFunction = priceListDiscount -> {
-				deletePriceListDiscount(
-					priceListDiscount.getPriceListDiscountId());
+				if (priceListDiscount.getPriceListDiscountId() != null) {
+					deletePriceListDiscount(
+						priceListDiscount.getPriceListDiscountId());
 
-				return priceListDiscount;
+					return priceListDiscount;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceListDiscount. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

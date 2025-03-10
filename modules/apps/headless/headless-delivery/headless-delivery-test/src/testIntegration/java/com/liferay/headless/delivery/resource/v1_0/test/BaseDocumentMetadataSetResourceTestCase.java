@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.DocumentMetadataSet;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -887,6 +889,63 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 		throws Exception {
 
 		return testGraphQLDocumentMetadataSet_addDocumentMetadataSet();
+	}
+
+	@Test
+	public void testDeleteDocumentMetadataSetBatch() throws Exception {
+		DocumentMetadataSet documentMetadataSet1 =
+			testDeleteDocumentMetadataSetBatch_addDocumentMetadataSet();
+
+		testDeleteDocumentMetadataSetBatch_deleteDocumentMetadataSet(
+			"COMPLETED", documentMetadataSet1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			documentMetadataSetResource.getDocumentMetadataSetHttpResponse(
+				documentMetadataSet1.getId()));
+	}
+
+	protected DocumentMetadataSet
+			testDeleteDocumentMetadataSetBatch_addDocumentMetadataSet()
+		throws Exception {
+
+		return testDeleteDocumentMetadataSet_addDocumentMetadataSet();
+	}
+
+	protected void testDeleteDocumentMetadataSetBatch_deleteDocumentMetadataSet(
+			String expectedExecuteStatus, Long documentMetadataSetId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", documentMetadataSetId
+		).build();
+		HttpInvoker.HttpResponse response =
+			documentMetadataSetResource.
+				deleteDocumentMetadataSetBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3077,6 +3136,10 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.DocumentMetadataSetResource
 			_documentMetadataSetResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

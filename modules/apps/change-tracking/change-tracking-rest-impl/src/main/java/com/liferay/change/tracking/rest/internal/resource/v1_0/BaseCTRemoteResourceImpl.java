@@ -524,9 +524,14 @@ public abstract class BaseCTRemoteResourceImpl
 
 		UnsafeFunction<CTRemote, CTRemote, Exception> ctRemoteUnsafeFunction =
 			ctRemote -> {
-				deleteCTRemote(ctRemote.getId());
+				if (ctRemote.getId() != null) {
+					deleteCTRemote(ctRemote.getId());
 
-				return ctRemote;
+					return ctRemote;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete ctRemote. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

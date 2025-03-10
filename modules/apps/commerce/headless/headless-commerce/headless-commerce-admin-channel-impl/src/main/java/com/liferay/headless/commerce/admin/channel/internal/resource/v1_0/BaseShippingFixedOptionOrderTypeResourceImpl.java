@@ -276,11 +276,18 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceImpl
 			<ShippingFixedOptionOrderType, ShippingFixedOptionOrderType,
 			 Exception> shippingFixedOptionOrderTypeUnsafeFunction =
 				shippingFixedOptionOrderType -> {
-					deleteShippingFixedOptionOrderType(
-						shippingFixedOptionOrderType.
-							getShippingFixedOptionOrderTypeId());
+					if (shippingFixedOptionOrderType.
+							getShippingFixedOptionOrderTypeId() != null) {
 
-					return shippingFixedOptionOrderType;
+						deleteShippingFixedOptionOrderType(
+							shippingFixedOptionOrderType.
+								getShippingFixedOptionOrderTypeId());
+
+						return shippingFixedOptionOrderType;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete shippingFixedOptionOrderType. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

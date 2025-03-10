@@ -1032,9 +1032,14 @@ public abstract class BaseDocumentMetadataSetResourceImpl
 
 		UnsafeFunction<DocumentMetadataSet, DocumentMetadataSet, Exception>
 			documentMetadataSetUnsafeFunction = documentMetadataSet -> {
-				deleteDocumentMetadataSet(documentMetadataSet.getId());
+				if (documentMetadataSet.getId() != null) {
+					deleteDocumentMetadataSet(documentMetadataSet.getId());
 
-				return documentMetadataSet;
+					return documentMetadataSet;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete documentMetadataSet. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

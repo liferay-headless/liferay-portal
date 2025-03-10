@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -2901,6 +2903,101 @@ public abstract class BaseOrganizationResourceTestCase {
 		throws Exception {
 
 		return testGraphQLOrganization_addOrganization();
+	}
+
+	@Test
+	public void testDeleteOrganizationBatch() throws Exception {
+		Organization organization1 =
+			testDeleteOrganizationBatch_addOrganization();
+
+		testDeleteOrganizationBatch_deleteOrganization(
+			"COMPLETED", null, organization1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			organizationResource.getOrganizationHttpResponse(
+				organization1.getId()));
+
+		Organization organization2 =
+			testDeleteOrganizationBatch_addOrganization();
+
+		testDeleteOrganizationBatch_deleteOrganization(
+			"COMPLETED", organization2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			organizationResource.getOrganizationHttpResponse(
+				organization2.getId()));
+
+		organization1 = testDeleteOrganizationBatch_addOrganization();
+		organization2 = testDeleteOrganizationBatch_addOrganization();
+
+		testDeleteOrganizationBatch_deleteOrganization(
+			"COMPLETED", organization2.getExternalReferenceCode(),
+			organization1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			organizationResource.getOrganizationHttpResponse(
+				organization1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			organizationResource.getOrganizationHttpResponse(
+				organization2.getId()));
+
+		testDeleteOrganizationBatch_deleteOrganization(
+			"COMPLETED", organization2.getExternalReferenceCode(),
+			organization1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			organizationResource.getOrganizationHttpResponse(
+				organization2.getId()));
+	}
+
+	protected Organization testDeleteOrganizationBatch_addOrganization()
+		throws Exception {
+
+		return testDeleteOrganization_addOrganization();
+	}
+
+	protected void testDeleteOrganizationBatch_deleteOrganization(
+			String expectedExecuteStatus, String organizationERC,
+			String organizationId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", organizationId
+		).<String, Object>put(
+			"externalReferenceCode", organizationERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			organizationResource.deleteOrganizationBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -6524,5 +6621,9 @@ public abstract class BaseOrganizationResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.OrganizationResource
 		_organizationResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 }

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -4566,6 +4568,99 @@ public abstract class BaseUserAccountResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteUserAccountBatch() throws Exception {
+		UserAccount userAccount1 = testDeleteUserAccountBatch_addUserAccount();
+
+		testDeleteUserAccountBatch_deleteUserAccount(
+			"COMPLETED", null, userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount1.getId()));
+
+		UserAccount userAccount2 = testDeleteUserAccountBatch_addUserAccount();
+
+		testDeleteUserAccountBatch_deleteUserAccount(
+			"COMPLETED", userAccount2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount2.getId()));
+
+		userAccount1 = testDeleteUserAccountBatch_addUserAccount();
+		userAccount2 = testDeleteUserAccountBatch_addUserAccount();
+
+		testDeleteUserAccountBatch_deleteUserAccount(
+			"COMPLETED", userAccount2.getExternalReferenceCode(),
+			userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount2.getId()));
+
+		testDeleteUserAccountBatch_deleteUserAccount(
+			"COMPLETED", userAccount2.getExternalReferenceCode(),
+			userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount2.getId()));
+	}
+
+	protected UserAccount testDeleteUserAccountBatch_addUserAccount()
+		throws Exception {
+
+		return testDeleteUserAccount_addUserAccount();
+	}
+
+	protected void testDeleteUserAccountBatch_deleteUserAccount(
+			String expectedExecuteStatus, String userAccountERC,
+			Long userAccountId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", userAccountId
+		).<String, Object>put(
+			"externalReferenceCode", userAccountERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			userAccountResource.deleteUserAccountBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
+	}
+
+	@Test
 	public void testGetUserAccount() throws Exception {
 		UserAccount postUserAccount = testGetUserAccount_addUserAccount();
 
@@ -8197,6 +8292,10 @@ public abstract class BaseUserAccountResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.UserAccountResource
 		_userAccountResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

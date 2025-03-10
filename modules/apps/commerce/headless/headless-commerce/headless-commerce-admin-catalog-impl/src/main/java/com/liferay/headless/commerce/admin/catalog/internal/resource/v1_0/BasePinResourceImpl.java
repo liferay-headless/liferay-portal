@@ -434,9 +434,14 @@ public abstract class BasePinResourceImpl
 		throws Exception {
 
 		UnsafeFunction<Pin, Pin, Exception> pinUnsafeFunction = pin -> {
-			deletePin(pin.getId());
+			if (pin.getId() != null) {
+				deletePin(pin.getId());
 
-			return pin;
+				return pin;
+			}
+
+			throw new UnsupportedOperationException(
+				"Unable to delete pin. No valid identifier provided.");
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {

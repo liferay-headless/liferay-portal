@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.PriceEntry;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -240,6 +242,100 @@ public abstract class BasePriceEntryResourceTestCase {
 	@Test
 	public void testGraphQLDeletePriceEntry() throws Exception {
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testDeletePriceEntryBatch() throws Exception {
+		PriceEntry priceEntry1 = testDeletePriceEntryBatch_addPriceEntry();
+
+		testDeletePriceEntryBatch_deletePriceEntry(
+			"COMPLETED", null, priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry1.getPriceEntryId()));
+
+		PriceEntry priceEntry2 = testDeletePriceEntryBatch_addPriceEntry();
+
+		testDeletePriceEntryBatch_deletePriceEntry(
+			"COMPLETED", priceEntry2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry2.getPriceEntryId()));
+
+		priceEntry1 = testDeletePriceEntryBatch_addPriceEntry();
+		priceEntry2 = testDeletePriceEntryBatch_addPriceEntry();
+
+		testDeletePriceEntryBatch_deletePriceEntry(
+			"COMPLETED", priceEntry2.getExternalReferenceCode(),
+			priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry1.getPriceEntryId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry2.getPriceEntryId()));
+
+		testDeletePriceEntryBatch_deletePriceEntry(
+			"COMPLETED", priceEntry2.getExternalReferenceCode(),
+			priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry2.getPriceEntryId()));
+	}
+
+	protected PriceEntry testDeletePriceEntryBatch_addPriceEntry()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void testDeletePriceEntryBatch_deletePriceEntry(
+			String expectedExecuteStatus, String priceEntryERC,
+			Long priceEntryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", priceEntryId
+		).<String, Object>put(
+			"externalReferenceCode", priceEntryERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			priceEntryResource.deletePriceEntryBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2750,6 +2846,10 @@ public abstract class BasePriceEntryResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.pricing.resource.v2_0.
 			PriceEntryResource _priceEntryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.OptionValue;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -487,6 +489,99 @@ public abstract class BaseOptionValueResourceTestCase {
 		throws Exception {
 
 		return testGraphQLOptionValue_addOptionValue();
+	}
+
+	@Test
+	public void testDeleteOptionValueBatch() throws Exception {
+		OptionValue optionValue1 = testDeleteOptionValueBatch_addOptionValue();
+
+		testDeleteOptionValueBatch_deleteOptionValue(
+			"COMPLETED", null, optionValue1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionValueResource.getOptionValueHttpResponse(
+				optionValue1.getId()));
+
+		OptionValue optionValue2 = testDeleteOptionValueBatch_addOptionValue();
+
+		testDeleteOptionValueBatch_deleteOptionValue(
+			"COMPLETED", optionValue2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			optionValueResource.getOptionValueHttpResponse(
+				optionValue2.getId()));
+
+		optionValue1 = testDeleteOptionValueBatch_addOptionValue();
+		optionValue2 = testDeleteOptionValueBatch_addOptionValue();
+
+		testDeleteOptionValueBatch_deleteOptionValue(
+			"COMPLETED", optionValue2.getExternalReferenceCode(),
+			optionValue1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionValueResource.getOptionValueHttpResponse(
+				optionValue1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			optionValueResource.getOptionValueHttpResponse(
+				optionValue2.getId()));
+
+		testDeleteOptionValueBatch_deleteOptionValue(
+			"COMPLETED", optionValue2.getExternalReferenceCode(),
+			optionValue1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionValueResource.getOptionValueHttpResponse(
+				optionValue2.getId()));
+	}
+
+	protected OptionValue testDeleteOptionValueBatch_addOptionValue()
+		throws Exception {
+
+		return testDeleteOptionValue_addOptionValue();
+	}
+
+	protected void testDeleteOptionValueBatch_deleteOptionValue(
+			String expectedExecuteStatus, String optionValueERC,
+			Long optionValueId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", optionValueId
+		).<String, Object>put(
+			"externalReferenceCode", optionValueERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			optionValueResource.deleteOptionValueBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2338,6 +2433,10 @@ public abstract class BaseOptionValueResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		OptionValueResource _optionValueResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

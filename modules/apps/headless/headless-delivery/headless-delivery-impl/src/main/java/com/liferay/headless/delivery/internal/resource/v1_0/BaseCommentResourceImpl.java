@@ -1868,9 +1868,14 @@ public abstract class BaseCommentResourceImpl
 
 		UnsafeFunction<Comment, Comment, Exception> commentUnsafeFunction =
 			comment -> {
-				deleteComment(comment.getId());
+				if (comment.getId() != null) {
+					deleteComment(comment.getId());
 
-				return comment;
+					return comment;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete comment. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

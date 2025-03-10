@@ -403,9 +403,14 @@ public abstract class BaseDiscountCategoryResourceImpl
 
 		UnsafeFunction<DiscountCategory, DiscountCategory, Exception>
 			discountCategoryUnsafeFunction = discountCategory -> {
-				deleteDiscountCategory(discountCategory.getId());
+				if (discountCategory.getId() != null) {
+					deleteDiscountCategory(discountCategory.getId());
 
-				return discountCategory;
+					return discountCategory;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountCategory. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

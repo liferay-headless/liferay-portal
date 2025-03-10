@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductConfigurationList;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1092,6 +1094,113 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 		throws Exception {
 
 		return testGraphQLProductConfigurationList_addProductConfigurationList();
+	}
+
+	@Test
+	public void testDeleteProductConfigurationListBatch() throws Exception {
+		ProductConfigurationList productConfigurationList1 =
+			testDeleteProductConfigurationListBatch_addProductConfigurationList();
+
+		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
+			"COMPLETED", null, productConfigurationList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productConfigurationListResource.
+				getProductConfigurationListHttpResponse(
+					productConfigurationList1.getId()));
+
+		ProductConfigurationList productConfigurationList2 =
+			testDeleteProductConfigurationListBatch_addProductConfigurationList();
+
+		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
+			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
+			null);
+
+		assertHttpResponseStatusCode(
+			404,
+			productConfigurationListResource.
+				getProductConfigurationListHttpResponse(
+					productConfigurationList2.getId()));
+
+		productConfigurationList1 =
+			testDeleteProductConfigurationListBatch_addProductConfigurationList();
+		productConfigurationList2 =
+			testDeleteProductConfigurationListBatch_addProductConfigurationList();
+
+		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
+			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
+			productConfigurationList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productConfigurationListResource.
+				getProductConfigurationListHttpResponse(
+					productConfigurationList1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			productConfigurationListResource.
+				getProductConfigurationListHttpResponse(
+					productConfigurationList2.getId()));
+
+		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
+			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
+			productConfigurationList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productConfigurationListResource.
+				getProductConfigurationListHttpResponse(
+					productConfigurationList2.getId()));
+	}
+
+	protected ProductConfigurationList
+			testDeleteProductConfigurationListBatch_addProductConfigurationList()
+		throws Exception {
+
+		return testDeleteProductConfigurationList_addProductConfigurationList();
+	}
+
+	protected void
+			testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
+				String expectedExecuteStatus,
+				String productConfigurationListERC,
+				Long productConfigurationListId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", productConfigurationListId
+		).<String, Object>put(
+			"externalReferenceCode", productConfigurationListERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			productConfigurationListResource.
+				deleteProductConfigurationListBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2642,6 +2751,10 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		ProductConfigurationListResource _productConfigurationListResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

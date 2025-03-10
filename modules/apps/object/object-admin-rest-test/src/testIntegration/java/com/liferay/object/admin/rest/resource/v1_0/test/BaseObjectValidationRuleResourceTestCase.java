@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRule;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1176,6 +1178,64 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 		throws Exception {
 
 		return testGraphQLObjectValidationRule_addObjectValidationRule();
+	}
+
+	@Test
+	public void testDeleteObjectValidationRuleBatch() throws Exception {
+		ObjectValidationRule objectValidationRule1 =
+			testDeleteObjectValidationRuleBatch_addObjectValidationRule();
+
+		testDeleteObjectValidationRuleBatch_deleteObjectValidationRule(
+			"COMPLETED", objectValidationRule1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectValidationRuleResource.getObjectValidationRuleHttpResponse(
+				objectValidationRule1.getId()));
+	}
+
+	protected ObjectValidationRule
+			testDeleteObjectValidationRuleBatch_addObjectValidationRule()
+		throws Exception {
+
+		return testDeleteObjectValidationRule_addObjectValidationRule();
+	}
+
+	protected void
+			testDeleteObjectValidationRuleBatch_deleteObjectValidationRule(
+				String expectedExecuteStatus, Long objectValidationRuleId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", objectValidationRuleId
+		).build();
+		HttpInvoker.HttpResponse response =
+			objectValidationRuleResource.
+				deleteObjectValidationRuleBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2832,6 +2892,10 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 	private
 		com.liferay.object.admin.rest.resource.v1_0.ObjectValidationRuleResource
 			_objectValidationRuleResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

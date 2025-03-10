@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.site.setting.client.dto.v1_0.TaxCategory;
 import com.liferay.headless.commerce.admin.site.setting.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.site.setting.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -522,6 +524,60 @@ public abstract class BaseTaxCategoryResourceTestCase {
 		throws Exception {
 
 		return testGraphQLTaxCategory_addTaxCategory();
+	}
+
+	@Test
+	public void testDeleteTaxCategoryBatch() throws Exception {
+		TaxCategory taxCategory1 = testDeleteTaxCategoryBatch_addTaxCategory();
+
+		testDeleteTaxCategoryBatch_deleteTaxCategory(
+			"COMPLETED", taxCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			taxCategoryResource.getTaxCategoryHttpResponse(
+				taxCategory1.getId()));
+	}
+
+	protected TaxCategory testDeleteTaxCategoryBatch_addTaxCategory()
+		throws Exception {
+
+		return testDeleteTaxCategory_addTaxCategory();
+	}
+
+	protected void testDeleteTaxCategoryBatch_deleteTaxCategory(
+			String expectedExecuteStatus, Long taxCategoryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", taxCategoryId
+		).build();
+		HttpInvoker.HttpResponse response =
+			taxCategoryResource.deleteTaxCategoryBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1490,6 +1546,10 @@ public abstract class BaseTaxCategoryResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.site.setting.resource.v1_0.
 		TaxCategoryResource _taxCategoryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

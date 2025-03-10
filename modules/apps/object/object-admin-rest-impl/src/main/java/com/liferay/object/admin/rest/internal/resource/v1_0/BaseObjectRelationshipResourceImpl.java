@@ -711,9 +711,14 @@ public abstract class BaseObjectRelationshipResourceImpl
 
 		UnsafeFunction<ObjectRelationship, ObjectRelationship, Exception>
 			objectRelationshipUnsafeFunction = objectRelationship -> {
-				deleteObjectRelationship(objectRelationship.getId());
+				if (objectRelationship.getId() != null) {
+					deleteObjectRelationship(objectRelationship.getId());
 
-				return objectRelationship;
+					return objectRelationship;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectRelationship. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

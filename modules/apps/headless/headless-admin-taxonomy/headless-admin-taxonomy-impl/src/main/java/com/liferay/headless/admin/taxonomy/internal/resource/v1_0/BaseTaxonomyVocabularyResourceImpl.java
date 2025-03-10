@@ -2034,9 +2034,14 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 
 		UnsafeFunction<TaxonomyVocabulary, TaxonomyVocabulary, Exception>
 			taxonomyVocabularyUnsafeFunction = taxonomyVocabulary -> {
-				deleteTaxonomyVocabulary(taxonomyVocabulary.getId());
+				if (taxonomyVocabulary.getId() != null) {
+					deleteTaxonomyVocabulary(taxonomyVocabulary.getId());
 
-				return taxonomyVocabulary;
+					return taxonomyVocabulary;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete taxonomyVocabulary. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

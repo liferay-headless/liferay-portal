@@ -410,10 +410,15 @@ public abstract class BasePriceListAccountResourceImpl
 
 		UnsafeFunction<PriceListAccount, PriceListAccount, Exception>
 			priceListAccountUnsafeFunction = priceListAccount -> {
-				deletePriceListAccount(
-					priceListAccount.getPriceListAccountId());
+				if (priceListAccount.getPriceListAccountId() != null) {
+					deletePriceListAccount(
+						priceListAccount.getPriceListAccountId());
 
-				return priceListAccount;
+					return priceListAccount;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceListAccount. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -753,9 +753,14 @@ public abstract class BaseRegionResourceImpl
 
 		UnsafeFunction<Region, Region, Exception> regionUnsafeFunction =
 			region -> {
-				deleteRegion(region.getId());
+				if (region.getId() != null) {
+					deleteRegion(region.getId());
 
-				return region;
+					return region;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete region. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -1283,9 +1283,14 @@ public abstract class BaseMessageBoardSectionResourceImpl
 
 		UnsafeFunction<MessageBoardSection, MessageBoardSection, Exception>
 			messageBoardSectionUnsafeFunction = messageBoardSection -> {
-				deleteMessageBoardSection(messageBoardSection.getId());
+				if (messageBoardSection.getId() != null) {
+					deleteMessageBoardSection(messageBoardSection.getId());
 
-				return messageBoardSection;
+					return messageBoardSection;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete messageBoardSection. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

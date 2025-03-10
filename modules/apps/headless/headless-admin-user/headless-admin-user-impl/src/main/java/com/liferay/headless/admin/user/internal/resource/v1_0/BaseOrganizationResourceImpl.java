@@ -1754,9 +1754,30 @@ public abstract class BaseOrganizationResourceImpl
 
 		UnsafeFunction<Organization, Organization, Exception>
 			organizationUnsafeFunction = organization -> {
-				deleteOrganization(organization.getId());
+				if (organization.getId() != null) {
+					try {
+						deleteOrganization(organization.getId());
 
-				return organization;
+						return organization;
+					}
+					catch (Exception exception) {
+						if (organization.getExternalReferenceCode() != null) {
+							deleteOrganizationByExternalReferenceCode(
+								organization.getExternalReferenceCode());
+
+							return organization;
+						}
+					}
+				}
+				else if (organization.getExternalReferenceCode() != null) {
+					deleteOrganizationByExternalReferenceCode(
+						organization.getExternalReferenceCode());
+
+					return organization;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete organization. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

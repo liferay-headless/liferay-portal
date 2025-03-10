@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.list.type.client.dto.v1_0.ListTypeEntry;
 import com.liferay.headless.admin.list.type.client.http.HttpInvoker;
 import com.liferay.headless.admin.list.type.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1306,6 +1308,61 @@ public abstract class BaseListTypeEntryResourceTestCase {
 		throws Exception {
 
 		return testGraphQLListTypeEntry_addListTypeEntry();
+	}
+
+	@Test
+	public void testDeleteListTypeEntryBatch() throws Exception {
+		ListTypeEntry listTypeEntry1 =
+			testDeleteListTypeEntryBatch_addListTypeEntry();
+
+		testDeleteListTypeEntryBatch_deleteListTypeEntry(
+			"COMPLETED", listTypeEntry1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			listTypeEntryResource.getListTypeEntryHttpResponse(
+				listTypeEntry1.getId()));
+	}
+
+	protected ListTypeEntry testDeleteListTypeEntryBatch_addListTypeEntry()
+		throws Exception {
+
+		return testDeleteListTypeEntry_addListTypeEntry();
+	}
+
+	protected void testDeleteListTypeEntryBatch_deleteListTypeEntry(
+			String expectedExecuteStatus, Long listTypeEntryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", listTypeEntryId
+		).build();
+		HttpInvoker.HttpResponse response =
+			listTypeEntryResource.deleteListTypeEntryBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2649,6 +2706,10 @@ public abstract class BaseListTypeEntryResourceTestCase {
 	private
 		com.liferay.headless.admin.list.type.resource.v1_0.ListTypeEntryResource
 			_listTypeEntryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

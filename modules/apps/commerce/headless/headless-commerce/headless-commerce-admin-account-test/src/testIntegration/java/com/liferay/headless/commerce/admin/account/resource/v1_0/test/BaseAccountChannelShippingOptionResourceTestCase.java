@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.AccountChannelShippingOption;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.User;
 import com.liferay.headless.commerce.admin.account.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -347,6 +349,66 @@ public abstract class BaseAccountChannelShippingOptionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLAccountChannelShippingOption_addAccountChannelShippingOption();
+	}
+
+	@Test
+	public void testDeleteAccountChannelShippingOptionBatch() throws Exception {
+		AccountChannelShippingOption accountChannelShippingOption1 =
+			testDeleteAccountChannelShippingOptionBatch_addAccountChannelShippingOption();
+
+		testDeleteAccountChannelShippingOptionBatch_deleteAccountChannelShippingOption(
+			"COMPLETED", accountChannelShippingOption1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountChannelShippingOptionResource.
+				getAccountChannelShippingOptionHttpResponse(
+					accountChannelShippingOption1.getId()));
+	}
+
+	protected AccountChannelShippingOption
+			testDeleteAccountChannelShippingOptionBatch_addAccountChannelShippingOption()
+		throws Exception {
+
+		return testDeleteAccountChannelShippingOption_addAccountChannelShippingOption();
+	}
+
+	protected void
+			testDeleteAccountChannelShippingOptionBatch_deleteAccountChannelShippingOption(
+				String expectedExecuteStatus,
+				Long accountChannelShippingOptionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", accountChannelShippingOptionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			accountChannelShippingOptionResource.
+				deleteAccountChannelShippingOptionBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2276,6 +2338,10 @@ public abstract class BaseAccountChannelShippingOptionResourceTestCase {
 	private com.liferay.headless.commerce.admin.account.resource.v1_0.
 		AccountChannelShippingOptionResource
 			_accountChannelShippingOptionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

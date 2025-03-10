@@ -769,9 +769,14 @@ public abstract class BaseObjectValidationRuleResourceImpl
 
 		UnsafeFunction<ObjectValidationRule, ObjectValidationRule, Exception>
 			objectValidationRuleUnsafeFunction = objectValidationRule -> {
-				deleteObjectValidationRule(objectValidationRule.getId());
+				if (objectValidationRule.getId() != null) {
+					deleteObjectValidationRule(objectValidationRule.getId());
 
-				return objectValidationRule;
+					return objectValidationRule;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectValidationRule. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

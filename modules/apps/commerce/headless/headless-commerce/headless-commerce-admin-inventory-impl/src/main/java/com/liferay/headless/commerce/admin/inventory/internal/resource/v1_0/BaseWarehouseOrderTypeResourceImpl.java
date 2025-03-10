@@ -419,10 +419,15 @@ public abstract class BaseWarehouseOrderTypeResourceImpl
 
 		UnsafeFunction<WarehouseOrderType, WarehouseOrderType, Exception>
 			warehouseOrderTypeUnsafeFunction = warehouseOrderType -> {
-				deleteWarehouseOrderType(
-					warehouseOrderType.getWarehouseOrderTypeId());
+				if (warehouseOrderType.getWarehouseOrderTypeId() != null) {
+					deleteWarehouseOrderType(
+						warehouseOrderType.getWarehouseOrderTypeId());
 
-				return warehouseOrderType;
+					return warehouseOrderType;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete warehouseOrderType. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

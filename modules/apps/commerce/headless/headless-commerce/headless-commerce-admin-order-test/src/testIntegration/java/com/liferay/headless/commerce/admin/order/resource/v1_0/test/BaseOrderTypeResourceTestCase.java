@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.OrderType;
 import com.liferay.headless.commerce.admin.order.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.order.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1106,6 +1108,93 @@ public abstract class BaseOrderTypeResourceTestCase {
 		throws Exception {
 
 		return testGraphQLOrderType_addOrderType();
+	}
+
+	@Test
+	public void testDeleteOrderTypeBatch() throws Exception {
+		OrderType orderType1 = testDeleteOrderTypeBatch_addOrderType();
+
+		testDeleteOrderTypeBatch_deleteOrderType(
+			"COMPLETED", null, orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType1.getId()));
+
+		OrderType orderType2 = testDeleteOrderTypeBatch_addOrderType();
+
+		testDeleteOrderTypeBatch_deleteOrderType(
+			"COMPLETED", orderType2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType2.getId()));
+
+		orderType1 = testDeleteOrderTypeBatch_addOrderType();
+		orderType2 = testDeleteOrderTypeBatch_addOrderType();
+
+		testDeleteOrderTypeBatch_deleteOrderType(
+			"COMPLETED", orderType2.getExternalReferenceCode(),
+			orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			orderTypeResource.getOrderTypeHttpResponse(orderType2.getId()));
+
+		testDeleteOrderTypeBatch_deleteOrderType(
+			"COMPLETED", orderType2.getExternalReferenceCode(),
+			orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType2.getId()));
+	}
+
+	protected OrderType testDeleteOrderTypeBatch_addOrderType()
+		throws Exception {
+
+		return testDeleteOrderType_addOrderType();
+	}
+
+	protected void testDeleteOrderTypeBatch_deleteOrderType(
+			String expectedExecuteStatus, String orderTypeERC, Long orderTypeId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", orderTypeId
+		).<String, Object>put(
+			"externalReferenceCode", orderTypeERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			orderTypeResource.deleteOrderTypeBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2552,6 +2641,10 @@ public abstract class BaseOrderTypeResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.order.resource.v1_0.
 			OrderTypeResource _orderTypeResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

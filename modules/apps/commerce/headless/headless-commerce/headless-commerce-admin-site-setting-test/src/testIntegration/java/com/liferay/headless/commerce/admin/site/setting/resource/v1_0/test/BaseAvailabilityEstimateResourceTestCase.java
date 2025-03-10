@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.site.setting.client.dto.v1_0.AvailabilityEstimate;
 import com.liferay.headless.commerce.admin.site.setting.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.site.setting.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -311,6 +313,64 @@ public abstract class BaseAvailabilityEstimateResourceTestCase {
 		throws Exception {
 
 		return testGraphQLAvailabilityEstimate_addAvailabilityEstimate();
+	}
+
+	@Test
+	public void testDeleteAvailabilityEstimateBatch() throws Exception {
+		AvailabilityEstimate availabilityEstimate1 =
+			testDeleteAvailabilityEstimateBatch_addAvailabilityEstimate();
+
+		testDeleteAvailabilityEstimateBatch_deleteAvailabilityEstimate(
+			"COMPLETED", availabilityEstimate1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			availabilityEstimateResource.getAvailabilityEstimateHttpResponse(
+				availabilityEstimate1.getId()));
+	}
+
+	protected AvailabilityEstimate
+			testDeleteAvailabilityEstimateBatch_addAvailabilityEstimate()
+		throws Exception {
+
+		return testDeleteAvailabilityEstimate_addAvailabilityEstimate();
+	}
+
+	protected void
+			testDeleteAvailabilityEstimateBatch_deleteAvailabilityEstimate(
+				String expectedExecuteStatus, Long availabilityEstimateId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", availabilityEstimateId
+		).build();
+		HttpInvoker.HttpResponse response =
+			availabilityEstimateResource.
+				deleteAvailabilityEstimateBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1566,6 +1626,10 @@ public abstract class BaseAvailabilityEstimateResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.site.setting.resource.v1_0.
 		AvailabilityEstimateResource _availabilityEstimateResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

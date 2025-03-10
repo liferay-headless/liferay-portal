@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -987,6 +989,83 @@ public abstract class BaseWebUrlResourceTestCase {
 
 	protected WebUrl testGraphQLDeleteWebUrl_addWebUrl() throws Exception {
 		return testGraphQLWebUrl_addWebUrl();
+	}
+
+	@Test
+	public void testDeleteWebUrlBatch() throws Exception {
+		WebUrl webUrl1 = testDeleteWebUrlBatch_addWebUrl();
+
+		testDeleteWebUrlBatch_deleteWebUrl("COMPLETED", null, webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+
+		WebUrl webUrl2 = testDeleteWebUrlBatch_addWebUrl();
+
+		testDeleteWebUrlBatch_deleteWebUrl(
+			"COMPLETED", webUrl2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
+
+		webUrl1 = testDeleteWebUrlBatch_addWebUrl();
+		webUrl2 = testDeleteWebUrlBatch_addWebUrl();
+
+		testDeleteWebUrlBatch_deleteWebUrl(
+			"COMPLETED", webUrl2.getExternalReferenceCode(), webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
+
+		testDeleteWebUrlBatch_deleteWebUrl(
+			"COMPLETED", webUrl2.getExternalReferenceCode(), webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
+	}
+
+	protected WebUrl testDeleteWebUrlBatch_addWebUrl() throws Exception {
+		return testDeleteWebUrl_addWebUrl();
+	}
+
+	protected void testDeleteWebUrlBatch_deleteWebUrl(
+			String expectedExecuteStatus, String webUrlERC, Long webUrlId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", webUrlId
+		).<String, Object>put(
+			"externalReferenceCode", webUrlERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			webUrlResource.deleteWebUrlBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2104,6 +2183,10 @@ public abstract class BaseWebUrlResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.WebUrlResource
 		_webUrlResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

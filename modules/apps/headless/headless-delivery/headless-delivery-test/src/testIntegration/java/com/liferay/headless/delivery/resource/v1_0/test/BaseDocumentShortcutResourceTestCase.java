@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.DocumentShortcut;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -564,6 +566,62 @@ public abstract class BaseDocumentShortcutResourceTestCase {
 		throws Exception {
 
 		return testGraphQLDocumentShortcut_addDocumentShortcut();
+	}
+
+	@Test
+	public void testDeleteDocumentShortcutBatch() throws Exception {
+		DocumentShortcut documentShortcut1 =
+			testDeleteDocumentShortcutBatch_addDocumentShortcut();
+
+		testDeleteDocumentShortcutBatch_deleteDocumentShortcut(
+			"COMPLETED", documentShortcut1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			documentShortcutResource.getDocumentShortcutHttpResponse(
+				documentShortcut1.getId()));
+	}
+
+	protected DocumentShortcut
+			testDeleteDocumentShortcutBatch_addDocumentShortcut()
+		throws Exception {
+
+		return testDeleteDocumentShortcut_addDocumentShortcut();
+	}
+
+	protected void testDeleteDocumentShortcutBatch_deleteDocumentShortcut(
+			String expectedExecuteStatus, Long documentShortcutId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", documentShortcutId
+		).build();
+		HttpInvoker.HttpResponse response =
+			documentShortcutResource.deleteDocumentShortcutBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2660,6 +2718,10 @@ public abstract class BaseDocumentShortcutResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.DocumentShortcutResource
 		_documentShortcutResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -984,6 +986,101 @@ public abstract class BasePostalAddressResourceTestCase {
 		throws Exception {
 
 		return testGraphQLPostalAddress_addPostalAddress();
+	}
+
+	@Test
+	public void testDeletePostalAddressBatch() throws Exception {
+		PostalAddress postalAddress1 =
+			testDeletePostalAddressBatch_addPostalAddress();
+
+		testDeletePostalAddressBatch_deletePostalAddress(
+			"COMPLETED", null, postalAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			postalAddressResource.getPostalAddressHttpResponse(
+				postalAddress1.getId()));
+
+		PostalAddress postalAddress2 =
+			testDeletePostalAddressBatch_addPostalAddress();
+
+		testDeletePostalAddressBatch_deletePostalAddress(
+			"COMPLETED", postalAddress2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			postalAddressResource.getPostalAddressHttpResponse(
+				postalAddress2.getId()));
+
+		postalAddress1 = testDeletePostalAddressBatch_addPostalAddress();
+		postalAddress2 = testDeletePostalAddressBatch_addPostalAddress();
+
+		testDeletePostalAddressBatch_deletePostalAddress(
+			"COMPLETED", postalAddress2.getExternalReferenceCode(),
+			postalAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			postalAddressResource.getPostalAddressHttpResponse(
+				postalAddress1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			postalAddressResource.getPostalAddressHttpResponse(
+				postalAddress2.getId()));
+
+		testDeletePostalAddressBatch_deletePostalAddress(
+			"COMPLETED", postalAddress2.getExternalReferenceCode(),
+			postalAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			postalAddressResource.getPostalAddressHttpResponse(
+				postalAddress2.getId()));
+	}
+
+	protected PostalAddress testDeletePostalAddressBatch_addPostalAddress()
+		throws Exception {
+
+		return testDeletePostalAddress_addPostalAddress();
+	}
+
+	protected void testDeletePostalAddressBatch_deletePostalAddress(
+			String expectedExecuteStatus, String postalAddressERC,
+			Long postalAddressId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", postalAddressId
+		).<String, Object>put(
+			"externalReferenceCode", postalAddressERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			postalAddressResource.deletePostalAddressBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2940,6 +3037,10 @@ public abstract class BasePostalAddressResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.PostalAddressResource
 		_postalAddressResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

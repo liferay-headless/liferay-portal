@@ -439,10 +439,17 @@ public abstract class BasePriceModifierCategoryResourceImpl
 
 		UnsafeFunction<PriceModifierCategory, PriceModifierCategory, Exception>
 			priceModifierCategoryUnsafeFunction = priceModifierCategory -> {
-				deletePriceModifierCategory(
-					priceModifierCategory.getPriceModifierCategoryId());
+				if (priceModifierCategory.getPriceModifierCategoryId() !=
+						null) {
 
-				return priceModifierCategory;
+					deletePriceModifierCategory(
+						priceModifierCategory.getPriceModifierCategoryId());
+
+					return priceModifierCategory;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceModifierCategory. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

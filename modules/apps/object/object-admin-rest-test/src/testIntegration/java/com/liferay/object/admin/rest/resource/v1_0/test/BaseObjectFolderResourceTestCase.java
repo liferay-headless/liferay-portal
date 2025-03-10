@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectFolder;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -723,6 +725,61 @@ public abstract class BaseObjectFolderResourceTestCase {
 		throws Exception {
 
 		return testGraphQLObjectFolder_addObjectFolder();
+	}
+
+	@Test
+	public void testDeleteObjectFolderBatch() throws Exception {
+		ObjectFolder objectFolder1 =
+			testDeleteObjectFolderBatch_addObjectFolder();
+
+		testDeleteObjectFolderBatch_deleteObjectFolder(
+			"COMPLETED", objectFolder1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectFolderResource.getObjectFolderHttpResponse(
+				objectFolder1.getId()));
+	}
+
+	protected ObjectFolder testDeleteObjectFolderBatch_addObjectFolder()
+		throws Exception {
+
+		return testDeleteObjectFolder_addObjectFolder();
+	}
+
+	protected void testDeleteObjectFolderBatch_deleteObjectFolder(
+			String expectedExecuteStatus, Long objectFolderId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", objectFolderId
+		).build();
+		HttpInvoker.HttpResponse response =
+			objectFolderResource.deleteObjectFolderBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1981,6 +2038,10 @@ public abstract class BaseObjectFolderResourceTestCase {
 	@Inject
 	private com.liferay.object.admin.rest.resource.v1_0.ObjectFolderResource
 		_objectFolderResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

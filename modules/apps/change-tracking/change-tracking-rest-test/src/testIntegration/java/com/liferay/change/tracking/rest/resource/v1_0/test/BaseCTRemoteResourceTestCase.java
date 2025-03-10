@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.change.tracking.rest.client.dto.v1_0.CTRemote;
 import com.liferay.change.tracking.rest.client.http.HttpInvoker;
 import com.liferay.change.tracking.rest.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -566,6 +568,55 @@ public abstract class BaseCTRemoteResourceTestCase {
 		throws Exception {
 
 		return testGraphQLCTRemote_addCTRemote();
+	}
+
+	@Test
+	public void testDeleteCTRemoteBatch() throws Exception {
+		CTRemote ctRemote1 = testDeleteCTRemoteBatch_addCTRemote();
+
+		testDeleteCTRemoteBatch_deleteCTRemote("COMPLETED", ctRemote1.getId());
+
+		assertHttpResponseStatusCode(
+			404, ctRemoteResource.getCTRemoteHttpResponse(ctRemote1.getId()));
+	}
+
+	protected CTRemote testDeleteCTRemoteBatch_addCTRemote() throws Exception {
+		return testDeleteCTRemote_addCTRemote();
+	}
+
+	protected void testDeleteCTRemoteBatch_deleteCTRemote(
+			String expectedExecuteStatus, Long ctRemoteId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", ctRemoteId
+		).build();
+		HttpInvoker.HttpResponse response =
+			ctRemoteResource.deleteCTRemoteBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2002,6 +2053,10 @@ public abstract class BaseCTRemoteResourceTestCase {
 	@Inject
 	private com.liferay.change.tracking.rest.resource.v1_0.CTRemoteResource
 		_ctRemoteResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

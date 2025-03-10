@@ -857,9 +857,30 @@ public abstract class BaseCTCollectionResourceImpl
 
 		UnsafeFunction<CTCollection, CTCollection, Exception>
 			ctCollectionUnsafeFunction = ctCollection -> {
-				deleteCTCollection(ctCollection.getId());
+				if (ctCollection.getId() != null) {
+					try {
+						deleteCTCollection(ctCollection.getId());
 
-				return ctCollection;
+						return ctCollection;
+					}
+					catch (Exception exception) {
+						if (ctCollection.getExternalReferenceCode() != null) {
+							deleteCTCollectionByExternalReferenceCode(
+								ctCollection.getExternalReferenceCode());
+
+							return ctCollection;
+						}
+					}
+				}
+				else if (ctCollection.getExternalReferenceCode() != null) {
+					deleteCTCollectionByExternalReferenceCode(
+						ctCollection.getExternalReferenceCode());
+
+					return ctCollection;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete ctCollection. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

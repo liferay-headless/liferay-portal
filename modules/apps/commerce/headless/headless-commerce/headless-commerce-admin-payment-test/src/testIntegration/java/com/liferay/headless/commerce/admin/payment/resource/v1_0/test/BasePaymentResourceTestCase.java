@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.payment.client.dto.v1_0.Payment;
 import com.liferay.headless.commerce.admin.payment.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.payment.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -991,6 +993,84 @@ public abstract class BasePaymentResourceTestCase {
 
 	protected Payment testGraphQLDeletePayment_addPayment() throws Exception {
 		return testGraphQLPayment_addPayment();
+	}
+
+	@Test
+	public void testDeletePaymentBatch() throws Exception {
+		Payment payment1 = testDeletePaymentBatch_addPayment();
+
+		testDeletePaymentBatch_deletePayment(
+			"COMPLETED", null, payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+
+		Payment payment2 = testDeletePaymentBatch_addPayment();
+
+		testDeletePaymentBatch_deletePayment(
+			"COMPLETED", payment2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment2.getId()));
+
+		payment1 = testDeletePaymentBatch_addPayment();
+		payment2 = testDeletePaymentBatch_addPayment();
+
+		testDeletePaymentBatch_deletePayment(
+			"COMPLETED", payment2.getExternalReferenceCode(), payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, paymentResource.getPaymentHttpResponse(payment2.getId()));
+
+		testDeletePaymentBatch_deletePayment(
+			"COMPLETED", payment2.getExternalReferenceCode(), payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment2.getId()));
+	}
+
+	protected Payment testDeletePaymentBatch_addPayment() throws Exception {
+		return testDeletePayment_addPayment();
+	}
+
+	protected void testDeletePaymentBatch_deletePayment(
+			String expectedExecuteStatus, String paymentERC, Long paymentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", paymentId
+		).<String, Object>put(
+			"externalReferenceCode", paymentERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			paymentResource.deletePaymentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3425,6 +3505,10 @@ public abstract class BasePaymentResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.payment.resource.v1_0.
 			PaymentResource _paymentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseFolder;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -329,6 +331,63 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		throws Exception {
 
 		return testGraphQLKnowledgeBaseFolder_addKnowledgeBaseFolder();
+	}
+
+	@Test
+	public void testDeleteKnowledgeBaseFolderBatch() throws Exception {
+		KnowledgeBaseFolder knowledgeBaseFolder1 =
+			testDeleteKnowledgeBaseFolderBatch_addKnowledgeBaseFolder();
+
+		testDeleteKnowledgeBaseFolderBatch_deleteKnowledgeBaseFolder(
+			"COMPLETED", knowledgeBaseFolder1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			knowledgeBaseFolderResource.getKnowledgeBaseFolderHttpResponse(
+				knowledgeBaseFolder1.getId()));
+	}
+
+	protected KnowledgeBaseFolder
+			testDeleteKnowledgeBaseFolderBatch_addKnowledgeBaseFolder()
+		throws Exception {
+
+		return testDeleteKnowledgeBaseFolder_addKnowledgeBaseFolder();
+	}
+
+	protected void testDeleteKnowledgeBaseFolderBatch_deleteKnowledgeBaseFolder(
+			String expectedExecuteStatus, Long knowledgeBaseFolderId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", knowledgeBaseFolderId
+		).build();
+		HttpInvoker.HttpResponse response =
+			knowledgeBaseFolderResource.
+				deleteKnowledgeBaseFolderBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2996,6 +3055,10 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.KnowledgeBaseFolderResource
 			_knowledgeBaseFolderResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

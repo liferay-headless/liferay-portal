@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.shipment.client.dto.v1_0.Shipment;
 import com.liferay.headless.commerce.admin.shipment.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1030,6 +1032,86 @@ public abstract class BaseShipmentResourceTestCase {
 		throws Exception {
 
 		return testGraphQLShipment_addShipment();
+	}
+
+	@Test
+	public void testDeleteShipmentBatch() throws Exception {
+		Shipment shipment1 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", null, shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
+
+		Shipment shipment2 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+
+		shipment1 = testDeleteShipmentBatch_addShipment();
+		shipment2 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(),
+			shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+
+		testDeleteShipmentBatch_deleteShipment(
+			"COMPLETED", shipment2.getExternalReferenceCode(),
+			shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
+	}
+
+	protected Shipment testDeleteShipmentBatch_addShipment() throws Exception {
+		return testDeleteShipment_addShipment();
+	}
+
+	protected void testDeleteShipmentBatch_deleteShipment(
+			String expectedExecuteStatus, String shipmentERC, Long shipmentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", shipmentId
+		).<String, Object>put(
+			"externalReferenceCode", shipmentERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			shipmentResource.deleteShipmentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2889,6 +2971,10 @@ public abstract class BaseShipmentResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.shipment.resource.v1_0.
 			ShipmentResource _shipmentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

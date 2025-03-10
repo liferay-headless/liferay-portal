@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.data.engine.rest.client.dto.v2_0.DataRecord;
 import com.liferay.data.engine.rest.client.http.HttpInvoker;
 import com.liferay.data.engine.rest.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1030,6 +1032,59 @@ public abstract class BaseDataRecordResourceTestCase {
 		throws Exception {
 
 		return testGraphQLDataRecord_addDataRecord();
+	}
+
+	@Test
+	public void testDeleteDataRecordBatch() throws Exception {
+		DataRecord dataRecord1 = testDeleteDataRecordBatch_addDataRecord();
+
+		testDeleteDataRecordBatch_deleteDataRecord(
+			"COMPLETED", dataRecord1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			dataRecordResource.getDataRecordHttpResponse(dataRecord1.getId()));
+	}
+
+	protected DataRecord testDeleteDataRecordBatch_addDataRecord()
+		throws Exception {
+
+		return testDeleteDataRecord_addDataRecord();
+	}
+
+	protected void testDeleteDataRecordBatch_deleteDataRecord(
+			String expectedExecuteStatus, Long dataRecordId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", dataRecordId
+		).build();
+		HttpInvoker.HttpResponse response =
+			dataRecordResource.deleteDataRecordBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2047,6 +2102,10 @@ public abstract class BaseDataRecordResourceTestCase {
 	@Inject
 	private com.liferay.data.engine.rest.resource.v2_0.DataRecordResource
 		_dataRecordResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

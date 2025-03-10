@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardAttachment;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -339,6 +341,65 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		throws Exception {
 
 		return testGraphQLMessageBoardAttachment_addMessageBoardAttachment();
+	}
+
+	@Test
+	public void testDeleteMessageBoardAttachmentBatch() throws Exception {
+		MessageBoardAttachment messageBoardAttachment1 =
+			testDeleteMessageBoardAttachmentBatch_addMessageBoardAttachment();
+
+		testDeleteMessageBoardAttachmentBatch_deleteMessageBoardAttachment(
+			"COMPLETED", messageBoardAttachment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			messageBoardAttachmentResource.
+				getMessageBoardAttachmentHttpResponse(
+					messageBoardAttachment1.getId()));
+	}
+
+	protected MessageBoardAttachment
+			testDeleteMessageBoardAttachmentBatch_addMessageBoardAttachment()
+		throws Exception {
+
+		return testDeleteMessageBoardAttachment_addMessageBoardAttachment();
+	}
+
+	protected void
+			testDeleteMessageBoardAttachmentBatch_deleteMessageBoardAttachment(
+				String expectedExecuteStatus, Long messageBoardAttachmentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", messageBoardAttachmentId
+		).build();
+		HttpInvoker.HttpResponse response =
+			messageBoardAttachmentResource.
+				deleteMessageBoardAttachmentBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2318,6 +2379,10 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.
 			MessageBoardAttachmentResource _messageBoardAttachmentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

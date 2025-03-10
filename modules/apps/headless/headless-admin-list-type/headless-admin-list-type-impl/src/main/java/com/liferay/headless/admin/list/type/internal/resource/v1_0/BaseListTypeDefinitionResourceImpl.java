@@ -685,9 +685,14 @@ public abstract class BaseListTypeDefinitionResourceImpl
 
 		UnsafeFunction<ListTypeDefinition, ListTypeDefinition, Exception>
 			listTypeDefinitionUnsafeFunction = listTypeDefinition -> {
-				deleteListTypeDefinition(listTypeDefinition.getId());
+				if (listTypeDefinition.getId() != null) {
+					deleteListTypeDefinition(listTypeDefinition.getId());
 
-				return listTypeDefinition;
+					return listTypeDefinition;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete listTypeDefinition. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

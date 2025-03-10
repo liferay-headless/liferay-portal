@@ -377,9 +377,14 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 
 		UnsafeFunction<AvailabilityEstimate, AvailabilityEstimate, Exception>
 			availabilityEstimateUnsafeFunction = availabilityEstimate -> {
-				deleteAvailabilityEstimate(availabilityEstimate.getId());
+				if (availabilityEstimate.getId() != null) {
+					deleteAvailabilityEstimate(availabilityEstimate.getId());
 
-				return availabilityEstimate;
+					return availabilityEstimate;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete availabilityEstimate. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

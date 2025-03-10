@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -815,6 +817,83 @@ public abstract class BasePhoneResourceTestCase {
 
 	protected Phone testGraphQLDeletePhone_addPhone() throws Exception {
 		return testGraphQLPhone_addPhone();
+	}
+
+	@Test
+	public void testDeletePhoneBatch() throws Exception {
+		Phone phone1 = testDeletePhoneBatch_addPhone();
+
+		testDeletePhoneBatch_deletePhone("COMPLETED", null, phone1.getId());
+
+		assertHttpResponseStatusCode(
+			404, phoneResource.getPhoneHttpResponse(phone1.getId()));
+
+		Phone phone2 = testDeletePhoneBatch_addPhone();
+
+		testDeletePhoneBatch_deletePhone(
+			"COMPLETED", phone2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, phoneResource.getPhoneHttpResponse(phone2.getId()));
+
+		phone1 = testDeletePhoneBatch_addPhone();
+		phone2 = testDeletePhoneBatch_addPhone();
+
+		testDeletePhoneBatch_deletePhone(
+			"COMPLETED", phone2.getExternalReferenceCode(), phone1.getId());
+
+		assertHttpResponseStatusCode(
+			404, phoneResource.getPhoneHttpResponse(phone1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, phoneResource.getPhoneHttpResponse(phone2.getId()));
+
+		testDeletePhoneBatch_deletePhone(
+			"COMPLETED", phone2.getExternalReferenceCode(), phone1.getId());
+
+		assertHttpResponseStatusCode(
+			404, phoneResource.getPhoneHttpResponse(phone2.getId()));
+	}
+
+	protected Phone testDeletePhoneBatch_addPhone() throws Exception {
+		return testDeletePhone_addPhone();
+	}
+
+	protected void testDeletePhoneBatch_deletePhone(
+			String expectedExecuteStatus, String phoneERC, Long phoneId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", phoneId
+		).<String, Object>put(
+			"externalReferenceCode", phoneERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			phoneResource.deletePhoneBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2172,6 +2251,10 @@ public abstract class BasePhoneResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.PhoneResource
 		_phoneResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

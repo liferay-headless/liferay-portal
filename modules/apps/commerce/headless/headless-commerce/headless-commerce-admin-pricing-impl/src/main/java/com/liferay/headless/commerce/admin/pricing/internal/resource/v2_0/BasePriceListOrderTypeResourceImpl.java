@@ -400,10 +400,15 @@ public abstract class BasePriceListOrderTypeResourceImpl
 
 		UnsafeFunction<PriceListOrderType, PriceListOrderType, Exception>
 			priceListOrderTypeUnsafeFunction = priceListOrderType -> {
-				deletePriceListOrderType(
-					priceListOrderType.getPriceListOrderTypeId());
+				if (priceListOrderType.getPriceListOrderTypeId() != null) {
+					deletePriceListOrderType(
+						priceListOrderType.getPriceListOrderTypeId());
 
-				return priceListOrderType;
+					return priceListOrderType;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceListOrderType. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

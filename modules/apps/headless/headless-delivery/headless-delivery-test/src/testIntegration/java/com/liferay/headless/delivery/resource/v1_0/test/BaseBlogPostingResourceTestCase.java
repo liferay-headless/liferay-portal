@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.BlogPosting;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.Rating;
@@ -48,6 +49,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -326,6 +328,60 @@ public abstract class BaseBlogPostingResourceTestCase {
 		throws Exception {
 
 		return testGraphQLBlogPosting_addBlogPosting();
+	}
+
+	@Test
+	public void testDeleteBlogPostingBatch() throws Exception {
+		BlogPosting blogPosting1 = testDeleteBlogPostingBatch_addBlogPosting();
+
+		testDeleteBlogPostingBatch_deleteBlogPosting(
+			"COMPLETED", blogPosting1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			blogPostingResource.getBlogPostingHttpResponse(
+				blogPosting1.getId()));
+	}
+
+	protected BlogPosting testDeleteBlogPostingBatch_addBlogPosting()
+		throws Exception {
+
+		return testDeleteBlogPosting_addBlogPosting();
+	}
+
+	protected void testDeleteBlogPostingBatch_deleteBlogPosting(
+			String expectedExecuteStatus, Long blogPostingId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", blogPostingId
+		).build();
+		HttpInvoker.HttpResponse response =
+			blogPostingResource.deleteBlogPostingBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3553,6 +3609,10 @@ public abstract class BaseBlogPostingResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.BlogPostingResource
 		_blogPostingResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

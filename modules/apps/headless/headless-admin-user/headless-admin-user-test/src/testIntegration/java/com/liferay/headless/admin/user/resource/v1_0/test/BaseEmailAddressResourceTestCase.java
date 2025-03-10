@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -694,6 +696,101 @@ public abstract class BaseEmailAddressResourceTestCase {
 		throws Exception {
 
 		return testGraphQLEmailAddress_addEmailAddress();
+	}
+
+	@Test
+	public void testDeleteEmailAddressBatch() throws Exception {
+		EmailAddress emailAddress1 =
+			testDeleteEmailAddressBatch_addEmailAddress();
+
+		testDeleteEmailAddressBatch_deleteEmailAddress(
+			"COMPLETED", null, emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress1.getId()));
+
+		EmailAddress emailAddress2 =
+			testDeleteEmailAddressBatch_addEmailAddress();
+
+		testDeleteEmailAddressBatch_deleteEmailAddress(
+			"COMPLETED", emailAddress2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress2.getId()));
+
+		emailAddress1 = testDeleteEmailAddressBatch_addEmailAddress();
+		emailAddress2 = testDeleteEmailAddressBatch_addEmailAddress();
+
+		testDeleteEmailAddressBatch_deleteEmailAddress(
+			"COMPLETED", emailAddress2.getExternalReferenceCode(),
+			emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress2.getId()));
+
+		testDeleteEmailAddressBatch_deleteEmailAddress(
+			"COMPLETED", emailAddress2.getExternalReferenceCode(),
+			emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress2.getId()));
+	}
+
+	protected EmailAddress testDeleteEmailAddressBatch_addEmailAddress()
+		throws Exception {
+
+		return testDeleteEmailAddress_addEmailAddress();
+	}
+
+	protected void testDeleteEmailAddressBatch_deleteEmailAddress(
+			String expectedExecuteStatus, String emailAddressERC,
+			Long emailAddressId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", emailAddressId
+		).<String, Object>put(
+			"externalReferenceCode", emailAddressERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			emailAddressResource.deleteEmailAddressBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2228,6 +2325,10 @@ public abstract class BaseEmailAddressResourceTestCase {
 	@Inject
 	private com.liferay.headless.admin.user.resource.v1_0.EmailAddressResource
 		_emailAddressResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

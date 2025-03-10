@@ -189,9 +189,14 @@ public abstract class BaseExperimentResourceImpl
 
 		UnsafeFunction<Experiment, Experiment, Exception>
 			experimentUnsafeFunction = experiment -> {
-				deleteExperiment(experiment.getId());
+				if (experiment.getId() != null) {
+					deleteExperiment(experiment.getId());
 
-				return experiment;
+					return experiment;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete experiment. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

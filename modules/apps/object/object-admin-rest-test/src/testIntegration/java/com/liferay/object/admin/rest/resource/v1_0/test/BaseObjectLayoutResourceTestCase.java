@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayout;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1075,6 +1077,61 @@ public abstract class BaseObjectLayoutResourceTestCase {
 		throws Exception {
 
 		return testGraphQLObjectLayout_addObjectLayout();
+	}
+
+	@Test
+	public void testDeleteObjectLayoutBatch() throws Exception {
+		ObjectLayout objectLayout1 =
+			testDeleteObjectLayoutBatch_addObjectLayout();
+
+		testDeleteObjectLayoutBatch_deleteObjectLayout(
+			"COMPLETED", objectLayout1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectLayoutResource.getObjectLayoutHttpResponse(
+				objectLayout1.getId()));
+	}
+
+	protected ObjectLayout testDeleteObjectLayoutBatch_addObjectLayout()
+		throws Exception {
+
+		return testDeleteObjectLayout_addObjectLayout();
+	}
+
+	protected void testDeleteObjectLayoutBatch_deleteObjectLayout(
+			String expectedExecuteStatus, Long objectLayoutId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", objectLayoutId
+		).build();
+		HttpInvoker.HttpResponse response =
+			objectLayoutResource.deleteObjectLayoutBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2300,6 +2357,10 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	@Inject
 	private com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource
 		_objectLayoutResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

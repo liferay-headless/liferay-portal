@@ -2250,9 +2250,14 @@ public abstract class BaseDocumentResourceImpl
 
 		UnsafeFunction<Document, Document, Exception> documentUnsafeFunction =
 			document -> {
-				deleteDocument(document.getId());
+				if (document.getId() != null) {
+					deleteDocument(document.getId());
 
-				return document;
+					return document;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete document. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

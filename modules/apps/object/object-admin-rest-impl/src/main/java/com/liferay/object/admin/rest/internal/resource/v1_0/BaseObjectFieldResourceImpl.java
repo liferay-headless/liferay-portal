@@ -759,9 +759,14 @@ public abstract class BaseObjectFieldResourceImpl
 
 		UnsafeFunction<ObjectField, ObjectField, Exception>
 			objectFieldUnsafeFunction = objectField -> {
-				deleteObjectField(objectField.getId());
+				if (objectField.getId() != null) {
+					deleteObjectField(objectField.getId());
 
-				return objectField;
+					return objectField;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectField. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

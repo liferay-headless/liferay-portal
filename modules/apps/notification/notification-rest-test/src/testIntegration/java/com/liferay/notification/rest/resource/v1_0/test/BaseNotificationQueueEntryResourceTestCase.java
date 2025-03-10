@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.notification.rest.client.dto.v1_0.NotificationQueueEntry;
 import com.liferay.notification.rest.client.http.HttpInvoker;
 import com.liferay.notification.rest.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -858,6 +860,65 @@ public abstract class BaseNotificationQueueEntryResourceTestCase {
 		throws Exception {
 
 		return testGraphQLNotificationQueueEntry_addNotificationQueueEntry();
+	}
+
+	@Test
+	public void testDeleteNotificationQueueEntryBatch() throws Exception {
+		NotificationQueueEntry notificationQueueEntry1 =
+			testDeleteNotificationQueueEntryBatch_addNotificationQueueEntry();
+
+		testDeleteNotificationQueueEntryBatch_deleteNotificationQueueEntry(
+			"COMPLETED", notificationQueueEntry1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			notificationQueueEntryResource.
+				getNotificationQueueEntryHttpResponse(
+					notificationQueueEntry1.getId()));
+	}
+
+	protected NotificationQueueEntry
+			testDeleteNotificationQueueEntryBatch_addNotificationQueueEntry()
+		throws Exception {
+
+		return testDeleteNotificationQueueEntry_addNotificationQueueEntry();
+	}
+
+	protected void
+			testDeleteNotificationQueueEntryBatch_deleteNotificationQueueEntry(
+				String expectedExecuteStatus, Long notificationQueueEntryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", notificationQueueEntryId
+		).build();
+		HttpInvoker.HttpResponse response =
+			notificationQueueEntryResource.
+				deleteNotificationQueueEntryBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2424,6 +2485,10 @@ public abstract class BaseNotificationQueueEntryResourceTestCase {
 	private
 		com.liferay.notification.rest.resource.v1_0.
 			NotificationQueueEntryResource _notificationQueueEntryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

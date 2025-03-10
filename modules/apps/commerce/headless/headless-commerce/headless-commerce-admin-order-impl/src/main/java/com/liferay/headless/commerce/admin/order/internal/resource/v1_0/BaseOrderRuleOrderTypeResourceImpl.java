@@ -408,10 +408,15 @@ public abstract class BaseOrderRuleOrderTypeResourceImpl
 
 		UnsafeFunction<OrderRuleOrderType, OrderRuleOrderType, Exception>
 			orderRuleOrderTypeUnsafeFunction = orderRuleOrderType -> {
-				deleteOrderRuleOrderType(
-					orderRuleOrderType.getOrderRuleOrderTypeId());
+				if (orderRuleOrderType.getOrderRuleOrderTypeId() != null) {
+					deleteOrderRuleOrderType(
+						orderRuleOrderType.getOrderRuleOrderTypeId());
 
-				return orderRuleOrderType;
+					return orderRuleOrderType;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete orderRuleOrderType. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

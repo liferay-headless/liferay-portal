@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowInstance;
 import com.liferay.headless.admin.workflow.client.http.HttpInvoker;
 import com.liferay.headless.admin.workflow.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -562,6 +564,62 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWorkflowInstance_addWorkflowInstance();
+	}
+
+	@Test
+	public void testDeleteWorkflowInstanceBatch() throws Exception {
+		WorkflowInstance workflowInstance1 =
+			testDeleteWorkflowInstanceBatch_addWorkflowInstance();
+
+		testDeleteWorkflowInstanceBatch_deleteWorkflowInstance(
+			"COMPLETED", workflowInstance1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			workflowInstanceResource.getWorkflowInstanceHttpResponse(
+				workflowInstance1.getId()));
+	}
+
+	protected WorkflowInstance
+			testDeleteWorkflowInstanceBatch_addWorkflowInstance()
+		throws Exception {
+
+		return testDeleteWorkflowInstance_addWorkflowInstance();
+	}
+
+	protected void testDeleteWorkflowInstanceBatch_deleteWorkflowInstance(
+			String expectedExecuteStatus, Long workflowInstanceId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", workflowInstanceId
+		).build();
+		HttpInvoker.HttpResponse response =
+			workflowInstanceResource.deleteWorkflowInstanceBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1842,6 +1900,10 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 	private
 		com.liferay.headless.admin.workflow.resource.v1_0.
 			WorkflowInstanceResource _workflowInstanceResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

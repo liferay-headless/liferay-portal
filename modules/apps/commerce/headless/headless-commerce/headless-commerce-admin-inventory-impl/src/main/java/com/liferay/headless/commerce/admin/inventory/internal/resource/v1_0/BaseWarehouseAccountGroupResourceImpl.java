@@ -438,10 +438,17 @@ public abstract class BaseWarehouseAccountGroupResourceImpl
 
 		UnsafeFunction<WarehouseAccountGroup, WarehouseAccountGroup, Exception>
 			warehouseAccountGroupUnsafeFunction = warehouseAccountGroup -> {
-				deleteWarehouseAccountGroup(
-					warehouseAccountGroup.getWarehouseAccountGroupId());
+				if (warehouseAccountGroup.getWarehouseAccountGroupId() !=
+						null) {
 
-				return warehouseAccountGroup;
+					deleteWarehouseAccountGroup(
+						warehouseAccountGroup.getWarehouseAccountGroupId());
+
+					return warehouseAccountGroup;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete warehouseAccountGroup. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

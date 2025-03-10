@@ -361,9 +361,14 @@ public abstract class BaseProductOptionValueResourceImpl
 
 		UnsafeFunction<ProductOptionValue, ProductOptionValue, Exception>
 			productOptionValueUnsafeFunction = productOptionValue -> {
-				deleteProductOptionValue(productOptionValue.getId());
+				if (productOptionValue.getId() != null) {
+					deleteProductOptionValue(productOptionValue.getId());
 
-				return productOptionValue;
+					return productOptionValue;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete productOptionValue. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -289,9 +289,14 @@ public abstract class BaseProductAccountGroupResourceImpl
 
 		UnsafeFunction<ProductAccountGroup, ProductAccountGroup, Exception>
 			productAccountGroupUnsafeFunction = productAccountGroup -> {
-				deleteProductAccountGroup(productAccountGroup.getId());
+				if (productAccountGroup.getId() != null) {
+					deleteProductAccountGroup(productAccountGroup.getId());
 
-				return productAccountGroup;
+					return productAccountGroup;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete productAccountGroup. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

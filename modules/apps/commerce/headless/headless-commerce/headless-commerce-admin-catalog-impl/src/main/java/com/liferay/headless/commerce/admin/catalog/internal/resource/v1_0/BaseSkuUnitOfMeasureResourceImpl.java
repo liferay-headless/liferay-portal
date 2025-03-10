@@ -465,9 +465,14 @@ public abstract class BaseSkuUnitOfMeasureResourceImpl
 
 		UnsafeFunction<SkuUnitOfMeasure, SkuUnitOfMeasure, Exception>
 			skuUnitOfMeasureUnsafeFunction = skuUnitOfMeasure -> {
-				deleteSkuUnitOfMeasure(skuUnitOfMeasure.getId());
+				if (skuUnitOfMeasure.getId() != null) {
+					deleteSkuUnitOfMeasure(skuUnitOfMeasure.getId());
 
-				return skuUnitOfMeasure;
+					return skuUnitOfMeasure;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete skuUnitOfMeasure. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

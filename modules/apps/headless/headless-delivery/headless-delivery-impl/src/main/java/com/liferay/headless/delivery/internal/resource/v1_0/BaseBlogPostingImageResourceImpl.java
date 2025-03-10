@@ -615,9 +615,14 @@ public abstract class BaseBlogPostingImageResourceImpl
 
 		UnsafeFunction<BlogPostingImage, BlogPostingImage, Exception>
 			blogPostingImageUnsafeFunction = blogPostingImage -> {
-				deleteBlogPostingImage(blogPostingImage.getId());
+				if (blogPostingImage.getId() != null) {
+					deleteBlogPostingImage(blogPostingImage.getId());
 
-				return blogPostingImage;
+					return blogPostingImage;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete blogPostingImage. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

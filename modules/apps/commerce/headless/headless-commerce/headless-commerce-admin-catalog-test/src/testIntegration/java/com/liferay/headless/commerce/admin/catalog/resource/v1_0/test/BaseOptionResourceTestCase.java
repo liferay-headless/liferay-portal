@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Option;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -904,6 +906,83 @@ public abstract class BaseOptionResourceTestCase {
 
 	protected Option testGraphQLDeleteOption_addOption() throws Exception {
 		return testGraphQLOption_addOption();
+	}
+
+	@Test
+	public void testDeleteOptionBatch() throws Exception {
+		Option option1 = testDeleteOptionBatch_addOption();
+
+		testDeleteOptionBatch_deleteOption("COMPLETED", null, option1.getId());
+
+		assertHttpResponseStatusCode(
+			404, optionResource.getOptionHttpResponse(option1.getId()));
+
+		Option option2 = testDeleteOptionBatch_addOption();
+
+		testDeleteOptionBatch_deleteOption(
+			"COMPLETED", option2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, optionResource.getOptionHttpResponse(option2.getId()));
+
+		option1 = testDeleteOptionBatch_addOption();
+		option2 = testDeleteOptionBatch_addOption();
+
+		testDeleteOptionBatch_deleteOption(
+			"COMPLETED", option2.getExternalReferenceCode(), option1.getId());
+
+		assertHttpResponseStatusCode(
+			404, optionResource.getOptionHttpResponse(option1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, optionResource.getOptionHttpResponse(option2.getId()));
+
+		testDeleteOptionBatch_deleteOption(
+			"COMPLETED", option2.getExternalReferenceCode(), option1.getId());
+
+		assertHttpResponseStatusCode(
+			404, optionResource.getOptionHttpResponse(option2.getId()));
+	}
+
+	protected Option testDeleteOptionBatch_addOption() throws Exception {
+		return testDeleteOption_addOption();
+	}
+
+	protected void testDeleteOptionBatch_deleteOption(
+			String expectedExecuteStatus, String optionERC, Long optionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", optionId
+		).<String, Object>put(
+			"externalReferenceCode", optionERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			optionResource.deleteOptionBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2178,6 +2257,10 @@ public abstract class BaseOptionResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionResource
 			_optionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

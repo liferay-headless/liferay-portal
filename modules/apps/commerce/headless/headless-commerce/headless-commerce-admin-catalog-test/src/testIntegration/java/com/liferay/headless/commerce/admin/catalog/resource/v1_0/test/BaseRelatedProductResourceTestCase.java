@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.RelatedProduct;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -750,6 +752,61 @@ public abstract class BaseRelatedProductResourceTestCase {
 		throws Exception {
 
 		return testGraphQLRelatedProduct_addRelatedProduct();
+	}
+
+	@Test
+	public void testDeleteRelatedProductBatch() throws Exception {
+		RelatedProduct relatedProduct1 =
+			testDeleteRelatedProductBatch_addRelatedProduct();
+
+		testDeleteRelatedProductBatch_deleteRelatedProduct(
+			"COMPLETED", relatedProduct1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			relatedProductResource.getRelatedProductHttpResponse(
+				relatedProduct1.getId()));
+	}
+
+	protected RelatedProduct testDeleteRelatedProductBatch_addRelatedProduct()
+		throws Exception {
+
+		return testDeleteRelatedProduct_addRelatedProduct();
+	}
+
+	protected void testDeleteRelatedProductBatch_deleteRelatedProduct(
+			String expectedExecuteStatus, Long relatedProductId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", relatedProductId
+		).build();
+		HttpInvoker.HttpResponse response =
+			relatedProductResource.deleteRelatedProductBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1843,6 +1900,10 @@ public abstract class BaseRelatedProductResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		RelatedProductResource _relatedProductResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

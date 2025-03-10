@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.WikiPageAttachment;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -597,6 +599,63 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWikiPageAttachment_addWikiPageAttachment();
+	}
+
+	@Test
+	public void testDeleteWikiPageAttachmentBatch() throws Exception {
+		WikiPageAttachment wikiPageAttachment1 =
+			testDeleteWikiPageAttachmentBatch_addWikiPageAttachment();
+
+		testDeleteWikiPageAttachmentBatch_deleteWikiPageAttachment(
+			"COMPLETED", wikiPageAttachment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			wikiPageAttachmentResource.getWikiPageAttachmentHttpResponse(
+				wikiPageAttachment1.getId()));
+	}
+
+	protected WikiPageAttachment
+			testDeleteWikiPageAttachmentBatch_addWikiPageAttachment()
+		throws Exception {
+
+		return testDeleteWikiPageAttachment_addWikiPageAttachment();
+	}
+
+	protected void testDeleteWikiPageAttachmentBatch_deleteWikiPageAttachment(
+			String expectedExecuteStatus, Long wikiPageAttachmentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", wikiPageAttachmentId
+		).build();
+		HttpInvoker.HttpResponse response =
+			wikiPageAttachmentResource.
+				deleteWikiPageAttachmentBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2133,6 +2192,10 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.WikiPageAttachmentResource
 			_wikiPageAttachmentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

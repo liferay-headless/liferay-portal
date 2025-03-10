@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.client.http.HttpInvoker;
 import com.liferay.headless.admin.workflow.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -955,6 +957,63 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWorkflowDefinition_addWorkflowDefinition();
+	}
+
+	@Test
+	public void testDeleteWorkflowDefinitionBatch() throws Exception {
+		WorkflowDefinition workflowDefinition1 =
+			testDeleteWorkflowDefinitionBatch_addWorkflowDefinition();
+
+		testDeleteWorkflowDefinitionBatch_deleteWorkflowDefinition(
+			"COMPLETED", workflowDefinition1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			workflowDefinitionResource.getWorkflowDefinitionHttpResponse(
+				workflowDefinition1.getId()));
+	}
+
+	protected WorkflowDefinition
+			testDeleteWorkflowDefinitionBatch_addWorkflowDefinition()
+		throws Exception {
+
+		return testDeleteWorkflowDefinition_addWorkflowDefinition();
+	}
+
+	protected void testDeleteWorkflowDefinitionBatch_deleteWorkflowDefinition(
+			String expectedExecuteStatus, Long workflowDefinitionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", workflowDefinitionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			workflowDefinitionResource.
+				deleteWorkflowDefinitionBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2560,6 +2619,10 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	private
 		com.liferay.headless.admin.workflow.resource.v1_0.
 			WorkflowDefinitionResource _workflowDefinitionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -273,11 +273,18 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 			<PaymentMethodGroupRelTerm, PaymentMethodGroupRelTerm, Exception>
 				paymentMethodGroupRelTermUnsafeFunction =
 					paymentMethodGroupRelTerm -> {
-						deletePaymentMethodGroupRelTerm(
-							paymentMethodGroupRelTerm.
-								getPaymentMethodGroupRelTermId());
+						if (paymentMethodGroupRelTerm.
+								getPaymentMethodGroupRelTermId() != null) {
 
-						return paymentMethodGroupRelTerm;
+							deletePaymentMethodGroupRelTerm(
+								paymentMethodGroupRelTerm.
+									getPaymentMethodGroupRelTermId());
+
+							return paymentMethodGroupRelTerm;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete paymentMethodGroupRelTerm. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -482,10 +482,15 @@ public abstract class BaseNotificationQueueEntryResourceImpl
 			<NotificationQueueEntry, NotificationQueueEntry, Exception>
 				notificationQueueEntryUnsafeFunction =
 					notificationQueueEntry -> {
-						deleteNotificationQueueEntry(
-							notificationQueueEntry.getId());
+						if (notificationQueueEntry.getId() != null) {
+							deleteNotificationQueueEntry(
+								notificationQueueEntry.getId());
 
-						return notificationQueueEntry;
+							return notificationQueueEntry;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete notificationQueueEntry. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

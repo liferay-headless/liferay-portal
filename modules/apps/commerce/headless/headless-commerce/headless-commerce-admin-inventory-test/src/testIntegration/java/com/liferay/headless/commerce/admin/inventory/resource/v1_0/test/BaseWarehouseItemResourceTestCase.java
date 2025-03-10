@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.inventory.client.dto.v1_0.WarehouseItem;
 import com.liferay.headless.commerce.admin.inventory.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.inventory.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -721,6 +723,101 @@ public abstract class BaseWarehouseItemResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWarehouseItem_addWarehouseItem();
+	}
+
+	@Test
+	public void testDeleteWarehouseItemBatch() throws Exception {
+		WarehouseItem warehouseItem1 =
+			testDeleteWarehouseItemBatch_addWarehouseItem();
+
+		testDeleteWarehouseItemBatch_deleteWarehouseItem(
+			"COMPLETED", null, warehouseItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem1.getId()));
+
+		WarehouseItem warehouseItem2 =
+			testDeleteWarehouseItemBatch_addWarehouseItem();
+
+		testDeleteWarehouseItemBatch_deleteWarehouseItem(
+			"COMPLETED", warehouseItem2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem2.getId()));
+
+		warehouseItem1 = testDeleteWarehouseItemBatch_addWarehouseItem();
+		warehouseItem2 = testDeleteWarehouseItemBatch_addWarehouseItem();
+
+		testDeleteWarehouseItemBatch_deleteWarehouseItem(
+			"COMPLETED", warehouseItem2.getExternalReferenceCode(),
+			warehouseItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem2.getId()));
+
+		testDeleteWarehouseItemBatch_deleteWarehouseItem(
+			"COMPLETED", warehouseItem2.getExternalReferenceCode(),
+			warehouseItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem2.getId()));
+	}
+
+	protected WarehouseItem testDeleteWarehouseItemBatch_addWarehouseItem()
+		throws Exception {
+
+		return testDeleteWarehouseItem_addWarehouseItem();
+	}
+
+	protected void testDeleteWarehouseItemBatch_deleteWarehouseItem(
+			String expectedExecuteStatus, String warehouseItemERC,
+			Long warehouseItemId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", warehouseItemId
+		).<String, Object>put(
+			"externalReferenceCode", warehouseItemERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			warehouseItemResource.deleteWarehouseItemBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2458,6 +2555,10 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.inventory.resource.v1_0.
 		WarehouseItemResource _warehouseItemResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

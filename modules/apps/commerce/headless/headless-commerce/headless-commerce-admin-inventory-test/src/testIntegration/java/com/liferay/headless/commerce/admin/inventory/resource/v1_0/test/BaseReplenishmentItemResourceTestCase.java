@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.inventory.client.dto.v1_0.ReplenishmentItem;
 import com.liferay.headless.commerce.admin.inventory.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.inventory.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -603,6 +605,104 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 		throws Exception {
 
 		return testGraphQLReplenishmentItem_addReplenishmentItem();
+	}
+
+	@Test
+	public void testDeleteReplenishmentItemBatch() throws Exception {
+		ReplenishmentItem replenishmentItem1 =
+			testDeleteReplenishmentItemBatch_addReplenishmentItem();
+
+		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
+			"COMPLETED", null, replenishmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			replenishmentItemResource.getReplenishmentItemHttpResponse(
+				replenishmentItem1.getId()));
+
+		ReplenishmentItem replenishmentItem2 =
+			testDeleteReplenishmentItemBatch_addReplenishmentItem();
+
+		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
+			"COMPLETED", replenishmentItem2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			replenishmentItemResource.getReplenishmentItemHttpResponse(
+				replenishmentItem2.getId()));
+
+		replenishmentItem1 =
+			testDeleteReplenishmentItemBatch_addReplenishmentItem();
+		replenishmentItem2 =
+			testDeleteReplenishmentItemBatch_addReplenishmentItem();
+
+		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
+			"COMPLETED", replenishmentItem2.getExternalReferenceCode(),
+			replenishmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			replenishmentItemResource.getReplenishmentItemHttpResponse(
+				replenishmentItem1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			replenishmentItemResource.getReplenishmentItemHttpResponse(
+				replenishmentItem2.getId()));
+
+		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
+			"COMPLETED", replenishmentItem2.getExternalReferenceCode(),
+			replenishmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			replenishmentItemResource.getReplenishmentItemHttpResponse(
+				replenishmentItem2.getId()));
+	}
+
+	protected ReplenishmentItem
+			testDeleteReplenishmentItemBatch_addReplenishmentItem()
+		throws Exception {
+
+		return testDeleteReplenishmentItem_addReplenishmentItem();
+	}
+
+	protected void testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
+			String expectedExecuteStatus, String replenishmentItemERC,
+			Long replenishmentItemId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", replenishmentItemId
+		).<String, Object>put(
+			"externalReferenceCode", replenishmentItemERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			replenishmentItemResource.deleteReplenishmentItemBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2348,6 +2448,10 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.inventory.resource.v1_0.
 		ReplenishmentItemResource _replenishmentItemResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

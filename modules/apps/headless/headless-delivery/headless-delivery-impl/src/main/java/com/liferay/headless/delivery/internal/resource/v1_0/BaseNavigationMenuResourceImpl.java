@@ -1042,9 +1042,14 @@ public abstract class BaseNavigationMenuResourceImpl
 
 		UnsafeFunction<NavigationMenu, NavigationMenu, Exception>
 			navigationMenuUnsafeFunction = navigationMenu -> {
-				deleteNavigationMenu(navigationMenu.getId());
+				if (navigationMenu.getId() != null) {
+					deleteNavigationMenu(navigationMenu.getId());
 
-				return navigationMenu;
+					return navigationMenu;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete navigationMenu. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

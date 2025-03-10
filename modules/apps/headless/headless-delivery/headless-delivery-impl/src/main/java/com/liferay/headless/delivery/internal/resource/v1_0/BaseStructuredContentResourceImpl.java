@@ -2755,9 +2755,14 @@ public abstract class BaseStructuredContentResourceImpl
 
 		UnsafeFunction<StructuredContent, StructuredContent, Exception>
 			structuredContentUnsafeFunction = structuredContent -> {
-				deleteStructuredContent(structuredContent.getId());
+				if (structuredContent.getId() != null) {
+					deleteStructuredContent(structuredContent.getId());
 
-				return structuredContent;
+					return structuredContent;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete structuredContent. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

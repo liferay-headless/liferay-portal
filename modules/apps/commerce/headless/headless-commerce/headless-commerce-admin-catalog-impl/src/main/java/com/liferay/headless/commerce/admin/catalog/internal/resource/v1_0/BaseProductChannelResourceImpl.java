@@ -279,9 +279,14 @@ public abstract class BaseProductChannelResourceImpl
 
 		UnsafeFunction<ProductChannel, ProductChannel, Exception>
 			productChannelUnsafeFunction = productChannel -> {
-				deleteProductChannel(productChannel.getId());
+				if (productChannel.getId() != null) {
+					deleteProductChannel(productChannel.getId());
 
-				return productChannel;
+					return productChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete productChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

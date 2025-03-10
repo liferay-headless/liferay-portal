@@ -273,11 +273,18 @@ public abstract class BaseShippingFixedOptionTermResourceImpl
 			<ShippingFixedOptionTerm, ShippingFixedOptionTerm, Exception>
 				shippingFixedOptionTermUnsafeFunction =
 					shippingFixedOptionTerm -> {
-						deleteShippingFixedOptionTerm(
-							shippingFixedOptionTerm.
-								getShippingFixedOptionTermId());
+						if (shippingFixedOptionTerm.
+								getShippingFixedOptionTermId() != null) {
 
-						return shippingFixedOptionTerm;
+							deleteShippingFixedOptionTerm(
+								shippingFixedOptionTerm.
+									getShippingFixedOptionTermId());
+
+							return shippingFixedOptionTerm;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete shippingFixedOptionTerm. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

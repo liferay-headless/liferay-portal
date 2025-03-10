@@ -2076,10 +2076,15 @@ public abstract class BaseStructuredContentFolderResourceImpl
 			<StructuredContentFolder, StructuredContentFolder, Exception>
 				structuredContentFolderUnsafeFunction =
 					structuredContentFolder -> {
-						deleteStructuredContentFolder(
-							structuredContentFolder.getId());
+						if (structuredContentFolder.getId() != null) {
+							deleteStructuredContentFolder(
+								structuredContentFolder.getId());
 
-						return structuredContentFolder;
+							return structuredContentFolder;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete structuredContentFolder. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

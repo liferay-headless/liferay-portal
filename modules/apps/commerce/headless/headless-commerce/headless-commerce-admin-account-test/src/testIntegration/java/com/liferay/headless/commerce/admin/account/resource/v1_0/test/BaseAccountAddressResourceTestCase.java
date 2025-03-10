@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.AccountAddress;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.User;
 import com.liferay.headless.commerce.admin.account.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -509,6 +511,101 @@ public abstract class BaseAccountAddressResourceTestCase {
 		throws Exception {
 
 		return testGraphQLAccountAddress_addAccountAddress();
+	}
+
+	@Test
+	public void testDeleteAccountAddressBatch() throws Exception {
+		AccountAddress accountAddress1 =
+			testDeleteAccountAddressBatch_addAccountAddress();
+
+		testDeleteAccountAddressBatch_deleteAccountAddress(
+			"COMPLETED", null, accountAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountAddressResource.getAccountAddressHttpResponse(
+				accountAddress1.getId()));
+
+		AccountAddress accountAddress2 =
+			testDeleteAccountAddressBatch_addAccountAddress();
+
+		testDeleteAccountAddressBatch_deleteAccountAddress(
+			"COMPLETED", accountAddress2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			accountAddressResource.getAccountAddressHttpResponse(
+				accountAddress2.getId()));
+
+		accountAddress1 = testDeleteAccountAddressBatch_addAccountAddress();
+		accountAddress2 = testDeleteAccountAddressBatch_addAccountAddress();
+
+		testDeleteAccountAddressBatch_deleteAccountAddress(
+			"COMPLETED", accountAddress2.getExternalReferenceCode(),
+			accountAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountAddressResource.getAccountAddressHttpResponse(
+				accountAddress1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			accountAddressResource.getAccountAddressHttpResponse(
+				accountAddress2.getId()));
+
+		testDeleteAccountAddressBatch_deleteAccountAddress(
+			"COMPLETED", accountAddress2.getExternalReferenceCode(),
+			accountAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			accountAddressResource.getAccountAddressHttpResponse(
+				accountAddress2.getId()));
+	}
+
+	protected AccountAddress testDeleteAccountAddressBatch_addAccountAddress()
+		throws Exception {
+
+		return testDeleteAccountAddress_addAccountAddress();
+	}
+
+	protected void testDeleteAccountAddressBatch_deleteAccountAddress(
+			String expectedExecuteStatus, String accountAddressERC,
+			Long accountAddressId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", accountAddressId
+		).<String, Object>put(
+			"externalReferenceCode", accountAddressERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			accountAddressResource.deleteAccountAddressBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2768,6 +2865,10 @@ public abstract class BaseAccountAddressResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.account.resource.v1_0.
 		AccountAddressResource _accountAddressResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

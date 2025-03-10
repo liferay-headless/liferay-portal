@@ -629,10 +629,15 @@ public abstract class BaseKnowledgeBaseAttachmentResourceImpl
 			<KnowledgeBaseAttachment, KnowledgeBaseAttachment, Exception>
 				knowledgeBaseAttachmentUnsafeFunction =
 					knowledgeBaseAttachment -> {
-						deleteKnowledgeBaseAttachment(
-							knowledgeBaseAttachment.getId());
+						if (knowledgeBaseAttachment.getId() != null) {
+							deleteKnowledgeBaseAttachment(
+								knowledgeBaseAttachment.getId());
 
-						return knowledgeBaseAttachment;
+							return knowledgeBaseAttachment;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete knowledgeBaseAttachment. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

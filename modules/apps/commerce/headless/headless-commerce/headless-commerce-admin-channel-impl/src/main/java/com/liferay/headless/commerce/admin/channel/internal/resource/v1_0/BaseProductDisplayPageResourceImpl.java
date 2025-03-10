@@ -454,9 +454,14 @@ public abstract class BaseProductDisplayPageResourceImpl
 
 		UnsafeFunction<ProductDisplayPage, ProductDisplayPage, Exception>
 			productDisplayPageUnsafeFunction = productDisplayPage -> {
-				deleteProductDisplayPage(productDisplayPage.getId());
+				if (productDisplayPage.getId() != null) {
+					deleteProductDisplayPage(productDisplayPage.getId());
 
-				return productDisplayPage;
+					return productDisplayPage;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete productDisplayPage. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

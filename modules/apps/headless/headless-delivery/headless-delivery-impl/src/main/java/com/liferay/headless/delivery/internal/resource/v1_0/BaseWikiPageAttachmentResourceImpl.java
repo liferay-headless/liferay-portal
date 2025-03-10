@@ -583,9 +583,14 @@ public abstract class BaseWikiPageAttachmentResourceImpl
 
 		UnsafeFunction<WikiPageAttachment, WikiPageAttachment, Exception>
 			wikiPageAttachmentUnsafeFunction = wikiPageAttachment -> {
-				deleteWikiPageAttachment(wikiPageAttachment.getId());
+				if (wikiPageAttachment.getId() != null) {
+					deleteWikiPageAttachment(wikiPageAttachment.getId());
 
-				return wikiPageAttachment;
+					return wikiPageAttachment;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete wikiPageAttachment. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

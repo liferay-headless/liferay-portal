@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.channel.client.dto.v1_0.CategoryDisplayPage;
 import com.liferay.headless.commerce.admin.channel.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.channel.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -321,6 +323,63 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 		throws Exception {
 
 		return testGraphQLCategoryDisplayPage_addCategoryDisplayPage();
+	}
+
+	@Test
+	public void testDeleteCategoryDisplayPageBatch() throws Exception {
+		CategoryDisplayPage categoryDisplayPage1 =
+			testDeleteCategoryDisplayPageBatch_addCategoryDisplayPage();
+
+		testDeleteCategoryDisplayPageBatch_deleteCategoryDisplayPage(
+			"COMPLETED", categoryDisplayPage1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			categoryDisplayPageResource.getCategoryDisplayPageHttpResponse(
+				categoryDisplayPage1.getId()));
+	}
+
+	protected CategoryDisplayPage
+			testDeleteCategoryDisplayPageBatch_addCategoryDisplayPage()
+		throws Exception {
+
+		return testDeleteCategoryDisplayPage_addCategoryDisplayPage();
+	}
+
+	protected void testDeleteCategoryDisplayPageBatch_deleteCategoryDisplayPage(
+			String expectedExecuteStatus, Long categoryDisplayPageId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", categoryDisplayPageId
+		).build();
+		HttpInvoker.HttpResponse response =
+			categoryDisplayPageResource.
+				deleteCategoryDisplayPageBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2568,6 +2627,10 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.channel.resource.v1_0.
 		CategoryDisplayPageResource _categoryDisplayPageResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

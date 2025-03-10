@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -466,6 +468,55 @@ public abstract class BaseSLAResourceTestCase {
 
 	protected SLA testGraphQLDeleteSLA_addSLA() throws Exception {
 		return testGraphQLSLA_addSLA();
+	}
+
+	@Test
+	public void testDeleteSLABatch() throws Exception {
+		SLA sla1 = testDeleteSLABatch_addSLA();
+
+		testDeleteSLABatch_deleteSLA("COMPLETED", sla1.getId());
+
+		assertHttpResponseStatusCode(
+			404, slaResource.getSLAHttpResponse(sla1.getId()));
+	}
+
+	protected SLA testDeleteSLABatch_addSLA() throws Exception {
+		return testDeleteSLA_addSLA();
+	}
+
+	protected void testDeleteSLABatch_deleteSLA(
+			String expectedExecuteStatus, Long slaId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", slaId
+		).build();
+		HttpInvoker.HttpResponse response =
+			slaResource.deleteSLABatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1735,6 +1786,10 @@ public abstract class BaseSLAResourceTestCase {
 	@Inject
 	private com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResource
 		_slaResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

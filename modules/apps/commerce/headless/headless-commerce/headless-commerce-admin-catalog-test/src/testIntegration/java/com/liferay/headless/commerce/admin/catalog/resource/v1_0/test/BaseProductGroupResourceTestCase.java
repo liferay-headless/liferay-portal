@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductGroup;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -990,6 +992,101 @@ public abstract class BaseProductGroupResourceTestCase {
 		throws Exception {
 
 		return testGraphQLProductGroup_addProductGroup();
+	}
+
+	@Test
+	public void testDeleteProductGroupBatch() throws Exception {
+		ProductGroup productGroup1 =
+			testDeleteProductGroupBatch_addProductGroup();
+
+		testDeleteProductGroupBatch_deleteProductGroup(
+			"COMPLETED", null, productGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productGroupResource.getProductGroupHttpResponse(
+				productGroup1.getId()));
+
+		ProductGroup productGroup2 =
+			testDeleteProductGroupBatch_addProductGroup();
+
+		testDeleteProductGroupBatch_deleteProductGroup(
+			"COMPLETED", productGroup2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			productGroupResource.getProductGroupHttpResponse(
+				productGroup2.getId()));
+
+		productGroup1 = testDeleteProductGroupBatch_addProductGroup();
+		productGroup2 = testDeleteProductGroupBatch_addProductGroup();
+
+		testDeleteProductGroupBatch_deleteProductGroup(
+			"COMPLETED", productGroup2.getExternalReferenceCode(),
+			productGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productGroupResource.getProductGroupHttpResponse(
+				productGroup1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			productGroupResource.getProductGroupHttpResponse(
+				productGroup2.getId()));
+
+		testDeleteProductGroupBatch_deleteProductGroup(
+			"COMPLETED", productGroup2.getExternalReferenceCode(),
+			productGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productGroupResource.getProductGroupHttpResponse(
+				productGroup2.getId()));
+	}
+
+	protected ProductGroup testDeleteProductGroupBatch_addProductGroup()
+		throws Exception {
+
+		return testDeleteProductGroup_addProductGroup();
+	}
+
+	protected void testDeleteProductGroupBatch_deleteProductGroup(
+			String expectedExecuteStatus, String productGroupERC,
+			Long productGroupId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", productGroupId
+		).<String, Object>put(
+			"externalReferenceCode", productGroupERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			productGroupResource.deleteProductGroupBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2087,6 +2184,10 @@ public abstract class BaseProductGroupResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		ProductGroupResource _productGroupResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -705,9 +705,14 @@ public abstract class BaseObjectActionResourceImpl
 
 		UnsafeFunction<ObjectAction, ObjectAction, Exception>
 			objectActionUnsafeFunction = objectAction -> {
-				deleteObjectAction(objectAction.getId());
+				if (objectAction.getId() != null) {
+					deleteObjectAction(objectAction.getId());
 
-				return objectAction;
+					return objectAction;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectAction. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

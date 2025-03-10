@@ -197,9 +197,14 @@ public abstract class BaseFormDocumentResourceImpl
 
 		UnsafeFunction<FormDocument, FormDocument, Exception>
 			formDocumentUnsafeFunction = formDocument -> {
-				deleteFormDocument(formDocument.getId());
+				if (formDocument.getId() != null) {
+					deleteFormDocument(formDocument.getId());
 
-				return formDocument;
+					return formDocument;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete formDocument. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

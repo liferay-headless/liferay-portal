@@ -620,9 +620,14 @@ public abstract class BaseObjectLayoutResourceImpl
 
 		UnsafeFunction<ObjectLayout, ObjectLayout, Exception>
 			objectLayoutUnsafeFunction = objectLayout -> {
-				deleteObjectLayout(objectLayout.getId());
+				if (objectLayout.getId() != null) {
+					deleteObjectLayout(objectLayout.getId());
 
-				return objectLayout;
+					return objectLayout;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectLayout. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

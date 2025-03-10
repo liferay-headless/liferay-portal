@@ -650,9 +650,14 @@ public abstract class BaseObjectViewResourceImpl
 
 		UnsafeFunction<ObjectView, ObjectView, Exception>
 			objectViewUnsafeFunction = objectView -> {
-				deleteObjectView(objectView.getId());
+				if (objectView.getId() != null) {
+					deleteObjectView(objectView.getId());
 
-				return objectView;
+					return objectView;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectView. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

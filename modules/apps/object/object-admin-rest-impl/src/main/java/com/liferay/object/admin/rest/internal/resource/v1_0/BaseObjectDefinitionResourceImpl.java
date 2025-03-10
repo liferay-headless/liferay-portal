@@ -814,9 +814,14 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 		UnsafeFunction<ObjectDefinition, ObjectDefinition, Exception>
 			objectDefinitionUnsafeFunction = objectDefinition -> {
-				deleteObjectDefinition(objectDefinition.getId());
+				if (objectDefinition.getId() != null) {
+					deleteObjectDefinition(objectDefinition.getId());
 
-				return objectDefinition;
+					return objectDefinition;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete objectDefinition. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

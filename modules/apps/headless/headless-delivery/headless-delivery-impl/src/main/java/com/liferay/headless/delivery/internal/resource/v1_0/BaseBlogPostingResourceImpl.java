@@ -1424,9 +1424,14 @@ public abstract class BaseBlogPostingResourceImpl
 
 		UnsafeFunction<BlogPosting, BlogPosting, Exception>
 			blogPostingUnsafeFunction = blogPosting -> {
-				deleteBlogPosting(blogPosting.getId());
+				if (blogPosting.getId() != null) {
+					deleteBlogPosting(blogPosting.getId());
 
-				return blogPosting;
+					return blogPosting;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete blogPosting. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

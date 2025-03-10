@@ -336,10 +336,15 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 			<ProductVirtualSettingsFileEntry, ProductVirtualSettingsFileEntry,
 			 Exception> productVirtualSettingsFileEntryUnsafeFunction =
 				productVirtualSettingsFileEntry -> {
-					deleteProductVirtualSettingsFileEntry(
-						productVirtualSettingsFileEntry.getId());
+					if (productVirtualSettingsFileEntry.getId() != null) {
+						deleteProductVirtualSettingsFileEntry(
+							productVirtualSettingsFileEntry.getId());
 
-					return productVirtualSettingsFileEntry;
+						return productVirtualSettingsFileEntry;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete productVirtualSettingsFileEntry. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

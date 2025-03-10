@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.shipment.client.dto.v1_0.ShipmentItem;
 import com.liferay.headless.commerce.admin.shipment.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -487,6 +489,101 @@ public abstract class BaseShipmentItemResourceTestCase {
 		throws Exception {
 
 		return testGraphQLShipmentItem_addShipmentItem();
+	}
+
+	@Test
+	public void testDeleteShipmentItemBatch() throws Exception {
+		ShipmentItem shipmentItem1 =
+			testDeleteShipmentItemBatch_addShipmentItem();
+
+		testDeleteShipmentItemBatch_deleteShipmentItem(
+			"COMPLETED", null, shipmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			shipmentItemResource.getShipmentItemHttpResponse(
+				shipmentItem1.getId()));
+
+		ShipmentItem shipmentItem2 =
+			testDeleteShipmentItemBatch_addShipmentItem();
+
+		testDeleteShipmentItemBatch_deleteShipmentItem(
+			"COMPLETED", shipmentItem2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			shipmentItemResource.getShipmentItemHttpResponse(
+				shipmentItem2.getId()));
+
+		shipmentItem1 = testDeleteShipmentItemBatch_addShipmentItem();
+		shipmentItem2 = testDeleteShipmentItemBatch_addShipmentItem();
+
+		testDeleteShipmentItemBatch_deleteShipmentItem(
+			"COMPLETED", shipmentItem2.getExternalReferenceCode(),
+			shipmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			shipmentItemResource.getShipmentItemHttpResponse(
+				shipmentItem1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			shipmentItemResource.getShipmentItemHttpResponse(
+				shipmentItem2.getId()));
+
+		testDeleteShipmentItemBatch_deleteShipmentItem(
+			"COMPLETED", shipmentItem2.getExternalReferenceCode(),
+			shipmentItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			shipmentItemResource.getShipmentItemHttpResponse(
+				shipmentItem2.getId()));
+	}
+
+	protected ShipmentItem testDeleteShipmentItemBatch_addShipmentItem()
+		throws Exception {
+
+		return testDeleteShipmentItem_addShipmentItem();
+	}
+
+	protected void testDeleteShipmentItemBatch_deleteShipmentItem(
+			String expectedExecuteStatus, String shipmentItemERC,
+			Long shipmentItemId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", shipmentItemId
+		).<String, Object>put(
+			"externalReferenceCode", shipmentItemERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			shipmentItemResource.deleteShipmentItemBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2615,6 +2712,10 @@ public abstract class BaseShipmentItemResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.shipment.resource.v1_0.
 		ShipmentItemResource _shipmentItemResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

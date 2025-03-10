@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.Account;
 import com.liferay.headless.commerce.admin.account.client.dto.v1_0.User;
 import com.liferay.headless.commerce.admin.account.client.http.HttpInvoker;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -910,6 +912,84 @@ public abstract class BaseAccountResourceTestCase {
 
 	protected Account testGraphQLDeleteAccount_addAccount() throws Exception {
 		return testGraphQLAccount_addAccount();
+	}
+
+	@Test
+	public void testDeleteAccountBatch() throws Exception {
+		Account account1 = testDeleteAccountBatch_addAccount();
+
+		testDeleteAccountBatch_deleteAccount(
+			"COMPLETED", null, account1.getId());
+
+		assertHttpResponseStatusCode(
+			404, accountResource.getAccountHttpResponse(account1.getId()));
+
+		Account account2 = testDeleteAccountBatch_addAccount();
+
+		testDeleteAccountBatch_deleteAccount(
+			"COMPLETED", account2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, accountResource.getAccountHttpResponse(account2.getId()));
+
+		account1 = testDeleteAccountBatch_addAccount();
+		account2 = testDeleteAccountBatch_addAccount();
+
+		testDeleteAccountBatch_deleteAccount(
+			"COMPLETED", account2.getExternalReferenceCode(), account1.getId());
+
+		assertHttpResponseStatusCode(
+			404, accountResource.getAccountHttpResponse(account1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, accountResource.getAccountHttpResponse(account2.getId()));
+
+		testDeleteAccountBatch_deleteAccount(
+			"COMPLETED", account2.getExternalReferenceCode(), account1.getId());
+
+		assertHttpResponseStatusCode(
+			404, accountResource.getAccountHttpResponse(account2.getId()));
+	}
+
+	protected Account testDeleteAccountBatch_addAccount() throws Exception {
+		return testDeleteAccount_addAccount();
+	}
+
+	protected void testDeleteAccountBatch_deleteAccount(
+			String expectedExecuteStatus, String accountERC, Long accountId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", accountId
+		).<String, Object>put(
+			"externalReferenceCode", accountERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			accountResource.deleteAccountBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2437,6 +2517,10 @@ public abstract class BaseAccountResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.account.resource.v1_0.
 			AccountResource _accountResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

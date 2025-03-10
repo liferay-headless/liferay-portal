@@ -465,11 +465,19 @@ public abstract class BaseProductConfigurationListAccountGroupResourceImpl
 			 ProductConfigurationListAccountGroup, Exception>
 				productConfigurationListAccountGroupUnsafeFunction =
 					productConfigurationListAccountGroup -> {
-						deleteProductConfigurationListAccountGroup(
-							productConfigurationListAccountGroup.
-								getProductConfigurationListAccountGroupId());
+						if (productConfigurationListAccountGroup.
+								getProductConfigurationListAccountGroupId() !=
+									null) {
 
-						return productConfigurationListAccountGroup;
+							deleteProductConfigurationListAccountGroup(
+								productConfigurationListAccountGroup.
+									getProductConfigurationListAccountGroupId());
+
+							return productConfigurationListAccountGroup;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete productConfigurationListAccountGroup. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

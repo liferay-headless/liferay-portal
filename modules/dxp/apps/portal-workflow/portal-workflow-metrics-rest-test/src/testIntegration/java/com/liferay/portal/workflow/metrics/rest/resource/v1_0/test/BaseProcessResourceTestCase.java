@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -317,6 +319,55 @@ public abstract class BaseProcessResourceTestCase {
 
 	protected Process testGraphQLDeleteProcess_addProcess() throws Exception {
 		return testGraphQLProcess_addProcess();
+	}
+
+	@Test
+	public void testDeleteProcessBatch() throws Exception {
+		Process process1 = testDeleteProcessBatch_addProcess();
+
+		testDeleteProcessBatch_deleteProcess("COMPLETED", process1.getId());
+
+		assertHttpResponseStatusCode(
+			404, processResource.getProcessHttpResponse(process1.getId()));
+	}
+
+	protected Process testDeleteProcessBatch_addProcess() throws Exception {
+		return testDeleteProcess_addProcess();
+	}
+
+	protected void testDeleteProcessBatch_deleteProcess(
+			String expectedExecuteStatus, Long processId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", processId
+		).build();
+		HttpInvoker.HttpResponse response =
+			processResource.deleteProcessBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1614,6 +1665,10 @@ public abstract class BaseProcessResourceTestCase {
 	private
 		com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource
 			_processResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

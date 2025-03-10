@@ -672,9 +672,14 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 
 		UnsafeFunction<WorkflowDefinition, WorkflowDefinition, Exception>
 			workflowDefinitionUnsafeFunction = workflowDefinition -> {
-				deleteWorkflowDefinition(workflowDefinition.getId());
+				if (workflowDefinition.getId() != null) {
+					deleteWorkflowDefinition(workflowDefinition.getId());
 
-				return workflowDefinition;
+					return workflowDefinition;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete workflowDefinition. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

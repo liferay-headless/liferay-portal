@@ -425,10 +425,17 @@ public abstract class BasePriceListAccountGroupResourceImpl
 
 		UnsafeFunction<PriceListAccountGroup, PriceListAccountGroup, Exception>
 			priceListAccountGroupUnsafeFunction = priceListAccountGroup -> {
-				deletePriceListAccountGroup(
-					priceListAccountGroup.getPriceListAccountGroupId());
+				if (priceListAccountGroup.getPriceListAccountGroupId() !=
+						null) {
 
-				return priceListAccountGroup;
+					deletePriceListAccountGroup(
+						priceListAccountGroup.getPriceListAccountGroupId());
+
+					return priceListAccountGroup;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceListAccountGroup. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

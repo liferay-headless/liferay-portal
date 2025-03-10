@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.OrderNote;
 import com.liferay.headless.commerce.admin.order.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.order.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -474,6 +476,93 @@ public abstract class BaseOrderNoteResourceTestCase {
 		throws Exception {
 
 		return testGraphQLOrderNote_addOrderNote();
+	}
+
+	@Test
+	public void testDeleteOrderNoteBatch() throws Exception {
+		OrderNote orderNote1 = testDeleteOrderNoteBatch_addOrderNote();
+
+		testDeleteOrderNoteBatch_deleteOrderNote(
+			"COMPLETED", null, orderNote1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderNoteResource.getOrderNoteHttpResponse(orderNote1.getId()));
+
+		OrderNote orderNote2 = testDeleteOrderNoteBatch_addOrderNote();
+
+		testDeleteOrderNoteBatch_deleteOrderNote(
+			"COMPLETED", orderNote2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			orderNoteResource.getOrderNoteHttpResponse(orderNote2.getId()));
+
+		orderNote1 = testDeleteOrderNoteBatch_addOrderNote();
+		orderNote2 = testDeleteOrderNoteBatch_addOrderNote();
+
+		testDeleteOrderNoteBatch_deleteOrderNote(
+			"COMPLETED", orderNote2.getExternalReferenceCode(),
+			orderNote1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderNoteResource.getOrderNoteHttpResponse(orderNote1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			orderNoteResource.getOrderNoteHttpResponse(orderNote2.getId()));
+
+		testDeleteOrderNoteBatch_deleteOrderNote(
+			"COMPLETED", orderNote2.getExternalReferenceCode(),
+			orderNote1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderNoteResource.getOrderNoteHttpResponse(orderNote2.getId()));
+	}
+
+	protected OrderNote testDeleteOrderNoteBatch_addOrderNote()
+		throws Exception {
+
+		return testDeleteOrderNote_addOrderNote();
+	}
+
+	protected void testDeleteOrderNoteBatch_deleteOrderNote(
+			String expectedExecuteStatus, String orderNoteERC, Long orderNoteId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", orderNoteId
+		).<String, Object>put(
+			"externalReferenceCode", orderNoteERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			orderNoteResource.deleteOrderNoteBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2064,6 +2153,10 @@ public abstract class BaseOrderNoteResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.order.resource.v1_0.
 			OrderNoteResource _orderNoteResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

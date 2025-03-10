@@ -783,9 +783,14 @@ public abstract class BaseSXPElementResourceImpl
 
 		UnsafeFunction<SXPElement, SXPElement, Exception>
 			sxpElementUnsafeFunction = sxpElement -> {
-				deleteSXPElement(sxpElement.getId());
+				if (sxpElement.getId() != null) {
+					deleteSXPElement(sxpElement.getId());
 
-				return sxpElement;
+					return sxpElement;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete sxpElement. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

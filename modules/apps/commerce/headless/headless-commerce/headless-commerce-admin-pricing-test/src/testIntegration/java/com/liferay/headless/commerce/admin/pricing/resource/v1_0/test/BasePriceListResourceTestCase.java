@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v1_0.PriceList;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -945,6 +947,93 @@ public abstract class BasePriceListResourceTestCase {
 		throws Exception {
 
 		return testGraphQLPriceList_addPriceList();
+	}
+
+	@Test
+	public void testDeletePriceListBatch() throws Exception {
+		PriceList priceList1 = testDeletePriceListBatch_addPriceList();
+
+		testDeletePriceListBatch_deletePriceList(
+			"COMPLETED", null, priceList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceListResource.getPriceListHttpResponse(priceList1.getId()));
+
+		PriceList priceList2 = testDeletePriceListBatch_addPriceList();
+
+		testDeletePriceListBatch_deletePriceList(
+			"COMPLETED", priceList2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			priceListResource.getPriceListHttpResponse(priceList2.getId()));
+
+		priceList1 = testDeletePriceListBatch_addPriceList();
+		priceList2 = testDeletePriceListBatch_addPriceList();
+
+		testDeletePriceListBatch_deletePriceList(
+			"COMPLETED", priceList2.getExternalReferenceCode(),
+			priceList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceListResource.getPriceListHttpResponse(priceList1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			priceListResource.getPriceListHttpResponse(priceList2.getId()));
+
+		testDeletePriceListBatch_deletePriceList(
+			"COMPLETED", priceList2.getExternalReferenceCode(),
+			priceList1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceListResource.getPriceListHttpResponse(priceList2.getId()));
+	}
+
+	protected PriceList testDeletePriceListBatch_addPriceList()
+		throws Exception {
+
+		return testDeletePriceList_addPriceList();
+	}
+
+	protected void testDeletePriceListBatch_deletePriceList(
+			String expectedExecuteStatus, String priceListERC, Long priceListId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", priceListId
+		).<String, Object>put(
+			"externalReferenceCode", priceListERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			priceListResource.deletePriceListBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2314,6 +2403,10 @@ public abstract class BasePriceListResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.pricing.resource.v1_0.
 			PriceListResource _priceListResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

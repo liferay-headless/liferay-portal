@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Specification;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1037,6 +1039,101 @@ public abstract class BaseSpecificationResourceTestCase {
 		throws Exception {
 
 		return testGraphQLSpecification_addSpecification();
+	}
+
+	@Test
+	public void testDeleteSpecificationBatch() throws Exception {
+		Specification specification1 =
+			testDeleteSpecificationBatch_addSpecification();
+
+		testDeleteSpecificationBatch_deleteSpecification(
+			"COMPLETED", null, specification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			specificationResource.getSpecificationHttpResponse(
+				specification1.getId()));
+
+		Specification specification2 =
+			testDeleteSpecificationBatch_addSpecification();
+
+		testDeleteSpecificationBatch_deleteSpecification(
+			"COMPLETED", specification2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			specificationResource.getSpecificationHttpResponse(
+				specification2.getId()));
+
+		specification1 = testDeleteSpecificationBatch_addSpecification();
+		specification2 = testDeleteSpecificationBatch_addSpecification();
+
+		testDeleteSpecificationBatch_deleteSpecification(
+			"COMPLETED", specification2.getExternalReferenceCode(),
+			specification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			specificationResource.getSpecificationHttpResponse(
+				specification1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			specificationResource.getSpecificationHttpResponse(
+				specification2.getId()));
+
+		testDeleteSpecificationBatch_deleteSpecification(
+			"COMPLETED", specification2.getExternalReferenceCode(),
+			specification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			specificationResource.getSpecificationHttpResponse(
+				specification2.getId()));
+	}
+
+	protected Specification testDeleteSpecificationBatch_addSpecification()
+		throws Exception {
+
+		return testDeleteSpecification_addSpecification();
+	}
+
+	protected void testDeleteSpecificationBatch_deleteSpecification(
+			String expectedExecuteStatus, String specificationERC,
+			Long specificationId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", specificationId
+		).<String, Object>put(
+			"externalReferenceCode", specificationERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			specificationResource.deleteSpecificationBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2287,6 +2384,10 @@ public abstract class BaseSpecificationResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		SpecificationResource _specificationResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

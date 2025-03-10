@@ -675,9 +675,14 @@ public abstract class BaseListTypeEntryResourceImpl
 
 		UnsafeFunction<ListTypeEntry, ListTypeEntry, Exception>
 			listTypeEntryUnsafeFunction = listTypeEntry -> {
-				deleteListTypeEntry(listTypeEntry.getId());
+				if (listTypeEntry.getId() != null) {
+					deleteListTypeEntry(listTypeEntry.getId());
 
-				return listTypeEntry;
+					return listTypeEntry;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete listTypeEntry. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

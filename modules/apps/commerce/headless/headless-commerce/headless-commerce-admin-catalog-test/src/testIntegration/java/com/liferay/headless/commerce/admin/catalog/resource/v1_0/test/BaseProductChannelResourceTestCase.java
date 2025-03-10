@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductChannel;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -315,6 +317,61 @@ public abstract class BaseProductChannelResourceTestCase {
 		throws Exception {
 
 		return testGraphQLProductChannel_addProductChannel();
+	}
+
+	@Test
+	public void testDeleteProductChannelBatch() throws Exception {
+		ProductChannel productChannel1 =
+			testDeleteProductChannelBatch_addProductChannel();
+
+		testDeleteProductChannelBatch_deleteProductChannel(
+			"COMPLETED", productChannel1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productChannelResource.getProductChannelHttpResponse(
+				productChannel1.getId()));
+	}
+
+	protected ProductChannel testDeleteProductChannelBatch_addProductChannel()
+		throws Exception {
+
+		return testDeleteProductChannel_addProductChannel();
+	}
+
+	protected void testDeleteProductChannelBatch_deleteProductChannel(
+			String expectedExecuteStatus, Long productChannelId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", productChannelId
+		).build();
+		HttpInvoker.HttpResponse response =
+			productChannelResource.deleteProductChannelBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -1905,6 +1962,10 @@ public abstract class BaseProductChannelResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		ProductChannelResource _productChannelResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

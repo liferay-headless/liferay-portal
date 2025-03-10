@@ -464,11 +464,19 @@ public abstract class BaseProductConfigurationListOrderTypeResourceImpl
 			 ProductConfigurationListOrderType, Exception>
 				productConfigurationListOrderTypeUnsafeFunction =
 					productConfigurationListOrderType -> {
-						deleteProductConfigurationListOrderType(
-							productConfigurationListOrderType.
-								getProductConfigurationListOrderTypeId());
+						if (productConfigurationListOrderType.
+								getProductConfigurationListOrderTypeId() !=
+									null) {
 
-						return productConfigurationListOrderType;
+							deleteProductConfigurationListOrderType(
+								productConfigurationListOrderType.
+									getProductConfigurationListOrderTypeId());
+
+							return productConfigurationListOrderType;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete productConfigurationListOrderType. No valid identifier provided.");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {

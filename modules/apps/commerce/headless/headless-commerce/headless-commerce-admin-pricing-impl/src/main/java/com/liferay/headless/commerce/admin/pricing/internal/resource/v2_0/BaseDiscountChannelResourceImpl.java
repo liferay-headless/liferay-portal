@@ -417,9 +417,15 @@ public abstract class BaseDiscountChannelResourceImpl
 
 		UnsafeFunction<DiscountChannel, DiscountChannel, Exception>
 			discountChannelUnsafeFunction = discountChannel -> {
-				deleteDiscountChannel(discountChannel.getDiscountChannelId());
+				if (discountChannel.getDiscountChannelId() != null) {
+					deleteDiscountChannel(
+						discountChannel.getDiscountChannelId());
 
-				return discountChannel;
+					return discountChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

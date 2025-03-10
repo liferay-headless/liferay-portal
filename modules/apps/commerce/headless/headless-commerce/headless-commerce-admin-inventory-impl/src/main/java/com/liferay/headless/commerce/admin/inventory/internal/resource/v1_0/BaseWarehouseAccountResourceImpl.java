@@ -419,10 +419,15 @@ public abstract class BaseWarehouseAccountResourceImpl
 
 		UnsafeFunction<WarehouseAccount, WarehouseAccount, Exception>
 			warehouseAccountUnsafeFunction = warehouseAccount -> {
-				deleteWarehouseAccount(
-					warehouseAccount.getWarehouseAccountId());
+				if (warehouseAccount.getWarehouseAccountId() != null) {
+					deleteWarehouseAccount(
+						warehouseAccount.getWarehouseAccountId());
 
-				return warehouseAccount;
+					return warehouseAccount;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete warehouseAccount. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

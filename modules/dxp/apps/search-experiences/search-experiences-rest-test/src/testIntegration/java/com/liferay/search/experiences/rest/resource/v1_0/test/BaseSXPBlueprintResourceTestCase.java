@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -902,6 +904,61 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		throws Exception {
 
 		return testGraphQLSXPBlueprint_addSXPBlueprint();
+	}
+
+	@Test
+	public void testDeleteSXPBlueprintBatch() throws Exception {
+		SXPBlueprint sxpBlueprint1 =
+			testDeleteSXPBlueprintBatch_addSXPBlueprint();
+
+		testDeleteSXPBlueprintBatch_deleteSXPBlueprint(
+			"COMPLETED", sxpBlueprint1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			sxpBlueprintResource.getSXPBlueprintHttpResponse(
+				sxpBlueprint1.getId()));
+	}
+
+	protected SXPBlueprint testDeleteSXPBlueprintBatch_addSXPBlueprint()
+		throws Exception {
+
+		return testDeleteSXPBlueprint_addSXPBlueprint();
+	}
+
+	protected void testDeleteSXPBlueprintBatch_deleteSXPBlueprint(
+			String expectedExecuteStatus, Long sxpBlueprintId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", sxpBlueprintId
+		).build();
+		HttpInvoker.HttpResponse response =
+			sxpBlueprintResource.deleteSXPBlueprintBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2507,6 +2564,10 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	private
 		com.liferay.search.experiences.rest.resource.v1_0.SXPBlueprintResource
 			_sxpBlueprintResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

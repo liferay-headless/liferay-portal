@@ -384,9 +384,14 @@ public abstract class BaseProcessResourceImpl
 
 		UnsafeFunction<Process, Process, Exception> processUnsafeFunction =
 			process -> {
-				deleteProcess(process.getId());
+				if (process.getId() != null) {
+					deleteProcess(process.getId());
 
-				return process;
+					return process;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete process. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

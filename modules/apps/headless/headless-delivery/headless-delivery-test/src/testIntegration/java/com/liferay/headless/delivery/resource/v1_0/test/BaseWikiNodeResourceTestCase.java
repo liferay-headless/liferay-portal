@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.WikiNode;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1126,6 +1128,55 @@ public abstract class BaseWikiNodeResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWikiNode_addWikiNode();
+	}
+
+	@Test
+	public void testDeleteWikiNodeBatch() throws Exception {
+		WikiNode wikiNode1 = testDeleteWikiNodeBatch_addWikiNode();
+
+		testDeleteWikiNodeBatch_deleteWikiNode("COMPLETED", wikiNode1.getId());
+
+		assertHttpResponseStatusCode(
+			404, wikiNodeResource.getWikiNodeHttpResponse(wikiNode1.getId()));
+	}
+
+	protected WikiNode testDeleteWikiNodeBatch_addWikiNode() throws Exception {
+		return testDeleteWikiNode_addWikiNode();
+	}
+
+	protected void testDeleteWikiNodeBatch_deleteWikiNode(
+			String expectedExecuteStatus, Long wikiNodeId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", wikiNodeId
+		).build();
+		HttpInvoker.HttpResponse response =
+			wikiNodeResource.deleteWikiNodeBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2659,6 +2710,10 @@ public abstract class BaseWikiNodeResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.WikiNodeResource
 		_wikiNodeResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

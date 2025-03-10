@@ -371,9 +371,14 @@ public abstract class BaseChannelAccountResourceImpl
 
 		UnsafeFunction<ChannelAccount, ChannelAccount, Exception>
 			channelAccountUnsafeFunction = channelAccount -> {
-				deleteChannelAccount(channelAccount.getChannelAccountId());
+				if (channelAccount.getChannelAccountId() != null) {
+					deleteChannelAccount(channelAccount.getChannelAccountId());
 
-				return channelAccount;
+					return channelAccount;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete channelAccount. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

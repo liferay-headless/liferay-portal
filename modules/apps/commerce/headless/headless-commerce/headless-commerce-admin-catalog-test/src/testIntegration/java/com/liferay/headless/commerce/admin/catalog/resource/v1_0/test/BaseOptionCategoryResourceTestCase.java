@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.OptionCategory;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1049,6 +1051,101 @@ public abstract class BaseOptionCategoryResourceTestCase {
 		throws Exception {
 
 		return testGraphQLOptionCategory_addOptionCategory();
+	}
+
+	@Test
+	public void testDeleteOptionCategoryBatch() throws Exception {
+		OptionCategory optionCategory1 =
+			testDeleteOptionCategoryBatch_addOptionCategory();
+
+		testDeleteOptionCategoryBatch_deleteOptionCategory(
+			"COMPLETED", null, optionCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionCategoryResource.getOptionCategoryHttpResponse(
+				optionCategory1.getId()));
+
+		OptionCategory optionCategory2 =
+			testDeleteOptionCategoryBatch_addOptionCategory();
+
+		testDeleteOptionCategoryBatch_deleteOptionCategory(
+			"COMPLETED", optionCategory2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			optionCategoryResource.getOptionCategoryHttpResponse(
+				optionCategory2.getId()));
+
+		optionCategory1 = testDeleteOptionCategoryBatch_addOptionCategory();
+		optionCategory2 = testDeleteOptionCategoryBatch_addOptionCategory();
+
+		testDeleteOptionCategoryBatch_deleteOptionCategory(
+			"COMPLETED", optionCategory2.getExternalReferenceCode(),
+			optionCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionCategoryResource.getOptionCategoryHttpResponse(
+				optionCategory1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			optionCategoryResource.getOptionCategoryHttpResponse(
+				optionCategory2.getId()));
+
+		testDeleteOptionCategoryBatch_deleteOptionCategory(
+			"COMPLETED", optionCategory2.getExternalReferenceCode(),
+			optionCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			optionCategoryResource.getOptionCategoryHttpResponse(
+				optionCategory2.getId()));
+	}
+
+	protected OptionCategory testDeleteOptionCategoryBatch_addOptionCategory()
+		throws Exception {
+
+		return testDeleteOptionCategory_addOptionCategory();
+	}
+
+	protected void testDeleteOptionCategoryBatch_deleteOptionCategory(
+			String expectedExecuteStatus, String optionCategoryERC,
+			Long optionCategoryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", optionCategoryId
+		).<String, Object>put(
+			"externalReferenceCode", optionCategoryERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			optionCategoryResource.deleteOptionCategoryBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2171,6 +2268,10 @@ public abstract class BaseOptionCategoryResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		OptionCategoryResource _optionCategoryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

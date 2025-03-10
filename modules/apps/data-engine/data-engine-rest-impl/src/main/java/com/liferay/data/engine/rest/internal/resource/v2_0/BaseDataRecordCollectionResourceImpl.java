@@ -859,9 +859,14 @@ public abstract class BaseDataRecordCollectionResourceImpl
 
 		UnsafeFunction<DataRecordCollection, DataRecordCollection, Exception>
 			dataRecordCollectionUnsafeFunction = dataRecordCollection -> {
-				deleteDataRecordCollection(dataRecordCollection.getId());
+				if (dataRecordCollection.getId() != null) {
+					deleteDataRecordCollection(dataRecordCollection.getId());
 
-				return dataRecordCollection;
+					return dataRecordCollection;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete dataRecordCollection. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

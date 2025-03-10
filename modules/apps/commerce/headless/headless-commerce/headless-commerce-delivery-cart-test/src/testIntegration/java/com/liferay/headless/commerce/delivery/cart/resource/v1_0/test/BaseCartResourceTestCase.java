@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.delivery.cart.client.dto.v1_0.Cart;
 import com.liferay.headless.commerce.delivery.cart.client.http.HttpInvoker;
 import com.liferay.headless.commerce.delivery.cart.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -624,6 +626,83 @@ public abstract class BaseCartResourceTestCase {
 
 	protected Cart testGraphQLDeleteCart_addCart() throws Exception {
 		return testGraphQLCart_addCart();
+	}
+
+	@Test
+	public void testDeleteCartBatch() throws Exception {
+		Cart cart1 = testDeleteCartBatch_addCart();
+
+		testDeleteCartBatch_deleteCart("COMPLETED", null, cart1.getId());
+
+		assertHttpResponseStatusCode(
+			404, cartResource.getCartHttpResponse(cart1.getId()));
+
+		Cart cart2 = testDeleteCartBatch_addCart();
+
+		testDeleteCartBatch_deleteCart(
+			"COMPLETED", cart2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, cartResource.getCartHttpResponse(cart2.getId()));
+
+		cart1 = testDeleteCartBatch_addCart();
+		cart2 = testDeleteCartBatch_addCart();
+
+		testDeleteCartBatch_deleteCart(
+			"COMPLETED", cart2.getExternalReferenceCode(), cart1.getId());
+
+		assertHttpResponseStatusCode(
+			404, cartResource.getCartHttpResponse(cart1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, cartResource.getCartHttpResponse(cart2.getId()));
+
+		testDeleteCartBatch_deleteCart(
+			"COMPLETED", cart2.getExternalReferenceCode(), cart1.getId());
+
+		assertHttpResponseStatusCode(
+			404, cartResource.getCartHttpResponse(cart2.getId()));
+	}
+
+	protected Cart testDeleteCartBatch_addCart() throws Exception {
+		return testDeleteCart_addCart();
+	}
+
+	protected void testDeleteCartBatch_deleteCart(
+			String expectedExecuteStatus, String cartERC, Long cartId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", cartId
+		).<String, Object>put(
+			"externalReferenceCode", cartERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			cartResource.deleteCartBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -4747,6 +4826,10 @@ public abstract class BaseCartResourceTestCase {
 	private
 		com.liferay.headless.commerce.delivery.cart.resource.v1_0.CartResource
 			_cartResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

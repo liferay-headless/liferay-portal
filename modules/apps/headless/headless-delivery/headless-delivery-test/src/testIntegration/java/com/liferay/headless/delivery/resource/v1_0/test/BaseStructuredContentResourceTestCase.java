@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
@@ -52,6 +53,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -3482,6 +3484,62 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteStructuredContentBatch() throws Exception {
+		StructuredContent structuredContent1 =
+			testDeleteStructuredContentBatch_addStructuredContent();
+
+		testDeleteStructuredContentBatch_deleteStructuredContent(
+			"COMPLETED", structuredContent1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			structuredContentResource.getStructuredContentHttpResponse(
+				structuredContent1.getId()));
+	}
+
+	protected StructuredContent
+			testDeleteStructuredContentBatch_addStructuredContent()
+		throws Exception {
+
+		return testDeleteStructuredContent_addStructuredContent();
+	}
+
+	protected void testDeleteStructuredContentBatch_deleteStructuredContent(
+			String expectedExecuteStatus, Long structuredContentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", structuredContentId
+		).build();
+		HttpInvoker.HttpResponse response =
+			structuredContentResource.deleteStructuredContentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
+	}
+
+	@Test
 	public void testGetStructuredContent() throws Exception {
 		StructuredContent postStructuredContent =
 			testGetStructuredContent_addStructuredContent();
@@ -6205,6 +6263,10 @@ public abstract class BaseStructuredContentResourceTestCase {
 	private
 		com.liferay.headless.delivery.resource.v1_0.StructuredContentResource
 			_structuredContentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.NavigationMenu;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -320,6 +322,61 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		throws Exception {
 
 		return testGraphQLNavigationMenu_addNavigationMenu();
+	}
+
+	@Test
+	public void testDeleteNavigationMenuBatch() throws Exception {
+		NavigationMenu navigationMenu1 =
+			testDeleteNavigationMenuBatch_addNavigationMenu();
+
+		testDeleteNavigationMenuBatch_deleteNavigationMenu(
+			"COMPLETED", navigationMenu1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			navigationMenuResource.getNavigationMenuHttpResponse(
+				navigationMenu1.getId()));
+	}
+
+	protected NavigationMenu testDeleteNavigationMenuBatch_addNavigationMenu()
+		throws Exception {
+
+		return testDeleteNavigationMenu_addNavigationMenu();
+	}
+
+	protected void testDeleteNavigationMenuBatch_deleteNavigationMenu(
+			String expectedExecuteStatus, Long navigationMenuId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", navigationMenuId
+		).build();
+		HttpInvoker.HttpResponse response =
+			navigationMenuResource.deleteNavigationMenuBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2427,6 +2484,10 @@ public abstract class BaseNavigationMenuResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.NavigationMenuResource
 		_navigationMenuResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

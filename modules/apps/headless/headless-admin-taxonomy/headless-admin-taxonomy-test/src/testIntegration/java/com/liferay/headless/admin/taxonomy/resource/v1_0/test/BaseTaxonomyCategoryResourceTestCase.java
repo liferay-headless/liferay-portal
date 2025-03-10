@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.http.HttpInvoker;
 import com.liferay.headless.admin.taxonomy.client.pagination.Page;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -968,6 +970,62 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		throws Exception {
 
 		return testGraphQLTaxonomyCategory_addTaxonomyCategory();
+	}
+
+	@Test
+	public void testDeleteTaxonomyCategoryBatch() throws Exception {
+		TaxonomyCategory taxonomyCategory1 =
+			testDeleteTaxonomyCategoryBatch_addTaxonomyCategory();
+
+		testDeleteTaxonomyCategoryBatch_deleteTaxonomyCategory(
+			"COMPLETED", taxonomyCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			taxonomyCategoryResource.getTaxonomyCategoryHttpResponse(
+				taxonomyCategory1.getId()));
+	}
+
+	protected TaxonomyCategory
+			testDeleteTaxonomyCategoryBatch_addTaxonomyCategory()
+		throws Exception {
+
+		return testDeleteTaxonomyCategory_addTaxonomyCategory();
+	}
+
+	protected void testDeleteTaxonomyCategoryBatch_deleteTaxonomyCategory(
+			String expectedExecuteStatus, String taxonomyCategoryId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", taxonomyCategoryId
+		).build();
+		HttpInvoker.HttpResponse response =
+			taxonomyCategoryResource.deleteTaxonomyCategoryBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3566,5 +3624,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 	private
 		com.liferay.headless.admin.taxonomy.resource.v1_0.
 			TaxonomyCategoryResource _taxonomyCategoryResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 }

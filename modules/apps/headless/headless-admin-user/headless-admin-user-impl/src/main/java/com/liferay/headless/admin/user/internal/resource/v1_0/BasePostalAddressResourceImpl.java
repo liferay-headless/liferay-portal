@@ -1209,9 +1209,30 @@ public abstract class BasePostalAddressResourceImpl
 
 		UnsafeFunction<PostalAddress, PostalAddress, Exception>
 			postalAddressUnsafeFunction = postalAddress -> {
-				deletePostalAddress(postalAddress.getId());
+				if (postalAddress.getId() != null) {
+					try {
+						deletePostalAddress(postalAddress.getId());
 
-				return postalAddress;
+						return postalAddress;
+					}
+					catch (Exception exception) {
+						if (postalAddress.getExternalReferenceCode() != null) {
+							deletePostalAddressByExternalReferenceCode(
+								postalAddress.getExternalReferenceCode());
+
+							return postalAddress;
+						}
+					}
+				}
+				else if (postalAddress.getExternalReferenceCode() != null) {
+					deletePostalAddressByExternalReferenceCode(
+						postalAddress.getExternalReferenceCode());
+
+					return postalAddress;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete postalAddress. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

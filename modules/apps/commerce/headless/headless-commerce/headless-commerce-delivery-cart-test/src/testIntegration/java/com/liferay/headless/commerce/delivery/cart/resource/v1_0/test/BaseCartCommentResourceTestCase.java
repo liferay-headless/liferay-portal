@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.delivery.cart.client.dto.v1_0.CartComment;
 import com.liferay.headless.commerce.delivery.cart.client.http.HttpInvoker;
 import com.liferay.headless.commerce.delivery.cart.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -574,6 +576,99 @@ public abstract class BaseCartCommentResourceTestCase {
 		throws Exception {
 
 		return testGraphQLCartComment_addCartComment();
+	}
+
+	@Test
+	public void testDeleteCartCommentBatch() throws Exception {
+		CartComment cartComment1 = testDeleteCartCommentBatch_addCartComment();
+
+		testDeleteCartCommentBatch_deleteCartComment(
+			"COMPLETED", null, cartComment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			cartCommentResource.getCartCommentHttpResponse(
+				cartComment1.getId()));
+
+		CartComment cartComment2 = testDeleteCartCommentBatch_addCartComment();
+
+		testDeleteCartCommentBatch_deleteCartComment(
+			"COMPLETED", cartComment2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			cartCommentResource.getCartCommentHttpResponse(
+				cartComment2.getId()));
+
+		cartComment1 = testDeleteCartCommentBatch_addCartComment();
+		cartComment2 = testDeleteCartCommentBatch_addCartComment();
+
+		testDeleteCartCommentBatch_deleteCartComment(
+			"COMPLETED", cartComment2.getExternalReferenceCode(),
+			cartComment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			cartCommentResource.getCartCommentHttpResponse(
+				cartComment1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			cartCommentResource.getCartCommentHttpResponse(
+				cartComment2.getId()));
+
+		testDeleteCartCommentBatch_deleteCartComment(
+			"COMPLETED", cartComment2.getExternalReferenceCode(),
+			cartComment1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			cartCommentResource.getCartCommentHttpResponse(
+				cartComment2.getId()));
+	}
+
+	protected CartComment testDeleteCartCommentBatch_addCartComment()
+		throws Exception {
+
+		return testDeleteCartComment_addCartComment();
+	}
+
+	protected void testDeleteCartCommentBatch_deleteCartComment(
+			String expectedExecuteStatus, String cartCommentERC,
+			Long cartCommentId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", cartCommentId
+		).<String, Object>put(
+			"externalReferenceCode", cartCommentERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			cartCommentResource.deleteCartCommentBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2379,6 +2474,10 @@ public abstract class BaseCartCommentResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.delivery.cart.resource.v1_0.
 		CartCommentResource _cartCommentResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

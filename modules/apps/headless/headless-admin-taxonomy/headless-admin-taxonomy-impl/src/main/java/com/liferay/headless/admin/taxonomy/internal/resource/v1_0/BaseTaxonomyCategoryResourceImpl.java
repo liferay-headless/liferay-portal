@@ -1392,9 +1392,14 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 		UnsafeFunction<TaxonomyCategory, TaxonomyCategory, Exception>
 			taxonomyCategoryUnsafeFunction = taxonomyCategory -> {
-				deleteTaxonomyCategory(taxonomyCategory.getId());
+				if (taxonomyCategory.getId() != null) {
+					deleteTaxonomyCategory(taxonomyCategory.getId());
 
-				return taxonomyCategory;
+					return taxonomyCategory;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete taxonomyCategory. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

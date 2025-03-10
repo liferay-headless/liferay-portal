@@ -434,9 +434,14 @@ public abstract class BaseGroupedProductResourceImpl
 
 		UnsafeFunction<GroupedProduct, GroupedProduct, Exception>
 			groupedProductUnsafeFunction = groupedProduct -> {
-				deleteGroupedProduct(groupedProduct.getId());
+				if (groupedProduct.getId() != null) {
+					deleteGroupedProduct(groupedProduct.getId());
 
-				return groupedProduct;
+					return groupedProduct;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete groupedProduct. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -277,11 +277,18 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceImpl
 			<PaymentMethodGroupRelOrderType, PaymentMethodGroupRelOrderType,
 			 Exception> paymentMethodGroupRelOrderTypeUnsafeFunction =
 				paymentMethodGroupRelOrderType -> {
-					deletePaymentMethodGroupRelOrderType(
-						paymentMethodGroupRelOrderType.
-							getPaymentMethodGroupRelOrderTypeId());
+					if (paymentMethodGroupRelOrderType.
+							getPaymentMethodGroupRelOrderTypeId() != null) {
 
-					return paymentMethodGroupRelOrderType;
+						deletePaymentMethodGroupRelOrderType(
+							paymentMethodGroupRelOrderType.
+								getPaymentMethodGroupRelOrderTypeId());
+
+						return paymentMethodGroupRelOrderType;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete paymentMethodGroupRelOrderType. No valid identifier provided.");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {

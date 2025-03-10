@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.DocumentFolder;
@@ -52,6 +53,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1095,6 +1097,61 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		throws Exception {
 
 		return testGraphQLDocumentFolder_addDocumentFolder();
+	}
+
+	@Test
+	public void testDeleteDocumentFolderBatch() throws Exception {
+		DocumentFolder documentFolder1 =
+			testDeleteDocumentFolderBatch_addDocumentFolder();
+
+		testDeleteDocumentFolderBatch_deleteDocumentFolder(
+			"COMPLETED", documentFolder1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			documentFolderResource.getDocumentFolderHttpResponse(
+				documentFolder1.getId()));
+	}
+
+	protected DocumentFolder testDeleteDocumentFolderBatch_addDocumentFolder()
+		throws Exception {
+
+		return testDeleteDocumentFolder_addDocumentFolder();
+	}
+
+	protected void testDeleteDocumentFolderBatch_deleteDocumentFolder(
+			String expectedExecuteStatus, Long documentFolderId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", documentFolderId
+		).build();
+		HttpInvoker.HttpResponse response =
+			documentFolderResource.deleteDocumentFolderBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -4705,6 +4762,10 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	@Inject
 	private com.liferay.headless.delivery.resource.v1_0.DocumentFolderResource
 		_documentFolderResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

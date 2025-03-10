@@ -343,9 +343,14 @@ public abstract class BaseTaxCategoryResourceImpl
 
 		UnsafeFunction<TaxCategory, TaxCategory, Exception>
 			taxCategoryUnsafeFunction = taxCategory -> {
-				deleteTaxCategory(taxCategory.getId());
+				if (taxCategory.getId() != null) {
+					deleteTaxCategory(taxCategory.getId());
 
-				return taxCategory;
+					return taxCategory;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete taxCategory. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

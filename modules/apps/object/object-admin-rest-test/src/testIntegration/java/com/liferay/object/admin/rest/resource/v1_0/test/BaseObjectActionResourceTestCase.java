@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.client.http.HttpInvoker;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -319,6 +321,61 @@ public abstract class BaseObjectActionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLObjectAction_addObjectAction();
+	}
+
+	@Test
+	public void testDeleteObjectActionBatch() throws Exception {
+		ObjectAction objectAction1 =
+			testDeleteObjectActionBatch_addObjectAction();
+
+		testDeleteObjectActionBatch_deleteObjectAction(
+			"COMPLETED", objectAction1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectActionResource.getObjectActionHttpResponse(
+				objectAction1.getId()));
+	}
+
+	protected ObjectAction testDeleteObjectActionBatch_addObjectAction()
+		throws Exception {
+
+		return testDeleteObjectAction_addObjectAction();
+	}
+
+	protected void testDeleteObjectActionBatch_deleteObjectAction(
+			String expectedExecuteStatus, Long objectActionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", objectActionId
+		).build();
+		HttpInvoker.HttpResponse response =
+			objectActionResource.deleteObjectActionBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2713,6 +2770,10 @@ public abstract class BaseObjectActionResourceTestCase {
 	@Inject
 	private com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource
 		_objectActionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

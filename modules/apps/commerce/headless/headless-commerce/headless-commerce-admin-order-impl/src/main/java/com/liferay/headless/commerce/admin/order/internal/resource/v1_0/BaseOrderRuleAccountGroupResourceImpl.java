@@ -425,10 +425,17 @@ public abstract class BaseOrderRuleAccountGroupResourceImpl
 
 		UnsafeFunction<OrderRuleAccountGroup, OrderRuleAccountGroup, Exception>
 			orderRuleAccountGroupUnsafeFunction = orderRuleAccountGroup -> {
-				deleteOrderRuleAccountGroup(
-					orderRuleAccountGroup.getOrderRuleAccountGroupId());
+				if (orderRuleAccountGroup.getOrderRuleAccountGroupId() !=
+						null) {
 
-				return orderRuleAccountGroup;
+					deleteOrderRuleAccountGroup(
+						orderRuleAccountGroup.getOrderRuleAccountGroupId());
+
+					return orderRuleAccountGroup;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete orderRuleAccountGroup. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

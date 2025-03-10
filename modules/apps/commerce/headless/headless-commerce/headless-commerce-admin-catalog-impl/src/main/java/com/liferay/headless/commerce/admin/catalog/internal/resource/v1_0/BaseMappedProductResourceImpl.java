@@ -540,9 +540,14 @@ public abstract class BaseMappedProductResourceImpl
 
 		UnsafeFunction<MappedProduct, MappedProduct, Exception>
 			mappedProductUnsafeFunction = mappedProduct -> {
-				deleteMappedProduct(mappedProduct.getId());
+				if (mappedProduct.getId() != null) {
+					deleteMappedProduct(mappedProduct.getId());
 
-				return mappedProduct;
+					return mappedProduct;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete mappedProduct. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

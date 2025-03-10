@@ -418,10 +418,15 @@ public abstract class BasePriceListChannelResourceImpl
 
 		UnsafeFunction<PriceListChannel, PriceListChannel, Exception>
 			priceListChannelUnsafeFunction = priceListChannel -> {
-				deletePriceListChannel(
-					priceListChannel.getPriceListChannelId());
+				if (priceListChannel.getPriceListChannelId() != null) {
+					deletePriceListChannel(
+						priceListChannel.getPriceListChannelId());
 
-				return priceListChannel;
+					return priceListChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete priceListChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

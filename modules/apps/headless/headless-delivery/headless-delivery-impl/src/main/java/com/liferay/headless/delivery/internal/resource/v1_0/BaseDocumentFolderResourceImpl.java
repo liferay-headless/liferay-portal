@@ -1996,9 +1996,14 @@ public abstract class BaseDocumentFolderResourceImpl
 
 		UnsafeFunction<DocumentFolder, DocumentFolder, Exception>
 			documentFolderUnsafeFunction = documentFolder -> {
-				deleteDocumentFolder(documentFolder.getId());
+				if (documentFolder.getId() != null) {
+					deleteDocumentFolder(documentFolder.getId());
 
-				return documentFolder;
+					return documentFolder;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete documentFolder. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

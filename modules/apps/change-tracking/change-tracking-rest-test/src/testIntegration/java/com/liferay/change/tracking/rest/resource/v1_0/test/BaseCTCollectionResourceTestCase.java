@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.change.tracking.rest.client.dto.v1_0.CTCollection;
 import com.liferay.change.tracking.rest.client.http.HttpInvoker;
 import com.liferay.change.tracking.rest.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -879,6 +881,101 @@ public abstract class BaseCTCollectionResourceTestCase {
 		throws Exception {
 
 		return testGraphQLCTCollection_addCTCollection();
+	}
+
+	@Test
+	public void testDeleteCTCollectionBatch() throws Exception {
+		CTCollection ctCollection1 =
+			testDeleteCTCollectionBatch_addCTCollection();
+
+		testDeleteCTCollectionBatch_deleteCTCollection(
+			"COMPLETED", null, ctCollection1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			ctCollectionResource.getCTCollectionHttpResponse(
+				ctCollection1.getId()));
+
+		CTCollection ctCollection2 =
+			testDeleteCTCollectionBatch_addCTCollection();
+
+		testDeleteCTCollectionBatch_deleteCTCollection(
+			"COMPLETED", ctCollection2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			ctCollectionResource.getCTCollectionHttpResponse(
+				ctCollection2.getId()));
+
+		ctCollection1 = testDeleteCTCollectionBatch_addCTCollection();
+		ctCollection2 = testDeleteCTCollectionBatch_addCTCollection();
+
+		testDeleteCTCollectionBatch_deleteCTCollection(
+			"COMPLETED", ctCollection2.getExternalReferenceCode(),
+			ctCollection1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			ctCollectionResource.getCTCollectionHttpResponse(
+				ctCollection1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			ctCollectionResource.getCTCollectionHttpResponse(
+				ctCollection2.getId()));
+
+		testDeleteCTCollectionBatch_deleteCTCollection(
+			"COMPLETED", ctCollection2.getExternalReferenceCode(),
+			ctCollection1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			ctCollectionResource.getCTCollectionHttpResponse(
+				ctCollection2.getId()));
+	}
+
+	protected CTCollection testDeleteCTCollectionBatch_addCTCollection()
+		throws Exception {
+
+		return testDeleteCTCollection_addCTCollection();
+	}
+
+	protected void testDeleteCTCollectionBatch_deleteCTCollection(
+			String expectedExecuteStatus, String ctCollectionERC,
+			Long ctCollectionId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", ctCollectionId
+		).<String, Object>put(
+			"externalReferenceCode", ctCollectionERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			ctCollectionResource.deleteCTCollectionBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2426,6 +2523,10 @@ public abstract class BaseCTCollectionResourceTestCase {
 	@Inject
 	private com.liferay.change.tracking.rest.resource.v1_0.CTCollectionResource
 		_ctCollectionResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

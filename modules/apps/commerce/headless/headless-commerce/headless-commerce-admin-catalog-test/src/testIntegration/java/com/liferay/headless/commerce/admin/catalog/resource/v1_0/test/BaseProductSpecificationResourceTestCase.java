@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.catalog.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -542,6 +544,107 @@ public abstract class BaseProductSpecificationResourceTestCase {
 		throws Exception {
 
 		return testGraphQLProductSpecification_addProductSpecification();
+	}
+
+	@Test
+	public void testDeleteProductSpecificationBatch() throws Exception {
+		ProductSpecification productSpecification1 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", null, productSpecification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification1.getId()));
+
+		ProductSpecification productSpecification2 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			null);
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
+
+		productSpecification1 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+		productSpecification2 =
+			testDeleteProductSpecificationBatch_addProductSpecification();
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			productSpecification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
+
+		testDeleteProductSpecificationBatch_deleteProductSpecification(
+			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			productSpecification1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			productSpecificationResource.getProductSpecificationHttpResponse(
+				productSpecification2.getId()));
+	}
+
+	protected ProductSpecification
+			testDeleteProductSpecificationBatch_addProductSpecification()
+		throws Exception {
+
+		return testDeleteProductSpecification_addProductSpecification();
+	}
+
+	protected void
+			testDeleteProductSpecificationBatch_deleteProductSpecification(
+				String expectedExecuteStatus, String productSpecificationERC,
+				Long productSpecificationId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", productSpecificationId
+		).<String, Object>put(
+			"externalReferenceCode", productSpecificationERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			productSpecificationResource.
+				deleteProductSpecificationBatchHttpResponse(
+					null,
+					JSONFactoryUtil.createJSONArray(
+						Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2528,6 +2631,10 @@ public abstract class BaseProductSpecificationResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.catalog.resource.v1_0.
 		ProductSpecificationResource _productSpecificationResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

@@ -450,9 +450,14 @@ public abstract class BaseRelatedProductResourceImpl
 
 		UnsafeFunction<RelatedProduct, RelatedProduct, Exception>
 			relatedProductUnsafeFunction = relatedProduct -> {
-				deleteRelatedProduct(relatedProduct.getId());
+				if (relatedProduct.getId() != null) {
+					deleteRelatedProduct(relatedProduct.getId());
 
-				return relatedProduct;
+					return relatedProduct;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete relatedProduct. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.PriceModifier;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -1187,6 +1189,101 @@ public abstract class BasePriceModifierResourceTestCase {
 		throws Exception {
 
 		return testGraphQLPriceModifier_addPriceModifier();
+	}
+
+	@Test
+	public void testDeletePriceModifierBatch() throws Exception {
+		PriceModifier priceModifier1 =
+			testDeletePriceModifierBatch_addPriceModifier();
+
+		testDeletePriceModifierBatch_deletePriceModifier(
+			"COMPLETED", null, priceModifier1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceModifierResource.getPriceModifierHttpResponse(
+				priceModifier1.getId()));
+
+		PriceModifier priceModifier2 =
+			testDeletePriceModifierBatch_addPriceModifier();
+
+		testDeletePriceModifierBatch_deletePriceModifier(
+			"COMPLETED", priceModifier2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			priceModifierResource.getPriceModifierHttpResponse(
+				priceModifier2.getId()));
+
+		priceModifier1 = testDeletePriceModifierBatch_addPriceModifier();
+		priceModifier2 = testDeletePriceModifierBatch_addPriceModifier();
+
+		testDeletePriceModifierBatch_deletePriceModifier(
+			"COMPLETED", priceModifier2.getExternalReferenceCode(),
+			priceModifier1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceModifierResource.getPriceModifierHttpResponse(
+				priceModifier1.getId()));
+
+		assertHttpResponseStatusCode(
+			200,
+			priceModifierResource.getPriceModifierHttpResponse(
+				priceModifier2.getId()));
+
+		testDeletePriceModifierBatch_deletePriceModifier(
+			"COMPLETED", priceModifier2.getExternalReferenceCode(),
+			priceModifier1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceModifierResource.getPriceModifierHttpResponse(
+				priceModifier2.getId()));
+	}
+
+	protected PriceModifier testDeletePriceModifierBatch_addPriceModifier()
+		throws Exception {
+
+		return testDeletePriceModifier_addPriceModifier();
+	}
+
+	protected void testDeletePriceModifierBatch_deletePriceModifier(
+			String expectedExecuteStatus, String priceModifierERC,
+			Long priceModifierId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", priceModifierId
+		).<String, Object>put(
+			"externalReferenceCode", priceModifierERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			priceModifierResource.deletePriceModifierBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -2768,6 +2865,10 @@ public abstract class BasePriceModifierResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.admin.pricing.resource.v2_0.
 		PriceModifierResource _priceModifierResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

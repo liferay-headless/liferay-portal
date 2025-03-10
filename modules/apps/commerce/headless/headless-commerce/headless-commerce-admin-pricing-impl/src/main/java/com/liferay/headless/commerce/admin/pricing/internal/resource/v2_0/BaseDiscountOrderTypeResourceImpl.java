@@ -418,10 +418,15 @@ public abstract class BaseDiscountOrderTypeResourceImpl
 
 		UnsafeFunction<DiscountOrderType, DiscountOrderType, Exception>
 			discountOrderTypeUnsafeFunction = discountOrderType -> {
-				deleteDiscountOrderType(
-					discountOrderType.getDiscountOrderTypeId());
+				if (discountOrderType.getDiscountOrderTypeId() != null) {
+					deleteDiscountOrderType(
+						discountOrderType.getDiscountOrderTypeId());
 
-				return discountOrderType;
+					return discountOrderType;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountOrderType. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

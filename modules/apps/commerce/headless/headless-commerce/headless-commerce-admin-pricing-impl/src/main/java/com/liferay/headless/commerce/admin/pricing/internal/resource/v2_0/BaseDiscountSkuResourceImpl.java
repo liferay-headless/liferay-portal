@@ -403,9 +403,14 @@ public abstract class BaseDiscountSkuResourceImpl
 
 		UnsafeFunction<DiscountSku, DiscountSku, Exception>
 			discountSkuUnsafeFunction = discountSku -> {
-				deleteDiscountSku(discountSku.getDiscountSkuId());
+				if (discountSku.getDiscountSkuId() != null) {
+					deleteDiscountSku(discountSku.getDiscountSkuId());
 
-				return discountSku;
+					return discountSku;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete discountSku. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

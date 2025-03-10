@@ -1514,9 +1514,14 @@ public abstract class BaseKeywordResourceImpl
 
 		UnsafeFunction<Keyword, Keyword, Exception> keywordUnsafeFunction =
 			keyword -> {
-				deleteKeyword(keyword.getId());
+				if (keyword.getId() != null) {
+					deleteKeyword(keyword.getId());
 
-				return keyword;
+					return keyword;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete keyword. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

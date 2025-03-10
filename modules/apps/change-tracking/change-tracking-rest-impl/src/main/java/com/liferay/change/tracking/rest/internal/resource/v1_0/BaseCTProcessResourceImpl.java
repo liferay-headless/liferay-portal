@@ -372,9 +372,14 @@ public abstract class BaseCTProcessResourceImpl
 
 		UnsafeFunction<CTProcess, CTProcess, Exception>
 			ctProcessUnsafeFunction = ctProcess -> {
-				deleteCTProcess(ctProcess.getId());
+				if (ctProcess.getId() != null) {
+					deleteCTProcess(ctProcess.getId());
 
-				return ctProcess;
+					return ctProcess;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete ctProcess. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

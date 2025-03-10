@@ -413,10 +413,15 @@ public abstract class BaseOrderTypeChannelResourceImpl
 
 		UnsafeFunction<OrderTypeChannel, OrderTypeChannel, Exception>
 			orderTypeChannelUnsafeFunction = orderTypeChannel -> {
-				deleteOrderTypeChannel(
-					orderTypeChannel.getOrderTypeChannelId());
+				if (orderTypeChannel.getOrderTypeChannelId() != null) {
+					deleteOrderTypeChannel(
+						orderTypeChannel.getOrderTypeChannelId());
 
-				return orderTypeChannel;
+					return orderTypeChannel;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete orderTypeChannel. No valid identifier provided.");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {

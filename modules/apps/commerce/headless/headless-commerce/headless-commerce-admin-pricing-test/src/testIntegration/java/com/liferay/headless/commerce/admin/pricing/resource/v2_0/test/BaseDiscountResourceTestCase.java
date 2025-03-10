@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.Discount;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -961,6 +963,86 @@ public abstract class BaseDiscountResourceTestCase {
 		throws Exception {
 
 		return testGraphQLDiscount_addDiscount();
+	}
+
+	@Test
+	public void testDeleteDiscountBatch() throws Exception {
+		Discount discount1 = testDeleteDiscountBatch_addDiscount();
+
+		testDeleteDiscountBatch_deleteDiscount(
+			"COMPLETED", null, discount1.getId());
+
+		assertHttpResponseStatusCode(
+			404, discountResource.getDiscountHttpResponse(discount1.getId()));
+
+		Discount discount2 = testDeleteDiscountBatch_addDiscount();
+
+		testDeleteDiscountBatch_deleteDiscount(
+			"COMPLETED", discount2.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, discountResource.getDiscountHttpResponse(discount2.getId()));
+
+		discount1 = testDeleteDiscountBatch_addDiscount();
+		discount2 = testDeleteDiscountBatch_addDiscount();
+
+		testDeleteDiscountBatch_deleteDiscount(
+			"COMPLETED", discount2.getExternalReferenceCode(),
+			discount1.getId());
+
+		assertHttpResponseStatusCode(
+			404, discountResource.getDiscountHttpResponse(discount1.getId()));
+
+		assertHttpResponseStatusCode(
+			200, discountResource.getDiscountHttpResponse(discount2.getId()));
+
+		testDeleteDiscountBatch_deleteDiscount(
+			"COMPLETED", discount2.getExternalReferenceCode(),
+			discount1.getId());
+
+		assertHttpResponseStatusCode(
+			404, discountResource.getDiscountHttpResponse(discount2.getId()));
+	}
+
+	protected Discount testDeleteDiscountBatch_addDiscount() throws Exception {
+		return testDeleteDiscount_addDiscount();
+	}
+
+	protected void testDeleteDiscountBatch_deleteDiscount(
+			String expectedExecuteStatus, String discountERC, Long discountId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", discountId
+		).<String, Object>put(
+			"externalReferenceCode", discountERC
+		).build();
+		HttpInvoker.HttpResponse response =
+			discountResource.deleteDiscountBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -3068,6 +3150,10 @@ public abstract class BaseDiscountResourceTestCase {
 	private
 		com.liferay.headless.commerce.admin.pricing.resource.v2_0.
 			DiscountResource _discountResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

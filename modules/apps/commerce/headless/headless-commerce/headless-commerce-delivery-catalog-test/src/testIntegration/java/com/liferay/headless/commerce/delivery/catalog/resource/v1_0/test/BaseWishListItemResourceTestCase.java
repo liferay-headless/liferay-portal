@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.WishListItem;
 import com.liferay.headless.commerce.delivery.catalog.client.http.HttpInvoker;
 import com.liferay.headless.commerce.delivery.catalog.client.pagination.Page;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
@@ -328,6 +330,73 @@ public abstract class BaseWishListItemResourceTestCase {
 		throws Exception {
 
 		return testGraphQLWishListItem_addWishListItem();
+	}
+
+	@Test
+	public void testDeleteWishListItemBatch() throws Exception {
+		WishListItem wishListItem1 =
+			testDeleteWishListItemBatch_addWishListItem();
+
+		testDeleteWishListItemBatch_deleteWishListItem(
+			"COMPLETED", wishListItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			wishListItemResource.getWishListItemHttpResponse(
+				wishListItem1.getId(),
+				testDeleteWishListItemBatch_getAccountId(),
+				testDeleteWishListItemBatch_getCurrencyCode()));
+	}
+
+	protected WishListItem testDeleteWishListItemBatch_addWishListItem()
+		throws Exception {
+
+		return testDeleteWishListItem_addWishListItem();
+	}
+
+	protected void testDeleteWishListItemBatch_deleteWishListItem(
+			String expectedExecuteStatus, Long wishListItemId)
+		throws Exception {
+
+		Map<String, Object> map = HashMapBuilder.<String, Object>put(
+			"id", wishListItemId
+		).build();
+		HttpInvoker.HttpResponse response =
+			wishListItemResource.deleteWishListItemBatchHttpResponse(
+				null,
+				JSONFactoryUtil.createJSONArray(
+					Collections.singletonList(map)));
+
+		Assert.assertEquals(202, response.getStatusCode());
+
+		while (true) {
+			String executeStatus =
+				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+					JSONFactoryUtil.createJSONObject(
+						response.getContent()
+					).getLong(
+						"id"
+					)
+				).getExecuteStatus();
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				break;
+			}
+		}
+	}
+
+	protected Long testDeleteWishListItemBatch_getAccountId() throws Exception {
+		return testDeleteWishListItem_getAccountId();
+	}
+
+	protected String testDeleteWishListItemBatch_getCurrencyCode()
+		throws Exception {
+
+		return testDeleteWishListItem_getCurrencyCode();
 	}
 
 	@Test
@@ -1751,6 +1820,10 @@ public abstract class BaseWishListItemResourceTestCase {
 	@Inject
 	private com.liferay.headless.commerce.delivery.catalog.resource.v1_0.
 		WishListItemResource _wishListItemResource;
+
+	@Inject
+	private BatchEngineImportTaskLocalService
+		_batchEngineImportTaskLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
