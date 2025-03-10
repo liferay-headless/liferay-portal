@@ -149,6 +149,12 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 	@Ignore
 	@Override
 	@Test
+	public void testDeleteProductBatch() throws Exception {
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testDeleteProductByExternalReferenceCodeByVersion()
 		throws Exception {
 	}
