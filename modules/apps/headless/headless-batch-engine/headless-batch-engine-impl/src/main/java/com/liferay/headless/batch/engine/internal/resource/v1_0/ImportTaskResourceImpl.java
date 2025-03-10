@@ -5,8 +5,6 @@
 
 package com.liferay.headless.batch.engine.internal.resource.v1_0;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskContentType;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
@@ -102,7 +100,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.DELETE, _getBytes(object, contentType),
+			BatchEngineTaskOperation.DELETE, _getBytes(object),
 			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
@@ -185,14 +183,14 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			String className, String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String object)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.CREATE, _getBytes(object, contentType),
+			BatchEngineTaskOperation.CREATE, _getBytes(object),
 			callbackURL, className, createStrategy,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			fieldNameMapping, importStrategy, taskItemDelegateName, null);
@@ -223,7 +221,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.UPDATE, _getBytes(object, contentType),
+			BatchEngineTaskOperation.UPDATE, _getBytes(object),
 			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, updateStrategy);
@@ -255,25 +253,14 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(Object object, String contentType)
+	private byte[] _getBytes(Object object)
 		throws Exception {
 
-		byte[] bytes = null;
-
-		if (contentType.equals(MediaType.APPLICATION_JSON)) {
-			ObjectMapper objectMapper = new ObjectMapper();
-
-			bytes = objectMapper.writeValueAsBytes(object);
-		}
-		else {
 			String content = (String)object;
-
-			bytes = content.getBytes();
-		}
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(
-				"fileName", new ByteArrayInputStream(bytes));
+				"fileName", new ByteArrayInputStream(content.getBytes()));
 
 		return unsyncByteArrayOutputStream.toByteArray();
 	}

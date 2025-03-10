@@ -72,7 +72,7 @@ public interface ImportTaskResource {
 			String className, String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String object)
 		throws Exception;
 
 	public ImportTask postImportTask(

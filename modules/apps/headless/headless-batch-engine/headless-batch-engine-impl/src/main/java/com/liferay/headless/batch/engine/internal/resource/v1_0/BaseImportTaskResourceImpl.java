@@ -369,7 +369,7 @@ public abstract class BaseImportTaskResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("taskItemDelegateName")
 			String taskItemDelegateName,
-			Object object)
+			String object)
 		throws Exception {
 
 		return new ImportTask();
