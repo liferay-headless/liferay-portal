@@ -456,7 +456,7 @@ public abstract class BaseProductSpecificationResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			productSpecificationResource.getProductSpecificationHttpResponse(
-				productSpecification.getId()));
+				0L));
 	}
 
 	protected ProductSpecification

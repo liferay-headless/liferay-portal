@@ -234,8 +234,7 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			categoryDisplayPageResource.getCategoryDisplayPageHttpResponse(
-				categoryDisplayPage.getId()));
+			categoryDisplayPageResource.getCategoryDisplayPageHttpResponse(0L));
 	}
 
 	protected CategoryDisplayPage

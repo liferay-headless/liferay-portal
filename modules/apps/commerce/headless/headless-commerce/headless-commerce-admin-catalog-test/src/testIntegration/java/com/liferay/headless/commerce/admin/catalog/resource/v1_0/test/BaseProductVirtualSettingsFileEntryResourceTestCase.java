@@ -250,8 +250,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			productVirtualSettingsFileEntryResource.
-				getProductVirtualSettingsFileEntryHttpResponse(
-					productVirtualSettingsFileEntry.getId()));
+				getProductVirtualSettingsFileEntryHttpResponse(0L));
 	}
 
 	protected ProductVirtualSettingsFileEntry

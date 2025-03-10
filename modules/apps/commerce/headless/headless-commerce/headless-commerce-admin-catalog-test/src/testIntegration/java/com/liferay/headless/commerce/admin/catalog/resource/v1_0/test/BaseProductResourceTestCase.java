@@ -1046,7 +1046,7 @@ public abstract class BaseProductResourceTestCase {
 			404, productResource.getProductHttpResponse(product.getId()));
 
 		assertHttpResponseStatusCode(
-			404, productResource.getProductHttpResponse(product.getId()));
+			404, productResource.getProductHttpResponse(0L));
 	}
 
 	protected Product testDeleteProduct_addProduct() throws Exception {
@@ -1521,7 +1521,7 @@ public abstract class BaseProductResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			productResource.getProductByVersionHttpResponse(
-				product.getId(), product.getVersion()));
+				0L, product.getVersion()));
 	}
 
 	protected Product testDeleteProductByVersion_addProduct() throws Exception {

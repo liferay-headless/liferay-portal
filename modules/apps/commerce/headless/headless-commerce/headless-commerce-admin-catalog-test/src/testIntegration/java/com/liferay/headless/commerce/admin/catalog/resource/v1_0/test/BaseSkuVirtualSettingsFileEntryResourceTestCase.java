@@ -246,8 +246,7 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			skuVirtualSettingsFileEntryResource.
-				getSkuVirtualSettingsFileEntryHttpResponse(
-					skuVirtualSettingsFileEntry.getId()));
+				getSkuVirtualSettingsFileEntryHttpResponse(0L));
 	}
 
 	protected SkuVirtualSettingsFileEntry

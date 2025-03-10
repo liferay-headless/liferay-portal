@@ -635,9 +635,7 @@ public abstract class BaseWarehouseItemResourceTestCase {
 				warehouseItem.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			warehouseItemResource.getWarehouseItemHttpResponse(
-				warehouseItem.getId()));
+			404, warehouseItemResource.getWarehouseItemHttpResponse(0L));
 	}
 
 	protected WarehouseItem testDeleteWarehouseItem_addWarehouseItem()

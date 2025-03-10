@@ -229,9 +229,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 				discountRule.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			discountRuleResource.getDiscountRuleHttpResponse(
-				discountRule.getId()));
+			404, discountRuleResource.getDiscountRuleHttpResponse(0L));
 	}
 
 	protected DiscountRule testDeleteDiscountRule_addDiscountRule()

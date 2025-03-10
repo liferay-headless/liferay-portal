@@ -229,9 +229,7 @@ public abstract class BaseProductChannelResourceTestCase {
 				productChannel.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			productChannelResource.getProductChannelHttpResponse(
-				productChannel.getId()));
+			404, productChannelResource.getProductChannelHttpResponse(0L));
 	}
 
 	protected ProductChannel testDeleteProductChannel_addProductChannel()

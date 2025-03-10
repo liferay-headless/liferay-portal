@@ -1496,7 +1496,7 @@ public abstract class BaseProductConfigurationResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			productConfigurationResource.getProductConfigurationHttpResponse(
-				productConfiguration.getId()));
+				0L));
 	}
 
 	protected ProductConfiguration

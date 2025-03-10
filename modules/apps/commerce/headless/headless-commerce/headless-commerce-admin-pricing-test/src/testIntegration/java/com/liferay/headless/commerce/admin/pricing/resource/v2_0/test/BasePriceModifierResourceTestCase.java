@@ -1101,9 +1101,7 @@ public abstract class BasePriceModifierResourceTestCase {
 				priceModifier.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			priceModifierResource.getPriceModifierHttpResponse(
-				priceModifier.getId()));
+			404, priceModifierResource.getPriceModifierHttpResponse(0L));
 	}
 
 	protected PriceModifier testDeletePriceModifier_addPriceModifier()

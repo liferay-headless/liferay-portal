@@ -487,7 +487,7 @@ public abstract class BaseCTRemoteResourceTestCase {
 			404, ctRemoteResource.getCTRemoteHttpResponse(ctRemote.getId()));
 
 		assertHttpResponseStatusCode(
-			404, ctRemoteResource.getCTRemoteHttpResponse(ctRemote.getId()));
+			404, ctRemoteResource.getCTRemoteHttpResponse(0L));
 	}
 
 	protected CTRemote testDeleteCTRemote_addCTRemote() throws Exception {

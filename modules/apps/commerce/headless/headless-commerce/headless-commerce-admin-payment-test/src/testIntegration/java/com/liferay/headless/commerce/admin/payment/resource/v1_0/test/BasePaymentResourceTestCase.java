@@ -913,7 +913,7 @@ public abstract class BasePaymentResourceTestCase {
 			404, paymentResource.getPaymentHttpResponse(payment.getId()));
 
 		assertHttpResponseStatusCode(
-			404, paymentResource.getPaymentHttpResponse(payment.getId()));
+			404, paymentResource.getPaymentHttpResponse(0L));
 	}
 
 	protected Payment testDeletePayment_addPayment() throws Exception {

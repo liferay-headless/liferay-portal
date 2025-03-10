@@ -951,9 +951,7 @@ public abstract class BaseSpecificationResourceTestCase {
 				specification.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			specificationResource.getSpecificationHttpResponse(
-				specification.getId()));
+			404, specificationResource.getSpecificationHttpResponse(0L));
 	}
 
 	protected Specification testDeleteSpecification_addSpecification()

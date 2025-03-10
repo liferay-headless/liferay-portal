@@ -1233,8 +1233,7 @@ public abstract class BaseProductDisplayPageResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			productDisplayPageResource.getProductDisplayPageHttpResponse(
-				productDisplayPage.getId()));
+			productDisplayPageResource.getProductDisplayPageHttpResponse(0L));
 	}
 
 	protected ProductDisplayPage

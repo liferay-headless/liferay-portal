@@ -1441,9 +1441,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 				measurementUnit.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			measurementUnitResource.getMeasurementUnitHttpResponse(
-				measurementUnit.getId()));
+			404, measurementUnitResource.getMeasurementUnitHttpResponse(0L));
 	}
 
 	protected MeasurementUnit testDeleteMeasurementUnit_addMeasurementUnit()

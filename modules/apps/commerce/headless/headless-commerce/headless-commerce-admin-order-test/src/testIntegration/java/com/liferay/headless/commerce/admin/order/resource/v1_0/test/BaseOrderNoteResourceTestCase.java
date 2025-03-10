@@ -395,7 +395,7 @@ public abstract class BaseOrderNoteResourceTestCase {
 			404, orderNoteResource.getOrderNoteHttpResponse(orderNote.getId()));
 
 		assertHttpResponseStatusCode(
-			404, orderNoteResource.getOrderNoteHttpResponse(orderNote.getId()));
+			404, orderNoteResource.getOrderNoteHttpResponse(0L));
 	}
 
 	protected OrderNote testDeleteOrderNote_addOrderNote() throws Exception {

@@ -1027,7 +1027,7 @@ public abstract class BaseOrderTypeResourceTestCase {
 			404, orderTypeResource.getOrderTypeHttpResponse(orderType.getId()));
 
 		assertHttpResponseStatusCode(
-			404, orderTypeResource.getOrderTypeHttpResponse(orderType.getId()));
+			404, orderTypeResource.getOrderTypeHttpResponse(0L));
 	}
 
 	protected OrderType testDeleteOrderType_addOrderType() throws Exception {

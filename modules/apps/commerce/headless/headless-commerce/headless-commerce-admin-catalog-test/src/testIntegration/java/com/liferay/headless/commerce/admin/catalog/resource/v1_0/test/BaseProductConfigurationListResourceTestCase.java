@@ -1003,8 +1003,7 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			productConfigurationListResource.
-				getProductConfigurationListHttpResponse(
-					productConfigurationList.getId()));
+				getProductConfigurationListHttpResponse(0L));
 	}
 
 	protected ProductConfigurationList

@@ -831,7 +831,7 @@ public abstract class BaseCurrencyResourceTestCase {
 			404, currencyResource.getCurrencyHttpResponse(currency.getId()));
 
 		assertHttpResponseStatusCode(
-			404, currencyResource.getCurrencyHttpResponse(currency.getId()));
+			404, currencyResource.getCurrencyHttpResponse(0L));
 	}
 
 	protected Currency testDeleteCurrency_addCurrency() throws Exception {

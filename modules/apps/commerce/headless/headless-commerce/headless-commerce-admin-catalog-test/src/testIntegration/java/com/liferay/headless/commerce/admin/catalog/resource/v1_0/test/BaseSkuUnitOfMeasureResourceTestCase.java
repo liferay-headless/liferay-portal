@@ -225,9 +225,7 @@ public abstract class BaseSkuUnitOfMeasureResourceTestCase {
 				skuUnitOfMeasure.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			skuUnitOfMeasureResource.getSkuUnitOfMeasureHttpResponse(
-				skuUnitOfMeasure.getId()));
+			404, skuUnitOfMeasureResource.getSkuUnitOfMeasureHttpResponse(0L));
 	}
 
 	protected SkuUnitOfMeasure testDeleteSkuUnitOfMeasure_addSkuUnitOfMeasure()

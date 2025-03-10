@@ -236,9 +236,7 @@ public abstract class BaseProductOptionResourceTestCase {
 				productOption.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			productOptionResource.getProductOptionHttpResponse(
-				productOption.getId()));
+			404, productOptionResource.getProductOptionHttpResponse(0L));
 	}
 
 	protected ProductOption testDeleteProductOption_addProductOption()

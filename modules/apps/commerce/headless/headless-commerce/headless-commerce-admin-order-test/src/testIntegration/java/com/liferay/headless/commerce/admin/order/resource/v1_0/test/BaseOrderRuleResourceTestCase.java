@@ -898,7 +898,7 @@ public abstract class BaseOrderRuleResourceTestCase {
 			404, orderRuleResource.getOrderRuleHttpResponse(orderRule.getId()));
 
 		assertHttpResponseStatusCode(
-			404, orderRuleResource.getOrderRuleHttpResponse(orderRule.getId()));
+			404, orderRuleResource.getOrderRuleHttpResponse(0L));
 	}
 
 	protected OrderRule testDeleteOrderRule_addOrderRule() throws Exception {

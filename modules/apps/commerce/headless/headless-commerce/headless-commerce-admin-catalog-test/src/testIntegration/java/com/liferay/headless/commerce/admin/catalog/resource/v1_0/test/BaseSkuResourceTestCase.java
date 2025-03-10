@@ -1172,8 +1172,7 @@ public abstract class BaseSkuResourceTestCase {
 		assertHttpResponseStatusCode(
 			404, skuResource.getSkuHttpResponse(sku.getId()));
 
-		assertHttpResponseStatusCode(
-			404, skuResource.getSkuHttpResponse(sku.getId()));
+		assertHttpResponseStatusCode(404, skuResource.getSkuHttpResponse(0L));
 	}
 
 	protected Sku testDeleteSku_addSku() throws Exception {

@@ -871,7 +871,7 @@ public abstract class BaseOrderItemResourceTestCase {
 			404, orderItemResource.getOrderItemHttpResponse(orderItem.getId()));
 
 		assertHttpResponseStatusCode(
-			404, orderItemResource.getOrderItemHttpResponse(orderItem.getId()));
+			404, orderItemResource.getOrderItemHttpResponse(0L));
 	}
 
 	protected OrderItem testDeleteOrderItem_addOrderItem() throws Exception {

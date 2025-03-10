@@ -225,7 +225,7 @@ public abstract class BaseAvailabilityEstimateResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			availabilityEstimateResource.getAvailabilityEstimateHttpResponse(
-				availabilityEstimate.getId()));
+				0L));
 	}
 
 	protected AvailabilityEstimate

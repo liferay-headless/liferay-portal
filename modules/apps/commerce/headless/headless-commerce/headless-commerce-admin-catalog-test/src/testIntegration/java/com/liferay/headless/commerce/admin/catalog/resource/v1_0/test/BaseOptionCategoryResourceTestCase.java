@@ -963,9 +963,7 @@ public abstract class BaseOptionCategoryResourceTestCase {
 				optionCategory.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			optionCategoryResource.getOptionCategoryHttpResponse(
-				optionCategory.getId()));
+			404, optionCategoryResource.getOptionCategoryHttpResponse(0L));
 	}
 
 	protected OptionCategory testDeleteOptionCategory_addOptionCategory()

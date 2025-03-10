@@ -846,8 +846,7 @@ public abstract class BaseTermResourceTestCase {
 		assertHttpResponseStatusCode(
 			404, termResource.getTermHttpResponse(term.getId()));
 
-		assertHttpResponseStatusCode(
-			404, termResource.getTermHttpResponse(term.getId()));
+		assertHttpResponseStatusCode(404, termResource.getTermHttpResponse(0L));
 	}
 
 	protected Term testDeleteTerm_addTerm() throws Exception {

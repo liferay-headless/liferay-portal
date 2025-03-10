@@ -904,9 +904,7 @@ public abstract class BaseProductGroupResourceTestCase {
 				productGroup.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			productGroupResource.getProductGroupHttpResponse(
-				productGroup.getId()));
+			404, productGroupResource.getProductGroupHttpResponse(0L));
 	}
 
 	protected ProductGroup testDeleteProductGroup_addProductGroup()

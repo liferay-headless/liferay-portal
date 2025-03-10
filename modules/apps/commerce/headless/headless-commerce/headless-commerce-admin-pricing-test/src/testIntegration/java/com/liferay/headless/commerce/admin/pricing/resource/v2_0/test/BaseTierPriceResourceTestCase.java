@@ -812,7 +812,7 @@ public abstract class BaseTierPriceResourceTestCase {
 			404, tierPriceResource.getTierPriceHttpResponse(tierPrice.getId()));
 
 		assertHttpResponseStatusCode(
-			404, tierPriceResource.getTierPriceHttpResponse(tierPrice.getId()));
+			404, tierPriceResource.getTierPriceHttpResponse(0L));
 	}
 
 	protected TierPrice testDeleteTierPrice_addTierPrice() throws Exception {

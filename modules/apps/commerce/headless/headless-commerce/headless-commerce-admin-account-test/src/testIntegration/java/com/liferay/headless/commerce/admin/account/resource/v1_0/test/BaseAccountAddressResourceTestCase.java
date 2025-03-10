@@ -423,9 +423,7 @@ public abstract class BaseAccountAddressResourceTestCase {
 				accountAddress.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			accountAddressResource.getAccountAddressHttpResponse(
-				accountAddress.getId()));
+			404, accountAddressResource.getAccountAddressHttpResponse(0L));
 	}
 
 	protected AccountAddress testDeleteAccountAddress_addAccountAddress()

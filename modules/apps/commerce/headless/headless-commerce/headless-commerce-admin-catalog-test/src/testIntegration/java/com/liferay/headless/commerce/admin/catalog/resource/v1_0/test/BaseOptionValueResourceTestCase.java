@@ -401,9 +401,7 @@ public abstract class BaseOptionValueResourceTestCase {
 				optionValue.getId()));
 
 		assertHttpResponseStatusCode(
-			404,
-			optionValueResource.getOptionValueHttpResponse(
-				optionValue.getId()));
+			404, optionValueResource.getOptionValueHttpResponse(0L));
 	}
 
 	protected OptionValue testDeleteOptionValue_addOptionValue()
