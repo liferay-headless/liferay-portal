@@ -13,7 +13,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 
@@ -130,10 +129,13 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 	private String _getItemsArray(String jsonString) {
 		try {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				jsonString);
 
 			if (jsonObject.has("items")) {
-				return jsonObject.get("items").toString();
+				return jsonObject.get(
+					"items"
+				).toString();
 			}
 		}
 		catch (JSONException jsonException) {
@@ -176,6 +178,9 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		return _taskItemDelegateName;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		VulcanBatchEngineImportTaskResourceImpl.class);
+
 	private AcceptLanguage _contextAcceptLanguage;
 	private Company _contextCompany;
 	private HttpServletRequest _contextHttpServletRequest;
@@ -183,8 +188,5 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private User _contextUser;
 	private final ImportTaskResource.Factory _factory;
 	private String _taskItemDelegateName;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VulcanBatchEngineImportTaskResourceImpl.class);
 
 }

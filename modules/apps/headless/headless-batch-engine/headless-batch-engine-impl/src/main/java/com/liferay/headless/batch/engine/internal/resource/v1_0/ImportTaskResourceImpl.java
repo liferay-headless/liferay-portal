@@ -100,10 +100,10 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.DELETE, _getBytes(content),
-			callbackURL, className, null,
-			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
-			null, importStrategy, taskItemDelegateName, null);
+			BatchEngineTaskOperation.DELETE, _getBytes(content), callbackURL,
+			className, null, _getBatchEngineTaskContentType(contentType),
+			externalReferenceCode, null, importStrategy, taskItemDelegateName,
+			null);
 	}
 
 	@Override
@@ -190,8 +190,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.CREATE, _getBytes(content),
-			callbackURL, className, createStrategy,
+			BatchEngineTaskOperation.CREATE, _getBytes(content), callbackURL,
+			className, createStrategy,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			fieldNameMapping, importStrategy, taskItemDelegateName, null);
 	}
@@ -221,10 +221,10 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.UPDATE, _getBytes(object),
-			callbackURL, className, null,
-			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
-			null, importStrategy, taskItemDelegateName, updateStrategy);
+			BatchEngineTaskOperation.UPDATE, _getBytes(object), callbackURL,
+			className, null, _getBatchEngineTaskContentType(contentType),
+			externalReferenceCode, null, importStrategy, taskItemDelegateName,
+			updateStrategy);
 	}
 
 	@Activate
@@ -253,9 +253,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(String content)
-		throws Exception {
-
+	private byte[] _getBytes(String content) throws Exception {
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(
 				"fileName", new ByteArrayInputStream(content.getBytes()));
