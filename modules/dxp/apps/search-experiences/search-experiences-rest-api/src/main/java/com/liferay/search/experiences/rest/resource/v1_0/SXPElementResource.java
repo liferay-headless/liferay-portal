@@ -59,8 +59,7 @@ public interface SXPElementResource {
 
 	public SXPElement postSXPElement(SXPElement sxpElement) throws Exception;
 
-	public Response postSXPElementBatch(
-			SXPElement sxpElement, String callbackURL, Object object)
+	public Response postSXPElementBatch(String callbackURL, Object object)
 		throws Exception;
 
 	public SXPElement getSXPElementByExternalReferenceCode(
@@ -78,8 +77,7 @@ public interface SXPElementResource {
 
 	public void deleteSXPElement(Long sxpElementId) throws Exception;
 
-	public Response deleteSXPElementBatch(
-			Long sxpElementId, String callbackURL, Object object)
+	public Response deleteSXPElementBatch(String callbackURL, Object object)
 		throws Exception;
 
 	public SXPElement getSXPElement(Long sxpElementId) throws Exception;
@@ -90,9 +88,7 @@ public interface SXPElementResource {
 	public SXPElement putSXPElement(Long sxpElementId, SXPElement sxpElement)
 		throws Exception;
 
-	public Response putSXPElementBatch(
-			Long sxpElementId, SXPElement sxpElement, String callbackURL,
-			Object object)
+	public Response putSXPElementBatch(String callbackURL, Object object)
 		throws Exception;
 
 	public SXPElement postSXPElementCopy(Long sxpElementId) throws Exception;

@@ -100,7 +100,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createCTCollectionBatch(
-			@GraphQLName("ctCollection") CTCollection ctCollection,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -109,7 +108,7 @@ public class Mutation {
 			_ctCollectionResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			ctCollectionResource -> ctCollectionResource.postCTCollectionBatch(
-				ctCollection, callbackURL, object));
+				callbackURL, object));
 	}
 
 	@GraphQLField
@@ -190,7 +189,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteCTCollectionBatch(
-			@GraphQLName("ctCollectionId") Long ctCollectionId,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -200,7 +198,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			ctCollectionResource ->
 				ctCollectionResource.deleteCTCollectionBatch(
-					ctCollectionId, callbackURL, object));
+					callbackURL, object));
 	}
 
 	@GraphQLField
@@ -231,8 +229,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response updateCTCollectionBatch(
-			@GraphQLName("ctCollectionId") Long ctCollectionId,
-			@GraphQLName("ctCollection") CTCollection ctCollection,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -241,7 +237,7 @@ public class Mutation {
 			_ctCollectionResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			ctCollectionResource -> ctCollectionResource.putCTCollectionBatch(
-				ctCollectionId, ctCollection, callbackURL, object));
+				callbackURL, object));
 	}
 
 	@GraphQLField
@@ -325,7 +321,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteCTProcessBatch(
-			@GraphQLName("ctProcessId") Long ctProcessId,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -334,7 +329,7 @@ public class Mutation {
 			_ctProcessResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			ctProcessResource -> ctProcessResource.deleteCTProcessBatch(
-				ctProcessId, callbackURL, object));
+				callbackURL, object));
 	}
 
 	@GraphQLField
@@ -382,7 +377,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createCTRemoteBatch(
-			@GraphQLName("ctRemote") CTRemote ctRemote,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -391,7 +385,7 @@ public class Mutation {
 			_ctRemoteResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			ctRemoteResource -> ctRemoteResource.postCTRemoteBatch(
-				ctRemote, callbackURL, object));
+				callbackURL, object));
 	}
 
 	@GraphQLField
@@ -443,7 +437,6 @@ public class Mutation {
 
 	@GraphQLField
 	public Response updateCTRemoteBatch(
-			@GraphQLName("ctRemote") CTRemote ctRemote,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -452,7 +445,7 @@ public class Mutation {
 			_ctRemoteResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			ctRemoteResource -> ctRemoteResource.putCTRemoteBatch(
-				ctRemote, callbackURL, object));
+				callbackURL, object));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
