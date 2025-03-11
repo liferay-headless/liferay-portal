@@ -227,7 +227,7 @@ public abstract class BaseSiteTestEntityResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -242,7 +242,7 @@ public abstract class BaseSiteTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				SiteTestEntity.class.getName(), callbackURL, object)
+				SiteTestEntity.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -618,7 +618,7 @@ public abstract class BaseSiteTestEntityResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -633,7 +633,7 @@ public abstract class BaseSiteTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				SiteTestEntity.class.getName(), callbackURL, null, object)
+				SiteTestEntity.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 
