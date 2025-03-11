@@ -533,7 +533,7 @@ public class ResourceOpenAPIParser {
 		}
 		else if (batchOperationType == BatchOperationType.IMPORT) {
 			javaMethodParameters.add(
-				new JavaMethodParameter("object", "Object"));
+				new JavaMethodParameter("contentString", "String"));
 		}
 
 		javaMethodSignatures.add(
