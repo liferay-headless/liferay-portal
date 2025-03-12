@@ -66,11 +66,11 @@ public interface CommentResource {
 		throws Exception;
 
 	public void postBlogPostingCommentBatch(
-			Long blogPostingId, String callbackURL, Object object)
+			Long blogPostingId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postBlogPostingCommentBatchHttpResponse(
-			Long blogPostingId, String callbackURL, Object object)
+			Long blogPostingId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteComment(Long commentId) throws Exception;
@@ -78,11 +78,11 @@ public interface CommentResource {
 	public HttpInvoker.HttpResponse deleteCommentHttpResponse(Long commentId)
 		throws Exception;
 
-	public void deleteCommentBatch(String callbackURL, Object object)
+	public void deleteCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCommentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Comment getComment(Long commentId) throws Exception;
@@ -96,11 +96,11 @@ public interface CommentResource {
 			Long commentId, Comment comment)
 		throws Exception;
 
-	public void putCommentBatch(String callbackURL, Object object)
+	public void putCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCommentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Comment> getCommentCommentsPage(
@@ -151,11 +151,11 @@ public interface CommentResource {
 		throws Exception;
 
 	public void postDocumentCommentBatch(
-			Long documentId, String callbackURL, Object object)
+			Long documentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDocumentCommentBatchHttpResponse(
-			Long documentId, String callbackURL, Object object)
+			Long documentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -336,12 +336,13 @@ public interface CommentResource {
 		throws Exception;
 
 	public void postStructuredContentCommentBatch(
-			Long structuredContentId, String callbackURL, Object object)
+			Long structuredContentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postStructuredContentCommentBatchHttpResponse(
-				Long structuredContentId, String callbackURL, Object object)
+				Long structuredContentId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -820,12 +821,12 @@ public interface CommentResource {
 		}
 
 		public void postBlogPostingCommentBatch(
-				Long blogPostingId, String callbackURL, Object object)
+				Long blogPostingId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postBlogPostingCommentBatchHttpResponse(
-					blogPostingId, callbackURL, object);
+					blogPostingId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -876,12 +877,12 @@ public interface CommentResource {
 		}
 
 		public HttpInvoker.HttpResponse postBlogPostingCommentBatchHttpResponse(
-				Long blogPostingId, String callbackURL, Object object)
+				Long blogPostingId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1025,11 +1026,11 @@ public interface CommentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCommentBatch(String callbackURL, Object object)
+		public void deleteCommentBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCommentBatchHttpResponse(callbackURL, object);
+				deleteCommentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1080,12 +1081,12 @@ public interface CommentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCommentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1333,11 +1334,11 @@ public interface CommentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putCommentBatch(String callbackURL, Object object)
+		public void putCommentBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putCommentBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1388,12 +1389,12 @@ public interface CommentResource {
 		}
 
 		public HttpInvoker.HttpResponse putCommentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2035,12 +2036,12 @@ public interface CommentResource {
 		}
 
 		public void postDocumentCommentBatch(
-				Long documentId, String callbackURL, Object object)
+				Long documentId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDocumentCommentBatchHttpResponse(
-					documentId, callbackURL, object);
+					documentId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2091,12 +2092,12 @@ public interface CommentResource {
 		}
 
 		public HttpInvoker.HttpResponse postDocumentCommentBatchHttpResponse(
-				Long documentId, String callbackURL, Object object)
+				Long documentId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3907,12 +3908,13 @@ public interface CommentResource {
 		}
 
 		public void postStructuredContentCommentBatch(
-				Long structuredContentId, String callbackURL, Object object)
+				Long structuredContentId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postStructuredContentCommentBatchHttpResponse(
-					structuredContentId, callbackURL, object);
+					structuredContentId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3964,12 +3966,13 @@ public interface CommentResource {
 
 		public HttpInvoker.HttpResponse
 				postStructuredContentCommentBatchHttpResponse(
-					Long structuredContentId, String callbackURL, Object object)
+					Long structuredContentId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

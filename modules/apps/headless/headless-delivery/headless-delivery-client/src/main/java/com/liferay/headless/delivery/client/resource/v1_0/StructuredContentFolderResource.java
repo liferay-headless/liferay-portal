@@ -76,12 +76,12 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public void postAssetLibraryStructuredContentFolderBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryStructuredContentFolderBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -170,12 +170,12 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public void postSiteStructuredContentFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSiteStructuredContentFolderBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteStructuredContentFolderByExternalReferenceCode(
@@ -279,12 +279,12 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public void deleteStructuredContentFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteStructuredContentFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public StructuredContentFolder getStructuredContentFolder(
@@ -316,11 +316,11 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public void putStructuredContentFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putStructuredContentFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putStructuredContentFolderSubscribe(
@@ -831,12 +831,12 @@ public interface StructuredContentFolderResource {
 		}
 
 		public void postAssetLibraryStructuredContentFolderBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryStructuredContentFolderBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -888,12 +888,13 @@ public interface StructuredContentFolderResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryStructuredContentFolderBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1880,12 +1881,12 @@ public interface StructuredContentFolderResource {
 		}
 
 		public void postSiteStructuredContentFolderBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteStructuredContentFolderBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1937,12 +1938,12 @@ public interface StructuredContentFolderResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteStructuredContentFolderBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3136,12 +3137,12 @@ public interface StructuredContentFolderResource {
 		}
 
 		public void deleteStructuredContentFolderBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteStructuredContentFolderBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3193,12 +3194,12 @@ public interface StructuredContentFolderResource {
 
 		public HttpInvoker.HttpResponse
 				deleteStructuredContentFolderBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3573,12 +3574,12 @@ public interface StructuredContentFolderResource {
 		}
 
 		public void putStructuredContentFolderBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putStructuredContentFolderBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3630,12 +3631,12 @@ public interface StructuredContentFolderResource {
 
 		public HttpInvoker.HttpResponse
 				putStructuredContentFolderBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

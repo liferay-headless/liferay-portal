@@ -78,12 +78,14 @@ public interface DocumentResource {
 
 	public void postAssetLibraryDocumentBatch(
 			Long assetLibraryId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAssetLibraryDocumentBatchHttpResponse(
 			Long assetLibraryId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryDocumentByExternalReferenceCode(
@@ -179,12 +181,14 @@ public interface DocumentResource {
 
 	public void postDocumentFolderDocumentBatch(
 			Long documentFolderId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDocumentFolderDocumentBatchHttpResponse(
 			Long documentFolderId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public void deleteDocument(Long documentId) throws Exception;
@@ -192,11 +196,11 @@ public interface DocumentResource {
 	public HttpInvoker.HttpResponse deleteDocumentHttpResponse(Long documentId)
 		throws Exception;
 
-	public void deleteDocumentBatch(String callbackURL, Object object)
+	public void deleteDocumentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDocumentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Document getDocument(Long documentId) throws Exception;
@@ -226,12 +230,12 @@ public interface DocumentResource {
 
 	public void putDocumentBatch(
 			Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDocumentBatchHttpResponse(
 			Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentMyRating(Long documentId) throws Exception;
@@ -319,12 +323,12 @@ public interface DocumentResource {
 
 	public void postSiteDocumentBatch(
 			Long siteId, Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteDocumentBatchHttpResponse(
 			Long siteId, Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteDocumentByExternalReferenceCode(
@@ -874,13 +878,13 @@ public interface DocumentResource {
 		public void postAssetLibraryDocumentBatch(
 				Long assetLibraryId, Document document,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryDocumentBatchHttpResponse(
 					assetLibraryId, document, multipartFiles, callbackURL,
-					object);
+					contentString);
 
 			String content = httpResponse.getContent();
 
@@ -934,12 +938,12 @@ public interface DocumentResource {
 				postAssetLibraryDocumentBatchHttpResponse(
 					Long assetLibraryId, Document document,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2047,13 +2051,13 @@ public interface DocumentResource {
 		public void postDocumentFolderDocumentBatch(
 				Long documentFolderId, Document document,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDocumentFolderDocumentBatchHttpResponse(
 					documentFolderId, document, multipartFiles, callbackURL,
-					object);
+					contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2107,12 +2111,12 @@ public interface DocumentResource {
 				postDocumentFolderDocumentBatchHttpResponse(
 					Long documentFolderId, Document document,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2256,11 +2260,12 @@ public interface DocumentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDocumentBatch(String callbackURL, Object object)
+		public void deleteDocumentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDocumentBatchHttpResponse(callbackURL, object);
+				deleteDocumentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2311,12 +2316,12 @@ public interface DocumentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDocumentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2691,12 +2696,12 @@ public interface DocumentResource {
 
 		public void putDocumentBatch(
 				Document document, Map<String, File> multipartFiles,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putDocumentBatchHttpResponse(
-					document, multipartFiles, callbackURL, object);
+					document, multipartFiles, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2748,12 +2753,12 @@ public interface DocumentResource {
 
 		public HttpInvoker.HttpResponse putDocumentBatchHttpResponse(
 				Document document, Map<String, File> multipartFiles,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3929,12 +3934,13 @@ public interface DocumentResource {
 		public void postSiteDocumentBatch(
 				Long siteId, Document document,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteDocumentBatchHttpResponse(
-					siteId, document, multipartFiles, callbackURL, object);
+					siteId, document, multipartFiles, callbackURL,
+					contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3987,12 +3993,12 @@ public interface DocumentResource {
 		public HttpInvoker.HttpResponse postSiteDocumentBatchHttpResponse(
 				Long siteId, Document document,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

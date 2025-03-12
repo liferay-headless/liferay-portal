@@ -53,7 +53,8 @@ public interface BlogPostingResource {
 
 	public void deleteBlogPosting(Long blogPostingId) throws Exception;
 
-	public Response deleteBlogPostingBatch(String callbackURL, Object object)
+	public Response deleteBlogPostingBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public BlogPosting getBlogPosting(Long blogPostingId) throws Exception;
@@ -66,7 +67,8 @@ public interface BlogPostingResource {
 			Long blogPostingId, BlogPosting blogPosting)
 		throws Exception;
 
-	public Response putBlogPostingBatch(String callbackURL, Object object)
+	public Response putBlogPostingBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteBlogPostingMyRating(Long blogPostingId) throws Exception;
@@ -108,7 +110,7 @@ public interface BlogPostingResource {
 		throws Exception;
 
 	public Response postSiteBlogPostingBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteBlogPostingByExternalReferenceCode(

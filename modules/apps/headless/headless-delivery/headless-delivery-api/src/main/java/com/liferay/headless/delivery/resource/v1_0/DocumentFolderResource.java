@@ -67,7 +67,7 @@ public interface DocumentFolderResource {
 		throws Exception;
 
 	public Response postAssetLibraryDocumentFolderBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -87,7 +87,8 @@ public interface DocumentFolderResource {
 
 	public void deleteDocumentFolder(Long documentFolderId) throws Exception;
 
-	public Response deleteDocumentFolderBatch(String callbackURL, Object object)
+	public Response deleteDocumentFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentFolder getDocumentFolder(Long documentFolderId)
@@ -101,7 +102,8 @@ public interface DocumentFolderResource {
 			Long documentFolderId, DocumentFolder documentFolder)
 		throws Exception;
 
-	public Response putDocumentFolderBatch(String callbackURL, Object object)
+	public Response putDocumentFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentFolderMyRating(Long documentFolderId)
@@ -161,7 +163,7 @@ public interface DocumentFolderResource {
 		throws Exception;
 
 	public Response postSiteDocumentFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

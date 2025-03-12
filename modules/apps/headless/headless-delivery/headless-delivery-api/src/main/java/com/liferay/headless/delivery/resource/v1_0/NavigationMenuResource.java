@@ -52,7 +52,8 @@ public interface NavigationMenuResource {
 
 	public void deleteNavigationMenu(Long navigationMenuId) throws Exception;
 
-	public Response deleteNavigationMenuBatch(String callbackURL, Object object)
+	public Response deleteNavigationMenuBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NavigationMenu getNavigationMenu(Long navigationMenuId)
@@ -62,7 +63,8 @@ public interface NavigationMenuResource {
 			Long navigationMenuId, NavigationMenu navigationMenu)
 		throws Exception;
 
-	public Response putNavigationMenuBatch(String callbackURL, Object object)
+	public Response putNavigationMenuBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -90,7 +92,7 @@ public interface NavigationMenuResource {
 		throws Exception;
 
 	public Response postSiteNavigationMenuBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteNavigationMenuByExternalReferenceCode(

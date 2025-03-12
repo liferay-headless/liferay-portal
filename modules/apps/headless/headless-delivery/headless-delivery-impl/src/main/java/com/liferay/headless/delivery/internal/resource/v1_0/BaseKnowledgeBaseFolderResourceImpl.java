@@ -153,7 +153,7 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -361,7 +361,7 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -864,7 +864,7 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -879,7 +879,8 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				KnowledgeBaseFolder.class.getName(), callbackURL, null, object)
+				KnowledgeBaseFolder.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

@@ -54,7 +54,7 @@ public interface MessageBoardSectionResource {
 		throws Exception;
 
 	public Response deleteMessageBoardSectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardSection getMessageBoardSection(
@@ -70,7 +70,7 @@ public interface MessageBoardSectionResource {
 		throws Exception;
 
 	public Response putMessageBoardSectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -122,7 +122,7 @@ public interface MessageBoardSectionResource {
 		throws Exception;
 
 	public Response postSiteMessageBoardSectionBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

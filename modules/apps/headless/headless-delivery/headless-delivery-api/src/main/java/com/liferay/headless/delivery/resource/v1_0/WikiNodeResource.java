@@ -65,7 +65,7 @@ public interface WikiNodeResource {
 		throws Exception;
 
 	public Response postSiteWikiNodeBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteWikiNodeByExternalReferenceCode(
@@ -92,7 +92,8 @@ public interface WikiNodeResource {
 
 	public void deleteWikiNode(Long wikiNodeId) throws Exception;
 
-	public Response deleteWikiNodeBatch(String callbackURL, Object object)
+	public Response deleteWikiNodeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WikiNode getWikiNode(Long wikiNodeId) throws Exception;
@@ -100,7 +101,7 @@ public interface WikiNodeResource {
 	public WikiNode putWikiNode(Long wikiNodeId, WikiNode wikiNode)
 		throws Exception;
 
-	public Response putWikiNodeBatch(String callbackURL, Object object)
+	public Response putWikiNodeBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

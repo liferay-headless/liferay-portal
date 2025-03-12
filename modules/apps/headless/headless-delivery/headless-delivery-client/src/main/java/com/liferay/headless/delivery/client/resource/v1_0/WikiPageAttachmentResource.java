@@ -66,11 +66,12 @@ public interface WikiPageAttachmentResource {
 			Long wikiPageAttachmentId)
 		throws Exception;
 
-	public void deleteWikiPageAttachmentBatch(String callbackURL, Object object)
+	public void deleteWikiPageAttachmentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWikiPageAttachmentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WikiPageAttachment getWikiPageAttachment(Long wikiPageAttachmentId)
@@ -111,14 +112,15 @@ public interface WikiPageAttachmentResource {
 
 	public void postWikiPageWikiPageAttachmentBatch(
 			Long wikiPageId, WikiPageAttachment wikiPageAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWikiPageWikiPageAttachmentBatchHttpResponse(
 				Long wikiPageId, WikiPageAttachment wikiPageAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -566,11 +568,12 @@ public interface WikiPageAttachmentResource {
 		}
 
 		public void deleteWikiPageAttachmentBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWikiPageAttachmentBatchHttpResponse(callbackURL, object);
+				deleteWikiPageAttachmentBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -622,12 +625,12 @@ public interface WikiPageAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				deleteWikiPageAttachmentBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1116,13 +1119,13 @@ public interface WikiPageAttachmentResource {
 		public void postWikiPageWikiPageAttachmentBatch(
 				Long wikiPageId, WikiPageAttachment wikiPageAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWikiPageWikiPageAttachmentBatchHttpResponse(
 					wikiPageId, wikiPageAttachment, multipartFiles, callbackURL,
-					object);
+					contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1176,12 +1179,12 @@ public interface WikiPageAttachmentResource {
 				postWikiPageWikiPageAttachmentBatchHttpResponse(
 					Long wikiPageId, WikiPageAttachment wikiPageAttachment,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

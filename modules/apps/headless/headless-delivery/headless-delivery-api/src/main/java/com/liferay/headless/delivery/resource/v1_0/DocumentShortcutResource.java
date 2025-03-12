@@ -64,14 +64,14 @@ public interface DocumentShortcutResource {
 		throws Exception;
 
 	public Response postAssetLibraryDocumentShortcutBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentShortcut(Long documentShortcutId)
 		throws Exception;
 
 	public Response deleteDocumentShortcutBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentShortcut getDocumentShortcut(Long documentShortcutId)
@@ -85,7 +85,8 @@ public interface DocumentShortcutResource {
 			Long documentShortcutId, DocumentShortcut documentShortcut)
 		throws Exception;
 
-	public Response putDocumentShortcutBatch(String callbackURL, Object object)
+	public Response putDocumentShortcutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DocumentShortcut> getSiteDocumentShortcutsPage(
@@ -102,7 +103,7 @@ public interface DocumentShortcutResource {
 		throws Exception;
 
 	public Response postSiteDocumentShortcutBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteDocumentShortcutByExternalReferenceCode(

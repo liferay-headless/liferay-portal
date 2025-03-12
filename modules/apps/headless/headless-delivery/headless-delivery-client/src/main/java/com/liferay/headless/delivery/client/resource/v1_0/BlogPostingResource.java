@@ -45,11 +45,11 @@ public interface BlogPostingResource {
 			Long blogPostingId)
 		throws Exception;
 
-	public void deleteBlogPostingBatch(String callbackURL, Object object)
+	public void deleteBlogPostingBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteBlogPostingBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public BlogPosting getBlogPosting(Long blogPostingId) throws Exception;
@@ -74,11 +74,11 @@ public interface BlogPostingResource {
 			Long blogPostingId, BlogPosting blogPosting)
 		throws Exception;
 
-	public void putBlogPostingBatch(String callbackURL, Object object)
+	public void putBlogPostingBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putBlogPostingBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteBlogPostingMyRating(Long blogPostingId) throws Exception;
@@ -162,11 +162,11 @@ public interface BlogPostingResource {
 		throws Exception;
 
 	public void postSiteBlogPostingBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteBlogPostingBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteBlogPostingByExternalReferenceCode(
@@ -438,11 +438,12 @@ public interface BlogPostingResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteBlogPostingBatch(String callbackURL, Object object)
+		public void deleteBlogPostingBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteBlogPostingBatchHttpResponse(callbackURL, object);
+				deleteBlogPostingBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -493,12 +494,12 @@ public interface BlogPostingResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteBlogPostingBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -856,11 +857,12 @@ public interface BlogPostingResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putBlogPostingBatch(String callbackURL, Object object)
+		public void putBlogPostingBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putBlogPostingBatchHttpResponse(callbackURL, object);
+				putBlogPostingBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -911,12 +913,12 @@ public interface BlogPostingResource {
 		}
 
 		public HttpInvoker.HttpResponse putBlogPostingBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2084,12 +2086,12 @@ public interface BlogPostingResource {
 		}
 
 		public void postSiteBlogPostingBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteBlogPostingBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2140,12 +2142,12 @@ public interface BlogPostingResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteBlogPostingBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

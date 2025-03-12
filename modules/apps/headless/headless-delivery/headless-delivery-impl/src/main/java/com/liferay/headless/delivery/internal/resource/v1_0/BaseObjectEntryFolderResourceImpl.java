@@ -315,7 +315,7 @@ public abstract class BaseObjectEntryFolderResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -330,7 +330,8 @@ public abstract class BaseObjectEntryFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				ObjectEntryFolder.class.getName(), callbackURL, null, object)
+				ObjectEntryFolder.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

@@ -43,12 +43,12 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public void deleteMessageBoardAttachmentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteMessageBoardAttachmentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardAttachment getMessageBoardAttachment(
@@ -96,7 +96,8 @@ public interface MessageBoardAttachmentResource {
 	public void postMessageBoardMessageMessageBoardAttachmentBatch(
 			Long messageBoardMessageId,
 			MessageBoardAttachment messageBoardAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
@@ -104,7 +105,7 @@ public interface MessageBoardAttachmentResource {
 				Long messageBoardMessageId,
 				MessageBoardAttachment messageBoardAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 		throws Exception;
 
 	public Page<MessageBoardAttachment>
@@ -144,7 +145,8 @@ public interface MessageBoardAttachmentResource {
 	public void postMessageBoardThreadMessageBoardAttachmentBatch(
 			Long messageBoardThreadId,
 			MessageBoardAttachment messageBoardAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
@@ -152,7 +154,7 @@ public interface MessageBoardAttachmentResource {
 				Long messageBoardThreadId,
 				MessageBoardAttachment messageBoardAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 		throws Exception;
 
 	public void
@@ -397,12 +399,12 @@ public interface MessageBoardAttachmentResource {
 		}
 
 		public void deleteMessageBoardAttachmentBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteMessageBoardAttachmentBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -454,12 +456,12 @@ public interface MessageBoardAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				deleteMessageBoardAttachmentBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -959,13 +961,13 @@ public interface MessageBoardAttachmentResource {
 				Long messageBoardMessageId,
 				MessageBoardAttachment messageBoardAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardMessageMessageBoardAttachmentBatchHttpResponse(
 					messageBoardMessageId, messageBoardAttachment,
-					multipartFiles, callbackURL, object);
+					multipartFiles, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1020,12 +1022,12 @@ public interface MessageBoardAttachmentResource {
 					Long messageBoardMessageId,
 					MessageBoardAttachment messageBoardAttachment,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1419,13 +1421,13 @@ public interface MessageBoardAttachmentResource {
 				Long messageBoardThreadId,
 				MessageBoardAttachment messageBoardAttachment,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardThreadMessageBoardAttachmentBatchHttpResponse(
 					messageBoardThreadId, messageBoardAttachment,
-					multipartFiles, callbackURL, object);
+					multipartFiles, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1480,12 +1482,12 @@ public interface MessageBoardAttachmentResource {
 					Long messageBoardThreadId,
 					MessageBoardAttachment messageBoardAttachment,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

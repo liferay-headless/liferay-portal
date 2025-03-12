@@ -47,11 +47,11 @@ public interface MessageBoardMessageResource {
 		throws Exception;
 
 	public void deleteMessageBoardMessageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMessageBoardMessageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardMessage getMessageBoardMessage(
@@ -78,11 +78,12 @@ public interface MessageBoardMessageResource {
 			Long messageBoardMessageId, MessageBoardMessage messageBoardMessage)
 		throws Exception;
 
-	public void putMessageBoardMessageBatch(String callbackURL, Object object)
+	public void putMessageBoardMessageBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putMessageBoardMessageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putMessageBoardMessageMarkAsAnswer(Long messageBoardMessageId)
@@ -228,12 +229,13 @@ public interface MessageBoardMessageResource {
 		throws Exception;
 
 	public void postMessageBoardThreadMessageBoardMessageBatch(
-			Long messageBoardThreadId, String callbackURL, Object object)
+			Long messageBoardThreadId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postMessageBoardThreadMessageBoardMessageBatchHttpResponse(
-				Long messageBoardThreadId, String callbackURL, Object object)
+				Long messageBoardThreadId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public Page<MessageBoardMessage> getSiteMessageBoardMessagesPage(
@@ -543,11 +545,12 @@ public interface MessageBoardMessageResource {
 		}
 
 		public void deleteMessageBoardMessageBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteMessageBoardMessageBatchHttpResponse(callbackURL, object);
+				deleteMessageBoardMessageBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -599,12 +602,12 @@ public interface MessageBoardMessageResource {
 
 		public HttpInvoker.HttpResponse
 				deleteMessageBoardMessageBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -974,11 +977,12 @@ public interface MessageBoardMessageResource {
 		}
 
 		public void putMessageBoardMessageBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putMessageBoardMessageBatchHttpResponse(callbackURL, object);
+				putMessageBoardMessageBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1029,12 +1033,12 @@ public interface MessageBoardMessageResource {
 		}
 
 		public HttpInvoker.HttpResponse putMessageBoardMessageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2806,12 +2810,13 @@ public interface MessageBoardMessageResource {
 		}
 
 		public void postMessageBoardThreadMessageBoardMessageBatch(
-				Long messageBoardThreadId, String callbackURL, Object object)
+				Long messageBoardThreadId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardThreadMessageBoardMessageBatchHttpResponse(
-					messageBoardThreadId, callbackURL, object);
+					messageBoardThreadId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2864,12 +2869,12 @@ public interface MessageBoardMessageResource {
 		public HttpInvoker.HttpResponse
 				postMessageBoardThreadMessageBoardMessageBatchHttpResponse(
 					Long messageBoardThreadId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

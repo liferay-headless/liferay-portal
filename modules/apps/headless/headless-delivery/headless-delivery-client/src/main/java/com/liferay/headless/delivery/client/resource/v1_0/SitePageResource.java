@@ -65,11 +65,11 @@ public interface SitePageResource {
 		throws Exception;
 
 	public void postSiteSitePageBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteSitePageBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SitePage getSiteSitePage(Long siteId, String friendlyUrlPath)
@@ -588,11 +588,12 @@ public interface SitePageResource {
 		}
 
 		public void postSiteSitePageBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSitePageBatchHttpResponse(siteId, callbackURL, object);
+				postSiteSitePageBatchHttpResponse(
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -643,12 +644,12 @@ public interface SitePageResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteSitePageBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

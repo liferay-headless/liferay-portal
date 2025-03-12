@@ -77,7 +77,7 @@ public interface WikiPageResource {
 		throws Exception;
 
 	public Response postWikiNodeWikiPageBatch(
-			Long wikiNodeId, String callbackURL, Object object)
+			Long wikiNodeId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WikiPage> getWikiPageWikiPagesPage(Long parentWikiPageId)
@@ -89,7 +89,8 @@ public interface WikiPageResource {
 
 	public void deleteWikiPage(Long wikiPageId) throws Exception;
 
-	public Response deleteWikiPageBatch(String callbackURL, Object object)
+	public Response deleteWikiPageBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WikiPage getWikiPage(Long wikiPageId) throws Exception;
@@ -97,7 +98,7 @@ public interface WikiPageResource {
 	public WikiPage putWikiPage(Long wikiPageId, WikiPage wikiPage)
 		throws Exception;
 
-	public Response putWikiPageBatch(String callbackURL, Object object)
+	public Response putWikiPageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

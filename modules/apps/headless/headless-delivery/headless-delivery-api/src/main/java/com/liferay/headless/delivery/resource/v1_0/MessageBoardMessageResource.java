@@ -55,7 +55,7 @@ public interface MessageBoardMessageResource {
 		throws Exception;
 
 	public Response deleteMessageBoardMessageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardMessage getMessageBoardMessage(
@@ -71,7 +71,7 @@ public interface MessageBoardMessageResource {
 		throws Exception;
 
 	public Response putMessageBoardMessageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putMessageBoardMessageMarkAsAnswer(Long messageBoardMessageId)
@@ -142,7 +142,7 @@ public interface MessageBoardMessageResource {
 		throws Exception;
 
 	public Response postMessageBoardThreadMessageBoardMessageBatch(
-			Long messageBoardThreadId, String callbackURL, Object object)
+			Long messageBoardThreadId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<MessageBoardMessage> getSiteMessageBoardMessagesPage(

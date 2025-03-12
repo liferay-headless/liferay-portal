@@ -65,19 +65,19 @@ public interface CommentResource {
 		throws Exception;
 
 	public Response postBlogPostingCommentBatch(
-			Long blogPostingId, String callbackURL, Object object)
+			Long blogPostingId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteComment(Long commentId) throws Exception;
 
-	public Response deleteCommentBatch(String callbackURL, Object object)
+	public Response deleteCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Comment getComment(Long commentId) throws Exception;
 
 	public Comment putComment(Long commentId, Comment comment) throws Exception;
 
-	public Response putCommentBatch(String callbackURL, Object object)
+	public Response putCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Comment> getCommentCommentsPage(
@@ -104,7 +104,7 @@ public interface CommentResource {
 		throws Exception;
 
 	public Response postDocumentCommentBatch(
-			Long documentId, String callbackURL, Object object)
+			Long documentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -196,7 +196,7 @@ public interface CommentResource {
 		throws Exception;
 
 	public Response postStructuredContentCommentBatch(
-			Long structuredContentId, String callbackURL, Object object)
+			Long structuredContentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -69,7 +69,7 @@ public interface DocumentDataDefinitionTypeResource {
 		throws Exception;
 
 	public Response postAssetLibraryDocumentDataDefinitionTypeBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentDataDefinitionType(
@@ -77,7 +77,7 @@ public interface DocumentDataDefinitionTypeResource {
 		throws Exception;
 
 	public Response deleteDocumentDataDefinitionTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentDataDefinitionType getDocumentDataDefinitionType(
@@ -101,7 +101,7 @@ public interface DocumentDataDefinitionTypeResource {
 		throws Exception;
 
 	public Response postSiteDocumentDataDefinitionTypeBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

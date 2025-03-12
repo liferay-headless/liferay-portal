@@ -64,12 +64,12 @@ public interface DocumentMetadataSetResource {
 		throws Exception;
 
 	public void postAssetLibraryDocumentMetadataSetBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryDocumentMetadataSetBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryDocumentMetadataSetByExternalReferenceCode(
@@ -111,11 +111,11 @@ public interface DocumentMetadataSetResource {
 		throws Exception;
 
 	public void deleteDocumentMetadataSetBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDocumentMetadataSetBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentMetadataSet getDocumentMetadataSet(
@@ -154,12 +154,12 @@ public interface DocumentMetadataSetResource {
 		throws Exception;
 
 	public void postSiteDocumentMetadataSetBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSiteDocumentMetadataSetBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteDocumentMetadataSetByExternalReferenceCode(
@@ -646,12 +646,12 @@ public interface DocumentMetadataSetResource {
 		}
 
 		public void postAssetLibraryDocumentMetadataSetBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryDocumentMetadataSetBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -703,12 +703,13 @@ public interface DocumentMetadataSetResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryDocumentMetadataSetBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1190,11 +1191,12 @@ public interface DocumentMetadataSetResource {
 		}
 
 		public void deleteDocumentMetadataSetBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDocumentMetadataSetBatchHttpResponse(callbackURL, object);
+				deleteDocumentMetadataSetBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1246,12 +1248,12 @@ public interface DocumentMetadataSetResource {
 
 		public HttpInvoker.HttpResponse
 				deleteDocumentMetadataSetBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1736,12 +1738,12 @@ public interface DocumentMetadataSetResource {
 		}
 
 		public void postSiteDocumentMetadataSetBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteDocumentMetadataSetBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1793,12 +1795,12 @@ public interface DocumentMetadataSetResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteDocumentMetadataSetBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

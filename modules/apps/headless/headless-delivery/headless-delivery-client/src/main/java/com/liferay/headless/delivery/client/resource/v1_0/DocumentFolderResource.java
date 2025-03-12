@@ -74,12 +74,12 @@ public interface DocumentFolderResource {
 		throws Exception;
 
 	public void postAssetLibraryDocumentFolderBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryDocumentFolderBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getAssetLibraryDocumentFolderPermissionsPage(
@@ -115,11 +115,12 @@ public interface DocumentFolderResource {
 			Long documentFolderId)
 		throws Exception;
 
-	public void deleteDocumentFolderBatch(String callbackURL, Object object)
+	public void deleteDocumentFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDocumentFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentFolder getDocumentFolder(Long documentFolderId)
@@ -145,11 +146,11 @@ public interface DocumentFolderResource {
 			Long documentFolderId, DocumentFolder documentFolder)
 		throws Exception;
 
-	public void putDocumentFolderBatch(String callbackURL, Object object)
+	public void putDocumentFolderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDocumentFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentFolderMyRating(Long documentFolderId)
@@ -269,11 +270,11 @@ public interface DocumentFolderResource {
 		throws Exception;
 
 	public void postSiteDocumentFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteDocumentFolderBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getSiteDocumentFolderPermissionsPage(
@@ -818,12 +819,12 @@ public interface DocumentFolderResource {
 		}
 
 		public void postAssetLibraryDocumentFolderBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryDocumentFolderBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -875,12 +876,13 @@ public interface DocumentFolderResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryDocumentFolderBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1369,11 +1371,13 @@ public interface DocumentFolderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDocumentFolderBatch(String callbackURL, Object object)
+		public void deleteDocumentFolderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDocumentFolderBatchHttpResponse(callbackURL, object);
+				deleteDocumentFolderBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1424,12 +1428,12 @@ public interface DocumentFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDocumentFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1790,11 +1794,12 @@ public interface DocumentFolderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDocumentFolderBatch(String callbackURL, Object object)
+		public void putDocumentFolderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDocumentFolderBatchHttpResponse(callbackURL, object);
+				putDocumentFolderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1845,12 +1850,12 @@ public interface DocumentFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse putDocumentFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3378,12 +3383,12 @@ public interface DocumentFolderResource {
 		}
 
 		public void postSiteDocumentFolderBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteDocumentFolderBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3434,12 +3439,12 @@ public interface DocumentFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteDocumentFolderBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

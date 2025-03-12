@@ -44,11 +44,12 @@ public interface BlogPostingImageResource {
 			Long blogPostingImageId)
 		throws Exception;
 
-	public void deleteBlogPostingImageBatch(String callbackURL, Object object)
+	public void deleteBlogPostingImageBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteBlogPostingImageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
@@ -92,12 +93,14 @@ public interface BlogPostingImageResource {
 
 	public void postSiteBlogPostingImageBatch(
 			Long siteId, BlogPostingImage blogPostingImage,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteBlogPostingImageBatchHttpResponse(
 			Long siteId, BlogPostingImage blogPostingImage,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Map<String, File> multipartFiles, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public void deleteSiteBlogPostingImageByExternalReferenceCode(
@@ -333,11 +336,12 @@ public interface BlogPostingImageResource {
 		}
 
 		public void deleteBlogPostingImageBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteBlogPostingImageBatchHttpResponse(callbackURL, object);
+				deleteBlogPostingImageBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -388,12 +392,12 @@ public interface BlogPostingImageResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteBlogPostingImageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -920,13 +924,13 @@ public interface BlogPostingImageResource {
 		public void postSiteBlogPostingImageBatch(
 				Long siteId, BlogPostingImage blogPostingImage,
 				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteBlogPostingImageBatchHttpResponse(
 					siteId, blogPostingImage, multipartFiles, callbackURL,
-					object);
+					contentString);
 
 			String content = httpResponse.getContent();
 
@@ -980,12 +984,12 @@ public interface BlogPostingImageResource {
 				postSiteBlogPostingImageBatchHttpResponse(
 					Long siteId, BlogPostingImage blogPostingImage,
 					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

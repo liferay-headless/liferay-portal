@@ -45,11 +45,11 @@ public interface MessageBoardSectionResource {
 		throws Exception;
 
 	public void deleteMessageBoardSectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMessageBoardSectionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardSection getMessageBoardSection(
@@ -76,11 +76,12 @@ public interface MessageBoardSectionResource {
 			Long messageBoardSectionId, MessageBoardSection messageBoardSection)
 		throws Exception;
 
-	public void putMessageBoardSectionBatch(String callbackURL, Object object)
+	public void putMessageBoardSectionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putMessageBoardSectionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getMessageBoardSectionPermissionsPage(
@@ -183,12 +184,12 @@ public interface MessageBoardSectionResource {
 		throws Exception;
 
 	public void postSiteMessageBoardSectionBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSiteMessageBoardSectionBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getSiteMessageBoardSectionPermissionsPage(
@@ -424,11 +425,12 @@ public interface MessageBoardSectionResource {
 		}
 
 		public void deleteMessageBoardSectionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteMessageBoardSectionBatchHttpResponse(callbackURL, object);
+				deleteMessageBoardSectionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -480,12 +482,12 @@ public interface MessageBoardSectionResource {
 
 		public HttpInvoker.HttpResponse
 				deleteMessageBoardSectionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -855,11 +857,12 @@ public interface MessageBoardSectionResource {
 		}
 
 		public void putMessageBoardSectionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putMessageBoardSectionBatchHttpResponse(callbackURL, object);
+				putMessageBoardSectionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -910,12 +913,12 @@ public interface MessageBoardSectionResource {
 		}
 
 		public HttpInvoker.HttpResponse putMessageBoardSectionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2135,12 +2138,12 @@ public interface MessageBoardSectionResource {
 		}
 
 		public void postSiteMessageBoardSectionBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteMessageBoardSectionBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2192,12 +2195,12 @@ public interface MessageBoardSectionResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteMessageBoardSectionBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

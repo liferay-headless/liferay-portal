@@ -75,12 +75,12 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public void postAssetLibraryStructuredContentBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryStructuredContentBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryStructuredContentByExternalReferenceCode(
@@ -190,11 +190,11 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public void postSiteStructuredContentBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteStructuredContentBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteStructuredContentByExternalReferenceCode(
@@ -298,13 +298,14 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public void postStructuredContentFolderStructuredContentBatch(
-			Long structuredContentFolderId, String callbackURL, Object object)
+			Long structuredContentFolderId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postStructuredContentFolderStructuredContentBatchHttpResponse(
 				Long structuredContentFolderId, String callbackURL,
-				Object object)
+				String contentString)
 		throws Exception;
 
 	public void deleteStructuredContent(Long structuredContentId)
@@ -314,11 +315,12 @@ public interface StructuredContentResource {
 			Long structuredContentId)
 		throws Exception;
 
-	public void deleteStructuredContentBatch(String callbackURL, Object object)
+	public void deleteStructuredContentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteStructuredContentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public StructuredContent getStructuredContent(Long structuredContentId)
@@ -344,11 +346,12 @@ public interface StructuredContentResource {
 			Long structuredContentId, StructuredContent structuredContent)
 		throws Exception;
 
-	public void putStructuredContentBatch(String callbackURL, Object object)
+	public void putStructuredContentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putStructuredContentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteStructuredContentMyRating(Long structuredContentId)
@@ -918,12 +921,12 @@ public interface StructuredContentResource {
 		}
 
 		public void postAssetLibraryStructuredContentBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryStructuredContentBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -975,12 +978,13 @@ public interface StructuredContentResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryStructuredContentBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2221,12 +2225,12 @@ public interface StructuredContentResource {
 		}
 
 		public void postSiteStructuredContentBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteStructuredContentBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2278,12 +2282,12 @@ public interface StructuredContentResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteStructuredContentBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3488,12 +3492,12 @@ public interface StructuredContentResource {
 
 		public void postStructuredContentFolderStructuredContentBatch(
 				Long structuredContentFolderId, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postStructuredContentFolderStructuredContentBatchHttpResponse(
-					structuredContentFolderId, callbackURL, object);
+					structuredContentFolderId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3546,12 +3550,12 @@ public interface StructuredContentResource {
 		public HttpInvoker.HttpResponse
 				postStructuredContentFolderStructuredContentBatchHttpResponse(
 					Long structuredContentFolderId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3699,11 +3703,12 @@ public interface StructuredContentResource {
 		}
 
 		public void deleteStructuredContentBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteStructuredContentBatchHttpResponse(callbackURL, object);
+				deleteStructuredContentBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3755,12 +3760,12 @@ public interface StructuredContentResource {
 
 		public HttpInvoker.HttpResponse
 				deleteStructuredContentBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -4122,11 +4127,13 @@ public interface StructuredContentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putStructuredContentBatch(String callbackURL, Object object)
+		public void putStructuredContentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putStructuredContentBatchHttpResponse(callbackURL, object);
+				putStructuredContentBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -4177,12 +4184,12 @@ public interface StructuredContentResource {
 		}
 
 		public HttpInvoker.HttpResponse putStructuredContentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

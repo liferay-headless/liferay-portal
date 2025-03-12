@@ -55,7 +55,7 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public Response deleteKnowledgeBaseArticleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public KnowledgeBaseArticle getKnowledgeBaseArticle(
@@ -73,7 +73,7 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public Response putKnowledgeBaseArticleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteKnowledgeBaseArticleMyRating(Long knowledgeBaseArticleId)
@@ -139,7 +139,8 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public Response postKnowledgeBaseFolderKnowledgeBaseArticleBatch(
-			Long knowledgeBaseFolderId, String callbackURL, Object object)
+			Long knowledgeBaseFolderId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public Page<KnowledgeBaseArticle> getSiteKnowledgeBaseArticlesPage(
@@ -158,7 +159,7 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public Response postSiteKnowledgeBaseArticleBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKnowledgeBaseArticleByExternalReferenceCode(

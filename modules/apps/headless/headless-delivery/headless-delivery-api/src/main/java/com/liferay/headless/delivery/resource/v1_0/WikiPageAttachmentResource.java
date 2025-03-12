@@ -66,7 +66,7 @@ public interface WikiPageAttachmentResource {
 		throws Exception;
 
 	public Response deleteWikiPageAttachmentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WikiPageAttachment getWikiPageAttachment(Long wikiPageAttachmentId)
@@ -87,7 +87,7 @@ public interface WikiPageAttachmentResource {
 
 	public Response postWikiPageWikiPageAttachmentBatch(
 			Long wikiPageId, MultipartBody multipartBody, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

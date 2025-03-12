@@ -68,7 +68,7 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public Response postAssetLibraryStructuredContentFolderBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -114,7 +114,7 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public Response postSiteStructuredContentFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteStructuredContentFolderByExternalReferenceCode(
@@ -171,7 +171,7 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public Response deleteStructuredContentFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public StructuredContentFolder getStructuredContentFolder(
@@ -189,7 +189,7 @@ public interface StructuredContentFolderResource {
 		throws Exception;
 
 	public Response putStructuredContentFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putStructuredContentFolderSubscribe(

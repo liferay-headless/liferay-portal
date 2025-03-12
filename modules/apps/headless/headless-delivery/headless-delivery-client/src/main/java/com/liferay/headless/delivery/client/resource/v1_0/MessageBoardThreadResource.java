@@ -80,12 +80,14 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public void postMessageBoardSectionMessageBoardThreadBatch(
-			Long messageBoardSectionId, String callbackURL, Object object)
+			Long messageBoardSectionId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postMessageBoardSectionMessageBoardThreadBatchHttpResponse(
-				Long messageBoardSectionId, String callbackURL, Object object)
+				Long messageBoardSectionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public Page<MessageBoardThread> getMessageBoardThreadsRankedPage(
@@ -108,11 +110,12 @@ public interface MessageBoardThreadResource {
 			Long messageBoardThreadId)
 		throws Exception;
 
-	public void deleteMessageBoardThreadBatch(String callbackURL, Object object)
+	public void deleteMessageBoardThreadBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMessageBoardThreadBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardThread getMessageBoardThread(Long messageBoardThreadId)
@@ -138,11 +141,12 @@ public interface MessageBoardThreadResource {
 			Long messageBoardThreadId, MessageBoardThread messageBoardThread)
 		throws Exception;
 
-	public void putMessageBoardThreadBatch(String callbackURL, Object object)
+	public void putMessageBoardThreadBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putMessageBoardThreadBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteMessageBoardThreadMyRating(Long messageBoardThreadId)
@@ -242,11 +246,11 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public void postSiteMessageBoardThreadBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteMessageBoardThreadBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardThread getSiteMessageBoardThreadByFriendlyUrlPath(
@@ -761,12 +765,13 @@ public interface MessageBoardThreadResource {
 		}
 
 		public void postMessageBoardSectionMessageBoardThreadBatch(
-				Long messageBoardSectionId, String callbackURL, Object object)
+				Long messageBoardSectionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardSectionMessageBoardThreadBatchHttpResponse(
-					messageBoardSectionId, callbackURL, object);
+					messageBoardSectionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -819,12 +824,12 @@ public interface MessageBoardThreadResource {
 		public HttpInvoker.HttpResponse
 				postMessageBoardSectionMessageBoardThreadBatchHttpResponse(
 					Long messageBoardSectionId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1113,11 +1118,12 @@ public interface MessageBoardThreadResource {
 		}
 
 		public void deleteMessageBoardThreadBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteMessageBoardThreadBatchHttpResponse(callbackURL, object);
+				deleteMessageBoardThreadBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1169,12 +1175,12 @@ public interface MessageBoardThreadResource {
 
 		public HttpInvoker.HttpResponse
 				deleteMessageBoardThreadBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1542,11 +1548,12 @@ public interface MessageBoardThreadResource {
 		}
 
 		public void putMessageBoardThreadBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putMessageBoardThreadBatchHttpResponse(callbackURL, object);
+				putMessageBoardThreadBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1597,12 +1604,12 @@ public interface MessageBoardThreadResource {
 		}
 
 		public HttpInvoker.HttpResponse putMessageBoardThreadBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2896,12 +2903,12 @@ public interface MessageBoardThreadResource {
 		}
 
 		public void postSiteMessageBoardThreadBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteMessageBoardThreadBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2953,12 +2960,12 @@ public interface MessageBoardThreadResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteMessageBoardThreadBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

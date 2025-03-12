@@ -64,12 +64,12 @@ public interface DocumentShortcutResource {
 		throws Exception;
 
 	public void postAssetLibraryDocumentShortcutBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryDocumentShortcutBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocumentShortcut(Long documentShortcutId)
@@ -79,11 +79,12 @@ public interface DocumentShortcutResource {
 			Long documentShortcutId)
 		throws Exception;
 
-	public void deleteDocumentShortcutBatch(String callbackURL, Object object)
+	public void deleteDocumentShortcutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDocumentShortcutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DocumentShortcut getDocumentShortcut(Long documentShortcutId)
@@ -109,11 +110,12 @@ public interface DocumentShortcutResource {
 			Long documentShortcutId, DocumentShortcut documentShortcut)
 		throws Exception;
 
-	public void putDocumentShortcutBatch(String callbackURL, Object object)
+	public void putDocumentShortcutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDocumentShortcutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DocumentShortcut> getSiteDocumentShortcutsPage(
@@ -144,11 +146,11 @@ public interface DocumentShortcutResource {
 		throws Exception;
 
 	public void postSiteDocumentShortcutBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteDocumentShortcutBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteDocumentShortcutByExternalReferenceCode(
@@ -630,12 +632,12 @@ public interface DocumentShortcutResource {
 		}
 
 		public void postAssetLibraryDocumentShortcutBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryDocumentShortcutBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -687,12 +689,13 @@ public interface DocumentShortcutResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryDocumentShortcutBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -839,11 +842,12 @@ public interface DocumentShortcutResource {
 		}
 
 		public void deleteDocumentShortcutBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDocumentShortcutBatchHttpResponse(callbackURL, object);
+				deleteDocumentShortcutBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -894,12 +898,12 @@ public interface DocumentShortcutResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDocumentShortcutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1261,11 +1265,13 @@ public interface DocumentShortcutResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDocumentShortcutBatch(String callbackURL, Object object)
+		public void putDocumentShortcutBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDocumentShortcutBatchHttpResponse(callbackURL, object);
+				putDocumentShortcutBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1316,12 +1322,12 @@ public interface DocumentShortcutResource {
 		}
 
 		public HttpInvoker.HttpResponse putDocumentShortcutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1698,12 +1704,12 @@ public interface DocumentShortcutResource {
 		}
 
 		public void postSiteDocumentShortcutBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteDocumentShortcutBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1755,12 +1761,12 @@ public interface DocumentShortcutResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteDocumentShortcutBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

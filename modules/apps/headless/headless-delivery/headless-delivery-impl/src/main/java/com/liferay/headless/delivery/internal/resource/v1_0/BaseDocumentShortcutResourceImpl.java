@@ -267,7 +267,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -282,7 +282,8 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				DocumentShortcut.class.getName(), callbackURL, null, object)
+				DocumentShortcut.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 
@@ -346,7 +347,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -539,7 +540,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -747,7 +748,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -762,7 +763,8 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				DocumentShortcut.class.getName(), callbackURL, null, object)
+				DocumentShortcut.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

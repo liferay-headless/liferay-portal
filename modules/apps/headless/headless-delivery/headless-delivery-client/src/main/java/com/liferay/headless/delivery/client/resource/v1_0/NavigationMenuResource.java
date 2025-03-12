@@ -43,11 +43,12 @@ public interface NavigationMenuResource {
 			Long navigationMenuId)
 		throws Exception;
 
-	public void deleteNavigationMenuBatch(String callbackURL, Object object)
+	public void deleteNavigationMenuBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteNavigationMenuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NavigationMenu getNavigationMenu(Long navigationMenuId)
@@ -65,11 +66,11 @@ public interface NavigationMenuResource {
 			Long navigationMenuId, NavigationMenu navigationMenu)
 		throws Exception;
 
-	public void putNavigationMenuBatch(String callbackURL, Object object)
+	public void putNavigationMenuBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putNavigationMenuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getNavigationMenuPermissionsPage(
@@ -118,11 +119,11 @@ public interface NavigationMenuResource {
 		throws Exception;
 
 	public void postSiteNavigationMenuBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteNavigationMenuBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteNavigationMenuByExternalReferenceCode(
@@ -386,11 +387,13 @@ public interface NavigationMenuResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteNavigationMenuBatch(String callbackURL, Object object)
+		public void deleteNavigationMenuBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteNavigationMenuBatchHttpResponse(callbackURL, object);
+				deleteNavigationMenuBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -441,12 +444,12 @@ public interface NavigationMenuResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteNavigationMenuBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -698,11 +701,12 @@ public interface NavigationMenuResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putNavigationMenuBatch(String callbackURL, Object object)
+		public void putNavigationMenuBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putNavigationMenuBatchHttpResponse(callbackURL, object);
+				putNavigationMenuBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -753,12 +757,12 @@ public interface NavigationMenuResource {
 		}
 
 		public HttpInvoker.HttpResponse putNavigationMenuBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1362,12 +1366,12 @@ public interface NavigationMenuResource {
 		}
 
 		public void postSiteNavigationMenuBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteNavigationMenuBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1418,12 +1422,12 @@ public interface NavigationMenuResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteNavigationMenuBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

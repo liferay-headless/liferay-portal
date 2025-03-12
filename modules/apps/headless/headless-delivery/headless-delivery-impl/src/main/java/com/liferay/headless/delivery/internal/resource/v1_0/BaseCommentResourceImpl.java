@@ -303,7 +303,7 @@ public abstract class BaseCommentResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -318,7 +318,7 @@ public abstract class BaseCommentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				Comment.class.getName(), callbackURL, null, object)
+				Comment.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 
@@ -378,7 +378,7 @@ public abstract class BaseCommentResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -502,7 +502,7 @@ public abstract class BaseCommentResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -863,7 +863,7 @@ public abstract class BaseCommentResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -878,7 +878,7 @@ public abstract class BaseCommentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				Comment.class.getName(), callbackURL, null, object)
+				Comment.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 
@@ -1788,7 +1788,7 @@ public abstract class BaseCommentResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -1803,7 +1803,7 @@ public abstract class BaseCommentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				Comment.class.getName(), callbackURL, null, object)
+				Comment.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 

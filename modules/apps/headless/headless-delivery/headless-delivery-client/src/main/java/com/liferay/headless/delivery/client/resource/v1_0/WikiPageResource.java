@@ -95,11 +95,11 @@ public interface WikiPageResource {
 		throws Exception;
 
 	public void postWikiNodeWikiPageBatch(
-			Long wikiNodeId, String callbackURL, Object object)
+			Long wikiNodeId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postWikiNodeWikiPageBatchHttpResponse(
-			Long wikiNodeId, String callbackURL, Object object)
+			Long wikiNodeId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WikiPage> getWikiPageWikiPagesPage(Long parentWikiPageId)
@@ -122,11 +122,11 @@ public interface WikiPageResource {
 	public HttpInvoker.HttpResponse deleteWikiPageHttpResponse(Long wikiPageId)
 		throws Exception;
 
-	public void deleteWikiPageBatch(String callbackURL, Object object)
+	public void deleteWikiPageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWikiPageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WikiPage getWikiPage(Long wikiPageId) throws Exception;
@@ -141,11 +141,11 @@ public interface WikiPageResource {
 			Long wikiPageId, WikiPage wikiPage)
 		throws Exception;
 
-	public void putWikiPageBatch(String callbackURL, Object object)
+	public void putWikiPageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putWikiPageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getWikiPagePermissionsPage(
@@ -981,12 +981,12 @@ public interface WikiPageResource {
 		}
 
 		public void postWikiNodeWikiPageBatch(
-				Long wikiNodeId, String callbackURL, Object object)
+				Long wikiNodeId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWikiNodeWikiPageBatchHttpResponse(
-					wikiNodeId, callbackURL, object);
+					wikiNodeId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1037,12 +1037,12 @@ public interface WikiPageResource {
 		}
 
 		public HttpInvoker.HttpResponse postWikiNodeWikiPageBatchHttpResponse(
-				Long wikiNodeId, String callbackURL, Object object)
+				Long wikiNodeId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1399,11 +1399,12 @@ public interface WikiPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteWikiPageBatch(String callbackURL, Object object)
+		public void deleteWikiPageBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWikiPageBatchHttpResponse(callbackURL, object);
+				deleteWikiPageBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1454,12 +1455,12 @@ public interface WikiPageResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteWikiPageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1707,11 +1708,11 @@ public interface WikiPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putWikiPageBatch(String callbackURL, Object object)
+		public void putWikiPageBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putWikiPageBatchHttpResponse(callbackURL, object);
+				putWikiPageBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1762,12 +1763,12 @@ public interface WikiPageResource {
 		}
 
 		public HttpInvoker.HttpResponse putWikiPageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

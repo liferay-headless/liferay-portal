@@ -70,7 +70,8 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public Response postMessageBoardSectionMessageBoardThreadBatch(
-			Long messageBoardSectionId, String callbackURL, Object object)
+			Long messageBoardSectionId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public Page<MessageBoardThread> getMessageBoardThreadsRankedPage(
@@ -82,7 +83,7 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public Response deleteMessageBoardThreadBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardThread getMessageBoardThread(Long messageBoardThreadId)
@@ -97,7 +98,7 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public Response putMessageBoardThreadBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteMessageBoardThreadMyRating(Long messageBoardThreadId)
@@ -147,7 +148,7 @@ public interface MessageBoardThreadResource {
 		throws Exception;
 
 	public Response postSiteMessageBoardThreadBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardThread getSiteMessageBoardThreadByFriendlyUrlPath(

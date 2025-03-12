@@ -55,7 +55,7 @@ public interface BlogPostingImageResource {
 		throws Exception;
 
 	public Response deleteBlogPostingImageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
@@ -78,7 +78,7 @@ public interface BlogPostingImageResource {
 
 	public Response postSiteBlogPostingImageBatch(
 			Long siteId, MultipartBody multipartBody, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public void deleteSiteBlogPostingImageByExternalReferenceCode(

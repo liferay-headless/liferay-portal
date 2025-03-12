@@ -54,7 +54,7 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public Response deleteMessageBoardAttachmentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MessageBoardAttachment getMessageBoardAttachment(
@@ -78,7 +78,7 @@ public interface MessageBoardAttachmentResource {
 
 	public Response postMessageBoardMessageMessageBoardAttachmentBatch(
 			Long messageBoardMessageId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<MessageBoardAttachment>
@@ -98,7 +98,7 @@ public interface MessageBoardAttachmentResource {
 
 	public Response postMessageBoardThreadMessageBoardAttachmentBatch(
 			Long messageBoardThreadId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void

@@ -68,14 +68,14 @@ public interface KnowledgeBaseAttachmentResource {
 
 	public Response postKnowledgeBaseArticleKnowledgeBaseAttachmentBatch(
 			Long knowledgeBaseArticleId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteKnowledgeBaseAttachment(Long knowledgeBaseAttachmentId)
 		throws Exception;
 
 	public Response deleteKnowledgeBaseAttachmentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public KnowledgeBaseAttachment getKnowledgeBaseAttachment(

@@ -65,7 +65,7 @@ public interface SitePageResource {
 		throws Exception;
 
 	public Response postSiteSitePageBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SitePage getSiteSitePage(Long siteId, String friendlyUrlPath)

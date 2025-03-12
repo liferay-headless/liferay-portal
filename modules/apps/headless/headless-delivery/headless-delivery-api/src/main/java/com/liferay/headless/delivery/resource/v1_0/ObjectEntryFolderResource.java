@@ -66,7 +66,7 @@ public interface ObjectEntryFolderResource {
 		throws Exception;
 
 	public Response postAssetLibraryObjectEntryFolderBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

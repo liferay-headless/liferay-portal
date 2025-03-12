@@ -69,7 +69,7 @@ public interface DocumentResource {
 
 	public Response postAssetLibraryDocumentBatch(
 			Long assetLibraryId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryDocumentByExternalReferenceCode(
@@ -117,12 +117,13 @@ public interface DocumentResource {
 
 	public Response postDocumentFolderDocumentBatch(
 			Long documentFolderId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDocument(Long documentId) throws Exception;
 
-	public Response deleteDocumentBatch(String callbackURL, Object object)
+	public Response deleteDocumentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Document getDocument(Long documentId) throws Exception;
@@ -134,7 +135,8 @@ public interface DocumentResource {
 		throws Exception;
 
 	public Response putDocumentBatch(
-			MultipartBody multipartBody, String callbackURL, Object object)
+			MultipartBody multipartBody, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public void deleteDocumentMyRating(Long documentId) throws Exception;
@@ -177,7 +179,7 @@ public interface DocumentResource {
 
 	public Response postSiteDocumentBatch(
 			Long siteId, MultipartBody multipartBody, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public void deleteSiteDocumentByExternalReferenceCode(

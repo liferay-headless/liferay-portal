@@ -45,11 +45,11 @@ public interface KnowledgeBaseFolderResource {
 		throws Exception;
 
 	public void deleteKnowledgeBaseFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteKnowledgeBaseFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public KnowledgeBaseFolder getKnowledgeBaseFolder(
@@ -76,11 +76,12 @@ public interface KnowledgeBaseFolderResource {
 			Long knowledgeBaseFolderId, KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception;
 
-	public void putKnowledgeBaseFolderBatch(String callbackURL, Object object)
+	public void putKnowledgeBaseFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putKnowledgeBaseFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getKnowledgeBaseFolderPermissionsPage(
@@ -150,12 +151,12 @@ public interface KnowledgeBaseFolderResource {
 		throws Exception;
 
 	public void postSiteKnowledgeBaseFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSiteKnowledgeBaseFolderBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
@@ -422,11 +423,12 @@ public interface KnowledgeBaseFolderResource {
 		}
 
 		public void deleteKnowledgeBaseFolderBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteKnowledgeBaseFolderBatchHttpResponse(callbackURL, object);
+				deleteKnowledgeBaseFolderBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -478,12 +480,12 @@ public interface KnowledgeBaseFolderResource {
 
 		public HttpInvoker.HttpResponse
 				deleteKnowledgeBaseFolderBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -853,11 +855,12 @@ public interface KnowledgeBaseFolderResource {
 		}
 
 		public void putKnowledgeBaseFolderBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putKnowledgeBaseFolderBatchHttpResponse(callbackURL, object);
+				putKnowledgeBaseFolderBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -908,12 +911,12 @@ public interface KnowledgeBaseFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse putKnowledgeBaseFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1751,12 +1754,12 @@ public interface KnowledgeBaseFolderResource {
 		}
 
 		public void postSiteKnowledgeBaseFolderBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteKnowledgeBaseFolderBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1808,12 +1811,12 @@ public interface KnowledgeBaseFolderResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteKnowledgeBaseFolderBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

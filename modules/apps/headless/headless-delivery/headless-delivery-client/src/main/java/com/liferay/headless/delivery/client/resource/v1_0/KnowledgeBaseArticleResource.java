@@ -47,11 +47,11 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public void deleteKnowledgeBaseArticleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteKnowledgeBaseArticleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public KnowledgeBaseArticle getKnowledgeBaseArticle(
@@ -82,11 +82,12 @@ public interface KnowledgeBaseArticleResource {
 			KnowledgeBaseArticle knowledgeBaseArticle)
 		throws Exception;
 
-	public void putKnowledgeBaseArticleBatch(String callbackURL, Object object)
+	public void putKnowledgeBaseArticleBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putKnowledgeBaseArticleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteKnowledgeBaseArticleMyRating(Long knowledgeBaseArticleId)
@@ -219,12 +220,14 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public void postKnowledgeBaseFolderKnowledgeBaseArticleBatch(
-			Long knowledgeBaseFolderId, String callbackURL, Object object)
+			Long knowledgeBaseFolderId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postKnowledgeBaseFolderKnowledgeBaseArticleBatchHttpResponse(
-				Long knowledgeBaseFolderId, String callbackURL, Object object)
+				Long knowledgeBaseFolderId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public Page<KnowledgeBaseArticle> getSiteKnowledgeBaseArticlesPage(
@@ -261,12 +264,12 @@ public interface KnowledgeBaseArticleResource {
 		throws Exception;
 
 	public void postSiteKnowledgeBaseArticleBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSiteKnowledgeBaseArticleBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKnowledgeBaseArticleByExternalReferenceCode(
@@ -547,12 +550,12 @@ public interface KnowledgeBaseArticleResource {
 		}
 
 		public void deleteKnowledgeBaseArticleBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteKnowledgeBaseArticleBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -604,12 +607,12 @@ public interface KnowledgeBaseArticleResource {
 
 		public HttpInvoker.HttpResponse
 				deleteKnowledgeBaseArticleBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -979,11 +982,12 @@ public interface KnowledgeBaseArticleResource {
 		}
 
 		public void putKnowledgeBaseArticleBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putKnowledgeBaseArticleBatchHttpResponse(callbackURL, object);
+				putKnowledgeBaseArticleBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1035,12 +1039,12 @@ public interface KnowledgeBaseArticleResource {
 
 		public HttpInvoker.HttpResponse
 				putKnowledgeBaseArticleBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2599,12 +2603,13 @@ public interface KnowledgeBaseArticleResource {
 		}
 
 		public void postKnowledgeBaseFolderKnowledgeBaseArticleBatch(
-				Long knowledgeBaseFolderId, String callbackURL, Object object)
+				Long knowledgeBaseFolderId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postKnowledgeBaseFolderKnowledgeBaseArticleBatchHttpResponse(
-					knowledgeBaseFolderId, callbackURL, object);
+					knowledgeBaseFolderId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2657,12 +2662,12 @@ public interface KnowledgeBaseArticleResource {
 		public HttpInvoker.HttpResponse
 				postKnowledgeBaseFolderKnowledgeBaseArticleBatchHttpResponse(
 					Long knowledgeBaseFolderId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3081,12 +3086,12 @@ public interface KnowledgeBaseArticleResource {
 		}
 
 		public void postSiteKnowledgeBaseArticleBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteKnowledgeBaseArticleBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3138,12 +3143,12 @@ public interface KnowledgeBaseArticleResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteKnowledgeBaseArticleBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

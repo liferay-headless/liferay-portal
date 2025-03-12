@@ -67,7 +67,7 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public Response postAssetLibraryStructuredContentBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryStructuredContentByExternalReferenceCode(
@@ -123,7 +123,7 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public Response postSiteStructuredContentBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteStructuredContentByExternalReferenceCode(
@@ -177,14 +177,15 @@ public interface StructuredContentResource {
 		throws Exception;
 
 	public Response postStructuredContentFolderStructuredContentBatch(
-			Long structuredContentFolderId, String callbackURL, Object object)
+			Long structuredContentFolderId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public void deleteStructuredContent(Long structuredContentId)
 		throws Exception;
 
 	public Response deleteStructuredContentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public StructuredContent getStructuredContent(Long structuredContentId)
@@ -198,7 +199,8 @@ public interface StructuredContentResource {
 			Long structuredContentId, StructuredContent structuredContent)
 		throws Exception;
 
-	public Response putStructuredContentBatch(String callbackURL, Object object)
+	public Response putStructuredContentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteStructuredContentMyRating(Long structuredContentId)

@@ -54,7 +54,7 @@ public interface KnowledgeBaseFolderResource {
 		throws Exception;
 
 	public Response deleteKnowledgeBaseFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public KnowledgeBaseFolder getKnowledgeBaseFolder(
@@ -70,7 +70,7 @@ public interface KnowledgeBaseFolderResource {
 		throws Exception;
 
 	public Response putKnowledgeBaseFolderBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -108,7 +108,7 @@ public interface KnowledgeBaseFolderResource {
 		throws Exception;
 
 	public Response postSiteKnowledgeBaseFolderBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
