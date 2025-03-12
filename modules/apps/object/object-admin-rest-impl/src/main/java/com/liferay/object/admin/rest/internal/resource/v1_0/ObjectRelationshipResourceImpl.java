@@ -24,6 +24,9 @@ import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexStatusManagerThreadLocal;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -305,6 +308,24 @@ public class ObjectRelationshipResourceImpl
 			objectRelationship.getObjectDefinitionId1(), objectRelationship);
 	}
 
+	private com.liferay.object.model.ObjectDefinition
+			_addDefaultObjectDefinition(
+				ObjectRelationship objectRelationship,
+				ObjectFolder defaultObjectFolder)
+		throws Exception {
+
+		return _objectDefinitionLocalService.addObjectDefinition(
+			objectRelationship.getObjectDefinitionExternalReferenceCode2(),
+			contextUser.getUserId(), defaultObjectFolder.getObjectFolderId(),
+			GetterUtil.get(
+				objectRelationship.getObjectDefinitionModifiable2(), true),
+			GetterUtil.get(
+				objectRelationship.getObjectDefinitionScope2(),
+				ObjectDefinitionConstants.SCOPE_COMPANY),
+			GetterUtil.get(
+				objectRelationship.getObjectDefinitionSystem2(), false));
+	}
+
 	private com.liferay.object.model.ObjectDefinition _getObjectDefinition2(
 			ObjectRelationship objectRelationship)
 		throws Exception {
@@ -325,26 +346,48 @@ public class ObjectRelationshipResourceImpl
 			_objectFolderLocalService.getOrAddDefaultObjectFolder(
 				contextCompany.getCompanyId());
 
+		if (!SearchContext.isBatchMode()) {
+			return _addDefaultObjectDefinition(
+				objectRelationship, defaultObjectFolder);
+		}
+
 		boolean indexReadOnly = IndexStatusManagerThreadLocal.isIndexReadOnly();
 
 		IndexStatusManagerThreadLocal.setIndexReadOnly(true);
 
 		try {
-			return _objectDefinitionLocalService.addObjectDefinition(
-				objectRelationship.getObjectDefinitionExternalReferenceCode2(),
-				contextUser.getUserId(),
-				defaultObjectFolder.getObjectFolderId(),
-				GetterUtil.get(
-					objectRelationship.getObjectDefinitionModifiable2(), true),
-				GetterUtil.get(
-					objectRelationship.getObjectDefinitionScope2(),
-					ObjectDefinitionConstants.SCOPE_COMPANY),
-				GetterUtil.get(
-					objectRelationship.getObjectDefinitionSystem2(), false));
+			serviceBuilderObjectDefinition2 = _addDefaultObjectDefinition(
+				objectRelationship, defaultObjectFolder);
 		}
 		finally {
 			IndexStatusManagerThreadLocal.setIndexReadOnly(indexReadOnly);
 		}
+
+		long serviceBuilderObjectDefinition2Id =
+			serviceBuilderObjectDefinition2.getObjectDefinitionId();
+
+		SearchContext.registerBatchModeSyncCallable(
+			() -> {
+				com.liferay.object.model.ObjectDefinition objectDefinition =
+					_objectDefinitionLocalService.fetchObjectDefinition(
+						serviceBuilderObjectDefinition2Id);
+
+				if ((objectDefinition != null) &&
+					(objectDefinition.getMvccVersion() == 0)) {
+
+					Indexer<com.liferay.object.model.ObjectDefinition> indexer =
+						IndexerRegistryUtil.getIndexer(
+							com.liferay.object.model.ObjectDefinition.class);
+
+					if (indexer != null) {
+						indexer.reindex(objectDefinition);
+					}
+				}
+
+				return null;
+			});
+
+		return serviceBuilderObjectDefinition2;
 	}
 
 	private ObjectRelationship _toObjectRelationship(
