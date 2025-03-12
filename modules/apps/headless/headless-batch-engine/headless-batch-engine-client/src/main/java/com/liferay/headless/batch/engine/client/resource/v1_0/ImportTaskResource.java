@@ -63,12 +63,12 @@ public interface ImportTaskResource {
 
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String importStrategy, String taskItemDelegateName, String string)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteImportTaskHttpResponse(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String importStrategy, String taskItemDelegateName, String string)
 		throws Exception;
 
 	public ImportTask deleteFormDataImportTask(
@@ -88,7 +88,7 @@ public interface ImportTaskResource {
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String string)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postImportTaskHttpResponse(
@@ -96,7 +96,7 @@ public interface ImportTaskResource {
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String string)
 		throws Exception;
 
 	public ImportTask postFormDataImportTask(
@@ -120,13 +120,13 @@ public interface ImportTaskResource {
 	public ImportTask putImportTask(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
+			String updateStrategy, String string)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putImportTaskHttpResponse(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
+			String updateStrategy, String string)
 		throws Exception;
 
 	public ImportTask putFormDataImportTask(
@@ -574,13 +574,13 @@ public interface ImportTaskResource {
 		public ImportTask deleteImportTask(
 				String className, String callbackURL,
 				String externalReferenceCode, String importStrategy,
-				String taskItemDelegateName, Object object)
+				String taskItemDelegateName, String string)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteImportTaskHttpResponse(
 					className, callbackURL, externalReferenceCode,
-					importStrategy, taskItemDelegateName, object);
+					importStrategy, taskItemDelegateName, string);
 
 			String content = httpResponse.getContent();
 
@@ -644,12 +644,12 @@ public interface ImportTaskResource {
 		public HttpInvoker.HttpResponse deleteImportTaskHttpResponse(
 				String className, String callbackURL,
 				String externalReferenceCode, String importStrategy,
-				String taskItemDelegateName, Object object)
+				String taskItemDelegateName, String string)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(string.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -853,17 +853,17 @@ public interface ImportTaskResource {
 		}
 
 		public ImportTask postImportTask(
-				String className, String batchExternalReferenceCode,
-				String batchRestrictFields, String callbackURL,
-				String createStrategy, String externalReferenceCode,
-				String fieldNameMapping, String importStrategy,
-				String taskItemDelegateName, Object object)
+				String className, String batchExternalReferenceCode, String batchRestrictFields,
+				String callbackURL, String createStrategy,
+				String externalReferenceCode, String fieldNameMapping,
+				String importStrategy, String taskItemDelegateName,
+				String string)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postImportTaskHttpResponse(
-				className, batchExternalReferenceCode, batchRestrictFields,
-				callbackURL, createStrategy, externalReferenceCode,
-				fieldNameMapping, importStrategy, taskItemDelegateName, object);
+				className, batchExternalReferenceCode, batchRestrictFields, callbackURL, createStrategy,
+				externalReferenceCode, fieldNameMapping, importStrategy,
+				taskItemDelegateName, string);
 
 			String content = httpResponse.getContent();
 
@@ -929,12 +929,12 @@ public interface ImportTaskResource {
 				String batchRestrictFields, String callbackURL,
 				String createStrategy, String externalReferenceCode,
 				String fieldNameMapping, String importStrategy,
-				String taskItemDelegateName, Object object)
+				String taskItemDelegateName, String string)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(string.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1188,12 +1188,12 @@ public interface ImportTaskResource {
 				String className, String callbackURL,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, String updateStrategy,
-				Object object)
+				String string)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putImportTaskHttpResponse(
 				className, callbackURL, externalReferenceCode, importStrategy,
-				taskItemDelegateName, updateStrategy, object);
+				taskItemDelegateName, updateStrategy, string);
 
 			String content = httpResponse.getContent();
 
@@ -1258,12 +1258,12 @@ public interface ImportTaskResource {
 				String className, String callbackURL,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, String updateStrategy,
-				Object object)
+				String string)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(string.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

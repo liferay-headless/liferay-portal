@@ -59,7 +59,7 @@ public interface ImportTaskResource {
 
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String importStrategy, String taskItemDelegateName, String string)
 		throws Exception;
 
 	public ImportTask deleteImportTask(
@@ -73,7 +73,7 @@ public interface ImportTaskResource {
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String string)
 		throws Exception;
 
 	public ImportTask postImportTask(
@@ -87,7 +87,7 @@ public interface ImportTaskResource {
 	public ImportTask putImportTask(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
+			String updateStrategy, String string)
 		throws Exception;
 
 	public ImportTask putImportTask(
