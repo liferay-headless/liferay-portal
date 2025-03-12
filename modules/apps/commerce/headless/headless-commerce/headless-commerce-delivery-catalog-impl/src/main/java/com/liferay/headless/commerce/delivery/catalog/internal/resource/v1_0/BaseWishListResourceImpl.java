@@ -336,7 +336,7 @@ public abstract class BaseWishListResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WishList.class.getName(), callbackURL, object)
+				WishList.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

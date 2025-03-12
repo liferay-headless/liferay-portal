@@ -628,7 +628,7 @@ public abstract class BaseWikiPageResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WikiPage.class.getName(), callbackURL, object)
+				WikiPage.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -752,7 +752,7 @@ public abstract class BaseWikiPageResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				WikiPage.class.getName(), callbackURL, object)
+				WikiPage.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

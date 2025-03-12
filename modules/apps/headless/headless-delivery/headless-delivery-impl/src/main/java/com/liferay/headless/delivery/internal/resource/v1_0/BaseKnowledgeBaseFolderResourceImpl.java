@@ -168,7 +168,7 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				KnowledgeBaseFolder.class.getName(), callbackURL, object)
+				KnowledgeBaseFolder.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -376,7 +376,7 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				KnowledgeBaseFolder.class.getName(), callbackURL, object)
+				KnowledgeBaseFolder.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

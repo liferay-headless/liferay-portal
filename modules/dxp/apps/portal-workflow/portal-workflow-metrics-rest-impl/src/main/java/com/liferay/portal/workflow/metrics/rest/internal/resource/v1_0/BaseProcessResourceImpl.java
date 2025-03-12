@@ -202,7 +202,7 @@ public abstract class BaseProcessResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Process.class.getName(), callbackURL, object)
+				Process.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -306,7 +306,7 @@ public abstract class BaseProcessResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Process.class.getName(), callbackURL, object)
+				Process.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

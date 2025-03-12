@@ -608,7 +608,7 @@ public abstract class BaseShipmentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Shipment.class.getName(), callbackURL, object)
+				Shipment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

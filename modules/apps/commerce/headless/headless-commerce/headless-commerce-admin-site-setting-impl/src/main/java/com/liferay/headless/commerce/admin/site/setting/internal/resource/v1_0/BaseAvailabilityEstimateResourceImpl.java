@@ -151,7 +151,8 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				AvailabilityEstimate.class.getName(), callbackURL, object)
+				AvailabilityEstimate.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -269,7 +270,8 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				AvailabilityEstimate.class.getName(), callbackURL, object)
+				AvailabilityEstimate.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

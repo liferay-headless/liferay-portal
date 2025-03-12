@@ -486,7 +486,7 @@ public abstract class BaseCartResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Cart.class.getName(), callbackURL, object)
+				Cart.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -728,7 +728,7 @@ public abstract class BaseCartResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Cart.class.getName(), callbackURL, object)
+				Cart.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

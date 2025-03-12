@@ -143,7 +143,7 @@ public abstract class BaseWarehouseOrderTypeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WarehouseOrderType.class.getName(), callbackURL, object)
+				WarehouseOrderType.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

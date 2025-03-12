@@ -142,7 +142,7 @@ public abstract class BaseFormDocumentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				FormDocument.class.getName(), callbackURL, object)
+				FormDocument.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

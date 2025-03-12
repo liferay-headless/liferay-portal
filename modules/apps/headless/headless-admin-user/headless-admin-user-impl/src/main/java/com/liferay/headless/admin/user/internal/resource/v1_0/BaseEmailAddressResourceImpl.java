@@ -386,7 +386,7 @@ public abstract class BaseEmailAddressResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				EmailAddress.class.getName(), callbackURL, object)
+				EmailAddress.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

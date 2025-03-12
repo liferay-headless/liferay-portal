@@ -138,7 +138,7 @@ public abstract class BaseDiscountSkuResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountSku.class.getName(), callbackURL, object)
+				DiscountSku.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

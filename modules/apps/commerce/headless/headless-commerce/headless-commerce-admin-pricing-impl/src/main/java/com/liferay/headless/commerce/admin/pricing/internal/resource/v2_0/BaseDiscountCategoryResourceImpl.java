@@ -142,7 +142,7 @@ public abstract class BaseDiscountCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountCategory.class.getName(), callbackURL, object)
+				DiscountCategory.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

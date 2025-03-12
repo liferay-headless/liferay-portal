@@ -376,7 +376,7 @@ public abstract class BaseObjectFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectFolder.class.getName(), callbackURL, object)
+				ObjectFolder.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -531,7 +531,7 @@ public abstract class BaseObjectFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectFolder.class.getName(), callbackURL, object)
+				ObjectFolder.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

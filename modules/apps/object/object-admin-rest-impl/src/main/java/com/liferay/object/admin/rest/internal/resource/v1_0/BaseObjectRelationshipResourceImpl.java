@@ -521,7 +521,7 @@ public abstract class BaseObjectRelationshipResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectRelationship.class.getName(), callbackURL, object)
+				ObjectRelationship.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -633,7 +633,7 @@ public abstract class BaseObjectRelationshipResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectRelationship.class.getName(), callbackURL, object)
+				ObjectRelationship.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

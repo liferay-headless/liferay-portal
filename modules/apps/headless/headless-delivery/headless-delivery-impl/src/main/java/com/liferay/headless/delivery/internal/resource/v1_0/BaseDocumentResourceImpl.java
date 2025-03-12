@@ -1019,7 +1019,7 @@ public abstract class BaseDocumentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Document.class.getName(), callbackURL, object)
+				Document.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -1181,7 +1181,7 @@ public abstract class BaseDocumentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Document.class.getName(), callbackURL, object)
+				Document.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

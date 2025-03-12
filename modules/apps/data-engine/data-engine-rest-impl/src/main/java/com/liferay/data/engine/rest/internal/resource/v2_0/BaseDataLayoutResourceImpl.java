@@ -387,7 +387,7 @@ public abstract class BaseDataLayoutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DataLayout.class.getName(), callbackURL, object)
+				DataLayout.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -493,7 +493,7 @@ public abstract class BaseDataLayoutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				DataLayout.class.getName(), callbackURL, object)
+				DataLayout.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

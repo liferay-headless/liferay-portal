@@ -520,7 +520,7 @@ public abstract class BasePhoneResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Phone.class.getName(), callbackURL, object)
+				Phone.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

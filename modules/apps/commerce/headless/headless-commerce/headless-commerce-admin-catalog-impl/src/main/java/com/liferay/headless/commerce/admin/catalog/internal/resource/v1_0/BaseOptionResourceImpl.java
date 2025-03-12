@@ -466,7 +466,7 @@ public abstract class BaseOptionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Option.class.getName(), callbackURL, object)
+				Option.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

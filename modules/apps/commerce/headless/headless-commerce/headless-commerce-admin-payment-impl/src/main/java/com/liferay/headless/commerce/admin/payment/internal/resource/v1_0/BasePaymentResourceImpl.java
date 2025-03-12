@@ -595,7 +595,7 @@ public abstract class BasePaymentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Payment.class.getName(), callbackURL, object)
+				Payment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

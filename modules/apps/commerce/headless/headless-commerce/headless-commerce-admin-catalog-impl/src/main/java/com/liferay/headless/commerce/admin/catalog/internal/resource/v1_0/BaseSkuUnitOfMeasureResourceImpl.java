@@ -143,7 +143,7 @@ public abstract class BaseSkuUnitOfMeasureResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				SkuUnitOfMeasure.class.getName(), callbackURL, object)
+				SkuUnitOfMeasure.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

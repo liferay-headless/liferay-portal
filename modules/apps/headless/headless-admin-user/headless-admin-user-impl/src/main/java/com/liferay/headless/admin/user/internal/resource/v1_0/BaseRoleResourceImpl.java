@@ -801,7 +801,7 @@ public abstract class BaseRoleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Role.class.getName(), callbackURL, object)
+				Role.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -977,7 +977,7 @@ public abstract class BaseRoleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Role.class.getName(), callbackURL, object)
+				Role.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

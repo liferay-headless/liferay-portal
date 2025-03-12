@@ -511,7 +511,7 @@ public abstract class BaseOrderRuleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderRule.class.getName(), callbackURL, object)
+				OrderRule.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

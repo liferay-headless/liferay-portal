@@ -440,7 +440,7 @@ public abstract class BaseSXPElementResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				SXPElement.class.getName(), callbackURL, object)
+				SXPElement.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -654,7 +654,7 @@ public abstract class BaseSXPElementResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				SXPElement.class.getName(), callbackURL, object)
+				SXPElement.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -447,7 +447,7 @@ public abstract class BaseCountryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Country.class.getName(), callbackURL, object)
+				Country.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -642,7 +642,7 @@ public abstract class BaseCountryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Country.class.getName(), callbackURL, object)
+				Country.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

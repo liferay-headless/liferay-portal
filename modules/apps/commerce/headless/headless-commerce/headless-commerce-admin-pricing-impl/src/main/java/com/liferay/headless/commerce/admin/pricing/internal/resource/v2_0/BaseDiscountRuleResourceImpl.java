@@ -139,7 +139,7 @@ public abstract class BaseDiscountRuleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountRule.class.getName(), callbackURL, object)
+				DiscountRule.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

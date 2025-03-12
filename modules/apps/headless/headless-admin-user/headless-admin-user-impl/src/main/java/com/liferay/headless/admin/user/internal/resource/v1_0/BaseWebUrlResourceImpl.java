@@ -655,7 +655,7 @@ public abstract class BaseWebUrlResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WebUrl.class.getName(), callbackURL, object)
+				WebUrl.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

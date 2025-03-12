@@ -142,7 +142,7 @@ public abstract class BasePriceListOrderTypeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PriceListOrderType.class.getName(), callbackURL, object)
+				PriceListOrderType.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

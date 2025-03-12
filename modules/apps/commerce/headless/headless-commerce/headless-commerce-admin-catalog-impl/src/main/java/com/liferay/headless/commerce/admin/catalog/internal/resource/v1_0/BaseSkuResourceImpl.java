@@ -677,7 +677,7 @@ public abstract class BaseSkuResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Sku.class.getName(), callbackURL, object)
+				Sku.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

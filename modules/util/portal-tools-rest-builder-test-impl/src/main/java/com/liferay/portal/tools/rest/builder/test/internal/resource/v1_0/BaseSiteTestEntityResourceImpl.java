@@ -242,7 +242,7 @@ public abstract class BaseSiteTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				SiteTestEntity.class.getName(), callbackURL, object)
+				SiteTestEntity.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

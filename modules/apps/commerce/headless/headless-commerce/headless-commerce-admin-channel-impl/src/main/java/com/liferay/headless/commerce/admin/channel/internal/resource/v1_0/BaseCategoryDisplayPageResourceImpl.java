@@ -147,7 +147,7 @@ public abstract class BaseCategoryDisplayPageResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				CategoryDisplayPage.class.getName(), callbackURL, object)
+				CategoryDisplayPage.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -245,7 +245,7 @@ public abstract class BaseOrderNoteResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderNote.class.getName(), callbackURL, object)
+				OrderNote.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -214,7 +214,7 @@ public abstract class BaseTaxCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				TaxCategory.class.getName(), callbackURL, object)
+				TaxCategory.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -320,7 +320,7 @@ public abstract class BaseTaxCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				TaxCategory.class.getName(), callbackURL, object)
+				TaxCategory.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

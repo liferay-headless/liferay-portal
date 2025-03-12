@@ -507,7 +507,7 @@ public abstract class BaseTermResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Term.class.getName(), callbackURL, object)
+				Term.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

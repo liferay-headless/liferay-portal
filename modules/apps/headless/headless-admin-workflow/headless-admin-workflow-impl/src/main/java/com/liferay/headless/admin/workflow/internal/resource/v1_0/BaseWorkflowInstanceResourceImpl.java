@@ -305,7 +305,7 @@ public abstract class BaseWorkflowInstanceResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WorkflowInstance.class.getName(), callbackURL, object)
+				WorkflowInstance.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

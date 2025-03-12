@@ -138,7 +138,7 @@ public abstract class BasePinResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Pin.class.getName(), callbackURL, object)
+				Pin.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -146,7 +146,8 @@ public abstract class BaseOrderRuleAccountGroupResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderRuleAccountGroup.class.getName(), callbackURL, object)
+				OrderRuleAccountGroup.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

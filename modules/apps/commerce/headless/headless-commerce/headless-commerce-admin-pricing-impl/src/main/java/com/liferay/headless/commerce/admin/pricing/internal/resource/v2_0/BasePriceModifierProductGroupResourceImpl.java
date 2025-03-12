@@ -148,7 +148,8 @@ public abstract class BasePriceModifierProductGroupResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PriceModifierProductGroup.class.getName(), callbackURL, object)
+				PriceModifierProductGroup.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

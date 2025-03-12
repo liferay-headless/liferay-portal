@@ -1866,7 +1866,7 @@ public abstract class BaseStructuredContentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				StructuredContent.class.getName(), callbackURL, object)
+				StructuredContent.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -2126,7 +2126,7 @@ public abstract class BaseStructuredContentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				StructuredContent.class.getName(), callbackURL, object)
+				StructuredContent.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

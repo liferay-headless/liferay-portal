@@ -285,7 +285,7 @@ public abstract class BaseCTProcessResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				CTProcess.class.getName(), callbackURL, object)
+				CTProcess.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

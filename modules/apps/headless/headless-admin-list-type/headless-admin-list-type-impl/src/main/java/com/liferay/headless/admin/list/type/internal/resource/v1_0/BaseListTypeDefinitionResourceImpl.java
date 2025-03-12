@@ -420,7 +420,7 @@ public abstract class BaseListTypeDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ListTypeDefinition.class.getName(), callbackURL, object)
+				ListTypeDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -596,7 +596,7 @@ public abstract class BaseListTypeDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ListTypeDefinition.class.getName(), callbackURL, object)
+				ListTypeDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

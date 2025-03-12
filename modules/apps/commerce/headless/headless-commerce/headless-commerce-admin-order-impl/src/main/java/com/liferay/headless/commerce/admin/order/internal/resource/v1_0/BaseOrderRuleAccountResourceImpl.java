@@ -142,7 +142,7 @@ public abstract class BaseOrderRuleAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderRuleAccount.class.getName(), callbackURL, object)
+				OrderRuleAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

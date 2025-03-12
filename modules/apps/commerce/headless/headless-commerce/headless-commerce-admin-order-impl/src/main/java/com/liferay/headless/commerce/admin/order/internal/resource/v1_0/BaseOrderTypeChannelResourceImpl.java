@@ -142,7 +142,7 @@ public abstract class BaseOrderTypeChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderTypeChannel.class.getName(), callbackURL, object)
+				OrderTypeChannel.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -1496,7 +1496,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				TaxonomyVocabulary.class.getName(), callbackURL, object)
+				TaxonomyVocabulary.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -1747,7 +1747,7 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				TaxonomyVocabulary.class.getName(), callbackURL, object)
+				TaxonomyVocabulary.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

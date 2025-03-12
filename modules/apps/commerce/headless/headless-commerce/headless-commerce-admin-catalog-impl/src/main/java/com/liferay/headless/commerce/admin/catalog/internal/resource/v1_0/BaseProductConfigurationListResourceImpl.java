@@ -478,7 +478,8 @@ public abstract class BaseProductConfigurationListResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ProductConfigurationList.class.getName(), callbackURL, object)
+				ProductConfigurationList.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

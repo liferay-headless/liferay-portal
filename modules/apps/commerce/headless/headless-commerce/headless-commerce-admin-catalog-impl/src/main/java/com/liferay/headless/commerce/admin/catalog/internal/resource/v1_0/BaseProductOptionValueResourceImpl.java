@@ -143,7 +143,7 @@ public abstract class BaseProductOptionValueResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ProductOptionValue.class.getName(), callbackURL, object)
+				ProductOptionValue.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

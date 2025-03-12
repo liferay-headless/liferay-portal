@@ -538,7 +538,7 @@ public abstract class BaseRegionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Region.class.getName(), callbackURL, object)
+				Region.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -700,7 +700,7 @@ public abstract class BaseRegionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Region.class.getName(), callbackURL, object)
+				Region.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

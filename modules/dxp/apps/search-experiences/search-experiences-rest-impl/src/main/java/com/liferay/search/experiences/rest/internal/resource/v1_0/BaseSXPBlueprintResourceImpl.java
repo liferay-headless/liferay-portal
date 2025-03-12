@@ -425,7 +425,7 @@ public abstract class BaseSXPBlueprintResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				SXPBlueprint.class.getName(), callbackURL, object)
+				SXPBlueprint.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -620,7 +620,7 @@ public abstract class BaseSXPBlueprintResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				SXPBlueprint.class.getName(), callbackURL, object)
+				SXPBlueprint.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -236,7 +236,7 @@ public abstract class BasePriceEntryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PriceEntry.class.getName(), callbackURL, object)
+				PriceEntry.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

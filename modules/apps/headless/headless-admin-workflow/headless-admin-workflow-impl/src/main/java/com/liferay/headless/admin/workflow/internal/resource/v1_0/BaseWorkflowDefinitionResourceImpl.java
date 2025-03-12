@@ -509,7 +509,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WorkflowDefinition.class.getName(), callbackURL, object)
+				WorkflowDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -621,7 +621,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				WorkflowDefinition.class.getName(), callbackURL, object)
+				WorkflowDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

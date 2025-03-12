@@ -540,7 +540,7 @@ public abstract class BaseChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Channel.class.getName(), callbackURL, object)
+				Channel.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -724,7 +724,7 @@ public abstract class BaseChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Channel.class.getName(), callbackURL, object)
+				Channel.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -148,7 +148,7 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceImpl
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
 				PaymentMethodGroupRelOrderType.class.getName(), callbackURL,
-				object)
+				contentString)
 		).build();
 	}
 

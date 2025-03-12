@@ -532,7 +532,7 @@ public abstract class BaseDocumentMetadataSetResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DocumentMetadataSet.class.getName(), callbackURL, object)
+				DocumentMetadataSet.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -388,7 +388,7 @@ public abstract class BaseDataListViewResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DataListView.class.getName(), callbackURL, object)
+				DataListView.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -494,7 +494,7 @@ public abstract class BaseDataListViewResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				DataListView.class.getName(), callbackURL, object)
+				DataListView.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

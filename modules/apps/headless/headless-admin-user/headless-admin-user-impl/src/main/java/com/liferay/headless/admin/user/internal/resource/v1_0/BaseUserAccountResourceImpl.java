@@ -2083,7 +2083,7 @@ public abstract class BaseUserAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				UserAccount.class.getName(), callbackURL, object)
+				UserAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -2315,7 +2315,7 @@ public abstract class BaseUserAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				UserAccount.class.getName(), callbackURL, object)
+				UserAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

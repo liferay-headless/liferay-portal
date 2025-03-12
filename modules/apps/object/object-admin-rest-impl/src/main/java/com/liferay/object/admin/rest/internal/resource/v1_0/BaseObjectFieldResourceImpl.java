@@ -463,7 +463,7 @@ public abstract class BaseObjectFieldResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectField.class.getName(), callbackURL, object)
+				ObjectField.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -693,7 +693,7 @@ public abstract class BaseObjectFieldResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectField.class.getName(), callbackURL, object)
+				ObjectField.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

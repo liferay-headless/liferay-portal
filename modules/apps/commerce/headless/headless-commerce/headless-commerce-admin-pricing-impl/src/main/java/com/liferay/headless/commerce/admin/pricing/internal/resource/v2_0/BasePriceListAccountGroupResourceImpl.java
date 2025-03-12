@@ -146,7 +146,8 @@ public abstract class BasePriceListAccountGroupResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PriceListAccountGroup.class.getName(), callbackURL, object)
+				PriceListAccountGroup.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

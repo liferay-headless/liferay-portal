@@ -569,7 +569,7 @@ public abstract class BaseCTCollectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				CTCollection.class.getName(), callbackURL, object)
+				CTCollection.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -733,7 +733,7 @@ public abstract class BaseCTCollectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				CTCollection.class.getName(), callbackURL, object)
+				CTCollection.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

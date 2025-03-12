@@ -280,7 +280,7 @@ public abstract class BaseCatalogResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Catalog.class.getName(), callbackURL, object)
+				Catalog.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -146,7 +146,8 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PaymentMethodGroupRelTerm.class.getName(), callbackURL, object)
+				PaymentMethodGroupRelTerm.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

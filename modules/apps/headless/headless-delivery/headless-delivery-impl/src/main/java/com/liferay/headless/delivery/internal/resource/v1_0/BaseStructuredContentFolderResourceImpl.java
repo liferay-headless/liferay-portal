@@ -1657,7 +1657,8 @@ public abstract class BaseStructuredContentFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				StructuredContentFolder.class.getName(), callbackURL, object)
+				StructuredContentFolder.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -1868,7 +1869,8 @@ public abstract class BaseStructuredContentFolderResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				StructuredContentFolder.class.getName(), callbackURL, object)
+				StructuredContentFolder.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

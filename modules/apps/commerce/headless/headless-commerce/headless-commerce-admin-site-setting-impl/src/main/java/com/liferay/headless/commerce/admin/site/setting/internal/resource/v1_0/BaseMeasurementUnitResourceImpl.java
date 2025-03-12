@@ -609,7 +609,7 @@ public abstract class BaseMeasurementUnitResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				MeasurementUnit.class.getName(), callbackURL, object)
+				MeasurementUnit.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

@@ -146,7 +146,8 @@ public abstract class BaseDiscountProductGroupResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountProductGroup.class.getName(), callbackURL, object)
+				DiscountProductGroup.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

@@ -267,7 +267,7 @@ public abstract class BaseDataDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DataDefinition.class.getName(), callbackURL, object)
+				DataDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -475,7 +475,7 @@ public abstract class BaseDataDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				DataDefinition.class.getName(), callbackURL, object)
+				DataDefinition.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

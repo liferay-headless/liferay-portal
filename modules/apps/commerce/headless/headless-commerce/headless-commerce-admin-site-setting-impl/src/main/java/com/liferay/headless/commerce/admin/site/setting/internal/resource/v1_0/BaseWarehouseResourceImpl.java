@@ -221,7 +221,7 @@ public abstract class BaseWarehouseResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Warehouse.class.getName(), callbackURL, object)
+				Warehouse.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -327,7 +327,7 @@ public abstract class BaseWarehouseResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Warehouse.class.getName(), callbackURL, object)
+				Warehouse.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

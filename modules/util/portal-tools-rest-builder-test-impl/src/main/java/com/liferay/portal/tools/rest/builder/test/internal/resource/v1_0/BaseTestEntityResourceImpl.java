@@ -439,7 +439,7 @@ public abstract class BaseTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				TestEntity.class.getName(), callbackURL, object)
+				TestEntity.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

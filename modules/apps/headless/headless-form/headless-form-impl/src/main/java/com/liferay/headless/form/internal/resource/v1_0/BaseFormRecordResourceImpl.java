@@ -180,7 +180,7 @@ public abstract class BaseFormRecordResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				FormRecord.class.getName(), callbackURL, object)
+				FormRecord.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

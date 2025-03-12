@@ -384,7 +384,8 @@ public abstract class BaseKnowledgeBaseAttachmentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				KnowledgeBaseAttachment.class.getName(), callbackURL, object)
+				KnowledgeBaseAttachment.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

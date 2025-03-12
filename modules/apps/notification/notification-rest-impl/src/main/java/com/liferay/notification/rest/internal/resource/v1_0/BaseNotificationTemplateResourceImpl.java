@@ -436,7 +436,8 @@ public abstract class BaseNotificationTemplateResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				NotificationTemplate.class.getName(), callbackURL, object)
+				NotificationTemplate.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -679,7 +680,8 @@ public abstract class BaseNotificationTemplateResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				NotificationTemplate.class.getName(), callbackURL, object)
+				NotificationTemplate.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

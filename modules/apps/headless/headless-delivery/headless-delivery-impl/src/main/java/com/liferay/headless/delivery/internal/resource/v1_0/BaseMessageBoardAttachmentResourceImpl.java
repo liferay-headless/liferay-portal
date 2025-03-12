@@ -153,7 +153,8 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				MessageBoardAttachment.class.getName(), callbackURL, object)
+				MessageBoardAttachment.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

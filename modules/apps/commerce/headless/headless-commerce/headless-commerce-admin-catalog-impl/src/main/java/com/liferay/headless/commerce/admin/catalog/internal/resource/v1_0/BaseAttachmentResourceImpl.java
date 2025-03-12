@@ -350,7 +350,7 @@ public abstract class BaseAttachmentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Attachment.class.getName(), callbackURL, object)
+				Attachment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

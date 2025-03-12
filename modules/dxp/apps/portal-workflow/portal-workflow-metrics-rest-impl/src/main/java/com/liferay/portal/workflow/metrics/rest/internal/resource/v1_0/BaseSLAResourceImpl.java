@@ -354,7 +354,7 @@ public abstract class BaseSLAResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				SLA.class.getName(), callbackURL, object)
+				SLA.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -469,7 +469,7 @@ public abstract class BaseSLAResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				SLA.class.getName(), callbackURL, object)
+				SLA.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

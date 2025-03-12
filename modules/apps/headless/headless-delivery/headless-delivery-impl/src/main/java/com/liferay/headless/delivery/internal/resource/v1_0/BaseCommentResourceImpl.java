@@ -393,7 +393,7 @@ public abstract class BaseCommentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Comment.class.getName(), callbackURL, object)
+				Comment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -517,7 +517,7 @@ public abstract class BaseCommentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Comment.class.getName(), callbackURL, object)
+				Comment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

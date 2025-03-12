@@ -143,7 +143,7 @@ public abstract class BaseWarehouseAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WarehouseAccount.class.getName(), callbackURL, object)
+				WarehouseAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

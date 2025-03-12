@@ -426,7 +426,8 @@ public abstract class BaseDocumentDataDefinitionTypeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DocumentDataDefinitionType.class.getName(), callbackURL, object)
+				DocumentDataDefinitionType.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

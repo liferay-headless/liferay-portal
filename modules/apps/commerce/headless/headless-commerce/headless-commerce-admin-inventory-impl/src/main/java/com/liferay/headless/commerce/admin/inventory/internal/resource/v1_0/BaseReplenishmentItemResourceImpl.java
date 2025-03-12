@@ -318,7 +318,7 @@ public abstract class BaseReplenishmentItemResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ReplenishmentItem.class.getName(), callbackURL, object)
+				ReplenishmentItem.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

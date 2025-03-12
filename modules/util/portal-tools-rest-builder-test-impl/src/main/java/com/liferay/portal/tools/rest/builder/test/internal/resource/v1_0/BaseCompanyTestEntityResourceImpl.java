@@ -570,7 +570,7 @@ public abstract class BaseCompanyTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				CompanyTestEntity.class.getName(), callbackURL, object)
+				CompanyTestEntity.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

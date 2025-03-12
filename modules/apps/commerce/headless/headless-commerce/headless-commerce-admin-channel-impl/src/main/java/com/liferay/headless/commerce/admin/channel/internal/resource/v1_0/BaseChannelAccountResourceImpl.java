@@ -142,7 +142,7 @@ public abstract class BaseChannelAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ChannelAccount.class.getName(), callbackURL, object)
+				ChannelAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

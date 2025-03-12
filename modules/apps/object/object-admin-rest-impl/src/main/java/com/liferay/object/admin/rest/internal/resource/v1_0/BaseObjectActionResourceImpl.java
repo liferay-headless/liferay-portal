@@ -140,7 +140,7 @@ public abstract class BaseObjectActionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectAction.class.getName(), callbackURL, object)
+				ObjectAction.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -331,7 +331,7 @@ public abstract class BaseObjectActionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectAction.class.getName(), callbackURL, object)
+				ObjectAction.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

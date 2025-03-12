@@ -169,7 +169,8 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				KnowledgeBaseArticle.class.getName(), callbackURL, object)
+				KnowledgeBaseArticle.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -408,7 +409,8 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				KnowledgeBaseArticle.class.getName(), callbackURL, object)
+				KnowledgeBaseArticle.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

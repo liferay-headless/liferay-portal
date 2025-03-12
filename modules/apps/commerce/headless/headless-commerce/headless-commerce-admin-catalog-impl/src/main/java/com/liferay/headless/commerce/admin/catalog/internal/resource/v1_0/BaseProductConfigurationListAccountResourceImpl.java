@@ -150,7 +150,7 @@ public abstract class BaseProductConfigurationListAccountResourceImpl
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
 				ProductConfigurationListAccount.class.getName(), callbackURL,
-				object)
+				contentString)
 		).build();
 	}
 

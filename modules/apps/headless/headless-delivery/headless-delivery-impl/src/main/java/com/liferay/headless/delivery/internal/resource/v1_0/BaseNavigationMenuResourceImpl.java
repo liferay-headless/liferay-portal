@@ -163,7 +163,7 @@ public abstract class BaseNavigationMenuResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				NavigationMenu.class.getName(), callbackURL, object)
+				NavigationMenu.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -290,7 +290,7 @@ public abstract class BaseNavigationMenuResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				NavigationMenu.class.getName(), callbackURL, object)
+				NavigationMenu.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

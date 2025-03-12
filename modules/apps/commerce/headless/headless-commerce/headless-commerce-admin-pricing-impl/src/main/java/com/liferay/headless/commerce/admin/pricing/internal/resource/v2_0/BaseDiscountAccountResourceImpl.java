@@ -142,7 +142,7 @@ public abstract class BaseDiscountAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountAccount.class.getName(), callbackURL, object)
+				DiscountAccount.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

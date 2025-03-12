@@ -432,7 +432,8 @@ public abstract class BaseDataRecordCollectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DataRecordCollection.class.getName(), callbackURL, object)
+				DataRecordCollection.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -550,7 +551,8 @@ public abstract class BaseDataRecordCollectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				DataRecordCollection.class.getName(), callbackURL, object)
+				DataRecordCollection.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

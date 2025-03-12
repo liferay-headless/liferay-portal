@@ -435,7 +435,7 @@ public abstract class BaseTierPriceResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				TierPrice.class.getName(), callbackURL, object)
+				TierPrice.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

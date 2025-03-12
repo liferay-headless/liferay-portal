@@ -264,7 +264,7 @@ public abstract class BaseWikiPageAttachmentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WikiPageAttachment.class.getName(), callbackURL, object)
+				WikiPageAttachment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

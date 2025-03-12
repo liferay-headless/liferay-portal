@@ -316,7 +316,7 @@ public abstract class BaseCTRemoteResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				CTRemote.class.getName(), callbackURL, object)
+				CTRemote.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -476,7 +476,7 @@ public abstract class BaseCTRemoteResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				CTRemote.class.getName(), callbackURL, object)
+				CTRemote.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

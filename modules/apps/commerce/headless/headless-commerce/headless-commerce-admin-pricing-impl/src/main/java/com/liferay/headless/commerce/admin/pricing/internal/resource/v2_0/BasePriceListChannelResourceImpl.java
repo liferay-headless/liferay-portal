@@ -142,7 +142,7 @@ public abstract class BasePriceListChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PriceListChannel.class.getName(), callbackURL, object)
+				PriceListChannel.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

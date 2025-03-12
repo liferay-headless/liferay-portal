@@ -266,7 +266,7 @@ public abstract class BaseAccountAddressResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				AccountAddress.class.getName(), callbackURL, object)
+				AccountAddress.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -492,7 +492,7 @@ public abstract class BaseAccountAddressResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				AccountAddress.class.getName(), callbackURL, object)
+				AccountAddress.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

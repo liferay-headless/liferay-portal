@@ -355,7 +355,8 @@ public abstract class BaseNotificationQueueEntryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				NotificationQueueEntry.class.getName(), callbackURL, object)
+				NotificationQueueEntry.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

@@ -141,7 +141,7 @@ public abstract class BaseProductChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ProductChannel.class.getName(), callbackURL, object)
+				ProductChannel.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

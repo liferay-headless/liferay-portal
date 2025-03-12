@@ -146,7 +146,8 @@ public abstract class BaseShippingFixedOptionTermResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ShippingFixedOptionTerm.class.getName(), callbackURL, object)
+				ShippingFixedOptionTerm.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

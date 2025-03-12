@@ -142,7 +142,7 @@ public abstract class BaseDiscountOrderTypeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DiscountOrderType.class.getName(), callbackURL, object)
+				DiscountOrderType.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

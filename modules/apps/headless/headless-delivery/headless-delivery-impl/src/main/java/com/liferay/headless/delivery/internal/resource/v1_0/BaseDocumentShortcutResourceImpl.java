@@ -362,7 +362,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				DocumentShortcut.class.getName(), callbackURL, object)
+				DocumentShortcut.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -555,7 +555,7 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				DocumentShortcut.class.getName(), callbackURL, object)
+				DocumentShortcut.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

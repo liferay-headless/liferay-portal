@@ -421,7 +421,7 @@ public abstract class BaseCurrencyResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Currency.class.getName(), callbackURL, object)
+				Currency.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

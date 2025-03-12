@@ -136,7 +136,7 @@ public abstract class BaseExperimentResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Experiment.class.getName(), callbackURL, object)
+				Experiment.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

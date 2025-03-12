@@ -162,7 +162,7 @@ public abstract class BaseBlogPostingResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				BlogPosting.class.getName(), callbackURL, object)
+				BlogPosting.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -372,7 +372,7 @@ public abstract class BaseBlogPostingResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				BlogPosting.class.getName(), callbackURL, object)
+				BlogPosting.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

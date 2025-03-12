@@ -487,7 +487,8 @@ public abstract class BaseObjectValidationRuleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				ObjectValidationRule.class.getName(), callbackURL, object)
+				ObjectValidationRule.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 
@@ -701,7 +702,8 @@ public abstract class BaseObjectValidationRuleResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				ObjectValidationRule.class.getName(), callbackURL, object)
+				ObjectValidationRule.class.getName(), callbackURL,
+				contentString)
 		).build();
 	}
 

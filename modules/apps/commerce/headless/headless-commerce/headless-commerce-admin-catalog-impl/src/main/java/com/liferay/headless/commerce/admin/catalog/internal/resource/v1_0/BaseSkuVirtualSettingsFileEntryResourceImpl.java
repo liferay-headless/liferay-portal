@@ -149,7 +149,7 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceImpl
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
 				SkuVirtualSettingsFileEntry.class.getName(), callbackURL,
-				object)
+				contentString)
 		).build();
 	}
 

@@ -142,7 +142,7 @@ public abstract class BaseTermOrderTypeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				TermOrderType.class.getName(), callbackURL, object)
+				TermOrderType.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

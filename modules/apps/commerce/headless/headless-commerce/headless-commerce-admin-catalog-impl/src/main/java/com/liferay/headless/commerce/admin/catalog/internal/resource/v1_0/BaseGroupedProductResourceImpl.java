@@ -142,7 +142,7 @@ public abstract class BaseGroupedProductResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				GroupedProduct.class.getName(), callbackURL, object)
+				GroupedProduct.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

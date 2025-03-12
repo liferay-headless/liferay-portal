@@ -150,7 +150,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
 				ProductVirtualSettingsFileEntry.class.getName(), callbackURL,
-				object)
+				contentString)
 		).build();
 	}
 

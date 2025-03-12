@@ -149,7 +149,7 @@ public abstract class BaseBlogPostingImageResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				BlogPostingImage.class.getName(), callbackURL, object)
+				BlogPostingImage.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

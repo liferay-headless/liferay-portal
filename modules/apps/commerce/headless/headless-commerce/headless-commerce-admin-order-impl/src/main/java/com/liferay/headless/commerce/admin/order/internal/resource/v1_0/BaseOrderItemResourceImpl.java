@@ -405,7 +405,7 @@ public abstract class BaseOrderItemResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				OrderItem.class.getName(), callbackURL, object)
+				OrderItem.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -542,7 +542,7 @@ public abstract class BaseOrderItemResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				OrderItem.class.getName(), callbackURL, object)
+				OrderItem.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

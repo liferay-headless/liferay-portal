@@ -744,7 +744,7 @@ public abstract class BasePostalAddressResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				PostalAddress.class.getName(), callbackURL, object)
+				PostalAddress.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -959,7 +959,7 @@ public abstract class BasePostalAddressResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				PostalAddress.class.getName(), callbackURL, object)
+				PostalAddress.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

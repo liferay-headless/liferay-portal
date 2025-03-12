@@ -167,7 +167,7 @@ public abstract class BaseMessageBoardSectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				MessageBoardSection.class.getName(), callbackURL, object)
+				MessageBoardSection.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -376,7 +376,7 @@ public abstract class BaseMessageBoardSectionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				MessageBoardSection.class.getName(), callbackURL, object)
+				MessageBoardSection.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

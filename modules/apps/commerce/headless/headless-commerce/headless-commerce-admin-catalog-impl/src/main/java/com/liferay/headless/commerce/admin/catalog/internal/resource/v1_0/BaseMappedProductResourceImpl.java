@@ -142,7 +142,7 @@ public abstract class BaseMappedProductResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				MappedProduct.class.getName(), callbackURL, object)
+				MappedProduct.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

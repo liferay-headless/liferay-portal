@@ -697,7 +697,7 @@ public abstract class BaseWikiNodeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				WikiNode.class.getName(), callbackURL, object)
+				WikiNode.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -821,7 +821,7 @@ public abstract class BaseWikiNodeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				WikiNode.class.getName(), callbackURL, object)
+				WikiNode.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

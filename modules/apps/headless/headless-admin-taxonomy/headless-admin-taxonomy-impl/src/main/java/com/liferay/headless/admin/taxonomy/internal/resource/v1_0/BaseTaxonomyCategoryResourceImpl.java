@@ -326,7 +326,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				TaxonomyCategory.class.getName(), callbackURL, object)
+				TaxonomyCategory.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -582,7 +582,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				TaxonomyCategory.class.getName(), callbackURL, object)
+				TaxonomyCategory.class.getName(), callbackURL, contentString)
 		).build();
 	}
 

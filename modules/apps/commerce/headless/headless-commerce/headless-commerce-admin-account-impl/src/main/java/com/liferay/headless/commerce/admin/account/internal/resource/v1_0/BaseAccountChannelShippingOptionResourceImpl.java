@@ -149,7 +149,7 @@ public abstract class BaseAccountChannelShippingOptionResourceImpl
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
 				AccountChannelShippingOption.class.getName(), callbackURL,
-				object)
+				contentString)
 		).build();
 	}
 

@@ -739,7 +739,7 @@ public abstract class BaseKeywordResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.deleteImportTask(
-				Keyword.class.getName(), callbackURL, object)
+				Keyword.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
@@ -859,7 +859,7 @@ public abstract class BaseKeywordResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.putImportTask(
-				Keyword.class.getName(), callbackURL, object)
+				Keyword.class.getName(), callbackURL, contentString)
 		).build();
 	}
 
