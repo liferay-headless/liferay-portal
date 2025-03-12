@@ -58,11 +58,12 @@ public interface DiscountRuleResource {
 	public HttpInvoker.HttpResponse deleteDiscountRuleHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteDiscountRuleBatch(String callbackURL, Object object)
+	public void deleteDiscountRuleBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DiscountRule getDiscountRule(Long id) throws Exception;
@@ -94,11 +95,11 @@ public interface DiscountRuleResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountRuleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDiscountIdDiscountRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -527,11 +528,12 @@ public interface DiscountRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDiscountRuleBatch(String callbackURL, Object object)
+		public void deleteDiscountRuleBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDiscountRuleBatchHttpResponse(callbackURL, object);
+				deleteDiscountRuleBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -582,12 +584,12 @@ public interface DiscountRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDiscountRuleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1047,12 +1049,12 @@ public interface DiscountRuleResource {
 		}
 
 		public void postDiscountIdDiscountRuleBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDiscountIdDiscountRuleBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1104,12 +1106,12 @@ public interface DiscountRuleResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountRuleBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

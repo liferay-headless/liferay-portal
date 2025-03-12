@@ -72,11 +72,12 @@ public interface WorkflowInstanceResource {
 			Long workflowInstanceId)
 		throws Exception;
 
-	public void deleteWorkflowInstanceBatch(String callbackURL, Object object)
+	public void deleteWorkflowInstanceBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWorkflowInstanceBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowInstance getWorkflowInstance(Long workflowInstanceId)
@@ -674,11 +675,12 @@ public interface WorkflowInstanceResource {
 		}
 
 		public void deleteWorkflowInstanceBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWorkflowInstanceBatchHttpResponse(callbackURL, object);
+				deleteWorkflowInstanceBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -729,12 +731,12 @@ public interface WorkflowInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteWorkflowInstanceBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

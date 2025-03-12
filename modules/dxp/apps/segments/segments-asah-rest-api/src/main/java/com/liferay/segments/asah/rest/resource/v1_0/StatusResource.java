@@ -51,7 +51,7 @@ public interface StatusResource {
 		throws Exception;
 
 	public Response postExperimentStatusBatch(
-			Long experimentId, String callbackURL, Object object)
+			Long experimentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

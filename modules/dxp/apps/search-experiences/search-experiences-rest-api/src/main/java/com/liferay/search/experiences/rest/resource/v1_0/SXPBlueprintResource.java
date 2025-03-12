@@ -61,7 +61,7 @@ public interface SXPBlueprintResource {
 		throws Exception;
 
 	public Response postSXPBlueprintBatch(
-			SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+			SXPBlueprint sxpBlueprint, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPBlueprint getSXPBlueprintByExternalReferenceCode(
@@ -78,7 +78,7 @@ public interface SXPBlueprintResource {
 	public void deleteSXPBlueprint(Long sxpBlueprintId) throws Exception;
 
 	public Response deleteSXPBlueprintBatch(
-			Long sxpBlueprintId, String callbackURL, Object object)
+			Long sxpBlueprintId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPBlueprint getSXPBlueprint(Long sxpBlueprintId) throws Exception;
@@ -93,7 +93,7 @@ public interface SXPBlueprintResource {
 
 	public Response putSXPBlueprintBatch(
 			Long sxpBlueprintId, SXPBlueprint sxpBlueprint, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public SXPBlueprint postSXPBlueprintCopy(Long sxpBlueprintId)

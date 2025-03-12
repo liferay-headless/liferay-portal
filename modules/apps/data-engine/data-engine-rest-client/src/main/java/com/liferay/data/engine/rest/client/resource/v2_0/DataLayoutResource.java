@@ -73,12 +73,12 @@ public interface DataLayoutResource {
 		throws Exception;
 
 	public void postDataDefinitionDataLayoutBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDataDefinitionDataLayoutBatchHttpResponse(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataLayout(Long dataLayoutId) throws Exception;
@@ -87,11 +87,11 @@ public interface DataLayoutResource {
 			Long dataLayoutId)
 		throws Exception;
 
-	public void deleteDataLayoutBatch(String callbackURL, Object object)
+	public void deleteDataLayoutBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDataLayoutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataLayout getDataLayout(Long dataLayoutId) throws Exception;
@@ -106,11 +106,11 @@ public interface DataLayoutResource {
 			Long dataLayoutId, DataLayout dataLayout)
 		throws Exception;
 
-	public void putDataLayoutBatch(String callbackURL, Object object)
+	public void putDataLayoutBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDataLayoutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void postDataLayoutContext(
@@ -706,12 +706,12 @@ public interface DataLayoutResource {
 		}
 
 		public void postDataDefinitionDataLayoutBatch(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDataDefinitionDataLayoutBatchHttpResponse(
-					dataDefinitionId, callbackURL, object);
+					dataDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -763,12 +763,13 @@ public interface DataLayoutResource {
 
 		public HttpInvoker.HttpResponse
 				postDataDefinitionDataLayoutBatchHttpResponse(
-					Long dataDefinitionId, String callbackURL, Object object)
+					Long dataDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -912,11 +913,12 @@ public interface DataLayoutResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDataLayoutBatch(String callbackURL, Object object)
+		public void deleteDataLayoutBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDataLayoutBatchHttpResponse(callbackURL, object);
+				deleteDataLayoutBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -967,12 +969,12 @@ public interface DataLayoutResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDataLayoutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1222,11 +1224,11 @@ public interface DataLayoutResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDataLayoutBatch(String callbackURL, Object object)
+		public void putDataLayoutBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDataLayoutBatchHttpResponse(callbackURL, object);
+				putDataLayoutBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1277,12 +1279,12 @@ public interface DataLayoutResource {
 		}
 
 		public HttpInvoker.HttpResponse putDataLayoutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

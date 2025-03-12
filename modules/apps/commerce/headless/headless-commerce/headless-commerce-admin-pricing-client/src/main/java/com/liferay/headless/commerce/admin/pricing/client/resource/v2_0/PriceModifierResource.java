@@ -73,12 +73,12 @@ public interface PriceModifierResource {
 		throws Exception;
 
 	public void postPriceListIdPriceModifierBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPriceListIdPriceModifierBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public void deletePriceModifierByExternalReferenceCode(
@@ -113,11 +113,12 @@ public interface PriceModifierResource {
 	public HttpInvoker.HttpResponse deletePriceModifierHttpResponse(Long id)
 		throws Exception;
 
-	public void deletePriceModifierBatch(String callbackURL, Object object)
+	public void deletePriceModifierBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceModifierBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public PriceModifier getPriceModifier(Long id) throws Exception;
@@ -706,12 +707,12 @@ public interface PriceModifierResource {
 		}
 
 		public void postPriceListIdPriceModifierBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPriceListIdPriceModifierBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -763,12 +764,12 @@ public interface PriceModifierResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceListIdPriceModifierBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1224,11 +1225,13 @@ public interface PriceModifierResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePriceModifierBatch(String callbackURL, Object object)
+		public void deletePriceModifierBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePriceModifierBatchHttpResponse(callbackURL, object);
+				deletePriceModifierBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1279,12 +1282,12 @@ public interface PriceModifierResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePriceModifierBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

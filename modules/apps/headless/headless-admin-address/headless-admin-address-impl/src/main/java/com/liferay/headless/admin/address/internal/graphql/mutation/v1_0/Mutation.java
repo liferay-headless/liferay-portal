@@ -87,14 +87,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createCountryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_countryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			countryResource -> countryResource.postCountryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -112,14 +112,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteCountryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_countryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			countryResource -> countryResource.deleteCountryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -150,14 +150,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateCountryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_countryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			countryResource -> countryResource.putCountryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -197,14 +197,14 @@ public class Mutation {
 	public Response createCountryRegionBatch(
 			@GraphQLName("countryId") Long countryId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_regionResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			regionResource -> regionResource.postCountryRegionBatch(
-				countryId, callbackURL, object));
+				countryId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -241,14 +241,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteRegionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_regionResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			regionResource -> regionResource.deleteRegionBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -278,14 +278,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateRegionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_regionResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			regionResource -> regionResource.putRegionBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

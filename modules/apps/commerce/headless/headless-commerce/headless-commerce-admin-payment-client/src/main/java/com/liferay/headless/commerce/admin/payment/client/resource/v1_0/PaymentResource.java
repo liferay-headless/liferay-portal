@@ -59,11 +59,11 @@ public interface PaymentResource {
 	public HttpInvoker.HttpResponse postPaymentHttpResponse(Payment payment)
 		throws Exception;
 
-	public void postPaymentBatch(String callbackURL, Object object)
+	public void postPaymentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postPaymentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deletePaymentByExternalReferenceCode(
@@ -116,11 +116,11 @@ public interface PaymentResource {
 	public HttpInvoker.HttpResponse deletePaymentHttpResponse(Long id)
 		throws Exception;
 
-	public void deletePaymentBatch(String callbackURL, Object object)
+	public void deletePaymentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePaymentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Payment getPayment(Long id) throws Exception;
@@ -599,11 +599,11 @@ public interface PaymentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postPaymentBatch(String callbackURL, Object object)
+		public void postPaymentBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postPaymentBatchHttpResponse(callbackURL, object);
+				postPaymentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -654,12 +654,12 @@ public interface PaymentResource {
 		}
 
 		public HttpInvoker.HttpResponse postPaymentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1324,11 +1324,11 @@ public interface PaymentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePaymentBatch(String callbackURL, Object object)
+		public void deletePaymentBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePaymentBatchHttpResponse(callbackURL, object);
+				deletePaymentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1379,12 +1379,12 @@ public interface PaymentResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePaymentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

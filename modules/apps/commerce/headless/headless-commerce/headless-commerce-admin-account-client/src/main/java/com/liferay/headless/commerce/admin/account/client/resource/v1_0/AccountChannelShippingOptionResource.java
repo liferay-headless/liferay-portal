@@ -41,12 +41,12 @@ public interface AccountChannelShippingOptionResource {
 		throws Exception;
 
 	public void deleteAccountChannelShippingOptionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteAccountChannelShippingOptionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public AccountChannelShippingOption getAccountChannelShippingOption(Long id)
@@ -111,12 +111,12 @@ public interface AccountChannelShippingOptionResource {
 		throws Exception;
 
 	public void postAccountIdAccountChannelShippingOptionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAccountIdAccountChannelShippingOptionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -334,12 +334,12 @@ public interface AccountChannelShippingOptionResource {
 		}
 
 		public void deleteAccountChannelShippingOptionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteAccountChannelShippingOptionBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -391,12 +391,12 @@ public interface AccountChannelShippingOptionResource {
 
 		public HttpInvoker.HttpResponse
 				deleteAccountChannelShippingOptionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1117,12 +1117,12 @@ public interface AccountChannelShippingOptionResource {
 		}
 
 		public void postAccountIdAccountChannelShippingOptionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountIdAccountChannelShippingOptionBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1174,12 +1174,12 @@ public interface AccountChannelShippingOptionResource {
 
 		public HttpInvoker.HttpResponse
 				postAccountIdAccountChannelShippingOptionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

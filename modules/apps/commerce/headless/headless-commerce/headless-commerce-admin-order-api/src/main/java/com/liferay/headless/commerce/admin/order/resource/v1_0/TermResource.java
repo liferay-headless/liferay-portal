@@ -59,7 +59,7 @@ public interface TermResource {
 
 	public Term postTerm(Term term) throws Exception;
 
-	public Response postTermBatch(String callbackURL, Object object)
+	public Response postTermBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteTermByExternalReferenceCode(String externalReferenceCode)
@@ -78,7 +78,7 @@ public interface TermResource {
 
 	public void deleteTerm(Long id) throws Exception;
 
-	public Response deleteTermBatch(String callbackURL, Object object)
+	public Response deleteTermBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Term getTerm(Long id) throws Exception;

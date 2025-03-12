@@ -180,14 +180,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createAccountBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			accountResource -> accountResource.postAccountBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -246,14 +246,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteAccountBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			accountResource -> accountResource.deleteAccountBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -324,7 +324,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteAccountAddressBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -332,7 +332,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.deleteAccountAddressBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -364,7 +364,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateAccountAddressBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -372,7 +372,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.putAccountAddressBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -407,7 +407,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createAccountIdAccountAddressBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -415,7 +415,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.postAccountIdAccountAddressBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -1002,7 +1002,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteAccountChannelShippingOptionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1011,7 +1011,7 @@ public class Mutation {
 			accountChannelShippingOptionResource ->
 				accountChannelShippingOptionResource.
 					deleteAccountChannelShippingOptionBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -1068,7 +1068,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createAccountIdAccountChannelShippingOptionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1077,7 +1077,7 @@ public class Mutation {
 			accountChannelShippingOptionResource ->
 				accountChannelShippingOptionResource.
 					postAccountIdAccountChannelShippingOptionBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -1143,7 +1143,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createAccountIdAccountMemberBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1151,7 +1151,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountMemberResource ->
 				accountMemberResource.postAccountIdAccountMemberBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -1231,7 +1231,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createAccountIdAccountOrganizationBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1239,7 +1239,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountOrganizationResource ->
 				accountOrganizationResource.
-					postAccountIdAccountOrganizationBatch(callbackURL, object));
+					postAccountIdAccountOrganizationBatch(
+						callbackURL, contentString));
 	}
 
 	@GraphQLField

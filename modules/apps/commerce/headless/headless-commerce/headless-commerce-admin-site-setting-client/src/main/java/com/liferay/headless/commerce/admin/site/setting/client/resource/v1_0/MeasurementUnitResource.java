@@ -60,11 +60,12 @@ public interface MeasurementUnitResource {
 			MeasurementUnit measurementUnit)
 		throws Exception;
 
-	public void postMeasurementUnitBatch(String callbackURL, Object object)
+	public void postMeasurementUnitBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postMeasurementUnitBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteMeasurementUnitByExternalReferenceCode(
@@ -138,11 +139,12 @@ public interface MeasurementUnitResource {
 	public HttpInvoker.HttpResponse deleteMeasurementUnitHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteMeasurementUnitBatch(String callbackURL, Object object)
+	public void deleteMeasurementUnitBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMeasurementUnitBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MeasurementUnit getMeasurementUnit(Long id) throws Exception;
@@ -614,11 +616,13 @@ public interface MeasurementUnitResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postMeasurementUnitBatch(String callbackURL, Object object)
+		public void postMeasurementUnitBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postMeasurementUnitBatchHttpResponse(callbackURL, object);
+				postMeasurementUnitBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -669,12 +673,12 @@ public interface MeasurementUnitResource {
 		}
 
 		public HttpInvoker.HttpResponse postMeasurementUnitBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1669,11 +1673,12 @@ public interface MeasurementUnitResource {
 		}
 
 		public void deleteMeasurementUnitBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteMeasurementUnitBatchHttpResponse(callbackURL, object);
+				deleteMeasurementUnitBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1724,12 +1729,12 @@ public interface MeasurementUnitResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteMeasurementUnitBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

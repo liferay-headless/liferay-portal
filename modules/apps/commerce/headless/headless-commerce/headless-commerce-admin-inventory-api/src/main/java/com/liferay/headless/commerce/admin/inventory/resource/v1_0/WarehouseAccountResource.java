@@ -52,7 +52,7 @@ public interface WarehouseAccountResource {
 		throws Exception;
 
 	public Response deleteWarehouseAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WarehouseAccount>
@@ -75,7 +75,7 @@ public interface WarehouseAccountResource {
 		throws Exception;
 
 	public Response postWarehouseIdWarehouseAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

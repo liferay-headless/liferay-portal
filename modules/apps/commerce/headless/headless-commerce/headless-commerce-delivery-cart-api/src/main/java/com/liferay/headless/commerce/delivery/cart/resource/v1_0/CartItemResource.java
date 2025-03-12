@@ -66,7 +66,8 @@ public interface CartItemResource {
 
 	public void deleteCartItem(Long cartItemId) throws Exception;
 
-	public Response deleteCartItemBatch(String callbackURL, Object object)
+	public Response deleteCartItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CartItem getCartItem(Long cartItemId) throws Exception;
@@ -77,7 +78,7 @@ public interface CartItemResource {
 	public CartItem putCartItem(Long cartItemId, CartItem cartItem)
 		throws Exception;
 
-	public Response putCartItemBatch(String callbackURL, Object object)
+	public Response putCartItemBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<CartItem> getCartByExternalReferenceCodeItemsPage(

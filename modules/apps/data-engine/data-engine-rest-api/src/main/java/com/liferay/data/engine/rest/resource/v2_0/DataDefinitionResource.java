@@ -62,7 +62,8 @@ public interface DataDefinitionResource {
 
 	public void deleteDataDefinition(Long dataDefinitionId) throws Exception;
 
-	public Response deleteDataDefinitionBatch(String callbackURL, Object object)
+	public Response deleteDataDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataDefinition getDataDefinition(Long dataDefinitionId)
@@ -76,7 +77,8 @@ public interface DataDefinitionResource {
 			Long dataDefinitionId, DataDefinition dataDefinition)
 		throws Exception;
 
-	public Response putDataDefinitionBatch(String callbackURL, Object object)
+	public Response putDataDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataDefinition postDataDefinitionCopy(Long dataDefinitionId)

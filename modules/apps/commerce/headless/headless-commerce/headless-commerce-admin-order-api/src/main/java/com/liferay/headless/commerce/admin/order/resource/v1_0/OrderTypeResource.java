@@ -62,7 +62,7 @@ public interface OrderTypeResource {
 
 	public OrderType postOrderType(OrderType orderType) throws Exception;
 
-	public Response postOrderTypeBatch(String callbackURL, Object object)
+	public Response postOrderTypeBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrderTypeByExternalReferenceCode(
@@ -83,7 +83,8 @@ public interface OrderTypeResource {
 
 	public void deleteOrderType(Long id) throws Exception;
 
-	public Response deleteOrderTypeBatch(String callbackURL, Object object)
+	public Response deleteOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderType getOrderType(Long id) throws Exception;

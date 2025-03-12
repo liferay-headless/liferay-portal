@@ -65,7 +65,7 @@ public interface ProductSpecificationResource {
 	public void deleteProductSpecification(Long id) throws Exception;
 
 	public Response deleteProductSpecificationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductSpecification getProductSpecification(Long id)
@@ -95,7 +95,7 @@ public interface ProductSpecificationResource {
 		throws Exception;
 
 	public Response postProductIdProductSpecificationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

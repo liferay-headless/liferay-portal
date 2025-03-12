@@ -52,7 +52,7 @@ public interface DiscountOrderTypeResource {
 		throws Exception;
 
 	public Response deleteDiscountOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountOrderType>
@@ -76,7 +76,7 @@ public interface DiscountOrderTypeResource {
 		throws Exception;
 
 	public Response postDiscountIdDiscountOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

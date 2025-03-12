@@ -82,14 +82,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteExperimentBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_experimentResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			experimentResource -> experimentResource.deleteExperimentBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -122,14 +122,14 @@ public class Mutation {
 	public Response createExperimentStatusBatch(
 			@GraphQLName("experimentId") Long experimentId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_statusResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			statusResource -> statusResource.postExperimentStatusBatch(
-				experimentId, callbackURL, object));
+				experimentId, callbackURL, contentString));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

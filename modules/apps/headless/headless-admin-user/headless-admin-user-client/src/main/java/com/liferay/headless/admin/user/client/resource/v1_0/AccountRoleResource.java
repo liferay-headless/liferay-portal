@@ -208,11 +208,11 @@ public interface AccountRoleResource {
 		throws Exception;
 
 	public void postAccountAccountRoleBatch(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAccountAccountRoleBatchHttpResponse(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountAccountRoleUserAccountAssociation(
@@ -2112,12 +2112,12 @@ public interface AccountRoleResource {
 		}
 
 		public void postAccountAccountRoleBatch(
-				Long accountId, String callbackURL, Object object)
+				Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountAccountRoleBatchHttpResponse(
-					accountId, callbackURL, object);
+					accountId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2168,12 +2168,12 @@ public interface AccountRoleResource {
 		}
 
 		public HttpInvoker.HttpResponse postAccountAccountRoleBatchHttpResponse(
-				Long accountId, String callbackURL, Object object)
+				Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

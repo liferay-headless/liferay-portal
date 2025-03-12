@@ -64,7 +64,7 @@ public interface ListTypeDefinitionResource {
 		throws Exception;
 
 	public Response postListTypeDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ListTypeDefinition getListTypeDefinitionByExternalReferenceCode(
@@ -79,7 +79,7 @@ public interface ListTypeDefinitionResource {
 		throws Exception;
 
 	public Response deleteListTypeDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ListTypeDefinition getListTypeDefinition(Long listTypeDefinitionId)
@@ -94,7 +94,7 @@ public interface ListTypeDefinitionResource {
 		throws Exception;
 
 	public Response putListTypeDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

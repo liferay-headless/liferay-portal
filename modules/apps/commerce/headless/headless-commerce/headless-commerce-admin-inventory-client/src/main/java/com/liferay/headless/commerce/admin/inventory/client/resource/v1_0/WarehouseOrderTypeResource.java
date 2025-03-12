@@ -41,11 +41,12 @@ public interface WarehouseOrderTypeResource {
 			Long warehouseOrderTypeId)
 		throws Exception;
 
-	public void deleteWarehouseOrderTypeBatch(String callbackURL, Object object)
+	public void deleteWarehouseOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWarehouseOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WarehouseOrderType>
@@ -91,12 +92,12 @@ public interface WarehouseOrderTypeResource {
 		throws Exception;
 
 	public void postWarehouseIdWarehouseOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWarehouseIdWarehouseOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -314,11 +315,12 @@ public interface WarehouseOrderTypeResource {
 		}
 
 		public void deleteWarehouseOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWarehouseOrderTypeBatchHttpResponse(callbackURL, object);
+				deleteWarehouseOrderTypeBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -370,12 +372,12 @@ public interface WarehouseOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				deleteWarehouseOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -883,12 +885,12 @@ public interface WarehouseOrderTypeResource {
 		}
 
 		public void postWarehouseIdWarehouseOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWarehouseIdWarehouseOrderTypeBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -940,12 +942,12 @@ public interface WarehouseOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				postWarehouseIdWarehouseOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

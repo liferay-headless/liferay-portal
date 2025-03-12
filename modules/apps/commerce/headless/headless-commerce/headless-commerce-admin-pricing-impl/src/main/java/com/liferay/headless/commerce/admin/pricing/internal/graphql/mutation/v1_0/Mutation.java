@@ -153,14 +153,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createDiscountBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_discountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			discountResource -> discountResource.postDiscountBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -217,14 +217,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteDiscountBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_discountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			discountResource -> discountResource.deleteDiscountBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -253,7 +253,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteDiscountAccountGroupBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -261,7 +261,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountAccountGroupResource ->
 				discountAccountGroupResource.deleteDiscountAccountGroupBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -300,7 +300,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createDiscountIdDiscountAccountGroupBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -309,7 +309,7 @@ public class Mutation {
 			discountAccountGroupResource ->
 				discountAccountGroupResource.
 					postDiscountIdDiscountAccountGroupBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -326,7 +326,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteDiscountCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -334,7 +334,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountCategoryResource ->
 				discountCategoryResource.deleteDiscountCategoryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -372,7 +372,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createDiscountIdDiscountCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -380,7 +380,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountCategoryResource ->
 				discountCategoryResource.postDiscountIdDiscountCategoryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -397,7 +397,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteDiscountProductBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -405,7 +405,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountProductResource ->
 				discountProductResource.deleteDiscountProductBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -440,7 +440,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createDiscountIdDiscountProductBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -448,7 +448,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountProductResource ->
 				discountProductResource.postDiscountIdDiscountProductBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -480,7 +480,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteDiscountRuleBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -488,7 +488,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountRuleResource ->
 				discountRuleResource.deleteDiscountRuleBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -521,7 +521,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createDiscountIdDiscountRuleBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -529,7 +529,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountRuleResource ->
 				discountRuleResource.postDiscountIdDiscountRuleBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -572,14 +572,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePriceEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_priceEntryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			priceEntryResource -> priceEntryResource.deletePriceEntryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -626,7 +626,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createPriceListIdPriceEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -634,7 +634,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceEntryResource ->
 				priceEntryResource.postPriceListIdPriceEntryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -670,14 +670,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createPriceListBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_priceListResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			priceListResource -> priceListResource.postPriceListBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -734,14 +734,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePriceListBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_priceListResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			priceListResource -> priceListResource.deletePriceListBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -771,7 +771,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePriceListAccountGroupBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -779,7 +779,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceListAccountGroupResource ->
 				priceListAccountGroupResource.deletePriceListAccountGroupBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -819,7 +819,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createPriceListIdPriceListAccountGroupBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -828,7 +828,7 @@ public class Mutation {
 			priceListAccountGroupResource ->
 				priceListAccountGroupResource.
 					postPriceListIdPriceListAccountGroupBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -862,7 +862,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createPriceEntryIdTierPriceBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -870,7 +870,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			tierPriceResource ->
 				tierPriceResource.postPriceEntryIdTierPriceBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -913,14 +913,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteTierPriceBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_tierPriceResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			tierPriceResource -> tierPriceResource.deleteTierPriceBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField

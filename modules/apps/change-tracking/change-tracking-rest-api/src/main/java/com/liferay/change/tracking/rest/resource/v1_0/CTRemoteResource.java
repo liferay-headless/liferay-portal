@@ -60,12 +60,13 @@ public interface CTRemoteResource {
 	public CTRemote postCTRemote(CTRemote ctRemote) throws Exception;
 
 	public Response postCTRemoteBatch(
-			CTRemote ctRemote, String callbackURL, Object object)
+			CTRemote ctRemote, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteCTRemote(Long id) throws Exception;
 
-	public Response deleteCTRemoteBatch(String callbackURL, Object object)
+	public Response deleteCTRemoteBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CTRemote getCTRemote(Long id) throws Exception;
@@ -75,7 +76,7 @@ public interface CTRemoteResource {
 	public CTRemote putCTRemote(Long id, CTRemote ctRemote) throws Exception;
 
 	public Response putCTRemoteBatch(
-			CTRemote ctRemote, String callbackURL, Object object)
+			CTRemote ctRemote, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

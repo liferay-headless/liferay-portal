@@ -62,7 +62,7 @@ public interface RegionResource {
 		throws Exception;
 
 	public Response postCountryRegionBatch(
-			Long countryId, String callbackURL, Object object)
+			Long countryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Region getCountryRegionByRegionCode(
@@ -80,7 +80,7 @@ public interface RegionResource {
 
 	public void deleteRegion(Long regionId) throws Exception;
 
-	public Response deleteRegionBatch(String callbackURL, Object object)
+	public Response deleteRegionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Region getRegion(Long regionId) throws Exception;
@@ -89,7 +89,7 @@ public interface RegionResource {
 
 	public Region putRegion(Long regionId, Region region) throws Exception;
 
-	public Response putRegionBatch(String callbackURL, Object object)
+	public Response putRegionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

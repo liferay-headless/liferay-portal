@@ -75,7 +75,7 @@ public interface ObjectRelationshipResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectRelationshipBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectRelationship putObjectRelationshipByExternalReferenceCode(
@@ -86,7 +86,7 @@ public interface ObjectRelationshipResource {
 		throws Exception;
 
 	public Response deleteObjectRelationshipBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectRelationship getObjectRelationship(Long objectRelationshipId)
@@ -97,7 +97,7 @@ public interface ObjectRelationshipResource {
 		throws Exception;
 
 	public Response putObjectRelationshipBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

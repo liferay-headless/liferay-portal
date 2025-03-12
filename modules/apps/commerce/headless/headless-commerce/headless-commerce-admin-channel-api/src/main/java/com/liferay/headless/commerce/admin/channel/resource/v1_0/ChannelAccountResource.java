@@ -50,7 +50,8 @@ public interface ChannelAccountResource {
 
 	public void deleteChannelAccount(Long channelAccountId) throws Exception;
 
-	public Response deleteChannelAccountBatch(String callbackURL, Object object)
+	public Response deleteChannelAccountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ChannelAccount>

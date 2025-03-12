@@ -50,7 +50,8 @@ public interface DiscountSkuResource {
 
 	public void deleteDiscountSku(Long discountSkuId) throws Exception;
 
-	public Response deleteDiscountSkuBatch(String callbackURL, Object object)
+	public Response deleteDiscountSkuBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountSku> getDiscountByExternalReferenceCodeDiscountSkusPage(
@@ -71,7 +72,7 @@ public interface DiscountSkuResource {
 		throws Exception;
 
 	public Response postDiscountIdDiscountSkuBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

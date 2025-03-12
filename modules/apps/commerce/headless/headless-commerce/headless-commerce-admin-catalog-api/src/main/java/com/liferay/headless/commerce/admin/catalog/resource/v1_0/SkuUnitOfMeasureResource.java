@@ -51,7 +51,7 @@ public interface SkuUnitOfMeasureResource {
 	public void deleteSkuUnitOfMeasure(Long id) throws Exception;
 
 	public Response deleteSkuUnitOfMeasureBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public SkuUnitOfMeasure getSkuUnitOfMeasure(Long id) throws Exception;
@@ -78,7 +78,7 @@ public interface SkuUnitOfMeasureResource {
 		throws Exception;
 
 	public Response postSkuIdSkuUnitOfMeasureBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

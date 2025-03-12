@@ -361,7 +361,7 @@ public abstract class BaseObjectViewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -376,7 +376,7 @@ public abstract class BaseObjectViewResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				ObjectView.class.getName(), callbackURL, null, object)
+				ObjectView.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 
@@ -433,7 +433,7 @@ public abstract class BaseObjectViewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -539,7 +539,7 @@ public abstract class BaseObjectViewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(

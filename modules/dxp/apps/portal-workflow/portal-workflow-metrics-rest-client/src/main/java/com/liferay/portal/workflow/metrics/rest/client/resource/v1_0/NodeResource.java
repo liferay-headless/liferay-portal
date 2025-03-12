@@ -56,11 +56,11 @@ public interface NodeResource {
 		throws Exception;
 
 	public void postProcessNodeBatch(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProcessNodeBatchHttpResponse(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcessNode(Long processId, Long nodeId) throws Exception;
@@ -503,12 +503,12 @@ public interface NodeResource {
 		}
 
 		public void postProcessNodeBatch(
-				Long processId, String callbackURL, Object object)
+				Long processId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProcessNodeBatchHttpResponse(
-					processId, callbackURL, object);
+					processId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -559,12 +559,12 @@ public interface NodeResource {
 		}
 
 		public HttpInvoker.HttpResponse postProcessNodeBatchHttpResponse(
-				Long processId, String callbackURL, Object object)
+				Long processId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

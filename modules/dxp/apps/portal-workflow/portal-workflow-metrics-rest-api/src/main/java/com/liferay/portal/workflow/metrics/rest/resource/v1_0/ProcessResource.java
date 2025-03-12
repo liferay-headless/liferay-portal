@@ -48,19 +48,19 @@ public interface ProcessResource {
 
 	public Process postProcess(Process process) throws Exception;
 
-	public Response postProcessBatch(String callbackURL, Object object)
+	public Response postProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcess(Long processId) throws Exception;
 
-	public Response deleteProcessBatch(String callbackURL, Object object)
+	public Response deleteProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Process getProcess(Long processId) throws Exception;
 
 	public void putProcess(Long processId, Process process) throws Exception;
 
-	public Response putProcessBatch(String callbackURL, Object object)
+	public Response putProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public String getProcessTitle(Long processId) throws Exception;

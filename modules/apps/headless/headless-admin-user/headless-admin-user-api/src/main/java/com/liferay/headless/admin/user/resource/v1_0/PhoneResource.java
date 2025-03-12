@@ -82,7 +82,7 @@ public interface PhoneResource {
 
 	public void deletePhone(Long phoneId) throws Exception;
 
-	public Response deletePhoneBatch(String callbackURL, Object object)
+	public Response deletePhoneBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Phone getPhone(Long phoneId) throws Exception;

@@ -123,7 +123,7 @@ public abstract class BaseDiscountSkuResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -328,7 +328,7 @@ public abstract class BaseDiscountSkuResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -343,7 +343,7 @@ public abstract class BaseDiscountSkuResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				DiscountSku.class.getName(), callbackURL, null, object)
+				DiscountSku.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 

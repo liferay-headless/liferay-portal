@@ -58,14 +58,15 @@ public interface WarehouseResource {
 
 	public Response deleteWarehouse(Long id) throws Exception;
 
-	public Response deleteWarehouseBatch(String callbackURL, Object object)
+	public Response deleteWarehouseBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Warehouse getWarehouse(Long id) throws Exception;
 
 	public Response putWarehouse(Long id, Warehouse warehouse) throws Exception;
 
-	public Response putWarehouseBatch(String callbackURL, Object object)
+	public Response putWarehouseBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

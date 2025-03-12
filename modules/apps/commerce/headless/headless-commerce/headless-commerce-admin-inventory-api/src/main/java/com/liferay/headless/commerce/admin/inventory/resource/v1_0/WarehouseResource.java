@@ -59,7 +59,7 @@ public interface WarehouseResource {
 
 	public Warehouse postWarehouse(Warehouse warehouse) throws Exception;
 
-	public Response postWarehouseBatch(String callbackURL, Object object)
+	public Response postWarehouseBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteWarehouseByExternalReferenceCode(

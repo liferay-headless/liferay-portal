@@ -61,7 +61,7 @@ public interface OrderTransitionResource {
 		throws Exception;
 
 	public Response postPlacedOrderOrderTransitionBatch(
-			Long placedOrderId, String callbackURL, Object object)
+			Long placedOrderId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

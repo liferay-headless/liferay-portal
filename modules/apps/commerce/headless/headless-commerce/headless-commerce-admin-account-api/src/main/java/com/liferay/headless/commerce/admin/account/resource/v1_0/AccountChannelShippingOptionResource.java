@@ -52,7 +52,7 @@ public interface AccountChannelShippingOptionResource {
 	public void deleteAccountChannelShippingOption(Long id) throws Exception;
 
 	public Response deleteAccountChannelShippingOptionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AccountChannelShippingOption getAccountChannelShippingOption(Long id)
@@ -85,7 +85,7 @@ public interface AccountChannelShippingOptionResource {
 		throws Exception;
 
 	public Response postAccountIdAccountChannelShippingOptionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

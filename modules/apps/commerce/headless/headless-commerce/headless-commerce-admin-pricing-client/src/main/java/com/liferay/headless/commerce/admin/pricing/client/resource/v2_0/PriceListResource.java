@@ -60,11 +60,11 @@ public interface PriceListResource {
 			PriceList priceList)
 		throws Exception;
 
-	public void postPriceListBatch(String callbackURL, Object object)
+	public void postPriceListBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postPriceListBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deletePriceListByExternalReferenceCode(
@@ -108,11 +108,11 @@ public interface PriceListResource {
 	public HttpInvoker.HttpResponse deletePriceListHttpResponse(Long id)
 		throws Exception;
 
-	public void deletePriceListBatch(String callbackURL, Object object)
+	public void deletePriceListBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceListBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public PriceList getPriceList(Long id) throws Exception;
@@ -590,11 +590,11 @@ public interface PriceListResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postPriceListBatch(String callbackURL, Object object)
+		public void postPriceListBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postPriceListBatchHttpResponse(callbackURL, object);
+				postPriceListBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -645,12 +645,12 @@ public interface PriceListResource {
 		}
 
 		public HttpInvoker.HttpResponse postPriceListBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1227,11 +1227,12 @@ public interface PriceListResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePriceListBatch(String callbackURL, Object object)
+		public void deletePriceListBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePriceListBatchHttpResponse(callbackURL, object);
+				deletePriceListBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1282,12 +1283,12 @@ public interface PriceListResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePriceListBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

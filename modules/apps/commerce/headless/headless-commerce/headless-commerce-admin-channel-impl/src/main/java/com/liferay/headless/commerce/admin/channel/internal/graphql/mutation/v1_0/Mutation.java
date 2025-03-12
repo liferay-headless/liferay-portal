@@ -189,7 +189,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteAccountAddressChannelBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -197,7 +197,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressChannelResource ->
 				accountAddressChannelResource.deleteAccountAddressChannelBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -250,7 +250,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteCategoryDisplayPageBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -258,7 +258,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			categoryDisplayPageResource ->
 				categoryDisplayPageResource.deleteCategoryDisplayPageBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -341,14 +341,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createChannelBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_channelResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			channelResource -> channelResource.postChannelBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -409,14 +409,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteChannelBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_channelResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			channelResource -> channelResource.deleteChannelBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -447,14 +447,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateChannelBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_channelResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			channelResource -> channelResource.putChannelBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -474,7 +474,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteChannelAccountBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -482,7 +482,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			channelAccountResource ->
 				channelAccountResource.deleteChannelAccountBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -668,7 +668,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePaymentMethodGroupRelOrderTypeBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -677,7 +677,7 @@ public class Mutation {
 			paymentMethodGroupRelOrderTypeResource ->
 				paymentMethodGroupRelOrderTypeResource.
 					deletePaymentMethodGroupRelOrderTypeBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -718,7 +718,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePaymentMethodGroupRelTermBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -726,7 +726,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			paymentMethodGroupRelTermResource ->
 				paymentMethodGroupRelTermResource.
-					deletePaymentMethodGroupRelTermBatch(callbackURL, object));
+					deletePaymentMethodGroupRelTermBatch(
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -795,7 +796,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteProductDisplayPageBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -803,7 +804,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			productDisplayPageResource ->
 				productDisplayPageResource.deleteProductDisplayPageBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -841,7 +842,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteShippingFixedOptionOrderTypeBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -850,7 +851,7 @@ public class Mutation {
 			shippingFixedOptionOrderTypeResource ->
 				shippingFixedOptionOrderTypeResource.
 					deleteShippingFixedOptionOrderTypeBatch(
-						callbackURL, object));
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -889,7 +890,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteShippingFixedOptionTermBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -897,7 +898,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			shippingFixedOptionTermResource ->
 				shippingFixedOptionTermResource.
-					deleteShippingFixedOptionTermBatch(callbackURL, object));
+					deleteShippingFixedOptionTermBatch(
+						callbackURL, contentString));
 	}
 
 	@GraphQLField

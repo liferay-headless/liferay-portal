@@ -60,11 +60,12 @@ public interface OptionCategoryResource {
 			OptionCategory optionCategory)
 		throws Exception;
 
-	public void postOptionCategoryBatch(String callbackURL, Object object)
+	public void postOptionCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOptionCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOptionCategoryByExternalReferenceCode(
@@ -108,11 +109,12 @@ public interface OptionCategoryResource {
 	public HttpInvoker.HttpResponse deleteOptionCategoryHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOptionCategoryBatch(String callbackURL, Object object)
+	public void deleteOptionCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOptionCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OptionCategory getOptionCategory(Long id) throws Exception;
@@ -583,11 +585,12 @@ public interface OptionCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOptionCategoryBatch(String callbackURL, Object object)
+		public void postOptionCategoryBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOptionCategoryBatchHttpResponse(callbackURL, object);
+				postOptionCategoryBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -638,12 +641,12 @@ public interface OptionCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse postOptionCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1210,11 +1213,13 @@ public interface OptionCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOptionCategoryBatch(String callbackURL, Object object)
+		public void deleteOptionCategoryBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOptionCategoryBatchHttpResponse(callbackURL, object);
+				deleteOptionCategoryBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1265,12 +1270,12 @@ public interface OptionCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOptionCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -101,12 +101,13 @@ public interface WorkflowDefinitionLinkResource {
 		throws Exception;
 
 	public void postWorkflowDefinitionWorkflowDefinitionLinkBatch(
-			Long workflowDefinitionId, String callbackURL, Object object)
+			Long workflowDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWorkflowDefinitionWorkflowDefinitionLinkBatchHttpResponse(
-				Long workflowDefinitionId, String callbackURL, Object object)
+				Long workflowDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -909,12 +910,13 @@ public interface WorkflowDefinitionLinkResource {
 		}
 
 		public void postWorkflowDefinitionWorkflowDefinitionLinkBatch(
-				Long workflowDefinitionId, String callbackURL, Object object)
+				Long workflowDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWorkflowDefinitionWorkflowDefinitionLinkBatchHttpResponse(
-					workflowDefinitionId, callbackURL, object);
+					workflowDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -967,12 +969,12 @@ public interface WorkflowDefinitionLinkResource {
 		public HttpInvoker.HttpResponse
 				postWorkflowDefinitionWorkflowDefinitionLinkBatchHttpResponse(
 					Long workflowDefinitionId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

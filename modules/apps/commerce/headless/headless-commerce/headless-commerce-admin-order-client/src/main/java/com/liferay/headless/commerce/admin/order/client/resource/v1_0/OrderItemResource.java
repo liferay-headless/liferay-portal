@@ -95,11 +95,11 @@ public interface OrderItemResource {
 	public HttpInvoker.HttpResponse deleteOrderItemHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOrderItemBatch(String callbackURL, Object object)
+	public void deleteOrderItemBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderItem getOrderItem(Long id) throws Exception;
@@ -120,11 +120,11 @@ public interface OrderItemResource {
 			Long id, OrderItem orderItem)
 		throws Exception;
 
-	public void putOrderItemBatch(String callbackURL, Object object)
+	public void putOrderItemBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putOrderItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderItem> getOrderByExternalReferenceCodeOrderItemsPage(
@@ -160,11 +160,12 @@ public interface OrderItemResource {
 			Long id, OrderItem orderItem)
 		throws Exception;
 
-	public void postOrderIdOrderItemBatch(String callbackURL, Object object)
+	public void postOrderIdOrderItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrderIdOrderItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -1032,11 +1033,12 @@ public interface OrderItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrderItemBatch(String callbackURL, Object object)
+		public void deleteOrderItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderItemBatchHttpResponse(callbackURL, object);
+				deleteOrderItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1087,12 +1089,12 @@ public interface OrderItemResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1436,11 +1438,11 @@ public interface OrderItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putOrderItemBatch(String callbackURL, Object object)
+		public void putOrderItemBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putOrderItemBatchHttpResponse(callbackURL, object);
+				putOrderItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1491,12 +1493,12 @@ public interface OrderItemResource {
 		}
 
 		public HttpInvoker.HttpResponse putOrderItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1980,11 +1982,13 @@ public interface OrderItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrderIdOrderItemBatch(String callbackURL, Object object)
+		public void postOrderIdOrderItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOrderIdOrderItemBatchHttpResponse(callbackURL, object);
+				postOrderIdOrderItemBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2035,12 +2039,12 @@ public interface OrderItemResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrderIdOrderItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -83,11 +83,12 @@ public interface ProductDisplayPageResource {
 			Long id)
 		throws Exception;
 
-	public void deleteProductDisplayPageBatch(String callbackURL, Object object)
+	public void deleteProductDisplayPageBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductDisplayPageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductDisplayPage getProductDisplayPage(Long id) throws Exception;
@@ -801,11 +802,12 @@ public interface ProductDisplayPageResource {
 		}
 
 		public void deleteProductDisplayPageBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductDisplayPageBatchHttpResponse(callbackURL, object);
+				deleteProductDisplayPageBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -857,12 +859,12 @@ public interface ProductDisplayPageResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductDisplayPageBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

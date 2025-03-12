@@ -50,7 +50,8 @@ public interface ObjectActionResource {
 
 	public void deleteObjectAction(Long objectActionId) throws Exception;
 
-	public Response deleteObjectActionBatch(String callbackURL, Object object)
+	public Response deleteObjectActionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectAction getObjectAction(Long objectActionId) throws Exception;
@@ -63,7 +64,8 @@ public interface ObjectActionResource {
 			Long objectActionId, ObjectAction objectAction)
 		throws Exception;
 
-	public Response putObjectActionBatch(String callbackURL, Object object)
+	public Response putObjectActionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ObjectAction>
@@ -91,7 +93,7 @@ public interface ObjectActionResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectActionBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

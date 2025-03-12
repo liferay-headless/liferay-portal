@@ -40,11 +40,12 @@ public interface DiscountChannelResource {
 			Long discountChannelId)
 		throws Exception;
 
-	public void deleteDiscountChannelBatch(String callbackURL, Object object)
+	public void deleteDiscountChannelBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountChannel>
@@ -86,12 +87,12 @@ public interface DiscountChannelResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDiscountIdDiscountChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -309,11 +310,12 @@ public interface DiscountChannelResource {
 		}
 
 		public void deleteDiscountChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDiscountChannelBatchHttpResponse(callbackURL, object);
+				deleteDiscountChannelBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -364,12 +366,12 @@ public interface DiscountChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDiscountChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -876,12 +878,12 @@ public interface DiscountChannelResource {
 		}
 
 		public void postDiscountIdDiscountChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDiscountIdDiscountChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -933,12 +935,12 @@ public interface DiscountChannelResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

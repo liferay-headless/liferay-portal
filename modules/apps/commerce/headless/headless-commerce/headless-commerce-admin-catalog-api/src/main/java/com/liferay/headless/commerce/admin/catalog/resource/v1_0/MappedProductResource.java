@@ -50,7 +50,8 @@ public interface MappedProductResource {
 
 	public void deleteMappedProduct(Long mappedProductId) throws Exception;
 
-	public Response deleteMappedProductBatch(String callbackURL, Object object)
+	public Response deleteMappedProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MappedProduct patchMappedProduct(
@@ -81,7 +82,7 @@ public interface MappedProductResource {
 		throws Exception;
 
 	public Response postProductIdMappedProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MappedProduct getProductIdMappedProductBySequence(

@@ -52,7 +52,7 @@ public interface OrderRuleChannelResource {
 		throws Exception;
 
 	public Response deleteOrderRuleChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderRuleChannel>
@@ -75,7 +75,7 @@ public interface OrderRuleChannelResource {
 		throws Exception;
 
 	public Response postOrderRuleIdOrderRuleChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

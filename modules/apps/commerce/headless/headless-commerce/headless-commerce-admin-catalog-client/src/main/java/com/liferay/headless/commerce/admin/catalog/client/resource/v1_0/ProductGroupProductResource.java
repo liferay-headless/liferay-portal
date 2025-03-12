@@ -41,11 +41,11 @@ public interface ProductGroupProductResource {
 		throws Exception;
 
 	public void deleteProductGroupProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductGroupProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ProductGroupProduct>
@@ -89,12 +89,12 @@ public interface ProductGroupProductResource {
 		throws Exception;
 
 	public void postProductGroupIdProductGroupProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductGroupIdProductGroupProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -310,11 +310,12 @@ public interface ProductGroupProductResource {
 		}
 
 		public void deleteProductGroupProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductGroupProductBatchHttpResponse(callbackURL, object);
+				deleteProductGroupProductBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +367,12 @@ public interface ProductGroupProductResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductGroupProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -868,12 +869,12 @@ public interface ProductGroupProductResource {
 		}
 
 		public void postProductGroupIdProductGroupProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductGroupIdProductGroupProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -925,12 +926,12 @@ public interface ProductGroupProductResource {
 
 		public HttpInvoker.HttpResponse
 				postProductGroupIdProductGroupProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

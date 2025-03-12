@@ -64,11 +64,11 @@ public interface NotificationQueueEntryResource {
 		throws Exception;
 
 	public void postNotificationQueueEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postNotificationQueueEntryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteNotificationQueueEntry(Long notificationQueueEntryId)
@@ -79,12 +79,12 @@ public interface NotificationQueueEntryResource {
 		throws Exception;
 
 	public void deleteNotificationQueueEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteNotificationQueueEntryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationQueueEntry getNotificationQueueEntry(
@@ -572,12 +572,12 @@ public interface NotificationQueueEntryResource {
 		}
 
 		public void postNotificationQueueEntryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postNotificationQueueEntryBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -629,12 +629,12 @@ public interface NotificationQueueEntryResource {
 
 		public HttpInvoker.HttpResponse
 				postNotificationQueueEntryBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -782,12 +782,12 @@ public interface NotificationQueueEntryResource {
 		}
 
 		public void deleteNotificationQueueEntryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteNotificationQueueEntryBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -839,12 +839,12 @@ public interface NotificationQueueEntryResource {
 
 		public HttpInvoker.HttpResponse
 				deleteNotificationQueueEntryBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

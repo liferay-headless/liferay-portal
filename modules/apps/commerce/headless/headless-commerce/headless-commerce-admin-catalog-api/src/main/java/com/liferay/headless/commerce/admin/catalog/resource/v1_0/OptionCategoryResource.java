@@ -60,7 +60,8 @@ public interface OptionCategoryResource {
 	public OptionCategory postOptionCategory(OptionCategory optionCategory)
 		throws Exception;
 
-	public Response postOptionCategoryBatch(String callbackURL, Object object)
+	public Response postOptionCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOptionCategoryByExternalReferenceCode(
@@ -81,7 +82,8 @@ public interface OptionCategoryResource {
 
 	public Response deleteOptionCategory(Long id) throws Exception;
 
-	public Response deleteOptionCategoryBatch(String callbackURL, Object object)
+	public Response deleteOptionCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OptionCategory getOptionCategory(Long id) throws Exception;

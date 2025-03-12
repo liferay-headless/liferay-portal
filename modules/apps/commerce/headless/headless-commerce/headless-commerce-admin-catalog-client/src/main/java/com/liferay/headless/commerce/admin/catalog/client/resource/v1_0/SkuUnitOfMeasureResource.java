@@ -39,11 +39,12 @@ public interface SkuUnitOfMeasureResource {
 	public HttpInvoker.HttpResponse deleteSkuUnitOfMeasureHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteSkuUnitOfMeasureBatch(String callbackURL, Object object)
+	public void deleteSkuUnitOfMeasureBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSkuUnitOfMeasureBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public SkuUnitOfMeasure getSkuUnitOfMeasure(Long id) throws Exception;
@@ -95,11 +96,11 @@ public interface SkuUnitOfMeasureResource {
 		throws Exception;
 
 	public void postSkuIdSkuUnitOfMeasureBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSkuIdSkuUnitOfMeasureBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -315,11 +316,12 @@ public interface SkuUnitOfMeasureResource {
 		}
 
 		public void deleteSkuUnitOfMeasureBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSkuUnitOfMeasureBatchHttpResponse(callbackURL, object);
+				deleteSkuUnitOfMeasureBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -370,12 +372,12 @@ public interface SkuUnitOfMeasureResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSkuUnitOfMeasureBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1074,11 +1076,12 @@ public interface SkuUnitOfMeasureResource {
 		}
 
 		public void postSkuIdSkuUnitOfMeasureBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSkuIdSkuUnitOfMeasureBatchHttpResponse(callbackURL, object);
+				postSkuIdSkuUnitOfMeasureBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1130,12 +1133,12 @@ public interface SkuUnitOfMeasureResource {
 
 		public HttpInvoker.HttpResponse
 				postSkuIdSkuUnitOfMeasureBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -60,7 +60,8 @@ public interface AccountGroupResource {
 	public AccountGroup postAccountGroup(AccountGroup accountGroup)
 		throws Exception;
 
-	public Response postAccountGroupBatch(String callbackURL, Object object)
+	public Response postAccountGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -93,7 +94,8 @@ public interface AccountGroupResource {
 
 	public void deleteAccountGroup(Long accountGroupId) throws Exception;
 
-	public Response deleteAccountGroupBatch(String callbackURL, Object object)
+	public Response deleteAccountGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AccountGroup getAccountGroup(Long accountGroupId) throws Exception;
@@ -106,7 +108,8 @@ public interface AccountGroupResource {
 			Long accountGroupId, AccountGroup accountGroup)
 		throws Exception;
 
-	public Response putAccountGroupBatch(String callbackURL, Object object)
+	public Response putAccountGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AccountGroup>

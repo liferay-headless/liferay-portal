@@ -39,11 +39,12 @@ public interface DiscountCategoryResource {
 	public HttpInvoker.HttpResponse deleteDiscountCategoryHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteDiscountCategoryBatch(String callbackURL, Object object)
+	public void deleteDiscountCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountCategory>
@@ -83,12 +84,12 @@ public interface DiscountCategoryResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountCategoryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDiscountIdDiscountCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -293,11 +294,12 @@ public interface DiscountCategoryResource {
 		}
 
 		public void deleteDiscountCategoryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDiscountCategoryBatchHttpResponse(callbackURL, object);
+				deleteDiscountCategoryBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -348,12 +350,12 @@ public interface DiscountCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDiscountCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -846,12 +848,12 @@ public interface DiscountCategoryResource {
 		}
 
 		public void postDiscountIdDiscountCategoryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDiscountIdDiscountCategoryBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -903,12 +905,12 @@ public interface DiscountCategoryResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountCategoryBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

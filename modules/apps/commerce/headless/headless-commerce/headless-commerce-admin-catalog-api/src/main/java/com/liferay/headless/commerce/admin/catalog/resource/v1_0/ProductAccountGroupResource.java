@@ -51,7 +51,7 @@ public interface ProductAccountGroupResource {
 	public void deleteProductAccountGroup(Long id) throws Exception;
 
 	public Response deleteProductAccountGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductAccountGroup getProductAccountGroup(Long id) throws Exception;

@@ -100,7 +100,8 @@ public interface OrganizationResource {
 	public Organization postOrganization(Organization organization)
 		throws Exception;
 
-	public Response postOrganizationBatch(String callbackURL, Object object)
+	public Response postOrganizationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrganizationByExternalReferenceCode(
@@ -148,7 +149,8 @@ public interface OrganizationResource {
 
 	public void deleteOrganization(String organizationId) throws Exception;
 
-	public Response deleteOrganizationBatch(String callbackURL, Object object)
+	public Response deleteOrganizationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Organization getOrganization(String organizationId) throws Exception;
@@ -161,7 +163,8 @@ public interface OrganizationResource {
 			String organizationId, Organization organization)
 		throws Exception;
 
-	public Response putOrganizationBatch(String callbackURL, Object object)
+	public Response putOrganizationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Organization> getOrganizationChildOrganizationsPage(

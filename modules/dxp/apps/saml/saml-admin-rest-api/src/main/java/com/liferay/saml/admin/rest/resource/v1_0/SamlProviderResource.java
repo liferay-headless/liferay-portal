@@ -54,7 +54,8 @@ public interface SamlProviderResource {
 	public SamlProvider postSamlProvider(SamlProvider samlProvider)
 		throws Exception;
 
-	public Response postSamlProviderBatch(String callbackURL, Object object)
+	public Response postSamlProviderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

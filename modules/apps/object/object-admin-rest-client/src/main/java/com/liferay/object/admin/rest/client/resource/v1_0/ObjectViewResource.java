@@ -86,12 +86,13 @@ public interface ObjectViewResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectViewBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectViewBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public void deleteObjectView(Long objectViewId) throws Exception;
@@ -100,11 +101,11 @@ public interface ObjectViewResource {
 			Long objectViewId)
 		throws Exception;
 
-	public void deleteObjectViewBatch(String callbackURL, Object object)
+	public void deleteObjectViewBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectViewBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectView getObjectView(Long objectViewId) throws Exception;
@@ -119,11 +120,11 @@ public interface ObjectViewResource {
 			Long objectViewId, ObjectView objectView)
 		throws Exception;
 
-	public void putObjectViewBatch(String callbackURL, Object object)
+	public void putObjectViewBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectViewBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectView postObjectViewCopy(Long objectViewId) throws Exception;
@@ -836,12 +837,13 @@ public interface ObjectViewResource {
 		}
 
 		public void postObjectDefinitionObjectViewBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectViewBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -893,12 +895,13 @@ public interface ObjectViewResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectViewBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1042,11 +1045,12 @@ public interface ObjectViewResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectViewBatch(String callbackURL, Object object)
+		public void deleteObjectViewBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectViewBatchHttpResponse(callbackURL, object);
+				deleteObjectViewBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1097,12 +1101,12 @@ public interface ObjectViewResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteObjectViewBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1352,11 +1356,11 @@ public interface ObjectViewResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectViewBatch(String callbackURL, Object object)
+		public void putObjectViewBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectViewBatchHttpResponse(callbackURL, object);
+				putObjectViewBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1407,12 +1411,12 @@ public interface ObjectViewResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectViewBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

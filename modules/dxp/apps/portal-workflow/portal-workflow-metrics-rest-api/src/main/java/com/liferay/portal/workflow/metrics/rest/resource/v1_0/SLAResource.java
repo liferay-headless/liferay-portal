@@ -60,13 +60,13 @@ public interface SLAResource {
 	public SLA postProcessSLA(Long processId, SLA sla) throws Exception;
 
 	public Response postProcessSLABatch(
-			Long processId, SLA sla, String callbackURL, Object object)
+			Long processId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSLA(Long slaId) throws Exception;
 
 	public Response deleteSLABatch(
-			Long slaId, String callbackURL, Object object)
+			Long slaId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SLA getSLA(Long slaId) throws Exception;
@@ -74,7 +74,7 @@ public interface SLAResource {
 	public SLA putSLA(Long slaId, SLA sla) throws Exception;
 
 	public Response putSLABatch(
-			Long slaId, SLA sla, String callbackURL, Object object)
+			Long slaId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

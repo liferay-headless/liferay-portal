@@ -44,12 +44,12 @@ public interface ProductConfigurationListChannelResource {
 		throws Exception;
 
 	public void deleteProductConfigurationListChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteProductConfigurationListChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ProductConfigurationListChannel>
@@ -100,12 +100,12 @@ public interface ProductConfigurationListChannelResource {
 
 	public void
 			postProductConfigurationListIdProductConfigurationListChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductConfigurationListIdProductConfigurationListChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -328,12 +328,12 @@ public interface ProductConfigurationListChannelResource {
 		}
 
 		public void deleteProductConfigurationListChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteProductConfigurationListChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -385,12 +385,12 @@ public interface ProductConfigurationListChannelResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductConfigurationListChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -911,12 +911,12 @@ public interface ProductConfigurationListChannelResource {
 
 		public void
 				postProductConfigurationListIdProductConfigurationListChannelBatch(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductConfigurationListIdProductConfigurationListChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -968,12 +968,12 @@ public interface ProductConfigurationListChannelResource {
 
 		public HttpInvoker.HttpResponse
 				postProductConfigurationListIdProductConfigurationListChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

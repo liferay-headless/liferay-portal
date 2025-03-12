@@ -48,7 +48,8 @@ public interface FormDocumentResource {
 
 	public void deleteFormDocument(Long formDocumentId) throws Exception;
 
-	public Response deleteFormDocumentBatch(String callbackURL, Object object)
+	public Response deleteFormDocumentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public FormDocument getFormDocument(Long formDocumentId) throws Exception;

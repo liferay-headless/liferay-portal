@@ -50,7 +50,7 @@ public interface PinResource {
 
 	public void deletePin(Long pinId) throws Exception;
 
-	public Response deletePinBatch(String callbackURL, Object object)
+	public Response deletePinBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Pin patchPin(Long pinId, Pin pin) throws Exception;
@@ -70,7 +70,8 @@ public interface PinResource {
 
 	public Pin postProductIdPin(Long id, Pin pin) throws Exception;
 
-	public Response postProductIdPinBatch(String callbackURL, Object object)
+	public Response postProductIdPinBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

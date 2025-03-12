@@ -58,11 +58,11 @@ public interface TestEntityResource {
 			TestEntity testEntity)
 		throws Exception;
 
-	public void postTestEntityBatch(String callbackURL, Object object)
+	public void postTestEntityBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postTestEntityBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Integer getTestEntityCount() throws Exception;
@@ -92,11 +92,11 @@ public interface TestEntityResource {
 		throws Exception;
 
 	public void putTestEntityBatch(
-			Long optionalParameter, String callbackURL, Object object)
+			Long optionalParameter, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putTestEntityBatchHttpResponse(
-			Long optionalParameter, String callbackURL, Object object)
+			Long optionalParameter, String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -615,11 +615,12 @@ public interface TestEntityResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postTestEntityBatch(String callbackURL, Object object)
+		public void postTestEntityBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postTestEntityBatchHttpResponse(callbackURL, object);
+				postTestEntityBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -670,12 +671,12 @@ public interface TestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse postTestEntityBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1148,12 +1149,13 @@ public interface TestEntityResource {
 		}
 
 		public void putTestEntityBatch(
-				Long optionalParameter, String callbackURL, Object object)
+				Long optionalParameter, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putTestEntityBatchHttpResponse(
-					optionalParameter, callbackURL, object);
+					optionalParameter, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1204,12 +1206,13 @@ public interface TestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse putTestEntityBatchHttpResponse(
-				Long optionalParameter, String callbackURL, Object object)
+				Long optionalParameter, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

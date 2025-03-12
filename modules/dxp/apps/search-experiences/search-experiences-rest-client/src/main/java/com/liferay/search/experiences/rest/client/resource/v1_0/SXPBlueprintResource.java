@@ -63,11 +63,11 @@ public interface SXPBlueprintResource {
 		throws Exception;
 
 	public void postSXPBlueprintBatch(
-			SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+			SXPBlueprint sxpBlueprint, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSXPBlueprintBatchHttpResponse(
-			SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+			SXPBlueprint sxpBlueprint, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPBlueprint getSXPBlueprintByExternalReferenceCode(
@@ -102,11 +102,11 @@ public interface SXPBlueprintResource {
 		throws Exception;
 
 	public void deleteSXPBlueprintBatch(
-			Long sxpBlueprintId, String callbackURL, Object object)
+			Long sxpBlueprintId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSXPBlueprintBatchHttpResponse(
-			Long sxpBlueprintId, String callbackURL, Object object)
+			Long sxpBlueprintId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPBlueprint getSXPBlueprint(Long sxpBlueprintId) throws Exception;
@@ -133,12 +133,12 @@ public interface SXPBlueprintResource {
 
 	public void putSXPBlueprintBatch(
 			Long sxpBlueprintId, SXPBlueprint sxpBlueprint, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putSXPBlueprintBatchHttpResponse(
 			Long sxpBlueprintId, SXPBlueprint sxpBlueprint, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public SXPBlueprint postSXPBlueprintCopy(Long sxpBlueprintId)
@@ -621,12 +621,13 @@ public interface SXPBlueprintResource {
 		}
 
 		public void postSXPBlueprintBatch(
-				SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+				SXPBlueprint sxpBlueprint, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSXPBlueprintBatchHttpResponse(
-					sxpBlueprint, callbackURL, object);
+					sxpBlueprint, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -677,12 +678,13 @@ public interface SXPBlueprintResource {
 		}
 
 		public HttpInvoker.HttpResponse postSXPBlueprintBatchHttpResponse(
-				SXPBlueprint sxpBlueprint, String callbackURL, Object object)
+				SXPBlueprint sxpBlueprint, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1148,12 +1150,12 @@ public interface SXPBlueprintResource {
 		}
 
 		public void deleteSXPBlueprintBatch(
-				Long sxpBlueprintId, String callbackURL, Object object)
+				Long sxpBlueprintId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteSXPBlueprintBatchHttpResponse(
-					sxpBlueprintId, callbackURL, object);
+					sxpBlueprintId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1204,12 +1206,12 @@ public interface SXPBlueprintResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSXPBlueprintBatchHttpResponse(
-				Long sxpBlueprintId, String callbackURL, Object object)
+				Long sxpBlueprintId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1573,12 +1575,12 @@ public interface SXPBlueprintResource {
 
 		public void putSXPBlueprintBatch(
 				Long sxpBlueprintId, SXPBlueprint sxpBlueprint,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putSXPBlueprintBatchHttpResponse(
-					sxpBlueprintId, sxpBlueprint, callbackURL, object);
+					sxpBlueprintId, sxpBlueprint, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1630,12 +1632,12 @@ public interface SXPBlueprintResource {
 
 		public HttpInvoker.HttpResponse putSXPBlueprintBatchHttpResponse(
 				Long sxpBlueprintId, SXPBlueprint sxpBlueprint,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

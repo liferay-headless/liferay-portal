@@ -62,7 +62,8 @@ public interface PriceEntryResource {
 
 	public Response deletePriceEntry(Long id) throws Exception;
 
-	public Response deletePriceEntryBatch(String callbackURL, Object object)
+	public Response deletePriceEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public PriceEntry getPriceEntry(Long id) throws Exception;
@@ -86,7 +87,7 @@ public interface PriceEntryResource {
 		throws Exception;
 
 	public Response postPriceListIdPriceEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

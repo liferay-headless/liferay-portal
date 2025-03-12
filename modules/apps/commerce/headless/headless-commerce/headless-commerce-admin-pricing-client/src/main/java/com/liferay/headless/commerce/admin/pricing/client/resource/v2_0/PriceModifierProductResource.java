@@ -42,11 +42,11 @@ public interface PriceModifierProductResource {
 		throws Exception;
 
 	public void deletePriceModifierProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceModifierProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceModifierProduct>
@@ -93,12 +93,12 @@ public interface PriceModifierProductResource {
 		throws Exception;
 
 	public void postPriceModifierIdPriceModifierProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPriceModifierIdPriceModifierProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -316,12 +316,12 @@ public interface PriceModifierProductResource {
 		}
 
 		public void deletePriceModifierProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deletePriceModifierProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -373,12 +373,12 @@ public interface PriceModifierProductResource {
 
 		public HttpInvoker.HttpResponse
 				deletePriceModifierProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -889,12 +889,12 @@ public interface PriceModifierProductResource {
 		}
 
 		public void postPriceModifierIdPriceModifierProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPriceModifierIdPriceModifierProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -946,12 +946,12 @@ public interface PriceModifierProductResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceModifierIdPriceModifierProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

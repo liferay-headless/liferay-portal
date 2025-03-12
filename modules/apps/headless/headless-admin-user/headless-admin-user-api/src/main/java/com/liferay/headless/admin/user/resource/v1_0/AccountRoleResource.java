@@ -133,7 +133,7 @@ public interface AccountRoleResource {
 		throws Exception;
 
 	public Response postAccountAccountRoleBatch(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountAccountRoleUserAccountAssociation(

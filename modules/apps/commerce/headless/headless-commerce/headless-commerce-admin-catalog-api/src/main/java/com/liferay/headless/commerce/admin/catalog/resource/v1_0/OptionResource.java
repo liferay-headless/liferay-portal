@@ -59,7 +59,7 @@ public interface OptionResource {
 
 	public Option postOption(Option option) throws Exception;
 
-	public Response postOptionBatch(String callbackURL, Object object)
+	public Response postOptionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response deleteOptionByExternalReferenceCode(
@@ -79,7 +79,7 @@ public interface OptionResource {
 
 	public Response deleteOption(Long id) throws Exception;
 
-	public Response deleteOptionBatch(String callbackURL, Object object)
+	public Response deleteOptionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Option getOption(Long id) throws Exception;

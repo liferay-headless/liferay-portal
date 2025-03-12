@@ -56,7 +56,8 @@ public interface SiteTestEntityResource {
 			Long siteTestEntityId, SiteTestEntity siteTestEntity)
 		throws Exception;
 
-	public Response putSiteTestEntityBatch(String callbackURL, Object object)
+	public Response putSiteTestEntityBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -83,7 +84,7 @@ public interface SiteTestEntityResource {
 		throws Exception;
 
 	public Response postSiteSiteTestEntityBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SiteTestEntity getSiteSiteTestEntityByExternalReferenceCode(

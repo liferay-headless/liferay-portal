@@ -63,11 +63,11 @@ public interface CTProcessResource {
 		throws Exception;
 
 	public void deleteCTProcessBatch(
-			Long ctProcessId, String callbackURL, Object object)
+			Long ctProcessId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCTProcessBatchHttpResponse(
-			Long ctProcessId, String callbackURL, Object object)
+			Long ctProcessId, String callbackURL, String contentString)
 		throws Exception;
 
 	public CTProcess getCTProcess(Long ctProcessId) throws Exception;
@@ -561,12 +561,12 @@ public interface CTProcessResource {
 		}
 
 		public void deleteCTProcessBatch(
-				Long ctProcessId, String callbackURL, Object object)
+				Long ctProcessId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteCTProcessBatchHttpResponse(
-					ctProcessId, callbackURL, object);
+					ctProcessId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -617,12 +617,12 @@ public interface CTProcessResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCTProcessBatchHttpResponse(
-				Long ctProcessId, String callbackURL, Object object)
+				Long ctProcessId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

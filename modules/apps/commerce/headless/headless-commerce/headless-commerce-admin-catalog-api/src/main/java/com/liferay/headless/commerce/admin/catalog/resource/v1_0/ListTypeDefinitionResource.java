@@ -56,7 +56,7 @@ public interface ListTypeDefinitionResource {
 		throws Exception;
 
 	public Response postSpecificationIdListTypeDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSpecificationListTypeDefinition(

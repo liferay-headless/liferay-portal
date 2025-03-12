@@ -42,11 +42,11 @@ public interface DiscountProductGroupResource {
 		throws Exception;
 
 	public void deleteDiscountProductGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountProductGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountProductGroup>
@@ -92,12 +92,12 @@ public interface DiscountProductGroupResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountProductGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDiscountIdDiscountProductGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -315,12 +315,12 @@ public interface DiscountProductGroupResource {
 		}
 
 		public void deleteDiscountProductGroupBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteDiscountProductGroupBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -372,12 +372,12 @@ public interface DiscountProductGroupResource {
 
 		public HttpInvoker.HttpResponse
 				deleteDiscountProductGroupBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -888,12 +888,12 @@ public interface DiscountProductGroupResource {
 		}
 
 		public void postDiscountIdDiscountProductGroupBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDiscountIdDiscountProductGroupBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -945,12 +945,12 @@ public interface DiscountProductGroupResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountProductGroupBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

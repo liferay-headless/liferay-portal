@@ -66,7 +66,7 @@ public interface TaxonomyCategoryResource {
 		throws Exception;
 
 	public Response deleteTaxonomyCategoryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxonomyCategory getTaxonomyCategory(String taxonomyCategoryId)
@@ -80,7 +80,8 @@ public interface TaxonomyCategoryResource {
 			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
-	public Response putTaxonomyCategoryBatch(String callbackURL, Object object)
+	public Response putTaxonomyCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
@@ -111,7 +112,7 @@ public interface TaxonomyCategoryResource {
 		throws Exception;
 
 	public Response postTaxonomyVocabularyTaxonomyCategoryBatch(
-			Long taxonomyVocabularyId, String callbackURL, Object object)
+			Long taxonomyVocabularyId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(

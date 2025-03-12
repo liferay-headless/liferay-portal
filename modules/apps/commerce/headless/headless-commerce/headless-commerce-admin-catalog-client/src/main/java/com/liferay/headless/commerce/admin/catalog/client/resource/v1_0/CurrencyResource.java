@@ -59,11 +59,11 @@ public interface CurrencyResource {
 	public HttpInvoker.HttpResponse postCurrencyHttpResponse(Currency currency)
 		throws Exception;
 
-	public void postCurrencyBatch(String callbackURL, Object object)
+	public void postCurrencyBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCurrencyBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteCurrencyByExternalReferenceCode(
@@ -98,11 +98,11 @@ public interface CurrencyResource {
 	public HttpInvoker.HttpResponse deleteCurrencyHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteCurrencyBatch(String callbackURL, Object object)
+	public void deleteCurrencyBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCurrencyBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Currency getCurrency(Long id) throws Exception;
@@ -579,11 +579,11 @@ public interface CurrencyResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postCurrencyBatch(String callbackURL, Object object)
+		public void postCurrencyBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postCurrencyBatchHttpResponse(callbackURL, object);
+				postCurrencyBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -634,12 +634,12 @@ public interface CurrencyResource {
 		}
 
 		public HttpInvoker.HttpResponse postCurrencyBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1106,11 +1106,12 @@ public interface CurrencyResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCurrencyBatch(String callbackURL, Object object)
+		public void deleteCurrencyBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCurrencyBatchHttpResponse(callbackURL, object);
+				deleteCurrencyBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1161,12 +1162,12 @@ public interface CurrencyResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCurrencyBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

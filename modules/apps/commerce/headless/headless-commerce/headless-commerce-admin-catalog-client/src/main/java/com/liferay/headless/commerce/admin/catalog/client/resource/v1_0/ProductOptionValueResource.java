@@ -40,11 +40,12 @@ public interface ProductOptionValueResource {
 			Long id)
 		throws Exception;
 
-	public void deleteProductOptionValueBatch(String callbackURL, Object object)
+	public void deleteProductOptionValueBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductOptionValueBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductOptionValue getProductOptionValue(Long id) throws Exception;
@@ -80,12 +81,12 @@ public interface ProductOptionValueResource {
 		throws Exception;
 
 	public void postProductOptionIdProductOptionValueBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductOptionIdProductOptionValueBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -301,11 +302,12 @@ public interface ProductOptionValueResource {
 		}
 
 		public void deleteProductOptionValueBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductOptionValueBatchHttpResponse(callbackURL, object);
+				deleteProductOptionValueBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -357,12 +359,12 @@ public interface ProductOptionValueResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductOptionValueBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -851,12 +853,12 @@ public interface ProductOptionValueResource {
 		}
 
 		public void postProductOptionIdProductOptionValueBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductOptionIdProductOptionValueBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -908,12 +910,12 @@ public interface ProductOptionValueResource {
 
 		public HttpInvoker.HttpResponse
 				postProductOptionIdProductOptionValueBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -59,11 +59,11 @@ public interface SLAResource {
 		throws Exception;
 
 	public void postProcessSLABatch(
-			Long processId, SLA sla, String callbackURL, Object object)
+			Long processId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProcessSLABatchHttpResponse(
-			Long processId, SLA sla, String callbackURL, Object object)
+			Long processId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSLA(Long slaId) throws Exception;
@@ -71,11 +71,12 @@ public interface SLAResource {
 	public HttpInvoker.HttpResponse deleteSLAHttpResponse(Long slaId)
 		throws Exception;
 
-	public void deleteSLABatch(Long slaId, String callbackURL, Object object)
+	public void deleteSLABatch(
+			Long slaId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSLABatchHttpResponse(
-			Long slaId, String callbackURL, Object object)
+			Long slaId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SLA getSLA(Long slaId) throws Exception;
@@ -89,11 +90,11 @@ public interface SLAResource {
 		throws Exception;
 
 	public void putSLABatch(
-			Long slaId, SLA sla, String callbackURL, Object object)
+			Long slaId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putSLABatchHttpResponse(
-			Long slaId, SLA sla, String callbackURL, Object object)
+			Long slaId, SLA sla, String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -546,12 +547,13 @@ public interface SLAResource {
 		}
 
 		public void postProcessSLABatch(
-				Long processId, SLA sla, String callbackURL, Object object)
+				Long processId, SLA sla, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProcessSLABatchHttpResponse(
-					processId, sla, callbackURL, object);
+					processId, sla, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -602,12 +604,13 @@ public interface SLAResource {
 		}
 
 		public HttpInvoker.HttpResponse postProcessSLABatchHttpResponse(
-				Long processId, SLA sla, String callbackURL, Object object)
+				Long processId, SLA sla, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -751,11 +754,11 @@ public interface SLAResource {
 		}
 
 		public void deleteSLABatch(
-				Long slaId, String callbackURL, Object object)
+				Long slaId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = deleteSLABatchHttpResponse(
-				slaId, callbackURL, object);
+				slaId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -806,12 +809,12 @@ public interface SLAResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSLABatchHttpResponse(
-				Long slaId, String callbackURL, Object object)
+				Long slaId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1058,11 +1061,11 @@ public interface SLAResource {
 		}
 
 		public void putSLABatch(
-				Long slaId, SLA sla, String callbackURL, Object object)
+				Long slaId, SLA sla, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putSLABatchHttpResponse(
-				slaId, sla, callbackURL, object);
+				slaId, sla, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1113,12 +1116,12 @@ public interface SLAResource {
 		}
 
 		public HttpInvoker.HttpResponse putSLABatchHttpResponse(
-				Long slaId, SLA sla, String callbackURL, Object object)
+				Long slaId, SLA sla, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

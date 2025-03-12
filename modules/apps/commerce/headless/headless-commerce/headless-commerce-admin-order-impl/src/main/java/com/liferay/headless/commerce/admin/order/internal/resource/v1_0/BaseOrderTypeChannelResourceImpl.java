@@ -127,7 +127,7 @@ public abstract class BaseOrderTypeChannelResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -339,7 +339,7 @@ public abstract class BaseOrderTypeChannelResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -354,7 +354,8 @@ public abstract class BaseOrderTypeChannelResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				OrderTypeChannel.class.getName(), callbackURL, null, object)
+				OrderTypeChannel.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

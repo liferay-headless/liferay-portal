@@ -97,7 +97,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createNotificationQueueEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -105,7 +105,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			notificationQueueEntryResource ->
 				notificationQueueEntryResource.postNotificationQueueEntryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -127,7 +127,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteNotificationQueueEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -135,7 +135,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			notificationQueueEntryResource ->
 				notificationQueueEntryResource.
-					deleteNotificationQueueEntryBatch(callbackURL, object));
+					deleteNotificationQueueEntryBatch(
+						callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -195,7 +196,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createNotificationTemplateBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -203,7 +204,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			notificationTemplateResource ->
 				notificationTemplateResource.postNotificationTemplateBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -242,7 +243,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteNotificationTemplateBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -250,7 +251,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			notificationTemplateResource ->
 				notificationTemplateResource.deleteNotificationTemplateBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -286,7 +287,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateNotificationTemplateBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -294,7 +295,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			notificationTemplateResource ->
 				notificationTemplateResource.putNotificationTemplateBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField

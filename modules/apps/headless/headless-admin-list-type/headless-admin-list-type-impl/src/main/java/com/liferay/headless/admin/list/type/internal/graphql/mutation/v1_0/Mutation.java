@@ -97,7 +97,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createListTypeDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -105,7 +105,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeDefinitionResource ->
 				listTypeDefinitionResource.postListTypeDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -142,7 +142,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteListTypeDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -150,7 +150,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeDefinitionResource ->
 				listTypeDefinitionResource.deleteListTypeDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -186,7 +186,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateListTypeDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -194,7 +194,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeDefinitionResource ->
 				listTypeDefinitionResource.putListTypeDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -257,7 +257,7 @@ public class Mutation {
 	public Response createListTypeDefinitionListTypeEntryBatch(
 			@GraphQLName("listTypeDefinitionId") Long listTypeDefinitionId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -265,7 +265,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeEntryResource ->
 				listTypeEntryResource.postListTypeDefinitionListTypeEntryBatch(
-					listTypeDefinitionId, callbackURL, object));
+					listTypeDefinitionId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -285,7 +285,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteListTypeEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -293,7 +293,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeEntryResource ->
 				listTypeEntryResource.deleteListTypeEntryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -312,7 +312,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateListTypeEntryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -320,7 +320,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			listTypeEntryResource ->
 				listTypeEntryResource.putListTypeEntryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

@@ -94,11 +94,12 @@ public interface EmailAddressResource {
 			Long emailAddressId)
 		throws Exception;
 
-	public void deleteEmailAddressBatch(String callbackURL, Object object)
+	public void deleteEmailAddressBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteEmailAddressBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public EmailAddress getEmailAddress(Long emailAddressId) throws Exception;
@@ -1040,11 +1041,12 @@ public interface EmailAddressResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteEmailAddressBatch(String callbackURL, Object object)
+		public void deleteEmailAddressBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteEmailAddressBatchHttpResponse(callbackURL, object);
+				deleteEmailAddressBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1095,12 +1097,12 @@ public interface EmailAddressResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteEmailAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

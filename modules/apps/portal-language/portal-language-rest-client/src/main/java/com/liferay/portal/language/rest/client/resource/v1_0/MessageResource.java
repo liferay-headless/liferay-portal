@@ -41,11 +41,13 @@ public interface MessageResource {
 		throws Exception;
 
 	public void deleteMessageBatch(
-			String key, String languageId, String callbackURL, Object object)
+			String key, String languageId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMessageBatchHttpResponse(
-			String key, String languageId, String callbackURL, Object object)
+			String key, String languageId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public Message getMessage(String key, String languageId) throws Exception;
@@ -59,11 +61,11 @@ public interface MessageResource {
 	public HttpInvoker.HttpResponse postMessageHttpResponse(Message message)
 		throws Exception;
 
-	public void postMessageBatch(String callbackURL, Object object)
+	public void postMessageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postMessageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Message putMessage(Message message) throws Exception;
@@ -71,11 +73,11 @@ public interface MessageResource {
 	public HttpInvoker.HttpResponse putMessageHttpResponse(Message message)
 		throws Exception;
 
-	public void putMessageBatch(String callbackURL, Object object)
+	public void putMessageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putMessageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void postMessageImport(
@@ -309,12 +311,12 @@ public interface MessageResource {
 
 		public void deleteMessageBatch(
 				String key, String languageId, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteMessageBatchHttpResponse(
-					key, languageId, callbackURL, object);
+					key, languageId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +368,12 @@ public interface MessageResource {
 
 		public HttpInvoker.HttpResponse deleteMessageBatchHttpResponse(
 				String key, String languageId, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -631,11 +633,11 @@ public interface MessageResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postMessageBatch(String callbackURL, Object object)
+		public void postMessageBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postMessageBatchHttpResponse(callbackURL, object);
+				postMessageBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -686,12 +688,12 @@ public interface MessageResource {
 		}
 
 		public HttpInvoker.HttpResponse postMessageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -832,11 +834,11 @@ public interface MessageResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putMessageBatch(String callbackURL, Object object)
+		public void putMessageBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putMessageBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -887,12 +889,12 @@ public interface MessageResource {
 		}
 
 		public HttpInvoker.HttpResponse putMessageBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

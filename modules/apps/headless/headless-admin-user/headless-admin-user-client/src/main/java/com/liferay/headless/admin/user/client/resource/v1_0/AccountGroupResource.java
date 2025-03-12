@@ -62,11 +62,11 @@ public interface AccountGroupResource {
 			AccountGroup accountGroup)
 		throws Exception;
 
-	public void postAccountGroupBatch(String callbackURL, Object object)
+	public void postAccountGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAccountGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void
@@ -135,11 +135,12 @@ public interface AccountGroupResource {
 			Long accountGroupId)
 		throws Exception;
 
-	public void deleteAccountGroupBatch(String callbackURL, Object object)
+	public void deleteAccountGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteAccountGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AccountGroup getAccountGroup(Long accountGroupId) throws Exception;
@@ -164,11 +165,11 @@ public interface AccountGroupResource {
 			Long accountGroupId, AccountGroup accountGroup)
 		throws Exception;
 
-	public void putAccountGroupBatch(String callbackURL, Object object)
+	public void putAccountGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putAccountGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AccountGroup>
@@ -666,11 +667,12 @@ public interface AccountGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postAccountGroupBatch(String callbackURL, Object object)
+		public void postAccountGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postAccountGroupBatchHttpResponse(callbackURL, object);
+				postAccountGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -721,12 +723,12 @@ public interface AccountGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse postAccountGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1532,11 +1534,12 @@ public interface AccountGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteAccountGroupBatch(String callbackURL, Object object)
+		public void deleteAccountGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteAccountGroupBatchHttpResponse(callbackURL, object);
+				deleteAccountGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1587,12 +1590,12 @@ public interface AccountGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteAccountGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1952,11 +1955,12 @@ public interface AccountGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putAccountGroupBatch(String callbackURL, Object object)
+		public void putAccountGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putAccountGroupBatchHttpResponse(callbackURL, object);
+				putAccountGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2007,12 +2011,12 @@ public interface AccountGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse putAccountGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

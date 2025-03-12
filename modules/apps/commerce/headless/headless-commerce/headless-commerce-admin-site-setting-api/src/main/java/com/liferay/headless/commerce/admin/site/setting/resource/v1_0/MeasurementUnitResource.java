@@ -60,7 +60,8 @@ public interface MeasurementUnitResource {
 	public MeasurementUnit postMeasurementUnit(MeasurementUnit measurementUnit)
 		throws Exception;
 
-	public Response postMeasurementUnitBatch(String callbackURL, Object object)
+	public Response postMeasurementUnitBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteMeasurementUnitByExternalReferenceCode(
@@ -94,7 +95,7 @@ public interface MeasurementUnitResource {
 	public void deleteMeasurementUnit(Long id) throws Exception;
 
 	public Response deleteMeasurementUnitBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MeasurementUnit getMeasurementUnit(Long id) throws Exception;

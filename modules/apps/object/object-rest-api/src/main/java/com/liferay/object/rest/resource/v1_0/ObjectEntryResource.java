@@ -58,7 +58,8 @@ public interface ObjectEntryResource {
 	public ObjectEntry postObjectEntry(ObjectEntry objectEntry)
 		throws Exception;
 
-	public Response postObjectEntryBatch(String callbackURL, Object object)
+	public Response postObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectEntry
@@ -114,7 +115,8 @@ public interface ObjectEntryResource {
 
 	public void deleteObjectEntry(Long objectEntryId) throws Exception;
 
-	public Response deleteObjectEntryBatch(String callbackURL, Object object)
+	public Response deleteObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectEntry getObjectEntry(Long objectEntryId) throws Exception;
@@ -127,7 +129,8 @@ public interface ObjectEntryResource {
 			Long objectEntryId, ObjectEntry objectEntry)
 		throws Exception;
 
-	public Response putObjectEntryBatch(String callbackURL, Object object)
+	public Response putObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putObjectEntryObjectActionObjectActionName(

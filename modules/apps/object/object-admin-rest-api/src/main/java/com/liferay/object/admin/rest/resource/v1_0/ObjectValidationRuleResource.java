@@ -76,14 +76,14 @@ public interface ObjectValidationRuleResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectValidationRuleBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteObjectValidationRule(Long objectValidationRuleId)
 		throws Exception;
 
 	public Response deleteObjectValidationRuleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectValidationRule getObjectValidationRule(
@@ -101,7 +101,7 @@ public interface ObjectValidationRuleResource {
 		throws Exception;
 
 	public Response putObjectValidationRuleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

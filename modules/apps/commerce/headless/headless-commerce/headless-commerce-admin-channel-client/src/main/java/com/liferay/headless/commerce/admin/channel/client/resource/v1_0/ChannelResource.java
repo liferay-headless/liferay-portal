@@ -66,11 +66,11 @@ public interface ChannelResource {
 	public HttpInvoker.HttpResponse postChannelHttpResponse(Channel channel)
 		throws Exception;
 
-	public void postChannelBatch(String callbackURL, Object object)
+	public void postChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteChannelByExternalReferenceCode(
@@ -114,11 +114,11 @@ public interface ChannelResource {
 	public HttpInvoker.HttpResponse deleteChannelHttpResponse(Long channelId)
 		throws Exception;
 
-	public void deleteChannelBatch(String callbackURL, Object object)
+	public void deleteChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Channel getChannel(Long channelId) throws Exception;
@@ -139,11 +139,11 @@ public interface ChannelResource {
 			Long channelId, Channel channel)
 		throws Exception;
 
-	public void putChannelBatch(String callbackURL, Object object)
+	public void putChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -715,11 +715,11 @@ public interface ChannelResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postChannelBatch(String callbackURL, Object object)
+		public void postChannelBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postChannelBatchHttpResponse(callbackURL, object);
+				postChannelBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -770,12 +770,12 @@ public interface ChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse postChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1353,11 +1353,11 @@ public interface ChannelResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteChannelBatch(String callbackURL, Object object)
+		public void deleteChannelBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteChannelBatchHttpResponse(callbackURL, object);
+				deleteChannelBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1408,12 +1408,12 @@ public interface ChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1768,11 +1768,11 @@ public interface ChannelResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putChannelBatch(String callbackURL, Object object)
+		public void putChannelBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putChannelBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1823,12 +1823,12 @@ public interface ChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse putChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

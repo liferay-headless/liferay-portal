@@ -63,7 +63,8 @@ public interface ObjectDefinitionResource {
 			ObjectDefinition objectDefinition)
 		throws Exception;
 
-	public Response postObjectDefinitionBatch(String callbackURL, Object object)
+	public Response postObjectDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
@@ -78,7 +79,7 @@ public interface ObjectDefinitionResource {
 		throws Exception;
 
 	public Response deleteObjectDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectDefinition getObjectDefinition(Long objectDefinitionId)
@@ -92,7 +93,8 @@ public interface ObjectDefinitionResource {
 			Long objectDefinitionId, ObjectDefinition objectDefinition)
 		throws Exception;
 
-	public Response putObjectDefinitionBatch(String callbackURL, Object object)
+	public Response putObjectDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectDefinition postObjectDefinitionPublish(Long objectDefinitionId)

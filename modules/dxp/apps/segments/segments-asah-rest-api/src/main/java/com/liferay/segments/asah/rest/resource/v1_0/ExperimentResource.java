@@ -48,7 +48,8 @@ public interface ExperimentResource {
 
 	public void deleteExperiment(String experimentId) throws Exception;
 
-	public Response deleteExperimentBatch(String callbackURL, Object object)
+	public Response deleteExperimentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Experiment getExperiment(String experimentId) throws Exception;

@@ -41,11 +41,12 @@ public interface PriceListOrderTypeResource {
 			Long priceListOrderTypeId)
 		throws Exception;
 
-	public void deletePriceListOrderTypeBatch(String callbackURL, Object object)
+	public void deletePriceListOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceListOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceListOrderType>
@@ -89,12 +90,12 @@ public interface PriceListOrderTypeResource {
 		throws Exception;
 
 	public void postPriceListIdPriceListOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPriceListIdPriceListOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -312,11 +313,12 @@ public interface PriceListOrderTypeResource {
 		}
 
 		public void deletePriceListOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePriceListOrderTypeBatchHttpResponse(callbackURL, object);
+				deletePriceListOrderTypeBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -368,12 +370,12 @@ public interface PriceListOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				deletePriceListOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -871,12 +873,12 @@ public interface PriceListOrderTypeResource {
 		}
 
 		public void postPriceListIdPriceListOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPriceListIdPriceListOrderTypeBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -928,12 +930,12 @@ public interface PriceListOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceListIdPriceListOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -92,12 +92,13 @@ public interface ObjectRelationshipResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectRelationshipBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectRelationshipBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public ObjectRelationship putObjectRelationshipByExternalReferenceCode(
@@ -117,11 +118,12 @@ public interface ObjectRelationshipResource {
 			Long objectRelationshipId)
 		throws Exception;
 
-	public void deleteObjectRelationshipBatch(String callbackURL, Object object)
+	public void deleteObjectRelationshipBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectRelationshipBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectRelationship getObjectRelationship(Long objectRelationshipId)
@@ -139,11 +141,12 @@ public interface ObjectRelationshipResource {
 			Long objectRelationshipId, ObjectRelationship objectRelationship)
 		throws Exception;
 
-	public void putObjectRelationshipBatch(String callbackURL, Object object)
+	public void putObjectRelationshipBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectRelationshipBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -874,12 +877,13 @@ public interface ObjectRelationshipResource {
 		}
 
 		public void postObjectDefinitionObjectRelationshipBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectRelationshipBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -931,12 +935,13 @@ public interface ObjectRelationshipResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectRelationshipBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1195,11 +1200,12 @@ public interface ObjectRelationshipResource {
 		}
 
 		public void deleteObjectRelationshipBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectRelationshipBatchHttpResponse(callbackURL, object);
+				deleteObjectRelationshipBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1251,12 +1257,12 @@ public interface ObjectRelationshipResource {
 
 		public HttpInvoker.HttpResponse
 				deleteObjectRelationshipBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1513,11 +1519,12 @@ public interface ObjectRelationshipResource {
 		}
 
 		public void putObjectRelationshipBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectRelationshipBatchHttpResponse(callbackURL, object);
+				putObjectRelationshipBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1568,12 +1575,12 @@ public interface ObjectRelationshipResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectRelationshipBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

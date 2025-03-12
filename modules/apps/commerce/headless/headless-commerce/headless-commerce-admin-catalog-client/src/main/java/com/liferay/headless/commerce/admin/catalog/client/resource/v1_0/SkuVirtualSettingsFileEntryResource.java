@@ -43,12 +43,12 @@ public interface SkuVirtualSettingsFileEntryResource {
 		throws Exception;
 
 	public void deleteSkuVirtualSettingsFileEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteSkuVirtualSettingsFileEntryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public SkuVirtualSettingsFileEntry getSkuVirtualSettingsFileEntry(Long id)
@@ -309,12 +309,12 @@ public interface SkuVirtualSettingsFileEntryResource {
 		}
 
 		public void deleteSkuVirtualSettingsFileEntryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteSkuVirtualSettingsFileEntryBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +366,12 @@ public interface SkuVirtualSettingsFileEntryResource {
 
 		public HttpInvoker.HttpResponse
 				deleteSkuVirtualSettingsFileEntryBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

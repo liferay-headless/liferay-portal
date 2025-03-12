@@ -74,7 +74,7 @@ public interface AccountResource {
 
 	public Account postAccount(Account account) throws Exception;
 
-	public Response postAccountBatch(String callbackURL, Object object)
+	public Response postAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountByExternalReferenceCode(
@@ -95,7 +95,7 @@ public interface AccountResource {
 
 	public void deleteAccount(Long accountId) throws Exception;
 
-	public Response deleteAccountBatch(String callbackURL, Object object)
+	public Response deleteAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Account getAccount(Long accountId) throws Exception;
@@ -105,7 +105,7 @@ public interface AccountResource {
 
 	public Account putAccount(Long accountId, Account account) throws Exception;
 
-	public Response putAccountBatch(String callbackURL, Object object)
+	public Response putAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrganizationByExternalReferenceCodeAccounts(

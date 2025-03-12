@@ -40,11 +40,12 @@ public interface ObjectActionResource {
 			Long objectActionId)
 		throws Exception;
 
-	public void deleteObjectActionBatch(String callbackURL, Object object)
+	public void deleteObjectActionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectActionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectAction getObjectAction(Long objectActionId) throws Exception;
@@ -69,11 +70,11 @@ public interface ObjectActionResource {
 			Long objectActionId, ObjectAction objectAction)
 		throws Exception;
 
-	public void putObjectActionBatch(String callbackURL, Object object)
+	public void putObjectActionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectActionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ObjectAction>
@@ -129,12 +130,13 @@ public interface ObjectActionResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectActionBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectActionBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -349,11 +351,12 @@ public interface ObjectActionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectActionBatch(String callbackURL, Object object)
+		public void deleteObjectActionBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectActionBatchHttpResponse(callbackURL, object);
+				deleteObjectActionBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -404,12 +407,12 @@ public interface ObjectActionResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteObjectActionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -769,11 +772,12 @@ public interface ObjectActionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectActionBatch(String callbackURL, Object object)
+		public void putObjectActionBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectActionBatchHttpResponse(callbackURL, object);
+				putObjectActionBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -824,12 +828,12 @@ public interface ObjectActionResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectActionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1465,12 +1469,13 @@ public interface ObjectActionResource {
 		}
 
 		public void postObjectDefinitionObjectActionBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectActionBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1522,12 +1527,13 @@ public interface ObjectActionResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectActionBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

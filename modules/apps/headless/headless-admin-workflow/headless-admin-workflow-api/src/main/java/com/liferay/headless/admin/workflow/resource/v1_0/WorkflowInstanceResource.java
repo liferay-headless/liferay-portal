@@ -68,7 +68,7 @@ public interface WorkflowInstanceResource {
 		throws Exception;
 
 	public Response deleteWorkflowInstanceBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowInstance getWorkflowInstance(Long workflowInstanceId)

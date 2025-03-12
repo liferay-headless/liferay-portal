@@ -39,11 +39,12 @@ public interface ProductChannelResource {
 	public HttpInvoker.HttpResponse deleteProductChannelHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteProductChannelBatch(String callbackURL, Object object)
+	public void deleteProductChannelBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductChannel getProductChannel(Long id) throws Exception;
@@ -281,11 +282,13 @@ public interface ProductChannelResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteProductChannelBatch(String callbackURL, Object object)
+		public void deleteProductChannelBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductChannelBatchHttpResponse(callbackURL, object);
+				deleteProductChannelBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -336,12 +339,12 @@ public interface ProductChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteProductChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

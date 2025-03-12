@@ -52,7 +52,7 @@ public interface AccountAddressChannelResource {
 		throws Exception;
 
 	public Response deleteAccountAddressChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AccountAddressChannel>

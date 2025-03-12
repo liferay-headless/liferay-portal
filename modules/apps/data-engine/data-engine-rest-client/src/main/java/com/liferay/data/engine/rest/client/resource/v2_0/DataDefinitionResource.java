@@ -69,11 +69,12 @@ public interface DataDefinitionResource {
 			Long dataDefinitionId)
 		throws Exception;
 
-	public void deleteDataDefinitionBatch(String callbackURL, Object object)
+	public void deleteDataDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDataDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataDefinition getDataDefinition(Long dataDefinitionId)
@@ -99,11 +100,11 @@ public interface DataDefinitionResource {
 			Long dataDefinitionId, DataDefinition dataDefinition)
 		throws Exception;
 
-	public void putDataDefinitionBatch(String callbackURL, Object object)
+	public void putDataDefinitionBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDataDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataDefinition postDataDefinitionCopy(Long dataDefinitionId)
@@ -745,11 +746,13 @@ public interface DataDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDataDefinitionBatch(String callbackURL, Object object)
+		public void deleteDataDefinitionBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDataDefinitionBatchHttpResponse(callbackURL, object);
+				deleteDataDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -800,12 +803,12 @@ public interface DataDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDataDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1166,11 +1169,12 @@ public interface DataDefinitionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDataDefinitionBatch(String callbackURL, Object object)
+		public void putDataDefinitionBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDataDefinitionBatchHttpResponse(callbackURL, object);
+				putDataDefinitionBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1221,12 +1225,12 @@ public interface DataDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse putDataDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

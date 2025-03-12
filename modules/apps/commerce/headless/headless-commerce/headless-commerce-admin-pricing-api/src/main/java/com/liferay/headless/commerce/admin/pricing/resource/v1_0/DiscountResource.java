@@ -57,7 +57,7 @@ public interface DiscountResource {
 
 	public Discount postDiscount(Discount discount) throws Exception;
 
-	public Response postDiscountBatch(String callbackURL, Object object)
+	public Response postDiscountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response deleteDiscountByExternalReferenceCode(
@@ -78,7 +78,8 @@ public interface DiscountResource {
 
 	public Response deleteDiscount(Long id) throws Exception;
 
-	public Response deleteDiscountBatch(String callbackURL, Object object)
+	public Response deleteDiscountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Discount getDiscount(Long id) throws Exception;

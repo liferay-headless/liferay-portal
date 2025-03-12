@@ -61,11 +61,12 @@ public interface WorkflowDefinitionResource {
 			WorkflowDefinition workflowDefinition)
 		throws Exception;
 
-	public void postWorkflowDefinitionBatch(String callbackURL, Object object)
+	public void postWorkflowDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postWorkflowDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowDefinition getWorkflowDefinitionByName(
@@ -116,11 +117,12 @@ public interface WorkflowDefinitionResource {
 			Long workflowDefinitionId)
 		throws Exception;
 
-	public void deleteWorkflowDefinitionBatch(String callbackURL, Object object)
+	public void deleteWorkflowDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWorkflowDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowDefinition getWorkflowDefinition(Long workflowDefinitionId)
@@ -138,11 +140,12 @@ public interface WorkflowDefinitionResource {
 			Long workflowDefinitionId, WorkflowDefinition workflowDefinition)
 		throws Exception;
 
-	public void putWorkflowDefinitionBatch(String callbackURL, Object object)
+	public void putWorkflowDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putWorkflowDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -602,11 +605,12 @@ public interface WorkflowDefinitionResource {
 		}
 
 		public void postWorkflowDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postWorkflowDefinitionBatchHttpResponse(callbackURL, object);
+				postWorkflowDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -657,12 +661,12 @@ public interface WorkflowDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse postWorkflowDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1369,11 +1373,12 @@ public interface WorkflowDefinitionResource {
 		}
 
 		public void deleteWorkflowDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWorkflowDefinitionBatchHttpResponse(callbackURL, object);
+				deleteWorkflowDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1425,12 +1430,12 @@ public interface WorkflowDefinitionResource {
 
 		public HttpInvoker.HttpResponse
 				deleteWorkflowDefinitionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1687,11 +1692,12 @@ public interface WorkflowDefinitionResource {
 		}
 
 		public void putWorkflowDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putWorkflowDefinitionBatchHttpResponse(callbackURL, object);
+				putWorkflowDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1742,12 +1748,12 @@ public interface WorkflowDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse putWorkflowDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

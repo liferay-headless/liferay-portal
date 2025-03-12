@@ -66,11 +66,11 @@ public interface OptionValueResource {
 	public HttpInvoker.HttpResponse deleteOptionValueHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOptionValueBatch(String callbackURL, Object object)
+	public void deleteOptionValueBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOptionValueBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OptionValue getOptionValue(Long id) throws Exception;
@@ -120,11 +120,12 @@ public interface OptionValueResource {
 			Long id, OptionValue optionValue)
 		throws Exception;
 
-	public void postOptionIdOptionValueBatch(String callbackURL, Object object)
+	public void postOptionIdOptionValueBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOptionIdOptionValueBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -630,11 +631,12 @@ public interface OptionValueResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOptionValueBatch(String callbackURL, Object object)
+		public void deleteOptionValueBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOptionValueBatchHttpResponse(callbackURL, object);
+				deleteOptionValueBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -685,12 +687,12 @@ public interface OptionValueResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOptionValueBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1396,11 +1398,12 @@ public interface OptionValueResource {
 		}
 
 		public void postOptionIdOptionValueBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOptionIdOptionValueBatchHttpResponse(callbackURL, object);
+				postOptionIdOptionValueBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1452,12 +1455,12 @@ public interface OptionValueResource {
 
 		public HttpInvoker.HttpResponse
 				postOptionIdOptionValueBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

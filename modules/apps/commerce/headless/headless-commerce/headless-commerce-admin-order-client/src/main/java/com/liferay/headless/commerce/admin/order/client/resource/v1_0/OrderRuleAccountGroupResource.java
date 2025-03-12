@@ -42,12 +42,12 @@ public interface OrderRuleAccountGroupResource {
 		throws Exception;
 
 	public void deleteOrderRuleAccountGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteOrderRuleAccountGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderRuleAccountGroup>
@@ -93,12 +93,12 @@ public interface OrderRuleAccountGroupResource {
 		throws Exception;
 
 	public void postOrderRuleIdOrderRuleAccountGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postOrderRuleIdOrderRuleAccountGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -318,12 +318,12 @@ public interface OrderRuleAccountGroupResource {
 		}
 
 		public void deleteOrderRuleAccountGroupBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteOrderRuleAccountGroupBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -375,12 +375,12 @@ public interface OrderRuleAccountGroupResource {
 
 		public HttpInvoker.HttpResponse
 				deleteOrderRuleAccountGroupBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -891,12 +891,12 @@ public interface OrderRuleAccountGroupResource {
 		}
 
 		public void postOrderRuleIdOrderRuleAccountGroupBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postOrderRuleIdOrderRuleAccountGroupBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -948,12 +948,12 @@ public interface OrderRuleAccountGroupResource {
 
 		public HttpInvoker.HttpResponse
 				postOrderRuleIdOrderRuleAccountGroupBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

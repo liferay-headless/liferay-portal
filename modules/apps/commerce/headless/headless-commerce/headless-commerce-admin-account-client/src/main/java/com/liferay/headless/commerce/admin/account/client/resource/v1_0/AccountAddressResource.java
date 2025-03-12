@@ -66,11 +66,12 @@ public interface AccountAddressResource {
 	public HttpInvoker.HttpResponse deleteAccountAddressHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteAccountAddressBatch(String callbackURL, Object object)
+	public void deleteAccountAddressBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteAccountAddressBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AccountAddress getAccountAddress(Long id) throws Exception;
@@ -94,11 +95,11 @@ public interface AccountAddressResource {
 			Long id, AccountAddress accountAddress)
 		throws Exception;
 
-	public void putAccountAddressBatch(String callbackURL, Object object)
+	public void putAccountAddressBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putAccountAddressBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AccountAddress>
@@ -138,12 +139,12 @@ public interface AccountAddressResource {
 		throws Exception;
 
 	public void postAccountIdAccountAddressBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAccountIdAccountAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -651,11 +652,13 @@ public interface AccountAddressResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteAccountAddressBatch(String callbackURL, Object object)
+		public void deleteAccountAddressBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteAccountAddressBatchHttpResponse(callbackURL, object);
+				deleteAccountAddressBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -706,12 +709,12 @@ public interface AccountAddressResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteAccountAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1068,11 +1071,12 @@ public interface AccountAddressResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putAccountAddressBatch(String callbackURL, Object object)
+		public void putAccountAddressBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putAccountAddressBatchHttpResponse(callbackURL, object);
+				putAccountAddressBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1123,12 +1127,12 @@ public interface AccountAddressResource {
 		}
 
 		public HttpInvoker.HttpResponse putAccountAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1616,12 +1620,12 @@ public interface AccountAddressResource {
 		}
 
 		public void postAccountIdAccountAddressBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountIdAccountAddressBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1673,12 +1677,12 @@ public interface AccountAddressResource {
 
 		public HttpInvoker.HttpResponse
 				postAccountIdAccountAddressBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

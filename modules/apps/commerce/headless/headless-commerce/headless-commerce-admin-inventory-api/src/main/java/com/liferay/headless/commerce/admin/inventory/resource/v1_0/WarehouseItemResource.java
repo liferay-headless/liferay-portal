@@ -75,7 +75,8 @@ public interface WarehouseItemResource {
 
 	public void deleteWarehouseItem(Long id) throws Exception;
 
-	public Response deleteWarehouseItemBatch(String callbackURL, Object object)
+	public Response deleteWarehouseItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WarehouseItem getWarehouseItem(Long id) throws Exception;
@@ -101,7 +102,7 @@ public interface WarehouseItemResource {
 		throws Exception;
 
 	public Response postWarehouseIdWarehouseItemBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

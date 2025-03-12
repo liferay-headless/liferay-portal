@@ -51,12 +51,12 @@ public interface ListTypeDefinitionResource {
 		throws Exception;
 
 	public void postSpecificationIdListTypeDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postSpecificationIdListTypeDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSpecificationListTypeDefinition(
@@ -403,12 +403,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public void postSpecificationIdListTypeDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSpecificationIdListTypeDefinitionBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -460,12 +460,12 @@ public interface ListTypeDefinitionResource {
 
 		public HttpInvoker.HttpResponse
 				postSpecificationIdListTypeDefinitionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

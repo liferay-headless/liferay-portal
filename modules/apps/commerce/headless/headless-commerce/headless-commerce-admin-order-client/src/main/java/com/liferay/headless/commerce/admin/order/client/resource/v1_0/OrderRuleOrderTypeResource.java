@@ -41,11 +41,12 @@ public interface OrderRuleOrderTypeResource {
 			Long orderRuleOrderTypeId)
 		throws Exception;
 
-	public void deleteOrderRuleOrderTypeBatch(String callbackURL, Object object)
+	public void deleteOrderRuleOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderRuleOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderRuleOrderType>
@@ -89,12 +90,12 @@ public interface OrderRuleOrderTypeResource {
 		throws Exception;
 
 	public void postOrderRuleIdOrderRuleOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postOrderRuleIdOrderRuleOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -312,11 +313,12 @@ public interface OrderRuleOrderTypeResource {
 		}
 
 		public void deleteOrderRuleOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderRuleOrderTypeBatchHttpResponse(callbackURL, object);
+				deleteOrderRuleOrderTypeBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -368,12 +370,12 @@ public interface OrderRuleOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				deleteOrderRuleOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -871,12 +873,12 @@ public interface OrderRuleOrderTypeResource {
 		}
 
 		public void postOrderRuleIdOrderRuleOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postOrderRuleIdOrderRuleOrderTypeBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -928,12 +930,12 @@ public interface OrderRuleOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				postOrderRuleIdOrderRuleOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

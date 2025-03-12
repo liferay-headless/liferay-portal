@@ -72,7 +72,7 @@ public interface ProductDisplayPageResource {
 	public void deleteProductDisplayPage(Long id) throws Exception;
 
 	public Response deleteProductDisplayPageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductDisplayPage getProductDisplayPage(Long id) throws Exception;

@@ -60,7 +60,7 @@ public interface CartTransitionResource {
 		throws Exception;
 
 	public Response postCartCartTransitionBatch(
-			Long cartId, String callbackURL, Object object)
+			Long cartId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

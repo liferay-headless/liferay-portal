@@ -60,11 +60,11 @@ public interface ObjectFolderResource {
 			ObjectFolder objectFolder)
 		throws Exception;
 
-	public void postObjectFolderBatch(String callbackURL, Object object)
+	public void postObjectFolderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postObjectFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectFolder getObjectFolderByExternalReferenceCode(
@@ -91,11 +91,12 @@ public interface ObjectFolderResource {
 			Long objectFolderId)
 		throws Exception;
 
-	public void deleteObjectFolderBatch(String callbackURL, Object object)
+	public void deleteObjectFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectFolder getObjectFolder(Long objectFolderId) throws Exception;
@@ -120,11 +121,11 @@ public interface ObjectFolderResource {
 			Long objectFolderId, ObjectFolder objectFolder)
 		throws Exception;
 
-	public void putObjectFolderBatch(String callbackURL, Object object)
+	public void putObjectFolderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectFolderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -573,11 +574,12 @@ public interface ObjectFolderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postObjectFolderBatch(String callbackURL, Object object)
+		public void postObjectFolderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postObjectFolderBatchHttpResponse(callbackURL, object);
+				postObjectFolderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -628,12 +630,12 @@ public interface ObjectFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse postObjectFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -993,11 +995,12 @@ public interface ObjectFolderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectFolderBatch(String callbackURL, Object object)
+		public void deleteObjectFolderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectFolderBatchHttpResponse(callbackURL, object);
+				deleteObjectFolderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1048,12 +1051,12 @@ public interface ObjectFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteObjectFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1413,11 +1416,12 @@ public interface ObjectFolderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectFolderBatch(String callbackURL, Object object)
+		public void putObjectFolderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectFolderBatchHttpResponse(callbackURL, object);
+				putObjectFolderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1468,12 +1472,12 @@ public interface ObjectFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectFolderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

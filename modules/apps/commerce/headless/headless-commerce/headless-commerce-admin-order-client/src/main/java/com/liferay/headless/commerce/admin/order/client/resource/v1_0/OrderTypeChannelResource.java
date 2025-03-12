@@ -41,11 +41,12 @@ public interface OrderTypeChannelResource {
 			Long orderTypeChannelId)
 		throws Exception;
 
-	public void deleteOrderTypeChannelBatch(String callbackURL, Object object)
+	public void deleteOrderTypeChannelBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderTypeChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderTypeChannel>
@@ -87,12 +88,12 @@ public interface OrderTypeChannelResource {
 		throws Exception;
 
 	public void postOrderTypeIdOrderTypeChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postOrderTypeIdOrderTypeChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -310,11 +311,12 @@ public interface OrderTypeChannelResource {
 		}
 
 		public void deleteOrderTypeChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderTypeChannelBatchHttpResponse(callbackURL, object);
+				deleteOrderTypeChannelBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -365,12 +367,12 @@ public interface OrderTypeChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderTypeChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -874,12 +876,12 @@ public interface OrderTypeChannelResource {
 		}
 
 		public void postOrderTypeIdOrderTypeChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postOrderTypeIdOrderTypeChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -931,12 +933,12 @@ public interface OrderTypeChannelResource {
 
 		public HttpInvoker.HttpResponse
 				postOrderTypeIdOrderTypeChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

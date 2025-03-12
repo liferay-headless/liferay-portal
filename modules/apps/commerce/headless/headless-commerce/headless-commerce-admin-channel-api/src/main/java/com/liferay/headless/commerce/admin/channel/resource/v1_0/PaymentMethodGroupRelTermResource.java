@@ -53,7 +53,7 @@ public interface PaymentMethodGroupRelTermResource {
 		throws Exception;
 
 	public Response deletePaymentMethodGroupRelTermBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PaymentMethodGroupRelTerm>

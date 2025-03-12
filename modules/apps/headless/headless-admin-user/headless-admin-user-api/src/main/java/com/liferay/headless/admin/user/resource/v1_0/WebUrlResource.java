@@ -95,7 +95,7 @@ public interface WebUrlResource {
 
 	public void deleteWebUrl(Long webUrlId) throws Exception;
 
-	public Response deleteWebUrlBatch(String callbackURL, Object object)
+	public Response deleteWebUrlBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public WebUrl getWebUrl(Long webUrlId) throws Exception;

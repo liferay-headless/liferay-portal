@@ -50,7 +50,8 @@ public interface TermOrderTypeResource {
 
 	public void deleteTermOrderType(Long termOrderTypeId) throws Exception;
 
-	public Response deleteTermOrderTypeBatch(String callbackURL, Object object)
+	public Response deleteTermOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<TermOrderType> getTermByExternalReferenceCodeTermOrderTypesPage(
@@ -70,7 +71,7 @@ public interface TermOrderTypeResource {
 		throws Exception;
 
 	public Response postTermIdTermOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

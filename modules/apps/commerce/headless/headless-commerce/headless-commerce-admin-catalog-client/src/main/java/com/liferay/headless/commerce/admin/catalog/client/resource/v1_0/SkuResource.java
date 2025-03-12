@@ -65,11 +65,11 @@ public interface SkuResource {
 			Long id, Sku sku)
 		throws Exception;
 
-	public void postProductIdSkuBatch(String callbackURL, Object object)
+	public void postProductIdSkuBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductIdSkuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Sku> getSkusPage(
@@ -128,11 +128,11 @@ public interface SkuResource {
 	public HttpInvoker.HttpResponse deleteSkuHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteSkuBatch(String callbackURL, Object object)
+	public void deleteSkuBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSkuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Sku getSku(Long id) throws Exception;
@@ -705,11 +705,12 @@ public interface SkuResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postProductIdSkuBatch(String callbackURL, Object object)
+		public void postProductIdSkuBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProductIdSkuBatchHttpResponse(callbackURL, object);
+				postProductIdSkuBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -760,12 +761,12 @@ public interface SkuResource {
 		}
 
 		public HttpInvoker.HttpResponse postProductIdSkuBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1568,11 +1569,11 @@ public interface SkuResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteSkuBatch(String callbackURL, Object object)
+		public void deleteSkuBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = deleteSkuBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1623,12 +1624,12 @@ public interface SkuResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSkuBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

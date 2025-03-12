@@ -153,7 +153,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createWorkflowDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -161,7 +161,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			workflowDefinitionResource ->
 				workflowDefinitionResource.postWorkflowDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -241,7 +241,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteWorkflowDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -249,7 +249,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			workflowDefinitionResource ->
 				workflowDefinitionResource.deleteWorkflowDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -270,7 +270,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateWorkflowDefinitionBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -278,7 +278,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			workflowDefinitionResource ->
 				workflowDefinitionResource.putWorkflowDefinitionBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -357,7 +357,7 @@ public class Mutation {
 	public Response createWorkflowDefinitionWorkflowDefinitionLinkBatch(
 			@GraphQLName("workflowDefinitionId") Long workflowDefinitionId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -366,7 +366,7 @@ public class Mutation {
 			workflowDefinitionLinkResource ->
 				workflowDefinitionLinkResource.
 					postWorkflowDefinitionWorkflowDefinitionLinkBatch(
-						workflowDefinitionId, callbackURL, object));
+						workflowDefinitionId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -420,7 +420,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteWorkflowInstanceBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -428,7 +428,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			workflowInstanceResource ->
 				workflowInstanceResource.deleteWorkflowInstanceBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField

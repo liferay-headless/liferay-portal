@@ -52,7 +52,7 @@ public interface WarehouseOrderTypeResource {
 		throws Exception;
 
 	public Response deleteWarehouseOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WarehouseOrderType>
@@ -76,7 +76,7 @@ public interface WarehouseOrderTypeResource {
 		throws Exception;
 
 	public Response postWarehouseIdWarehouseOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

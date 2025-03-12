@@ -64,7 +64,7 @@ public interface DataRecordResource {
 		throws Exception;
 
 	public Response postDataDefinitionDataRecordBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DataRecord> getDataRecordCollectionDataRecordsPage(
@@ -83,7 +83,8 @@ public interface DataRecordResource {
 		throws Exception;
 
 	public Response postDataRecordCollectionDataRecordBatch(
-			Long dataRecordCollectionId, String callbackURL, Object object)
+			Long dataRecordCollectionId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public String getDataRecordCollectionDataRecordExport(
@@ -92,7 +93,8 @@ public interface DataRecordResource {
 
 	public void deleteDataRecord(Long dataRecordId) throws Exception;
 
-	public Response deleteDataRecordBatch(String callbackURL, Object object)
+	public Response deleteDataRecordBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataRecord getDataRecord(Long dataRecordId) throws Exception;
@@ -103,7 +105,7 @@ public interface DataRecordResource {
 	public DataRecord putDataRecord(Long dataRecordId, DataRecord dataRecord)
 		throws Exception;
 
-	public Response putDataRecordBatch(String callbackURL, Object object)
+	public Response putDataRecordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

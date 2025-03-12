@@ -60,11 +60,11 @@ public interface CartTransitionResource {
 		throws Exception;
 
 	public void postCartCartTransitionBatch(
-			Long cartId, String callbackURL, Object object)
+			Long cartId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCartCartTransitionBatchHttpResponse(
-			Long cartId, String callbackURL, Object object)
+			Long cartId, String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -505,12 +505,12 @@ public interface CartTransitionResource {
 		}
 
 		public void postCartCartTransitionBatch(
-				Long cartId, String callbackURL, Object object)
+				Long cartId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postCartCartTransitionBatchHttpResponse(
-					cartId, callbackURL, object);
+					cartId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -561,12 +561,12 @@ public interface CartTransitionResource {
 		}
 
 		public HttpInvoker.HttpResponse postCartCartTransitionBatchHttpResponse(
-				Long cartId, String callbackURL, Object object)
+				Long cartId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

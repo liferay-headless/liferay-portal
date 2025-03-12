@@ -40,11 +40,12 @@ public interface MappedProductResource {
 			Long mappedProductId)
 		throws Exception;
 
-	public void deleteMappedProductBatch(String callbackURL, Object object)
+	public void deleteMappedProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteMappedProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MappedProduct patchMappedProduct(
@@ -103,11 +104,11 @@ public interface MappedProductResource {
 		throws Exception;
 
 	public void postProductIdMappedProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductIdMappedProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public MappedProduct getProductIdMappedProductBySequence(
@@ -331,11 +332,13 @@ public interface MappedProductResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteMappedProductBatch(String callbackURL, Object object)
+		public void deleteMappedProductBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteMappedProductBatchHttpResponse(callbackURL, object);
+				deleteMappedProductBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -386,12 +389,12 @@ public interface MappedProductResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteMappedProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1118,12 +1121,12 @@ public interface MappedProductResource {
 		}
 
 		public void postProductIdMappedProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductIdMappedProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1175,12 +1178,12 @@ public interface MappedProductResource {
 
 		public HttpInvoker.HttpResponse
 				postProductIdMappedProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

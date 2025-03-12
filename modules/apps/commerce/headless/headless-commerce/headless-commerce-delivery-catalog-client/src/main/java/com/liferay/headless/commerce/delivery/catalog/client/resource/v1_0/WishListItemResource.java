@@ -40,11 +40,12 @@ public interface WishListItemResource {
 			Long wishListItemId)
 		throws Exception;
 
-	public void deleteWishListItemBatch(String callbackURL, Object object)
+	public void deleteWishListItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWishListItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WishListItem getWishListItem(
@@ -287,11 +288,12 @@ public interface WishListItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteWishListItemBatch(String callbackURL, Object object)
+		public void deleteWishListItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWishListItemBatchHttpResponse(callbackURL, object);
+				deleteWishListItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -342,12 +344,12 @@ public interface WishListItemResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteWishListItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

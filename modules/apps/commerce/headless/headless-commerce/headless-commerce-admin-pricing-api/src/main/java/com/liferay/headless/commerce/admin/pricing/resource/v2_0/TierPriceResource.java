@@ -65,7 +65,7 @@ public interface TierPriceResource {
 		throws Exception;
 
 	public Response postPriceEntryIdTierPriceBatch(
-			Long priceEntryId, String callbackURL, Object object)
+			Long priceEntryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteTierPriceByExternalReferenceCode(
@@ -82,7 +82,8 @@ public interface TierPriceResource {
 
 	public void deleteTierPrice(Long id) throws Exception;
 
-	public Response deleteTierPriceBatch(String callbackURL, Object object)
+	public Response deleteTierPriceBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TierPrice getTierPrice(Long id) throws Exception;

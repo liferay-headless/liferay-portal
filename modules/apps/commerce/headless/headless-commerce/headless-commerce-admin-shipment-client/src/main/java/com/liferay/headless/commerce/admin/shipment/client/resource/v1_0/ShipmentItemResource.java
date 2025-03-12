@@ -67,11 +67,12 @@ public interface ShipmentItemResource {
 			Long shipmentItemId)
 		throws Exception;
 
-	public void deleteShipmentItemBatch(String callbackURL, Object object)
+	public void deleteShipmentItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteShipmentItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ShipmentItem getShipmentItem(Long shipmentItemId) throws Exception;
@@ -669,11 +670,12 @@ public interface ShipmentItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteShipmentItemBatch(String callbackURL, Object object)
+		public void deleteShipmentItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteShipmentItemBatchHttpResponse(callbackURL, object);
+				deleteShipmentItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -724,12 +726,12 @@ public interface ShipmentItemResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteShipmentItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -59,7 +59,8 @@ public interface DiscountRuleResource {
 
 	public Response deleteDiscountRule(Long id) throws Exception;
 
-	public Response deleteDiscountRuleBatch(String callbackURL, Object object)
+	public Response deleteDiscountRuleBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DiscountRule getDiscountRule(Long id) throws Exception;
@@ -76,7 +77,7 @@ public interface DiscountRuleResource {
 		throws Exception;
 
 	public Response postDiscountIdDiscountRuleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

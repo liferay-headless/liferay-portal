@@ -108,14 +108,14 @@ public class Mutation {
 	public Response createAssetLibraryKeywordBatch(
 			@GraphQLName("assetLibraryId") @NotEmpty String assetLibraryId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.postAssetLibraryKeywordBatch(
-				Long.valueOf(assetLibraryId), callbackURL, object));
+				Long.valueOf(assetLibraryId), callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -193,14 +193,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteKeywordBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.deleteKeywordBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -220,14 +220,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateKeywordBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.putKeywordBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -295,14 +295,14 @@ public class Mutation {
 	public Response createSiteKeywordBatch(
 			@GraphQLName("siteKey") @NotEmpty String siteKey,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.postSiteKeywordBatch(
-				Long.valueOf(siteKey), callbackURL, object));
+				Long.valueOf(siteKey), callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -396,7 +396,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteTaxonomyCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -404,7 +404,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyCategoryResource ->
 				taxonomyCategoryResource.deleteTaxonomyCategoryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -442,7 +442,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateTaxonomyCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -450,7 +450,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyCategoryResource ->
 				taxonomyCategoryResource.putTaxonomyCategoryBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -519,7 +519,7 @@ public class Mutation {
 	public Response createTaxonomyVocabularyTaxonomyCategoryBatch(
 			@GraphQLName("taxonomyVocabularyId") Long taxonomyVocabularyId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -528,7 +528,7 @@ public class Mutation {
 			taxonomyCategoryResource ->
 				taxonomyCategoryResource.
 					postTaxonomyVocabularyTaxonomyCategoryBatch(
-						taxonomyVocabularyId, callbackURL, object));
+						taxonomyVocabularyId, callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -618,7 +618,7 @@ public class Mutation {
 	public Response createAssetLibraryTaxonomyVocabularyBatch(
 			@GraphQLName("assetLibraryId") @NotEmpty String assetLibraryId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -627,7 +627,8 @@ public class Mutation {
 			taxonomyVocabularyResource ->
 				taxonomyVocabularyResource.
 					postAssetLibraryTaxonomyVocabularyBatch(
-						Long.valueOf(assetLibraryId), callbackURL, object));
+						Long.valueOf(assetLibraryId), callbackURL,
+						contentString));
 	}
 
 	@GraphQLField(
@@ -737,7 +738,7 @@ public class Mutation {
 	public Response createSiteTaxonomyVocabularyBatch(
 			@GraphQLName("siteKey") @NotEmpty String siteKey,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -745,7 +746,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyVocabularyResource ->
 				taxonomyVocabularyResource.postSiteTaxonomyVocabularyBatch(
-					Long.valueOf(siteKey), callbackURL, object));
+					Long.valueOf(siteKey), callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -831,7 +832,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteTaxonomyVocabularyBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -839,7 +840,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyVocabularyResource ->
 				taxonomyVocabularyResource.deleteTaxonomyVocabularyBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField(
@@ -879,7 +880,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateTaxonomyVocabularyBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -887,7 +888,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			taxonomyVocabularyResource ->
 				taxonomyVocabularyResource.putTaxonomyVocabularyBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField

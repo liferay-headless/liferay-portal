@@ -63,7 +63,7 @@ public interface ProductConfigurationListResource {
 		throws Exception;
 
 	public Response postProductConfigurationListBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProductConfigurationListByExternalReferenceCode(
@@ -84,7 +84,7 @@ public interface ProductConfigurationListResource {
 	public void deleteProductConfigurationList(Long id) throws Exception;
 
 	public Response deleteProductConfigurationListBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductConfigurationList getProductConfigurationList(Long id)

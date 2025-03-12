@@ -95,11 +95,12 @@ public interface WarehouseItemResource {
 	public HttpInvoker.HttpResponse deleteWarehouseItemHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteWarehouseItemBatch(String callbackURL, Object object)
+	public void deleteWarehouseItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWarehouseItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WarehouseItem getWarehouseItem(Long id) throws Exception;
@@ -151,12 +152,12 @@ public interface WarehouseItemResource {
 		throws Exception;
 
 	public void postWarehouseIdWarehouseItemBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWarehouseIdWarehouseItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -1032,11 +1033,13 @@ public interface WarehouseItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteWarehouseItemBatch(String callbackURL, Object object)
+		public void deleteWarehouseItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWarehouseItemBatchHttpResponse(callbackURL, object);
+				deleteWarehouseItemBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1087,12 +1090,12 @@ public interface WarehouseItemResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteWarehouseItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1779,12 +1782,12 @@ public interface WarehouseItemResource {
 		}
 
 		public void postWarehouseIdWarehouseItemBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWarehouseIdWarehouseItemBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1836,12 +1839,12 @@ public interface WarehouseItemResource {
 
 		public HttpInvoker.HttpResponse
 				postWarehouseIdWarehouseItemBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

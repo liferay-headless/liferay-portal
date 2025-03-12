@@ -78,7 +78,7 @@ public interface CartResource {
 
 	public Response deleteCart(Long cartId) throws Exception;
 
-	public Response deleteCartBatch(String callbackURL, Object object)
+	public Response deleteCartBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Cart getCart(Long cartId) throws Exception;
@@ -87,7 +87,7 @@ public interface CartResource {
 
 	public Cart putCart(Long cartId, Cart cart) throws Exception;
 
-	public Response putCartBatch(String callbackURL, Object object)
+	public Response putCartBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Cart postCartCheckout(Long cartId) throws Exception;

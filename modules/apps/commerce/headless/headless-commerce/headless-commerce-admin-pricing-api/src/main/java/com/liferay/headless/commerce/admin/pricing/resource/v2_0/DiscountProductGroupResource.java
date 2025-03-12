@@ -52,7 +52,7 @@ public interface DiscountProductGroupResource {
 		throws Exception;
 
 	public Response deleteDiscountProductGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountProductGroup>
@@ -76,7 +76,7 @@ public interface DiscountProductGroupResource {
 		throws Exception;
 
 	public Response postDiscountIdDiscountProductGroupBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

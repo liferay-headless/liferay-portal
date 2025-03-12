@@ -70,11 +70,11 @@ public interface PostalAddressResource {
 		throws Exception;
 
 	public void postAccountPostalAddressBatch(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAccountPostalAddressBatchHttpResponse(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PostalAddress>
@@ -149,11 +149,12 @@ public interface PostalAddressResource {
 			Long postalAddressId)
 		throws Exception;
 
-	public void deletePostalAddressBatch(String callbackURL, Object object)
+	public void deletePostalAddressBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePostalAddressBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public PostalAddress getPostalAddress(Long postalAddressId)
@@ -179,11 +180,11 @@ public interface PostalAddressResource {
 			Long postalAddressId, PostalAddress postalAddress)
 		throws Exception;
 
-	public void putPostalAddressBatch(String callbackURL, Object object)
+	public void putPostalAddressBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putPostalAddressBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PostalAddress>
@@ -762,12 +763,12 @@ public interface PostalAddressResource {
 		}
 
 		public void postAccountPostalAddressBatch(
-				Long accountId, String callbackURL, Object object)
+				Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountPostalAddressBatchHttpResponse(
-					accountId, callbackURL, object);
+					accountId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -819,12 +820,12 @@ public interface PostalAddressResource {
 
 		public HttpInvoker.HttpResponse
 				postAccountPostalAddressBatchHttpResponse(
-					Long accountId, String callbackURL, Object object)
+					Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1735,11 +1736,13 @@ public interface PostalAddressResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePostalAddressBatch(String callbackURL, Object object)
+		public void deletePostalAddressBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePostalAddressBatchHttpResponse(callbackURL, object);
+				deletePostalAddressBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1790,12 +1793,12 @@ public interface PostalAddressResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePostalAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2155,11 +2158,12 @@ public interface PostalAddressResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putPostalAddressBatch(String callbackURL, Object object)
+		public void putPostalAddressBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putPostalAddressBatchHttpResponse(callbackURL, object);
+				putPostalAddressBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2210,12 +2214,12 @@ public interface PostalAddressResource {
 		}
 
 		public HttpInvoker.HttpResponse putPostalAddressBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

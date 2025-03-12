@@ -75,11 +75,11 @@ public interface CartItemResource {
 	public HttpInvoker.HttpResponse deleteCartItemHttpResponse(Long cartItemId)
 		throws Exception;
 
-	public void deleteCartItemBatch(String callbackURL, Object object)
+	public void deleteCartItemBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCartItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CartItem getCartItem(Long cartItemId) throws Exception;
@@ -101,11 +101,11 @@ public interface CartItemResource {
 			Long cartItemId, CartItem cartItem)
 		throws Exception;
 
-	public void putCartItemBatch(String callbackURL, Object object)
+	public void putCartItemBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCartItemBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<CartItem> getCartByExternalReferenceCodeItemsPage(
@@ -790,11 +790,12 @@ public interface CartItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCartItemBatch(String callbackURL, Object object)
+		public void deleteCartItemBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCartItemBatchHttpResponse(callbackURL, object);
+				deleteCartItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -845,12 +846,12 @@ public interface CartItemResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCartItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1205,11 +1206,11 @@ public interface CartItemResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putCartItemBatch(String callbackURL, Object object)
+		public void putCartItemBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putCartItemBatchHttpResponse(callbackURL, object);
+				putCartItemBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1260,12 +1261,12 @@ public interface CartItemResource {
 		}
 
 		public HttpInvoker.HttpResponse putCartItemBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

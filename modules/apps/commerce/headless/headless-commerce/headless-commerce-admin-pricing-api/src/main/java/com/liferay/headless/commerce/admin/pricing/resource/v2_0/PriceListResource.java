@@ -59,7 +59,7 @@ public interface PriceListResource {
 
 	public PriceList postPriceList(PriceList priceList) throws Exception;
 
-	public Response postPriceListBatch(String callbackURL, Object object)
+	public Response postPriceListBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deletePriceListByExternalReferenceCode(
@@ -80,7 +80,8 @@ public interface PriceListResource {
 
 	public void deletePriceList(Long id) throws Exception;
 
-	public Response deletePriceListBatch(String callbackURL, Object object)
+	public Response deletePriceListBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public PriceList getPriceList(Long id) throws Exception;

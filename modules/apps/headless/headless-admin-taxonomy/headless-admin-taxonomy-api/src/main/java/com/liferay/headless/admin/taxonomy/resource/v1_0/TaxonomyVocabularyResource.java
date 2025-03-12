@@ -64,7 +64,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Response postAssetLibraryTaxonomyVocabularyBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
@@ -109,7 +109,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Response postSiteTaxonomyVocabularyBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteTaxonomyVocabularyByExternalReferenceCode(
@@ -140,7 +140,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Response deleteTaxonomyVocabularyBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxonomyVocabulary getTaxonomyVocabulary(Long taxonomyVocabularyId)
@@ -155,7 +155,7 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public Response putTaxonomyVocabularyBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

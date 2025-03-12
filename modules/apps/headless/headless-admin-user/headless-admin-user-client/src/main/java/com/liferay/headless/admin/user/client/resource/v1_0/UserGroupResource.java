@@ -69,11 +69,11 @@ public interface UserGroupResource {
 			UserGroup userGroup)
 		throws Exception;
 
-	public void postUserGroupBatch(String callbackURL, Object object)
+	public void postUserGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postUserGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteUserGroupByExternalReferenceCode(
@@ -136,11 +136,11 @@ public interface UserGroupResource {
 			Long userGroupId)
 		throws Exception;
 
-	public void deleteUserGroupBatch(String callbackURL, Object object)
+	public void deleteUserGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteUserGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserGroup getUserGroup(Long userGroupId) throws Exception;
@@ -162,11 +162,11 @@ public interface UserGroupResource {
 			Long userGroupId, UserGroup userGroup)
 		throws Exception;
 
-	public void putUserGroupBatch(String callbackURL, Object object)
+	public void putUserGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putUserGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteUserGroupUsers(Long userGroupId, Long[] longs)
@@ -751,11 +751,11 @@ public interface UserGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postUserGroupBatch(String callbackURL, Object object)
+		public void postUserGroupBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postUserGroupBatchHttpResponse(callbackURL, object);
+				postUserGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -806,12 +806,12 @@ public interface UserGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse postUserGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1621,11 +1621,12 @@ public interface UserGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteUserGroupBatch(String callbackURL, Object object)
+		public void deleteUserGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteUserGroupBatchHttpResponse(callbackURL, object);
+				deleteUserGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1676,12 +1677,12 @@ public interface UserGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteUserGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2037,11 +2038,11 @@ public interface UserGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putUserGroupBatch(String callbackURL, Object object)
+		public void putUserGroupBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putUserGroupBatchHttpResponse(callbackURL, object);
+				putUserGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2092,12 +2093,12 @@ public interface UserGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse putUserGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

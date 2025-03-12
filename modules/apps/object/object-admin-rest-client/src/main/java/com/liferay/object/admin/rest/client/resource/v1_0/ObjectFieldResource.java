@@ -88,12 +88,13 @@ public interface ObjectFieldResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectFieldBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectFieldBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public void deleteObjectField(Long objectFieldId) throws Exception;
@@ -102,11 +103,11 @@ public interface ObjectFieldResource {
 			Long objectFieldId)
 		throws Exception;
 
-	public void deleteObjectFieldBatch(String callbackURL, Object object)
+	public void deleteObjectFieldBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectFieldBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectField getObjectField(Long objectFieldId) throws Exception;
@@ -131,11 +132,11 @@ public interface ObjectFieldResource {
 			Long objectFieldId, ObjectField objectField)
 		throws Exception;
 
-	public void putObjectFieldBatch(String callbackURL, Object object)
+	public void putObjectFieldBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectFieldBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -861,12 +862,13 @@ public interface ObjectFieldResource {
 		}
 
 		public void postObjectDefinitionObjectFieldBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectFieldBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -918,12 +920,13 @@ public interface ObjectFieldResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectFieldBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1067,11 +1070,12 @@ public interface ObjectFieldResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectFieldBatch(String callbackURL, Object object)
+		public void deleteObjectFieldBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectFieldBatchHttpResponse(callbackURL, object);
+				deleteObjectFieldBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1122,12 +1126,12 @@ public interface ObjectFieldResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteObjectFieldBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1485,11 +1489,12 @@ public interface ObjectFieldResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectFieldBatch(String callbackURL, Object object)
+		public void putObjectFieldBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectFieldBatchHttpResponse(callbackURL, object);
+				putObjectFieldBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1540,12 +1545,12 @@ public interface ObjectFieldResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectFieldBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

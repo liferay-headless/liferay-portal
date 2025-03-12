@@ -87,12 +87,13 @@ public interface ObjectLayoutResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectLayoutBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectLayoutBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public void deleteObjectLayout(Long objectLayoutId) throws Exception;
@@ -101,11 +102,12 @@ public interface ObjectLayoutResource {
 			Long objectLayoutId)
 		throws Exception;
 
-	public void deleteObjectLayoutBatch(String callbackURL, Object object)
+	public void deleteObjectLayoutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectLayoutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectLayout getObjectLayout(Long objectLayoutId) throws Exception;
@@ -122,11 +124,11 @@ public interface ObjectLayoutResource {
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception;
 
-	public void putObjectLayoutBatch(String callbackURL, Object object)
+	public void putObjectLayoutBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectLayoutBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -835,12 +837,13 @@ public interface ObjectLayoutResource {
 		}
 
 		public void postObjectDefinitionObjectLayoutBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectLayoutBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -892,12 +895,13 @@ public interface ObjectLayoutResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectLayoutBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1041,11 +1045,12 @@ public interface ObjectLayoutResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteObjectLayoutBatch(String callbackURL, Object object)
+		public void deleteObjectLayoutBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteObjectLayoutBatchHttpResponse(callbackURL, object);
+				deleteObjectLayoutBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1096,12 +1101,12 @@ public interface ObjectLayoutResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteObjectLayoutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1353,11 +1358,12 @@ public interface ObjectLayoutResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putObjectLayoutBatch(String callbackURL, Object object)
+		public void putObjectLayoutBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectLayoutBatchHttpResponse(callbackURL, object);
+				putObjectLayoutBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1408,12 +1414,12 @@ public interface ObjectLayoutResource {
 		}
 
 		public HttpInvoker.HttpResponse putObjectLayoutBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

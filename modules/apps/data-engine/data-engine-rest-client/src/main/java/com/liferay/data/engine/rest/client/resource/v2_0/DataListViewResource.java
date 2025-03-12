@@ -72,12 +72,12 @@ public interface DataListViewResource {
 		throws Exception;
 
 	public void postDataDefinitionDataListViewBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDataDefinitionDataListViewBatchHttpResponse(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataListView(Long dataListViewId) throws Exception;
@@ -86,11 +86,12 @@ public interface DataListViewResource {
 			Long dataListViewId)
 		throws Exception;
 
-	public void deleteDataListViewBatch(String callbackURL, Object object)
+	public void deleteDataListViewBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDataListViewBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataListView getDataListView(Long dataListViewId) throws Exception;
@@ -107,11 +108,11 @@ public interface DataListViewResource {
 			Long dataListViewId, DataListView dataListView)
 		throws Exception;
 
-	public void putDataListViewBatch(String callbackURL, Object object)
+	public void putDataListViewBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDataListViewBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -689,12 +690,12 @@ public interface DataListViewResource {
 		}
 
 		public void postDataDefinitionDataListViewBatch(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDataDefinitionDataListViewBatchHttpResponse(
-					dataDefinitionId, callbackURL, object);
+					dataDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -746,12 +747,13 @@ public interface DataListViewResource {
 
 		public HttpInvoker.HttpResponse
 				postDataDefinitionDataListViewBatchHttpResponse(
-					Long dataDefinitionId, String callbackURL, Object object)
+					Long dataDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -895,11 +897,12 @@ public interface DataListViewResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDataListViewBatch(String callbackURL, Object object)
+		public void deleteDataListViewBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDataListViewBatchHttpResponse(callbackURL, object);
+				deleteDataListViewBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -950,12 +953,12 @@ public interface DataListViewResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDataListViewBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1207,11 +1210,12 @@ public interface DataListViewResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDataListViewBatch(String callbackURL, Object object)
+		public void putDataListViewBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDataListViewBatchHttpResponse(callbackURL, object);
+				putDataListViewBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1262,12 +1266,12 @@ public interface DataListViewResource {
 		}
 
 		public HttpInvoker.HttpResponse putDataListViewBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

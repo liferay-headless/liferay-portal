@@ -40,11 +40,12 @@ public interface GroupedProductResource {
 			Long groupedProductId)
 		throws Exception;
 
-	public void deleteGroupedProductBatch(String callbackURL, Object object)
+	public void deleteGroupedProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteGroupedProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public GroupedProduct patchGroupedProduct(
@@ -91,12 +92,12 @@ public interface GroupedProductResource {
 		throws Exception;
 
 	public void postProductIdGroupedProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductIdGroupedProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -313,11 +314,13 @@ public interface GroupedProductResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteGroupedProductBatch(String callbackURL, Object object)
+		public void deleteGroupedProductBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteGroupedProductBatchHttpResponse(callbackURL, object);
+				deleteGroupedProductBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -368,12 +371,12 @@ public interface GroupedProductResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteGroupedProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -970,12 +973,12 @@ public interface GroupedProductResource {
 		}
 
 		public void postProductIdGroupedProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductIdGroupedProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1027,12 +1030,12 @@ public interface GroupedProductResource {
 
 		public HttpInvoker.HttpResponse
 				postProductIdGroupedProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

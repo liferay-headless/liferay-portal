@@ -62,7 +62,8 @@ public interface OptionValueResource {
 
 	public Response deleteOptionValue(Long id) throws Exception;
 
-	public Response deleteOptionValueBatch(String callbackURL, Object object)
+	public Response deleteOptionValueBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OptionValue getOptionValue(Long id) throws Exception;
@@ -87,7 +88,7 @@ public interface OptionValueResource {
 		throws Exception;
 
 	public Response postOptionIdOptionValueBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

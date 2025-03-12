@@ -73,12 +73,13 @@ public interface ObjectFieldResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectFieldBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteObjectField(Long objectFieldId) throws Exception;
 
-	public Response deleteObjectFieldBatch(String callbackURL, Object object)
+	public Response deleteObjectFieldBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectField getObjectField(Long objectFieldId) throws Exception;
@@ -91,7 +92,8 @@ public interface ObjectFieldResource {
 			Long objectFieldId, ObjectField objectField)
 		throws Exception;
 
-	public Response putObjectFieldBatch(String callbackURL, Object object)
+	public Response putObjectFieldBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

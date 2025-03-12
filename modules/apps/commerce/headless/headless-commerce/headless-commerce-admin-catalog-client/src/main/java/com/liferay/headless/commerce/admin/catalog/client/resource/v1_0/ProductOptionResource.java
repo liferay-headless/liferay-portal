@@ -41,11 +41,12 @@ public interface ProductOptionResource {
 	public HttpInvoker.HttpResponse deleteProductOptionHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteProductOptionBatch(String callbackURL, Object object)
+	public void deleteProductOptionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductOptionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductOption getProductOption(Long id) throws Exception;
@@ -298,11 +299,13 @@ public interface ProductOptionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteProductOptionBatch(String callbackURL, Object object)
+		public void deleteProductOptionBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductOptionBatchHttpResponse(callbackURL, object);
+				deleteProductOptionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -353,12 +356,12 @@ public interface ProductOptionResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteProductOptionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

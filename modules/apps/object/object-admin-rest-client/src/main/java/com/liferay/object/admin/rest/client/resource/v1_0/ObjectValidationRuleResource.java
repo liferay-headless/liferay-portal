@@ -92,12 +92,13 @@ public interface ObjectValidationRuleResource {
 		throws Exception;
 
 	public void postObjectDefinitionObjectValidationRuleBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postObjectDefinitionObjectValidationRuleBatchHttpResponse(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public void deleteObjectValidationRule(Long objectValidationRuleId)
@@ -108,11 +109,11 @@ public interface ObjectValidationRuleResource {
 		throws Exception;
 
 	public void deleteObjectValidationRuleBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteObjectValidationRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectValidationRule getObjectValidationRule(
@@ -143,11 +144,12 @@ public interface ObjectValidationRuleResource {
 			ObjectValidationRule objectValidationRule)
 		throws Exception;
 
-	public void putObjectValidationRuleBatch(String callbackURL, Object object)
+	public void putObjectValidationRuleBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putObjectValidationRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -863,12 +865,13 @@ public interface ObjectValidationRuleResource {
 		}
 
 		public void postObjectDefinitionObjectValidationRuleBatch(
-				Long objectDefinitionId, String callbackURL, Object object)
+				Long objectDefinitionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postObjectDefinitionObjectValidationRuleBatchHttpResponse(
-					objectDefinitionId, callbackURL, object);
+					objectDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -920,12 +923,13 @@ public interface ObjectValidationRuleResource {
 
 		public HttpInvoker.HttpResponse
 				postObjectDefinitionObjectValidationRuleBatchHttpResponse(
-					Long objectDefinitionId, String callbackURL, Object object)
+					Long objectDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1072,12 +1076,12 @@ public interface ObjectValidationRuleResource {
 		}
 
 		public void deleteObjectValidationRuleBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteObjectValidationRuleBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1129,12 +1133,12 @@ public interface ObjectValidationRuleResource {
 
 		public HttpInvoker.HttpResponse
 				deleteObjectValidationRuleBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1504,11 +1508,12 @@ public interface ObjectValidationRuleResource {
 		}
 
 		public void putObjectValidationRuleBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putObjectValidationRuleBatchHttpResponse(callbackURL, object);
+				putObjectValidationRuleBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1560,12 +1565,12 @@ public interface ObjectValidationRuleResource {
 
 		public HttpInvoker.HttpResponse
 				putObjectValidationRuleBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

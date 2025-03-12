@@ -57,7 +57,7 @@ public interface NodeResource {
 	public Node postProcessNode(Long processId, Node node) throws Exception;
 
 	public Response postProcessNodeBatch(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcessNode(Long processId, Long nodeId) throws Exception;

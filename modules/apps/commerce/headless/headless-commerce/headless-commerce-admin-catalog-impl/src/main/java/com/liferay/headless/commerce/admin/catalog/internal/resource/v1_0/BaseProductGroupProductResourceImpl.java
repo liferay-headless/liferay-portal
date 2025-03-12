@@ -130,7 +130,7 @@ public abstract class BaseProductGroupProductResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -340,7 +340,7 @@ public abstract class BaseProductGroupProductResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -355,7 +355,8 @@ public abstract class BaseProductGroupProductResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				ProductGroupProduct.class.getName(), callbackURL, null, object)
+				ProductGroupProduct.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

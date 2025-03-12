@@ -51,7 +51,7 @@ public interface CategoryDisplayPageResource {
 	public void deleteCategoryDisplayPage(Long id) throws Exception;
 
 	public Response deleteCategoryDisplayPageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CategoryDisplayPage getCategoryDisplayPage(Long id) throws Exception;

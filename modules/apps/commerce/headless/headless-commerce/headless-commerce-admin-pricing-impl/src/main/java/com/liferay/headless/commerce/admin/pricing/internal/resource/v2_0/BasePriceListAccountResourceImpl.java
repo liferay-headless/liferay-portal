@@ -127,7 +127,7 @@ public abstract class BasePriceListAccountResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -336,7 +336,7 @@ public abstract class BasePriceListAccountResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -351,7 +351,8 @@ public abstract class BasePriceListAccountResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				PriceListAccount.class.getName(), callbackURL, null, object)
+				PriceListAccount.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

@@ -36,11 +36,11 @@ public interface ProcessResource {
 	public HttpInvoker.HttpResponse postProcessHttpResponse(Process process)
 		throws Exception;
 
-	public void postProcessBatch(String callbackURL, Object object)
+	public void postProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProcessBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcess(Long processId) throws Exception;
@@ -48,11 +48,11 @@ public interface ProcessResource {
 	public HttpInvoker.HttpResponse deleteProcessHttpResponse(Long processId)
 		throws Exception;
 
-	public void deleteProcessBatch(String callbackURL, Object object)
+	public void deleteProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProcessBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Process getProcess(Long processId) throws Exception;
@@ -66,11 +66,11 @@ public interface ProcessResource {
 			Long processId, Process process)
 		throws Exception;
 
-	public void putProcessBatch(String callbackURL, Object object)
+	public void putProcessBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putProcessBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public String getProcessTitle(Long processId) throws Exception;
@@ -289,11 +289,11 @@ public interface ProcessResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postProcessBatch(String callbackURL, Object object)
+		public void postProcessBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProcessBatchHttpResponse(callbackURL, object);
+				postProcessBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -344,12 +344,12 @@ public interface ProcessResource {
 		}
 
 		public HttpInvoker.HttpResponse postProcessBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -491,11 +491,11 @@ public interface ProcessResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteProcessBatch(String callbackURL, Object object)
+		public void deleteProcessBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProcessBatchHttpResponse(callbackURL, object);
+				deleteProcessBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -546,12 +546,12 @@ public interface ProcessResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteProcessBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -800,11 +800,11 @@ public interface ProcessResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putProcessBatch(String callbackURL, Object object)
+		public void putProcessBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putProcessBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -855,12 +855,12 @@ public interface ProcessResource {
 		}
 
 		public HttpInvoker.HttpResponse putProcessBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

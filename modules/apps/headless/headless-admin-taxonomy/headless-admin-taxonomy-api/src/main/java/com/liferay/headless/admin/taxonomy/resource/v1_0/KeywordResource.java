@@ -63,7 +63,7 @@ public interface KeywordResource {
 		throws Exception;
 
 	public Response postAssetLibraryKeywordBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryKeywordByExternalReferenceCode(
@@ -95,14 +95,14 @@ public interface KeywordResource {
 
 	public void deleteKeyword(Long keywordId) throws Exception;
 
-	public Response deleteKeywordBatch(String callbackURL, Object object)
+	public Response deleteKeywordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Keyword getKeyword(Long keywordId) throws Exception;
 
 	public Keyword putKeyword(Long keywordId, Keyword keyword) throws Exception;
 
-	public Response putKeywordBatch(String callbackURL, Object object)
+	public Response putKeywordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void putKeywordSubscribe(Long keywordId) throws Exception;
@@ -124,7 +124,7 @@ public interface KeywordResource {
 		throws Exception;
 
 	public Response postSiteKeywordBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKeywordByExternalReferenceCode(

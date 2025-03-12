@@ -115,11 +115,11 @@ public interface PhoneResource {
 	public HttpInvoker.HttpResponse deletePhoneHttpResponse(Long phoneId)
 		throws Exception;
 
-	public void deletePhoneBatch(String callbackURL, Object object)
+	public void deletePhoneBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePhoneBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Phone getPhone(Long phoneId) throws Exception;
@@ -1352,11 +1352,11 @@ public interface PhoneResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePhoneBatch(String callbackURL, Object object)
+		public void deletePhoneBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePhoneBatchHttpResponse(callbackURL, object);
+				deletePhoneBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1407,12 +1407,12 @@ public interface PhoneResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePhoneBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

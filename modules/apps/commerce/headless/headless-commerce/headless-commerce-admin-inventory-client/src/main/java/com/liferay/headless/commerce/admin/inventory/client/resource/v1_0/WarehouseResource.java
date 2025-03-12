@@ -60,11 +60,11 @@ public interface WarehouseResource {
 			Warehouse warehouse)
 		throws Exception;
 
-	public void postWarehouseBatch(String callbackURL, Object object)
+	public void postWarehouseBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postWarehouseBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteWarehouseByExternalReferenceCode(
@@ -582,11 +582,11 @@ public interface WarehouseResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postWarehouseBatch(String callbackURL, Object object)
+		public void postWarehouseBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postWarehouseBatchHttpResponse(callbackURL, object);
+				postWarehouseBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -637,12 +637,12 @@ public interface WarehouseResource {
 		}
 
 		public HttpInvoker.HttpResponse postWarehouseBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

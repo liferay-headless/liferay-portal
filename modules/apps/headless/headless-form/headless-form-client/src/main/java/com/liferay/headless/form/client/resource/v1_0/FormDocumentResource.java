@@ -38,11 +38,12 @@ public interface FormDocumentResource {
 			Long formDocumentId)
 		throws Exception;
 
-	public void deleteFormDocumentBatch(String callbackURL, Object object)
+	public void deleteFormDocumentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteFormDocumentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public FormDocument getFormDocument(Long formDocumentId) throws Exception;
@@ -263,11 +264,12 @@ public interface FormDocumentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteFormDocumentBatch(String callbackURL, Object object)
+		public void deleteFormDocumentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteFormDocumentBatchHttpResponse(callbackURL, object);
+				deleteFormDocumentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -318,12 +320,12 @@ public interface FormDocumentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteFormDocumentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

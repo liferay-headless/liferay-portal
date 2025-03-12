@@ -64,11 +64,12 @@ public interface NotificationTemplateResource {
 			NotificationTemplate notificationTemplate)
 		throws Exception;
 
-	public void postNotificationTemplateBatch(String callbackURL, Object object)
+	public void postNotificationTemplateBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postNotificationTemplateBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate getNotificationTemplateByExternalReferenceCode(
@@ -99,11 +100,11 @@ public interface NotificationTemplateResource {
 		throws Exception;
 
 	public void deleteNotificationTemplateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteNotificationTemplateBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate getNotificationTemplate(
@@ -134,11 +135,12 @@ public interface NotificationTemplateResource {
 			NotificationTemplate notificationTemplate)
 		throws Exception;
 
-	public void putNotificationTemplateBatch(String callbackURL, Object object)
+	public void putNotificationTemplateBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putNotificationTemplateBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate postNotificationTemplateCopy(
@@ -620,11 +622,12 @@ public interface NotificationTemplateResource {
 		}
 
 		public void postNotificationTemplateBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postNotificationTemplateBatchHttpResponse(callbackURL, object);
+				postNotificationTemplateBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -676,12 +679,12 @@ public interface NotificationTemplateResource {
 
 		public HttpInvoker.HttpResponse
 				postNotificationTemplateBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1049,12 +1052,12 @@ public interface NotificationTemplateResource {
 		}
 
 		public void deleteNotificationTemplateBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteNotificationTemplateBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1106,12 +1109,12 @@ public interface NotificationTemplateResource {
 
 		public HttpInvoker.HttpResponse
 				deleteNotificationTemplateBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1481,11 +1484,12 @@ public interface NotificationTemplateResource {
 		}
 
 		public void putNotificationTemplateBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putNotificationTemplateBatchHttpResponse(callbackURL, object);
+				putNotificationTemplateBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1537,12 +1541,12 @@ public interface NotificationTemplateResource {
 
 		public HttpInvoker.HttpResponse
 				putNotificationTemplateBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

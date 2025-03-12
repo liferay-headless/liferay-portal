@@ -43,12 +43,12 @@ public interface PaymentMethodGroupRelTermResource {
 		throws Exception;
 
 	public void deletePaymentMethodGroupRelTermBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deletePaymentMethodGroupRelTermBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PaymentMethodGroupRelTerm>
@@ -292,12 +292,12 @@ public interface PaymentMethodGroupRelTermResource {
 		}
 
 		public void deletePaymentMethodGroupRelTermBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deletePaymentMethodGroupRelTermBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -349,12 +349,12 @@ public interface PaymentMethodGroupRelTermResource {
 
 		public HttpInvoker.HttpResponse
 				deletePaymentMethodGroupRelTermBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

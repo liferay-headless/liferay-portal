@@ -67,14 +67,14 @@ public interface DataRecordCollectionResource {
 		throws Exception;
 
 	public Response postDataDefinitionDataRecordCollectionBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataRecordCollection(Long dataRecordCollectionId)
 		throws Exception;
 
 	public Response deleteDataRecordCollectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataRecordCollection getDataRecordCollection(
@@ -87,7 +87,7 @@ public interface DataRecordCollectionResource {
 		throws Exception;
 
 	public Response putDataRecordCollectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

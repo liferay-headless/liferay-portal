@@ -51,7 +51,7 @@ public interface AvailabilityEstimateResource {
 	public Response deleteAvailabilityEstimate(Long id) throws Exception;
 
 	public Response deleteAvailabilityEstimateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AvailabilityEstimate getAvailabilityEstimate(Long id)
@@ -62,7 +62,7 @@ public interface AvailabilityEstimateResource {
 		throws Exception;
 
 	public Response putAvailabilityEstimateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AvailabilityEstimate>

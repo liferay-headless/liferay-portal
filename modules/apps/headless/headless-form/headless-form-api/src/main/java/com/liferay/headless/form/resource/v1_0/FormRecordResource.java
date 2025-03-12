@@ -53,7 +53,7 @@ public interface FormRecordResource {
 	public FormRecord putFormRecord(Long formRecordId, FormRecord formRecord)
 		throws Exception;
 
-	public Response putFormRecordBatch(String callbackURL, Object object)
+	public Response putFormRecordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<FormRecord> getFormFormRecordsPage(
@@ -69,7 +69,7 @@ public interface FormRecordResource {
 		throws Exception;
 
 	public Response postFormFormRecordBatch(
-			Long formId, String callbackURL, Object object)
+			Long formId, String callbackURL, String contentString)
 		throws Exception;
 
 	public FormRecord getFormFormRecordByLatestDraft(Long formId)

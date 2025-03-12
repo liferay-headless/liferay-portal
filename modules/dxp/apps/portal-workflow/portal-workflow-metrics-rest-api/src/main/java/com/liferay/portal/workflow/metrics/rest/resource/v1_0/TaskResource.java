@@ -59,7 +59,7 @@ public interface TaskResource {
 	public Task postProcessTask(Long processId, Task task) throws Exception;
 
 	public Response postProcessTaskBatch(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcessTask(Long processId, Long taskId) throws Exception;

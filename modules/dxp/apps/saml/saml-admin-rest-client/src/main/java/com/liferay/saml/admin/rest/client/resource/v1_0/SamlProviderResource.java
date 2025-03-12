@@ -51,11 +51,11 @@ public interface SamlProviderResource {
 			SamlProvider samlProvider)
 		throws Exception;
 
-	public void postSamlProviderBatch(String callbackURL, Object object)
+	public void postSamlProviderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSamlProviderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -477,11 +477,12 @@ public interface SamlProviderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postSamlProviderBatch(String callbackURL, Object object)
+		public void postSamlProviderBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSamlProviderBatchHttpResponse(callbackURL, object);
+				postSamlProviderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -532,12 +533,12 @@ public interface SamlProviderResource {
 		}
 
 		public HttpInvoker.HttpResponse postSamlProviderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

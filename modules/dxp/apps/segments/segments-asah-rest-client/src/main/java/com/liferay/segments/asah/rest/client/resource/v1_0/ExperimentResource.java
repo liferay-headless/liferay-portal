@@ -38,11 +38,11 @@ public interface ExperimentResource {
 			String experimentId)
 		throws Exception;
 
-	public void deleteExperimentBatch(String callbackURL, Object object)
+	public void deleteExperimentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteExperimentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Experiment getExperiment(String experimentId) throws Exception;
@@ -262,11 +262,12 @@ public interface ExperimentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteExperimentBatch(String callbackURL, Object object)
+		public void deleteExperimentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteExperimentBatchHttpResponse(callbackURL, object);
+				deleteExperimentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -317,12 +318,12 @@ public interface ExperimentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteExperimentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

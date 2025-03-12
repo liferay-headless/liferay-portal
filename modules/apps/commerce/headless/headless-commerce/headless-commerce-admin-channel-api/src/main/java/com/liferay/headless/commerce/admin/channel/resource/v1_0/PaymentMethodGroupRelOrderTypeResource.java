@@ -53,7 +53,7 @@ public interface PaymentMethodGroupRelOrderTypeResource {
 		throws Exception;
 
 	public Response deletePaymentMethodGroupRelOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PaymentMethodGroupRelOrderType>

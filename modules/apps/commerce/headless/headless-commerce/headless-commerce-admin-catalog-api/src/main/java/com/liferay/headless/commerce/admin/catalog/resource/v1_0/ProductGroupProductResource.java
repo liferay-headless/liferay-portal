@@ -51,7 +51,7 @@ public interface ProductGroupProductResource {
 	public void deleteProductGroupProduct(Long id) throws Exception;
 
 	public Response deleteProductGroupProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ProductGroupProduct>
@@ -74,7 +74,7 @@ public interface ProductGroupProductResource {
 		throws Exception;
 
 	public Response postProductGroupIdProductGroupProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

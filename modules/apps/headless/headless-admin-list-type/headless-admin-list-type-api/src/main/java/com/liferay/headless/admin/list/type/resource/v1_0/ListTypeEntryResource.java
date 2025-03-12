@@ -77,12 +77,13 @@ public interface ListTypeEntryResource {
 		throws Exception;
 
 	public Response postListTypeDefinitionListTypeEntryBatch(
-			Long listTypeDefinitionId, String callbackURL, Object object)
+			Long listTypeDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteListTypeEntry(Long listTypeEntryId) throws Exception;
 
-	public Response deleteListTypeEntryBatch(String callbackURL, Object object)
+	public Response deleteListTypeEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ListTypeEntry getListTypeEntry(Long listTypeEntryId)
@@ -92,7 +93,8 @@ public interface ListTypeEntryResource {
 			Long listTypeEntryId, ListTypeEntry listTypeEntry)
 		throws Exception;
 
-	public Response putListTypeEntryBatch(String callbackURL, Object object)
+	public Response putListTypeEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

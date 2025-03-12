@@ -242,7 +242,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -257,7 +257,8 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				WorkflowDefinition.class.getName(), callbackURL, null, object)
+				WorkflowDefinition.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 
@@ -493,7 +494,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -605,7 +606,7 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(

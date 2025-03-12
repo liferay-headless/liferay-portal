@@ -66,12 +66,12 @@ public interface DSEnvelopeResource {
 
 	public void postSiteDSEnvelopeBatch(
 			Long siteId, DSEnvelope dsEnvelope, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteDSEnvelopeBatchHttpResponse(
 			Long siteId, DSEnvelope dsEnvelope, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public DSEnvelope getSiteDSEnvelope(Long siteId, String dsEnvelopeId)
@@ -564,12 +564,12 @@ public interface DSEnvelopeResource {
 
 		public void postSiteDSEnvelopeBatch(
 				Long siteId, DSEnvelope dsEnvelope, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteDSEnvelopeBatchHttpResponse(
-					siteId, dsEnvelope, callbackURL, object);
+					siteId, dsEnvelope, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -621,12 +621,12 @@ public interface DSEnvelopeResource {
 
 		public HttpInvoker.HttpResponse postSiteDSEnvelopeBatchHttpResponse(
 				Long siteId, DSEnvelope dsEnvelope, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

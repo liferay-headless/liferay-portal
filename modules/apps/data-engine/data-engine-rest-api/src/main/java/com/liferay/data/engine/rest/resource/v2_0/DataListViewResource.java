@@ -66,12 +66,13 @@ public interface DataListViewResource {
 		throws Exception;
 
 	public Response postDataDefinitionDataListViewBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataListView(Long dataListViewId) throws Exception;
 
-	public Response deleteDataListViewBatch(String callbackURL, Object object)
+	public Response deleteDataListViewBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataListView getDataListView(Long dataListViewId) throws Exception;
@@ -80,7 +81,8 @@ public interface DataListViewResource {
 			Long dataListViewId, DataListView dataListView)
 		throws Exception;
 
-	public Response putDataListViewBatch(String callbackURL, Object object)
+	public Response putDataListViewBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -52,7 +52,7 @@ public interface SkuVirtualSettingsFileEntryResource {
 	public void deleteSkuVirtualSettingsFileEntry(Long id) throws Exception;
 
 	public Response deleteSkuVirtualSettingsFileEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public SkuVirtualSettingsFileEntry getSkuVirtualSettingsFileEntry(Long id)

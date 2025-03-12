@@ -90,7 +90,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteAvailabilityEstimateBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -98,7 +98,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			availabilityEstimateResource ->
 				availabilityEstimateResource.deleteAvailabilityEstimateBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -119,7 +119,7 @@ public class Mutation {
 	@GraphQLField
 	public Response updateAvailabilityEstimateBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -127,7 +127,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			availabilityEstimateResource ->
 				availabilityEstimateResource.putAvailabilityEstimateBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -183,7 +183,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createMeasurementUnitBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -191,7 +191,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			measurementUnitResource ->
 				measurementUnitResource.postMeasurementUnitBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -283,7 +283,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteMeasurementUnitBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -291,7 +291,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			measurementUnitResource ->
 				measurementUnitResource.deleteMeasurementUnitBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -336,14 +336,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteTaxCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_taxCategoryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			taxCategoryResource -> taxCategoryResource.deleteTaxCategoryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -362,14 +362,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateTaxCategoryBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_taxCategoryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			taxCategoryResource -> taxCategoryResource.putTaxCategoryBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -399,14 +399,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteWarehouseBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_warehouseResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			warehouseResource -> warehouseResource.deleteWarehouseBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -424,14 +424,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateWarehouseBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_warehouseResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			warehouseResource -> warehouseResource.putWarehouseBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

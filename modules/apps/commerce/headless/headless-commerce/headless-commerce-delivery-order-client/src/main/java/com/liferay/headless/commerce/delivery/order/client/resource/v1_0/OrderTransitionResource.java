@@ -61,12 +61,12 @@ public interface OrderTransitionResource {
 		throws Exception;
 
 	public void postPlacedOrderOrderTransitionBatch(
-			Long placedOrderId, String callbackURL, Object object)
+			Long placedOrderId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPlacedOrderOrderTransitionBatchHttpResponse(
-				Long placedOrderId, String callbackURL, Object object)
+				Long placedOrderId, String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -511,12 +511,12 @@ public interface OrderTransitionResource {
 		}
 
 		public void postPlacedOrderOrderTransitionBatch(
-				Long placedOrderId, String callbackURL, Object object)
+				Long placedOrderId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPlacedOrderOrderTransitionBatchHttpResponse(
-					placedOrderId, callbackURL, object);
+					placedOrderId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -568,12 +568,13 @@ public interface OrderTransitionResource {
 
 		public HttpInvoker.HttpResponse
 				postPlacedOrderOrderTransitionBatchHttpResponse(
-					Long placedOrderId, String callbackURL, Object object)
+					Long placedOrderId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

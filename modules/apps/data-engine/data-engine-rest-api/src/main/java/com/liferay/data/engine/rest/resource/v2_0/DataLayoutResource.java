@@ -67,12 +67,13 @@ public interface DataLayoutResource {
 		throws Exception;
 
 	public Response postDataDefinitionDataLayoutBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataLayout(Long dataLayoutId) throws Exception;
 
-	public Response deleteDataLayoutBatch(String callbackURL, Object object)
+	public Response deleteDataLayoutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataLayout getDataLayout(Long dataLayoutId) throws Exception;
@@ -80,7 +81,7 @@ public interface DataLayoutResource {
 	public DataLayout putDataLayout(Long dataLayoutId, DataLayout dataLayout)
 		throws Exception;
 
-	public Response putDataLayoutBatch(String callbackURL, Object object)
+	public Response putDataLayoutBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response postDataLayoutContext(

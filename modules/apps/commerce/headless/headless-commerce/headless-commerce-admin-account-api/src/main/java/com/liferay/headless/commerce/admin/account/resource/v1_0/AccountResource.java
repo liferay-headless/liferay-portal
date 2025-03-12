@@ -69,7 +69,7 @@ public interface AccountResource {
 
 	public Account postAccount(Account account) throws Exception;
 
-	public Response postAccountBatch(String callbackURL, Object object)
+	public Response postAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response deleteAccountByExternalReferenceCode(
@@ -90,7 +90,7 @@ public interface AccountResource {
 
 	public Response deleteAccount(Long id) throws Exception;
 
-	public Response deleteAccountBatch(String callbackURL, Object object)
+	public Response deleteAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Account getAccount(Long id) throws Exception;

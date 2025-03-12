@@ -78,12 +78,12 @@ public interface DataRecordCollectionResource {
 		throws Exception;
 
 	public void postDataDefinitionDataRecordCollectionBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDataDefinitionDataRecordCollectionBatchHttpResponse(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteDataRecordCollection(Long dataRecordCollectionId)
@@ -94,11 +94,11 @@ public interface DataRecordCollectionResource {
 		throws Exception;
 
 	public void deleteDataRecordCollectionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDataRecordCollectionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataRecordCollection getDataRecordCollection(
@@ -119,11 +119,12 @@ public interface DataRecordCollectionResource {
 			DataRecordCollection dataRecordCollection)
 		throws Exception;
 
-	public void putDataRecordCollectionBatch(String callbackURL, Object object)
+	public void putDataRecordCollectionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDataRecordCollectionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getDataRecordCollectionPermissionsPage(
@@ -736,12 +737,12 @@ public interface DataRecordCollectionResource {
 		}
 
 		public void postDataDefinitionDataRecordCollectionBatch(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDataDefinitionDataRecordCollectionBatchHttpResponse(
-					dataDefinitionId, callbackURL, object);
+					dataDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -793,12 +794,13 @@ public interface DataRecordCollectionResource {
 
 		public HttpInvoker.HttpResponse
 				postDataDefinitionDataRecordCollectionBatchHttpResponse(
-					Long dataDefinitionId, String callbackURL, Object object)
+					Long dataDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -945,12 +947,12 @@ public interface DataRecordCollectionResource {
 		}
 
 		public void deleteDataRecordCollectionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteDataRecordCollectionBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1002,12 +1004,12 @@ public interface DataRecordCollectionResource {
 
 		public HttpInvoker.HttpResponse
 				deleteDataRecordCollectionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1265,11 +1267,12 @@ public interface DataRecordCollectionResource {
 		}
 
 		public void putDataRecordCollectionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDataRecordCollectionBatchHttpResponse(callbackURL, object);
+				putDataRecordCollectionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1321,12 +1324,12 @@ public interface DataRecordCollectionResource {
 
 		public HttpInvoker.HttpResponse
 				putDataRecordCollectionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

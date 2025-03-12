@@ -62,11 +62,11 @@ public interface ProductGroupResource {
 			ProductGroup productGroup)
 		throws Exception;
 
-	public void postProductGroupBatch(String callbackURL, Object object)
+	public void postProductGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProductGroupByExternalReferenceCode(
@@ -110,11 +110,12 @@ public interface ProductGroupResource {
 	public HttpInvoker.HttpResponse deleteProductGroupHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteProductGroupBatch(String callbackURL, Object object)
+	public void deleteProductGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductGroupBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductGroup getProductGroup(Long id) throws Exception;
@@ -595,11 +596,12 @@ public interface ProductGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postProductGroupBatch(String callbackURL, Object object)
+		public void postProductGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProductGroupBatchHttpResponse(callbackURL, object);
+				postProductGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -650,12 +652,12 @@ public interface ProductGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse postProductGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1221,11 +1223,12 @@ public interface ProductGroupResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteProductGroupBatch(String callbackURL, Object object)
+		public void deleteProductGroupBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteProductGroupBatchHttpResponse(callbackURL, object);
+				deleteProductGroupBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1276,12 +1279,12 @@ public interface ProductGroupResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteProductGroupBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

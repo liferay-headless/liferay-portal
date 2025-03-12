@@ -138,7 +138,7 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteFormDocumentBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -146,7 +146,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			formDocumentResource ->
 				formDocumentResource.deleteFormDocumentBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -165,14 +165,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateFormRecordBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_formRecordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			formRecordResource -> formRecordResource.putFormRecordBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -208,14 +208,14 @@ public class Mutation {
 	public Response createFormFormRecordBatch(
 			@GraphQLName("formId") Long formId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_formRecordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			formRecordResource -> formRecordResource.postFormFormRecordBatch(
-				formId, callbackURL, object));
+				formId, callbackURL, contentString));
 	}
 
 	@GraphQLField

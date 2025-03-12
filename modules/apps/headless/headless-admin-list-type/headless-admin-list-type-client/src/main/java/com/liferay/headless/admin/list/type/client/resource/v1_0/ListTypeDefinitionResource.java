@@ -64,11 +64,12 @@ public interface ListTypeDefinitionResource {
 			ListTypeDefinition listTypeDefinition)
 		throws Exception;
 
-	public void postListTypeDefinitionBatch(String callbackURL, Object object)
+	public void postListTypeDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postListTypeDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ListTypeDefinition getListTypeDefinitionByExternalReferenceCode(
@@ -97,11 +98,12 @@ public interface ListTypeDefinitionResource {
 			Long listTypeDefinitionId)
 		throws Exception;
 
-	public void deleteListTypeDefinitionBatch(String callbackURL, Object object)
+	public void deleteListTypeDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteListTypeDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ListTypeDefinition getListTypeDefinition(Long listTypeDefinitionId)
@@ -127,11 +129,12 @@ public interface ListTypeDefinitionResource {
 			Long listTypeDefinitionId, ListTypeDefinition listTypeDefinition)
 		throws Exception;
 
-	public void putListTypeDefinitionBatch(String callbackURL, Object object)
+	public void putListTypeDefinitionBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putListTypeDefinitionBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -602,11 +605,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public void postListTypeDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postListTypeDefinitionBatchHttpResponse(callbackURL, object);
+				postListTypeDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -657,12 +661,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse postListTypeDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1027,11 +1031,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public void deleteListTypeDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteListTypeDefinitionBatchHttpResponse(callbackURL, object);
+				deleteListTypeDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1083,12 +1088,12 @@ public interface ListTypeDefinitionResource {
 
 		public HttpInvoker.HttpResponse
 				deleteListTypeDefinitionBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1456,11 +1461,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public void putListTypeDefinitionBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putListTypeDefinitionBatchHttpResponse(callbackURL, object);
+				putListTypeDefinitionBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1511,12 +1517,12 @@ public interface ListTypeDefinitionResource {
 		}
 
 		public HttpInvoker.HttpResponse putListTypeDefinitionBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

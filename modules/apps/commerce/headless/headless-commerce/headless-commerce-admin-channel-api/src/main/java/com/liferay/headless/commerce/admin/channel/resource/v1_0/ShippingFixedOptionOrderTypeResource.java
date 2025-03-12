@@ -53,7 +53,7 @@ public interface ShippingFixedOptionOrderTypeResource {
 		throws Exception;
 
 	public Response deleteShippingFixedOptionOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ShippingFixedOptionOrderType>

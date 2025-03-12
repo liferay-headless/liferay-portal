@@ -40,11 +40,11 @@ public interface DiscountSkuResource {
 			Long discountSkuId)
 		throws Exception;
 
-	public void deleteDiscountSkuBatch(String callbackURL, Object object)
+	public void deleteDiscountSkuBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountSkuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountSku> getDiscountByExternalReferenceCodeDiscountSkusPage(
@@ -84,11 +84,11 @@ public interface DiscountSkuResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountSkuBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDiscountIdDiscountSkuBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -302,11 +302,12 @@ public interface DiscountSkuResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDiscountSkuBatch(String callbackURL, Object object)
+		public void deleteDiscountSkuBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDiscountSkuBatchHttpResponse(callbackURL, object);
+				deleteDiscountSkuBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -357,12 +358,12 @@ public interface DiscountSkuResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDiscountSkuBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -865,11 +866,12 @@ public interface DiscountSkuResource {
 		}
 
 		public void postDiscountIdDiscountSkuBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postDiscountIdDiscountSkuBatchHttpResponse(callbackURL, object);
+				postDiscountIdDiscountSkuBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -921,12 +923,12 @@ public interface DiscountSkuResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountSkuBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

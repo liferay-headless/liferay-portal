@@ -59,7 +59,7 @@ public interface CountryResource {
 
 	public Country postCountry(Country country) throws Exception;
 
-	public Response postCountryBatch(String callbackURL, Object object)
+	public Response postCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Country getCountryByA2(String a2) throws Exception;
@@ -72,7 +72,7 @@ public interface CountryResource {
 
 	public void deleteCountry(Long countryId) throws Exception;
 
-	public Response deleteCountryBatch(String callbackURL, Object object)
+	public Response deleteCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Country getCountry(Long countryId) throws Exception;
@@ -82,7 +82,7 @@ public interface CountryResource {
 
 	public Country putCountry(Long countryId, Country country) throws Exception;
 
-	public Response putCountryBatch(String callbackURL, Object object)
+	public Response putCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

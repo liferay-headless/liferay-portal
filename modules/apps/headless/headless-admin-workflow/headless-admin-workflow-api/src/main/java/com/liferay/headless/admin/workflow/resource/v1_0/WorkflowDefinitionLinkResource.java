@@ -82,7 +82,7 @@ public interface WorkflowDefinitionLinkResource {
 		throws Exception;
 
 	public Response postWorkflowDefinitionWorkflowDefinitionLinkBatch(
-			Long workflowDefinitionId, String callbackURL, Object object)
+			Long workflowDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

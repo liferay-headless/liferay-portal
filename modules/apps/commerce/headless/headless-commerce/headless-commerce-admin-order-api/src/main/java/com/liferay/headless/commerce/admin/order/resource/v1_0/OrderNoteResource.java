@@ -62,7 +62,8 @@ public interface OrderNoteResource {
 
 	public Response deleteOrderNote(Long id) throws Exception;
 
-	public Response deleteOrderNoteBatch(String callbackURL, Object object)
+	public Response deleteOrderNoteBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderNote getOrderNote(Long id) throws Exception;
@@ -85,7 +86,8 @@ public interface OrderNoteResource {
 	public OrderNote postOrderIdOrderNote(Long id, OrderNote orderNote)
 		throws Exception;
 
-	public Response postOrderIdOrderNoteBatch(String callbackURL, Object object)
+	public Response postOrderIdOrderNoteBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

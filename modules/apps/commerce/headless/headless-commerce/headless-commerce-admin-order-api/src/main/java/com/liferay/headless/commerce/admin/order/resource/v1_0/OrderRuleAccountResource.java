@@ -52,7 +52,7 @@ public interface OrderRuleAccountResource {
 		throws Exception;
 
 	public Response deleteOrderRuleAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderRuleAccount>
@@ -75,7 +75,7 @@ public interface OrderRuleAccountResource {
 		throws Exception;
 
 	public Response postOrderRuleIdOrderRuleAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

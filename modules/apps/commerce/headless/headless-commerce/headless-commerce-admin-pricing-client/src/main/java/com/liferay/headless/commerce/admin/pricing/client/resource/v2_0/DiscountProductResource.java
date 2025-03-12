@@ -40,11 +40,12 @@ public interface DiscountProductResource {
 			Long discountProductId)
 		throws Exception;
 
-	public void deleteDiscountProductBatch(String callbackURL, Object object)
+	public void deleteDiscountProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDiscountProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DiscountProduct>
@@ -86,12 +87,12 @@ public interface DiscountProductResource {
 		throws Exception;
 
 	public void postDiscountIdDiscountProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDiscountIdDiscountProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -309,11 +310,12 @@ public interface DiscountProductResource {
 		}
 
 		public void deleteDiscountProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDiscountProductBatchHttpResponse(callbackURL, object);
+				deleteDiscountProductBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -364,12 +366,12 @@ public interface DiscountProductResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDiscountProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -876,12 +878,12 @@ public interface DiscountProductResource {
 		}
 
 		public void postDiscountIdDiscountProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDiscountIdDiscountProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -933,12 +935,12 @@ public interface DiscountProductResource {
 
 		public HttpInvoker.HttpResponse
 				postDiscountIdDiscountProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

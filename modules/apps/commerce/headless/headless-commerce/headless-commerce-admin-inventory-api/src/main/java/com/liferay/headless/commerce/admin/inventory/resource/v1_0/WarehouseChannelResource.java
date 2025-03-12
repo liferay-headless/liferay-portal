@@ -52,7 +52,7 @@ public interface WarehouseChannelResource {
 		throws Exception;
 
 	public Response deleteWarehouseChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WarehouseChannel>
@@ -75,7 +75,7 @@ public interface WarehouseChannelResource {
 		throws Exception;
 
 	public Response postWarehouseIdWarehouseChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

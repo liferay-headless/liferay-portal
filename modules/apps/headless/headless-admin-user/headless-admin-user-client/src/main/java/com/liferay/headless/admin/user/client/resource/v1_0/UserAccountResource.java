@@ -166,11 +166,11 @@ public interface UserAccountResource {
 		throws Exception;
 
 	public void postAccountUserAccountBatch(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAccountUserAccountBatchHttpResponse(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountUserAccountsByEmailAddress(
@@ -354,11 +354,11 @@ public interface UserAccountResource {
 			UserAccount userAccount)
 		throws Exception;
 
-	public void postUserAccountBatch(String callbackURL, Object object)
+	public void postUserAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postUserAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserAccount getUserAccountByEmailAddress(String emailAddress)
@@ -420,11 +420,11 @@ public interface UserAccountResource {
 			Long userAccountId)
 		throws Exception;
 
-	public void deleteUserAccountBatch(String callbackURL, Object object)
+	public void deleteUserAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteUserAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserAccount getUserAccount(Long userAccountId) throws Exception;
@@ -449,11 +449,11 @@ public interface UserAccountResource {
 			Long userAccountId, UserAccount userAccount)
 		throws Exception;
 
-	public void putUserAccountBatch(String callbackURL, Object object)
+	public void putUserAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putUserAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void postUserAccountImage(
@@ -2009,12 +2009,12 @@ public interface UserAccountResource {
 		}
 
 		public void postAccountUserAccountBatch(
-				Long accountId, String callbackURL, Object object)
+				Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountUserAccountBatchHttpResponse(
-					accountId, callbackURL, object);
+					accountId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2065,12 +2065,12 @@ public interface UserAccountResource {
 		}
 
 		public HttpInvoker.HttpResponse postAccountUserAccountBatchHttpResponse(
-				Long accountId, String callbackURL, Object object)
+				Long accountId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -4347,11 +4347,12 @@ public interface UserAccountResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postUserAccountBatch(String callbackURL, Object object)
+		public void postUserAccountBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postUserAccountBatchHttpResponse(callbackURL, object);
+				postUserAccountBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -4402,12 +4403,12 @@ public interface UserAccountResource {
 		}
 
 		public HttpInvoker.HttpResponse postUserAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -5218,11 +5219,12 @@ public interface UserAccountResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteUserAccountBatch(String callbackURL, Object object)
+		public void deleteUserAccountBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteUserAccountBatchHttpResponse(callbackURL, object);
+				deleteUserAccountBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -5273,12 +5275,12 @@ public interface UserAccountResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteUserAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -5636,11 +5638,12 @@ public interface UserAccountResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putUserAccountBatch(String callbackURL, Object object)
+		public void putUserAccountBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putUserAccountBatchHttpResponse(callbackURL, object);
+				putUserAccountBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -5691,12 +5694,12 @@ public interface UserAccountResource {
 		}
 
 		public HttpInvoker.HttpResponse putUserAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

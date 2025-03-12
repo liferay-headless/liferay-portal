@@ -59,11 +59,11 @@ public interface CountryResource {
 	public HttpInvoker.HttpResponse postCountryHttpResponse(Country country)
 		throws Exception;
 
-	public void postCountryBatch(String callbackURL, Object object)
+	public void postCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCountryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Country getCountryByA2(String a2) throws Exception;
@@ -92,11 +92,11 @@ public interface CountryResource {
 	public HttpInvoker.HttpResponse deleteCountryHttpResponse(Long countryId)
 		throws Exception;
 
-	public void deleteCountryBatch(String callbackURL, Object object)
+	public void deleteCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCountryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Country getCountry(Long countryId) throws Exception;
@@ -117,11 +117,11 @@ public interface CountryResource {
 			Long countryId, Country country)
 		throws Exception;
 
-	public void putCountryBatch(String callbackURL, Object object)
+	public void putCountryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCountryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -586,11 +586,11 @@ public interface CountryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postCountryBatch(String callbackURL, Object object)
+		public void postCountryBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postCountryBatchHttpResponse(callbackURL, object);
+				postCountryBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -641,12 +641,12 @@ public interface CountryResource {
 		}
 
 		public HttpInvoker.HttpResponse postCountryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1198,11 +1198,11 @@ public interface CountryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCountryBatch(String callbackURL, Object object)
+		public void deleteCountryBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCountryBatchHttpResponse(callbackURL, object);
+				deleteCountryBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1253,12 +1253,12 @@ public interface CountryResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCountryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1613,11 +1613,11 @@ public interface CountryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putCountryBatch(String callbackURL, Object object)
+		public void putCountryBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putCountryBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1668,12 +1668,12 @@ public interface CountryResource {
 		}
 
 		public HttpInvoker.HttpResponse putCountryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

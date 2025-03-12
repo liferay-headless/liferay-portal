@@ -315,14 +315,14 @@ public class Mutation {
 	public Response createProcessInstanceBatch(
 			@GraphQLName("processId") Long processId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_instanceResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			instanceResource -> instanceResource.postProcessInstanceBatch(
-				processId, callbackURL, object));
+				processId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -403,14 +403,14 @@ public class Mutation {
 	public Response createProcessNodeBatch(
 			@GraphQLName("processId") Long processId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_nodeResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			nodeResource -> nodeResource.postProcessNodeBatch(
-				processId, callbackURL, object));
+				processId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -440,14 +440,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createProcessBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_processResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			processResource -> processResource.postProcessBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -465,14 +465,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deleteProcessBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_processResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			processResource -> processResource.deleteProcessBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -492,14 +492,14 @@ public class Mutation {
 	@GraphQLField
 	public Response updateProcessBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_processResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			processResource -> processResource.putProcessBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -600,13 +600,13 @@ public class Mutation {
 			@GraphQLName("processId") Long processId,
 			@GraphQLName("sla") SLA sla,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_slaResourceComponentServiceObjects, this::_populateResourceContext,
 			slaResource -> slaResource.postProcessSLABatch(
-				processId, sla, callbackURL, object));
+				processId, sla, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -624,13 +624,13 @@ public class Mutation {
 	public Response deleteSLABatch(
 			@GraphQLName("slaId") Long slaId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_slaResourceComponentServiceObjects, this::_populateResourceContext,
 			slaResource -> slaResource.deleteSLABatch(
-				slaId, callbackURL, object));
+				slaId, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -647,13 +647,13 @@ public class Mutation {
 	public Response updateSLABatch(
 			@GraphQLName("slaId") Long slaId, @GraphQLName("sla") SLA sla,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_slaResourceComponentServiceObjects, this::_populateResourceContext,
 			slaResource -> slaResource.putSLABatch(
-				slaId, sla, callbackURL, object));
+				slaId, sla, callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -687,14 +687,14 @@ public class Mutation {
 	public Response createProcessTaskBatch(
 			@GraphQLName("processId") Long processId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_taskResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			taskResource -> taskResource.postProcessTaskBatch(
-				processId, callbackURL, object));
+				processId, callbackURL, contentString));
 	}
 
 	@GraphQLField

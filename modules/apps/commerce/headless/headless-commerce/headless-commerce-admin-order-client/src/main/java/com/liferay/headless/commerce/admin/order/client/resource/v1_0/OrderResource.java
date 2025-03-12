@@ -59,11 +59,11 @@ public interface OrderResource {
 	public HttpInvoker.HttpResponse postOrderHttpResponse(Order order)
 		throws Exception;
 
-	public void postOrderBatch(String callbackURL, Object object)
+	public void postOrderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrderByExternalReferenceCode(String externalReferenceCode)
@@ -103,11 +103,11 @@ public interface OrderResource {
 	public HttpInvoker.HttpResponse deleteOrderHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOrderBatch(String callbackURL, Object object)
+	public void deleteOrderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Order getOrder(Long id) throws Exception;
@@ -580,11 +580,11 @@ public interface OrderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrderBatch(String callbackURL, Object object)
+		public void postOrderBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postOrderBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -635,12 +635,12 @@ public interface OrderResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1194,11 +1194,11 @@ public interface OrderResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrderBatch(String callbackURL, Object object)
+		public void deleteOrderBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderBatchHttpResponse(callbackURL, object);
+				deleteOrderBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1249,12 +1249,12 @@ public interface OrderResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

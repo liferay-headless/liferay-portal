@@ -50,7 +50,8 @@ public interface GroupedProductResource {
 
 	public void deleteGroupedProduct(Long groupedProductId) throws Exception;
 
-	public Response deleteGroupedProductBatch(String callbackURL, Object object)
+	public Response deleteGroupedProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public GroupedProduct patchGroupedProduct(
@@ -75,7 +76,7 @@ public interface GroupedProductResource {
 		throws Exception;
 
 	public Response postProductIdGroupedProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

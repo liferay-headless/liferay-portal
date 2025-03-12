@@ -41,11 +41,12 @@ public interface WarehouseChannelResource {
 			Long warehouseChannelId)
 		throws Exception;
 
-	public void deleteWarehouseChannelBatch(String callbackURL, Object object)
+	public void deleteWarehouseChannelBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWarehouseChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<WarehouseChannel>
@@ -88,12 +89,12 @@ public interface WarehouseChannelResource {
 		throws Exception;
 
 	public void postWarehouseIdWarehouseChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWarehouseIdWarehouseChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -311,11 +312,12 @@ public interface WarehouseChannelResource {
 		}
 
 		public void deleteWarehouseChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteWarehouseChannelBatchHttpResponse(callbackURL, object);
+				deleteWarehouseChannelBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +368,12 @@ public interface WarehouseChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteWarehouseChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -879,12 +881,12 @@ public interface WarehouseChannelResource {
 		}
 
 		public void postWarehouseIdWarehouseChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWarehouseIdWarehouseChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -936,12 +938,12 @@ public interface WarehouseChannelResource {
 
 		public HttpInvoker.HttpResponse
 				postWarehouseIdWarehouseChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

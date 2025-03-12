@@ -51,7 +51,7 @@ public interface ProductOptionValueResource {
 	public void deleteProductOptionValue(Long id) throws Exception;
 
 	public Response deleteProductOptionValueBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductOptionValue getProductOptionValue(Long id) throws Exception;
@@ -69,7 +69,7 @@ public interface ProductOptionValueResource {
 		throws Exception;
 
 	public Response postProductOptionIdProductOptionValueBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

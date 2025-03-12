@@ -224,7 +224,7 @@ public class Mutation {
 	public Response createPlacedOrderOrderTransitionBatch(
 			@GraphQLName("placedOrderId") Long placedOrderId,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -232,7 +232,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			orderTransitionResource ->
 				orderTransitionResource.postPlacedOrderOrderTransitionBatch(
-					placedOrderId, callbackURL, object));
+					placedOrderId, callbackURL, contentString));
 	}
 
 	@GraphQLField

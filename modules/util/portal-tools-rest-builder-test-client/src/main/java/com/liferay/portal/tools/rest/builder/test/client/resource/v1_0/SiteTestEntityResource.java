@@ -51,11 +51,11 @@ public interface SiteTestEntityResource {
 			Long siteTestEntityId, SiteTestEntity siteTestEntity)
 		throws Exception;
 
-	public void putSiteTestEntityBatch(String callbackURL, Object object)
+	public void putSiteTestEntityBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putSiteTestEntityBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getSiteTestEntityPermissionsPage(
@@ -103,11 +103,11 @@ public interface SiteTestEntityResource {
 		throws Exception;
 
 	public void postSiteSiteTestEntityBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteSiteTestEntityBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SiteTestEntity getSiteSiteTestEntityByExternalReferenceCode(
@@ -452,11 +452,12 @@ public interface SiteTestEntityResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putSiteTestEntityBatch(String callbackURL, Object object)
+		public void putSiteTestEntityBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteTestEntityBatchHttpResponse(callbackURL, object);
+				putSiteTestEntityBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -507,12 +508,12 @@ public interface SiteTestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse putSiteTestEntityBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1108,12 +1109,12 @@ public interface SiteTestEntityResource {
 		}
 
 		public void postSiteSiteTestEntityBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteSiteTestEntityBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1164,12 +1165,12 @@ public interface SiteTestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteSiteTestEntityBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

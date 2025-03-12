@@ -367,7 +367,7 @@ public abstract class BaseAccountOrganizationResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -382,7 +382,8 @@ public abstract class BaseAccountOrganizationResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				AccountOrganization.class.getName(), callbackURL, null, object)
+				AccountOrganization.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

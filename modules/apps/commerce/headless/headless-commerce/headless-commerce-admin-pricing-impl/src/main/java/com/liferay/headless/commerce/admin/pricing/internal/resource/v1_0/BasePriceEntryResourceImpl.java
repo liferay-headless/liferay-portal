@@ -230,7 +230,7 @@ public abstract class BasePriceEntryResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -480,7 +480,7 @@ public abstract class BasePriceEntryResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -495,7 +495,7 @@ public abstract class BasePriceEntryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				PriceEntry.class.getName(), callbackURL, null, object)
+				PriceEntry.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 

@@ -77,11 +77,11 @@ public interface AttachmentResource {
 	public HttpInvoker.HttpResponse deleteAttachmentHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteAttachmentBatch(String callbackURL, Object object)
+	public void deleteAttachmentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteAttachmentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Attachment> getProductByExternalReferenceCodeAttachmentsPage(
@@ -171,11 +171,12 @@ public interface AttachmentResource {
 			Long id, Attachment attachment)
 		throws Exception;
 
-	public void postProductIdAttachmentBatch(String callbackURL, Object object)
+	public void postProductIdAttachmentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductIdAttachmentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Attachment postProductIdAttachmentByBase64(
@@ -871,11 +872,12 @@ public interface AttachmentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteAttachmentBatch(String callbackURL, Object object)
+		public void deleteAttachmentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteAttachmentBatchHttpResponse(callbackURL, object);
+				deleteAttachmentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -926,12 +928,12 @@ public interface AttachmentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteAttachmentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2085,11 +2087,12 @@ public interface AttachmentResource {
 		}
 
 		public void postProductIdAttachmentBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProductIdAttachmentBatchHttpResponse(callbackURL, object);
+				postProductIdAttachmentBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2141,12 +2144,12 @@ public interface AttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				postProductIdAttachmentBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

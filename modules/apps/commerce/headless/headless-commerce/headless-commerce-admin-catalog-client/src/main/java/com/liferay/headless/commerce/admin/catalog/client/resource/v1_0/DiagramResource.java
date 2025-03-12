@@ -68,11 +68,12 @@ public interface DiagramResource {
 			Long id, Diagram diagram)
 		throws Exception;
 
-	public void postProductIdDiagramBatch(String callbackURL, Object object)
+	public void postProductIdDiagramBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductIdDiagramBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -722,11 +723,13 @@ public interface DiagramResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postProductIdDiagramBatch(String callbackURL, Object object)
+		public void postProductIdDiagramBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProductIdDiagramBatchHttpResponse(callbackURL, object);
+				postProductIdDiagramBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -777,12 +780,12 @@ public interface DiagramResource {
 		}
 
 		public HttpInvoker.HttpResponse postProductIdDiagramBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

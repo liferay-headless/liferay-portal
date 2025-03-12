@@ -68,7 +68,8 @@ public interface AttachmentResource {
 
 	public void deleteAttachment(Long id) throws Exception;
 
-	public Response deleteAttachmentBatch(String callbackURL, Object object)
+	public Response deleteAttachmentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Attachment> getProductByExternalReferenceCodeAttachmentsPage(
@@ -111,7 +112,7 @@ public interface AttachmentResource {
 		throws Exception;
 
 	public Response postProductIdAttachmentBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Attachment postProductIdAttachmentByBase64(

@@ -58,7 +58,8 @@ public interface TaxCategoryResource {
 
 	public Response deleteTaxCategory(Long id) throws Exception;
 
-	public Response deleteTaxCategoryBatch(String callbackURL, Object object)
+	public Response deleteTaxCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxCategory getTaxCategory(Long id) throws Exception;
@@ -66,7 +67,8 @@ public interface TaxCategoryResource {
 	public Response putTaxCategory(Long id, TaxCategory taxCategory)
 		throws Exception;
 
-	public Response putTaxCategoryBatch(String callbackURL, Object object)
+	public Response putTaxCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

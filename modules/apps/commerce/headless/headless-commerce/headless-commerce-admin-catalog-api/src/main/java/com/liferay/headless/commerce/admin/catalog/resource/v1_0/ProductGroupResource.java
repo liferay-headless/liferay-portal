@@ -60,7 +60,8 @@ public interface ProductGroupResource {
 	public ProductGroup postProductGroup(ProductGroup productGroup)
 		throws Exception;
 
-	public Response postProductGroupBatch(String callbackURL, Object object)
+	public Response postProductGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProductGroupByExternalReferenceCode(
@@ -81,7 +82,8 @@ public interface ProductGroupResource {
 
 	public void deleteProductGroup(Long id) throws Exception;
 
-	public Response deleteProductGroupBatch(String callbackURL, Object object)
+	public Response deleteProductGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductGroup getProductGroup(Long id) throws Exception;

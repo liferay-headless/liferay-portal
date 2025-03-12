@@ -43,12 +43,12 @@ public interface ProductVirtualSettingsFileEntryResource {
 		throws Exception;
 
 	public void deleteProductVirtualSettingsFileEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteProductVirtualSettingsFileEntryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductVirtualSettingsFileEntry getProductVirtualSettingsFileEntry(
@@ -311,12 +311,12 @@ public interface ProductVirtualSettingsFileEntryResource {
 		}
 
 		public void deleteProductVirtualSettingsFileEntryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteProductVirtualSettingsFileEntryBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -368,12 +368,12 @@ public interface ProductVirtualSettingsFileEntryResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductVirtualSettingsFileEntryBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -59,11 +59,11 @@ public interface RoleResource {
 	public HttpInvoker.HttpResponse postRoleHttpResponse(Role role)
 		throws Exception;
 
-	public void postRoleBatch(String callbackURL, Object object)
+	public void postRoleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postRoleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteRoleByExternalReferenceCode(String externalReferenceCode)
@@ -163,11 +163,11 @@ public interface RoleResource {
 	public HttpInvoker.HttpResponse deleteRoleHttpResponse(Long roleId)
 		throws Exception;
 
-	public void deleteRoleBatch(String callbackURL, Object object)
+	public void deleteRoleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteRoleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Role getRole(Long roleId) throws Exception;
@@ -186,11 +186,11 @@ public interface RoleResource {
 	public HttpInvoker.HttpResponse putRoleHttpResponse(Long roleId, Role role)
 		throws Exception;
 
-	public void putRoleBatch(String callbackURL, Object object)
+	public void putRoleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putRoleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteRoleUserAccountAssociation(
@@ -708,11 +708,11 @@ public interface RoleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postRoleBatch(String callbackURL, Object object)
+		public void postRoleBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postRoleBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -763,12 +763,12 @@ public interface RoleResource {
 		}
 
 		public HttpInvoker.HttpResponse postRoleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2016,11 +2016,11 @@ public interface RoleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteRoleBatch(String callbackURL, Object object)
+		public void deleteRoleBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = deleteRoleBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2071,12 +2071,12 @@ public interface RoleResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteRoleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2426,11 +2426,11 @@ public interface RoleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putRoleBatch(String callbackURL, Object object)
+		public void putRoleBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putRoleBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2481,12 +2481,12 @@ public interface RoleResource {
 		}
 
 		public HttpInvoker.HttpResponse putRoleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

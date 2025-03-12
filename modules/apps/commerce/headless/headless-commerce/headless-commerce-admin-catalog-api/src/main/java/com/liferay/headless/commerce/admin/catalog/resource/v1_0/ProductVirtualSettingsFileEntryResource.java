@@ -52,7 +52,7 @@ public interface ProductVirtualSettingsFileEntryResource {
 	public void deleteProductVirtualSettingsFileEntry(Long id) throws Exception;
 
 	public Response deleteProductVirtualSettingsFileEntryBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductVirtualSettingsFileEntry getProductVirtualSettingsFileEntry(

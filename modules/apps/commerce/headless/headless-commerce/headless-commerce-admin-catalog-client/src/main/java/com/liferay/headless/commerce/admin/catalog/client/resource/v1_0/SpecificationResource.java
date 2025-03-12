@@ -62,11 +62,11 @@ public interface SpecificationResource {
 			Specification specification)
 		throws Exception;
 
-	public void postSpecificationBatch(String callbackURL, Object object)
+	public void postSpecificationBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSpecificationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSpecificationByExternalReferenceCode(
@@ -110,11 +110,12 @@ public interface SpecificationResource {
 	public HttpInvoker.HttpResponse deleteSpecificationHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteSpecificationBatch(String callbackURL, Object object)
+	public void deleteSpecificationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSpecificationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Specification getSpecification(Long id) throws Exception;
@@ -596,11 +597,12 @@ public interface SpecificationResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postSpecificationBatch(String callbackURL, Object object)
+		public void postSpecificationBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSpecificationBatchHttpResponse(callbackURL, object);
+				postSpecificationBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -651,12 +653,12 @@ public interface SpecificationResource {
 		}
 
 		public HttpInvoker.HttpResponse postSpecificationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1233,11 +1235,13 @@ public interface SpecificationResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteSpecificationBatch(String callbackURL, Object object)
+		public void deleteSpecificationBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSpecificationBatchHttpResponse(callbackURL, object);
+				deleteSpecificationBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1288,12 +1292,12 @@ public interface SpecificationResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSpecificationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

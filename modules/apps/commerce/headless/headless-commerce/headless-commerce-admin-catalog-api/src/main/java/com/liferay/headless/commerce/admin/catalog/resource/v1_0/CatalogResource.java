@@ -66,7 +66,7 @@ public interface CatalogResource {
 
 	public Response deleteCatalog(Long id) throws Exception;
 
-	public Response deleteCatalogBatch(String callbackURL, Object object)
+	public Response deleteCatalogBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Catalog getCatalog(Long id) throws Exception;
@@ -84,7 +84,7 @@ public interface CatalogResource {
 
 	public Catalog postCatalog(Catalog catalog) throws Exception;
 
-	public Response postCatalogBatch(String callbackURL, Object object)
+	public Response postCatalogBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Catalog getProductByExternalReferenceCodeCatalog(

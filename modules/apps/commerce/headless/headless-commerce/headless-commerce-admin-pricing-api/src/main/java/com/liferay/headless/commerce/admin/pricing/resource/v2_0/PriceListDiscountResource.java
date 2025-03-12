@@ -52,7 +52,7 @@ public interface PriceListDiscountResource {
 		throws Exception;
 
 	public Response deletePriceListDiscountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceListDiscount>
@@ -75,7 +75,7 @@ public interface PriceListDiscountResource {
 		throws Exception;
 
 	public Response postPriceListIdPriceListDiscountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

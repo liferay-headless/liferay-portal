@@ -42,12 +42,12 @@ public interface AccountAddressChannelResource {
 		throws Exception;
 
 	public void deleteAccountAddressChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteAccountAddressChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AccountAddressChannel>
@@ -310,12 +310,12 @@ public interface AccountAddressChannelResource {
 		}
 
 		public void deleteAccountAddressChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteAccountAddressChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -367,12 +367,12 @@ public interface AccountAddressChannelResource {
 
 		public HttpInvoker.HttpResponse
 				deleteAccountAddressChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

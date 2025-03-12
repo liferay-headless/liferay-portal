@@ -75,7 +75,7 @@ public class Mutation {
 	@GraphQLField
 	public Response createDispatchTriggerBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -83,7 +83,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			dispatchTriggerResource ->
 				dispatchTriggerResource.postDispatchTriggerBatch(
-					callbackURL, object));
+					callbackURL, contentString));
 	}
 
 	@GraphQLField

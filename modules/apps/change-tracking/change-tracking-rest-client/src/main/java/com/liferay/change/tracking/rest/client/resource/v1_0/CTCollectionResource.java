@@ -66,11 +66,11 @@ public interface CTCollectionResource {
 		throws Exception;
 
 	public void postCTCollectionBatch(
-			CTCollection ctCollection, String callbackURL, Object object)
+			CTCollection ctCollection, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCTCollectionBatchHttpResponse(
-			CTCollection ctCollection, String callbackURL, Object object)
+			CTCollection ctCollection, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteCTCollectionByExternalReferenceCode(
@@ -141,11 +141,11 @@ public interface CTCollectionResource {
 		throws Exception;
 
 	public void deleteCTCollectionBatch(
-			Long ctCollectionId, String callbackURL, Object object)
+			Long ctCollectionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCTCollectionBatchHttpResponse(
-			Long ctCollectionId, String callbackURL, Object object)
+			Long ctCollectionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public CTCollection getCTCollection(Long ctCollectionId) throws Exception;
@@ -172,12 +172,12 @@ public interface CTCollectionResource {
 
 	public void putCTCollectionBatch(
 			Long ctCollectionId, CTCollection ctCollection, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCTCollectionBatchHttpResponse(
 			Long ctCollectionId, CTCollection ctCollection, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public void postCTCollectionCheckout(Long ctCollectionId) throws Exception;
@@ -671,12 +671,13 @@ public interface CTCollectionResource {
 		}
 
 		public void postCTCollectionBatch(
-				CTCollection ctCollection, String callbackURL, Object object)
+				CTCollection ctCollection, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postCTCollectionBatchHttpResponse(
-					ctCollection, callbackURL, object);
+					ctCollection, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -727,12 +728,13 @@ public interface CTCollectionResource {
 		}
 
 		public HttpInvoker.HttpResponse postCTCollectionBatchHttpResponse(
-				CTCollection ctCollection, String callbackURL, Object object)
+				CTCollection ctCollection, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1642,12 +1644,12 @@ public interface CTCollectionResource {
 		}
 
 		public void deleteCTCollectionBatch(
-				Long ctCollectionId, String callbackURL, Object object)
+				Long ctCollectionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteCTCollectionBatchHttpResponse(
-					ctCollectionId, callbackURL, object);
+					ctCollectionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1698,12 +1700,12 @@ public interface CTCollectionResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCTCollectionBatchHttpResponse(
-				Long ctCollectionId, String callbackURL, Object object)
+				Long ctCollectionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2067,12 +2069,12 @@ public interface CTCollectionResource {
 
 		public void putCTCollectionBatch(
 				Long ctCollectionId, CTCollection ctCollection,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putCTCollectionBatchHttpResponse(
-					ctCollectionId, ctCollection, callbackURL, object);
+					ctCollectionId, ctCollection, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2124,12 +2126,12 @@ public interface CTCollectionResource {
 
 		public HttpInvoker.HttpResponse putCTCollectionBatchHttpResponse(
 				Long ctCollectionId, CTCollection ctCollection,
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

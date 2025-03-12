@@ -41,11 +41,11 @@ public interface AvailabilityEstimateResource {
 		throws Exception;
 
 	public void deleteAvailabilityEstimateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteAvailabilityEstimateBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public AvailabilityEstimate getAvailabilityEstimate(Long id)
@@ -62,11 +62,12 @@ public interface AvailabilityEstimateResource {
 			Long id, AvailabilityEstimate availabilityEstimate)
 		throws Exception;
 
-	public void putAvailabilityEstimateBatch(String callbackURL, Object object)
+	public void putAvailabilityEstimateBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putAvailabilityEstimateBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<AvailabilityEstimate>
@@ -291,12 +292,12 @@ public interface AvailabilityEstimateResource {
 		}
 
 		public void deleteAvailabilityEstimateBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteAvailabilityEstimateBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -348,12 +349,12 @@ public interface AvailabilityEstimateResource {
 
 		public HttpInvoker.HttpResponse
 				deleteAvailabilityEstimateBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -596,11 +597,12 @@ public interface AvailabilityEstimateResource {
 		}
 
 		public void putAvailabilityEstimateBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putAvailabilityEstimateBatchHttpResponse(callbackURL, object);
+				putAvailabilityEstimateBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -652,12 +654,12 @@ public interface AvailabilityEstimateResource {
 
 		public HttpInvoker.HttpResponse
 				putAvailabilityEstimateBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

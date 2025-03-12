@@ -80,11 +80,11 @@ public interface AccountResource {
 	public HttpInvoker.HttpResponse postAccountHttpResponse(Account account)
 		throws Exception;
 
-	public void postAccountBatch(String callbackURL, Object object)
+	public void postAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountByExternalReferenceCode(
@@ -130,11 +130,11 @@ public interface AccountResource {
 	public HttpInvoker.HttpResponse deleteAccountHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteAccountBatch(String callbackURL, Object object)
+	public void deleteAccountBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Account getAccount(Long id) throws Exception;
@@ -816,11 +816,11 @@ public interface AccountResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postAccountBatch(String callbackURL, Object object)
+		public void postAccountBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postAccountBatchHttpResponse(callbackURL, object);
+				postAccountBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -871,12 +871,12 @@ public interface AccountResource {
 		}
 
 		public HttpInvoker.HttpResponse postAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1417,11 +1417,11 @@ public interface AccountResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteAccountBatch(String callbackURL, Object object)
+		public void deleteAccountBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteAccountBatchHttpResponse(callbackURL, object);
+				deleteAccountBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1472,12 +1472,12 @@ public interface AccountResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

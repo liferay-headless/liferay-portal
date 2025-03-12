@@ -76,11 +76,11 @@ public interface CartCommentResource {
 			Long cartCommentId)
 		throws Exception;
 
-	public void deleteCartCommentBatch(String callbackURL, Object object)
+	public void deleteCartCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCartCommentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CartComment getCartComment(Long cartCommentId) throws Exception;
@@ -105,11 +105,11 @@ public interface CartCommentResource {
 			Long cartCommentId, CartComment cartComment)
 		throws Exception;
 
-	public void putCartCommentBatch(String callbackURL, Object object)
+	public void putCartCommentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCartCommentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<CartComment> getCartByExternalReferenceCodeCommentsPage(
@@ -792,11 +792,12 @@ public interface CartCommentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCartCommentBatch(String callbackURL, Object object)
+		public void deleteCartCommentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCartCommentBatchHttpResponse(callbackURL, object);
+				deleteCartCommentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -847,12 +848,12 @@ public interface CartCommentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCartCommentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1210,11 +1211,12 @@ public interface CartCommentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putCartCommentBatch(String callbackURL, Object object)
+		public void putCartCommentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putCartCommentBatchHttpResponse(callbackURL, object);
+				putCartCommentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1265,12 +1267,12 @@ public interface CartCommentResource {
 		}
 
 		public HttpInvoker.HttpResponse putCartCommentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -78,14 +78,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createPaymentBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_paymentResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			paymentResource -> paymentResource.postPaymentBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField
@@ -153,14 +153,14 @@ public class Mutation {
 	@GraphQLField
 	public Response deletePaymentBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_paymentResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			paymentResource -> paymentResource.deletePaymentBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	@GraphQLField

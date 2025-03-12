@@ -62,7 +62,8 @@ public interface ShipmentItemResource {
 
 	public void deleteShipmentItem(Long shipmentItemId) throws Exception;
 
-	public Response deleteShipmentItemBatch(String callbackURL, Object object)
+	public Response deleteShipmentItemBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ShipmentItem getShipmentItem(Long shipmentItemId) throws Exception;

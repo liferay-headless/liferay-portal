@@ -41,11 +41,12 @@ public interface PriceListChannelResource {
 			Long priceListChannelId)
 		throws Exception;
 
-	public void deletePriceListChannelBatch(String callbackURL, Object object)
+	public void deletePriceListChannelBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceListChannelBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceListChannel>
@@ -88,12 +89,12 @@ public interface PriceListChannelResource {
 		throws Exception;
 
 	public void postPriceListIdPriceListChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPriceListIdPriceListChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -311,11 +312,12 @@ public interface PriceListChannelResource {
 		}
 
 		public void deletePriceListChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePriceListChannelBatchHttpResponse(callbackURL, object);
+				deletePriceListChannelBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +368,12 @@ public interface PriceListChannelResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePriceListChannelBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -879,12 +881,12 @@ public interface PriceListChannelResource {
 		}
 
 		public void postPriceListIdPriceListChannelBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPriceListIdPriceListChannelBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -936,12 +938,12 @@ public interface PriceListChannelResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceListIdPriceListChannelBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

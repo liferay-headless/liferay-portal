@@ -41,11 +41,11 @@ public interface StatusResource {
 		throws Exception;
 
 	public void postExperimentStatusBatch(
-			Long experimentId, String callbackURL, Object object)
+			Long experimentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postExperimentStatusBatchHttpResponse(
-			Long experimentId, String callbackURL, Object object)
+			Long experimentId, String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -264,12 +264,12 @@ public interface StatusResource {
 		}
 
 		public void postExperimentStatusBatch(
-				Long experimentId, String callbackURL, Object object)
+				Long experimentId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postExperimentStatusBatchHttpResponse(
-					experimentId, callbackURL, object);
+					experimentId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -320,12 +320,12 @@ public interface StatusResource {
 		}
 
 		public HttpInvoker.HttpResponse postExperimentStatusBatchHttpResponse(
-				Long experimentId, String callbackURL, Object object)
+				Long experimentId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

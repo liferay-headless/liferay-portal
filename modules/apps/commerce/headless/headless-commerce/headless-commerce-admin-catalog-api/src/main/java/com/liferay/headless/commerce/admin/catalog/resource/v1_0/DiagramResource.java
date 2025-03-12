@@ -62,7 +62,8 @@ public interface DiagramResource {
 	public Diagram postProductIdDiagram(Long id, Diagram diagram)
 		throws Exception;
 
-	public Response postProductIdDiagramBatch(String callbackURL, Object object)
+	public Response postProductIdDiagramBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

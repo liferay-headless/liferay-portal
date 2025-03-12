@@ -61,11 +61,11 @@ public interface SXPElementResource {
 		throws Exception;
 
 	public void postSXPElementBatch(
-			SXPElement sxpElement, String callbackURL, Object object)
+			SXPElement sxpElement, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSXPElementBatchHttpResponse(
-			SXPElement sxpElement, String callbackURL, Object object)
+			SXPElement sxpElement, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPElement getSXPElementByExternalReferenceCode(
@@ -106,11 +106,11 @@ public interface SXPElementResource {
 		throws Exception;
 
 	public void deleteSXPElementBatch(
-			Long sxpElementId, String callbackURL, Object object)
+			Long sxpElementId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteSXPElementBatchHttpResponse(
-			Long sxpElementId, String callbackURL, Object object)
+			Long sxpElementId, String callbackURL, String contentString)
 		throws Exception;
 
 	public SXPElement getSXPElement(Long sxpElementId) throws Exception;
@@ -134,12 +134,12 @@ public interface SXPElementResource {
 
 	public void putSXPElementBatch(
 			Long sxpElementId, SXPElement sxpElement, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putSXPElementBatchHttpResponse(
 			Long sxpElementId, SXPElement sxpElement, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public SXPElement postSXPElementCopy(Long sxpElementId) throws Exception;
@@ -620,12 +620,12 @@ public interface SXPElementResource {
 		}
 
 		public void postSXPElementBatch(
-				SXPElement sxpElement, String callbackURL, Object object)
+				SXPElement sxpElement, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSXPElementBatchHttpResponse(
-					sxpElement, callbackURL, object);
+					sxpElement, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -676,12 +676,12 @@ public interface SXPElementResource {
 		}
 
 		public HttpInvoker.HttpResponse postSXPElementBatchHttpResponse(
-				SXPElement sxpElement, String callbackURL, Object object)
+				SXPElement sxpElement, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1252,12 +1252,12 @@ public interface SXPElementResource {
 		}
 
 		public void deleteSXPElementBatch(
-				Long sxpElementId, String callbackURL, Object object)
+				Long sxpElementId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteSXPElementBatchHttpResponse(
-					sxpElementId, callbackURL, object);
+					sxpElementId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1308,12 +1308,12 @@ public interface SXPElementResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteSXPElementBatchHttpResponse(
-				Long sxpElementId, String callbackURL, Object object)
+				Long sxpElementId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1675,12 +1675,12 @@ public interface SXPElementResource {
 
 		public void putSXPElementBatch(
 				Long sxpElementId, SXPElement sxpElement, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				putSXPElementBatchHttpResponse(
-					sxpElementId, sxpElement, callbackURL, object);
+					sxpElementId, sxpElement, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1732,12 +1732,12 @@ public interface SXPElementResource {
 
 		public HttpInvoker.HttpResponse putSXPElementBatchHttpResponse(
 				Long sxpElementId, SXPElement sxpElement, String callbackURL,
-				Object object)
+				String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

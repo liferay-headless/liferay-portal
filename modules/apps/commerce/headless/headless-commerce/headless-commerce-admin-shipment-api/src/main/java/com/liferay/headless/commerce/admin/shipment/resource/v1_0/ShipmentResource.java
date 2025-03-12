@@ -59,7 +59,7 @@ public interface ShipmentResource {
 
 	public Shipment postShipment(Shipment shipment) throws Exception;
 
-	public Response postShipmentBatch(String callbackURL, Object object)
+	public Response postShipmentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteShipmentByExternalReferenceCode(
@@ -92,7 +92,8 @@ public interface ShipmentResource {
 
 	public void deleteShipment(Long shipmentId) throws Exception;
 
-	public Response deleteShipmentBatch(String callbackURL, Object object)
+	public Response deleteShipmentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Shipment getShipment(Long shipmentId) throws Exception;

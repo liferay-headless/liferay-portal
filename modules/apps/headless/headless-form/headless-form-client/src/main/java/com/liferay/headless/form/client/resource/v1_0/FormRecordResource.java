@@ -46,11 +46,11 @@ public interface FormRecordResource {
 			Long formRecordId, FormRecord formRecord)
 		throws Exception;
 
-	public void putFormRecordBatch(String callbackURL, Object object)
+	public void putFormRecordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putFormRecordBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<FormRecord> getFormFormRecordsPage(
@@ -80,11 +80,11 @@ public interface FormRecordResource {
 		throws Exception;
 
 	public void postFormFormRecordBatch(
-			Long formId, String callbackURL, Object object)
+			Long formId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postFormFormRecordBatchHttpResponse(
-			Long formId, String callbackURL, Object object)
+			Long formId, String callbackURL, String contentString)
 		throws Exception;
 
 	public FormRecord getFormFormRecordByLatestDraft(Long formId)
@@ -413,11 +413,11 @@ public interface FormRecordResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putFormRecordBatch(String callbackURL, Object object)
+		public void putFormRecordBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putFormRecordBatchHttpResponse(callbackURL, object);
+				putFormRecordBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -468,12 +468,12 @@ public interface FormRecordResource {
 		}
 
 		public HttpInvoker.HttpResponse putFormRecordBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -848,12 +848,12 @@ public interface FormRecordResource {
 		}
 
 		public void postFormFormRecordBatch(
-				Long formId, String callbackURL, Object object)
+				Long formId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postFormFormRecordBatchHttpResponse(
-					formId, callbackURL, object);
+					formId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -904,12 +904,12 @@ public interface FormRecordResource {
 		}
 
 		public HttpInvoker.HttpResponse postFormFormRecordBatchHttpResponse(
-				Long formId, String callbackURL, Object object)
+				Long formId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

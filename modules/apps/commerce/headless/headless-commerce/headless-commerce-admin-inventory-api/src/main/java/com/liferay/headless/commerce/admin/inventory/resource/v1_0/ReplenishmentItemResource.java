@@ -68,7 +68,7 @@ public interface ReplenishmentItemResource {
 		throws Exception;
 
 	public Response deleteReplenishmentItemBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ReplenishmentItem getReplenishmentItem(Long replenishmentItemId)
@@ -96,7 +96,8 @@ public interface ReplenishmentItemResource {
 		throws Exception;
 
 	public Response postReplenishmentItemBatch(
-			Long warehouseId, String sku, String callbackURL, Object object)
+			Long warehouseId, String sku, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -74,14 +74,14 @@ public class Mutation {
 	@GraphQLField
 	public Response createSamlProviderBatch(
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_samlProviderResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			samlProviderResource -> samlProviderResource.postSamlProviderBatch(
-				callbackURL, object));
+				callbackURL, contentString));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

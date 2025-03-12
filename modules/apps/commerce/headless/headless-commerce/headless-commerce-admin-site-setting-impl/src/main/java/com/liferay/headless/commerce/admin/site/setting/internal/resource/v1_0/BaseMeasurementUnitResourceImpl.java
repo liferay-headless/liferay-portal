@@ -237,7 +237,7 @@ public abstract class BaseMeasurementUnitResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -252,7 +252,8 @@ public abstract class BaseMeasurementUnitResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				MeasurementUnit.class.getName(), callbackURL, null, object)
+				MeasurementUnit.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 
@@ -593,7 +594,7 @@ public abstract class BaseMeasurementUnitResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(

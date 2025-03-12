@@ -311,7 +311,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -567,7 +567,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -1060,7 +1060,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -1075,7 +1075,8 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				TaxonomyCategory.class.getName(), callbackURL, null, object)
+				TaxonomyCategory.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

@@ -71,11 +71,11 @@ public interface ProductSpecificationResource {
 		throws Exception;
 
 	public void deleteProductSpecificationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductSpecificationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductSpecification getProductSpecification(Long id)
@@ -133,12 +133,12 @@ public interface ProductSpecificationResource {
 		throws Exception;
 
 	public void postProductIdProductSpecificationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductIdProductSpecificationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -685,12 +685,12 @@ public interface ProductSpecificationResource {
 		}
 
 		public void deleteProductSpecificationBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteProductSpecificationBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -742,12 +742,12 @@ public interface ProductSpecificationResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductSpecificationBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1457,12 +1457,12 @@ public interface ProductSpecificationResource {
 		}
 
 		public void postProductIdProductSpecificationBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductIdProductSpecificationBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1514,12 +1514,12 @@ public interface ProductSpecificationResource {
 
 		public HttpInvoker.HttpResponse
 				postProductIdProductSpecificationBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

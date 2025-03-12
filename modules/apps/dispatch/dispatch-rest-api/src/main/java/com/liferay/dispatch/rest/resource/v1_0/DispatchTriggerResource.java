@@ -56,7 +56,8 @@ public interface DispatchTriggerResource {
 	public DispatchTrigger postDispatchTrigger(DispatchTrigger dispatchTrigger)
 		throws Exception;
 
-	public Response postDispatchTriggerBatch(String callbackURL, Object object)
+	public Response postDispatchTriggerBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void postDispatchTriggerRun(Long dispatchTriggerId) throws Exception;

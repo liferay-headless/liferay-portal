@@ -83,12 +83,12 @@ public interface ProductConfigurationResource {
 		throws Exception;
 
 	public void postProductConfigurationListIdProductConfigurationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductConfigurationListIdProductConfigurationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProductConfigurationByExternalReferenceCode(
@@ -128,11 +128,11 @@ public interface ProductConfigurationResource {
 		throws Exception;
 
 	public void deleteProductConfigurationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteProductConfigurationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ProductConfiguration getProductConfiguration(Long id)
@@ -796,12 +796,12 @@ public interface ProductConfigurationResource {
 		}
 
 		public void postProductConfigurationListIdProductConfigurationBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductConfigurationListIdProductConfigurationBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -853,12 +853,12 @@ public interface ProductConfigurationResource {
 
 		public HttpInvoker.HttpResponse
 				postProductConfigurationListIdProductConfigurationBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1332,12 +1332,12 @@ public interface ProductConfigurationResource {
 		}
 
 		public void deleteProductConfigurationBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteProductConfigurationBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1389,12 +1389,12 @@ public interface ProductConfigurationResource {
 
 		public HttpInvoker.HttpResponse
 				deleteProductConfigurationBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -58,11 +58,11 @@ public interface TaskResource {
 		throws Exception;
 
 	public void postProcessTaskBatch(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProcessTaskBatchHttpResponse(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcessTask(Long processId, Long taskId) throws Exception;
@@ -533,12 +533,12 @@ public interface TaskResource {
 		}
 
 		public void postProcessTaskBatch(
-				Long processId, String callbackURL, Object object)
+				Long processId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProcessTaskBatchHttpResponse(
-					processId, callbackURL, object);
+					processId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -589,12 +589,12 @@ public interface TaskResource {
 		}
 
 		public HttpInvoker.HttpResponse postProcessTaskBatchHttpResponse(
-				Long processId, String callbackURL, Object object)
+				Long processId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

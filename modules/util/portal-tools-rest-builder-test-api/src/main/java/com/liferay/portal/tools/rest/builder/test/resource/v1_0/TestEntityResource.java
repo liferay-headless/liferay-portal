@@ -59,7 +59,8 @@ public interface TestEntityResource {
 
 	public TestEntity postTestEntity(TestEntity testEntity) throws Exception;
 
-	public Response postTestEntityBatch(String callbackURL, Object object)
+	public Response postTestEntityBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Integer getTestEntityCount() throws Exception;
@@ -75,7 +76,7 @@ public interface TestEntityResource {
 		throws Exception;
 
 	public Response putTestEntityBatch(
-			Long optionalParameter, String callbackURL, Object object)
+			Long optionalParameter, String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

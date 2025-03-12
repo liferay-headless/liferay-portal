@@ -42,12 +42,12 @@ public interface ShippingFixedOptionTermResource {
 		throws Exception;
 
 	public void deleteShippingFixedOptionTermBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deleteShippingFixedOptionTermBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ShippingFixedOptionTerm>
@@ -291,12 +291,12 @@ public interface ShippingFixedOptionTermResource {
 		}
 
 		public void deleteShippingFixedOptionTermBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteShippingFixedOptionTermBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -348,12 +348,12 @@ public interface ShippingFixedOptionTermResource {
 
 		public HttpInvoker.HttpResponse
 				deleteShippingFixedOptionTermBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

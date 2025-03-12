@@ -60,7 +60,8 @@ public interface SpecificationResource {
 	public Specification postSpecification(Specification specification)
 		throws Exception;
 
-	public Response postSpecificationBatch(String callbackURL, Object object)
+	public Response postSpecificationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSpecificationByExternalReferenceCode(
@@ -81,7 +82,8 @@ public interface SpecificationResource {
 
 	public void deleteSpecification(Long id) throws Exception;
 
-	public Response deleteSpecificationBatch(String callbackURL, Object object)
+	public Response deleteSpecificationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Specification getSpecification(Long id) throws Exception;

@@ -59,7 +59,7 @@ public interface OrderResource {
 
 	public Order postOrder(Order order) throws Exception;
 
-	public Response postOrderBatch(String callbackURL, Object object)
+	public Response postOrderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response deleteOrderByExternalReferenceCode(
@@ -79,7 +79,7 @@ public interface OrderResource {
 
 	public Response deleteOrder(Long id) throws Exception;
 
-	public Response deleteOrderBatch(String callbackURL, Object object)
+	public Response deleteOrderBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Order getOrder(Long id) throws Exception;

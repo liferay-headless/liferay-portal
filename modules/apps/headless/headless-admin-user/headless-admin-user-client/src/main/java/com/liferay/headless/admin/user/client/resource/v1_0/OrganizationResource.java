@@ -150,11 +150,11 @@ public interface OrganizationResource {
 			Organization organization)
 		throws Exception;
 
-	public void postOrganizationBatch(String callbackURL, Object object)
+	public void postOrganizationBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrganizationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrganizationByExternalReferenceCode(
@@ -253,11 +253,12 @@ public interface OrganizationResource {
 			String organizationId)
 		throws Exception;
 
-	public void deleteOrganizationBatch(String callbackURL, Object object)
+	public void deleteOrganizationBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrganizationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Organization getOrganization(String organizationId) throws Exception;
@@ -282,11 +283,11 @@ public interface OrganizationResource {
 			String organizationId, Organization organization)
 		throws Exception;
 
-	public void putOrganizationBatch(String callbackURL, Object object)
+	public void putOrganizationBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putOrganizationBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Organization> getOrganizationChildOrganizationsPage(
@@ -1858,11 +1859,12 @@ public interface OrganizationResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrganizationBatch(String callbackURL, Object object)
+		public void postOrganizationBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOrganizationBatchHttpResponse(callbackURL, object);
+				postOrganizationBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1913,12 +1915,12 @@ public interface OrganizationResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrganizationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3096,11 +3098,12 @@ public interface OrganizationResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrganizationBatch(String callbackURL, Object object)
+		public void deleteOrganizationBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrganizationBatchHttpResponse(callbackURL, object);
+				deleteOrganizationBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3151,12 +3154,12 @@ public interface OrganizationResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrganizationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -3516,11 +3519,12 @@ public interface OrganizationResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putOrganizationBatch(String callbackURL, Object object)
+		public void putOrganizationBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putOrganizationBatchHttpResponse(callbackURL, object);
+				putOrganizationBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3571,12 +3575,12 @@ public interface OrganizationResource {
 		}
 
 		public HttpInvoker.HttpResponse putOrganizationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

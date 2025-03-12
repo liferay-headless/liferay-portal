@@ -74,7 +74,8 @@ public interface EmailAddressResource {
 
 	public void deleteEmailAddress(Long emailAddressId) throws Exception;
 
-	public Response deleteEmailAddressBatch(String callbackURL, Object object)
+	public Response deleteEmailAddressBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public EmailAddress getEmailAddress(Long emailAddressId) throws Exception;

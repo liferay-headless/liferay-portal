@@ -75,11 +75,11 @@ public interface CatalogResource {
 	public HttpInvoker.HttpResponse deleteCatalogHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteCatalogBatch(String callbackURL, Object object)
+	public void deleteCatalogBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCatalogBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Catalog getCatalog(Long id) throws Exception;
@@ -118,11 +118,11 @@ public interface CatalogResource {
 	public HttpInvoker.HttpResponse postCatalogHttpResponse(Catalog catalog)
 		throws Exception;
 
-	public void postCatalogBatch(String callbackURL, Object object)
+	public void postCatalogBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCatalogBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Catalog getProductByExternalReferenceCodeCatalog(
@@ -754,11 +754,11 @@ public interface CatalogResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteCatalogBatch(String callbackURL, Object object)
+		public void deleteCatalogBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCatalogBatchHttpResponse(callbackURL, object);
+				deleteCatalogBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -809,12 +809,12 @@ public interface CatalogResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteCatalogBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1400,11 +1400,11 @@ public interface CatalogResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postCatalogBatch(String callbackURL, Object object)
+		public void postCatalogBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postCatalogBatchHttpResponse(callbackURL, object);
+				postCatalogBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1455,12 +1455,12 @@ public interface CatalogResource {
 		}
 
 		public HttpInvoker.HttpResponse postCatalogBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

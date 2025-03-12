@@ -54,11 +54,12 @@ public interface DispatchTriggerResource {
 			DispatchTrigger dispatchTrigger)
 		throws Exception;
 
-	public void postDispatchTriggerBatch(String callbackURL, Object object)
+	public void postDispatchTriggerBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDispatchTriggerBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void postDispatchTriggerRun(Long dispatchTriggerId) throws Exception;
@@ -495,11 +496,13 @@ public interface DispatchTriggerResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postDispatchTriggerBatch(String callbackURL, Object object)
+		public void postDispatchTriggerBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postDispatchTriggerBatchHttpResponse(callbackURL, object);
+				postDispatchTriggerBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -550,12 +553,12 @@ public interface DispatchTriggerResource {
 		}
 
 		public HttpInvoker.HttpResponse postDispatchTriggerBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

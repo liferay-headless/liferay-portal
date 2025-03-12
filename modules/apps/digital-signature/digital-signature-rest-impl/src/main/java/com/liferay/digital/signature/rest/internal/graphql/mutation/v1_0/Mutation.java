@@ -98,14 +98,14 @@ public class Mutation {
 			@GraphQLName("siteKey") @NotEmpty String siteKey,
 			@GraphQLName("dsEnvelope") DSEnvelope dsEnvelope,
 			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
+			@GraphQLName("contentString") String contentString)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_dsEnvelopeResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			dsEnvelopeResource -> dsEnvelopeResource.postSiteDSEnvelopeBatch(
-				Long.valueOf(siteKey), dsEnvelope, callbackURL, object));
+				Long.valueOf(siteKey), dsEnvelope, callbackURL, contentString));
 	}
 
 	@GraphQLField

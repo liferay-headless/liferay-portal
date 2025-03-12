@@ -41,11 +41,12 @@ public interface PriceListAccountResource {
 			Long priceListAccountId)
 		throws Exception;
 
-	public void deletePriceListAccountBatch(String callbackURL, Object object)
+	public void deletePriceListAccountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePriceListAccountBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceListAccount>
@@ -88,12 +89,12 @@ public interface PriceListAccountResource {
 		throws Exception;
 
 	public void postPriceListIdPriceListAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postPriceListIdPriceListAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -311,11 +312,12 @@ public interface PriceListAccountResource {
 		}
 
 		public void deletePriceListAccountBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deletePriceListAccountBatchHttpResponse(callbackURL, object);
+				deletePriceListAccountBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -366,12 +368,12 @@ public interface PriceListAccountResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePriceListAccountBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -879,12 +881,12 @@ public interface PriceListAccountResource {
 		}
 
 		public void postPriceListIdPriceListAccountBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postPriceListIdPriceListAccountBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -936,12 +938,12 @@ public interface PriceListAccountResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceListIdPriceListAccountBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

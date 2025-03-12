@@ -73,12 +73,13 @@ public interface ObjectViewResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectViewBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteObjectView(Long objectViewId) throws Exception;
 
-	public Response deleteObjectViewBatch(String callbackURL, Object object)
+	public Response deleteObjectViewBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectView getObjectView(Long objectViewId) throws Exception;
@@ -86,7 +87,7 @@ public interface ObjectViewResource {
 	public ObjectView putObjectView(Long objectViewId, ObjectView objectView)
 		throws Exception;
 
-	public Response putObjectViewBatch(String callbackURL, Object object)
+	public Response putObjectViewBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectView postObjectViewCopy(Long objectViewId) throws Exception;

@@ -52,7 +52,7 @@ public interface OrderTypeChannelResource {
 		throws Exception;
 
 	public Response deleteOrderTypeChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<OrderTypeChannel>
@@ -74,7 +74,7 @@ public interface OrderTypeChannelResource {
 		throws Exception;
 
 	public Response postOrderTypeIdOrderTypeChannelBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -59,7 +59,7 @@ public interface CurrencyResource {
 
 	public Currency postCurrency(Currency currency) throws Exception;
 
-	public Response postCurrencyBatch(String callbackURL, Object object)
+	public Response postCurrencyBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteCurrencyByExternalReferenceCode(
@@ -76,7 +76,8 @@ public interface CurrencyResource {
 
 	public void deleteCurrency(Long id) throws Exception;
 
-	public Response deleteCurrencyBatch(String callbackURL, Object object)
+	public Response deleteCurrencyBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Currency getCurrency(Long id) throws Exception;

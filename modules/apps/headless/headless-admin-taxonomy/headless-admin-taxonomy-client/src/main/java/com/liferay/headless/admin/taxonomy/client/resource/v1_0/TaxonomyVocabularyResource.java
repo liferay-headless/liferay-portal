@@ -71,12 +71,12 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public void postAssetLibraryTaxonomyVocabularyBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAssetLibraryTaxonomyVocabularyBatchHttpResponse(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
@@ -159,11 +159,11 @@ public interface TaxonomyVocabularyResource {
 		throws Exception;
 
 	public void postSiteTaxonomyVocabularyBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteTaxonomyVocabularyBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteTaxonomyVocabularyByExternalReferenceCode(
@@ -220,11 +220,12 @@ public interface TaxonomyVocabularyResource {
 			Long taxonomyVocabularyId)
 		throws Exception;
 
-	public void deleteTaxonomyVocabularyBatch(String callbackURL, Object object)
+	public void deleteTaxonomyVocabularyBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTaxonomyVocabularyBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxonomyVocabulary getTaxonomyVocabulary(Long taxonomyVocabularyId)
@@ -250,11 +251,12 @@ public interface TaxonomyVocabularyResource {
 			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception;
 
-	public void putTaxonomyVocabularyBatch(String callbackURL, Object object)
+	public void putTaxonomyVocabularyBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putTaxonomyVocabularyBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getTaxonomyVocabularyPermissionsPage(
@@ -756,12 +758,12 @@ public interface TaxonomyVocabularyResource {
 		}
 
 		public void postAssetLibraryTaxonomyVocabularyBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryTaxonomyVocabularyBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -813,12 +815,13 @@ public interface TaxonomyVocabularyResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryTaxonomyVocabularyBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1793,12 +1796,12 @@ public interface TaxonomyVocabularyResource {
 		}
 
 		public void postSiteTaxonomyVocabularyBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteTaxonomyVocabularyBatchHttpResponse(
-					siteId, callbackURL, object);
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1850,12 +1853,12 @@ public interface TaxonomyVocabularyResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteTaxonomyVocabularyBatchHttpResponse(
-					Long siteId, String callbackURL, Object object)
+					Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2563,11 +2566,12 @@ public interface TaxonomyVocabularyResource {
 		}
 
 		public void deleteTaxonomyVocabularyBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteTaxonomyVocabularyBatchHttpResponse(callbackURL, object);
+				deleteTaxonomyVocabularyBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2619,12 +2623,12 @@ public interface TaxonomyVocabularyResource {
 
 		public HttpInvoker.HttpResponse
 				deleteTaxonomyVocabularyBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2992,11 +2996,12 @@ public interface TaxonomyVocabularyResource {
 		}
 
 		public void putTaxonomyVocabularyBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putTaxonomyVocabularyBatchHttpResponse(callbackURL, object);
+				putTaxonomyVocabularyBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -3047,12 +3052,12 @@ public interface TaxonomyVocabularyResource {
 		}
 
 		public HttpInvoker.HttpResponse putTaxonomyVocabularyBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

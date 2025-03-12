@@ -59,7 +59,7 @@ public interface PaymentResource {
 
 	public Payment postPayment(Payment payment) throws Exception;
 
-	public Response postPaymentBatch(String callbackURL, Object object)
+	public Response postPaymentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Response deletePaymentByExternalReferenceCode(
@@ -84,7 +84,7 @@ public interface PaymentResource {
 
 	public Response deletePayment(Long id) throws Exception;
 
-	public Response deletePaymentBatch(String callbackURL, Object object)
+	public Response deletePaymentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Payment getPayment(Long id) throws Exception;

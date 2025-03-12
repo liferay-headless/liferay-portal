@@ -63,7 +63,7 @@ public interface CTCollectionResource {
 		throws Exception;
 
 	public Response postCTCollectionBatch(
-			CTCollection ctCollection, String callbackURL, Object object)
+			CTCollection ctCollection, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteCTCollectionByExternalReferenceCode(
@@ -96,7 +96,7 @@ public interface CTCollectionResource {
 	public void deleteCTCollection(Long ctCollectionId) throws Exception;
 
 	public Response deleteCTCollectionBatch(
-			Long ctCollectionId, String callbackURL, Object object)
+			Long ctCollectionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public CTCollection getCTCollection(Long ctCollectionId) throws Exception;
@@ -111,7 +111,7 @@ public interface CTCollectionResource {
 
 	public Response putCTCollectionBatch(
 			Long ctCollectionId, CTCollection ctCollection, String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception;
 
 	public void postCTCollectionCheckout(Long ctCollectionId) throws Exception;

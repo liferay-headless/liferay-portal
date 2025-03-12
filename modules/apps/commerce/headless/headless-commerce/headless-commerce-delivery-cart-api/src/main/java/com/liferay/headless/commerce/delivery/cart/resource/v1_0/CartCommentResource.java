@@ -66,7 +66,8 @@ public interface CartCommentResource {
 
 	public void deleteCartComment(Long cartCommentId) throws Exception;
 
-	public Response deleteCartCommentBatch(String callbackURL, Object object)
+	public Response deleteCartCommentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CartComment getCartComment(Long cartCommentId) throws Exception;
@@ -79,7 +80,8 @@ public interface CartCommentResource {
 			Long cartCommentId, CartComment cartComment)
 		throws Exception;
 
-	public Response putCartCommentBatch(String callbackURL, Object object)
+	public Response putCartCommentBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<CartComment> getCartByExternalReferenceCodeCommentsPage(

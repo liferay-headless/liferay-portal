@@ -67,12 +67,12 @@ public interface DataRecordResource {
 		throws Exception;
 
 	public void postDataDefinitionDataRecordBatch(
-			Long dataDefinitionId, String callbackURL, Object object)
+			Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDataDefinitionDataRecordBatchHttpResponse(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<DataRecord> getDataRecordCollectionDataRecordsPage(
@@ -109,12 +109,14 @@ public interface DataRecordResource {
 		throws Exception;
 
 	public void postDataRecordCollectionDataRecordBatch(
-			Long dataRecordCollectionId, String callbackURL, Object object)
+			Long dataRecordCollectionId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postDataRecordCollectionDataRecordBatchHttpResponse(
-				Long dataRecordCollectionId, String callbackURL, Object object)
+				Long dataRecordCollectionId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public String getDataRecordCollectionDataRecordExport(
@@ -132,11 +134,11 @@ public interface DataRecordResource {
 			Long dataRecordId)
 		throws Exception;
 
-	public void deleteDataRecordBatch(String callbackURL, Object object)
+	public void deleteDataRecordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteDataRecordBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public DataRecord getDataRecord(Long dataRecordId) throws Exception;
@@ -158,11 +160,11 @@ public interface DataRecordResource {
 			Long dataRecordId, DataRecord dataRecord)
 		throws Exception;
 
-	public void putDataRecordBatch(String callbackURL, Object object)
+	public void putDataRecordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDataRecordBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -646,12 +648,12 @@ public interface DataRecordResource {
 		}
 
 		public void postDataDefinitionDataRecordBatch(
-				Long dataDefinitionId, String callbackURL, Object object)
+				Long dataDefinitionId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDataDefinitionDataRecordBatchHttpResponse(
-					dataDefinitionId, callbackURL, object);
+					dataDefinitionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -703,12 +705,13 @@ public interface DataRecordResource {
 
 		public HttpInvoker.HttpResponse
 				postDataDefinitionDataRecordBatchHttpResponse(
-					Long dataDefinitionId, String callbackURL, Object object)
+					Long dataDefinitionId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1122,12 +1125,13 @@ public interface DataRecordResource {
 		}
 
 		public void postDataRecordCollectionDataRecordBatch(
-				Long dataRecordCollectionId, String callbackURL, Object object)
+				Long dataRecordCollectionId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDataRecordCollectionDataRecordBatchHttpResponse(
-					dataRecordCollectionId, callbackURL, object);
+					dataRecordCollectionId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1180,12 +1184,12 @@ public interface DataRecordResource {
 		public HttpInvoker.HttpResponse
 				postDataRecordCollectionDataRecordBatchHttpResponse(
 					Long dataRecordCollectionId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1444,11 +1448,12 @@ public interface DataRecordResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteDataRecordBatch(String callbackURL, Object object)
+		public void deleteDataRecordBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteDataRecordBatchHttpResponse(callbackURL, object);
+				deleteDataRecordBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1499,12 +1504,12 @@ public interface DataRecordResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteDataRecordBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1862,11 +1867,11 @@ public interface DataRecordResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDataRecordBatch(String callbackURL, Object object)
+		public void putDataRecordBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDataRecordBatchHttpResponse(callbackURL, object);
+				putDataRecordBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1917,12 +1922,12 @@ public interface DataRecordResource {
 		}
 
 		public HttpInvoker.HttpResponse putDataRecordBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

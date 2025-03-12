@@ -59,7 +59,7 @@ public interface OrderRuleResource {
 
 	public OrderRule postOrderRule(OrderRule orderRule) throws Exception;
 
-	public Response postOrderRuleBatch(String callbackURL, Object object)
+	public Response postOrderRuleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrderRuleByExternalReferenceCode(
@@ -80,7 +80,8 @@ public interface OrderRuleResource {
 
 	public void deleteOrderRule(Long id) throws Exception;
 
-	public Response deleteOrderRuleBatch(String callbackURL, Object object)
+	public Response deleteOrderRuleBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderRule getOrderRule(Long id) throws Exception;

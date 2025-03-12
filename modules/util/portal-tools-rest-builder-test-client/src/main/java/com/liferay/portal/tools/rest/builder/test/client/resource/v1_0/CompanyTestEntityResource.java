@@ -59,11 +59,12 @@ public interface CompanyTestEntityResource {
 			CompanyTestEntity companyTestEntity)
 		throws Exception;
 
-	public void postCompanyTestEntityBatch(String callbackURL, Object object)
+	public void postCompanyTestEntityBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postCompanyTestEntityBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CompanyTestEntity getCompanyTestEntityByExternalReferenceCode(
@@ -100,11 +101,12 @@ public interface CompanyTestEntityResource {
 			Long companyTestEntityId, CompanyTestEntity companyTestEntity)
 		throws Exception;
 
-	public void putCompanyTestEntityBatch(String callbackURL, Object object)
+	public void putCompanyTestEntityBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putCompanyTestEntityBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getCompanyTestEntityPermissionsPage(
@@ -554,11 +556,12 @@ public interface CompanyTestEntityResource {
 		}
 
 		public void postCompanyTestEntityBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postCompanyTestEntityBatchHttpResponse(callbackURL, object);
+				postCompanyTestEntityBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -609,12 +612,12 @@ public interface CompanyTestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse postCompanyTestEntityBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1087,11 +1090,13 @@ public interface CompanyTestEntityResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putCompanyTestEntityBatch(String callbackURL, Object object)
+		public void putCompanyTestEntityBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putCompanyTestEntityBatchHttpResponse(callbackURL, object);
+				putCompanyTestEntityBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1142,12 +1147,12 @@ public interface CompanyTestEntityResource {
 		}
 
 		public HttpInvoker.HttpResponse putCompanyTestEntityBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

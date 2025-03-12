@@ -66,7 +66,7 @@ public interface InstanceResource {
 		throws Exception;
 
 	public Response postProcessInstanceBatch(
-			Long processId, String callbackURL, Object object)
+			Long processId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProcessInstance(Long processId, Long instanceId)

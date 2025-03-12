@@ -62,7 +62,7 @@ public interface UserGroupResource {
 
 	public UserGroup postUserGroup(UserGroup userGroup) throws Exception;
 
-	public Response postUserGroupBatch(String callbackURL, Object object)
+	public Response postUserGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteUserGroupByExternalReferenceCode(
@@ -91,7 +91,8 @@ public interface UserGroupResource {
 
 	public void deleteUserGroup(Long userGroupId) throws Exception;
 
-	public Response deleteUserGroupBatch(String callbackURL, Object object)
+	public Response deleteUserGroupBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserGroup getUserGroup(Long userGroupId) throws Exception;
@@ -102,7 +103,7 @@ public interface UserGroupResource {
 	public UserGroup putUserGroup(Long userGroupId, UserGroup userGroup)
 		throws Exception;
 
-	public Response putUserGroupBatch(String callbackURL, Object object)
+	public Response putUserGroupBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteUserGroupUsers(Long userGroupId, Long[] longs)

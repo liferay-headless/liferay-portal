@@ -53,7 +53,7 @@ public interface ProductConfigurationListOrderTypeResource {
 		throws Exception;
 
 	public Response deleteProductConfigurationListOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ProductConfigurationListOrderType>
@@ -83,7 +83,7 @@ public interface ProductConfigurationListOrderTypeResource {
 
 	public Response
 			postProductConfigurationListIdProductConfigurationListOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -64,7 +64,7 @@ public interface NotificationTemplateResource {
 		throws Exception;
 
 	public Response postNotificationTemplateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate getNotificationTemplateByExternalReferenceCode(
@@ -80,7 +80,7 @@ public interface NotificationTemplateResource {
 		throws Exception;
 
 	public Response deleteNotificationTemplateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate getNotificationTemplate(
@@ -98,7 +98,7 @@ public interface NotificationTemplateResource {
 		throws Exception;
 
 	public Response putNotificationTemplateBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public NotificationTemplate postNotificationTemplateCopy(

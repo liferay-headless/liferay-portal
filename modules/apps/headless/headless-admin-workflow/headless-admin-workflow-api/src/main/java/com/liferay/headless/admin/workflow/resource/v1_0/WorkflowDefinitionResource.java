@@ -62,7 +62,7 @@ public interface WorkflowDefinitionResource {
 		throws Exception;
 
 	public Response postWorkflowDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowDefinition getWorkflowDefinitionByName(
@@ -88,7 +88,7 @@ public interface WorkflowDefinitionResource {
 		throws Exception;
 
 	public Response deleteWorkflowDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WorkflowDefinition getWorkflowDefinition(Long workflowDefinitionId)
@@ -99,7 +99,7 @@ public interface WorkflowDefinitionResource {
 		throws Exception;
 
 	public Response putWorkflowDefinitionBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

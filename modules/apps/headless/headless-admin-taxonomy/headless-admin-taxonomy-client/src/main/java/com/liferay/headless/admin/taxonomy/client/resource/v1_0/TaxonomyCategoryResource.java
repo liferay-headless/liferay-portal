@@ -75,11 +75,12 @@ public interface TaxonomyCategoryResource {
 			String taxonomyCategoryId)
 		throws Exception;
 
-	public void deleteTaxonomyCategoryBatch(String callbackURL, Object object)
+	public void deleteTaxonomyCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTaxonomyCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxonomyCategory getTaxonomyCategory(String taxonomyCategoryId)
@@ -105,11 +106,12 @@ public interface TaxonomyCategoryResource {
 			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
-	public void putTaxonomyCategoryBatch(String callbackURL, Object object)
+	public void putTaxonomyCategoryBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putTaxonomyCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<Permission> getTaxonomyCategoryPermissionsPage(
@@ -166,12 +168,13 @@ public interface TaxonomyCategoryResource {
 		throws Exception;
 
 	public void postTaxonomyVocabularyTaxonomyCategoryBatch(
-			Long taxonomyVocabularyId, String callbackURL, Object object)
+			Long taxonomyVocabularyId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postTaxonomyVocabularyTaxonomyCategoryBatchHttpResponse(
-				Long taxonomyVocabularyId, String callbackURL, Object object)
+				Long taxonomyVocabularyId, String callbackURL,
+				String contentString)
 		throws Exception;
 
 	public void deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
@@ -782,11 +785,12 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public void deleteTaxonomyCategoryBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteTaxonomyCategoryBatchHttpResponse(callbackURL, object);
+				deleteTaxonomyCategoryBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -837,12 +841,12 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteTaxonomyCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1204,11 +1208,13 @@ public interface TaxonomyCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putTaxonomyCategoryBatch(String callbackURL, Object object)
+		public void putTaxonomyCategoryBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putTaxonomyCategoryBatchHttpResponse(callbackURL, object);
+				putTaxonomyCategoryBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1259,12 +1265,12 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse putTaxonomyCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1910,12 +1916,13 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public void postTaxonomyVocabularyTaxonomyCategoryBatch(
-				Long taxonomyVocabularyId, String callbackURL, Object object)
+				Long taxonomyVocabularyId, String callbackURL,
+				String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postTaxonomyVocabularyTaxonomyCategoryBatchHttpResponse(
-					taxonomyVocabularyId, callbackURL, object);
+					taxonomyVocabularyId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1968,12 +1975,12 @@ public interface TaxonomyCategoryResource {
 		public HttpInvoker.HttpResponse
 				postTaxonomyVocabularyTaxonomyCategoryBatchHttpResponse(
 					Long taxonomyVocabularyId, String callbackURL,
-					Object object)
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

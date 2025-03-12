@@ -61,7 +61,7 @@ public interface CompanyTestEntityResource {
 		throws Exception;
 
 	public Response postCompanyTestEntityBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CompanyTestEntity getCompanyTestEntityByExternalReferenceCode(
@@ -79,7 +79,8 @@ public interface CompanyTestEntityResource {
 			Long companyTestEntityId, CompanyTestEntity companyTestEntity)
 		throws Exception;
 
-	public Response putCompanyTestEntityBatch(String callbackURL, Object object)
+	public Response putCompanyTestEntityBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>

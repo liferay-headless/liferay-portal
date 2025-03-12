@@ -68,11 +68,11 @@ public interface TierPriceResource {
 		throws Exception;
 
 	public void postPriceEntryIdTierPriceBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postPriceEntryIdTierPriceBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteTierPriceByExternalReferenceCode(
@@ -107,11 +107,11 @@ public interface TierPriceResource {
 	public HttpInvoker.HttpResponse deleteTierPriceHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteTierPriceBatch(String callbackURL, Object object)
+	public void deleteTierPriceBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTierPriceBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TierPrice getTierPrice(Long id) throws Exception;
@@ -681,11 +681,12 @@ public interface TierPriceResource {
 		}
 
 		public void postPriceEntryIdTierPriceBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postPriceEntryIdTierPriceBatchHttpResponse(callbackURL, object);
+				postPriceEntryIdTierPriceBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -737,12 +738,12 @@ public interface TierPriceResource {
 
 		public HttpInvoker.HttpResponse
 				postPriceEntryIdTierPriceBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1176,11 +1177,12 @@ public interface TierPriceResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteTierPriceBatch(String callbackURL, Object object)
+		public void deleteTierPriceBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteTierPriceBatchHttpResponse(callbackURL, object);
+				deleteTierPriceBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1231,12 +1233,12 @@ public interface TierPriceResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteTierPriceBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

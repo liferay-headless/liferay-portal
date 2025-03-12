@@ -68,7 +68,8 @@ public interface WishListResource {
 
 	public void deleteWishList(Long wishListId) throws Exception;
 
-	public Response deleteWishListBatch(String callbackURL, Object object)
+	public Response deleteWishListBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public WishList getWishList(Long wishListId) throws Exception;

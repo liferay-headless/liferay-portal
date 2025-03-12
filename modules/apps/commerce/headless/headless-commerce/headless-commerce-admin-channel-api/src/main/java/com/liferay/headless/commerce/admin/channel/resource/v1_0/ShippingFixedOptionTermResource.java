@@ -52,7 +52,7 @@ public interface ShippingFixedOptionTermResource {
 		throws Exception;
 
 	public Response deleteShippingFixedOptionTermBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<ShippingFixedOptionTerm>

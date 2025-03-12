@@ -59,11 +59,11 @@ public interface TermResource {
 	public HttpInvoker.HttpResponse postTermHttpResponse(Term term)
 		throws Exception;
 
-	public void postTermBatch(String callbackURL, Object object)
+	public void postTermBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postTermBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteTermByExternalReferenceCode(String externalReferenceCode)
@@ -103,11 +103,11 @@ public interface TermResource {
 	public HttpInvoker.HttpResponse deleteTermHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteTermBatch(String callbackURL, Object object)
+	public void deleteTermBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTermBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Term getTerm(Long id) throws Exception;
@@ -579,11 +579,11 @@ public interface TermResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postTermBatch(String callbackURL, Object object)
+		public void postTermBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postTermBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -634,12 +634,12 @@ public interface TermResource {
 		}
 
 		public HttpInvoker.HttpResponse postTermBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1214,11 +1214,11 @@ public interface TermResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteTermBatch(String callbackURL, Object object)
+		public void deleteTermBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = deleteTermBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1269,12 +1269,12 @@ public interface TermResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteTermBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

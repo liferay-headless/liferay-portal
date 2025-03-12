@@ -62,7 +62,7 @@ public interface ChannelResource {
 
 	public Channel postChannel(Channel channel) throws Exception;
 
-	public Response postChannelBatch(String callbackURL, Object object)
+	public Response postChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteChannelByExternalReferenceCode(
@@ -83,7 +83,7 @@ public interface ChannelResource {
 
 	public void deleteChannel(Long channelId) throws Exception;
 
-	public Response deleteChannelBatch(String callbackURL, Object object)
+	public Response deleteChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Channel getChannel(Long channelId) throws Exception;
@@ -93,7 +93,7 @@ public interface ChannelResource {
 
 	public Channel putChannel(Long channelId, Channel channel) throws Exception;
 
-	public Response putChannelBatch(String callbackURL, Object object)
+	public Response putChannelBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

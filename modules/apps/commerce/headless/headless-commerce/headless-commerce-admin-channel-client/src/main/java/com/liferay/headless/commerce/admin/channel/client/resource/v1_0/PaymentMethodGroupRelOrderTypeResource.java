@@ -44,12 +44,12 @@ public interface PaymentMethodGroupRelOrderTypeResource {
 		throws Exception;
 
 	public void deletePaymentMethodGroupRelOrderTypeBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			deletePaymentMethodGroupRelOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PaymentMethodGroupRelOrderType>
@@ -296,12 +296,12 @@ public interface PaymentMethodGroupRelOrderTypeResource {
 		}
 
 		public void deletePaymentMethodGroupRelOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deletePaymentMethodGroupRelOrderTypeBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -353,12 +353,12 @@ public interface PaymentMethodGroupRelOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				deletePaymentMethodGroupRelOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

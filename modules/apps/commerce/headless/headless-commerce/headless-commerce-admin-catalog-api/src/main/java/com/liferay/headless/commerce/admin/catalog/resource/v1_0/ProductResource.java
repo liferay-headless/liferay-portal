@@ -59,7 +59,7 @@ public interface ProductResource {
 
 	public Product postProduct(Product product) throws Exception;
 
-	public Response postProductBatch(String callbackURL, Object object)
+	public Response postProductBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteProductByExternalReferenceCode(
@@ -92,7 +92,7 @@ public interface ProductResource {
 
 	public void deleteProduct(Long id) throws Exception;
 
-	public Response deleteProductBatch(String callbackURL, Object object)
+	public Response deleteProductBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Product getProduct(Long id) throws Exception;

@@ -94,12 +94,12 @@ public interface AccountOrganizationResource {
 		throws Exception;
 
 	public void postAccountIdAccountOrganizationBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postAccountIdAccountOrganizationBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountIdAccountOrganization(Long id, Long organizationId)
@@ -892,12 +892,12 @@ public interface AccountOrganizationResource {
 		}
 
 		public void postAccountIdAccountOrganizationBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAccountIdAccountOrganizationBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -949,12 +949,12 @@ public interface AccountOrganizationResource {
 
 		public HttpInvoker.HttpResponse
 				postAccountIdAccountOrganizationBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

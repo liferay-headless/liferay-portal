@@ -68,11 +68,11 @@ public interface KeywordResource {
 		throws Exception;
 
 	public void postAssetLibraryKeywordBatch(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAssetLibraryKeywordBatchHttpResponse(
-			Long assetLibraryId, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAssetLibraryKeywordByExternalReferenceCode(
@@ -134,11 +134,11 @@ public interface KeywordResource {
 	public HttpInvoker.HttpResponse deleteKeywordHttpResponse(Long keywordId)
 		throws Exception;
 
-	public void deleteKeywordBatch(String callbackURL, Object object)
+	public void deleteKeywordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteKeywordBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Keyword getKeyword(Long keywordId) throws Exception;
@@ -152,11 +152,11 @@ public interface KeywordResource {
 			Long keywordId, Keyword keyword)
 		throws Exception;
 
-	public void putKeywordBatch(String callbackURL, Object object)
+	public void putKeywordBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putKeywordBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void putKeywordSubscribe(Long keywordId) throws Exception;
@@ -199,11 +199,11 @@ public interface KeywordResource {
 		throws Exception;
 
 	public void postSiteKeywordBatch(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteKeywordBatchHttpResponse(
-			Long siteId, String callbackURL, Object object)
+			Long siteId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteSiteKeywordByExternalReferenceCode(
@@ -725,12 +725,12 @@ public interface KeywordResource {
 		}
 
 		public void postAssetLibraryKeywordBatch(
-				Long assetLibraryId, String callbackURL, Object object)
+				Long assetLibraryId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryKeywordBatchHttpResponse(
-					assetLibraryId, callbackURL, object);
+					assetLibraryId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -782,12 +782,13 @@ public interface KeywordResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryKeywordBatchHttpResponse(
-					Long assetLibraryId, String callbackURL, Object object)
+					Long assetLibraryId, String callbackURL,
+					String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1609,11 +1610,11 @@ public interface KeywordResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteKeywordBatch(String callbackURL, Object object)
+		public void deleteKeywordBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteKeywordBatchHttpResponse(callbackURL, object);
+				deleteKeywordBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1664,12 +1665,12 @@ public interface KeywordResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteKeywordBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1917,11 +1918,11 @@ public interface KeywordResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putKeywordBatch(String callbackURL, Object object)
+		public void putKeywordBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = putKeywordBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1972,12 +1973,12 @@ public interface KeywordResource {
 		}
 
 		public HttpInvoker.HttpResponse putKeywordBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -2593,11 +2594,12 @@ public interface KeywordResource {
 		}
 
 		public void postSiteKeywordBatch(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteKeywordBatchHttpResponse(siteId, callbackURL, object);
+				postSiteKeywordBatchHttpResponse(
+					siteId, callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -2648,12 +2650,12 @@ public interface KeywordResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteKeywordBatchHttpResponse(
-				Long siteId, String callbackURL, Object object)
+				Long siteId, String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -110,7 +110,7 @@ public interface UserAccountResource {
 		throws Exception;
 
 	public Response postAccountUserAccountBatch(
-			Long accountId, String callbackURL, Object object)
+			Long accountId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteAccountUserAccountsByEmailAddress(
@@ -195,7 +195,8 @@ public interface UserAccountResource {
 	public UserAccount postUserAccount(UserAccount userAccount)
 		throws Exception;
 
-	public Response postUserAccountBatch(String callbackURL, Object object)
+	public Response postUserAccountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserAccount getUserAccountByEmailAddress(String emailAddress)
@@ -224,7 +225,8 @@ public interface UserAccountResource {
 
 	public void deleteUserAccount(Long userAccountId) throws Exception;
 
-	public Response deleteUserAccountBatch(String callbackURL, Object object)
+	public Response deleteUserAccountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public UserAccount getUserAccount(Long userAccountId) throws Exception;
@@ -237,7 +239,8 @@ public interface UserAccountResource {
 			Long userAccountId, UserAccount userAccount)
 		throws Exception;
 
-	public Response putUserAccountBatch(String callbackURL, Object object)
+	public Response putUserAccountBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Response postUserAccountImage(

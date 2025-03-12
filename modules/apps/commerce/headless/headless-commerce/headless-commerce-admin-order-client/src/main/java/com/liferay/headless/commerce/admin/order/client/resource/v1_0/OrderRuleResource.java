@@ -60,11 +60,11 @@ public interface OrderRuleResource {
 			OrderRule orderRule)
 		throws Exception;
 
-	public void postOrderRuleBatch(String callbackURL, Object object)
+	public void postOrderRuleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrderRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrderRuleByExternalReferenceCode(
@@ -108,11 +108,11 @@ public interface OrderRuleResource {
 	public HttpInvoker.HttpResponse deleteOrderRuleHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOrderRuleBatch(String callbackURL, Object object)
+	public void deleteOrderRuleBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderRuleBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderRule getOrderRule(Long id) throws Exception;
@@ -590,11 +590,11 @@ public interface OrderRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrderRuleBatch(String callbackURL, Object object)
+		public void postOrderRuleBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOrderRuleBatchHttpResponse(callbackURL, object);
+				postOrderRuleBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -645,12 +645,12 @@ public interface OrderRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrderRuleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1227,11 +1227,12 @@ public interface OrderRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrderRuleBatch(String callbackURL, Object object)
+		public void deleteOrderRuleBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderRuleBatchHttpResponse(callbackURL, object);
+				deleteOrderRuleBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1282,12 +1283,12 @@ public interface OrderRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderRuleBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

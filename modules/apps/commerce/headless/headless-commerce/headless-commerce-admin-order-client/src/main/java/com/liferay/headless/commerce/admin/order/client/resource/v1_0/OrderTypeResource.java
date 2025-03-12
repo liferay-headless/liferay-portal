@@ -67,11 +67,11 @@ public interface OrderTypeResource {
 			OrderType orderType)
 		throws Exception;
 
-	public void postOrderTypeBatch(String callbackURL, Object object)
+	public void postOrderTypeBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteOrderTypeByExternalReferenceCode(
@@ -115,11 +115,11 @@ public interface OrderTypeResource {
 	public HttpInvoker.HttpResponse deleteOrderTypeHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOrderTypeBatch(String callbackURL, Object object)
+	public void deleteOrderTypeBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderType getOrderType(Long id) throws Exception;
@@ -712,11 +712,11 @@ public interface OrderTypeResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrderTypeBatch(String callbackURL, Object object)
+		public void postOrderTypeBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOrderTypeBatchHttpResponse(callbackURL, object);
+				postOrderTypeBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -767,12 +767,12 @@ public interface OrderTypeResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1349,11 +1349,12 @@ public interface OrderTypeResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrderTypeBatch(String callbackURL, Object object)
+		public void deleteOrderTypeBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderTypeBatchHttpResponse(callbackURL, object);
+				deleteOrderTypeBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1404,12 +1405,12 @@ public interface OrderTypeResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

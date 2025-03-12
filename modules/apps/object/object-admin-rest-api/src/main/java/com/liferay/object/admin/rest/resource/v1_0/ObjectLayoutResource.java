@@ -73,12 +73,13 @@ public interface ObjectLayoutResource {
 		throws Exception;
 
 	public Response postObjectDefinitionObjectLayoutBatch(
-			Long objectDefinitionId, String callbackURL, Object object)
+			Long objectDefinitionId, String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteObjectLayout(Long objectLayoutId) throws Exception;
 
-	public Response deleteObjectLayoutBatch(String callbackURL, Object object)
+	public Response deleteObjectLayoutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectLayout getObjectLayout(Long objectLayoutId) throws Exception;
@@ -87,7 +88,8 @@ public interface ObjectLayoutResource {
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception;
 
-	public Response putObjectLayoutBatch(String callbackURL, Object object)
+	public Response putObjectLayoutBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

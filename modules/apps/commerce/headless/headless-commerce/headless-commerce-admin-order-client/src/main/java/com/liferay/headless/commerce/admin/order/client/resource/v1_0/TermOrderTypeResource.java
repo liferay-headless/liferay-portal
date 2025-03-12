@@ -40,11 +40,12 @@ public interface TermOrderTypeResource {
 			Long termOrderTypeId)
 		throws Exception;
 
-	public void deleteTermOrderTypeBatch(String callbackURL, Object object)
+	public void deleteTermOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTermOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<TermOrderType> getTermByExternalReferenceCodeTermOrderTypesPage(
@@ -81,11 +82,12 @@ public interface TermOrderTypeResource {
 			Long id, TermOrderType termOrderType)
 		throws Exception;
 
-	public void postTermIdTermOrderTypeBatch(String callbackURL, Object object)
+	public void postTermIdTermOrderTypeBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postTermIdTermOrderTypeBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -300,11 +302,13 @@ public interface TermOrderTypeResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteTermOrderTypeBatch(String callbackURL, Object object)
+		public void deleteTermOrderTypeBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteTermOrderTypeBatchHttpResponse(callbackURL, object);
+				deleteTermOrderTypeBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -355,12 +359,12 @@ public interface TermOrderTypeResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteTermOrderTypeBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -851,11 +855,12 @@ public interface TermOrderTypeResource {
 		}
 
 		public void postTermIdTermOrderTypeBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postTermIdTermOrderTypeBatchHttpResponse(callbackURL, object);
+				postTermIdTermOrderTypeBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -907,12 +912,12 @@ public interface TermOrderTypeResource {
 
 		public HttpInvoker.HttpResponse
 				postTermIdTermOrderTypeBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

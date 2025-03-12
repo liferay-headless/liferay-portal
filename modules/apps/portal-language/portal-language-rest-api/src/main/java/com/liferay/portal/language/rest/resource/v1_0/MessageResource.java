@@ -50,19 +50,20 @@ public interface MessageResource {
 	public void deleteMessage(String key, String languageId) throws Exception;
 
 	public Response deleteMessageBatch(
-			String key, String languageId, String callbackURL, Object object)
+			String key, String languageId, String callbackURL,
+			String contentString)
 		throws Exception;
 
 	public Message getMessage(String key, String languageId) throws Exception;
 
 	public Message postMessage(Message message) throws Exception;
 
-	public Response postMessageBatch(String callbackURL, Object object)
+	public Response postMessageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public Message putMessage(Message message) throws Exception;
 
-	public Response putMessageBatch(String callbackURL, Object object)
+	public Response putMessageBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public void postMessageImport(

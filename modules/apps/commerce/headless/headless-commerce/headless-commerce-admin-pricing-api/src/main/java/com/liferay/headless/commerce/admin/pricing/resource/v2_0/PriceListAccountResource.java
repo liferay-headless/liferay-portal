@@ -52,7 +52,7 @@ public interface PriceListAccountResource {
 		throws Exception;
 
 	public Response deletePriceListAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Page<PriceListAccount>
@@ -75,7 +75,7 @@ public interface PriceListAccountResource {
 		throws Exception;
 
 	public Response postPriceListIdPriceListAccountBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

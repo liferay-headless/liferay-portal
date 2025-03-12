@@ -59,11 +59,11 @@ public interface ShipmentResource {
 	public HttpInvoker.HttpResponse postShipmentHttpResponse(Shipment shipment)
 		throws Exception;
 
-	public void postShipmentBatch(String callbackURL, Object object)
+	public void postShipmentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postShipmentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteShipmentByExternalReferenceCode(
@@ -134,11 +134,11 @@ public interface ShipmentResource {
 	public HttpInvoker.HttpResponse deleteShipmentHttpResponse(Long shipmentId)
 		throws Exception;
 
-	public void deleteShipmentBatch(String callbackURL, Object object)
+	public void deleteShipmentBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteShipmentBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Shipment getShipment(Long shipmentId) throws Exception;
@@ -636,11 +636,11 @@ public interface ShipmentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postShipmentBatch(String callbackURL, Object object)
+		public void postShipmentBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postShipmentBatchHttpResponse(callbackURL, object);
+				postShipmentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -691,12 +691,12 @@ public interface ShipmentResource {
 		}
 
 		public HttpInvoker.HttpResponse postShipmentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1605,11 +1605,12 @@ public interface ShipmentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteShipmentBatch(String callbackURL, Object object)
+		public void deleteShipmentBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteShipmentBatchHttpResponse(callbackURL, object);
+				deleteShipmentBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1660,12 +1661,12 @@ public interface ShipmentResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteShipmentBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

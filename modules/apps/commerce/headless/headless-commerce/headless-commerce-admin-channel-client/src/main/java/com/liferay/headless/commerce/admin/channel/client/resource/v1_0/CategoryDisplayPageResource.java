@@ -41,11 +41,11 @@ public interface CategoryDisplayPageResource {
 		throws Exception;
 
 	public void deleteCategoryDisplayPageBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteCategoryDisplayPageBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public CategoryDisplayPage getCategoryDisplayPage(Long id) throws Exception;
@@ -318,11 +318,12 @@ public interface CategoryDisplayPageResource {
 		}
 
 		public void deleteCategoryDisplayPageBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteCategoryDisplayPageBatchHttpResponse(callbackURL, object);
+				deleteCategoryDisplayPageBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -374,12 +375,12 @@ public interface CategoryDisplayPageResource {
 
 		public HttpInvoker.HttpResponse
 				deleteCategoryDisplayPageBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

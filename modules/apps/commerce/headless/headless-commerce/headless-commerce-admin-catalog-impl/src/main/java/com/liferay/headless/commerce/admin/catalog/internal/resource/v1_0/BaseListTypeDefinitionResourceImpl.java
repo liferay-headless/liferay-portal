@@ -159,7 +159,7 @@ public abstract class BaseListTypeDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -174,7 +174,8 @@ public abstract class BaseListTypeDefinitionResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				ListTypeDefinition.class.getName(), callbackURL, null, object)
+				ListTypeDefinition.class.getName(), callbackURL, null,
+				contentString)
 		).build();
 	}
 

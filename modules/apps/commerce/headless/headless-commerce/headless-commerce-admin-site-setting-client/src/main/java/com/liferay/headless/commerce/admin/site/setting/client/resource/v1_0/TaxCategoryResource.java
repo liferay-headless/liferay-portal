@@ -57,11 +57,11 @@ public interface TaxCategoryResource {
 	public HttpInvoker.HttpResponse deleteTaxCategoryHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteTaxCategoryBatch(String callbackURL, Object object)
+	public void deleteTaxCategoryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTaxCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public TaxCategory getTaxCategory(Long id) throws Exception;
@@ -76,11 +76,11 @@ public interface TaxCategoryResource {
 			Long id, TaxCategory taxCategory)
 		throws Exception;
 
-	public void putTaxCategoryBatch(String callbackURL, Object object)
+	public void putTaxCategoryBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putTaxCategoryBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -508,11 +508,12 @@ public interface TaxCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteTaxCategoryBatch(String callbackURL, Object object)
+		public void deleteTaxCategoryBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteTaxCategoryBatchHttpResponse(callbackURL, object);
+				deleteTaxCategoryBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -563,12 +564,12 @@ public interface TaxCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteTaxCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -805,11 +806,12 @@ public interface TaxCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putTaxCategoryBatch(String callbackURL, Object object)
+		public void putTaxCategoryBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putTaxCategoryBatchHttpResponse(callbackURL, object);
+				putTaxCategoryBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -860,12 +862,12 @@ public interface TaxCategoryResource {
 		}
 
 		public HttpInvoker.HttpResponse putTaxCategoryBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

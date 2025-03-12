@@ -66,11 +66,11 @@ public interface OrderNoteResource {
 	public HttpInvoker.HttpResponse deleteOrderNoteHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteOrderNoteBatch(String callbackURL, Object object)
+	public void deleteOrderNoteBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteOrderNoteBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public OrderNote getOrderNote(Long id) throws Exception;
@@ -117,11 +117,12 @@ public interface OrderNoteResource {
 			Long id, OrderNote orderNote)
 		throws Exception;
 
-	public void postOrderIdOrderNoteBatch(String callbackURL, Object object)
+	public void postOrderIdOrderNoteBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postOrderIdOrderNoteBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -627,11 +628,12 @@ public interface OrderNoteResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteOrderNoteBatch(String callbackURL, Object object)
+		public void deleteOrderNoteBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteOrderNoteBatchHttpResponse(callbackURL, object);
+				deleteOrderNoteBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -682,12 +684,12 @@ public interface OrderNoteResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteOrderNoteBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -1369,11 +1371,13 @@ public interface OrderNoteResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postOrderIdOrderNoteBatch(String callbackURL, Object object)
+		public void postOrderIdOrderNoteBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postOrderIdOrderNoteBatchHttpResponse(callbackURL, object);
+				postOrderIdOrderNoteBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1424,12 +1428,12 @@ public interface OrderNoteResource {
 		}
 
 		public HttpInvoker.HttpResponse postOrderIdOrderNoteBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -60,7 +60,8 @@ public interface ObjectFolderResource {
 	public ObjectFolder postObjectFolder(ObjectFolder objectFolder)
 		throws Exception;
 
-	public Response postObjectFolderBatch(String callbackURL, Object object)
+	public Response postObjectFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectFolder getObjectFolderByExternalReferenceCode(
@@ -73,7 +74,8 @@ public interface ObjectFolderResource {
 
 	public void deleteObjectFolder(Long objectFolderId) throws Exception;
 
-	public Response deleteObjectFolderBatch(String callbackURL, Object object)
+	public Response deleteObjectFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public ObjectFolder getObjectFolder(Long objectFolderId) throws Exception;
@@ -86,7 +88,8 @@ public interface ObjectFolderResource {
 			Long objectFolderId, ObjectFolder objectFolder)
 		throws Exception;
 
-	public Response putObjectFolderBatch(String callbackURL, Object object)
+	public Response putObjectFolderBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

@@ -39,11 +39,11 @@ public interface PinResource {
 	public HttpInvoker.HttpResponse deletePinHttpResponse(Long pinId)
 		throws Exception;
 
-	public void deletePinBatch(String callbackURL, Object object)
+	public void deletePinBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deletePinBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public Pin patchPin(Long pinId, Pin pin) throws Exception;
@@ -85,11 +85,11 @@ public interface PinResource {
 			Long id, Pin pin)
 		throws Exception;
 
-	public void postProductIdPinBatch(String callbackURL, Object object)
+	public void postProductIdPinBatch(String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postProductIdPinBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public static class Builder {
@@ -302,11 +302,11 @@ public interface PinResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deletePinBatch(String callbackURL, Object object)
+		public void deletePinBatch(String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = deletePinBatchHttpResponse(
-				callbackURL, object);
+				callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -357,12 +357,12 @@ public interface PinResource {
 		}
 
 		public HttpInvoker.HttpResponse deletePinBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -970,11 +970,12 @@ public interface PinResource {
 			return httpInvoker.invoke();
 		}
 
-		public void postProductIdPinBatch(String callbackURL, Object object)
+		public void postProductIdPinBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postProductIdPinBatchHttpResponse(callbackURL, object);
+				postProductIdPinBatchHttpResponse(callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -1025,12 +1026,12 @@ public interface PinResource {
 		}
 
 		public HttpInvoker.HttpResponse postProductIdPinBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

@@ -300,7 +300,7 @@ public abstract class BaseDSEnvelopeResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
-			Object object)
+			String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
@@ -315,7 +315,7 @@ public abstract class BaseDSEnvelopeResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineImportTaskResource.postImportTask(
-				DSEnvelope.class.getName(), callbackURL, null, object)
+				DSEnvelope.class.getName(), callbackURL, null, contentString)
 		).build();
 	}
 

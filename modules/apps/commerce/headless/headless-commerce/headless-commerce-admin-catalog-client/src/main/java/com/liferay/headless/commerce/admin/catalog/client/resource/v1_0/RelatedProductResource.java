@@ -72,12 +72,12 @@ public interface RelatedProductResource {
 		throws Exception;
 
 	public void postProductIdRelatedProductBatch(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postProductIdRelatedProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 		throws Exception;
 
 	public void deleteRelatedProduct(Long id) throws Exception;
@@ -85,11 +85,12 @@ public interface RelatedProductResource {
 	public HttpInvoker.HttpResponse deleteRelatedProductHttpResponse(Long id)
 		throws Exception;
 
-	public void deleteRelatedProductBatch(String callbackURL, Object object)
+	public void deleteRelatedProductBatch(
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteRelatedProductBatchHttpResponse(
-			String callbackURL, Object object)
+			String callbackURL, String contentString)
 		throws Exception;
 
 	public RelatedProduct getRelatedProduct(Long id) throws Exception;
@@ -666,12 +667,12 @@ public interface RelatedProductResource {
 		}
 
 		public void postProductIdRelatedProductBatch(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postProductIdRelatedProductBatchHttpResponse(
-					callbackURL, object);
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -723,12 +724,12 @@ public interface RelatedProductResource {
 
 		public HttpInvoker.HttpResponse
 				postProductIdRelatedProductBatchHttpResponse(
-					String callbackURL, Object object)
+					String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
@@ -859,11 +860,13 @@ public interface RelatedProductResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteRelatedProductBatch(String callbackURL, Object object)
+		public void deleteRelatedProductBatch(
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteRelatedProductBatchHttpResponse(callbackURL, object);
+				deleteRelatedProductBatchHttpResponse(
+					callbackURL, contentString);
 
 			String content = httpResponse.getContent();
 
@@ -914,12 +917,12 @@ public interface RelatedProductResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteRelatedProductBatchHttpResponse(
-				String callbackURL, Object object)
+				String callbackURL, String contentString)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body(object.toString(), "application/json");
+			httpInvoker.body(contentString.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(
