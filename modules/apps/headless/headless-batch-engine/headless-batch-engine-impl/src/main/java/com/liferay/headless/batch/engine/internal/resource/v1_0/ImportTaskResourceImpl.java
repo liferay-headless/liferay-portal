@@ -5,8 +5,6 @@
 
 package com.liferay.headless.batch.engine.internal.resource.v1_0;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskContentType;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
@@ -95,7 +93,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	@Override
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, String contentString)
+			String importStrategy, String taskItemDelegateName,
+			String contentString)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
@@ -258,9 +257,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(String contentString)
-		throws Exception {
-
+	private byte[] _getBytes(String contentString) throws Exception {
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(
 				"fileName", new ByteArrayInputStream(contentString.getBytes()));

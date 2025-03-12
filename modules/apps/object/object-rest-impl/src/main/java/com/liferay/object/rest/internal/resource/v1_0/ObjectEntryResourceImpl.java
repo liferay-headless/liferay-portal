@@ -146,7 +146,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public Response deleteObjectEntryBatch(String callbackURL, String contentString)
+	public Response deleteObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setTaskItemDelegateName(
@@ -329,7 +330,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public Response postObjectEntryBatch(String callbackURL, String contentString)
+	public Response postObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setTaskItemDelegateName(
@@ -431,7 +433,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	}
 
 	@Override
-	public Response putObjectEntryBatch(String callbackURL, String contentString)
+	public Response putObjectEntryBatch(
+			String callbackURL, String contentString)
 		throws Exception {
 
 		vulcanBatchEngineImportTaskResource.setTaskItemDelegateName(

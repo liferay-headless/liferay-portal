@@ -41,7 +41,8 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 		return importTaskResource.deleteImportTask(
 			name, callbackURL, _getExternalReferenceCode(),
-			_getImportStrategy(), _getTaskItemDelegateName(), object.toString());
+			_getImportStrategy(), _getTaskItemDelegateName(),
+			object.toString());
 	}
 
 	@Override
@@ -130,7 +131,9 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 		Map<?, ?> map = (Map)object;
 
-		return map.get("items").toString();
+		return map.get(
+			"items"
+		).toString();
 	}
 
 	private String _getQueryParameterValue(String queryParameterName) {
