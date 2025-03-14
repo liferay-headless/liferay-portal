@@ -25,6 +25,9 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -34,6 +37,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -69,6 +73,25 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			new PortletDataHandlerBoolean(
 				taskItemDelegateName, taskItemDelegateName, true, true, null,
 				className));
+	}
+
+	public void exportDeletionSystemEvents(
+		PortletDataContext portletDataContext) {
+
+		String key = _itemClassName + "_batchDeleteERCs";
+
+		Map<String, String> map =
+			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(key);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (String erc : map.keySet()) {
+			jsonArray.put(
+				JSONUtil.put("externalReferenceCode", String.valueOf(erc)));
+		}
+
+		portletDataContext.addZipEntry(
+			_deletionsFileName, jsonArray.toString());
 	}
 
 	@Override
