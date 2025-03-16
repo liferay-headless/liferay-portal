@@ -853,17 +853,17 @@ public interface ImportTaskResource {
 		}
 
 		public ImportTask postImportTask(
-				String className, String batchExternalReferenceCode, String batchRestrictFields,
-				String callbackURL, String createStrategy,
-				String externalReferenceCode, String fieldNameMapping,
-				String importStrategy, String taskItemDelegateName,
-				String string)
+				String className, String batchExternalReferenceCode,
+				String batchRestrictFields, String callbackURL,
+				String createStrategy, String externalReferenceCode,
+				String fieldNameMapping, String importStrategy,
+				String taskItemDelegateName, String string)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse = postImportTaskHttpResponse(
-				className, batchExternalReferenceCode, batchRestrictFields, callbackURL, createStrategy,
-				externalReferenceCode, fieldNameMapping, importStrategy,
-				taskItemDelegateName, string);
+				className, batchExternalReferenceCode, batchRestrictFields,
+				callbackURL, createStrategy, externalReferenceCode,
+				fieldNameMapping, importStrategy, taskItemDelegateName, string);
 
 			String content = httpResponse.getContent();
 
