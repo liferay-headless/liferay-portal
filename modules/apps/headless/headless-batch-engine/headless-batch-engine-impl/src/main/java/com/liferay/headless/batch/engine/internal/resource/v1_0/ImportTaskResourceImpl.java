@@ -101,8 +101,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.DELETE, null,
-			_getBytes(contentString), callbackURL, className, null,
+			BatchEngineTaskOperation.DELETE, null, _getBytes(contentString),
+			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
 	}
@@ -194,10 +194,9 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 		return _importFile(
 			BatchEngineTaskOperation.CREATE, batchExternalReferenceCode,
-			_getBytes(contentString), callbackURL, className,
-			createStrategy, _getBatchEngineTaskContentType(contentType),
-			externalReferenceCode, fieldNameMapping, importStrategy,
-			taskItemDelegateName, null);
+			_getBytes(contentString), callbackURL, className, createStrategy,
+			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
+			fieldNameMapping, importStrategy, taskItemDelegateName, null);
 	}
 
 	@Override
@@ -225,8 +224,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.UPDATE, null,
-			_getBytes(contentString), callbackURL, className, null,
+			BatchEngineTaskOperation.UPDATE, null, _getBytes(contentString),
+			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, updateStrategy);
 	}
