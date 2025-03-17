@@ -2422,7 +2422,7 @@ public class StructuredContentResourceTest
 							JSONFactoryUtil.createJSONObject(
 								String.valueOf(
 									_randomStructuredContent(
-										LocaleUtil.getDefault()))))
+										LocaleUtil.getDefault())))).toString()
 					).getContent()));
 
 		Assert.assertEquals(1, jsonObject.getLong("processedItemsCount"));
