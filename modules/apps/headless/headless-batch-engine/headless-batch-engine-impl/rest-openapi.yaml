@@ -388,10 +388,10 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
+                            type: string
                     application/x-ndjson:
                         schema:
-                            type: object
+                            type: string
                     application/xml:
                         schema:
                             type: object
@@ -465,13 +465,13 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
+                            type: string
                     application/x-ndjson:
                         schema:
-                            type: object
+                            type: string
                     application/xml:
                         schema:
-                            type: object
+                            type: string
                     multipart/form-data:
                         schema:
                             properties:
@@ -480,7 +480,7 @@ paths:
                                     type: string
                     text/csv:
                         schema:
-                            type: object
+                            type: string
                 required: true
             responses:
                 202:
@@ -530,13 +530,13 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
+                            type: string
                     application/x-ndjson:
                         schema:
-                            type: object
+                            type: string
                     application/xml:
                         schema:
-                            type: object
+                            type: string
                     multipart/form-data:
                         schema:
                             properties:
@@ -545,7 +545,7 @@ paths:
                                     type: string
                     text/csv:
                         schema:
-                            type: object
+                            type: string
                 required: true
             responses:
                 202:
