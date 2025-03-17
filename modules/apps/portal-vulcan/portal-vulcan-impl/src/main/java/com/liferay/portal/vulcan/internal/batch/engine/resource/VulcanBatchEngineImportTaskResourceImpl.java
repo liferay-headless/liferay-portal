@@ -133,6 +133,30 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	}
 
 	private String _getItemsArray(Object object) {
+
+		if (object instanceof Map<?, ?> map) {
+
+			Object items = map.get("items");
+
+			if (items != null) {
+				try {
+					ObjectMapper objectMapper = new ObjectMapper();
+
+					return objectMapper.writeValueAsString(items);
+				}	catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Unable to serialize collection of maps", exception);
+					}
+
+					return "";
+				}
+
+			}
+
+			return "";
+		}
+
 		if ((object instanceof Collection<?> collection) &&
 			!collection.isEmpty() &&
 			(
