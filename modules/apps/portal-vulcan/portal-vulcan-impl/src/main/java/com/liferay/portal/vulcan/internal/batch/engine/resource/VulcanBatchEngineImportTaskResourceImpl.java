@@ -5,6 +5,7 @@
 
 package com.liferay.portal.vulcan.internal.batch.engine.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liferay.headless.batch.engine.resource.v1_0.ImportTaskResource;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -16,6 +17,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -130,21 +132,23 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	}
 
 	private String _getItemsArray(Object object) {
-		if (object instanceof Map<?, ?> map) {
-			Object items = map.get("items");
-
-			if (items != null) {
-				return items.toString();
+		if (object instanceof Collection<?> collection) {
+			if (!collection.isEmpty() && collection.iterator().next() instanceof Map) {
+				try {
+					ObjectMapper mapper = new ObjectMapper();
+					return mapper.writeValueAsString(object);
+				} catch (Exception e) {
+					if (_log.isDebugEnabled()) {
+						_log.debug("Unable to serialize collection of maps", e);
+					}
+					return "[]";
+				}
 			}
-
-			return "";
 		}
 
 		if (object instanceof String jsonString) {
 			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					jsonString);
-
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
 				if (jsonObject.has("items")) {
 					return jsonObject.getString("items");
 				}
