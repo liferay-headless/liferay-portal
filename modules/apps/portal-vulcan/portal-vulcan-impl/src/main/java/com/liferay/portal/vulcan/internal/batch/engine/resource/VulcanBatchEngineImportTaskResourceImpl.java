@@ -145,8 +145,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
-							"Unable to serialize items from Map",
-							exception);
+							"Unable to serialize items from Map", exception);
 					}
 				}
 			}
