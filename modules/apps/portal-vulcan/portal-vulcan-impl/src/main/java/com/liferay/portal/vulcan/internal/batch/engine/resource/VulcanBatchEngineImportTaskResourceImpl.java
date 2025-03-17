@@ -132,24 +132,28 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private String _getItemsArray(Object object) {
 		if (object instanceof Map<?, ?> map) {
 			Object items = map.get("items");
+
 			if (items != null) {
 				return items.toString();
 			}
+
 			return "";
 		}
 
 		if (object instanceof String jsonString) {
 			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					jsonString);
 
 				if (jsonObject.has("items")) {
 					return jsonObject.getString("items");
 				}
 			}
-			catch (JSONException exception) {
-				// Process the exception according to LPS-36174
+			catch (JSONException jsonException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug("Unable to parse JSON string: " + jsonString, exception);
+					_log.debug(
+						"Unable to parse JSON string: " + jsonString,
+						jsonException);
 				}
 			}
 		}
@@ -188,6 +192,9 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		return _taskItemDelegateName;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		VulcanBatchEngineImportTaskResourceImpl.class);
+
 	private AcceptLanguage _contextAcceptLanguage;
 	private Company _contextCompany;
 	private HttpServletRequest _contextHttpServletRequest;
@@ -195,8 +202,5 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private User _contextUser;
 	private final ImportTaskResource.Factory _factory;
 	private String _taskItemDelegateName;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VulcanBatchEngineImportTaskResourceImpl.class);
 
 }
