@@ -133,9 +133,7 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	}
 
 	private String _getItemsArray(Object object) {
-
 		if (object instanceof Map<?, ?> map) {
-
 			Object items = map.get("items");
 
 			if (items != null) {
@@ -143,18 +141,15 @@ public class VulcanBatchEngineImportTaskResourceImpl
 					ObjectMapper objectMapper = new ObjectMapper();
 
 					return objectMapper.writeValueAsString(items);
-				}	catch (Exception exception) {
+				}
+				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
-							"Unable to serialize collection of maps", exception);
+							"Unable to serialize items from Map",
+							exception);
 					}
-
-					return "";
 				}
-
 			}
-
-			return "";
 		}
 
 		if ((object instanceof Collection<?> collection) &&
@@ -173,8 +168,6 @@ public class VulcanBatchEngineImportTaskResourceImpl
 					_log.debug(
 						"Unable to serialize collection of maps", exception);
 				}
-
-				return "[]";
 			}
 		}
 
