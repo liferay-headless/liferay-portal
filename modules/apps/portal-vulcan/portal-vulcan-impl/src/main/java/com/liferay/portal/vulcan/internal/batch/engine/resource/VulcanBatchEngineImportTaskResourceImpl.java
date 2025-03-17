@@ -6,6 +6,8 @@
 package com.liferay.portal.vulcan.internal.batch.engine.resource;
 
 import com.liferay.headless.batch.engine.resource.v1_0.ImportTaskResource;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -125,15 +127,21 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	}
 
 	private String _getItemsArray(Object object) {
-		if (!(object instanceof Map)) {
-			return object.toString();
+		if (object instanceof Map<?, ?> map) {
+			Object items = map.get("items");
+			return items != null ? items.toString() : "";
 		}
+		if (object instanceof String jsonString) {
+			try {
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
 
-		Map<?, ?> map = (Map)object;
-
-		return map.get(
-			"items"
-		).toString();
+				if (jsonObject.has("items")) {
+					return jsonObject.getString("items");
+				}
+			} catch (Exception ignored) {
+			}
+		}
+		return object.toString();
 	}
 
 	private String _getQueryParameterValue(String queryParameterName) {
