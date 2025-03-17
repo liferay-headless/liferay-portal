@@ -215,7 +215,7 @@ public abstract class BaseImportTaskResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("taskItemDelegateName")
 			String taskItemDelegateName,
-			Object object)
+			String string)
 		throws Exception {
 
 		return new ImportTask();
@@ -376,7 +376,7 @@ public abstract class BaseImportTaskResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("taskItemDelegateName")
 			String taskItemDelegateName,
-			Object object)
+			String string)
 		throws Exception {
 
 		return new ImportTask();
@@ -544,7 +544,7 @@ public abstract class BaseImportTaskResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("updateStrategy")
 			String updateStrategy,
-			Object object)
+			String string)
 		throws Exception {
 
 		return new ImportTask();
