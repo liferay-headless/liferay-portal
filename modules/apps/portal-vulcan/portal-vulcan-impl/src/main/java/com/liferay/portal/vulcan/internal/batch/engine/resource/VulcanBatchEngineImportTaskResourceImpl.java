@@ -6,8 +6,11 @@
 package com.liferay.portal.vulcan.internal.batch.engine.resource;
 
 import com.liferay.headless.batch.engine.resource.v1_0.ImportTaskResource;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -129,24 +132,25 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private String _getItemsArray(Object object) {
 		if (object instanceof Map<?, ?> map) {
 			Object items = map.get("items");
-
 			if (items != null) {
 				return items.toString();
 			}
-
 			return "";
 		}
 
 		if (object instanceof String jsonString) {
 			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					jsonString);
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
 
 				if (jsonObject.has("items")) {
 					return jsonObject.getString("items");
 				}
 			}
-			catch (Exception ignored) {
+			catch (JSONException exception) {
+				// Process the exception according to LPS-36174
+				if (_log.isDebugEnabled()) {
+					_log.debug("Unable to parse JSON string: " + jsonString, exception);
+				}
 			}
 		}
 
@@ -191,5 +195,8 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private User _contextUser;
 	private final ImportTaskResource.Factory _factory;
 	private String _taskItemDelegateName;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		VulcanBatchEngineImportTaskResourceImpl.class);
 
 }
