@@ -46,7 +46,8 @@ public class VulcanBatchEngineImportTaskResourceImpl
 
 		return importTaskResource.deleteImportTask(
 			name, callbackURL, _getExternalReferenceCode(),
-			_getImportStrategy(), _getTaskItemDelegateName(), object.toString());
+			_getImportStrategy(), _getTaskItemDelegateName(),
+			object.toString());
 	}
 
 	@Override
@@ -191,6 +192,9 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		return _taskItemDelegateName;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		VulcanBatchEngineImportTaskResourceImpl.class);
+
 	private AcceptLanguage _contextAcceptLanguage;
 	private Company _contextCompany;
 	private HttpServletRequest _contextHttpServletRequest;
@@ -198,8 +202,5 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private User _contextUser;
 	private final ImportTaskResource.Factory _factory;
 	private String _taskItemDelegateName;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VulcanBatchEngineImportTaskResourceImpl.class);
 
 }

@@ -5,8 +5,6 @@
 
 package com.liferay.headless.batch.engine.internal.resource.v1_0;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskContentType;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
@@ -95,15 +93,16 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	@Override
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, String contentString)
+			String importStrategy, String taskItemDelegateName,
+			String contentString)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.DELETE, null,
-			_getBytes(contentString), callbackURL, className, null,
+			BatchEngineTaskOperation.DELETE, null, _getBytes(contentString),
+			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
 	}
@@ -195,10 +194,9 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 		return _importFile(
 			BatchEngineTaskOperation.CREATE, batchExternalReferenceCode,
-			_getBytes(contentString), callbackURL, className,
-			createStrategy, _getBatchEngineTaskContentType(contentType),
-			externalReferenceCode, fieldNameMapping, importStrategy,
-			taskItemDelegateName, null);
+			_getBytes(contentString), callbackURL, className, createStrategy,
+			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
+			fieldNameMapping, importStrategy, taskItemDelegateName, null);
 	}
 
 	@Override
@@ -226,8 +224,8 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			HttpHeaders.CONTENT_TYPE);
 
 		return _importFile(
-			BatchEngineTaskOperation.UPDATE, null,
-			_getBytes(contentString), callbackURL, className, null,
+			BatchEngineTaskOperation.UPDATE, null, _getBytes(contentString),
+			callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, updateStrategy);
 	}
@@ -258,9 +256,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(String contentString)
-		throws Exception {
-
+	private byte[] _getBytes(String contentString) throws Exception {
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(
 				"fileName", new ByteArrayInputStream(contentString.getBytes()));
