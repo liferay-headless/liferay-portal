@@ -129,18 +129,27 @@ public class VulcanBatchEngineImportTaskResourceImpl
 	private String _getItemsArray(Object object) {
 		if (object instanceof Map<?, ?> map) {
 			Object items = map.get("items");
-			return items != null ? items.toString() : "";
+
+			if (items != null) {
+				return items.toString();
+			}
+
+			return "";
 		}
+
 		if (object instanceof String jsonString) {
 			try {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					jsonString);
 
 				if (jsonObject.has("items")) {
 					return jsonObject.getString("items");
 				}
-			} catch (Exception ignored) {
+			}
+			catch (Exception ignored) {
 			}
 		}
+
 		return object.toString();
 	}
 
