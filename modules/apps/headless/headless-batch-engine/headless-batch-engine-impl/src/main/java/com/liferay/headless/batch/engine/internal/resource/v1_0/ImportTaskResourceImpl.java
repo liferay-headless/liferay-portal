@@ -95,7 +95,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	@Override
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String importStrategy, String taskItemDelegateName, String contentString)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
@@ -103,7 +103,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 		return _importFile(
 			BatchEngineTaskOperation.DELETE, null,
-			_getBytes(object, contentType), callbackURL, className, null,
+			_getBytes(contentString), callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
 	}
@@ -187,7 +187,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
 			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, Object object)
+			String taskItemDelegateName, String contentString)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
@@ -195,7 +195,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 		return _importFile(
 			BatchEngineTaskOperation.CREATE, batchExternalReferenceCode,
-			_getBytes(object, contentType), callbackURL, className,
+			_getBytes(contentString), callbackURL, className,
 			createStrategy, _getBatchEngineTaskContentType(contentType),
 			externalReferenceCode, fieldNameMapping, importStrategy,
 			taskItemDelegateName, null);
@@ -219,7 +219,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	public ImportTask putImportTask(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
+			String updateStrategy, String contentString)
 		throws Exception {
 
 		String contentType = contextHttpServletRequest.getHeader(
@@ -227,7 +227,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 		return _importFile(
 			BatchEngineTaskOperation.UPDATE, null,
-			_getBytes(object, contentType), callbackURL, className, null,
+			_getBytes(contentString), callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, updateStrategy);
 	}
@@ -258,25 +258,12 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return contentType;
 	}
 
-	private byte[] _getBytes(Object object, String contentType)
+	private byte[] _getBytes(String contentString)
 		throws Exception {
-
-		byte[] bytes = null;
-
-		if (contentType.equals(MediaType.APPLICATION_JSON)) {
-			ObjectMapper objectMapper = new ObjectMapper();
-
-			bytes = objectMapper.writeValueAsBytes(object);
-		}
-		else {
-			String content = (String)object;
-
-			bytes = content.getBytes();
-		}
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 			_getUnsyncByteArrayOutputStream(
-				"fileName", new ByteArrayInputStream(bytes));
+				"fileName", new ByteArrayInputStream(contentString.getBytes()));
 
 		return unsyncByteArrayOutputStream.toByteArray();
 	}
