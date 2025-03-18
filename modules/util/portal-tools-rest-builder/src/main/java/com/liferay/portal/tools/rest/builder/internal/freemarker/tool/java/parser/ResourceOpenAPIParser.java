@@ -1017,7 +1017,9 @@ public class ResourceOpenAPIParser {
 				String previousMethodNameSegment = methodNameSegments.get(
 					methodNameSegments.size() - 1);
 
-				if (pathName.endsWith("ExternalReferenceCode")) {
+				if (pathName.endsWith("ExternalReferenceCode") &&
+					ConfigUtil.isVersionCompatible(configYAML, 9)) {
+
 					if (!previousMethodNameSegment.equals("Site")) {
 						String externalReferenceCodeSubjectName =
 							StringUtil.upperCaseFirstLetter(
