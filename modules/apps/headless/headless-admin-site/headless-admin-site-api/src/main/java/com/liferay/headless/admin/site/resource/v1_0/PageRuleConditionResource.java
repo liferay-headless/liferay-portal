@@ -44,39 +44,36 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PageRuleConditionResource {
 
-	public void deleteSiteSiteByExternalReferenceCodePageRuleCondition(
+	public void deleteSitePageRuleConditionByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleConditionExternalReferenceCode)
 		throws Exception;
 
-	public PageRuleCondition
-			getSiteSiteByExternalReferenceCodePageRuleCondition(
-				String siteExternalReferenceCode,
-				String pageRuleConditionExternalReferenceCode)
+	public PageRuleCondition getSitePageRuleConditionByExternalReferenceCode(
+			String siteExternalReferenceCode,
+			String pageRuleConditionExternalReferenceCode)
 		throws Exception;
 
-	public PageRuleCondition
-			patchSiteSiteByExternalReferenceCodePageRuleCondition(
-				String siteExternalReferenceCode,
-				String pageRuleConditionExternalReferenceCode,
-				PageRuleCondition pageRuleCondition)
+	public PageRuleCondition patchSitePageRuleConditionByExternalReferenceCode(
+			String siteExternalReferenceCode,
+			String pageRuleConditionExternalReferenceCode,
+			PageRuleCondition pageRuleCondition)
 		throws Exception;
 
-	public PageRuleCondition
-			putSiteSiteByExternalReferenceCodePageRuleCondition(
-				String siteExternalReferenceCode,
-				String pageRuleConditionExternalReferenceCode,
-				PageRuleCondition pageRuleCondition)
+	public PageRuleCondition putSitePageRuleConditionByExternalReferenceCode(
+			String siteExternalReferenceCode,
+			String pageRuleConditionExternalReferenceCode,
+			PageRuleCondition pageRuleCondition)
 		throws Exception;
 
 	public Page<PageRuleCondition>
-			getSiteSiteByExternalReferenceCodePageRulePageRuleConditionsPage(
+			getSitePageRuleByExternalReferenceCodePageRuleConditionsPage(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
 	public PageRuleCondition
-			postSiteSiteByExternalReferenceCodePageRulePageRuleCondition(
+			postSitePageRuleByExternalReferenceCodePageRuleCondition(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode,
 				PageRuleCondition pageRuleCondition)

@@ -34,68 +34,68 @@ public interface PageRuleResource {
 	}
 
 	public Page<PageRule>
-			getSiteSiteByExternalReferenceCodePageExperiencePageRulesPage(
+			getSitePageExperienceByExternalReferenceCodePageRulesPage(
 				String siteExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodePageExperiencePageRulesPageHttpResponse(
+			getSitePageExperienceByExternalReferenceCodePageRulesPageHttpResponse(
 				String siteExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
-	public PageRule postSiteSiteByExternalReferenceCodePageExperiencePageRule(
+	public PageRule postSitePageExperienceByExternalReferenceCodePageRule(
 			String siteExternalReferenceCode,
 			String pageExperienceExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodePageExperiencePageRuleHttpResponse(
+			postSitePageExperienceByExternalReferenceCodePageRuleHttpResponse(
 				String siteExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodePageRule(
+	public void deleteSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			deleteSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+			deleteSitePageRuleByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule getSiteSiteByExternalReferenceCodePageRule(
+	public PageRule getSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+			getSitePageRuleByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule patchSiteSiteByExternalReferenceCodePageRule(
+	public PageRule patchSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			patchSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+			patchSitePageRuleByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public PageRule putSiteSiteByExternalReferenceCodePageRule(
+	public PageRule putSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+			putSitePageRuleByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
@@ -209,13 +209,13 @@ public interface PageRuleResource {
 	public static class PageRuleResourceImpl implements PageRuleResource {
 
 		public Page<PageRule>
-				getSiteSiteByExternalReferenceCodePageExperiencePageRulesPage(
+				getSitePageExperienceByExternalReferenceCodePageRulesPage(
 					String siteExternalReferenceCode,
 					String pageExperienceExternalReferenceCode, Boolean flatten)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodePageExperiencePageRulesPageHttpResponse(
+				getSitePageExperienceByExternalReferenceCodePageRulesPageHttpResponse(
 					siteExternalReferenceCode,
 					pageExperienceExternalReferenceCode, flatten);
 
@@ -279,7 +279,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodePageExperiencePageRulesPageHttpResponse(
+				getSitePageExperienceByExternalReferenceCodePageRulesPageHttpResponse(
 					String siteExternalReferenceCode,
 					String pageExperienceExternalReferenceCode, Boolean flatten)
 			throws Exception {
@@ -328,15 +328,13 @@ public interface PageRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public PageRule
-				postSiteSiteByExternalReferenceCodePageExperiencePageRule(
-					String siteExternalReferenceCode,
-					String pageExperienceExternalReferenceCode,
-					PageRule pageRule)
+		public PageRule postSitePageExperienceByExternalReferenceCodePageRule(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode, PageRule pageRule)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodePageExperiencePageRuleHttpResponse(
+				postSitePageExperienceByExternalReferenceCodePageRuleHttpResponse(
 					siteExternalReferenceCode,
 					pageExperienceExternalReferenceCode, pageRule);
 
@@ -400,7 +398,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodePageExperiencePageRuleHttpResponse(
+				postSitePageExperienceByExternalReferenceCodePageRuleHttpResponse(
 					String siteExternalReferenceCode,
 					String pageExperienceExternalReferenceCode,
 					PageRule pageRule)
@@ -448,13 +446,13 @@ public interface PageRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteSiteSiteByExternalReferenceCodePageRule(
+		public void deleteSitePageRuleByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				deleteSitePageRuleByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, pageRuleExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -517,7 +515,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				deleteSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				deleteSitePageRuleByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String pageRuleExternalReferenceCode)
 			throws Exception {
@@ -561,13 +559,13 @@ public interface PageRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public PageRule getSiteSiteByExternalReferenceCodePageRule(
+		public PageRule getSitePageRuleByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				getSitePageRuleByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, pageRuleExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -630,7 +628,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				getSitePageRuleByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String pageRuleExternalReferenceCode)
 			throws Exception {
@@ -674,13 +672,13 @@ public interface PageRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public PageRule patchSiteSiteByExternalReferenceCodePageRule(
+		public PageRule patchSitePageRuleByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, PageRule pageRule)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				patchSitePageRuleByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, pageRuleExternalReferenceCode,
 					pageRule);
 
@@ -744,7 +742,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				patchSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				patchSitePageRuleByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String pageRuleExternalReferenceCode, PageRule pageRule)
 			throws Exception {
@@ -790,13 +788,13 @@ public interface PageRuleResource {
 			return httpInvoker.invoke();
 		}
 
-		public PageRule putSiteSiteByExternalReferenceCodePageRule(
+		public PageRule putSitePageRuleByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, PageRule pageRule)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				putSitePageRuleByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, pageRuleExternalReferenceCode,
 					pageRule);
 
@@ -860,7 +858,7 @@ public interface PageRuleResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodePageRuleHttpResponse(
+				putSitePageRuleByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String pageRuleExternalReferenceCode, PageRule pageRule)
 			throws Exception {

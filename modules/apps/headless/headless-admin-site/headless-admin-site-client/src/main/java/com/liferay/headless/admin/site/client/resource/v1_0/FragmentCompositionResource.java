@@ -34,76 +34,96 @@ public interface FragmentCompositionResource {
 		return new Builder();
 	}
 
-	public Page<FragmentComposition>
-			getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
-				String siteExternalReferenceCode, String search,
-				String filterString, Pagination pagination, String sortString)
+	public Page<FragmentComposition> getSiteFragmentCompositionsPage(
+			String siteExternalReferenceCode, String search,
+			String filterString, Pagination pagination, String sortString)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse getSiteFragmentCompositionsPageHttpResponse(
+			String siteExternalReferenceCode, String search,
+			String filterString, Pagination pagination, String sortString)
+		throws Exception;
+
+	public void postSiteFragmentCompositionsPageExportBatch(
+			String siteExternalReferenceCode, String search,
+			String filterString, String sortString, String callbackURL,
+			String contentType, String fieldNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeFragmentCompositionsPageHttpResponse(
+			postSiteFragmentCompositionsPageExportBatchHttpResponse(
 				String siteExternalReferenceCode, String search,
-				String filterString, Pagination pagination, String sortString)
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
 		throws Exception;
 
-	public FragmentComposition
-			postSiteSiteByExternalReferenceCodeFragmentComposition(
-				String siteExternalReferenceCode, Boolean saveInlineContent,
-				Boolean saveMapping, FragmentComposition fragmentComposition)
+	public FragmentComposition postSiteFragmentComposition(
+			String siteExternalReferenceCode, Boolean saveInlineContent,
+			Boolean saveMapping, FragmentComposition fragmentComposition)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse postSiteFragmentCompositionHttpResponse(
+			String siteExternalReferenceCode, Boolean saveInlineContent,
+			Boolean saveMapping, FragmentComposition fragmentComposition)
+		throws Exception;
+
+	public void postSiteFragmentCompositionBatch(
+			String siteExternalReferenceCode, Boolean saveInlineContent,
+			Boolean saveMapping, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+			postSiteFragmentCompositionBatchHttpResponse(
 				String siteExternalReferenceCode, Boolean saveInlineContent,
-				Boolean saveMapping, FragmentComposition fragmentComposition)
+				Boolean saveMapping, String callbackURL, Object object)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodeFragmentComposition(
+	public void deleteSiteFragmentCompositionByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String fragmentCompositionExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			deleteSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+			deleteSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode)
 		throws Exception;
 
 	public FragmentComposition
-			getSiteSiteByExternalReferenceCodeFragmentComposition(
+			getSiteFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+			getSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode)
 		throws Exception;
 
 	public FragmentComposition
-			patchSiteSiteByExternalReferenceCodeFragmentComposition(
+			patchSiteFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			patchSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+			patchSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)
 		throws Exception;
 
 	public FragmentComposition
-			putSiteSiteByExternalReferenceCodeFragmentComposition(
+			putSiteFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+			putSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)
@@ -218,15 +238,13 @@ public interface FragmentCompositionResource {
 	public static class FragmentCompositionResourceImpl
 		implements FragmentCompositionResource {
 
-		public Page<FragmentComposition>
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
-					String siteExternalReferenceCode, String search,
-					String filterString, Pagination pagination,
-					String sortString)
+		public Page<FragmentComposition> getSiteFragmentCompositionsPage(
+				String siteExternalReferenceCode, String search,
+				String filterString, Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPageHttpResponse(
+				getSiteFragmentCompositionsPageHttpResponse(
 					siteExternalReferenceCode, search, filterString, pagination,
 					sortString);
 
@@ -290,7 +308,7 @@ public interface FragmentCompositionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPageHttpResponse(
+				getSiteFragmentCompositionsPageHttpResponse(
 					String siteExternalReferenceCode, String search,
 					String filterString, Pagination pagination,
 					String sortString)
@@ -352,15 +370,144 @@ public interface FragmentCompositionResource {
 			return httpInvoker.invoke();
 		}
 
-		public FragmentComposition
-				postSiteSiteByExternalReferenceCodeFragmentComposition(
-					String siteExternalReferenceCode, Boolean saveInlineContent,
-					Boolean saveMapping,
-					FragmentComposition fragmentComposition)
+		public void postSiteFragmentCompositionsPageExportBatch(
+				String siteExternalReferenceCode, String search,
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				postSiteFragmentCompositionsPageExportBatchHttpResponse(
+					siteExternalReferenceCode, search, filterString, sortString,
+					callbackURL, contentType, fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteFragmentCompositionsPageExportBatchHttpResponse(
+					String siteExternalReferenceCode, String search,
+					String filterString, String sortString, String callbackURL,
+					String contentType, String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body("[]", "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (contentType != null) {
+				httpInvoker.parameter(
+					"contentType", String.valueOf(contentType));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/fragment-compositions/export-batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
+		public FragmentComposition postSiteFragmentComposition(
+				String siteExternalReferenceCode, Boolean saveInlineContent,
+				Boolean saveMapping, FragmentComposition fragmentComposition)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteFragmentCompositionHttpResponse(
 					siteExternalReferenceCode, saveInlineContent, saveMapping,
 					fragmentComposition);
 
@@ -423,11 +570,9 @@ public interface FragmentCompositionResource {
 			}
 		}
 
-		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
-					String siteExternalReferenceCode, Boolean saveInlineContent,
-					Boolean saveMapping,
-					FragmentComposition fragmentComposition)
+		public HttpInvoker.HttpResponse postSiteFragmentCompositionHttpResponse(
+				String siteExternalReferenceCode, Boolean saveInlineContent,
+				Boolean saveMapping, FragmentComposition fragmentComposition)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -480,13 +625,131 @@ public interface FragmentCompositionResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteSiteSiteByExternalReferenceCodeFragmentComposition(
+		public void postSiteFragmentCompositionBatch(
+				String siteExternalReferenceCode, Boolean saveInlineContent,
+				Boolean saveMapping, String callbackURL, Object object)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteFragmentCompositionBatchHttpResponse(
+					siteExternalReferenceCode, saveInlineContent, saveMapping,
+					callbackURL, object);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteFragmentCompositionBatchHttpResponse(
+					String siteExternalReferenceCode, Boolean saveInlineContent,
+					Boolean saveMapping, String callbackURL, Object object)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(object.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (saveInlineContent != null) {
+				httpInvoker.parameter(
+					"saveInlineContent", String.valueOf(saveInlineContent));
+			}
+
+			if (saveMapping != null) {
+				httpInvoker.parameter(
+					"saveMapping", String.valueOf(saveMapping));
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/fragment-compositions/batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
+		public void deleteSiteFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				deleteSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					fragmentCompositionExternalReferenceCode);
 
@@ -550,7 +813,7 @@ public interface FragmentCompositionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				deleteSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				deleteSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode)
 			throws Exception {
@@ -596,13 +859,13 @@ public interface FragmentCompositionResource {
 		}
 
 		public FragmentComposition
-				getSiteSiteByExternalReferenceCodeFragmentComposition(
+				getSiteFragmentCompositionByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				getSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					fragmentCompositionExternalReferenceCode);
 
@@ -666,7 +929,7 @@ public interface FragmentCompositionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				getSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode)
 			throws Exception {
@@ -712,14 +975,14 @@ public interface FragmentCompositionResource {
 		}
 
 		public FragmentComposition
-				patchSiteSiteByExternalReferenceCodeFragmentComposition(
+				patchSiteFragmentCompositionByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode,
 					FragmentComposition fragmentComposition)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				patchSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					fragmentCompositionExternalReferenceCode,
 					fragmentComposition);
@@ -784,7 +1047,7 @@ public interface FragmentCompositionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				patchSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				patchSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode,
 					FragmentComposition fragmentComposition)
@@ -834,14 +1097,14 @@ public interface FragmentCompositionResource {
 		}
 
 		public FragmentComposition
-				putSiteSiteByExternalReferenceCodeFragmentComposition(
+				putSiteFragmentCompositionByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode,
 					FragmentComposition fragmentComposition)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				putSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					fragmentCompositionExternalReferenceCode,
 					fragmentComposition);
@@ -906,7 +1169,7 @@ public interface FragmentCompositionResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeFragmentCompositionHttpResponse(
+				putSiteFragmentCompositionByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String fragmentCompositionExternalReferenceCode,
 					FragmentComposition fragmentComposition)

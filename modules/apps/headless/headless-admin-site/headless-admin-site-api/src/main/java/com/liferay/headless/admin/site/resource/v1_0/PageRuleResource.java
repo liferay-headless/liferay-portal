@@ -45,32 +45,32 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PageRuleResource {
 
 	public Page<PageRule>
-			getSiteSiteByExternalReferenceCodePageExperiencePageRulesPage(
+			getSitePageExperienceByExternalReferenceCodePageRulesPage(
 				String siteExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
-	public PageRule postSiteSiteByExternalReferenceCodePageExperiencePageRule(
+	public PageRule postSitePageExperienceByExternalReferenceCodePageRule(
 			String siteExternalReferenceCode,
 			String pageExperienceExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodePageRule(
+	public void deleteSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule getSiteSiteByExternalReferenceCodePageRule(
+	public PageRule getSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule patchSiteSiteByExternalReferenceCodePageRule(
+	public PageRule patchSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public PageRule putSiteSiteByExternalReferenceCodePageRule(
+	public PageRule putSitePageRuleByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;

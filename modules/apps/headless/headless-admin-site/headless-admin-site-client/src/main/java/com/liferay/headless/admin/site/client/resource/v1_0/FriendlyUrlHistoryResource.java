@@ -33,37 +33,37 @@ public interface FriendlyUrlHistoryResource {
 	}
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistory(
+			getSiteDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistoryHttpResponse(
+			getSiteDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode)
 		throws Exception;
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistory(
+			getSiteSitePageByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistoryHttpResponse(
+			getSiteSitePageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistory(
+			getSiteUtilityPageByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistoryHttpResponse(
+			getSiteUtilityPageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode)
 		throws Exception;
@@ -178,13 +178,13 @@ public interface FriendlyUrlHistoryResource {
 		implements FriendlyUrlHistoryResource {
 
 		public FriendlyUrlHistory
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistory(
+				getSiteDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistory(
 					String siteExternalReferenceCode,
 					String displayPageTemplateExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistoryHttpResponse(
+				getSiteDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateExternalReferenceCode);
 
@@ -248,7 +248,7 @@ public interface FriendlyUrlHistoryResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistoryHttpResponse(
+				getSiteDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateExternalReferenceCode)
 			throws Exception {
@@ -294,13 +294,13 @@ public interface FriendlyUrlHistoryResource {
 		}
 
 		public FriendlyUrlHistory
-				getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistory(
+				getSiteSitePageByExternalReferenceCodeFriendlyUrlHistory(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistoryHttpResponse(
+				getSiteSitePageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -363,7 +363,7 @@ public interface FriendlyUrlHistoryResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistoryHttpResponse(
+				getSiteSitePageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode)
 			throws Exception {
@@ -408,13 +408,13 @@ public interface FriendlyUrlHistoryResource {
 		}
 
 		public FriendlyUrlHistory
-				getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistory(
+				getSiteUtilityPageByExternalReferenceCodeFriendlyUrlHistory(
 					String siteExternalReferenceCode,
 					String utilityPageExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistoryHttpResponse(
+				getSiteUtilityPageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					siteExternalReferenceCode,
 					utilityPageExternalReferenceCode);
 
@@ -478,7 +478,7 @@ public interface FriendlyUrlHistoryResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistoryHttpResponse(
+				getSiteUtilityPageByExternalReferenceCodeFriendlyUrlHistoryHttpResponse(
 					String siteExternalReferenceCode,
 					String utilityPageExternalReferenceCode)
 			throws Exception {
