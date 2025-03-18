@@ -30,6 +30,7 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -46,7 +47,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface UtilityPageResource {
 
-	public Page<UtilityPage> getSiteSiteByExternalReferenceCodeUtilityPagesPage(
+	public Page<UtilityPage> getSiteByExternalReferenceCodeUtilityPagesPage(
 			String siteExternalReferenceCode, String search,
 			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
 			com.liferay.portal.kernel.search.filter.Filter filter,
@@ -54,58 +55,76 @@ public interface UtilityPageResource {
 			com.liferay.portal.kernel.search.Sort[] sorts)
 		throws Exception;
 
-	public UtilityPage postSiteSiteByExternalReferenceCodeUtilityPage(
+	public Response postSiteByExternalReferenceCodeUtilityPagesPageExportBatch(
+			String siteExternalReferenceCode, String search,
+			com.liferay.portal.kernel.search.filter.Filter filter,
+			com.liferay.portal.kernel.search.Sort[] sorts, String callbackURL,
+			String contentType, String fieldNames)
+		throws Exception;
+
+	public UtilityPage postSiteByExternalReferenceCodeUtilityPage(
 			String siteExternalReferenceCode, UtilityPage utilityPage)
 		throws Exception;
 
+	public Response postSiteByExternalReferenceCodeUtilityPageBatch(
+			String siteExternalReferenceCode, String callbackURL, Object object)
+		throws Exception;
+
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			getSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
+			getSiteByExternalReferenceCodeUtilityPagePermissionsPage(
 				String siteExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteSiteByExternalReferenceCodeUtilityPagePermissionsPage(
+			putSiteByExternalReferenceCodeUtilityPagePermissionsPage(
 				String siteExternalReferenceCode,
 				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode)
 		throws Exception;
 
-	public UtilityPage getSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode)
+	public UtilityPage
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode)
 		throws Exception;
 
-	public UtilityPage patchSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
+	public UtilityPage
+			patchSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode,
+				UtilityPage utilityPage)
 		throws Exception;
 
-	public UtilityPage putSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
+	public UtilityPage
+			putSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode,
+				UtilityPage utilityPage)
 		throws Exception;
 
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
+			postSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			getSiteSiteExternalReferenceCodeUtilityPagePermissionsPage(
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putSiteSiteExternalReferenceCodeUtilityPagePermissionsPage(
+			putSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
-				String utilityPageExternalReferenceCode)
+				String utilityPageExternalReferenceCode,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

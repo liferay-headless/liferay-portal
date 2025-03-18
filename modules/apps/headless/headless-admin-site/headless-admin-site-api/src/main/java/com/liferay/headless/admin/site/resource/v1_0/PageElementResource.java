@@ -46,50 +46,56 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PageElementResource {
 
 	public Page<PageElement>
-			getSiteSiteByExternalReferenceCodePageExperiencePageElementsPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementsPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
 	public PageElement
-			postSiteSiteByExternalReferenceCodePageExperiencePageElement(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElement(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode,
 				PageElement pageElement)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode)
-		throws Exception;
-
-	public PageElement getSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode)
-		throws Exception;
-
-	public PageElement patchSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode, PageElement pageElement)
-		throws Exception;
-
-	public PageElement putSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode, PageElement pageElement)
+	public void
+			deleteSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode)
 		throws Exception;
 
 	public PageElement
-			postSiteSiteByExternalReferenceCodePageElementFragmentComposition(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode)
+		throws Exception;
+
+	public PageElement
+			patchSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode,
+				PageElement pageElement)
+		throws Exception;
+
+	public PageElement
+			putSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode,
+				PageElement pageElement)
+		throws Exception;
+
+	public PageElement
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCodeFragmentComposition(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode,
@@ -98,7 +104,7 @@ public interface PageElementResource {
 		throws Exception;
 
 	public Page<PageElement>
-			getSiteSiteByExternalReferenceCodePageElementPageElementsPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCodePageElementsPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode,

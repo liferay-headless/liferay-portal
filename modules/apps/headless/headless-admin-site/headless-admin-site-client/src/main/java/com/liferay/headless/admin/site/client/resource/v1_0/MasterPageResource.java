@@ -39,128 +39,157 @@ public interface MasterPageResource {
 		return new Builder();
 	}
 
-	public Page<MasterPage> getSiteSiteByExternalReferenceCodeMasterPagesPage(
+	public Page<MasterPage> getSiteByExternalReferenceCodeMasterPagesPage(
 			String siteExternalReferenceCode, String search,
 			List<String> aggregations, String filterString,
 			Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
+			getSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
 				String siteExternalReferenceCode, String search,
 				List<String> aggregations, String filterString,
 				Pagination pagination, String sortString)
 		throws Exception;
 
-	public MasterPage postSiteSiteByExternalReferenceCodeMasterPage(
+	public void postSiteByExternalReferenceCodeMasterPagesPageExportBatch(
+			String siteExternalReferenceCode, String search,
+			String filterString, String sortString, String callbackURL,
+			String contentType, String fieldNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postSiteByExternalReferenceCodeMasterPagesPageExportBatchHttpResponse(
+				String siteExternalReferenceCode, String search,
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
+		throws Exception;
+
+	public MasterPage postSiteByExternalReferenceCodeMasterPage(
 			String siteExternalReferenceCode, MasterPage masterPage)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+			postSiteByExternalReferenceCodeMasterPageHttpResponse(
 				String siteExternalReferenceCode, MasterPage masterPage)
 		throws Exception;
 
+	public void postSiteByExternalReferenceCodeMasterPageBatch(
+			String siteExternalReferenceCode, String callbackURL, Object object)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postSiteByExternalReferenceCodeMasterPageBatchHttpResponse(
+				String siteExternalReferenceCode, String callbackURL,
+				Object object)
+		throws Exception;
+
 	public Page<Permission>
-			getSiteSiteByExternalReferenceCodeMasterPagePermissionsPage(
+			getSiteByExternalReferenceCodeMasterPagePermissionsPage(
 				String siteExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+			getSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 				String siteExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public Page<Permission>
-			putSiteSiteByExternalReferenceCodeMasterPagePermissionsPage(
+			putSiteByExternalReferenceCodeMasterPagePermissionsPage(
 				String siteExternalReferenceCode, Permission[] permissions)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+			putSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 				String siteExternalReferenceCode, Permission[] permissions)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse
-			deleteSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+	public void
+			deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode)
 		throws Exception;
 
-	public MasterPage getSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode)
-		throws Exception;
-
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+			deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode)
 		throws Exception;
 
-	public MasterPage patchSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode, MasterPage masterPage)
+	public MasterPage
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			patchSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode)
+		throws Exception;
+
+	public MasterPage
+			patchSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode, MasterPage masterPage)
 		throws Exception;
 
-	public MasterPage putSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode, MasterPage masterPage)
+	public HttpInvoker.HttpResponse
+			patchSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode, MasterPage masterPage)
+		throws Exception;
+
+	public MasterPage
+			putSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode, MasterPage masterPage)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+			putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode, MasterPage masterPage)
 		throws Exception;
 
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeMasterPagePageSpecification(
+			postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodeMasterPagePageSpecificationHttpResponse(
+			postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecificationHttpResponse(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
 		throws Exception;
 
 	public Page<Permission>
-			getSiteSiteExternalReferenceCodeMasterPagePermissionsPage(
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public Page<Permission>
-			putSiteSiteExternalReferenceCodeMasterPagePermissionsPage(
+			putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode)
+				String masterPageExternalReferenceCode,
+				Permission[] permissions)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+			putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
 				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode)
+				String masterPageExternalReferenceCode,
+				Permission[] permissions)
 		throws Exception;
 
 	public static class Builder {
@@ -271,15 +300,14 @@ public interface MasterPageResource {
 
 	public static class MasterPageResourceImpl implements MasterPageResource {
 
-		public Page<MasterPage>
-				getSiteSiteByExternalReferenceCodeMasterPagesPage(
-					String siteExternalReferenceCode, String search,
-					List<String> aggregations, String filterString,
-					Pagination pagination, String sortString)
+		public Page<MasterPage> getSiteByExternalReferenceCodeMasterPagesPage(
+				String siteExternalReferenceCode, String search,
+				List<String> aggregations, String filterString,
+				Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
 					siteExternalReferenceCode, search, aggregations,
 					filterString, pagination, sortString);
 
@@ -343,7 +371,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPagesPageHttpResponse(
 					String siteExternalReferenceCode, String search,
 					List<String> aggregations, String filterString,
 					Pagination pagination, String sortString)
@@ -405,12 +433,143 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public MasterPage postSiteSiteByExternalReferenceCodeMasterPage(
+		public void postSiteByExternalReferenceCodeMasterPagesPageExportBatch(
+				String siteExternalReferenceCode, String search,
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteByExternalReferenceCodeMasterPagesPageExportBatchHttpResponse(
+					siteExternalReferenceCode, search, filterString, sortString,
+					callbackURL, contentType, fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteByExternalReferenceCodeMasterPagesPageExportBatchHttpResponse(
+					String siteExternalReferenceCode, String search,
+					String filterString, String sortString, String callbackURL,
+					String contentType, String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body("[]", "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (contentType != null) {
+				httpInvoker.parameter(
+					"contentType", String.valueOf(contentType));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/master-pages/export-batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
+		public MasterPage postSiteByExternalReferenceCodeMasterPage(
 				String siteExternalReferenceCode, MasterPage masterPage)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				postSiteByExternalReferenceCodeMasterPageHttpResponse(
 					siteExternalReferenceCode, masterPage);
 
 			String content = httpResponse.getContent();
@@ -473,7 +632,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				postSiteByExternalReferenceCodeMasterPageHttpResponse(
 					String siteExternalReferenceCode, MasterPage masterPage)
 			throws Exception {
 
@@ -516,13 +675,120 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
+		public void postSiteByExternalReferenceCodeMasterPageBatch(
+				String siteExternalReferenceCode, String callbackURL,
+				Object object)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteByExternalReferenceCodeMasterPageBatchHttpResponse(
+					siteExternalReferenceCode, callbackURL, object);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteByExternalReferenceCodeMasterPageBatchHttpResponse(
+					String siteExternalReferenceCode, String callbackURL,
+					Object object)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(object.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/master-pages/batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
 		public Page<Permission>
-				getSiteSiteByExternalReferenceCodeMasterPagePermissionsPage(
+				getSiteByExternalReferenceCodeMasterPagePermissionsPage(
 					String siteExternalReferenceCode, String roleNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 					siteExternalReferenceCode, roleNames);
 
 			String content = httpResponse.getContent();
@@ -585,7 +851,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 					String siteExternalReferenceCode, String roleNames)
 			throws Exception {
 
@@ -631,12 +897,12 @@ public interface MasterPageResource {
 		}
 
 		public Page<Permission>
-				putSiteSiteByExternalReferenceCodeMasterPagePermissionsPage(
+				putSiteByExternalReferenceCodeMasterPagePermissionsPage(
 					String siteExternalReferenceCode, Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 					siteExternalReferenceCode, permissions);
 
 			String content = httpResponse.getContent();
@@ -699,7 +965,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
 					String siteExternalReferenceCode, Permission[] permissions)
 			throws Exception {
 
@@ -748,13 +1014,14 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteSiteSiteByExternalReferenceCodeMasterPage(
-				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode)
+		public void
+				deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+					String siteExternalReferenceCode,
+					String masterPageExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -817,7 +1084,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				deleteSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode)
 			throws Exception {
@@ -862,13 +1129,14 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public MasterPage getSiteSiteByExternalReferenceCodeMasterPage(
-				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode)
+		public MasterPage
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+					String siteExternalReferenceCode,
+					String masterPageExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -931,7 +1199,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode)
 			throws Exception {
@@ -976,13 +1244,15 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public MasterPage patchSiteSiteByExternalReferenceCodeMasterPage(
-				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode, MasterPage masterPage)
+		public MasterPage
+				patchSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+					String siteExternalReferenceCode,
+					String masterPageExternalReferenceCode,
+					MasterPage masterPage)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				patchSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode,
 					masterPage);
 
@@ -1046,7 +1316,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				patchSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				patchSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode,
 					MasterPage masterPage)
@@ -1094,13 +1364,15 @@ public interface MasterPageResource {
 			return httpInvoker.invoke();
 		}
 
-		public MasterPage putSiteSiteByExternalReferenceCodeMasterPage(
-				String siteExternalReferenceCode,
-				String masterPageExternalReferenceCode, MasterPage masterPage)
+		public MasterPage
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+					String siteExternalReferenceCode,
+					String masterPageExternalReferenceCode,
+					MasterPage masterPage)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode,
 					masterPage);
 
@@ -1164,7 +1436,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeMasterPageHttpResponse(
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode,
 					MasterPage masterPage)
@@ -1213,14 +1485,14 @@ public interface MasterPageResource {
 		}
 
 		public ContentPageSpecification
-				postSiteSiteByExternalReferenceCodeMasterPagePageSpecification(
+				postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecification(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode,
 					ContentPageSpecification contentPageSpecification)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodeMasterPagePageSpecificationHttpResponse(
+				postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecificationHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode,
 					contentPageSpecification);
 
@@ -1284,7 +1556,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodeMasterPagePageSpecificationHttpResponse(
+				postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecificationHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode,
 					ContentPageSpecification contentPageSpecification)
@@ -1334,13 +1606,13 @@ public interface MasterPageResource {
 		}
 
 		public Page<Permission>
-				getSiteSiteExternalReferenceCodeMasterPagePermissionsPage(
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPage(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode, String roleNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
 					siteExternalReferenceCode, masterPageExternalReferenceCode,
 					roleNames);
 
@@ -1404,7 +1676,7 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
 					String siteExternalReferenceCode,
 					String masterPageExternalReferenceCode, String roleNames)
 			throws Exception {
@@ -1454,14 +1726,16 @@ public interface MasterPageResource {
 		}
 
 		public Page<Permission>
-				putSiteSiteExternalReferenceCodeMasterPagePermissionsPage(
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPage(
 					String siteExternalReferenceCode,
-					String masterPageExternalReferenceCode)
+					String masterPageExternalReferenceCode,
+					Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
-					siteExternalReferenceCode, masterPageExternalReferenceCode);
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
+					siteExternalReferenceCode, masterPageExternalReferenceCode,
+					permissions);
 
 			String content = httpResponse.getContent();
 
@@ -1523,14 +1797,21 @@ public interface MasterPageResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteExternalReferenceCodeMasterPagePermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePermissionsPageHttpResponse(
 					String siteExternalReferenceCode,
-					String masterPageExternalReferenceCode)
+					String masterPageExternalReferenceCode,
+					Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body("[]", "application/json");
+			List<String> values = new ArrayList<>();
+
+			for (Permission permissionValue : permissions) {
+				values.add(String.valueOf(permissionValue));
+			}
+
+			httpInvoker.body(values.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

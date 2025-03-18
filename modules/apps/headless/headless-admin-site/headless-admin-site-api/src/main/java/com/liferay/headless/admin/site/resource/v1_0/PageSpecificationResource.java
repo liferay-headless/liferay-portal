@@ -45,62 +45,63 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PageSpecificationResource {
 
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplatePageSpecificationsPage(
+			getSiteByExternalReferenceCodeDisplayPageTemplateByExternalReferenceCodePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode)
 		throws Exception;
 
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeMasterPagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String masterPageExternalReferenceCode)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodePageSpecification(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode)
-		throws Exception;
-
-	public PageSpecification
-			getSiteSiteByExternalReferenceCodePageSpecification(
+	public void
+			deleteSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode)
 		throws Exception;
 
 	public PageSpecification
-			patchSiteSiteByExternalReferenceCodePageSpecification(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode)
+		throws Exception;
+
+	public PageSpecification
+			patchSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				PageSpecification pageSpecification)
 		throws Exception;
 
 	public PageSpecification
-			putSiteSiteByExternalReferenceCodePageSpecification(
+			putSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				PageSpecification pageSpecification)
 		throws Exception;
 
 	public PageSpecification
-			postSiteSiteByExternalReferenceCodePageSpecificationPublish(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePublish(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode)
 		throws Exception;
 
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodePageTemplatePageSpecificationsPage(
+			getSiteByExternalReferenceCodePageTemplateByExternalReferenceCodePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String pageTemplateExternalReferenceCode)
 		throws Exception;
 
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeSitePagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeUtilityPagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePageSpecificationsPage(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode)
 		throws Exception;

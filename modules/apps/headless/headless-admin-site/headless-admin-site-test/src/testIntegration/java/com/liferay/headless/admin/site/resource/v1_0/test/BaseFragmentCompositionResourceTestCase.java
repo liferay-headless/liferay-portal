@@ -196,17 +196,17 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPage()
 		throws Exception {
 
 		String siteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
 		String irrelevantSiteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getIrrelevantSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getIrrelevantSiteExternalReferenceCode();
 
 		Page<FragmentComposition> page =
 			fragmentCompositionResource.
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+				getSiteByExternalReferenceCodeFragmentCompositionsPage(
 					siteExternalReferenceCode, null, null, Pagination.of(1, 10),
 					null);
 
@@ -214,13 +214,13 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 		if (irrelevantSiteExternalReferenceCode != null) {
 			FragmentComposition irrelevantFragmentComposition =
-				testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+				testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 					irrelevantSiteExternalReferenceCode,
 					randomIrrelevantFragmentComposition());
 
 			page =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						irrelevantSiteExternalReferenceCode, null, null,
 						Pagination.of(1, (int)totalCount + 1), null);
 
@@ -231,21 +231,21 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 				(List<FragmentComposition>)page.getItems());
 			assertValid(
 				page,
-				testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
+				testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
 					irrelevantSiteExternalReferenceCode));
 		}
 
 		FragmentComposition fragmentComposition1 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		FragmentComposition fragmentComposition2 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		page =
 			fragmentCompositionResource.
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+				getSiteByExternalReferenceCodeFragmentCompositionsPage(
 					siteExternalReferenceCode, null, null, Pagination.of(1, 10),
 					null);
 
@@ -257,22 +257,33 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 			fragmentComposition2, (List<FragmentComposition>)page.getItems());
 		assertValid(
 			page,
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
 				siteExternalReferenceCode));
 	}
 
 	protected Map<String, Map<String, String>>
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getExpectedActions(
 				String siteExternalReferenceCode)
 		throws Exception {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map createBatchAction = new HashMap<>();
+		createBatchAction.put("method", "POST");
+		createBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/fragment-compositions/batch".
+				replace(
+					"{siteExternalReferenceCode}",
+					String.valueOf(siteExternalReferenceCode)));
+
+		expectedActions.put("createBatch", createBatchAction);
+
 		return expectedActions;
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterDateTimeEquals()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterDateTimeEquals()
 		throws Exception {
 
 		List<EntityField> entityFields = getEntityFields(
@@ -283,18 +294,18 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		}
 
 		String siteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
 
 		FragmentComposition fragmentComposition1 = randomFragmentComposition();
 
 		fragmentComposition1 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, fragmentComposition1);
 
 		for (EntityField entityField : entityFields) {
 			Page<FragmentComposition> page =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null,
 						getFilterString(
 							entityField, "between", fragmentComposition1),
@@ -307,39 +318,39 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterDoubleEquals()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterDoubleEquals()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
 			"eq", EntityField.Type.DOUBLE);
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringContains()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringContains()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
 			"contains", EntityField.Type.STRING);
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringEquals()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringEquals()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
 			"eq", EntityField.Type.STRING);
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringStartsWith()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilterStringStartsWith()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
 			"startswith", EntityField.Type.STRING);
 	}
 
 	protected void
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithFilter(
 				String operator, EntityField.Type type)
 		throws Exception {
 
@@ -350,21 +361,21 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		}
 
 		String siteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
 
 		FragmentComposition fragmentComposition1 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		FragmentComposition fragmentComposition2 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		for (EntityField entityField : entityFields) {
 			Page<FragmentComposition> page =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null,
 						getFilterString(
 							entityField, operator, fragmentComposition1),
@@ -377,30 +388,30 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithPagination()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithPagination()
 		throws Exception {
 
 		String siteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
 
 		Page<FragmentComposition> fragmentCompositionPage =
 			fragmentCompositionResource.
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+				getSiteByExternalReferenceCodeFragmentCompositionsPage(
 					siteExternalReferenceCode, null, null, null, null);
 
 		int totalCount = GetterUtil.getInteger(
 			fragmentCompositionPage.getTotalCount());
 
 		FragmentComposition fragmentComposition1 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		FragmentComposition fragmentComposition2 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		FragmentComposition fragmentComposition3 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, randomFragmentComposition());
 
 		// See com.liferay.portal.vulcan.internal.configuration.HeadlessAPICompanyConfiguration#pageSizeLimit
@@ -410,7 +421,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		if (totalCount >= (pageSizeLimit - 2)) {
 			Page<FragmentComposition> page1 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(
 							(int)Math.ceil((totalCount + 1.0) / pageSizeLimit),
@@ -425,7 +436,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 			Page<FragmentComposition> page2 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(
 							(int)Math.ceil((totalCount + 2.0) / pageSizeLimit),
@@ -438,7 +449,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 			Page<FragmentComposition> page3 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(
 							(int)Math.ceil((totalCount + 3.0) / pageSizeLimit),
@@ -452,7 +463,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		else {
 			Page<FragmentComposition> page1 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(1, totalCount + 2), null);
 
@@ -465,7 +476,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 			Page<FragmentComposition> page2 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(2, totalCount + 2), null);
 
@@ -480,7 +491,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 			Page<FragmentComposition> page3 =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(1, (int)totalCount + 3), null);
 
@@ -497,10 +508,10 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSortDateTime()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSortDateTime()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, fragmentComposition1, fragmentComposition2) -> {
 				BeanTestUtil.setProperty(
@@ -510,10 +521,10 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSortDouble()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSortDouble()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, fragmentComposition1, fragmentComposition2) -> {
 				BeanTestUtil.setProperty(
@@ -524,10 +535,10 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSortInteger()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSortInteger()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, fragmentComposition1, fragmentComposition2) -> {
 				BeanTestUtil.setProperty(
@@ -538,10 +549,10 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSortString()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSortString()
 		throws Exception {
 
-		testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
+		testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
 			EntityField.Type.STRING,
 			(entityField, fragmentComposition1, fragmentComposition2) -> {
 				Class<?> clazz = fragmentComposition1.getClass();
@@ -591,7 +602,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	protected void
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPageWithSort(
 				EntityField.Type type,
 				UnsafeTriConsumer
 					<EntityField, FragmentComposition, FragmentComposition,
@@ -605,7 +616,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		}
 
 		String siteExternalReferenceCode =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode();
 
 		FragmentComposition fragmentComposition1 = randomFragmentComposition();
 		FragmentComposition fragmentComposition2 = randomFragmentComposition();
@@ -616,22 +627,22 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 		}
 
 		fragmentComposition1 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, fragmentComposition1);
 
 		fragmentComposition2 =
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				siteExternalReferenceCode, fragmentComposition2);
 
 		Page<FragmentComposition> page =
 			fragmentCompositionResource.
-				getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+				getSiteByExternalReferenceCodeFragmentCompositionsPage(
 					siteExternalReferenceCode, null, null, null, null);
 
 		for (EntityField entityField : entityFields) {
 			Page<FragmentComposition> ascPage =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(1, (int)page.getTotalCount() + 1),
 						entityField.getName() + ":asc");
@@ -645,7 +656,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 
 			Page<FragmentComposition> descPage =
 				fragmentCompositionResource.
-					getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+					getSiteByExternalReferenceCodeFragmentCompositionsPage(
 						siteExternalReferenceCode, null, null,
 						Pagination.of(1, (int)page.getTotalCount() + 1),
 						entityField.getName() + ":desc");
@@ -660,7 +671,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	protected FragmentComposition
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_addFragmentComposition(
 				String siteExternalReferenceCode,
 				FragmentComposition fragmentComposition)
 		throws Exception {
@@ -670,7 +681,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	protected String
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode()
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getSiteExternalReferenceCode()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -678,21 +689,21 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	protected String
-			testGetSiteSiteByExternalReferenceCodeFragmentCompositionsPage_getIrrelevantSiteExternalReferenceCode()
+			testGetSiteByExternalReferenceCodeFragmentCompositionsPage_getIrrelevantSiteExternalReferenceCode()
 		throws Exception {
 
 		return null;
 	}
 
 	@Test
-	public void testPostSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testPostSiteByExternalReferenceCodeFragmentComposition()
 		throws Exception {
 
 		FragmentComposition randomFragmentComposition =
 			randomFragmentComposition();
 
 		FragmentComposition postFragmentComposition =
-			testPostSiteSiteByExternalReferenceCodeFragmentComposition_addFragmentComposition(
+			testPostSiteByExternalReferenceCodeFragmentComposition_addFragmentComposition(
 				randomFragmentComposition);
 
 		assertEquals(randomFragmentComposition, postFragmentComposition);
@@ -700,7 +711,7 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	protected FragmentComposition
-			testPostSiteSiteByExternalReferenceCodeFragmentComposition_addFragmentComposition(
+			testPostSiteByExternalReferenceCodeFragmentComposition_addFragmentComposition(
 				FragmentComposition fragmentComposition)
 		throws Exception {
 
@@ -709,45 +720,52 @@ public abstract class BaseFragmentCompositionResourceTestCase {
 	}
 
 	@Test
-	public void testDeleteSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testDeleteSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode()
 		throws Exception {
 
 		Assert.assertTrue(false);
 	}
 
 	@Test
-	public void testGetSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testGetSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode()
 		throws Exception {
 
 		Assert.assertTrue(false);
 	}
 
 	@Test
-	public void testGraphQLGetSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testGraphQLGetSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode()
 		throws Exception {
 
 		Assert.assertTrue(true);
 	}
 
 	@Test
-	public void testGraphQLGetSiteSiteByExternalReferenceCodeFragmentCompositionNotFound()
+	public void testGraphQLGetSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCodeNotFound()
 		throws Exception {
 
 		Assert.assertTrue(true);
 	}
 
 	@Test
-	public void testPatchSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testPatchSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode()
 		throws Exception {
 
 		Assert.assertTrue(false);
 	}
 
 	@Test
-	public void testPutSiteSiteByExternalReferenceCodeFragmentComposition()
+	public void testPutSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode()
 		throws Exception {
 
 		Assert.assertTrue(false);
+	}
+
+	protected FragmentComposition
+			testPutSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode_createFragmentComposition()
+		throws Exception {
+
+		return randomFragmentComposition();
 	}
 
 	@Rule

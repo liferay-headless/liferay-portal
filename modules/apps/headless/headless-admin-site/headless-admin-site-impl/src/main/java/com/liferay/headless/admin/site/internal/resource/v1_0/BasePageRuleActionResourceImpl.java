@@ -108,15 +108,16 @@ public abstract class BasePageRuleActionResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageRuleAction(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
-			String pageRuleActionExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
+				String pageRuleActionExternalReferenceCode)
 		throws Exception {
 	}
 
@@ -163,15 +164,16 @@ public abstract class BasePageRuleActionResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public PageRuleAction getSiteSiteByExternalReferenceCodePageRuleAction(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
-			String pageRuleActionExternalReferenceCode)
+	public PageRuleAction
+			getSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
+				String pageRuleActionExternalReferenceCode)
 		throws Exception {
 
 		return new PageRuleAction();
@@ -221,20 +223,21 @@ public abstract class BasePageRuleActionResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public PageRuleAction patchSiteSiteByExternalReferenceCodePageRuleAction(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
-			String pageRuleActionExternalReferenceCode,
-			PageRuleAction pageRuleAction)
+	public PageRuleAction
+			patchSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
+				String pageRuleActionExternalReferenceCode,
+				PageRuleAction pageRuleAction)
 		throws Exception {
 
 		PageRuleAction existingPageRuleAction =
-			getSiteSiteByExternalReferenceCodePageRuleAction(
+			getSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
 				siteExternalReferenceCode, pageRuleActionExternalReferenceCode);
 
 		if (pageRuleAction.getAction() != null) {
@@ -256,7 +259,7 @@ public abstract class BasePageRuleActionResourceImpl
 
 		preparePatch(pageRuleAction, existingPageRuleAction);
 
-		return putSiteSiteByExternalReferenceCodePageRuleAction(
+		return putSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
 			siteExternalReferenceCode, pageRuleActionExternalReferenceCode,
 			existingPageRuleAction);
 	}
@@ -305,16 +308,17 @@ public abstract class BasePageRuleActionResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public PageRuleAction putSiteSiteByExternalReferenceCodePageRuleAction(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
-			String pageRuleActionExternalReferenceCode,
-			PageRuleAction pageRuleAction)
+	public PageRuleAction
+			putSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageRuleActionExternalReferenceCode")
+				String pageRuleActionExternalReferenceCode,
+				PageRuleAction pageRuleAction)
 		throws Exception {
 
 		return new PageRuleAction();
@@ -368,7 +372,7 @@ public abstract class BasePageRuleActionResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageRuleAction>
-			getSiteSiteByExternalReferenceCodePageRulePageRuleActionsPage(
+			getSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleActionsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -430,7 +434,7 @@ public abstract class BasePageRuleActionResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public PageRuleAction
-			postSiteSiteByExternalReferenceCodePageRulePageRuleAction(
+			postSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleAction(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")

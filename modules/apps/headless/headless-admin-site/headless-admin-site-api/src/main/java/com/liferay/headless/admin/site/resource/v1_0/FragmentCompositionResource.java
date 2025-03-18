@@ -29,6 +29,7 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -46,39 +47,53 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FragmentCompositionResource {
 
 	public Page<FragmentComposition>
-			getSiteSiteByExternalReferenceCodeFragmentCompositionsPage(
+			getSiteByExternalReferenceCodeFragmentCompositionsPage(
 				String siteExternalReferenceCode, String search,
 				com.liferay.portal.kernel.search.filter.Filter filter,
 				Pagination pagination,
 				com.liferay.portal.kernel.search.Sort[] sorts)
 		throws Exception;
 
+	public Response
+			postSiteByExternalReferenceCodeFragmentCompositionsPageExportBatch(
+				String siteExternalReferenceCode, String search,
+				com.liferay.portal.kernel.search.filter.Filter filter,
+				com.liferay.portal.kernel.search.Sort[] sorts,
+				String callbackURL, String contentType, String fieldNames)
+		throws Exception;
+
 	public FragmentComposition
-			postSiteSiteByExternalReferenceCodeFragmentComposition(
+			postSiteByExternalReferenceCodeFragmentComposition(
 				String siteExternalReferenceCode, Boolean saveInlineContent,
 				Boolean saveMapping, FragmentComposition fragmentComposition)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodeFragmentComposition(
-			String siteExternalReferenceCode,
-			String fragmentCompositionExternalReferenceCode)
+	public Response postSiteByExternalReferenceCodeFragmentCompositionBatch(
+			String siteExternalReferenceCode, Boolean saveInlineContent,
+			Boolean saveMapping, String callbackURL, Object object)
 		throws Exception;
 
-	public FragmentComposition
-			getSiteSiteByExternalReferenceCodeFragmentComposition(
+	public void
+			deleteSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode)
 		throws Exception;
 
 	public FragmentComposition
-			patchSiteSiteByExternalReferenceCodeFragmentComposition(
+			getSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String fragmentCompositionExternalReferenceCode)
+		throws Exception;
+
+	public FragmentComposition
+			patchSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)
 		throws Exception;
 
 	public FragmentComposition
-			putSiteSiteByExternalReferenceCodeFragmentComposition(
+			putSiteByExternalReferenceCodeFragmentCompositionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String fragmentCompositionExternalReferenceCode,
 				FragmentComposition fragmentComposition)

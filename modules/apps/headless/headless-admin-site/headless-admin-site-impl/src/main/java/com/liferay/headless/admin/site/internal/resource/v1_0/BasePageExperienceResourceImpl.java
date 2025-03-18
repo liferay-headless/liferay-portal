@@ -108,15 +108,16 @@ public abstract class BasePageExperienceResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageExperience(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
-			String pageExperienceExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
+				String pageExperienceExternalReferenceCode)
 		throws Exception {
 	}
 
@@ -163,15 +164,16 @@ public abstract class BasePageExperienceResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public PageExperience getSiteSiteByExternalReferenceCodePageExperience(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
-			String pageExperienceExternalReferenceCode)
+	public PageExperience
+			getSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
+				String pageExperienceExternalReferenceCode)
 		throws Exception {
 
 		return new PageExperience();
@@ -221,20 +223,21 @@ public abstract class BasePageExperienceResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public PageExperience patchSiteSiteByExternalReferenceCodePageExperience(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
-			String pageExperienceExternalReferenceCode,
-			PageExperience pageExperience)
+	public PageExperience
+			patchSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
+				String pageExperienceExternalReferenceCode,
+				PageExperience pageExperience)
 		throws Exception {
 
 		PageExperience existingPageExperience =
-			getSiteSiteByExternalReferenceCodePageExperience(
+			getSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
 				siteExternalReferenceCode, pageExperienceExternalReferenceCode);
 
 		if (pageExperience.getExternalReferenceCode() != null) {
@@ -268,7 +271,7 @@ public abstract class BasePageExperienceResourceImpl
 
 		preparePatch(pageExperience, existingPageExperience);
 
-		return putSiteSiteByExternalReferenceCodePageExperience(
+		return putSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
 			siteExternalReferenceCode, pageExperienceExternalReferenceCode,
 			existingPageExperience);
 	}
@@ -317,16 +320,17 @@ public abstract class BasePageExperienceResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public PageExperience putSiteSiteByExternalReferenceCodePageExperience(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
-			String pageExperienceExternalReferenceCode,
-			PageExperience pageExperience)
+	public PageExperience
+			putSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageExperienceExternalReferenceCode")
+				String pageExperienceExternalReferenceCode,
+				PageExperience pageExperience)
 		throws Exception {
 
 		return new PageExperience();
@@ -376,7 +380,7 @@ public abstract class BasePageExperienceResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageExperience>
-			getSiteSiteByExternalReferenceCodePageSpecificationPageExperiencesPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperiencesPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -435,7 +439,7 @@ public abstract class BasePageExperienceResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public PageExperience
-			postSiteSiteByExternalReferenceCodePageSpecificationPageExperience(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperience(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")

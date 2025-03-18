@@ -38,126 +38,153 @@ public interface DisplayPageTemplateFolderResource {
 	}
 
 	public Page<DisplayPageTemplateFolder>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPage(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFoldersPage(
 				String siteExternalReferenceCode, String search,
 				List<String> aggregations, String filterString,
 				Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
 				String siteExternalReferenceCode, String search,
 				List<String> aggregations, String filterString,
 				Pagination pagination, String sortString)
 		throws Exception;
 
+	public void
+			postSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageExportBatch(
+				String siteExternalReferenceCode, String search,
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageExportBatchHttpResponse(
+				String siteExternalReferenceCode, String search,
+				String filterString, String sortString, String callbackURL,
+				String contentType, String fieldNames)
+		throws Exception;
+
 	public DisplayPageTemplateFolder
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+			postSiteByExternalReferenceCodeDisplayPageTemplateFolder(
 				String siteExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+			postSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
 				String siteExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
+	public void postSiteByExternalReferenceCodeDisplayPageTemplateFolderBatch(
+			String siteExternalReferenceCode, String callbackURL, Object object)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			postSiteByExternalReferenceCodeDisplayPageTemplateFolderBatchHttpResponse(
+				String siteExternalReferenceCode, String callbackURL,
+				Object object)
+		throws Exception;
+
 	public Page<Permission>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
 				String siteExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 				String siteExternalReferenceCode, String roleNames)
 		throws Exception;
 
 	public Page<Permission>
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
 				String siteExternalReferenceCode, Permission[] permissions)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 				String siteExternalReferenceCode, Permission[] permissions)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
-			String siteExternalReferenceCode,
-			String displayPageTemplateFolderExternalReferenceCode)
-		throws Exception;
-
-	public HttpInvoker.HttpResponse
-			deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
-				String siteExternalReferenceCode,
-				String displayPageTemplateFolderExternalReferenceCode)
-		throws Exception;
-
-	public DisplayPageTemplateFolder
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+	public void
+			deleteSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+			deleteSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode)
 		throws Exception;
 
 	public DisplayPageTemplateFolder
-			patchSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String displayPageTemplateFolderExternalReferenceCode)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
+				String siteExternalReferenceCode,
+				String displayPageTemplateFolderExternalReferenceCode)
+		throws Exception;
+
+	public DisplayPageTemplateFolder
+			patchSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			patchSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+			patchSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
 	public DisplayPageTemplateFolder
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception;
 
 	public Page<Permission>
-			getSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				String roleNames)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+			getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				String roleNames)
 		throws Exception;
 
 	public Page<Permission>
-			putSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPage(
 				String siteExternalReferenceCode,
-				String displayPageTemplateFolderExternalReferenceCode)
+				String displayPageTemplateFolderExternalReferenceCode,
+				Permission[] permissions)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+			putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 				String siteExternalReferenceCode,
-				String displayPageTemplateFolderExternalReferenceCode)
+				String displayPageTemplateFolderExternalReferenceCode,
+				Permission[] permissions)
 		throws Exception;
 
 	public static class Builder {
@@ -270,14 +297,14 @@ public interface DisplayPageTemplateFolderResource {
 		implements DisplayPageTemplateFolderResource {
 
 		public Page<DisplayPageTemplateFolder>
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPage(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFoldersPage(
 					String siteExternalReferenceCode, String search,
 					List<String> aggregations, String filterString,
 					Pagination pagination, String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
 					siteExternalReferenceCode, search, aggregations,
 					filterString, pagination, sortString);
 
@@ -341,7 +368,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageHttpResponse(
 					String siteExternalReferenceCode, String search,
 					List<String> aggregations, String filterString,
 					Pagination pagination, String sortString)
@@ -403,14 +430,146 @@ public interface DisplayPageTemplateFolderResource {
 			return httpInvoker.invoke();
 		}
 
+		public void
+				postSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageExportBatch(
+					String siteExternalReferenceCode, String search,
+					String filterString, String sortString, String callbackURL,
+					String contentType, String fieldNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageExportBatchHttpResponse(
+					siteExternalReferenceCode, search, filterString, sortString,
+					callbackURL, contentType, fieldNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteByExternalReferenceCodeDisplayPageTemplateFoldersPageExportBatchHttpResponse(
+					String siteExternalReferenceCode, String search,
+					String filterString, String sortString, String callbackURL,
+					String contentType, String fieldNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body("[]", "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (contentType != null) {
+				httpInvoker.parameter(
+					"contentType", String.valueOf(contentType));
+			}
+
+			if (fieldNames != null) {
+				httpInvoker.parameter("fieldNames", String.valueOf(fieldNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/display-page-template-folders/export-batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
 		public DisplayPageTemplateFolder
-				postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolder(
 					String siteExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
 					siteExternalReferenceCode, displayPageTemplateFolder);
 
 			String content = httpResponse.getContent();
@@ -473,7 +632,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
 					String siteExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
 			throws Exception {
@@ -518,13 +677,121 @@ public interface DisplayPageTemplateFolderResource {
 			return httpInvoker.invoke();
 		}
 
+		public void
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolderBatch(
+					String siteExternalReferenceCode, String callbackURL,
+					Object object)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolderBatchHttpResponse(
+					siteExternalReferenceCode, callbackURL, object);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				Problem.ProblemException problemException = null;
+
+				if (Objects.equals(
+						httpResponse.getContentType(), "application/json")) {
+
+					problemException = new Problem.ProblemException(
+						Problem.toDTO(content));
+				}
+				else {
+					_logger.log(
+						Level.WARNING,
+						"Unable to process content type: " +
+							httpResponse.getContentType());
+
+					Problem problem = new Problem();
+
+					problem.setStatus(
+						String.valueOf(httpResponse.getStatusCode()));
+
+					problemException = new Problem.ProblemException(problem);
+				}
+
+				throw problemException;
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				postSiteByExternalReferenceCodeDisplayPageTemplateFolderBatchHttpResponse(
+					String siteExternalReferenceCode, String callbackURL,
+					Object object)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(object.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port + _builder._contextPath +
+						"/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/display-page-template-folders/batch");
+
+			httpInvoker.path(
+				"siteExternalReferenceCode", siteExternalReferenceCode);
+
+			if ((_builder._login != null) && (_builder._password != null)) {
+				httpInvoker.userNameAndPassword(
+					_builder._login + ":" + _builder._password);
+			}
+
+			return httpInvoker.invoke();
+		}
+
 		public Page<Permission>
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
 					String siteExternalReferenceCode, String roleNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 					siteExternalReferenceCode, roleNames);
 
 			String content = httpResponse.getContent();
@@ -587,7 +854,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 					String siteExternalReferenceCode, String roleNames)
 			throws Exception {
 
@@ -633,12 +900,12 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public Page<Permission>
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
 					String siteExternalReferenceCode, Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 					siteExternalReferenceCode, permissions);
 
 			String content = httpResponse.getContent();
@@ -701,7 +968,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
 					String siteExternalReferenceCode, Permission[] permissions)
 			throws Exception {
 
@@ -751,13 +1018,13 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public void
-				deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+				deleteSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				deleteSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateFolderExternalReferenceCode);
 
@@ -821,7 +1088,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				deleteSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode)
 			throws Exception {
@@ -867,13 +1134,13 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public DisplayPageTemplateFolder
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateFolderExternalReferenceCode);
 
@@ -937,7 +1204,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode)
 			throws Exception {
@@ -983,14 +1250,14 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public DisplayPageTemplateFolder
-				patchSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+				patchSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				patchSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateFolderExternalReferenceCode,
 					displayPageTemplateFolder);
@@ -1055,7 +1322,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				patchSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				patchSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
@@ -1105,14 +1372,14 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public DisplayPageTemplateFolder
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateFolderExternalReferenceCode,
 					displayPageTemplateFolder);
@@ -1177,7 +1444,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					DisplayPageTemplateFolder displayPageTemplateFolder)
@@ -1227,14 +1494,14 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public Page<Permission>
-				getSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPage(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					String roleNames)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 					siteExternalReferenceCode,
 					displayPageTemplateFolderExternalReferenceCode, roleNames);
 
@@ -1298,7 +1565,7 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				getSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 					String siteExternalReferenceCode,
 					String displayPageTemplateFolderExternalReferenceCode,
 					String roleNames)
@@ -1349,15 +1616,17 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public Page<Permission>
-				putSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPage(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPage(
 					String siteExternalReferenceCode,
-					String displayPageTemplateFolderExternalReferenceCode)
+					String displayPageTemplateFolderExternalReferenceCode,
+					Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 					siteExternalReferenceCode,
-					displayPageTemplateFolderExternalReferenceCode);
+					displayPageTemplateFolderExternalReferenceCode,
+					permissions);
 
 			String content = httpResponse.getContent();
 
@@ -1419,14 +1688,21 @@ public interface DisplayPageTemplateFolderResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteExternalReferenceCodeDisplayPageTemplateFolderPermissionsPageHttpResponse(
+				putSiteByExternalReferenceCodeDisplayPageTemplateFolderByExternalReferenceCodePermissionsPageHttpResponse(
 					String siteExternalReferenceCode,
-					String displayPageTemplateFolderExternalReferenceCode)
+					String displayPageTemplateFolderExternalReferenceCode,
+					Permission[] permissions)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-			httpInvoker.body("[]", "application/json");
+			List<String> values = new ArrayList<>();
+
+			for (Permission permissionValue : permissions) {
+				values.add(String.valueOf(permissionValue));
+			}
+
+			httpInvoker.body(values.toString(), "application/json");
 
 			if (_builder._locale != null) {
 				httpInvoker.header(

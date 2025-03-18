@@ -109,7 +109,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplatePageSpecificationsPage(
+			getSiteByExternalReferenceCodeDisplayPageTemplateByExternalReferenceCodePageSpecificationsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -168,7 +168,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeMasterPagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecificationsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -224,15 +224,16 @@ public abstract class BasePageSpecificationResourceImpl
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageSpecification(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("pageSpecificationExternalReferenceCode")
-			String pageSpecificationExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteExternalReferenceCode")
+				String siteExternalReferenceCode,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("pageSpecificationExternalReferenceCode")
+				String pageSpecificationExternalReferenceCode)
 		throws Exception {
 	}
 
@@ -280,7 +281,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public PageSpecification
-			getSiteSiteByExternalReferenceCodePageSpecification(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -339,7 +340,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public PageSpecification
-			patchSiteSiteByExternalReferenceCodePageSpecification(
+			patchSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -352,7 +353,7 @@ public abstract class BasePageSpecificationResourceImpl
 		throws Exception {
 
 		PageSpecification existingPageSpecification =
-			getSiteSiteByExternalReferenceCodePageSpecification(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				siteExternalReferenceCode,
 				pageSpecificationExternalReferenceCode);
 
@@ -371,7 +372,7 @@ public abstract class BasePageSpecificationResourceImpl
 
 		preparePatch(pageSpecification, existingPageSpecification);
 
-		return putSiteSiteByExternalReferenceCodePageSpecification(
+		return putSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 			siteExternalReferenceCode, pageSpecificationExternalReferenceCode,
 			existingPageSpecification);
 	}
@@ -421,7 +422,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public PageSpecification
-			putSiteSiteByExternalReferenceCodePageSpecification(
+			putSiteByExternalReferenceCodePageSpecificationByExternalReferenceCode(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -481,7 +482,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public PageSpecification
-			postSiteSiteByExternalReferenceCodePageSpecificationPublish(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePublish(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -539,7 +540,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodePageTemplatePageSpecificationsPage(
+			getSiteByExternalReferenceCodePageTemplateByExternalReferenceCodePageSpecificationsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -596,7 +597,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeSitePagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodePageSpecificationsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -653,7 +654,7 @@ public abstract class BasePageSpecificationResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<PageSpecification>
-			getSiteSiteByExternalReferenceCodeUtilityPagePageSpecificationsPage(
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePageSpecificationsPage(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")

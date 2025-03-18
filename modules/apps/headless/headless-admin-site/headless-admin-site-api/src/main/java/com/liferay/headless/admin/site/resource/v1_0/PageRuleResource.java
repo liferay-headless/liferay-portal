@@ -45,34 +45,39 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PageRuleResource {
 
 	public Page<PageRule>
-			getSiteSiteByExternalReferenceCodePageExperiencePageRulesPage(
+			getSiteByExternalReferenceCodePageExperienceByExternalReferenceCodePageRulesPage(
 				String siteExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
-	public PageRule postSiteSiteByExternalReferenceCodePageExperiencePageRule(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode, PageRule pageRule)
+	public PageRule
+			postSiteByExternalReferenceCodePageExperienceByExternalReferenceCodePageRule(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public void deleteSiteSiteByExternalReferenceCodePageRule(
-			String siteExternalReferenceCode,
-			String pageRuleExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageRuleByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule getSiteSiteByExternalReferenceCodePageRule(
-			String siteExternalReferenceCode,
-			String pageRuleExternalReferenceCode)
+	public PageRule
+			getSiteByExternalReferenceCodePageRuleByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleExternalReferenceCode)
 		throws Exception;
 
-	public PageRule patchSiteSiteByExternalReferenceCodePageRule(
-			String siteExternalReferenceCode,
-			String pageRuleExternalReferenceCode, PageRule pageRule)
+	public PageRule
+			patchSiteByExternalReferenceCodePageRuleByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
-	public PageRule putSiteSiteByExternalReferenceCodePageRule(
-			String siteExternalReferenceCode,
-			String pageRuleExternalReferenceCode, PageRule pageRule)
+	public PageRule
+			putSiteByExternalReferenceCodePageRuleByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleExternalReferenceCode, PageRule pageRule)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

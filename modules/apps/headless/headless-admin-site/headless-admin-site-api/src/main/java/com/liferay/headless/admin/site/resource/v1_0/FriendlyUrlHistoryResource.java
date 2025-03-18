@@ -42,19 +42,19 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FriendlyUrlHistoryResource {
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode)
 		throws Exception;
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodeFriendlyUrlHistory(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode)
 		throws Exception;

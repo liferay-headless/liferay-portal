@@ -44,36 +44,40 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PageRuleActionResource {
 
-	public void deleteSiteSiteByExternalReferenceCodePageRuleAction(
-			String siteExternalReferenceCode,
-			String pageRuleActionExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleActionExternalReferenceCode)
 		throws Exception;
 
-	public PageRuleAction getSiteSiteByExternalReferenceCodePageRuleAction(
-			String siteExternalReferenceCode,
-			String pageRuleActionExternalReferenceCode)
+	public PageRuleAction
+			getSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleActionExternalReferenceCode)
 		throws Exception;
 
-	public PageRuleAction patchSiteSiteByExternalReferenceCodePageRuleAction(
-			String siteExternalReferenceCode,
-			String pageRuleActionExternalReferenceCode,
-			PageRuleAction pageRuleAction)
+	public PageRuleAction
+			patchSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleActionExternalReferenceCode,
+				PageRuleAction pageRuleAction)
 		throws Exception;
 
-	public PageRuleAction putSiteSiteByExternalReferenceCodePageRuleAction(
-			String siteExternalReferenceCode,
-			String pageRuleActionExternalReferenceCode,
-			PageRuleAction pageRuleAction)
+	public PageRuleAction
+			putSiteByExternalReferenceCodePageRuleActionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleActionExternalReferenceCode,
+				PageRuleAction pageRuleAction)
 		throws Exception;
 
 	public Page<PageRuleAction>
-			getSiteSiteByExternalReferenceCodePageRulePageRuleActionsPage(
+			getSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleActionsPage(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
 	public PageRuleAction
-			postSiteSiteByExternalReferenceCodePageRulePageRuleAction(
+			postSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleAction(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode,
 				PageRuleAction pageRuleAction)

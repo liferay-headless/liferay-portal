@@ -44,36 +44,40 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PageExperienceResource {
 
-	public void deleteSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode)
 		throws Exception;
 
-	public PageExperience getSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode)
+	public PageExperience
+			getSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode)
 		throws Exception;
 
-	public PageExperience patchSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			PageExperience pageExperience)
+	public PageExperience
+			patchSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				PageExperience pageExperience)
 		throws Exception;
 
-	public PageExperience putSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			PageExperience pageExperience)
+	public PageExperience
+			putSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				PageExperience pageExperience)
 		throws Exception;
 
 	public Page<PageExperience>
-			getSiteSiteByExternalReferenceCodePageSpecificationPageExperiencesPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperiencesPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode)
 		throws Exception;
 
 	public PageExperience
-			postSiteSiteByExternalReferenceCodePageSpecificationPageExperience(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperience(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				PageExperience pageExperience)

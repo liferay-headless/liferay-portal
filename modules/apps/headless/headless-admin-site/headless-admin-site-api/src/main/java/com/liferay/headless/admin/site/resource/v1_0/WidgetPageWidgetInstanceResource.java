@@ -45,34 +45,34 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WidgetPageWidgetInstanceResource {
 
 	public Page<WidgetPageWidgetInstance>
-			getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPage(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPage(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			postSiteSiteByExternalReferenceCodeSitePageWidgetInstance(
+			postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstance(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				WidgetPageWidgetInstance widgetPageWidgetInstance)
 		throws Exception;
 
 	public void
-			deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,
@@ -80,7 +80,7 @@ public interface WidgetPageWidgetInstanceResource {
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,

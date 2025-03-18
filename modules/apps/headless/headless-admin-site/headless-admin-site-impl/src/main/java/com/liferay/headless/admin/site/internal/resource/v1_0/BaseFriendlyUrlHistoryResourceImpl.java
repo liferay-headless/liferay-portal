@@ -86,7 +86,7 @@ public abstract class BaseFriendlyUrlHistoryResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeDisplayPageTemplateByExternalReferenceCodeFriendlyUrlHistory(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -145,7 +145,7 @@ public abstract class BaseFriendlyUrlHistoryResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeSitePageFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeFriendlyUrlHistory(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")
@@ -202,7 +202,7 @@ public abstract class BaseFriendlyUrlHistoryResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public FriendlyUrlHistory
-			getSiteSiteByExternalReferenceCodeUtilityPageFriendlyUrlHistory(
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodeFriendlyUrlHistory(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("siteExternalReferenceCode")

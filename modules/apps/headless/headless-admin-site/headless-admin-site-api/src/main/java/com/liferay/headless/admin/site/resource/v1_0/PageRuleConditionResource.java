@@ -44,39 +44,40 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PageRuleConditionResource {
 
-	public void deleteSiteSiteByExternalReferenceCodePageRuleCondition(
-			String siteExternalReferenceCode,
-			String pageRuleConditionExternalReferenceCode)
-		throws Exception;
-
-	public PageRuleCondition
-			getSiteSiteByExternalReferenceCodePageRuleCondition(
+	public void
+			deleteSiteByExternalReferenceCodePageRuleConditionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleConditionExternalReferenceCode)
 		throws Exception;
 
 	public PageRuleCondition
-			patchSiteSiteByExternalReferenceCodePageRuleCondition(
+			getSiteByExternalReferenceCodePageRuleConditionByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageRuleConditionExternalReferenceCode)
+		throws Exception;
+
+	public PageRuleCondition
+			patchSiteByExternalReferenceCodePageRuleConditionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleConditionExternalReferenceCode,
 				PageRuleCondition pageRuleCondition)
 		throws Exception;
 
 	public PageRuleCondition
-			putSiteSiteByExternalReferenceCodePageRuleCondition(
+			putSiteByExternalReferenceCodePageRuleConditionByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String pageRuleConditionExternalReferenceCode,
 				PageRuleCondition pageRuleCondition)
 		throws Exception;
 
 	public Page<PageRuleCondition>
-			getSiteSiteByExternalReferenceCodePageRulePageRuleConditionsPage(
+			getSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleConditionsPage(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode, Boolean flatten)
 		throws Exception;
 
 	public PageRuleCondition
-			postSiteSiteByExternalReferenceCodePageRulePageRuleCondition(
+			postSiteByExternalReferenceCodePageRuleByExternalReferenceCodePageRuleCondition(
 				String siteExternalReferenceCode,
 				String pageRuleExternalReferenceCode,
 				PageRuleCondition pageRuleCondition)

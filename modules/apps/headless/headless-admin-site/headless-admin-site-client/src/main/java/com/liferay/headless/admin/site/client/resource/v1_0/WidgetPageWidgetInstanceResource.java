@@ -34,61 +34,61 @@ public interface WidgetPageWidgetInstanceResource {
 	}
 
 	public Page<WidgetPageWidgetInstance>
-			getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPage(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPage(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPageHttpResponse(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPageHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			postSiteSiteByExternalReferenceCodeSitePageWidgetInstance(
+			postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstance(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				WidgetPageWidgetInstance widgetPageWidgetInstance)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			postSiteSiteByExternalReferenceCodeSitePageWidgetInstanceHttpResponse(
+			postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				WidgetPageWidgetInstance widgetPageWidgetInstance)
 		throws Exception;
 
 	public void
-			deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+			deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,
@@ -96,7 +96,7 @@ public interface WidgetPageWidgetInstanceResource {
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+			patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,
@@ -104,7 +104,7 @@ public interface WidgetPageWidgetInstanceResource {
 		throws Exception;
 
 	public WidgetPageWidgetInstance
-			putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,
@@ -112,7 +112,7 @@ public interface WidgetPageWidgetInstanceResource {
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+			putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,
@@ -229,13 +229,13 @@ public interface WidgetPageWidgetInstanceResource {
 		implements WidgetPageWidgetInstanceResource {
 
 		public Page<WidgetPageWidgetInstance>
-				getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPage(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPage(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPageHttpResponse(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPageHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode);
 
 			String content = httpResponse.getContent();
@@ -298,7 +298,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPageHttpResponse(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPageHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode)
 			throws Exception {
@@ -343,14 +343,14 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public WidgetPageWidgetInstance
-				postSiteSiteByExternalReferenceCodeSitePageWidgetInstance(
+				postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstance(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					WidgetPageWidgetInstance widgetPageWidgetInstance)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteSiteByExternalReferenceCodeSitePageWidgetInstanceHttpResponse(
+				postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode,
 					widgetPageWidgetInstance);
 
@@ -414,7 +414,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				postSiteSiteByExternalReferenceCodeSitePageWidgetInstanceHttpResponse(
+				postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					WidgetPageWidgetInstance widgetPageWidgetInstance)
@@ -463,14 +463,14 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public void
-				deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+				deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode,
 					widgetInstanceExternalReferenceCode);
 
@@ -534,7 +534,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode)
@@ -583,14 +583,14 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public WidgetPageWidgetInstance
-				getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode,
 					widgetInstanceExternalReferenceCode);
 
@@ -654,7 +654,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode)
@@ -703,7 +703,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public WidgetPageWidgetInstance
-				patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+				patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode,
@@ -711,7 +711,7 @@ public interface WidgetPageWidgetInstanceResource {
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode,
 					widgetInstanceExternalReferenceCode,
 					widgetPageWidgetInstance);
@@ -776,7 +776,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				patchSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				patchSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode,
@@ -829,7 +829,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public WidgetPageWidgetInstance
-				putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+				putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode,
@@ -837,7 +837,7 @@ public interface WidgetPageWidgetInstanceResource {
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					siteExternalReferenceCode, sitePageExternalReferenceCode,
 					widgetInstanceExternalReferenceCode,
 					widgetPageWidgetInstance);
@@ -902,7 +902,7 @@ public interface WidgetPageWidgetInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse
-				putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCodeHttpResponse(
+				putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCodeHttpResponse(
 					String siteExternalReferenceCode,
 					String sitePageExternalReferenceCode,
 					String widgetInstanceExternalReferenceCode,
