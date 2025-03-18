@@ -1210,7 +1210,9 @@ public class ResourceOpenAPIParser {
 		if (basePath.equals("/asset-libraries/{assetLibraryId}")) {
 			return "AssetLibrary";
 		}
-		else if (basePath.equals("/sites/{siteId}")) {
+		else if (basePath.equals("/sites/{siteId}") ||
+				 basePath.equals("/sites/{siteExternalReferenceCode}")) {
+
 			return "Site";
 		}
 
