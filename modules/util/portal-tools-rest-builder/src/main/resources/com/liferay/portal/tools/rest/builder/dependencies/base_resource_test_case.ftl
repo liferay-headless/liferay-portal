@@ -2031,40 +2031,40 @@ public abstract class Base${schemaName}ResourceTestCase {
 
 						Assert.assertNotNull(put${schemaName}.getPermissions());
 					</#if>
-				</#if>
 
-				<#if javaMethodSignature.methodName?ends_with("ByExternalReferenceCode")>
-					${schemaName} new${schemaName} = test${javaMethodSignature.methodName?cap_first}_create${schemaName}();
+					<#if javaMethodSignature.methodName?ends_with("ByExternalReferenceCode")>
+						${schemaName} new${schemaName} = test${javaMethodSignature.methodName?cap_first}_create${schemaName}();
 
-					put${schemaName} = ${schemaVarName}Resource.${javaMethodSignature.methodName}(
-						<@getPutParameters
-							hasMultipartFiles = false
-							javaMethodSignature = javaMethodSignature
-							newSchemaVarNamePrefix = "new"
-							schemaName = schemaName
-							schemaVarName = schemaVarName
-							schemaVarNamePrefix = "new"
-						/>
-					);
+						put${schemaName} = ${schemaVarName}Resource.${javaMethodSignature.methodName}(
+							<@getPutParameters
+								hasMultipartFiles = false
+								javaMethodSignature = javaMethodSignature
+								newSchemaVarNamePrefix = "new"
+								schemaName = schemaName
+								schemaVarName = schemaVarName
+								schemaVarNamePrefix = "new"
+							/>
+						);
 
-					assertEquals(new${schemaName}, put${schemaName});
-					assertValid(put${schemaName});
+						assertEquals(new${schemaName}, put${schemaName});
+						assertValid(put${schemaName});
 
-					get${schemaName} =
+						get${schemaName} =
 
-					<#assign getJavaMethodSignature = javaMethodSignature.methodName?replace("put", "get", "f") />
+						<#assign getJavaMethodSignature = javaMethodSignature.methodName?replace("put", "get", "f") />
 
-					<#if freeMarkerTool.containsJavaMethodSignature(javaMethodSignatures, getJavaMethodSignature)>
-						${schemaVarName}Resource.${getJavaMethodSignature}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
-					<#else>
-						<#assign addResourceGetterMethod = true />
+						<#if freeMarkerTool.containsJavaMethodSignature(javaMethodSignatures, getJavaMethodSignature)>
+							${schemaVarName}Resource.${getJavaMethodSignature}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+						<#else>
+							<#assign addResourceGetterMethod = true />
 
-						test${javaMethodSignature.methodName?cap_first}_get${schemaName}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+							test${javaMethodSignature.methodName?cap_first}_get${schemaName}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+						</#if>
+
+						assertEquals(new${schemaName}, get${schemaName});
+
+						Assert.assertEquals(new${schemaName}.getExternalReferenceCode(), put${schemaName}.getExternalReferenceCode());
 					</#if>
-
-					assertEquals(new${schemaName}, get${schemaName});
-
-					Assert.assertEquals(new${schemaName}.getExternalReferenceCode(), put${schemaName}.getExternalReferenceCode());
 				</#if>
 			}
 
