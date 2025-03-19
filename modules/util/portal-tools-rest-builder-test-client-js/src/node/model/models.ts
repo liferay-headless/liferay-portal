@@ -12,6 +12,7 @@ import localVarRequest from 'request';
 	import {EntityModelResourceTestEntity1} from './entityModelResourceTestEntity1';
 	import {EntityModelResourceTestEntity2} from './entityModelResourceTestEntity2';
 	import {EnumTestEntity} from './enumTestEntity';
+	import {ErcSiteTestEntity} from './ercSiteTestEntity';
 	import {Facet} from './facet';
 	import {FacetValue} from './facetValue';
 	import {Filter} from './filter';
@@ -20,6 +21,7 @@ import localVarRequest from 'request';
 	import {NestedTestEntity} from './nestedTestEntity';
 	import {PageCompanyTestEntity} from './pageCompanyTestEntity';
 	import {PageEntityModelResourceTestEntity1} from './pageEntityModelResourceTestEntity1';
+	import {PageErcSiteTestEntity} from './pageErcSiteTestEntity';
 	import {PageFilter} from './pageFilter';
 	import {PagePermission} from './pagePermission';
 	import {PageSchema} from './pageSchema';
@@ -30,6 +32,7 @@ import localVarRequest from 'request';
 	import {Schema} from './schema';
 	import {SiteTestEntity} from './siteTestEntity';
 	import {Sort} from './sort';
+	import {SubTestEntity} from './subTestEntity';
 	import {TestEntity} from './testEntity';
 	import {TestEntityAddress} from './testEntityAddress';
 	import {UnreferencedTestEntity} from './unreferencedTestEntity';
@@ -41,6 +44,7 @@ import localVarRequest from 'request';
 	export * from './entityModelResourceTestEntity1';
 	export * from './entityModelResourceTestEntity2';
 	export * from './enumTestEntity';
+	export * from './ercSiteTestEntity';
 	export * from './facet';
 	export * from './facetValue';
 	export * from './filter';
@@ -49,6 +53,7 @@ import localVarRequest from 'request';
 	export * from './nestedTestEntity';
 	export * from './pageCompanyTestEntity';
 	export * from './pageEntityModelResourceTestEntity1';
+	export * from './pageErcSiteTestEntity';
 	export * from './pageFilter';
 	export * from './pagePermission';
 	export * from './pageSchema';
@@ -59,6 +64,7 @@ import localVarRequest from 'request';
 	export * from './schema';
 	export * from './siteTestEntity';
 	export * from './sort';
+	export * from './subTestEntity';
 	export * from './testEntity';
 	export * from './testEntityAddress';
 	export * from './unreferencedTestEntity';
@@ -96,6 +102,7 @@ const typeMap: {[index: string]: any} = {
 	EntityModelResourceTestEntity1,
 	EntityModelResourceTestEntity2,
 	EnumTestEntity,
+	ErcSiteTestEntity,
 	Facet,
 	FacetValue,
 	Filter,
@@ -104,6 +111,7 @@ const typeMap: {[index: string]: any} = {
 	NestedTestEntity,
 	PageCompanyTestEntity,
 	PageEntityModelResourceTestEntity1,
+	PageErcSiteTestEntity,
 	PageFilter,
 	PagePermission,
 	PageSchema,
@@ -114,6 +122,7 @@ const typeMap: {[index: string]: any} = {
 	Schema,
 	SiteTestEntity,
 	Sort,
+	SubTestEntity,
 	TestEntity,
 	TestEntityAddress,
 	UnreferencedTestEntity,
