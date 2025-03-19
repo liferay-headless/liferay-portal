@@ -995,7 +995,16 @@ public class FreeMarkerTool {
 				javaMethodSignatures, parameterName, schemaName);
 
 		if (javaMethodSignature != null) {
-			return true;
+			for (JavaMethodParameter javaMethodParameter :
+					javaMethodSignature.getJavaMethodParameters()) {
+
+				if (Objects.equals(
+						javaMethodParameter.getParameterName(),
+						parameterName)) {
+
+					return true;
+				}
+			}
 		}
 
 		return false;
