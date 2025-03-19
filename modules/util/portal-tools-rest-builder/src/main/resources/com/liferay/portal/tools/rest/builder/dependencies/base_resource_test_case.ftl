@@ -2816,7 +2816,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 					Assert.assertTrue(true);
 				</#if>
 				}
-		<#elseif configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "post") && stringUtil.equals(javaMethodSignature.methodName, "postSite" + schemaName) && javaMethodSignature.returnType?ends_with(schemaName) && !freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data")>
+		<#elseif configYAML.generateGraphQL && freeMarkerTool.hasHTTPMethod(javaMethodSignature, "post") && stringUtil.equals(javaMethodSignature.methodName, "postSite" + schemaName) && javaMethodSignature.returnType?ends_with(schemaName) && !freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data") && properties?keys?seq_contains("id")>
 			@Test
 			public void testGraphQL${javaMethodSignature.methodName?cap_first}() throws Exception {
 				${schemaName} random${schemaName} = random${schemaName}();
