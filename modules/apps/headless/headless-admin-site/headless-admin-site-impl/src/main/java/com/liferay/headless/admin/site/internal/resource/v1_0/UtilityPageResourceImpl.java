@@ -53,9 +53,10 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -70,9 +71,10 @@ public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 	}
 
 	@Override
-	public UtilityPage getSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode)
+	public UtilityPage
+			getSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -89,7 +91,7 @@ public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 	}
 
 	@Override
-	public Page<UtilityPage> getSiteSiteByExternalReferenceCodeUtilityPagesPage(
+	public Page<UtilityPage> getSiteByExternalReferenceCodeUtilityPagesPage(
 			String siteExternalReferenceCode, String search,
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
@@ -128,7 +130,7 @@ public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 	}
 
 	@Override
-	public UtilityPage postSiteSiteByExternalReferenceCodeUtilityPage(
+	public UtilityPage postSiteByExternalReferenceCodeUtilityPage(
 			String siteExternalReferenceCode, UtilityPage utilityPage)
 		throws Exception {
 
@@ -145,7 +147,7 @@ public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 
 	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeUtilityPagePageSpecification(
+			postSiteByExternalReferenceCodeUtilityPageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String utilityPageExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -173,9 +175,11 @@ public class UtilityPageResourceImpl extends BaseUtilityPageResourceImpl {
 	}
 
 	@Override
-	public UtilityPage putSiteSiteByExternalReferenceCodeUtilityPage(
-			String siteExternalReferenceCode,
-			String utilityPageExternalReferenceCode, UtilityPage utilityPage)
+	public UtilityPage
+			putSiteByExternalReferenceCodeUtilityPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String utilityPageExternalReferenceCode,
+				UtilityPage utilityPage)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {

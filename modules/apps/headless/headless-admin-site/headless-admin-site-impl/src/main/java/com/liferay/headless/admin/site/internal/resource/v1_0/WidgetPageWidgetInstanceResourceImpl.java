@@ -44,7 +44,7 @@ public class WidgetPageWidgetInstanceResourceImpl
 
 	@Override
 	public void
-			deleteSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
@@ -88,44 +88,8 @@ public class WidgetPageWidgetInstanceResourceImpl
 	}
 
 	@Override
-	public Page<WidgetPageWidgetInstance>
-			getSiteSiteByExternalReferenceCodeSitePageWidgetInstancesPage(
-				String siteExternalReferenceCode,
-				String sitePageExternalReferenceCode)
-		throws Exception {
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
-			throw new UnsupportedOperationException();
-		}
-
-		Layout layout = _layoutLocalService.fetchLayoutByExternalReferenceCode(
-			sitePageExternalReferenceCode,
-			GroupUtil.getGroupId(
-				false, contextCompany.getCompanyId(),
-				siteExternalReferenceCode));
-
-		if (layout == null) {
-			throw new UnsupportedOperationException();
-		}
-
-		LayoutType layoutType = layout.getLayoutType();
-
-		if (!(layoutType instanceof LayoutTypePortlet)) {
-			throw new UnsupportedOperationException();
-		}
-
-		LayoutTypePortlet layoutTypePortlet =
-			(LayoutTypePortlet)layout.getLayoutType();
-
-		return Page.of(
-			transform(
-				layoutTypePortlet.getPortletIds(),
-				portletId -> _toWidgetPageWidgetInstance(layout, portletId)));
-	}
-
-	@Override
 	public WidgetPageWidgetInstance
-			getSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode)
@@ -165,8 +129,44 @@ public class WidgetPageWidgetInstanceResourceImpl
 	}
 
 	@Override
+	public Page<WidgetPageWidgetInstance>
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstancesPage(
+				String siteExternalReferenceCode,
+				String sitePageExternalReferenceCode)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
+			throw new UnsupportedOperationException();
+		}
+
+		Layout layout = _layoutLocalService.fetchLayoutByExternalReferenceCode(
+			sitePageExternalReferenceCode,
+			GroupUtil.getGroupId(
+				false, contextCompany.getCompanyId(),
+				siteExternalReferenceCode));
+
+		if (layout == null) {
+			throw new UnsupportedOperationException();
+		}
+
+		LayoutType layoutType = layout.getLayoutType();
+
+		if (!(layoutType instanceof LayoutTypePortlet)) {
+			throw new UnsupportedOperationException();
+		}
+
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)layout.getLayoutType();
+
+		return Page.of(
+			transform(
+				layoutTypePortlet.getPortletIds(),
+				portletId -> _toWidgetPageWidgetInstance(layout, portletId)));
+	}
+
+	@Override
 	public WidgetPageWidgetInstance
-			postSiteSiteByExternalReferenceCodeSitePageWidgetInstance(
+			postSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstance(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				WidgetPageWidgetInstance widgetPageWidgetInstance)
@@ -203,7 +203,7 @@ public class WidgetPageWidgetInstanceResourceImpl
 
 	@Override
 	public WidgetPageWidgetInstance
-			putSiteSiteByExternalReferenceCodeWidgetInstanceWidgetInstanceExternalReferenceCode(
+			putSiteByExternalReferenceCodeSitePageByExternalReferenceCodeWidgetInstanceByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				String widgetInstanceExternalReferenceCode,

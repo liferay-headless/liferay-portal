@@ -46,9 +46,10 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PageExperienceResourceImpl extends BasePageExperienceResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode)
 		throws Exception {
 
 		FeatureFlagManagerUtil.checkEnabled("LPD-35443");
@@ -77,9 +78,10 @@ public class PageExperienceResourceImpl extends BasePageExperienceResourceImpl {
 	}
 
 	@Override
-	public PageExperience getSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode)
+	public PageExperience
+			getSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -97,7 +99,7 @@ public class PageExperienceResourceImpl extends BasePageExperienceResourceImpl {
 
 	@Override
 	public Page<PageExperience>
-			getSiteSiteByExternalReferenceCodePageSpecificationPageExperiencesPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperiencesPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode)
 		throws Exception {
@@ -126,7 +128,7 @@ public class PageExperienceResourceImpl extends BasePageExperienceResourceImpl {
 
 	@Override
 	public PageExperience
-			postSiteSiteByExternalReferenceCodePageSpecificationPageExperience(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperience(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				PageExperience pageExperience)
@@ -151,10 +153,11 @@ public class PageExperienceResourceImpl extends BasePageExperienceResourceImpl {
 	}
 
 	@Override
-	public PageExperience putSiteSiteByExternalReferenceCodePageExperience(
-			String siteExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			PageExperience pageExperience)
+	public PageExperience
+			putSiteByExternalReferenceCodePageExperienceByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				PageExperience pageExperience)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {

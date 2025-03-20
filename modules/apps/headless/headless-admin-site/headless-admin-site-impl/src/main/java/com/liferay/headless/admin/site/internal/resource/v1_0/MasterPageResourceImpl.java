@@ -65,9 +65,10 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -82,9 +83,10 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage getSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode)
+	public MasterPage
+			getSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -110,7 +112,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public Page<MasterPage> getSiteSiteByExternalReferenceCodeMasterPagesPage(
+	public Page<MasterPage> getSiteByExternalReferenceCodeMasterPagesPage(
 			String siteExternalReferenceCode, String search,
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
@@ -157,7 +159,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage postSiteSiteByExternalReferenceCodeMasterPage(
+	public MasterPage postSiteByExternalReferenceCodeMasterPage(
 			String siteExternalReferenceCode, MasterPage masterPage)
 		throws Exception {
 
@@ -174,7 +176,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 
 	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeMasterPagePageSpecification(
+			postSiteByExternalReferenceCodeMasterPageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String pageTemplateExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -210,9 +212,10 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage putSiteSiteByExternalReferenceCodeMasterPage(
-			String siteExternalReferenceCode,
-			String masterPageExternalReferenceCode, MasterPage masterPage)
+	public MasterPage
+			putSiteByExternalReferenceCodeMasterPageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String masterPageExternalReferenceCode, MasterPage masterPage)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {

@@ -37,9 +37,10 @@ public class PageTemplateSetResourceImpl
 	extends BasePageTemplateSetResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageTemplateSet(
-			String siteExternalReferenceCode,
-			String pageTemplateSetExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageTemplateSetByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageTemplateSetExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -54,9 +55,10 @@ public class PageTemplateSetResourceImpl
 	}
 
 	@Override
-	public PageTemplateSet getSiteSiteByExternalReferenceCodePageTemplateSet(
-			String siteExternalReferenceCode,
-			String pageTemplateSetExternalReferenceCode)
+	public PageTemplateSet
+			getSiteByExternalReferenceCodePageTemplateSetByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageTemplateSetExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -74,7 +76,7 @@ public class PageTemplateSetResourceImpl
 
 	@Override
 	public Page<PageTemplateSet>
-			getSiteSiteByExternalReferenceCodePageTemplateSetsPage(
+			getSiteByExternalReferenceCodePageTemplateSetsPage(
 				String siteExternalReferenceCode, String search,
 				Aggregation aggregation, Filter filter, Pagination pagination,
 				Sort[] sorts)
@@ -104,7 +106,7 @@ public class PageTemplateSetResourceImpl
 	}
 
 	@Override
-	public PageTemplateSet postSiteSiteByExternalReferenceCodePageTemplateSet(
+	public PageTemplateSet postSiteByExternalReferenceCodePageTemplateSet(
 			String siteExternalReferenceCode, PageTemplateSet pageTemplateSet)
 		throws Exception {
 
@@ -121,10 +123,11 @@ public class PageTemplateSetResourceImpl
 	}
 
 	@Override
-	public PageTemplateSet putSiteSiteByExternalReferenceCodePageTemplateSet(
-			String siteExternalReferenceCode,
-			String pageTemplateSetExternalReferenceCode,
-			PageTemplateSet pageTemplateSet)
+	public PageTemplateSet
+			putSiteByExternalReferenceCodePageTemplateSetByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageTemplateSetExternalReferenceCode,
+				PageTemplateSet pageTemplateSet)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {

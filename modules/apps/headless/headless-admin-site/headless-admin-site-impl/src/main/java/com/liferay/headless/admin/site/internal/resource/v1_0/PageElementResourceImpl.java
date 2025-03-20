@@ -43,11 +43,12 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PageElementResourceImpl extends BasePageElementResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -100,11 +101,12 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 	}
 
 	@Override
-	public PageElement getSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode)
+	public PageElement
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -153,7 +155,7 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 
 	@Override
 	public Page<PageElement>
-			getSiteSiteByExternalReferenceCodePageElementPageElementsPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCodePageElementsPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode,
@@ -207,7 +209,7 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 
 	@Override
 	public Page<PageElement>
-			getSiteSiteByExternalReferenceCodePageExperiencePageElementsPage(
+			getSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementsPage(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode, Boolean flatten)
@@ -256,7 +258,7 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 
 	@Override
 	public PageElement
-			postSiteSiteByExternalReferenceCodePageExperiencePageElement(
+			postSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElement(
 				String siteExternalReferenceCode,
 				String pageSpecificationExternalReferenceCode,
 				String pageExperienceExternalReferenceCode,
@@ -301,11 +303,13 @@ public class PageElementResourceImpl extends BasePageElementResourceImpl {
 	}
 
 	@Override
-	public PageElement putSiteSiteByExternalReferenceCodePageElement(
-			String siteExternalReferenceCode,
-			String pageSpecificationExternalReferenceCode,
-			String pageExperienceExternalReferenceCode,
-			String pageElementExternalReferenceCode, PageElement pageElement)
+	public PageElement
+			putSiteByExternalReferenceCodePageSpecificationByExternalReferenceCodePageExperienceByExternalReferenceCodePageElementByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String pageSpecificationExternalReferenceCode,
+				String pageExperienceExternalReferenceCode,
+				String pageElementExternalReferenceCode,
+				PageElement pageElement)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {

@@ -62,9 +62,10 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeSitePage(
-			String siteExternalReferenceCode,
-			String sitePageExternalReferenceCode)
+	public void
+			deleteSiteByExternalReferenceCodeSitePageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String sitePageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -87,9 +88,10 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 	}
 
 	@Override
-	public SitePage getSiteSiteByExternalReferenceCodeSitePage(
-			String siteExternalReferenceCode,
-			String sitePageExternalReferenceCode)
+	public SitePage
+			getSiteByExternalReferenceCodeSitePageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String sitePageExternalReferenceCode)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -108,7 +110,7 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 	}
 
 	@Override
-	public Page<SitePage> getSiteSiteByExternalReferenceCodeSitePagesPage(
+	public Page<SitePage> getSiteByExternalReferenceCodeSitePagesPage(
 			String siteExternalReferenceCode, String search,
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
@@ -145,7 +147,7 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 	}
 
 	@Override
-	public SitePage postByExternalReferenceCodeSitePage(
+	public SitePage postSiteByExternalReferenceCodeSitePage(
 			String siteExternalReferenceCode, SitePage sitePage)
 		throws Exception {
 
@@ -164,7 +166,7 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 
 	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeSitePagePageSpecification(
+			postSiteByExternalReferenceCodeSitePageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String sitePageExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -193,9 +195,10 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 	}
 
 	@Override
-	public SitePage putSiteSiteByExternalReferenceCodeSitePage(
-			String siteExternalReferenceCode,
-			String sitePageExternalReferenceCode, SitePage sitePage)
+	public SitePage
+			putSiteByExternalReferenceCodeSitePageByExternalReferenceCode(
+				String siteExternalReferenceCode,
+				String sitePageExternalReferenceCode, SitePage sitePage)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -240,7 +243,7 @@ public class SitePageResourceImpl extends BaseSitePageResourceImpl {
 			Group group = _groupLocalService.getGroup(
 				(Long)parameters.get("siteId"));
 
-			return getSiteSiteByExternalReferenceCodeSitePagesPage(
+			return getSiteByExternalReferenceCodeSitePagesPage(
 				group.getExternalReferenceCode(), search, null, filter,
 				pagination, sorts);
 		}
