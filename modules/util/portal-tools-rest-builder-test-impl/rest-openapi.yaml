@@ -185,6 +185,27 @@ components:
                     readOnly: true
                     type: boolean
             type: object
+        SubTestEntity:
+            properties:
+                dateCreated:
+                    format: date-time
+                    type: string
+                dateModified:
+                    format: date-time
+                    type: string
+                description:
+                    type: string
+                ercSiteTestEntityExternalReferenceCode:
+                    type: string
+                externalReferenceCode:
+                    type: string
+                permissions:
+                    items:
+                        type: permission
+                    type: array
+                siteExternalReferenceCode:
+                    type: string
+            type: object
         TestEntity:
             description:
                 "https://www.schema.org/Document"
@@ -751,6 +772,37 @@ paths:
                     description:
                         "OK"
             tags: ["ErcSiteTestEntity"]
+    /sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}/sub-test-entities/{subTestEntityExternalReferenceCode}:
+        get:
+            operationId: getSiteErcSiteTestEntityByExternalReferenceCodeSubTestEntityByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: ercSiteTestEntityExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: path
+                  name: siteExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: path
+                  name: subTestEntityExternalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/SubTestEntity"
+                        "application/xml":
+                            schema:
+                                $ref: "#/components/schemas/SubTestEntity"
+                    description:
+                        "OK"
+            tags: ["SubTestEntity"]
     /sites/{siteId}/site-test-entities:
         get:
             operationId: getSiteSiteTestEntitiesPage
