@@ -62,7 +62,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodePageTemplate(
+	public void deleteSitePageTemplateByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageTemplateExternalReferenceCode)
 		throws Exception {
@@ -79,7 +79,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 	}
 
 	@Override
-	public PageTemplate getSiteSiteByExternalReferenceCodePageTemplate(
+	public PageTemplate getSitePageTemplateByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageTemplateExternalReferenceCode)
 		throws Exception {
@@ -111,7 +111,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 
 	@Override
 	public Page<PageTemplate>
-			getSiteSiteByExternalReferenceCodePageTemplateSetPageTemplatesPage(
+			getSitePageTemplateSetByExternalReferenceCodePageTemplatesPage(
 				String siteExternalReferenceCode,
 				String pageTemplateSetExternalReferenceCode, Boolean flatten)
 		throws Exception {
@@ -147,11 +147,10 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 	}
 
 	@Override
-	public Page<PageTemplate>
-			getSiteSiteByExternalReferenceCodePageTemplatesPage(
-				String siteExternalReferenceCode, String search,
-				Aggregation aggregation, Filter filter, Pagination pagination,
-				Sort[] sorts)
+	public Page<PageTemplate> getSitePageTemplatesPage(
+			String siteExternalReferenceCode, String search,
+			Aggregation aggregation, Filter filter, Pagination pagination,
+			Sort[] sorts)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -174,7 +173,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 	}
 
 	@Override
-	public PageTemplate postSiteSiteByExternalReferenceCodePageTemplate(
+	public PageTemplate postSitePageTemplate(
 			String siteExternalReferenceCode, PageTemplate pageTemplate)
 		throws Exception {
 
@@ -191,7 +190,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 
 	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodePageTemplatePageSpecification(
+			postSitePageTemplateByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String pageTemplateExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -228,7 +227,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 
 	@Override
 	public PageTemplate
-			postSiteSiteByExternalReferenceCodePageTemplateSetPageTemplate(
+			postSitePageTemplateSetByExternalReferenceCodePageTemplate(
 				String siteExternalReferenceCode,
 				String pageTemplateSetExternalReferenceCode,
 				PageTemplate pageTemplate)
@@ -260,7 +259,7 @@ public class PageTemplateResourceImpl extends BasePageTemplateResourceImpl {
 	}
 
 	@Override
-	public PageTemplate putSiteSiteByExternalReferenceCodePageTemplate(
+	public PageTemplate putSitePageTemplateByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String pageTemplateExternalReferenceCode, PageTemplate pageTemplate)
 		throws Exception {
