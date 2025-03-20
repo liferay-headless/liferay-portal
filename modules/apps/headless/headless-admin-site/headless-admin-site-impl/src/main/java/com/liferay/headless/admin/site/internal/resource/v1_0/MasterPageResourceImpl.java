@@ -63,7 +63,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeMasterPage(
+	public void deleteSiteMasterPageByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String masterPageExternalReferenceCode)
 		throws Exception {
@@ -80,7 +80,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage getSiteSiteByExternalReferenceCodeMasterPage(
+	public MasterPage getSiteMasterPageByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String masterPageExternalReferenceCode)
 		throws Exception {
@@ -108,7 +108,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public Page<MasterPage> getSiteSiteByExternalReferenceCodeMasterPagesPage(
+	public Page<MasterPage> getSiteMasterPagesPage(
 			String siteExternalReferenceCode, String search,
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
@@ -155,7 +155,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage postSiteSiteByExternalReferenceCodeMasterPage(
+	public MasterPage postSiteMasterPage(
 			String siteExternalReferenceCode, MasterPage masterPage)
 		throws Exception {
 
@@ -172,7 +172,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 
 	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeMasterPagePageSpecification(
+			postSiteMasterPageByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String pageTemplateExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -208,7 +208,7 @@ public class MasterPageResourceImpl extends BaseMasterPageResourceImpl {
 	}
 
 	@Override
-	public MasterPage putSiteSiteByExternalReferenceCodeMasterPage(
+	public MasterPage putSiteMasterPageByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String masterPageExternalReferenceCode, MasterPage masterPage)
 		throws Exception {
