@@ -63,7 +63,7 @@ public interface ${schemaName}Resource {
 	/>
 
 	<#list javaMethodSignatures as javaMethodSignature>
-		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(${freeMarkerTool.getResourceParameters(configYAML, javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, allSchemas, false)}) throws Exception;
+		public ${javaMethodSignature.returnType} <#if javaMethodSignature.requestBodyMediaTypes?? && javaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${javaMethodSignature.methodName}Multipart<#else>${javaMethodSignature.methodName}</#if>(${freeMarkerTool.getResourceParameters(configYAML, javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, allSchemas, false)}) throws Exception;
 	</#list>
 
 	public default void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

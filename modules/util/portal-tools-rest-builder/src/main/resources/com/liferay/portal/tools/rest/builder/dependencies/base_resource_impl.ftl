@@ -309,7 +309,7 @@ public abstract class Base${schemaName}ResourceImpl
 		</#if>
 		@Override
 		${freeMarkerTool.getResourceMethodAnnotations(javaMethodSignature)}
-		public <#if generatePermissions>final</#if> ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(${freeMarkerTool.getResourceParameters(configYAML, javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, allSchemas, true)}) throws Exception {
+		public <#if generatePermissions>final</#if> ${javaMethodSignature.returnType} <#if javaMethodSignature.requestBodyMediaTypes?? && javaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${javaMethodSignature.methodName}Multipart<#else>${javaMethodSignature.methodName}</#if>(${freeMarkerTool.getResourceParameters(configYAML, javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, allSchemas, true)}) throws Exception {
 			<#if stringUtil.equals(javaMethodSignature.returnType, "boolean")>
 				return false;
 			<#elseif generateBatch && stringUtil.equals(javaMethodSignature.methodName, "delete" + schemaName + "Batch")>
@@ -591,10 +591,10 @@ public abstract class Base${schemaName}ResourceImpl
 				if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 					<#if postBatchJavaMethodSignature??>
 						<#if stringUtil.equals(javaDataType, postBatchJavaMethodSignature.returnType)>
-							${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${postBatchJavaMethodSignature.methodName}(
+							${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if postBatchJavaMethodSignature.requestBodyMediaTypes?? && postBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postBatchJavaMethodSignature.methodName}Multipart<#else>${postBatchJavaMethodSignature.methodName}</#if>(
 						<#else>
 							${schemaVarName}UnsafeFunction = ${schemaVarName} -> {
-								${postBatchJavaMethodSignature.methodName}(
+								<#if postBatchJavaMethodSignature.requestBodyMediaTypes?? && postBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postBatchJavaMethodSignature.methodName}Multipart<#else>${postBatchJavaMethodSignature.methodName}</#if>(
 						</#if>
 
 						<@getPOSTBatchJavaMethodParameters
@@ -616,10 +616,10 @@ public abstract class Base${schemaName}ResourceImpl
 
 							if (parameters.containsKey("${postParentBatchJavaMethodSignature.parentSchemaName?uncap_first}Id")) {
 								<#if stringUtil.equals(javaDataType, postParentBatchJavaMethodSignature.returnType)>
-									${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${postParentBatchJavaMethodSignature.methodName}(
+									${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if postParentBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentBatchJavaMethodSignature.methodName}Multipart<#else>${postParentBatchJavaMethodSignature.methodName}</#if>(
 								<#else>
 									${schemaVarName}UnsafeFunction = ${schemaVarName} -> {
-										${postParentBatchJavaMethodSignature.methodName}(
+										<#if postParentBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentBatchJavaMethodSignature.methodName}Multipart<#else>${postParentBatchJavaMethodSignature.methodName}</#if>(
 								</#if>
 
 								<@getPOSTBatchJavaMethodParameters
@@ -651,10 +651,10 @@ public abstract class Base${schemaName}ResourceImpl
 
 							if (parameters.containsKey("${postParentByERCBatchJavaMethodSignature.javaMethodParameters[0].parameterName}")) {
 								<#if stringUtil.equals(javaDataType, postParentByERCBatchJavaMethodSignature.returnType)>
-									${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${postParentByERCBatchJavaMethodSignature.methodName}(
+									${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentByERCBatchJavaMethodSignature.methodName}Multipart<#else>${postParentByERCBatchJavaMethodSignature.methodName}</#if>(
 								<#else>
 									${schemaVarName}UnsafeFunction = ${schemaVarName} -> {
-										${postParentByERCBatchJavaMethodSignature.methodName}(
+										<#if postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentByERCBatchJavaMethodSignature.methodName}Multipart<#else>${postParentByERCBatchJavaMethodSignature.methodName}</#if>(
 								</#if>
 
 								<@getPOSTBatchJavaMethodParameters
@@ -685,9 +685,9 @@ public abstract class Base${schemaName}ResourceImpl
 
 						if (parameters.containsKey("assetLibraryId")) {
 							<#if stringUtil.equals(javaDataType, postAssetLibraryBatchJavaMethodSignature.returnType)>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${postAssetLibraryBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?? && postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postAssetLibraryBatchJavaMethodSignature.methodName}Multipart<#else>${postAssetLibraryBatchJavaMethodSignature.methodName}</#if>(
 							<#else>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { ${postAssetLibraryBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { <#if postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?? && postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postAssetLibraryBatchJavaMethodSignature.methodName}Multipart<#else>${postAssetLibraryBatchJavaMethodSignature.methodName}</#if>(
 							</#if>
 
 							<@getPOSTBatchJavaMethodParameters
@@ -713,9 +713,9 @@ public abstract class Base${schemaName}ResourceImpl
 
 						if (parameters.containsKey("siteId")) {
 							<#if stringUtil.equals(javaDataType, postSiteBatchJavaMethodSignature.returnType)>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${postSiteBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if postSiteBatchJavaMethodSignature.requestBodyMediaTypes?? && postSiteBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postSiteBatchJavaMethodSignature.methodName}Multipart<#else>${postSiteBatchJavaMethodSignature.methodName}</#if>(
 							<#else>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { ${postSiteBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { <#if postSiteBatchJavaMethodSignature.requestBodyMediaTypes?? && postSiteBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postSiteBatchJavaMethodSignature.methodName}Multipart<#else>${postSiteBatchJavaMethodSignature.methodName}</#if>(
 							</#if>
 
 							<@getPOSTBatchJavaMethodParameters
@@ -747,9 +747,9 @@ public abstract class Base${schemaName}ResourceImpl
 					<#if putByERCBatchJavaMethodSignature??>
 						if(StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
 							<#if stringUtil.equals(javaDataType, putByERCBatchJavaMethodSignature.returnType)>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> ${putByERCBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if putByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && putByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${putByERCBatchJavaMethodSignature.methodName}Multipart<#else>${putByERCBatchJavaMethodSignature.methodName}</#if>(
 							<#else>
-								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { ${putByERCBatchJavaMethodSignature.methodName}(
+								${schemaVarName}UnsafeFunction = ${schemaVarName} -> { <#if putByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && putByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${putByERCBatchJavaMethodSignature.methodName}Multipart<#else>${putByERCBatchJavaMethodSignature.methodName}</#if>(
 							</#if>
 
 							<#list putByERCBatchJavaMethodSignature.javaMethodParameters as javaMethodParameter>
@@ -788,7 +788,7 @@ public abstract class Base${schemaName}ResourceImpl
 								${schemaName} persisted${schemaName} = null;
 
 								try {
-									${schemaName} get${schemaName} = ${getByERCBatchJavaMethodSignature.methodName}(
+									${schemaName} get${schemaName} = <#if getByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && getByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${getByERCBatchJavaMethodSignature.methodName}Multipart<#else>${getByERCBatchJavaMethodSignature.methodName}</#if>(
 
 									<#list getByERCBatchJavaMethodSignature.javaMethodParameters as javaMethodParameter>
 										<#if stringUtil.equals(javaMethodParameter.parameterName, "externalReferenceCode")>
@@ -815,9 +815,9 @@ public abstract class Base${schemaName}ResourceImpl
 									);
 
 									<#if stringUtil.equals(javaDataType, patchBatchJavaMethodSignature.returnType)>
-										persisted${schemaName} = patch${schemaName}(
+										persisted${schemaName} = <#if patchBatchJavaMethodSignature.requestBodyMediaTypes?? && patchBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${patchBatchJavaMethodSignature.methodName}Multipart<#else>${patchBatchJavaMethodSignature.methodName}</#if>(
 									<#else>
-										patch${schemaName}(
+										<#if patchBatchJavaMethodSignature.requestBodyMediaTypes?? && patchBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${patchBatchJavaMethodSignature.methodName}Multipart<#else>${patchBatchJavaMethodSignature.methodName}</#if>(
 									</#if>
 
 									<#list patchBatchJavaMethodSignature.javaMethodParameters as javaMethodParameter>
@@ -849,7 +849,7 @@ public abstract class Base${schemaName}ResourceImpl
 									<#assign parentParameterNames = [] />
 
 									<#if postBatchJavaMethodSignature?? && !postParentBatchJavaMethodSignatures?has_content && !postParentByERCBatchJavaMethodSignatures?has_content>
-										persisted${schemaName} = ${postBatchJavaMethodSignature.methodName}(
+										persisted${schemaName} = <#if postBatchJavaMethodSignature.requestBodyMediaTypes?? && postBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postBatchJavaMethodSignature.methodName}Multipart<#else>${postBatchJavaMethodSignature.methodName}</#if>(
 
 										<@getPOSTBatchJavaMethodParameters
 											javaMethodParameters = postBatchJavaMethodSignature.javaMethodParameters
@@ -864,7 +864,7 @@ public abstract class Base${schemaName}ResourceImpl
 											<#assign parentParameterNames = parentParameterNames + [postParentBatchJavaMethodSignature.parentSchemaName!?uncap_first + "Id"] />
 
 											if (parameters.containsKey("${postParentBatchJavaMethodSignature.parentSchemaName?uncap_first}Id")) {
-												persisted${schemaName} = ${postParentBatchJavaMethodSignature.methodName}(
+												persisted${schemaName} = <#if postParentBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentBatchJavaMethodSignature.methodName}Multipart<#else>${postParentBatchJavaMethodSignature.methodName}</#if>(
 
 												<@getPOSTBatchJavaMethodParameters
 													javaMethodParameters = postParentBatchJavaMethodSignature.javaMethodParameters
@@ -888,7 +888,7 @@ public abstract class Base${schemaName}ResourceImpl
 											</#if>
 
 											if (parameters.containsKey("${postParentByERCBatchJavaMethodSignature.javaMethodParameters[0].parameterName}")) {
-												persisted${schemaName} = ${postParentByERCBatchJavaMethodSignature.methodName}(
+												persisted${schemaName} = <#if postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?? && postParentByERCBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postParentByERCBatchJavaMethodSignature.methodName}Multipart<#else>${postParentByERCBatchJavaMethodSignature.methodName}</#if>(
 
 												<@getPOSTBatchJavaMethodParameters
 													javaMethodParameters = postParentByERCBatchJavaMethodSignature.javaMethodParameters
@@ -905,7 +905,7 @@ public abstract class Base${schemaName}ResourceImpl
 
 										<#if postBatchJavaMethodSignature??>
 											else {
-												persisted${schemaName} = ${postBatchJavaMethodSignature.methodName}(
+												persisted${schemaName} = <#if postBatchJavaMethodSignature.requestBodyMediaTypes?? && postBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postBatchJavaMethodSignature.methodName}Multipart<#else>${postBatchJavaMethodSignature.methodName}</#if>(
 
 												<@getPOSTBatchJavaMethodParameters
 													javaMethodParameters = postBatchJavaMethodSignature.javaMethodParameters
@@ -925,7 +925,7 @@ public abstract class Base${schemaName}ResourceImpl
 										</#if>
 
 										if (parameters.containsKey("assetLibraryId")) {
-											persisted${schemaName} = ${postAssetLibraryBatchJavaMethodSignature.methodName}(
+											persisted${schemaName} = <#if postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?? && postAssetLibraryBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postAssetLibraryBatchJavaMethodSignature.methodName}Multipart<#else>${postAssetLibraryBatchJavaMethodSignature.methodName}</#if>(
 
 											<@getPOSTBatchJavaMethodParameters
 												javaMethodParameters = postAssetLibraryBatchJavaMethodSignature.javaMethodParameters
@@ -942,7 +942,7 @@ public abstract class Base${schemaName}ResourceImpl
 										</#if>
 
 										if (parameters.containsKey("siteId")) {
-											persisted${schemaName} = ${postSiteBatchJavaMethodSignature.methodName}(
+											persisted${schemaName} = <#if postSiteBatchJavaMethodSignature.requestBodyMediaTypes?? && postSiteBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${postSiteBatchJavaMethodSignature.methodName}Multipart<#else>${postSiteBatchJavaMethodSignature.methodName}</#if>(
 
 											<@getPOSTBatchJavaMethodParameters
 												javaMethodParameters = postSiteBatchJavaMethodSignature.javaMethodParameters
@@ -1148,9 +1148,9 @@ public abstract class Base${schemaName}ResourceImpl
 			<#if updateStrategies?seq_contains("PARTIAL_UPDATE")>
 				if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 					<#if stringUtil.equals(javaDataType, patchBatchJavaMethodSignature.returnType)>
-						${schemaVarName}UnsafeFunction = ${schemaVarName} -> patch${schemaName}(
+						${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if patchBatchJavaMethodSignature.requestBodyMediaTypes?? && patchBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${patchBatchJavaMethodSignature.methodName}Multipart<#else>${patchBatchJavaMethodSignature.methodName}</#if>(
 					<#else>
-						${schemaVarName}UnsafeFunction = ${schemaVarName} -> { patch${schemaName}(
+						${schemaVarName}UnsafeFunction = ${schemaVarName} -> { <#if patchBatchJavaMethodSignature.requestBodyMediaTypes?? && patchBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${patchBatchJavaMethodSignature.methodName}Multipart<#else>${patchBatchJavaMethodSignature.methodName}</#if>(
 					</#if>
 
 					<#list patchBatchJavaMethodSignature.javaMethodParameters as javaMethodParameter>
@@ -1191,9 +1191,9 @@ public abstract class Base${schemaName}ResourceImpl
 			<#if updateStrategies?seq_contains("UPDATE")>
 				if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
 					<#if stringUtil.equals(javaDataType, putBatchJavaMethodSignature.returnType)>
-						${schemaVarName}UnsafeFunction = ${schemaVarName} -> put${schemaName}(
+						${schemaVarName}UnsafeFunction = ${schemaVarName} -> <#if putBatchJavaMethodSignature.requestBodyMediaTypes?? && putBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${putBatchJavaMethodSignature.methodName}Multipart<#else>${putBatchJavaMethodSignature.methodName}</#if>(
 					<#else>
-						${schemaVarName}UnsafeFunction = ${schemaVarName} -> { put${schemaName}(
+						${schemaVarName}UnsafeFunction = ${schemaVarName} -> { <#if putBatchJavaMethodSignature.requestBodyMediaTypes?? && putBatchJavaMethodSignature.requestBodyMediaTypes?seq_contains("multipart/form-data")>${putBatchJavaMethodSignature.methodName}Multipart<#else>${putBatchJavaMethodSignature.methodName}</#if>(
 					</#if>
 
 					<#list putBatchJavaMethodSignature.javaMethodParameters as javaMethodParameter>
