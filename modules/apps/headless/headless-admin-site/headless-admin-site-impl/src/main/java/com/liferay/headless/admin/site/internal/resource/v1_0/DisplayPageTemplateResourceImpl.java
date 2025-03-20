@@ -60,7 +60,7 @@ public class DisplayPageTemplateResourceImpl
 	extends BaseDisplayPageTemplateResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+	public void deleteSiteDisplayPageTemplateByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String displayPageTemplateExternalReferenceCode)
 		throws Exception {
@@ -78,7 +78,7 @@ public class DisplayPageTemplateResourceImpl
 
 	@Override
 	public DisplayPageTemplate
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+			getSiteDisplayPageTemplateByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode)
 		throws Exception {
@@ -107,7 +107,7 @@ public class DisplayPageTemplateResourceImpl
 
 	@Override
 	public Page<DisplayPageTemplate>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderDisplayPageTemplatesPage(
+			getSiteDisplayPageTemplateFolderByExternalReferenceCodeDisplayPageTemplatesPage(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				Boolean flatten)
@@ -145,11 +145,10 @@ public class DisplayPageTemplateResourceImpl
 	}
 
 	@Override
-	public Page<DisplayPageTemplate>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplatesPage(
-				String siteExternalReferenceCode, String search,
-				Aggregation aggregation, Filter filter, Pagination pagination,
-				Sort[] sorts)
+	public Page<DisplayPageTemplate> getSiteDisplayPageTemplatesPage(
+			String siteExternalReferenceCode, String search,
+			Aggregation aggregation, Filter filter, Pagination pagination,
+			Sort[] sorts)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -170,10 +169,9 @@ public class DisplayPageTemplateResourceImpl
 	}
 
 	@Override
-	public DisplayPageTemplate
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplate(
-				String siteExternalReferenceCode,
-				DisplayPageTemplate displayPageTemplate)
+	public DisplayPageTemplate postSiteDisplayPageTemplate(
+			String siteExternalReferenceCode,
+			DisplayPageTemplate displayPageTemplate)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -189,40 +187,8 @@ public class DisplayPageTemplateResourceImpl
 	}
 
 	@Override
-	public DisplayPageTemplate
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolderDisplayPageTemplate(
-				String siteExternalReferenceCode,
-				String displayPageTemplateFolderExternalReferenceCode,
-				DisplayPageTemplate displayPageTemplate)
-		throws Exception {
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
-			throw new UnsupportedOperationException();
-		}
-
-		long groupId = GroupUtil.getGroupId(
-			false, contextCompany.getCompanyId(), siteExternalReferenceCode);
-
-		LayoutPageTemplateCollection layoutPageTemplateCollection =
-			_layoutPageTemplateCollectionService.
-				getLayoutPageTemplateCollection(
-					displayPageTemplateFolderExternalReferenceCode, groupId);
-
-		if (!Objects.equals(
-				LayoutPageTemplateCollectionTypeConstants.DISPLAY_PAGE,
-				layoutPageTemplateCollection.getType())) {
-
-			throw new UnsupportedOperationException();
-		}
-
-		return _addDisplayPageTemplate(
-			displayPageTemplate, groupId,
-			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId());
-	}
-
-	@Override
 	public ContentPageSpecification
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplatePageSpecification(
+			postSiteDisplayPageTemplateByExternalReferenceCodePageSpecification(
 				String siteExternalReferenceCode,
 				String pageTemplateExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
@@ -259,7 +225,39 @@ public class DisplayPageTemplateResourceImpl
 
 	@Override
 	public DisplayPageTemplate
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplate(
+			postSiteDisplayPageTemplateFolderByExternalReferenceCodeDisplayPageTemplate(
+				String siteExternalReferenceCode,
+				String displayPageTemplateFolderExternalReferenceCode,
+				DisplayPageTemplate displayPageTemplate)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
+			throw new UnsupportedOperationException();
+		}
+
+		long groupId = GroupUtil.getGroupId(
+			false, contextCompany.getCompanyId(), siteExternalReferenceCode);
+
+		LayoutPageTemplateCollection layoutPageTemplateCollection =
+			_layoutPageTemplateCollectionService.
+				getLayoutPageTemplateCollection(
+					displayPageTemplateFolderExternalReferenceCode, groupId);
+
+		if (!Objects.equals(
+				LayoutPageTemplateCollectionTypeConstants.DISPLAY_PAGE,
+				layoutPageTemplateCollection.getType())) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		return _addDisplayPageTemplate(
+			displayPageTemplate, groupId,
+			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId());
+	}
+
+	@Override
+	public DisplayPageTemplate
+			putSiteDisplayPageTemplateByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateExternalReferenceCode,
 				DisplayPageTemplate displayPageTemplate)
