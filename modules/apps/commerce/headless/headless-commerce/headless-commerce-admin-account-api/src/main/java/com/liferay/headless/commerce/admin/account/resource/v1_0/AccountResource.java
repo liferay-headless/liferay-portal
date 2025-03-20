@@ -87,7 +87,7 @@ public interface AccountResource {
 			String externalReferenceCode, Account account)
 		throws Exception;
 
-	public Response postAccountByExternalReferenceCodeLogo(
+	public Response postAccountByExternalReferenceCodeLogoMultipart(
 			String externalReferenceCode, MultipartBody multipartBody)
 		throws Exception;
 
@@ -100,7 +100,8 @@ public interface AccountResource {
 
 	public Response patchAccount(Long id, Account account) throws Exception;
 
-	public Response postAccountLogo(Long id, MultipartBody multipartBody)
+	public Response postAccountLogoMultipart(
+			Long id, MultipartBody multipartBody)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(

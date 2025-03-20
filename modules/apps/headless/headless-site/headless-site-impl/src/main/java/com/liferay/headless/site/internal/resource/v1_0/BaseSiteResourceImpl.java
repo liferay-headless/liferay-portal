@@ -112,7 +112,9 @@ public abstract class BaseSiteResourceImpl implements SiteResource {
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Site postSite(MultipartBody multipartBody) throws Exception {
+	public Site postSiteMultipart(MultipartBody multipartBody)
+		throws Exception {
+
 		return new Site();
 	}
 
@@ -208,7 +210,7 @@ public abstract class BaseSiteResourceImpl implements SiteResource {
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public Site putSiteByExternalReferenceCode(
+	public Site putSiteByExternalReferenceCodeMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("externalReferenceCode")

@@ -70,8 +70,9 @@ public interface MessageBoardAttachmentResource {
 				String contentType, String fieldNames)
 		throws Exception;
 
-	public MessageBoardAttachment postMessageBoardMessageMessageBoardAttachment(
-			Long messageBoardMessageId, MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardMessageMessageBoardAttachmentMultipart(
+				Long messageBoardMessageId, MultipartBody multipartBody)
 		throws Exception;
 
 	public Response postMessageBoardMessageMessageBoardAttachmentBatch(
@@ -90,8 +91,9 @@ public interface MessageBoardAttachmentResource {
 				String contentType, String fieldNames)
 		throws Exception;
 
-	public MessageBoardAttachment postMessageBoardThreadMessageBoardAttachment(
-			Long messageBoardThreadId, MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardThreadMessageBoardAttachmentMultipart(
+				Long messageBoardThreadId, MultipartBody multipartBody)
 		throws Exception;
 
 	public Response postMessageBoardThreadMessageBoardAttachmentBatch(

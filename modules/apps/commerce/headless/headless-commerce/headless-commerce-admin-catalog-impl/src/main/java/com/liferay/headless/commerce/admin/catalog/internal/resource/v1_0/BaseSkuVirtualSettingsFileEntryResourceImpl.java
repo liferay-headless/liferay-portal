@@ -212,11 +212,13 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceImpl
 	@javax.ws.rs.Path("/sku-virtual-settings-file-entries/{id}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public SkuVirtualSettingsFileEntry patchSkuVirtualSettingsFileEntry(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull @javax.ws.rs.PathParam("id")
-			Long id,
-			MultipartBody multipartBody)
+	public SkuVirtualSettingsFileEntry
+			patchSkuVirtualSettingsFileEntryMultipart(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("id")
+				Long id,
+				MultipartBody multipartBody)
 		throws Exception {
 
 		return new SkuVirtualSettingsFileEntry();
@@ -299,7 +301,7 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public SkuVirtualSettingsFileEntry
-			postSkuVirtualSettingIdSkuVirtualSettingsFileEntry(
+			postSkuVirtualSettingIdSkuVirtualSettingsFileEntryMultipart(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("id")
@@ -440,13 +442,14 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 			skuVirtualSettingsFileEntryUnsafeFunction =
-				skuVirtualSettingsFileEntry -> patchSkuVirtualSettingsFileEntry(
-					skuVirtualSettingsFileEntry.getId() != null ?
-						skuVirtualSettingsFileEntry.getId() :
-							_parseLong(
-								(String)parameters.get(
-									"skuVirtualSettingsFileEntryId")),
-					null);
+				skuVirtualSettingsFileEntry ->
+					patchSkuVirtualSettingsFileEntryMultipart(
+						skuVirtualSettingsFileEntry.getId() != null ?
+							skuVirtualSettingsFileEntry.getId() :
+								_parseLong(
+									(String)parameters.get(
+										"skuVirtualSettingsFileEntryId")),
+						null);
 		}
 
 		if (skuVirtualSettingsFileEntryUnsafeFunction == null) {

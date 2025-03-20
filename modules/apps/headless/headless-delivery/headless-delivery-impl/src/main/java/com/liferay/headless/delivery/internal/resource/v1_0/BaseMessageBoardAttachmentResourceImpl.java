@@ -363,12 +363,13 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public MessageBoardAttachment postMessageBoardMessageMessageBoardAttachment(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("messageBoardMessageId")
-			Long messageBoardMessageId,
-			MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardMessageMessageBoardAttachmentMultipart(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("messageBoardMessageId")
+				Long messageBoardMessageId,
+				MultipartBody multipartBody)
 		throws Exception {
 
 		return new MessageBoardAttachment();
@@ -593,12 +594,13 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public MessageBoardAttachment postMessageBoardThreadMessageBoardAttachment(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull
-			@javax.ws.rs.PathParam("messageBoardThreadId")
-			Long messageBoardThreadId,
-			MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardThreadMessageBoardAttachmentMultipart(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("messageBoardThreadId")
+				Long messageBoardThreadId,
+				MultipartBody multipartBody)
 		throws Exception {
 
 		return new MessageBoardAttachment();
@@ -803,14 +805,14 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("messageBoardMessageId")) {
 				messageBoardAttachmentUnsafeFunction = messageBoardAttachment ->
-					postMessageBoardMessageMessageBoardAttachment(
+					postMessageBoardMessageMessageBoardAttachmentMultipart(
 						_parseLong(
 							(String)parameters.get("messageBoardMessageId")),
 						(MultipartBody)parameters.get("multipartBody"));
 			}
 			else if (parameters.containsKey("messageBoardThreadId")) {
 				messageBoardAttachmentUnsafeFunction = messageBoardAttachment ->
-					postMessageBoardThreadMessageBoardAttachment(
+					postMessageBoardThreadMessageBoardAttachmentMultipart(
 						_parseLong(
 							(String)parameters.get("messageBoardThreadId")),
 						(MultipartBody)parameters.get("multipartBody"));

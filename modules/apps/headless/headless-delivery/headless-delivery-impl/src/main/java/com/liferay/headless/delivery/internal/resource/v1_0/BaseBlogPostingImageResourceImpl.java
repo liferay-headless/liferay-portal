@@ -396,7 +396,7 @@ public abstract class BaseBlogPostingImageResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public BlogPostingImage postSiteBlogPostingImage(
+	public BlogPostingImage postSiteBlogPostingImageMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("siteId")
@@ -578,7 +578,7 @@ public abstract class BaseBlogPostingImageResourceImpl
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("siteId")) {
 				blogPostingImageUnsafeFunction =
-					blogPostingImage -> postSiteBlogPostingImage(
+					blogPostingImage -> postSiteBlogPostingImageMultipart(
 						(Long)parameters.get("siteId"),
 						(MultipartBody)parameters.get("multipartBody"));
 			}

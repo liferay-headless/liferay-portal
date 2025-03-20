@@ -56,8 +56,9 @@ public interface SkuVirtualSettingsFileEntryResource {
 	public SkuVirtualSettingsFileEntry getSkuVirtualSettingsFileEntry(Long id)
 		throws Exception;
 
-	public SkuVirtualSettingsFileEntry patchSkuVirtualSettingsFileEntry(
-			Long id, MultipartBody multipartBody)
+	public SkuVirtualSettingsFileEntry
+			patchSkuVirtualSettingsFileEntryMultipart(
+				Long id, MultipartBody multipartBody)
 		throws Exception;
 
 	public Page<SkuVirtualSettingsFileEntry>
@@ -66,7 +67,7 @@ public interface SkuVirtualSettingsFileEntryResource {
 		throws Exception;
 
 	public SkuVirtualSettingsFileEntry
-			postSkuVirtualSettingIdSkuVirtualSettingsFileEntry(
+			postSkuVirtualSettingIdSkuVirtualSettingsFileEntryMultipart(
 				Long id, MultipartBody multipartBody)
 		throws Exception;
 

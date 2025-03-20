@@ -286,7 +286,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Document postAssetLibraryDocument(
+	public Document postAssetLibraryDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("assetLibraryId")
@@ -477,7 +477,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public Document putAssetLibraryDocumentByExternalReferenceCode(
+	public Document putAssetLibraryDocumentByExternalReferenceCodeMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("assetLibraryId")
@@ -890,7 +890,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Document postDocumentFolderDocument(
+	public Document postDocumentFolderDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("documentFolderId")
@@ -1099,7 +1099,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.Path("/documents/{documentId}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Document patchDocument(
+	public Document patchDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("documentId")
@@ -1135,7 +1135,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public Document putDocument(
+	public Document putDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("documentId")
@@ -1741,7 +1741,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Document postSiteDocument(
+	public Document postSiteDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("siteId")
@@ -1932,7 +1932,7 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public Document putSiteDocumentByExternalReferenceCode(
+	public Document putSiteDocumentByExternalReferenceCodeMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("siteId")
@@ -2153,17 +2153,19 @@ public abstract class BaseDocumentResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("documentFolderId")) {
-				documentUnsafeFunction = document -> postDocumentFolderDocument(
-					_parseLong((String)parameters.get("documentFolderId")),
-					(MultipartBody)parameters.get("multipartBody"));
+				documentUnsafeFunction =
+					document -> postDocumentFolderDocumentMultipart(
+						_parseLong((String)parameters.get("documentFolderId")),
+						(MultipartBody)parameters.get("multipartBody"));
 			}
 			else if (parameters.containsKey("assetLibraryId")) {
-				documentUnsafeFunction = document -> postAssetLibraryDocument(
-					(Long)parameters.get("assetLibraryId"),
-					(MultipartBody)parameters.get("multipartBody"));
+				documentUnsafeFunction =
+					document -> postAssetLibraryDocumentMultipart(
+						(Long)parameters.get("assetLibraryId"),
+						(MultipartBody)parameters.get("multipartBody"));
 			}
 			else if (parameters.containsKey("siteId")) {
-				documentUnsafeFunction = document -> postSiteDocument(
+				documentUnsafeFunction = document -> postSiteDocumentMultipart(
 					(Long)parameters.get("siteId"),
 					(MultipartBody)parameters.get("multipartBody"));
 			}
@@ -2179,7 +2181,7 @@ public abstract class BaseDocumentResourceImpl
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
 				documentUnsafeFunction =
-					document -> putSiteDocumentByExternalReferenceCode(
+					document -> putSiteDocumentByExternalReferenceCodeMultipart(
 						document.getSiteId() != null ? document.getSiteId() :
 							(Long)parameters.get("siteId"),
 						document.getExternalReferenceCode(), null);
@@ -2197,7 +2199,7 @@ public abstract class BaseDocumentResourceImpl
 										(Long)parameters.get("siteId"),
 								document.getExternalReferenceCode());
 
-						persistedDocument = patchDocument(
+						persistedDocument = patchDocumentMultipart(
 							getDocument.getId() != null ? getDocument.getId() :
 								_parseLong(
 									(String)parameters.get("documentId")),
@@ -2205,18 +2207,23 @@ public abstract class BaseDocumentResourceImpl
 					}
 					catch (NoSuchModelException noSuchModelException) {
 						if (parameters.containsKey("documentFolderId")) {
-							persistedDocument = postDocumentFolderDocument(
-								_parseLong(
-									(String)parameters.get("documentFolderId")),
-								(MultipartBody)parameters.get("multipartBody"));
+							persistedDocument =
+								postDocumentFolderDocumentMultipart(
+									_parseLong(
+										(String)parameters.get(
+											"documentFolderId")),
+									(MultipartBody)parameters.get(
+										"multipartBody"));
 						}
 						else if (parameters.containsKey("assetLibraryId")) {
-							persistedDocument = postAssetLibraryDocument(
-								(Long)parameters.get("assetLibraryId"),
-								(MultipartBody)parameters.get("multipartBody"));
+							persistedDocument =
+								postAssetLibraryDocumentMultipart(
+									(Long)parameters.get("assetLibraryId"),
+									(MultipartBody)parameters.get(
+										"multipartBody"));
 						}
 						else if (parameters.containsKey("siteId")) {
-							persistedDocument = postSiteDocument(
+							persistedDocument = postSiteDocumentMultipart(
 								(Long)parameters.get("siteId"),
 								(MultipartBody)parameters.get("multipartBody"));
 						}
@@ -2378,14 +2385,14 @@ public abstract class BaseDocumentResourceImpl
 			"updateStrategy", "UPDATE");
 
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
-			documentUnsafeFunction = document -> patchDocument(
+			documentUnsafeFunction = document -> patchDocumentMultipart(
 				document.getId() != null ? document.getId() :
 					_parseLong((String)parameters.get("documentId")),
 				null);
 		}
 
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-			documentUnsafeFunction = document -> putDocument(
+			documentUnsafeFunction = document -> putDocumentMultipart(
 				document.getId() != null ? document.getId() :
 					_parseLong((String)parameters.get("documentId")),
 				null);

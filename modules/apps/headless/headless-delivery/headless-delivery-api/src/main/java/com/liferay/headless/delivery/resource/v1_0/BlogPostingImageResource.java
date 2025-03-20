@@ -74,7 +74,7 @@ public interface BlogPostingImageResource {
 			String contentType, String fieldNames)
 		throws Exception;
 
-	public BlogPostingImage postSiteBlogPostingImage(
+	public BlogPostingImage postSiteBlogPostingImageMultipart(
 			Long siteId, MultipartBody multipartBody)
 		throws Exception;
 

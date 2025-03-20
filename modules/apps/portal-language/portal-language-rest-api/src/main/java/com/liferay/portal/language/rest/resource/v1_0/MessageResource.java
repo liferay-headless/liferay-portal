@@ -63,7 +63,7 @@ public interface MessageResource {
 	public Response putMessageBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public void postMessageImport(
+	public void postMessageImportMultipart(
 			String languageId, MultipartBody multipartBody)
 		throws Exception;
 

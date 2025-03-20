@@ -213,11 +213,13 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 	@javax.ws.rs.Path("/product-virtual-settings-file-entries/{id}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ProductVirtualSettingsFileEntry patchProductVirtualSettingsFileEntry(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@javax.validation.constraints.NotNull @javax.ws.rs.PathParam("id")
-			Long id,
-			MultipartBody multipartBody)
+	public ProductVirtualSettingsFileEntry
+			patchProductVirtualSettingsFileEntryMultipart(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("id")
+				Long id,
+				MultipartBody multipartBody)
 		throws Exception {
 
 		return new ProductVirtualSettingsFileEntry();
@@ -300,7 +302,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public ProductVirtualSettingsFileEntry
-			postProductVirtualSettingIdProductVirtualSettingsFileEntry(
+			postProductVirtualSettingIdProductVirtualSettingsFileEntryMultipart(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("id")
@@ -443,7 +445,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 			productVirtualSettingsFileEntryUnsafeFunction =
 				productVirtualSettingsFileEntry ->
-					patchProductVirtualSettingsFileEntry(
+					patchProductVirtualSettingsFileEntryMultipart(
 						productVirtualSettingsFileEntry.getId() != null ?
 							productVirtualSettingsFileEntry.getId() :
 								_parseLong(

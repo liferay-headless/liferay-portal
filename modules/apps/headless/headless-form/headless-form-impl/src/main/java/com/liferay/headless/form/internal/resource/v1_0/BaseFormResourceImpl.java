@@ -161,7 +161,7 @@ public abstract class BaseFormResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public FormDocument postFormFormDocument(
+	public FormDocument postFormFormDocumentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("formId")

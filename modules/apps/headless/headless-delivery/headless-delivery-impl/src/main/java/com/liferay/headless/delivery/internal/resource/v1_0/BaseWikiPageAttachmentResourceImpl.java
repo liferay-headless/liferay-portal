@@ -460,7 +460,7 @@ public abstract class BaseWikiPageAttachmentResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public WikiPageAttachment postWikiPageWikiPageAttachment(
+	public WikiPageAttachment postWikiPageWikiPageAttachmentMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("wikiPageId")
@@ -542,9 +542,10 @@ public abstract class BaseWikiPageAttachmentResourceImpl
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("wikiPageId")) {
 				wikiPageAttachmentUnsafeFunction =
-					wikiPageAttachment -> postWikiPageWikiPageAttachment(
-						_parseLong((String)parameters.get("wikiPageId")),
-						(MultipartBody)parameters.get("multipartBody"));
+					wikiPageAttachment ->
+						postWikiPageWikiPageAttachmentMultipart(
+							_parseLong((String)parameters.get("wikiPageId")),
+							(MultipartBody)parameters.get("multipartBody"));
 			}
 			else {
 				throw new NotSupportedException(

@@ -232,7 +232,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public KnowledgeBaseAttachment
-			postKnowledgeBaseArticleKnowledgeBaseAttachment(
+			postKnowledgeBaseArticleKnowledgeBaseAttachmentMultipart(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
 				@javax.ws.rs.PathParam("knowledgeBaseArticleId")
@@ -579,7 +579,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceImpl
 			if (parameters.containsKey("knowledgeBaseArticleId")) {
 				knowledgeBaseAttachmentUnsafeFunction =
 					knowledgeBaseAttachment ->
-						postKnowledgeBaseArticleKnowledgeBaseAttachment(
+						postKnowledgeBaseArticleKnowledgeBaseAttachmentMultipart(
 							_parseLong(
 								(String)parameters.get(
 									"knowledgeBaseArticleId")),

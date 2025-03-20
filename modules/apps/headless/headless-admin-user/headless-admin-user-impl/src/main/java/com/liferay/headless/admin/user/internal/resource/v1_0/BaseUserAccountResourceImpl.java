@@ -2359,7 +2359,7 @@ public abstract class BaseUserAccountResourceImpl
 	@javax.ws.rs.Path("/user-accounts/{userAccountId}/image")
 	@javax.ws.rs.POST
 	@Override
-	public Response postUserAccountImage(
+	public Response postUserAccountImageMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("userAccountId")

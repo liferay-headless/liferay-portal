@@ -65,7 +65,7 @@ public interface DocumentResource {
 			String contentType, String fieldNames)
 		throws Exception;
 
-	public Document postAssetLibraryDocument(
+	public Document postAssetLibraryDocumentMultipart(
 			Long assetLibraryId, MultipartBody multipartBody)
 		throws Exception;
 
@@ -82,7 +82,7 @@ public interface DocumentResource {
 			Long assetLibraryId, String externalReferenceCode)
 		throws Exception;
 
-	public Document putAssetLibraryDocumentByExternalReferenceCode(
+	public Document putAssetLibraryDocumentByExternalReferenceCodeMultipart(
 			Long assetLibraryId, String externalReferenceCode,
 			MultipartBody multipartBody)
 		throws Exception;
@@ -117,7 +117,7 @@ public interface DocumentResource {
 			String contentType, String fieldNames)
 		throws Exception;
 
-	public Document postDocumentFolderDocument(
+	public Document postDocumentFolderDocumentMultipart(
 			Long documentFolderId, MultipartBody multipartBody)
 		throws Exception;
 
@@ -133,10 +133,12 @@ public interface DocumentResource {
 
 	public Document getDocument(Long documentId) throws Exception;
 
-	public Document patchDocument(Long documentId, MultipartBody multipartBody)
+	public Document patchDocumentMultipart(
+			Long documentId, MultipartBody multipartBody)
 		throws Exception;
 
-	public Document putDocument(Long documentId, MultipartBody multipartBody)
+	public Document putDocumentMultipart(
+			Long documentId, MultipartBody multipartBody)
 		throws Exception;
 
 	public Response putDocumentBatch(
@@ -182,7 +184,8 @@ public interface DocumentResource {
 			String contentType, String fieldNames)
 		throws Exception;
 
-	public Document postSiteDocument(Long siteId, MultipartBody multipartBody)
+	public Document postSiteDocumentMultipart(
+			Long siteId, MultipartBody multipartBody)
 		throws Exception;
 
 	public Response postSiteDocumentBatch(
@@ -198,7 +201,7 @@ public interface DocumentResource {
 			Long siteId, String externalReferenceCode)
 		throws Exception;
 
-	public Document putSiteDocumentByExternalReferenceCode(
+	public Document putSiteDocumentByExternalReferenceCodeMultipart(
 			Long siteId, String externalReferenceCode,
 			MultipartBody multipartBody)
 		throws Exception;

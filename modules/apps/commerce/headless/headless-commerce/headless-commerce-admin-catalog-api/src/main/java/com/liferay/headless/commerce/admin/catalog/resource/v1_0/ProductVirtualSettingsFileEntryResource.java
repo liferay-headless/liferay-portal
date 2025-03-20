@@ -57,8 +57,9 @@ public interface ProductVirtualSettingsFileEntryResource {
 			Long id)
 		throws Exception;
 
-	public ProductVirtualSettingsFileEntry patchProductVirtualSettingsFileEntry(
-			Long id, MultipartBody multipartBody)
+	public ProductVirtualSettingsFileEntry
+			patchProductVirtualSettingsFileEntryMultipart(
+				Long id, MultipartBody multipartBody)
 		throws Exception;
 
 	public Page<ProductVirtualSettingsFileEntry>
@@ -67,7 +68,7 @@ public interface ProductVirtualSettingsFileEntryResource {
 		throws Exception;
 
 	public ProductVirtualSettingsFileEntry
-			postProductVirtualSettingIdProductVirtualSettingsFileEntry(
+			postProductVirtualSettingIdProductVirtualSettingsFileEntryMultipart(
 				Long id, MultipartBody multipartBody)
 		throws Exception;
 

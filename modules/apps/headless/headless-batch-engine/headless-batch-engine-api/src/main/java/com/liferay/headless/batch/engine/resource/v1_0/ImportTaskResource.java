@@ -60,7 +60,7 @@ public interface ImportTaskResource {
 			String importStrategy, String taskItemDelegateName, Object object)
 		throws Exception;
 
-	public ImportTask deleteImportTask(
+	public ImportTask deleteImportTaskMultipart(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
 			MultipartBody multipartBody)
@@ -74,7 +74,7 @@ public interface ImportTaskResource {
 			String taskItemDelegateName, Object object)
 		throws Exception;
 
-	public ImportTask postImportTask(
+	public ImportTask postImportTaskMultipart(
 			String className, String batchExternalReferenceCode,
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
@@ -88,7 +88,7 @@ public interface ImportTaskResource {
 			String updateStrategy, Object object)
 		throws Exception;
 
-	public ImportTask putImportTask(
+	public ImportTask putImportTaskMultipart(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
 			String updateStrategy, MultipartBody multipartBody)

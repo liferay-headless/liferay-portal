@@ -79,7 +79,7 @@ public interface WikiPageAttachmentResource {
 			String fieldNames)
 		throws Exception;
 
-	public WikiPageAttachment postWikiPageWikiPageAttachment(
+	public WikiPageAttachment postWikiPageWikiPageAttachmentMultipart(
 			Long wikiPageId, MultipartBody multipartBody)
 		throws Exception;
 

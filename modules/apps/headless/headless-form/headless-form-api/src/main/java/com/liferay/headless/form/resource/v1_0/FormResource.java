@@ -55,7 +55,7 @@ public interface FormResource {
 			Long formId, FormContext formContext)
 		throws Exception;
 
-	public FormDocument postFormFormDocument(
+	public FormDocument postFormFormDocumentMultipart(
 			Long formId, MultipartBody multipartBody)
 		throws Exception;
 

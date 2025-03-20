@@ -261,7 +261,7 @@ public interface UserAccountResource {
 	public Response putUserAccountBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public Response postUserAccountImage(
+	public Response postUserAccountImageMultipart(
 			Long userAccountId, MultipartBody multipartBody)
 		throws Exception;
 
