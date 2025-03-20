@@ -42,7 +42,7 @@ public class DisplayPageTemplateFolderResourceImpl
 	extends BaseDisplayPageTemplateFolderResourceImpl {
 
 	@Override
-	public void deleteSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+	public void deleteSiteDisplayPageTemplateFolderByExternalReferenceCode(
 			String siteExternalReferenceCode,
 			String displayPageTemplateFolderExternalReferenceCode)
 		throws Exception {
@@ -60,7 +60,7 @@ public class DisplayPageTemplateFolderResourceImpl
 
 	@Override
 	public DisplayPageTemplateFolder
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+			getSiteDisplayPageTemplateFolderByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode)
 		throws Exception {
@@ -80,7 +80,7 @@ public class DisplayPageTemplateFolderResourceImpl
 
 	@Override
 	public Page<DisplayPageTemplateFolder>
-			getSiteSiteByExternalReferenceCodeDisplayPageTemplateFoldersPage(
+			getSiteDisplayPageTemplateFoldersPage(
 				String siteExternalReferenceCode, String search,
 				Aggregation aggregation, Filter filter, Pagination pagination,
 				Sort[] sorts)
@@ -111,10 +111,9 @@ public class DisplayPageTemplateFolderResourceImpl
 	}
 
 	@Override
-	public DisplayPageTemplateFolder
-			postSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
-				String siteExternalReferenceCode,
-				DisplayPageTemplateFolder displayPageTemplateFolder)
+	public DisplayPageTemplateFolder postSiteDisplayPageTemplateFolder(
+			String siteExternalReferenceCode,
+			DisplayPageTemplateFolder displayPageTemplateFolder)
 		throws Exception {
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
@@ -130,7 +129,7 @@ public class DisplayPageTemplateFolderResourceImpl
 
 	@Override
 	public DisplayPageTemplateFolder
-			putSiteSiteByExternalReferenceCodeDisplayPageTemplateFolder(
+			putSiteDisplayPageTemplateFolderByExternalReferenceCode(
 				String siteExternalReferenceCode,
 				String displayPageTemplateFolderExternalReferenceCode,
 				DisplayPageTemplateFolder displayPageTemplateFolder)
