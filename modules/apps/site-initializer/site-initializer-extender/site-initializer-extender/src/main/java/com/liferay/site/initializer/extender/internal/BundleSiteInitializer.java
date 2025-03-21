@@ -2145,7 +2145,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				Document existingDocument = documentsPage.fetchFirstItem();
 
 				if (existingDocument == null) {
-					document = documentResource.postDocumentFolderDocument(
+					document = documentResource.postDocumentFolderDocumentMultipart(
 						documentFolderId,
 						MultipartBody.of(
 							Collections.singletonMap(
@@ -2157,7 +2157,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 							__ -> _objectMapper, values));
 				}
 				else {
-					document = documentResource.putDocument(
+					document = documentResource.putDocumentMultipart(
 						existingDocument.getId(),
 						MultipartBody.of(
 							Collections.singletonMap(
@@ -2180,7 +2180,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				Document existingDocument = documentsPage.fetchFirstItem();
 
 				if (existingDocument == null) {
-					document = documentResource.postSiteDocument(
+					document = documentResource.postSiteDocumentMultipart(
 						groupId,
 						MultipartBody.of(
 							Collections.singletonMap(
@@ -2192,7 +2192,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 							__ -> _objectMapper, values));
 				}
 				else {
-					document = documentResource.putDocument(
+					document = documentResource.putDocumentMultipart(
 						existingDocument.getId(),
 						MultipartBody.of(
 							Collections.singletonMap(

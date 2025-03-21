@@ -158,7 +158,7 @@ public class SiteInitializerClientExtension
 			httpServletRequest
 		).build();
 
-		return siteResource.putSiteByExternalReferenceCode(
+		return siteResource.putSiteByExternalReferenceCodeMultipart(
 			externalReferenceCode, multipartBody);
 	}
 
