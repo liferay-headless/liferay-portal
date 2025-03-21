@@ -2145,16 +2145,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 				Document existingDocument = documentsPage.fetchFirstItem();
 
 				if (existingDocument == null) {
-					document = documentResource.postDocumentFolderDocumentMultipart(
-						documentFolderId,
-						MultipartBody.of(
-							Collections.singletonMap(
-								"file",
-								new BinaryFile(
-									MimeTypesUtil.getContentType(fileName),
-									fileName, urlConnection.getInputStream(),
-									urlConnection.getContentLength())),
-							__ -> _objectMapper, values));
+					document =
+						documentResource.postDocumentFolderDocumentMultipart(
+							documentFolderId,
+							MultipartBody.of(
+								Collections.singletonMap(
+									"file",
+									new BinaryFile(
+										MimeTypesUtil.getContentType(fileName),
+										fileName,
+										urlConnection.getInputStream(),
+										urlConnection.getContentLength())),
+								__ -> _objectMapper, values));
 				}
 				else {
 					document = documentResource.putDocumentMultipart(
