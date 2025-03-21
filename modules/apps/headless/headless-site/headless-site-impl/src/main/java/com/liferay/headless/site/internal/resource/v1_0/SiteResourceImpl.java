@@ -138,11 +138,11 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Site postSite(MultipartBody multipartBody) throws Exception {
+	public Site postSiteMultipart(MultipartBody multipartBody) throws Exception {
 		Site site = postSite(
 			multipartBody.getValueAsInstance("site", Site.class));
 
-		return putSiteByExternalReferenceCode(
+		return putSiteByExternalReferenceCodeMultipart(
 			site.getExternalReferenceCode(), multipartBody);
 	}
 
@@ -167,7 +167,7 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Site putSiteByExternalReferenceCode(
+	public Site putSiteByExternalReferenceCodeMultipart(
 			String externalReferenceCode, MultipartBody multipartBody)
 		throws Exception {
 

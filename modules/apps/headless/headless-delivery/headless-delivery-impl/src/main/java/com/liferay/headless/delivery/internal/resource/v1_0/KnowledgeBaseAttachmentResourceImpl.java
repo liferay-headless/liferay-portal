@@ -117,7 +117,7 @@ public class KnowledgeBaseAttachmentResourceImpl
 
 	@Override
 	public KnowledgeBaseAttachment
-			postKnowledgeBaseArticleKnowledgeBaseAttachment(
+			postKnowledgeBaseArticleKnowledgeBaseAttachmentMultipart(
 				Long knowledgeBaseArticleId, MultipartBody multipartBody)
 		throws Exception {
 

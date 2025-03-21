@@ -279,7 +279,7 @@ public class AccountResourceImpl extends BaseAccountResourceImpl {
 	}
 
 	@Override
-	public Response postAccountByExternalReferenceCodeLogo(
+	public Response postAccountByExternalReferenceCodeLogoMultipart(
 			String externalReferenceCode, MultipartBody multipartBody)
 		throws Exception {
 
@@ -332,7 +332,7 @@ public class AccountResourceImpl extends BaseAccountResourceImpl {
 	}
 
 	@Override
-	public Response postAccountLogo(Long id, MultipartBody multipartBody)
+	public Response postAccountLogoMultipart(Long id, MultipartBody multipartBody)
 		throws Exception {
 
 		updateAccountLogo(

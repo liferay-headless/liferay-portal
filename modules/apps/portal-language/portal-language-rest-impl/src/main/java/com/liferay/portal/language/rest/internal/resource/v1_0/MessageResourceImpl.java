@@ -83,7 +83,7 @@ public class MessageResourceImpl extends BaseMessageResourceImpl {
 	}
 
 	@Override
-	public void postMessageImport(
+	public void postMessageImportMultipart(
 			String languageId, MultipartBody multipartBody)
 		throws Exception {
 

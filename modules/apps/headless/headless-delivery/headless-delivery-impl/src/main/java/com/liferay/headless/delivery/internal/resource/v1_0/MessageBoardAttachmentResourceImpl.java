@@ -142,7 +142,7 @@ public class MessageBoardAttachmentResourceImpl
 	}
 
 	@Override
-	public MessageBoardAttachment postMessageBoardMessageMessageBoardAttachment(
+	public MessageBoardAttachment postMessageBoardMessageMessageBoardAttachmentMultipart(
 			Long messageBoardMessageId, MultipartBody multipartBody)
 		throws Exception {
 
@@ -150,7 +150,7 @@ public class MessageBoardAttachmentResourceImpl
 	}
 
 	@Override
-	public MessageBoardAttachment postMessageBoardThreadMessageBoardAttachment(
+	public MessageBoardAttachment postMessageBoardThreadMessageBoardAttachmentMultipart(
 			Long messageBoardThreadId, MultipartBody multipartBody)
 		throws Exception {
 

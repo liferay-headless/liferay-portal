@@ -126,7 +126,7 @@ public class BlogPostingImageResourceImpl
 	}
 
 	@Override
-	public BlogPostingImage postSiteBlogPostingImage(
+	public BlogPostingImage postSiteBlogPostingImageMultipart(
 			Long siteId, MultipartBody multipartBody)
 		throws Exception {
 

@@ -88,7 +88,7 @@ public class ProductVirtualSettingsFileEntryResourceImpl
 	}
 
 	@Override
-	public ProductVirtualSettingsFileEntry patchProductVirtualSettingsFileEntry(
+	public ProductVirtualSettingsFileEntry patchProductVirtualSettingsFileEntryMultipart(
 			Long id, MultipartBody multipartBody)
 		throws Exception {
 
@@ -141,7 +141,7 @@ public class ProductVirtualSettingsFileEntryResourceImpl
 
 	@Override
 	public ProductVirtualSettingsFileEntry
-			postProductVirtualSettingIdProductVirtualSettingsFileEntry(
+			postProductVirtualSettingIdProductVirtualSettingsFileEntryMultipart(
 				Long id, MultipartBody multipartBody)
 		throws Exception {
 

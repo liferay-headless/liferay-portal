@@ -110,7 +110,7 @@ public class WikiPageAttachmentResourceImpl
 	}
 
 	@Override
-	public WikiPageAttachment postWikiPageWikiPageAttachment(
+	public WikiPageAttachment postWikiPageWikiPageAttachmentMultipart(
 			Long wikiPageId, MultipartBody multipartBody)
 		throws Exception {
 

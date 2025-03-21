@@ -91,7 +91,7 @@ public class FormResourceImpl extends BaseFormResourceImpl {
 	}
 
 	@Override
-	public FormDocument postFormFormDocument(
+	public FormDocument postFormFormDocumentMultipart(
 			Long formId, MultipartBody multipartBody)
 		throws Exception {
 

@@ -79,7 +79,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 	@Override
-	public ImportTask deleteImportTask(
+	public ImportTask deleteImportTaskMultipart(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
 			MultipartBody multipartBody)
@@ -166,7 +166,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	}
 
 	@Override
-	public ImportTask postImportTask(
+	public ImportTask postImportTaskMultipart(
 			String className, String batchExternalReferenceCode,
 			String batchRestrictFields, String callbackURL,
 			String createStrategy, String externalReferenceCode,
@@ -202,7 +202,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	}
 
 	@Override
-	public ImportTask putImportTask(
+	public ImportTask putImportTaskMultipart(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName,
 			String updateStrategy, MultipartBody multipartBody)

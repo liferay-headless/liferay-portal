@@ -349,7 +349,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document patchDocument(Long documentId, MultipartBody multipartBody)
+	public Document patchDocumentMultipart(Long documentId, MultipartBody multipartBody)
 		throws Exception {
 
 		FileEntry existingFileEntry = _dlAppService.getFileEntry(documentId);
@@ -424,15 +424,15 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document postAssetLibraryDocument(
+	public Document postAssetLibraryDocumentMultipart(
 			Long assetLibraryId, MultipartBody multipartBody)
 		throws Exception {
 
-		return postSiteDocument(assetLibraryId, multipartBody);
+		return postSiteDocumentMultipart(assetLibraryId, multipartBody);
 	}
 
 	@Override
-	public Document postDocumentFolderDocument(
+	public Document postDocumentFolderDocumentMultipart(
 			Long documentFolderId, MultipartBody multipartBody)
 		throws Exception {
 
@@ -454,14 +454,14 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document postSiteDocument(Long siteId, MultipartBody multipartBody)
+	public Document postSiteDocumentMultipart(Long siteId, MultipartBody multipartBody)
 		throws Exception {
 
 		return _addDocument(null, siteId, siteId, null, multipartBody);
 	}
 
 	@Override
-	public Document putAssetLibraryDocumentByExternalReferenceCode(
+	public Document putAssetLibraryDocumentByExternalReferenceCodeMultipart(
 			Long assetLibraryId, String externalReferenceCode,
 			MultipartBody multipartBody)
 		throws Exception {
@@ -480,7 +480,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document putDocument(Long documentId, MultipartBody multipartBody)
+	public Document putDocumentMultipart(Long documentId, MultipartBody multipartBody)
 		throws Exception {
 
 		return _updateDocument(
@@ -498,7 +498,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document putSiteDocumentByExternalReferenceCode(
+	public Document putSiteDocumentByExternalReferenceCodeMultipart(
 			Long siteId, String externalReferenceCode,
 			MultipartBody multipartBody)
 		throws Exception {

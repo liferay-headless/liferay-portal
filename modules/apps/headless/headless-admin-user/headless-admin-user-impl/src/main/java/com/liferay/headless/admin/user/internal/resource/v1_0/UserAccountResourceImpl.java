@@ -1101,7 +1101,7 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 	}
 
 	@Override
-	public Response postUserAccountImage(
+	public Response postUserAccountImageMultipart(
 			Long userAccountId, MultipartBody multipartBody)
 		throws Exception {
 
