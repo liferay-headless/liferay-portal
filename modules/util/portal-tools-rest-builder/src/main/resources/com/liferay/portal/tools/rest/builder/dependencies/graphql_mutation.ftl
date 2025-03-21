@@ -59,6 +59,14 @@ public class Mutation {
 	</#list>
 
 	<#list javaMethodSignatures as javaMethodSignature>
+		<#assign hasMultipartBody = false />
+		<#list javaMethodSignature.javaMethodParameters as param>
+			<#if param.parameterType?contains("MultipartBody") || param.parameterName == "multipartBody">
+				<#assign hasMultipartBody = true />
+				<#break>
+			</#if>
+		</#list>
+
 		${freeMarkerTool.getGraphQLMethodAnnotations(javaMethodSignature)}
 		public
 
@@ -76,16 +84,16 @@ public class Mutation {
 					_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,
 					${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> {
 
-						Page paginationPage = ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${arguments});
+						Page paginationPage = ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.<#if hasMultipartBody>${javaMethodSignature.methodName}Multipart<#else>${javaMethodSignature.methodName}</#if>(${arguments});
 
 						return paginationPage.getItems();
 					});
 			<#elseif javaMethodSignature.returnType?contains("void")>
-				_applyVoidComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${arguments}));
+				_applyVoidComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.<#if hasMultipartBody>${javaMethodSignature.methodName}Multipart<#else>${javaMethodSignature.methodName}</#if>(${arguments}));
 
 				return true;
 			<#else>
-				return _applyComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${arguments}));
+				return _applyComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.<#if hasMultipartBody>${javaMethodSignature.methodName}Multipart<#else>${javaMethodSignature.methodName}</#if>(${arguments}));
 			</#if>
 		}
 	</#list>
