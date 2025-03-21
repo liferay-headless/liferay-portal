@@ -138,15 +138,6 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 	}
 
 	@Override
-	public Site postSiteMultipart(MultipartBody multipartBody) throws Exception {
-		Site site = postSite(
-			multipartBody.getValueAsInstance("site", Site.class));
-
-		return putSiteByExternalReferenceCodeMultipart(
-			site.getExternalReferenceCode(), multipartBody);
-	}
-
-	@Override
 	public Site postSite(Site site) throws Exception {
 		try {
 			Group group = _addGroup(site.getExternalReferenceCode(), site);
@@ -164,6 +155,17 @@ public class SiteResourceImpl extends BaseSiteResourceImpl {
 		catch (Throwable throwable) {
 			throw new Exception(throwable);
 		}
+	}
+
+	@Override
+	public Site postSiteMultipart(MultipartBody multipartBody)
+		throws Exception {
+
+		Site site = postSite(
+			multipartBody.getValueAsInstance("site", Site.class));
+
+		return putSiteByExternalReferenceCodeMultipart(
+			site.getExternalReferenceCode(), multipartBody);
 	}
 
 	@Override

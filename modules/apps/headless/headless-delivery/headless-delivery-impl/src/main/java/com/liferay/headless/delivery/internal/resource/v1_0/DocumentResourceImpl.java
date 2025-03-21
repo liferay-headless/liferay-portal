@@ -349,7 +349,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document patchDocumentMultipart(Long documentId, MultipartBody multipartBody)
+	public Document patchDocumentMultipart(
+			Long documentId, MultipartBody multipartBody)
 		throws Exception {
 
 		FileEntry existingFileEntry = _dlAppService.getFileEntry(documentId);
@@ -454,7 +455,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document postSiteDocumentMultipart(Long siteId, MultipartBody multipartBody)
+	public Document postSiteDocumentMultipart(
+			Long siteId, MultipartBody multipartBody)
 		throws Exception {
 
 		return _addDocument(null, siteId, siteId, null, multipartBody);
@@ -480,7 +482,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	@Override
-	public Document putDocumentMultipart(Long documentId, MultipartBody multipartBody)
+	public Document putDocumentMultipart(
+			Long documentId, MultipartBody multipartBody)
 		throws Exception {
 
 		return _updateDocument(

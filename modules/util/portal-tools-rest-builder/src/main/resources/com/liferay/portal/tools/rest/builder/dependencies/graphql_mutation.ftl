@@ -61,7 +61,7 @@ public class Mutation {
 	<#list javaMethodSignatures as javaMethodSignature>
 		<#assign hasMultipartBody = false />
 		<#list javaMethodSignature.javaMethodParameters as param>
-			<#if param.parameterType?contains("MultipartBody") || param.parameterName == "multipartBody">
+			<#if param.parameterType?contains("MultipartBody") || stringUtil.equals(param.parameterName, "multipartBody")>
 				<#assign hasMultipartBody = true />
 				<#break>
 			</#if>

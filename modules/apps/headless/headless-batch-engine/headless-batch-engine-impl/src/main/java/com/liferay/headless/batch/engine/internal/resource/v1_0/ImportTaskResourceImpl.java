@@ -79,20 +79,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 	@Override
-	public ImportTask deleteImportTaskMultipart(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			MultipartBody multipartBody)
-		throws Exception {
-
-		return _importFile(
-			BatchEngineTaskOperation.DELETE, null,
-			multipartBody.getBinaryFile("file"), callbackURL, className, null,
-			externalReferenceCode, null, importStrategy, taskItemDelegateName,
-			null);
-	}
-
-	@Override
 	public ImportTask deleteImportTask(
 			String className, String callbackURL, String externalReferenceCode,
 			String importStrategy, String taskItemDelegateName, Object object)
@@ -106,6 +92,20 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			_getBytes(object, contentType), callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, null);
+	}
+
+	@Override
+	public ImportTask deleteImportTaskMultipart(
+			String className, String callbackURL, String externalReferenceCode,
+			String importStrategy, String taskItemDelegateName,
+			MultipartBody multipartBody)
+		throws Exception {
+
+		return _importFile(
+			BatchEngineTaskOperation.DELETE, null,
+			multipartBody.getBinaryFile("file"), callbackURL, className, null,
+			externalReferenceCode, null, importStrategy, taskItemDelegateName,
+			null);
 	}
 
 	@Override
@@ -166,22 +166,6 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	}
 
 	@Override
-	public ImportTask postImportTaskMultipart(
-			String className, String batchExternalReferenceCode,
-			String batchRestrictFields, String callbackURL,
-			String createStrategy, String externalReferenceCode,
-			String fieldNameMapping, String importStrategy,
-			String taskItemDelegateName, MultipartBody multipartBody)
-		throws Exception {
-
-		return _importFile(
-			BatchEngineTaskOperation.CREATE, batchExternalReferenceCode,
-			multipartBody.getBinaryFile("file"), callbackURL, className,
-			createStrategy, externalReferenceCode, fieldNameMapping,
-			importStrategy, taskItemDelegateName, null);
-	}
-
-	@Override
 	public ImportTask postImportTask(
 			String className, String batchExternalReferenceCode,
 			String batchRestrictFields, String callbackURL,
@@ -202,17 +186,19 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 	}
 
 	@Override
-	public ImportTask putImportTaskMultipart(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, MultipartBody multipartBody)
+	public ImportTask postImportTaskMultipart(
+			String className, String batchExternalReferenceCode,
+			String batchRestrictFields, String callbackURL,
+			String createStrategy, String externalReferenceCode,
+			String fieldNameMapping, String importStrategy,
+			String taskItemDelegateName, MultipartBody multipartBody)
 		throws Exception {
 
 		return _importFile(
-			BatchEngineTaskOperation.UPDATE, null,
-			multipartBody.getBinaryFile("file"), callbackURL, className, null,
-			externalReferenceCode, null, importStrategy, taskItemDelegateName,
-			updateStrategy);
+			BatchEngineTaskOperation.CREATE, batchExternalReferenceCode,
+			multipartBody.getBinaryFile("file"), callbackURL, className,
+			createStrategy, externalReferenceCode, fieldNameMapping,
+			importStrategy, taskItemDelegateName, null);
 	}
 
 	@Override
@@ -230,6 +216,20 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 			_getBytes(object, contentType), callbackURL, className, null,
 			_getBatchEngineTaskContentType(contentType), externalReferenceCode,
 			null, importStrategy, taskItemDelegateName, updateStrategy);
+	}
+
+	@Override
+	public ImportTask putImportTaskMultipart(
+			String className, String callbackURL, String externalReferenceCode,
+			String importStrategy, String taskItemDelegateName,
+			String updateStrategy, MultipartBody multipartBody)
+		throws Exception {
+
+		return _importFile(
+			BatchEngineTaskOperation.UPDATE, null,
+			multipartBody.getBinaryFile("file"), callbackURL, className, null,
+			externalReferenceCode, null, importStrategy, taskItemDelegateName,
+			updateStrategy);
 	}
 
 	@Activate

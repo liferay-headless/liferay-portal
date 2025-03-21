@@ -88,8 +88,9 @@ public class ProductVirtualSettingsFileEntryResourceImpl
 	}
 
 	@Override
-	public ProductVirtualSettingsFileEntry patchProductVirtualSettingsFileEntryMultipart(
-			Long id, MultipartBody multipartBody)
+	public ProductVirtualSettingsFileEntry
+			patchProductVirtualSettingsFileEntryMultipart(
+				Long id, MultipartBody multipartBody)
 		throws Exception {
 
 		CPDVirtualSettingFileEntry cpdVirtualSettingFileEntry =

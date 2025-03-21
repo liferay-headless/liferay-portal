@@ -142,16 +142,18 @@ public class MessageBoardAttachmentResourceImpl
 	}
 
 	@Override
-	public MessageBoardAttachment postMessageBoardMessageMessageBoardAttachmentMultipart(
-			Long messageBoardMessageId, MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardMessageMessageBoardAttachmentMultipart(
+				Long messageBoardMessageId, MultipartBody multipartBody)
 		throws Exception {
 
 		return _addMessageBoardAttachment(messageBoardMessageId, multipartBody);
 	}
 
 	@Override
-	public MessageBoardAttachment postMessageBoardThreadMessageBoardAttachmentMultipart(
-			Long messageBoardThreadId, MultipartBody multipartBody)
+	public MessageBoardAttachment
+			postMessageBoardThreadMessageBoardAttachmentMultipart(
+				Long messageBoardThreadId, MultipartBody multipartBody)
 		throws Exception {
 
 		MBThread mbThread = _mbThreadLocalService.getMBThread(

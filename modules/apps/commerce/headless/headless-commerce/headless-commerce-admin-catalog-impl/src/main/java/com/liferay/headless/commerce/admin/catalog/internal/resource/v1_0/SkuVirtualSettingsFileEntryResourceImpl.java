@@ -86,8 +86,9 @@ public class SkuVirtualSettingsFileEntryResourceImpl
 	}
 
 	@Override
-	public SkuVirtualSettingsFileEntry patchSkuVirtualSettingsFileEntryMultipart(
-			Long id, MultipartBody multipartBody)
+	public SkuVirtualSettingsFileEntry
+			patchSkuVirtualSettingsFileEntryMultipart(
+				Long id, MultipartBody multipartBody)
 		throws Exception {
 
 		CPDVirtualSettingFileEntry cpdVirtualSettingFileEntry =

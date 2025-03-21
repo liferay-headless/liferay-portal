@@ -332,7 +332,8 @@ public class AccountResourceImpl extends BaseAccountResourceImpl {
 	}
 
 	@Override
-	public Response postAccountLogoMultipart(Long id, MultipartBody multipartBody)
+	public Response postAccountLogoMultipart(
+			Long id, MultipartBody multipartBody)
 		throws Exception {
 
 		updateAccountLogo(
