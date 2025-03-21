@@ -516,7 +516,7 @@ public class ResourceOpenAPIParser {
 				javaMethodSignature.getJavaMethodParameters()) {
 
 			if (_isValidParameter(
-					javaMethodParameter.getParameterName(), schemaName)) {
+					javaMethodParameter.getParameterName(), schemaName) && !StringUtil.equals(javaMethodParameter.getParameterName(), "multipartBody")) {
 
 				javaMethodParameters.add(javaMethodParameter);
 			}
