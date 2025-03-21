@@ -411,7 +411,6 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("messageBoardMessageId")
 			Long messageBoardMessageId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -642,7 +641,6 @@ public abstract class BaseMessageBoardAttachmentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("messageBoardThreadId")
 			Long messageBoardThreadId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,

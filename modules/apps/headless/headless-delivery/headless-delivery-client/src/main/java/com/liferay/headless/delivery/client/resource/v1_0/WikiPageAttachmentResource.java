@@ -110,15 +110,12 @@ public interface WikiPageAttachmentResource {
 		throws Exception;
 
 	public void postWikiPageWikiPageAttachmentBatch(
-			Long wikiPageId, WikiPageAttachment wikiPageAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long wikiPageId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postWikiPageWikiPageAttachmentBatchHttpResponse(
-				Long wikiPageId, WikiPageAttachment wikiPageAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long wikiPageId, String callbackURL, Object object)
 		throws Exception;
 
 	public static class Builder {
@@ -1114,15 +1111,12 @@ public interface WikiPageAttachmentResource {
 		}
 
 		public void postWikiPageWikiPageAttachmentBatch(
-				Long wikiPageId, WikiPageAttachment wikiPageAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long wikiPageId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postWikiPageWikiPageAttachmentBatchHttpResponse(
-					wikiPageId, wikiPageAttachment, multipartFiles, callbackURL,
-					object);
+					wikiPageId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -1174,9 +1168,7 @@ public interface WikiPageAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				postWikiPageWikiPageAttachmentBatchHttpResponse(
-					Long wikiPageId, WikiPageAttachment wikiPageAttachment,
-					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					Long wikiPageId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();

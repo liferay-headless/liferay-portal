@@ -229,7 +229,7 @@ public class Mutation {
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			accountResource ->
-				accountResource.postAccountByExternalReferenceCodeLogo(
+				accountResource.postAccountByExternalReferenceCodeLogoMultipart(
 					externalReferenceCode, multipartBody));
 	}
 
@@ -275,7 +275,7 @@ public class Mutation {
 		return _applyComponentServiceObjects(
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			accountResource -> accountResource.postAccountLogo(
+			accountResource -> accountResource.postAccountLogoMultipart(
 				id, multipartBody));
 	}
 

@@ -327,7 +327,6 @@ public abstract class BaseDocumentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("assetLibraryId")
 			Long assetLibraryId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -931,7 +930,6 @@ public abstract class BaseDocumentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("documentFolderId")
 			Long documentFolderId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -1168,7 +1166,6 @@ public abstract class BaseDocumentResourceImpl
 	@javax.ws.rs.PUT
 	@Override
 	public Response putDocumentBatch(
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
@@ -1782,7 +1779,6 @@ public abstract class BaseDocumentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("siteId")
 			Long siteId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,

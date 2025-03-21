@@ -79,8 +79,7 @@ public interface BlogPostingImageResource {
 		throws Exception;
 
 	public Response postSiteBlogPostingImageBatch(
-			Long siteId, MultipartBody multipartBody, String callbackURL,
-			Object object)
+			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteSiteBlogPostingImageByExternalReferenceCode(

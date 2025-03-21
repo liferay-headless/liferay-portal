@@ -71,17 +71,12 @@ public interface KnowledgeBaseAttachmentResource {
 		throws Exception;
 
 	public void postKnowledgeBaseArticleKnowledgeBaseAttachmentBatch(
-			Long knowledgeBaseArticleId,
-			KnowledgeBaseAttachment knowledgeBaseAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long knowledgeBaseArticleId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postKnowledgeBaseArticleKnowledgeBaseAttachmentBatchHttpResponse(
-				Long knowledgeBaseArticleId,
-				KnowledgeBaseAttachment knowledgeBaseAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long knowledgeBaseArticleId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteKnowledgeBaseAttachment(Long knowledgeBaseAttachmentId)
@@ -592,16 +587,12 @@ public interface KnowledgeBaseAttachmentResource {
 		}
 
 		public void postKnowledgeBaseArticleKnowledgeBaseAttachmentBatch(
-				Long knowledgeBaseArticleId,
-				KnowledgeBaseAttachment knowledgeBaseAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long knowledgeBaseArticleId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postKnowledgeBaseArticleKnowledgeBaseAttachmentBatchHttpResponse(
-					knowledgeBaseArticleId, knowledgeBaseAttachment,
-					multipartFiles, callbackURL, object);
+					knowledgeBaseArticleId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -653,9 +644,7 @@ public interface KnowledgeBaseAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				postKnowledgeBaseArticleKnowledgeBaseAttachmentBatchHttpResponse(
-					Long knowledgeBaseArticleId,
-					KnowledgeBaseAttachment knowledgeBaseAttachment,
-					Map<String, File> multipartFiles, String callbackURL,
+					Long knowledgeBaseArticleId, String callbackURL,
 					Object object)
 			throws Exception {
 

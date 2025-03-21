@@ -77,13 +77,11 @@ public interface DocumentResource {
 		throws Exception;
 
 	public void postAssetLibraryDocumentBatch(
-			Long assetLibraryId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postAssetLibraryDocumentBatchHttpResponse(
-			Long assetLibraryId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long assetLibraryId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteAssetLibraryDocumentByExternalReferenceCode(
@@ -178,13 +176,11 @@ public interface DocumentResource {
 		throws Exception;
 
 	public void postDocumentFolderDocumentBatch(
-			Long documentFolderId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long documentFolderId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postDocumentFolderDocumentBatchHttpResponse(
-			Long documentFolderId, Document document,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long documentFolderId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteDocument(Long documentId) throws Exception;
@@ -224,13 +220,10 @@ public interface DocumentResource {
 			Map<String, File> multipartFiles)
 		throws Exception;
 
-	public void putDocumentBatch(
-			Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+	public void putDocumentBatch(String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putDocumentBatchHttpResponse(
-			Document document, Map<String, File> multipartFiles,
 			String callbackURL, Object object)
 		throws Exception;
 
@@ -318,13 +311,11 @@ public interface DocumentResource {
 		throws Exception;
 
 	public void postSiteDocumentBatch(
-			Long siteId, Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteDocumentBatchHttpResponse(
-			Long siteId, Document document, Map<String, File> multipartFiles,
-			String callbackURL, Object object)
+			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteSiteDocumentByExternalReferenceCode(
@@ -872,15 +863,12 @@ public interface DocumentResource {
 		}
 
 		public void postAssetLibraryDocumentBatch(
-				Long assetLibraryId, Document document,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long assetLibraryId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postAssetLibraryDocumentBatchHttpResponse(
-					assetLibraryId, document, multipartFiles, callbackURL,
-					object);
+					assetLibraryId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -932,9 +920,7 @@ public interface DocumentResource {
 
 		public HttpInvoker.HttpResponse
 				postAssetLibraryDocumentBatchHttpResponse(
-					Long assetLibraryId, Document document,
-					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					Long assetLibraryId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -2045,15 +2031,12 @@ public interface DocumentResource {
 		}
 
 		public void postDocumentFolderDocumentBatch(
-				Long documentFolderId, Document document,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long documentFolderId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postDocumentFolderDocumentBatchHttpResponse(
-					documentFolderId, document, multipartFiles, callbackURL,
-					object);
+					documentFolderId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -2105,9 +2088,7 @@ public interface DocumentResource {
 
 		public HttpInvoker.HttpResponse
 				postDocumentFolderDocumentBatchHttpResponse(
-					Long documentFolderId, Document document,
-					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					Long documentFolderId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -2689,14 +2670,11 @@ public interface DocumentResource {
 			return httpInvoker.invoke();
 		}
 
-		public void putDocumentBatch(
-				Document document, Map<String, File> multipartFiles,
-				String callbackURL, Object object)
+		public void putDocumentBatch(String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				putDocumentBatchHttpResponse(
-					document, multipartFiles, callbackURL, object);
+				putDocumentBatchHttpResponse(callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -2747,7 +2725,6 @@ public interface DocumentResource {
 		}
 
 		public HttpInvoker.HttpResponse putDocumentBatchHttpResponse(
-				Document document, Map<String, File> multipartFiles,
 				String callbackURL, Object object)
 			throws Exception {
 
@@ -3927,14 +3904,11 @@ public interface DocumentResource {
 		}
 
 		public void postSiteDocumentBatch(
-				Long siteId, Document document,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long siteId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				postSiteDocumentBatchHttpResponse(
-					siteId, document, multipartFiles, callbackURL, object);
+				postSiteDocumentBatchHttpResponse(siteId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -3985,9 +3959,7 @@ public interface DocumentResource {
 		}
 
 		public HttpInvoker.HttpResponse postSiteDocumentBatchHttpResponse(
-				Long siteId, Document document,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long siteId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();

@@ -91,13 +91,11 @@ public interface BlogPostingImageResource {
 		throws Exception;
 
 	public void postSiteBlogPostingImageBatch(
-			Long siteId, BlogPostingImage blogPostingImage,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse postSiteBlogPostingImageBatchHttpResponse(
-			Long siteId, BlogPostingImage blogPostingImage,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
 	public void deleteSiteBlogPostingImageByExternalReferenceCode(
@@ -918,15 +916,12 @@ public interface BlogPostingImageResource {
 		}
 
 		public void postSiteBlogPostingImageBatch(
-				Long siteId, BlogPostingImage blogPostingImage,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long siteId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postSiteBlogPostingImageBatchHttpResponse(
-					siteId, blogPostingImage, multipartFiles, callbackURL,
-					object);
+					siteId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -978,9 +973,7 @@ public interface BlogPostingImageResource {
 
 		public HttpInvoker.HttpResponse
 				postSiteBlogPostingImageBatchHttpResponse(
-					Long siteId, BlogPostingImage blogPostingImage,
-					Map<String, File> multipartFiles, String callbackURL,
-					Object object)
+					Long siteId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();

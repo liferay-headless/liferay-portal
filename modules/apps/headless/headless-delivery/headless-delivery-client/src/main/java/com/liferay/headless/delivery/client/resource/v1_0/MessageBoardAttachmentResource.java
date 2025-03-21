@@ -94,17 +94,12 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public void postMessageBoardMessageMessageBoardAttachmentBatch(
-			Long messageBoardMessageId,
-			MessageBoardAttachment messageBoardAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long messageBoardMessageId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postMessageBoardMessageMessageBoardAttachmentBatchHttpResponse(
-				Long messageBoardMessageId,
-				MessageBoardAttachment messageBoardAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long messageBoardMessageId, String callbackURL, Object object)
 		throws Exception;
 
 	public Page<MessageBoardAttachment>
@@ -142,17 +137,12 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public void postMessageBoardThreadMessageBoardAttachmentBatch(
-			Long messageBoardThreadId,
-			MessageBoardAttachment messageBoardAttachment,
-			Map<String, File> multipartFiles, String callbackURL, Object object)
+			Long messageBoardThreadId, String callbackURL, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postMessageBoardThreadMessageBoardAttachmentBatchHttpResponse(
-				Long messageBoardThreadId,
-				MessageBoardAttachment messageBoardAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long messageBoardThreadId, String callbackURL, Object object)
 		throws Exception;
 
 	public void
@@ -956,16 +946,12 @@ public interface MessageBoardAttachmentResource {
 		}
 
 		public void postMessageBoardMessageMessageBoardAttachmentBatch(
-				Long messageBoardMessageId,
-				MessageBoardAttachment messageBoardAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long messageBoardMessageId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardMessageMessageBoardAttachmentBatchHttpResponse(
-					messageBoardMessageId, messageBoardAttachment,
-					multipartFiles, callbackURL, object);
+					messageBoardMessageId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -1017,9 +1003,7 @@ public interface MessageBoardAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				postMessageBoardMessageMessageBoardAttachmentBatchHttpResponse(
-					Long messageBoardMessageId,
-					MessageBoardAttachment messageBoardAttachment,
-					Map<String, File> multipartFiles, String callbackURL,
+					Long messageBoardMessageId, String callbackURL,
 					Object object)
 			throws Exception {
 
@@ -1416,16 +1400,12 @@ public interface MessageBoardAttachmentResource {
 		}
 
 		public void postMessageBoardThreadMessageBoardAttachmentBatch(
-				Long messageBoardThreadId,
-				MessageBoardAttachment messageBoardAttachment,
-				Map<String, File> multipartFiles, String callbackURL,
-				Object object)
+				Long messageBoardThreadId, String callbackURL, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				postMessageBoardThreadMessageBoardAttachmentBatchHttpResponse(
-					messageBoardThreadId, messageBoardAttachment,
-					multipartFiles, callbackURL, object);
+					messageBoardThreadId, callbackURL, object);
 
 			String content = httpResponse.getContent();
 
@@ -1477,9 +1457,7 @@ public interface MessageBoardAttachmentResource {
 
 		public HttpInvoker.HttpResponse
 				postMessageBoardThreadMessageBoardAttachmentBatchHttpResponse(
-					Long messageBoardThreadId,
-					MessageBoardAttachment messageBoardAttachment,
-					Map<String, File> multipartFiles, String callbackURL,
+					Long messageBoardThreadId, String callbackURL,
 					Object object)
 			throws Exception {
 

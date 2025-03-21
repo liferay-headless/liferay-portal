@@ -76,8 +76,7 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public Response postMessageBoardMessageMessageBoardAttachmentBatch(
-			Long messageBoardMessageId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			Long messageBoardMessageId, String callbackURL, Object object)
 		throws Exception;
 
 	public Page<MessageBoardAttachment>
@@ -97,8 +96,7 @@ public interface MessageBoardAttachmentResource {
 		throws Exception;
 
 	public Response postMessageBoardThreadMessageBoardAttachmentBatch(
-			Long messageBoardThreadId, MultipartBody multipartBody,
-			String callbackURL, Object object)
+			Long messageBoardThreadId, String callbackURL, Object object)
 		throws Exception;
 
 	public void

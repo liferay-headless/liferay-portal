@@ -2842,8 +2842,9 @@ public class Mutation {
 		return _applyComponentServiceObjects(
 			_userAccountResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			userAccountResource -> userAccountResource.postUserAccountImage(
-				userAccountId, multipartBody));
+			userAccountResource ->
+				userAccountResource.postUserAccountImageMultipart(
+					userAccountId, multipartBody));
 	}
 
 	@GraphQLField

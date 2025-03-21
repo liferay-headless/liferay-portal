@@ -279,7 +279,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceImpl
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("knowledgeBaseArticleId")
 			Long knowledgeBaseArticleId,
-			MultipartBody multipartBody,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,

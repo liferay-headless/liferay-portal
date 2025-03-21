@@ -3102,7 +3102,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			productVirtualSettingsFileEntryResource ->
 				productVirtualSettingsFileEntryResource.
-					patchProductVirtualSettingsFileEntry(id, multipartBody));
+					patchProductVirtualSettingsFileEntryMultipart(
+						id, multipartBody));
 	}
 
 	@GraphQLField
@@ -3121,7 +3122,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			productVirtualSettingsFileEntryResource ->
 				productVirtualSettingsFileEntryResource.
-					postProductVirtualSettingIdProductVirtualSettingsFileEntry(
+					postProductVirtualSettingIdProductVirtualSettingsFileEntryMultipart(
 						id, multipartBody));
 	}
 
@@ -3435,7 +3436,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			skuVirtualSettingsFileEntryResource ->
 				skuVirtualSettingsFileEntryResource.
-					patchSkuVirtualSettingsFileEntry(id, multipartBody));
+					patchSkuVirtualSettingsFileEntryMultipart(
+						id, multipartBody));
 	}
 
 	@GraphQLField
@@ -3454,7 +3456,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			skuVirtualSettingsFileEntryResource ->
 				skuVirtualSettingsFileEntryResource.
-					postSkuVirtualSettingIdSkuVirtualSettingsFileEntry(
+					postSkuVirtualSettingIdSkuVirtualSettingsFileEntryMultipart(
 						id, multipartBody));
 	}
 

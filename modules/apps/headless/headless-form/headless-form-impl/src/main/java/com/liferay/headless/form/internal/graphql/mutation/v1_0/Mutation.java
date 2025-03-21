@@ -101,7 +101,7 @@ public class Mutation {
 		return _applyComponentServiceObjects(
 			_formResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			formResource -> formResource.postFormFormDocument(
+			formResource -> formResource.postFormFormDocumentMultipart(
 				formId, multipartBody));
 	}
 
