@@ -176,12 +176,6 @@ components:
                     ChildTestEntity3: "#/components/schemas/ChildTestEntity3"
                 propertyName: type
             properties:
-                pageTestEntities:
-                    items:
-                        $ref: "#/components/schemas/TestEntity"
-                    type: array
-                objectProperty:
-                    type: object
                 dateCreated:
                     format: date-time
                     type: string
@@ -205,6 +199,12 @@ components:
                     type: string
                 nestedTestEntity:
                     $ref: "#/components/schemas/NestedTestEntity"
+                objectProperty:
+                    type: object
+                pageTestEntities:
+                    items:
+                        $ref: "#/components/schemas/TestEntity"
+                    type: array
                 self:
                     type: string
                 testEntities:
