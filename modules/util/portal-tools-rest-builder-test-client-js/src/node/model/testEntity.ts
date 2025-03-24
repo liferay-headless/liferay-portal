@@ -22,6 +22,8 @@
 			'jsonProperty'?: string;
 			'name'?: string;
 			'nestedTestEntity'?: NestedTestEntity;
+			'objectProperty'?: object;
+			'pageTestEntities'?: Array<TestEntity>;
 			'self'?: string;
 			'testEntities'?: TestEntity;
 			'type'?: 'ChildTestEntity1' | 'ChildTestEntity2' | 'ChildTestEntity3';
@@ -72,6 +74,16 @@
 			baseName: "nestedTestEntity",
 			name: "nestedTestEntity",
 			type: "NestedTestEntity",
+		},
+		{
+			baseName: "objectProperty",
+			name: "objectProperty",
+			type: "object",
+		},
+		{
+			baseName: "pageTestEntities",
+			name: "pageTestEntities",
+			type: "Array<TestEntity>",
 		},
 		{
 			baseName: "self",

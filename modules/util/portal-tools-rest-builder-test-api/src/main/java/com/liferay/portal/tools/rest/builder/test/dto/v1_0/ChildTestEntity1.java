@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
@@ -251,6 +252,52 @@ public class ChildTestEntity1 extends TestEntity implements Serializable {
 			sb.append("\"nestedTestEntity\": ");
 
 			sb.append(String.valueOf(nestedTestEntity));
+		}
+
+		Object objectProperty = getObjectProperty();
+
+		if (objectProperty != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectProperty\": ");
+
+			if (objectProperty instanceof Map) {
+				sb.append(
+					JSONFactoryUtil.createJSONObject(
+						(Map<?, ?>)objectProperty));
+			}
+			else if (objectProperty instanceof String) {
+				sb.append("\"");
+				sb.append(_escape((String)objectProperty));
+				sb.append("\"");
+			}
+			else {
+				sb.append(objectProperty);
+			}
+		}
+
+		TestEntity[] pageTestEntities = getPageTestEntities();
+
+		if (pageTestEntities != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"pageTestEntities\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < pageTestEntities.length; i++) {
+				sb.append(String.valueOf(pageTestEntities[i]));
+
+				if ((i + 1) < pageTestEntities.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		String self = getSelf();

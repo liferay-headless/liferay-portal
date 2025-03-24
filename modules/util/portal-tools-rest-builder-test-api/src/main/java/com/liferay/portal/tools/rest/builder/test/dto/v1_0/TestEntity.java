@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
@@ -405,6 +406,91 @@ public abstract class TestEntity implements Serializable {
 	private Supplier<NestedTestEntity> _nestedTestEntitySupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public Object getObjectProperty() {
+		if (_objectPropertySupplier != null) {
+			objectProperty = _objectPropertySupplier.get();
+
+			_objectPropertySupplier = null;
+		}
+
+		return objectProperty;
+	}
+
+	public void setObjectProperty(Object objectProperty) {
+		this.objectProperty = objectProperty;
+
+		_objectPropertySupplier = null;
+	}
+
+	@JsonIgnore
+	public void setObjectProperty(
+		UnsafeSupplier<Object, Exception> objectPropertyUnsafeSupplier) {
+
+		_objectPropertySupplier = () -> {
+			try {
+				return objectPropertyUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Object objectProperty;
+
+	@JsonIgnore
+	private Supplier<Object> _objectPropertySupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public TestEntity[] getPageTestEntities() {
+		if (_pageTestEntitiesSupplier != null) {
+			pageTestEntities = _pageTestEntitiesSupplier.get();
+
+			_pageTestEntitiesSupplier = null;
+		}
+
+		return pageTestEntities;
+	}
+
+	public void setPageTestEntities(TestEntity[] pageTestEntities) {
+		this.pageTestEntities = pageTestEntities;
+
+		_pageTestEntitiesSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setPageTestEntities(
+		UnsafeSupplier<TestEntity[], Exception>
+			pageTestEntitiesUnsafeSupplier) {
+
+		_pageTestEntitiesSupplier = () -> {
+			try {
+				return pageTestEntitiesUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected TestEntity[] pageTestEntities;
+
+	@JsonIgnore
+	private Supplier<TestEntity[]> _pageTestEntitiesSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public String getSelf() {
 		if (_selfSupplier != null) {
 			self = _selfSupplier.get();
@@ -681,6 +767,52 @@ public abstract class TestEntity implements Serializable {
 			sb.append("\"nestedTestEntity\": ");
 
 			sb.append(String.valueOf(nestedTestEntity));
+		}
+
+		Object objectProperty = getObjectProperty();
+
+		if (objectProperty != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectProperty\": ");
+
+			if (objectProperty instanceof Map) {
+				sb.append(
+					JSONFactoryUtil.createJSONObject(
+						(Map<?, ?>)objectProperty));
+			}
+			else if (objectProperty instanceof String) {
+				sb.append("\"");
+				sb.append(_escape((String)objectProperty));
+				sb.append("\"");
+			}
+			else {
+				sb.append(objectProperty);
+			}
+		}
+
+		TestEntity[] pageTestEntities = getPageTestEntities();
+
+		if (pageTestEntities != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"pageTestEntities\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < pageTestEntities.length; i++) {
+				sb.append(String.valueOf(pageTestEntities[i]));
+
+				if ((i + 1) < pageTestEntities.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		String self = getSelf();

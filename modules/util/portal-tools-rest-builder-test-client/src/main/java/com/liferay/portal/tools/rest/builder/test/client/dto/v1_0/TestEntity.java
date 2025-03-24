@@ -191,6 +191,49 @@ public abstract class TestEntity implements Cloneable, Serializable {
 
 	protected NestedTestEntity nestedTestEntity;
 
+	public Object getObjectProperty() {
+		return objectProperty;
+	}
+
+	public void setObjectProperty(Object objectProperty) {
+		this.objectProperty = objectProperty;
+	}
+
+	public void setObjectProperty(
+		UnsafeSupplier<Object, Exception> objectPropertyUnsafeSupplier) {
+
+		try {
+			objectProperty = objectPropertyUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Object objectProperty;
+
+	public TestEntity[] getPageTestEntities() {
+		return pageTestEntities;
+	}
+
+	public void setPageTestEntities(TestEntity[] pageTestEntities) {
+		this.pageTestEntities = pageTestEntities;
+	}
+
+	public void setPageTestEntities(
+		UnsafeSupplier<TestEntity[], Exception>
+			pageTestEntitiesUnsafeSupplier) {
+
+		try {
+			pageTestEntities = pageTestEntitiesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected TestEntity[] pageTestEntities;
+
 	public String getSelf() {
 		return self;
 	}

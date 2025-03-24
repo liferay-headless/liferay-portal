@@ -744,6 +744,22 @@ public abstract class BaseTestEntityResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("objectProperty", additionalAssertFieldName)) {
+				if (testEntity.getObjectProperty() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("pageTestEntities", additionalAssertFieldName)) {
+				if (testEntity.getPageTestEntities() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("self", additionalAssertFieldName)) {
 				if (testEntity.getSelf() == null) {
 					valid = false;
@@ -988,6 +1004,28 @@ public abstract class BaseTestEntityResourceTestCase {
 				if (!Objects.deepEquals(
 						testEntity1.getNestedTestEntity(),
 						testEntity2.getNestedTestEntity())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("objectProperty", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						testEntity1.getObjectProperty(),
+						testEntity2.getObjectProperty())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("pageTestEntities", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						testEntity1.getPageTestEntities(),
+						testEntity2.getPageTestEntities())) {
 
 					return false;
 				}
@@ -1374,6 +1412,16 @@ public abstract class BaseTestEntityResourceTestCase {
 		}
 
 		if (entityFieldName.equals("nestedTestEntity")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("objectProperty")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("pageTestEntities")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}

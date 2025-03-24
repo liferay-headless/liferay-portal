@@ -6,6 +6,7 @@
 package com.liferay.portal.tools.rest.builder.test.client.serdes.v1_0;
 
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.ChildTestEntity3;
+import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.TestEntity;
 import com.liferay.portal.tools.rest.builder.test.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
@@ -156,6 +157,47 @@ public class ChildTestEntity3SerDes {
 			sb.append(String.valueOf(childTestEntity3.getNestedTestEntity()));
 		}
 
+		if (childTestEntity3.getObjectProperty() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectProperty\": ");
+
+			if (childTestEntity3.getObjectProperty() instanceof String) {
+				sb.append("\"");
+				sb.append(
+					_escape((String)childTestEntity3.getObjectProperty()));
+				sb.append("\"");
+			}
+			else {
+				sb.append(childTestEntity3.getObjectProperty());
+			}
+		}
+
+		if (childTestEntity3.getPageTestEntities() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"pageTestEntities\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < childTestEntity3.getPageTestEntities().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(childTestEntity3.getPageTestEntities()[i]));
+
+				if ((i + 1) < childTestEntity3.getPageTestEntities().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (childTestEntity3.getSelf() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -285,6 +327,24 @@ public class ChildTestEntity3SerDes {
 				String.valueOf(childTestEntity3.getNestedTestEntity()));
 		}
 
+		if (childTestEntity3.getObjectProperty() == null) {
+			map.put("objectProperty", null);
+		}
+		else {
+			map.put(
+				"objectProperty",
+				String.valueOf(childTestEntity3.getObjectProperty()));
+		}
+
+		if (childTestEntity3.getPageTestEntities() == null) {
+			map.put("pageTestEntities", null);
+		}
+		else {
+			map.put(
+				"pageTestEntities",
+				String.valueOf(childTestEntity3.getPageTestEntities()));
+		}
+
 		if (childTestEntity3.getSelf() == null) {
 			map.put("self", null);
 		}
@@ -348,6 +408,12 @@ public class ChildTestEntity3SerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "nestedTestEntity")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "objectProperty")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "pageTestEntities")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "self")) {
@@ -414,6 +480,28 @@ public class ChildTestEntity3SerDes {
 					childTestEntity3.setNestedTestEntity(
 						NestedTestEntitySerDes.toDTO(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "objectProperty")) {
+				if (jsonParserFieldValue != null) {
+					childTestEntity3.setObjectProperty(
+						(Object)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "pageTestEntities")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					TestEntity[] pageTestEntitiesArray =
+						new TestEntity[jsonParserFieldValues.length];
+
+					for (int i = 0; i < pageTestEntitiesArray.length; i++) {
+						pageTestEntitiesArray[i] = TestEntitySerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					childTestEntity3.setPageTestEntities(pageTestEntitiesArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "self")) {

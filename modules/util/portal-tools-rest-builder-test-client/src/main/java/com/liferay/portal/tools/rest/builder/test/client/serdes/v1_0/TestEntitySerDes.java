@@ -152,6 +152,24 @@ public class TestEntitySerDes {
 				String.valueOf(testEntity.getNestedTestEntity()));
 		}
 
+		if (testEntity.getObjectProperty() == null) {
+			map.put("objectProperty", null);
+		}
+		else {
+			map.put(
+				"objectProperty",
+				String.valueOf(testEntity.getObjectProperty()));
+		}
+
+		if (testEntity.getPageTestEntities() == null) {
+			map.put("pageTestEntities", null);
+		}
+		else {
+			map.put(
+				"pageTestEntities",
+				String.valueOf(testEntity.getPageTestEntities()));
+		}
+
 		if (testEntity.getSelf() == null) {
 			map.put("self", null);
 		}
@@ -214,6 +232,12 @@ public class TestEntitySerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "nestedTestEntity")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "objectProperty")) {
+				return false;
+			}
+			else if (Objects.equals(jsonParserFieldName, "pageTestEntities")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "self")) {
@@ -307,6 +331,27 @@ public class TestEntitySerDes {
 					testEntity.setNestedTestEntity(
 						NestedTestEntitySerDes.toDTO(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "objectProperty")) {
+				if (jsonParserFieldValue != null) {
+					testEntity.setObjectProperty((Object)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "pageTestEntities")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					TestEntity[] pageTestEntitiesArray =
+						new TestEntity[jsonParserFieldValues.length];
+
+					for (int i = 0; i < pageTestEntitiesArray.length; i++) {
+						pageTestEntitiesArray[i] = TestEntitySerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					testEntity.setPageTestEntities(pageTestEntitiesArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "self")) {
