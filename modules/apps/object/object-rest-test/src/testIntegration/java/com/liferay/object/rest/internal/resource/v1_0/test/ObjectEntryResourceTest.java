@@ -417,8 +417,7 @@ public class ObjectEntryResourceTest {
 						).name(
 							ObjectFieldSettingConstants.NAME_TIME_STORAGE
 						).value(
-							ObjectFieldSettingConstants.
-								VALUE_USE_INPUT_AS_ENTERED
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -492,8 +491,7 @@ public class ObjectEntryResourceTest {
 						).name(
 							ObjectFieldSettingConstants.NAME_TIME_STORAGE
 						).value(
-							ObjectFieldSettingConstants.
-								VALUE_USE_INPUT_AS_ENTERED
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -566,8 +564,7 @@ public class ObjectEntryResourceTest {
 						).name(
 							ObjectFieldSettingConstants.NAME_TIME_STORAGE
 						).value(
-							ObjectFieldSettingConstants.
-								VALUE_USE_INPUT_AS_ENTERED
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -8039,6 +8036,46 @@ public class ObjectEntryResourceTest {
 		_assertItem(2, jsonObject, "autoIncrement", "10-private");
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
+	public void testPostCustomObjectEntryWithDateTimeObjectField()
+		throws Exception {
+
+		User user = GuestOrUserUtil.getGuestOrUser();
+
+		String timeZoneId = user.getTimeZoneId();
+
+		try {
+			user.setTimeZoneId("America/Anchorage"); //GMT-8
+
+			user = _userLocalService.updateUser(user);
+
+			JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_DATE_TIME, "2025-03-11T00:00:00.000Z"
+				).toString(),
+				_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+			Assert.assertEquals(
+				"2025-03-11T00:00:00.000Z",
+				jsonObject.getString(_OBJECT_FIELD_NAME_DATE_TIME));
+
+			jsonObject = HTTPTestUtil.invokeToJSONObject(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_DATE_TIME, "2025-03-11T00:00:00.000"
+				).toString(),
+				_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+			Assert.assertEquals(
+				"2025-03-11T08:00:00.000Z",
+				jsonObject.getString(_OBJECT_FIELD_NAME_DATE_TIME));
+		}
+		finally {
+			user.setTimeZoneId(timeZoneId);
+
+			_userLocalService.updateUser(user);
+		}
 	}
 
 	@Test
