@@ -34,6 +34,21 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 	}
 
 	@Override
+	protected TestEntity randomTestEntity() throws Exception {
+		TestEntity testEntity = super.randomTestEntity();
+
+		TestEntity testChildEntity = super.randomTestEntity();
+
+		testChildEntity.setObjectProperty(super.randomTestEntity().toString());
+
+		testEntity.setPageTestEntities(new TestEntity[] {
+			testChildEntity,
+			});
+
+		return testEntity;
+	}
+
+	@Override
 	@Test
 	public void testGetTestEntityCount() throws Exception {
 		int initialCount = testEntityResource.getTestEntityCount();
@@ -133,7 +148,7 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 
 	@Override
 	protected TestEntity testGetTestEntitiesPage_addTestEntity(
-			TestEntity testEntity)
+		TestEntity testEntity)
 		throws Exception {
 
 		return testEntityResource.postTestEntity(testEntity);
