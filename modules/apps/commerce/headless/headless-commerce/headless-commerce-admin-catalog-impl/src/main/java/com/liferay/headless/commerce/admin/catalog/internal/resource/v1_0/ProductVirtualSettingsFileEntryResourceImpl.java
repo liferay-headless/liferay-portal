@@ -231,7 +231,7 @@ public class ProductVirtualSettingsFileEntryResourceImpl
 			ActionUtil.addAction(
 				ActionKeys.UPDATE, getClass(),
 				cpDefinitionVirtualSetting.getClassPK(),
-				"patchProductVirtualSettingsFileEntry",
+				"patchProductVirtualSettingsFileEntryMultipart",
 				_cpDefinitionModelResourcePermission,
 				cpdVirtualSettingFileEntry.
 					getCPDefinitionVirtualSettingFileEntryId(),

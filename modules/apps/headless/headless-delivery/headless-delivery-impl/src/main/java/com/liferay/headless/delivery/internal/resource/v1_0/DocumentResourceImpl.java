@@ -174,7 +174,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 			HashMapBuilder.put(
 				"create",
 				addAction(
-					ActionKeys.ADD_DOCUMENT, "postAssetLibraryDocument",
+					ActionKeys.ADD_DOCUMENT, "postAssetLibraryDocumentMultipart",
 					DLConstants.RESOURCE_NAME, assetLibraryId)
 			).put(
 				"createBatch",
@@ -229,7 +229,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 				"create",
 				addAction(
 					ActionKeys.ADD_DOCUMENT, folder.getFolderId(),
-					"postDocumentFolderDocument", folder.getUserId(),
+					"postDocumentFolderDocumentMultipart", folder.getUserId(),
 					DLConstants.RESOURCE_NAME, folder.getGroupId())
 			).put(
 				"createBatch",
@@ -313,7 +313,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 			HashMapBuilder.put(
 				"create",
 				addAction(
-					ActionKeys.ADD_DOCUMENT, "postSiteDocument",
+					ActionKeys.ADD_DOCUMENT, "postSiteDocumentMultipart",
 					DLConstants.RESOURCE_NAME, siteId)
 			).put(
 				"createBatch",
@@ -976,13 +976,13 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 					"replace",
 					addAction(
 						ActionKeys.UPDATE, fileEntry.getPrimaryKey(),
-						"putDocument", fileEntry.getUserId(),
+						"putDocumentMultipart", fileEntry.getUserId(),
 						DLFileEntry.class.getName(), fileEntry.getGroupId())
 				).put(
 					"update",
 					addAction(
 						ActionKeys.UPDATE, fileEntry.getPrimaryKey(),
-						"patchDocument", fileEntry.getUserId(),
+						"patchDocumentMultipart", fileEntry.getUserId(),
 						DLFileEntry.class.getName(), fileEntry.getGroupId())
 				).build(),
 				_dtoConverterRegistry, fileEntry.getFileEntryId(),

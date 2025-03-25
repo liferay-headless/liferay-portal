@@ -230,7 +230,7 @@ public class SkuVirtualSettingsFileEntryResourceImpl
 			"patch",
 			ActionUtil.addAction(
 				ActionKeys.UPDATE, getClass(), cpDefinitionId,
-				"patchSkuVirtualSettingsFileEntry",
+				"patchSkuVirtualSettingsFileEntryMultipart",
 				_cpDefinitionModelResourcePermission,
 				cpdVirtualSettingFileEntry.
 					getCPDefinitionVirtualSettingFileEntryId(),
