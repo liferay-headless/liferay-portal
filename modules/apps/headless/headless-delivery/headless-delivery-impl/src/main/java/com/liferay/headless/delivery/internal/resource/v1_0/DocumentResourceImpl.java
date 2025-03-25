@@ -174,7 +174,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 			HashMapBuilder.put(
 				"create",
 				addAction(
-					ActionKeys.ADD_DOCUMENT, "postAssetLibraryDocumentMultipart",
+					ActionKeys.ADD_DOCUMENT,
+					"postAssetLibraryDocumentMultipart",
 					DLConstants.RESOURCE_NAME, assetLibraryId)
 			).put(
 				"createBatch",
