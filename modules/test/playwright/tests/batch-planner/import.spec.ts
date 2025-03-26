@@ -5,7 +5,7 @@
 
 import {
 	ObjectDefinition,
-	ObjectDefinitionApi,
+	ObjectDefinitionAPI,
 } from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 import * as path from 'path';
@@ -499,7 +499,7 @@ test('can handle OnlyAddNewRecords and UpdateChangedRecordFields import strategi
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -544,7 +544,7 @@ test('can import CSV file with an unexisting field', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -614,7 +614,7 @@ test('can import CSV file with custom columns order', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -687,7 +687,7 @@ test('can import CSV file with multiple site scoped object entries', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -791,7 +791,7 @@ test('can import CSV file with new and existing site scoped object entries', asy
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -907,7 +907,7 @@ test('can import CSV file with new and modified existing company scoped object e
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1020,7 +1020,7 @@ test('can map all imported fields', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
 			siteObjectDefinition
@@ -1053,7 +1053,7 @@ test('can preview CSV file', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1135,7 +1135,7 @@ test('can show duplicate error message with CSV import existing entry and only a
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1176,7 +1176,7 @@ test('can show unique contraint error message with CSV import existing entry and
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1238,7 +1238,7 @@ test('cannot import CSV file with empty headers row', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1276,7 +1276,7 @@ test('cannot import CSV file with object entry with UPSERT strategy', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1308,7 +1308,7 @@ test('cannot import empty CSV file', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1338,7 +1338,7 @@ test('can see correct custom object name in dropdown', async ({
 	dataMigrationCenterPage,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition({
@@ -1411,7 +1411,7 @@ test('cannot see relationship nested field', async ({
 	page,
 }) => {
 	const objectDefinitionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionApi);
+		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 	const {body: objectDefinition} =
 		await objectDefinitionAPIClient.postObjectDefinition(
@@ -1627,7 +1627,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(
@@ -1692,7 +1692,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(
@@ -1765,7 +1765,7 @@ test.describe('can rely on anyOf form validation', () => {
 		page,
 	}) => {
 		const objectDefinitionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionApi);
+			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
 
 		const {body: subjectResponse} =
 			await objectDefinitionAPIClient.postObjectDefinition(
