@@ -221,7 +221,7 @@ public class BatchEngineBrokerImpl implements BatchEngineBroker {
 			if ((createStrategy == CreateStrategy.INSERT) ||
 				(createStrategy == CreateStrategy.UPSERT)) {
 
-				importTaskResource.postImportTask(
+				importTaskResource.postImportTaskMultipart(
 					batchPlannerPlan.getInternalClassName(), null, null, null,
 					createStrategy.name(),
 					String.valueOf(batchPlannerPlan.getBatchPlannerPlanId()),
@@ -244,7 +244,7 @@ public class BatchEngineBrokerImpl implements BatchEngineBroker {
 				return;
 			}
 
-			importTaskResource.putImportTask(
+			importTaskResource.putImportTaskMultipart(
 				batchPlannerPlan.getInternalClassName(), null,
 				String.valueOf(batchPlannerPlan.getBatchPlannerPlanId()),
 				_getImportErrorStrategy(batchPlannerPlan),
