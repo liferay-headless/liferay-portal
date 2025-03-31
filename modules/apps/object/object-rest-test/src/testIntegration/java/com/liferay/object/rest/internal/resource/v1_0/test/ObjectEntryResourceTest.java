@@ -186,6 +186,10 @@ import java.math.BigDecimal;
 
 import java.text.DateFormat;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -411,7 +415,8 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
 					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DATE_TIME,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 					Collections.singletonList(
 						new ObjectFieldSettingBuilder(
 						).name(
@@ -419,6 +424,19 @@ public class ObjectEntryResourceTest {
 						).value(
 							ObjectFieldSettingConstants.
 								VALUE_USE_INPUT_AS_ENTERED
+						).build()),
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
+					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+					Collections.singletonList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_TIME_STORAGE
+						).value(
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -486,7 +504,8 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
 					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DATE_TIME,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 					Collections.singletonList(
 						new ObjectFieldSettingBuilder(
 						).name(
@@ -494,6 +513,19 @@ public class ObjectEntryResourceTest {
 						).value(
 							ObjectFieldSettingConstants.
 								VALUE_USE_INPUT_AS_ENTERED
+						).build()),
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
+					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+					Collections.singletonList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_TIME_STORAGE
+						).value(
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -560,7 +592,8 @@ public class ObjectEntryResourceTest {
 				ObjectFieldUtil.createObjectField(
 					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
 					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
-					RandomTestUtil.randomString(), _OBJECT_FIELD_NAME_DATE_TIME,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 					Collections.singletonList(
 						new ObjectFieldSettingBuilder(
 						).name(
@@ -568,6 +601,19 @@ public class ObjectEntryResourceTest {
 						).value(
 							ObjectFieldSettingConstants.
 								VALUE_USE_INPUT_AS_ENTERED
+						).build()),
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_DATE_TIME,
+					ObjectFieldConstants.DB_TYPE_DATE_TIME, true, true, null,
+					RandomTestUtil.randomString(),
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+					Collections.singletonList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_TIME_STORAGE
+						).value(
+							ObjectFieldSettingConstants.VALUE_CONVERT_TO_UTC
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -8042,6 +8088,96 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testPostCustomObjectEntryWithDateTimeObjectField()
+		throws Exception {
+
+		User user = GuestOrUserUtil.getGuestOrUser();
+
+		String timeZoneId = user.getTimeZoneId();
+
+		try {
+			String testTimeZoneId = "America/Anchorage";
+
+			user.setTimeZoneId(testTimeZoneId);
+
+			user = _userLocalService.updateUser(user);
+
+			JSONAssert.assertEquals(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+					"2025-03-11T00:00:00.000Z"
+				).put(
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC, "2025-03-11T00:00:00.000Z"
+				).toString(),
+				HTTPTestUtil.invokeToJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+						"2025-03-11T00:00:00.000Z"
+					).put(
+						_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+						"2025-03-11T00:00:00.000Z"
+					).toString(),
+					_objectDefinition1.getRESTContextPath(), Http.Method.POST
+				).toString(),
+				JSONCompareMode.LENIENT);
+
+			JSONAssert.assertEquals(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+					"2025-03-11T04:00:00.000Z"
+				).put(
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC, "2025-03-11T04:00:00.000Z"
+				).toString(),
+				HTTPTestUtil.invokeToJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+						"2025-03-11T00:00:00.000-04:00"
+					).put(
+						_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+						"2025-03-11T00:00:00.000-04:00"
+					).toString(),
+					_objectDefinition1.getRESTContextPath(), Http.Method.POST
+				).toString(),
+				JSONCompareMode.LENIENT);
+
+			JSONAssert.assertEquals(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+					"2025-03-11T00:00:00.000Z"
+				).put(
+					_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+					() -> {
+						ZonedDateTime zonedDateTime = ZonedDateTime.of(
+							2025, 3, 11, 0, 0, 0, 0, ZoneId.of(testTimeZoneId));
+
+						return zonedDateTime.withZoneSameInstant(
+							ZoneId.of("UTC")
+						).format(
+							DateTimeFormatter.ofPattern(
+								"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+						);
+					}
+				).toString(),
+				HTTPTestUtil.invokeToJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
+						"2025-03-11T00:00:00.000"
+					).put(
+						_OBJECT_FIELD_NAME_DATE_TIME_UTC,
+						"2025-03-11T00:00:00.000"
+					).toString(),
+					_objectDefinition1.getRESTContextPath(), Http.Method.POST
+				).toString(),
+				JSONCompareMode.LENIENT);
+		}
+		finally {
+			user.setTimeZoneId(timeZoneId);
+
+			_userLocalService.updateUser(user);
+		}
+	}
+
+	@Test
 	public void testPostCustomObjectEntryWithDuplicateExternalReferenceCode()
 		throws Exception {
 
@@ -10004,7 +10140,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -10050,7 +10186,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(
 						randomDate2.getTime() +
@@ -10099,7 +10235,7 @@ public class ObjectEntryResourceTest {
 				endpoint, jsonObject1, jsonObject2, _OBJECT_FIELD_NAME_DATE);
 			_testSortByCustomObjectField(
 				endpoint, jsonObject1, jsonObject2,
-				_OBJECT_FIELD_NAME_DATE_TIME);
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT);
 			_testSortByCustomObjectField(
 				endpoint, jsonObject1, jsonObject2, _OBJECT_FIELD_NAME_DECIMAL);
 			_testSortByCustomObjectField(
@@ -10141,7 +10277,7 @@ public class ObjectEntryResourceTest {
 
 			_testSortByCustomObjectField(
 				endpoint, jsonObject1, jsonObject2, _OBJECT_FIELD_NAME_BOOLEAN,
-				_OBJECT_FIELD_NAME_DATE, _OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE, _OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_OBJECT_FIELD_NAME_DECIMAL, _OBJECT_FIELD_NAME_INTEGER,
 				_OBJECT_FIELD_NAME_LONG_INTEGER, _OBJECT_FIELD_NAME_LONG_TEXT,
 				_OBJECT_FIELD_NAME_MULTISELECT_PICKLIST,
@@ -10198,7 +10334,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -10228,7 +10364,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -10258,7 +10394,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -10288,7 +10424,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -10320,7 +10456,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 1000))
 			).put(
@@ -10352,7 +10488,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (3 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 3000))
 			).put(
@@ -10479,7 +10615,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME));
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT));
 			_testSortByManyToOneAndOneToManyRelationshipsCustomObjectFields(
 				endpoint1, endpoint3, jsonObject1, jsonObject2, jsonObject3,
 				jsonObject4, depth2JSONObject1, depth2JSONObject2,
@@ -10559,7 +10695,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT),
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DECIMAL),
@@ -10679,7 +10815,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -10709,7 +10845,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -10739,7 +10875,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -10769,7 +10905,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -10879,7 +11015,7 @@ public class ObjectEntryResourceTest {
 				jsonObject4, depth1JSONObject1, depth1JSONObject2,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME));
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT));
 			_testSortByManyToOneRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2, jsonObject3,
 				jsonObject4, depth1JSONObject1, depth1JSONObject2,
@@ -10951,7 +11087,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME));
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT));
 			_testSortByManyToOneRelationshipCustomObjectFields(
 				endpoint1, endpoint3, jsonObject1, jsonObject2, jsonObject3,
 				jsonObject4, depth2JSONObject1, depth2JSONObject2,
@@ -11021,7 +11157,7 @@ public class ObjectEntryResourceTest {
 					_OBJECT_FIELD_NAME_DATE),
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT),
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_DECIMAL),
@@ -11059,7 +11195,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT),
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DECIMAL),
@@ -11548,7 +11684,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -11578,7 +11714,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -11610,7 +11746,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 1000))
 			).put(
@@ -11642,7 +11778,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (3 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 3000))
 			).put(
@@ -11672,7 +11808,7 @@ public class ObjectEntryResourceTest {
 			).put(
 				_OBJECT_FIELD_NAME_DATE, _dateFormat.format(randomDate1)
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(randomDate2)
 			).put(
 				_OBJECT_FIELD_NAME_DECIMAL, randomFloat1
@@ -11702,7 +11838,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (2 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 2000))
 			).put(
@@ -11734,7 +11870,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 1000))
 			).put(
@@ -11766,7 +11902,7 @@ public class ObjectEntryResourceTest {
 				() -> _dateFormat.format(
 					new Date(randomDate1.getTime() + (3 * 24 * 3600 * 1000)))
 			).put(
-				_OBJECT_FIELD_NAME_DATE_TIME,
+				_OBJECT_FIELD_NAME_DATE_TIME_INPUT,
 				_dateTimeDateFormat.format(
 					new Date(randomDate2.getTime() + 3000))
 			).put(
@@ -11888,7 +12024,7 @@ public class ObjectEntryResourceTest {
 				depth1JSONObject4,
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME));
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint2, jsonObject1, jsonObject2,
 				depth1JSONObject1, depth1JSONObject2, depth1JSONObject3,
@@ -11970,7 +12106,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME));
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT));
 			_testSortByOneToManyRelationshipCustomObjectFields(
 				endpoint1, endpoint3, jsonObject1, jsonObject2,
 				depth2JSONObject1, depth2JSONObject2, depth2JSONObject3,
@@ -12049,7 +12185,7 @@ public class ObjectEntryResourceTest {
 					_OBJECT_FIELD_NAME_DATE),
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT),
 				String.format(
 					"%s/%s", _objectRelationship1.getName(),
 					_OBJECT_FIELD_NAME_DECIMAL),
@@ -12088,7 +12224,7 @@ public class ObjectEntryResourceTest {
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(),
-					_OBJECT_FIELD_NAME_DATE_TIME),
+					_OBJECT_FIELD_NAME_DATE_TIME_INPUT),
 				String.format(
 					"%s/%s/%s", _objectRelationship1.getName(),
 					_objectRelationship2.getName(), _OBJECT_FIELD_NAME_DECIMAL),
@@ -16458,7 +16594,10 @@ public class ObjectEntryResourceTest {
 	private static final String _OBJECT_FIELD_NAME_DATE =
 		"x" + RandomTestUtil.randomString();
 
-	private static final String _OBJECT_FIELD_NAME_DATE_TIME =
+	private static final String _OBJECT_FIELD_NAME_DATE_TIME_INPUT =
+		"x" + RandomTestUtil.randomString();
+
+	private static final String _OBJECT_FIELD_NAME_DATE_TIME_UTC =
 		"x" + RandomTestUtil.randomString();
 
 	private static final String _OBJECT_FIELD_NAME_DECIMAL =
