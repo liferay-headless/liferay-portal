@@ -77,6 +77,112 @@ public abstract class TestEntity implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(TestEntity.class, json);
 	}
 
+	public static Class<? extends TestEntity> getConcreteClass(
+		Map<String, Object> map) {
+
+		Object discriminatorObj = map.get("type");
+
+		if (discriminatorObj == null) {
+			throw new IllegalArgumentException(
+				"Missing required discriminator field 'type'");
+		}
+
+		String discriminatorValue = discriminatorObj.toString();
+
+		switch (discriminatorValue) {
+			case "ChildTestEntity1":
+				try {
+					String packageName = TestEntity.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".ChildTestEntity1");
+
+					if (!TestEntity.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of TestEntity");
+					}
+
+					return (Class<? extends TestEntity>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			case "ChildTestEntity2":
+				try {
+					String packageName = TestEntity.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".ChildTestEntity2");
+
+					if (!TestEntity.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of TestEntity");
+					}
+
+					return (Class<? extends TestEntity>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			case "ChildTestEntity3":
+				try {
+					String packageName = TestEntity.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".ChildTestEntity3");
+
+					if (!TestEntity.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of TestEntity");
+					}
+
+					return (Class<? extends TestEntity>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			default:
+
+				try {
+					String packageName = TestEntity.class.getPackage(
+					).getName();
+					Class<?> clazz = Class.forName(
+						packageName + "." + discriminatorValue);
+
+					if (!TestEntity.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of TestEntity");
+					}
+
+					return (Class<? extends TestEntity>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"Invalid type value: " + discriminatorValue +
+							". Expected one of: ChildTestEntity1, ChildTestEntity2, ChildTestEntity3");
+				}
+		}
+	}
+
 	@io.swagger.v3.oas.annotations.media.Schema
 	public Date getDateCreated() {
 		if (_dateCreatedSupplier != null) {
