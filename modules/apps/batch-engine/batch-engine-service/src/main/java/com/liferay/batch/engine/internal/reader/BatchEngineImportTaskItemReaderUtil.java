@@ -23,12 +23,14 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import java.util.Arrays;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,10 +54,25 @@ public class BatchEngineImportTaskItemReaderUtil {
 		throws ReflectiveOperationException {
 
 		Map<String, Serializable> extendedProperties = new HashMap<>();
-		T item = itemClass.newInstance();
+
+		T item;
+
+		if (!Modifier.isAbstract(itemClass.getModifiers())) {
+			item = itemClass.newInstance();
+		}
+
+		else {
+			Class<? extends T> concreteClass = (Class<? extends T>)
+				itemClass.getMethod("getConcreteClass", Map.class)
+					.invoke(null, fieldNameValueMap);
+
+			item = concreteClass.getDeclaredConstructor().newInstance();
+		}
 
 		Set<String> batchRestrictFields = _getBatchRestrictFields(
 			batchEngineImportTask);
+
+
 
 		for (Map.Entry<String, Object> entry : fieldNameValueMap.entrySet()) {
 			String name = entry.getKey();
@@ -66,7 +83,7 @@ public class BatchEngineImportTaskItemReaderUtil {
 
 			Field field = null;
 
-			for (Field declaredField : itemClass.getDeclaredFields()) {
+			for (Field declaredField : _getAllFields(new ArrayList<>(), item.getClass())) {
 				if (name.equals(declaredField.getName()) ||
 					Objects.equals(
 						StringPool.UNDERLINE + name, declaredField.getName())) {
@@ -91,7 +108,7 @@ public class BatchEngineImportTaskItemReaderUtil {
 				continue;
 			}
 
-			for (Field declaredField : itemClass.getDeclaredFields()) {
+			for (Field declaredField : _getAllFields(new ArrayList<>(), item.getClass())) {
 				JsonAnySetter[] jsonAnySetters =
 					declaredField.getAnnotationsByType(JsonAnySetter.class);
 
@@ -123,6 +140,16 @@ public class BatchEngineImportTaskItemReaderUtil {
 		}
 
 		return item;
+	}
+
+	private static List<Field> _getAllFields(List<Field> fields, Class<?> type) {
+		fields.addAll(Arrays.asList(type.getDeclaredFields()));
+
+		if (type.getSuperclass() != null) {
+			_getAllFields(fields, type.getSuperclass());
+		}
+
+		return fields;
 	}
 
 	public static Map<String, Object> mapFieldNames(
