@@ -126,6 +126,71 @@ public <#if schema.discriminator?has_content>abstract</#if> class ${schemaName} 
 		return ObjectMapperUtil.unsafeReadValue(${schemaName}.class, json);
 	}
 
+	<#if schema.discriminator?has_content>
+
+	public static Class<? extends ${schemaName}> getConcreteClass(Map<String, Object> map) {
+
+		Object discriminatorObj = map.get("${schema.discriminator.propertyName}");
+
+		if (discriminatorObj == null) {
+			throw new IllegalArgumentException("Missing required discriminator field '${schema.discriminator.propertyName}'");
+		}
+
+		String discriminatorValue = discriminatorObj.toString();
+
+		<#if schema.discriminator.mapping?has_content>
+
+		switch (discriminatorValue) {
+			<#list schema.discriminator.mapping as mappingName, mappingSchema>
+				case "${mappingName}":
+					try {
+
+					String packageName = ${schemaName}.class.getPackage().getName();
+
+					Class<?> clazz = Class.forName(packageName + ".${mappingName}");
+					if (!${schemaName}.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException("Class " + clazz.getName() +
+							" is not a subclass of ${schemaName}");
+					}
+					return (Class<? extends ${schemaName}>) clazz;
+					} catch (ClassNotFoundException e) {
+						throw new IllegalArgumentException(
+						"No concrete class found for ${schema.discriminator.propertyName}: " + discriminatorValue, e);
+					}
+					</#list>
+						default:
+
+							try {
+								String packageName = ${schemaName}.class.getPackage().getName();
+								Class<?> clazz = Class.forName(packageName + "." + discriminatorValue);
+								if (!${schemaName}.class.isAssignableFrom(clazz)) {
+									throw new IllegalArgumentException("Class " + clazz.getName() +
+									" is not a subclass of ${schemaName}");
+								}
+								return (Class<? extends ${schemaName}>) clazz;
+							} catch (ClassNotFoundException e) {
+								throw new IllegalArgumentException("Invalid ${schema.discriminator.propertyName} value: " +
+								discriminatorValue + ". Expected one of: ${schema.discriminator.mapping?keys?join(", ")}");
+							}
+					}
+					<#else>
+
+						try {
+							String packageName = ${schemaName}.class.getPackage().getName();
+							Class<?> clazz = Class.forName(packageName + "." + discriminatorValue);
+							if (!${schemaName}.class.isAssignableFrom(clazz)) {
+								throw new IllegalArgumentException("Class " + clazz.getName() +
+									" is not a subclass of ${schemaName}");
+							}
+							return (Class<? extends ${schemaName}>) clazz;
+						} catch (ClassNotFoundException e) {
+							throw new IllegalArgumentException(
+							"No concrete class found for ${schema.discriminator.propertyName}: " + discriminatorValue, e);
+						}
+		</#if>
+		}
+	</#if>
+
 	<#assign
 		enumSchemas = freeMarkerTool.getDTOEnumSchemas(configYAML, openAPIYAML, schema)
 		jsonMapPropertyNames = []
