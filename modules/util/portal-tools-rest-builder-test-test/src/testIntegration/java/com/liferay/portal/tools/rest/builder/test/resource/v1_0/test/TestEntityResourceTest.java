@@ -6,11 +6,27 @@
 package com.liferay.portal.tools.rest.builder.test.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.ChildTestEntity1;
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.ChildTestEntity2;
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.TestEntity;
+import com.liferay.portal.tools.rest.builder.test.client.resource.v1_0.TestEntityResource;
+import com.liferay.portal.util.PropsValues;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,6 +37,35 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
+
+	public TestEntityResource createTestEntityResourceWithParameters(
+			String[] parameters)
+		throws Exception {
+
+		testGroup = GroupTestUtil.addGroup();
+
+		testCompany = CompanyLocalServiceUtil.getCompany(
+			testGroup.getCompanyId());
+
+		_testEntityResource.setContextCompany(testCompany);
+
+		User testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
+
+		testEntityResource = TestEntityResource.builder(
+		).authentication(
+			testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(), 8080, "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).parameters(
+			parameters
+		).build();
+
+		return testEntityResource;
+	}
 
 	@Override
 	@Test
@@ -118,6 +163,8 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 
 		assertEquals(expectedPatchChildTestEntity2, getChildTestEntity2);
 		assertValid(getChildTestEntity2);
+
+		_testPatchTestEntityBatch();
 	}
 
 	@Override
@@ -165,5 +212,94 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 	protected Long testPutTestEntity_getOptionalParameter() {
 		return RandomTestUtil.nextLong();
 	}
+
+	private void _testPatchTestEntityBatch() throws Exception {
+		ChildTestEntity1 postChildTestEntity = new ChildTestEntity1();
+
+		ChildTestEntity1 notExistingPostChildTestEntity =
+			new ChildTestEntity1();
+
+		postChildTestEntity.setProperty1(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+		postChildTestEntity.setType(TestEntity.Type.create("ChildTestEntity1"));
+
+		ChildTestEntity1 childTestEntity =
+			(ChildTestEntity1)testEntityResource.postTestEntity(
+				postChildTestEntity);
+
+		postChildTestEntity.setId(childTestEntity.getId());
+
+		postChildTestEntity.setDescription(StringUtil.randomString());
+
+		notExistingPostChildTestEntity.setProperty1(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+		notExistingPostChildTestEntity.setType(
+			TestEntity.Type.create("ChildTestEntity1"));
+		notExistingPostChildTestEntity.setId(childTestEntity.getId() + 1);
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.batch.engine.internal.strategy." +
+					"OnErrorContinueBatchEngineImportStrategy",
+				LoggerTestUtil.ERROR)) {
+
+			_waitForFinish(
+				"COMPLETED", true,
+				JSONFactoryUtil.createJSONObject(
+					createTestEntityResourceWithParameters(
+						new String[] {
+							"updateStrategy", "UPDATE", "importStrategy",
+							"ON_ERROR_CONTINUE"
+						}
+					).putTestEntityBatchHttpResponse(
+						null, null,
+						JSONUtil.putAll(
+							JSONFactoryUtil.createJSONObject(
+								String.valueOf(postChildTestEntity)),
+							JSONFactoryUtil.createJSONObject(
+								String.valueOf(notExistingPostChildTestEntity)))
+					).getContent()));
+		}
+
+		childTestEntity = (ChildTestEntity1)testEntityResource.getTestEntity(
+			childTestEntity.getId());
+
+		Assert.assertEquals(
+			postChildTestEntity.getId(), childTestEntity.getId());
+		Assert.assertEquals(
+			postChildTestEntity.getDescription(),
+			childTestEntity.getDescription());
+	}
+
+	private JSONObject _waitForFinish(
+			String expectedExecuteStatus, boolean importTask,
+			JSONObject jsonObject)
+		throws Exception {
+
+		String endpoint = StringBundler.concat(
+			"headless-batch-engine/v1.0/",
+			importTask ? "import-task" : "export-task",
+			"/by-external-reference-code/");
+
+		while (true) {
+			jsonObject = HTTPTestUtil.invokeToJSONObject(
+				null, endpoint + jsonObject.getString("externalReferenceCode"),
+				Http.Method.GET);
+
+			String executeStatus = jsonObject.getString("executeStatus");
+
+			if (StringUtil.equals(executeStatus, "COMPLETED") ||
+				StringUtil.equals(executeStatus, "FAILED")) {
+
+				Assert.assertEquals(expectedExecuteStatus, executeStatus);
+
+				return jsonObject;
+			}
+		}
+	}
+
+	@Inject
+	private
+		com.liferay.portal.tools.rest.builder.test.resource.v1_0.
+			TestEntityResource _testEntityResource;
 
 }
