@@ -187,6 +187,8 @@ components:
                 documentId:
                     format: int64
                     type: integer
+                externalReferenceCode:
+                    type: string
                 id:
                     format: int64
                     readOnly: true
