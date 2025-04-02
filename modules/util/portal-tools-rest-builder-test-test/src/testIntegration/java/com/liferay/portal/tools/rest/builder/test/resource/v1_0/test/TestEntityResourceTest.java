@@ -92,6 +92,13 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 
 	@Override
 	@Test
+	public void testPostTestEntity() throws Exception {
+		super.testPostTestEntity();
+		_testPostTestEntityBatch();
+	}
+
+	@Override
+	@Test
 	public void testPatchTestEntity() throws Exception {
 		super.testPatchTestEntity();
 
@@ -211,6 +218,69 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 	@Override
 	protected Long testPutTestEntity_getOptionalParameter() {
 		return RandomTestUtil.nextLong();
+	}
+
+	private void _testPostTestEntityBatch() throws Exception {
+		ChildTestEntity1 childTestEntity1 = new ChildTestEntity1() {
+			{
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				documentId = RandomTestUtil.randomLong();
+				id = RandomTestUtil.randomLong();
+				jsonProperty = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				self = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				property1 = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				externalReferenceCode = RandomTestUtil.randomString();
+				type = Type.create("ChildTestEntity1");
+			}
+		};
+
+		testPostTestEntity_addTestEntity(childTestEntity1);
+
+		ChildTestEntity2 childTestEntity2 = new ChildTestEntity2() {
+			{
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				description = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				documentId = RandomTestUtil.randomLong();
+				id = RandomTestUtil.randomLong();
+				jsonProperty = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				self = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				property2 = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+
+				type = Type.create("ChildTestEntity2");
+			}
+		};
+
+		testPostTestEntity_addTestEntity(childTestEntity2);
+
+		childTestEntity2.setId(RandomTestUtil.randomLong());
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+			"com.liferay.batch.engine.internal.BatchEngineImportTaskExecutorImpl",
+			LoggerTestUtil.ERROR
+			))  {
+
+			_waitForFinish(
+				"FAILED", true,
+				JSONFactoryUtil.createJSONObject(
+					testEntityResource.postTestEntityBatchHttpResponse(
+						null, JSONUtil.putAll(
+							JSONFactoryUtil.createJSONObject(
+								String.valueOf(childTestEntity1)),
+							JSONFactoryUtil.createJSONObject(
+								String.valueOf(childTestEntity2))
+						)).getContent()));
+		}
 	}
 
 	private void _testPatchTestEntityBatch() throws Exception {
