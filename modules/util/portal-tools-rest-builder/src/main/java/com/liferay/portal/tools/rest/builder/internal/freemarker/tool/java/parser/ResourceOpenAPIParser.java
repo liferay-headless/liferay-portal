@@ -480,6 +480,20 @@ public class ResourceOpenAPIParser {
 
 			batchOperationType = BatchOperationType.EXPORT;
 		}
+		else if (ConfigUtil.isVersionCompatible(configYAML, 9) &&
+				 methodName.equals(
+					 StringBundler.concat(
+						 "getSiteByExternalReferenceCode",
+						 TextFormatter.formatPlural(schemaName), "Page"))) {
+
+			batchOperationType = BatchOperationType.EXPORT;
+		}
+		else if (ConfigUtil.isVersionCompatible(configYAML, 9) &&
+				 methodName.equals(
+					 "postSiteByExternalReferenceCode" + schemaName)) {
+
+			batchOperationType = BatchOperationType.IMPORT;
+		}
 		else if (methodName.equals("delete" + schemaName) ||
 				 methodName.equals("post" + parentSchemaName + schemaName) ||
 				 methodName.equals(

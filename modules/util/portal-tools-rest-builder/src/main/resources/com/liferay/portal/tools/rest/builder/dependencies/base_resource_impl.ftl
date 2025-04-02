@@ -165,6 +165,8 @@ public abstract class Base${schemaName}ResourceImpl
 					<#assign getBatchJavaMethodSignature = javaMethodSignature />
 				</#if>
 			</#if>
+		<#elseif stringUtil.equals(javaMethodSignature.methodName, "getSiteByExternalReferenceCode" + schemaNames + "Page")>
+			<#assign getSiteBatchJavaMethodSignature = javaMethodSignature />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "patch" + schemaName)>
 			<#assign patchBatchJavaMethodSignature = javaMethodSignature />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName)>
@@ -179,6 +181,8 @@ public abstract class Base${schemaName}ResourceImpl
 					<#assign postBatchJavaMethodSignature = javaMethodSignature />
 				</#if>
 			</#if>
+		<#elseif stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName)>
+			<#assign postSiteBatchJavaMethodSignature = javaMethodSignature />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "ByExternalReferenceCode" + schemaName)>
 			<#assign postParentByExternalReferenceCodeBatchJavaMethodSignatures = postParentByExternalReferenceCodeBatchJavaMethodSignatures + [javaMethodSignature] />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "put" + schemaName)>
@@ -326,7 +330,7 @@ public abstract class Base${schemaName}ResourceImpl
 				return responseBuilder.entity(
 					vulcanBatchEngineImportTaskResource.deleteImportTask(${javaDataType}.class.getName(), callbackURL, object)
 				).build();
-			<#elseif generateBatch && stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaNames + "PageExportBatch")>
+			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaNames + "PageExportBatch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaNames + "PageExportBatch"))>
 				vulcanBatchEngineExportTaskResource.setContextAcceptLanguage(contextAcceptLanguage);
 				vulcanBatchEngineExportTaskResource.setContextCompany(contextCompany);
 				vulcanBatchEngineExportTaskResource.setContextHttpServletRequest(contextHttpServletRequest);
@@ -339,7 +343,7 @@ public abstract class Base${schemaName}ResourceImpl
 				return responseBuilder.entity(
 					vulcanBatchEngineExportTaskResource.postExportTask(${javaDataType}.class.getName(), callbackURL, contentType, fieldNames)
 				).build();
-			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "Id" + schemaName + "Batch"))>
+			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "Id" + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName + "Batch"))>
 				vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(contextAcceptLanguage);
 				vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
 				vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(contextHttpServletRequest);
