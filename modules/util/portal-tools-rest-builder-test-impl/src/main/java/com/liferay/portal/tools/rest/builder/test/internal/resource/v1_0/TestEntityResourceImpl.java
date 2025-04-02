@@ -61,19 +61,21 @@ public class TestEntityResourceImpl extends BaseTestEntityResourceImpl {
 	@Override
 	public TestEntity postTestEntity(TestEntity testEntity)
 		throws PortalException {
+
 		TestEntity existingEntity = _fetchByExternalReferenceCode(
 			testEntity.getExternalReferenceCode());
 
 		if (existingEntity != null) {
 			throw new PortalException(
 				"Duplicate test entity with external reference code " +
-				testEntity.getExternalReferenceCode());
+					testEntity.getExternalReferenceCode());
 		}
 
-		if (testEntity.getExternalReferenceCode() == null){
-			testEntity.setExternalReferenceCode(UUID.randomUUID().toString());
+		if (testEntity.getExternalReferenceCode() == null) {
+			testEntity.setExternalReferenceCode(
+				UUID.randomUUID(
+				).toString());
 		}
-
 
 		_testEntities.add(testEntity);
 
@@ -98,7 +100,9 @@ public class TestEntityResourceImpl extends BaseTestEntityResourceImpl {
 		return testEntity;
 	}
 
-	private TestEntity _fetchByExternalReferenceCode(String externalReferenceCode) {
+	private TestEntity _fetchByExternalReferenceCode(
+		String externalReferenceCode) {
+
 		if (externalReferenceCode == null) {
 			return null;
 		}
@@ -108,6 +112,7 @@ public class TestEntityResourceImpl extends BaseTestEntityResourceImpl {
 
 			if ((entityERC != null) &&
 				entityERC.equals(externalReferenceCode)) {
+
 				return entity;
 			}
 		}
