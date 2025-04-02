@@ -196,6 +196,7 @@ public abstract class BaseTestEntityResourceTestCase {
 		TestEntity testEntity = randomTestEntity();
 
 		testEntity.setDescription(regex);
+		testEntity.setExternalReferenceCode(regex);
 		testEntity.setJsonProperty(regex);
 		testEntity.setName(regex);
 		testEntity.setSelf(regex);
@@ -207,6 +208,7 @@ public abstract class BaseTestEntityResourceTestCase {
 		testEntity = TestEntitySerDes.toDTO(json);
 
 		Assert.assertEquals(regex, testEntity.getDescription());
+		Assert.assertEquals(regex, testEntity.getExternalReferenceCode());
 		Assert.assertEquals(regex, testEntity.getJsonProperty());
 		Assert.assertEquals(regex, testEntity.getName());
 		Assert.assertEquals(regex, testEntity.getSelf());
@@ -272,6 +274,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				documentId = RandomTestUtil.randomLong();
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				jsonProperty = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -295,6 +299,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				documentId = RandomTestUtil.randomLong();
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				jsonProperty = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -318,6 +324,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				documentId = RandomTestUtil.randomLong();
+				externalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				jsonProperty = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -720,6 +728,16 @@ public abstract class BaseTestEntityResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (testEntity.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("jsonProperty", additionalAssertFieldName)) {
 				if (testEntity.getJsonProperty() == null) {
 					valid = false;
@@ -946,6 +964,19 @@ public abstract class BaseTestEntityResourceTestCase {
 				if (!Objects.deepEquals(
 						testEntity1.getDocumentId(),
 						testEntity2.getDocumentId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						testEntity1.getExternalReferenceCode(),
+						testEntity2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1276,6 +1307,52 @@ public abstract class BaseTestEntityResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("externalReferenceCode")) {
+			Object object = testEntity.getExternalReferenceCode();
+
+			String value = String.valueOf(object);
+
+			if (operator.equals("contains")) {
+				sb = new StringBundler();
+
+				sb.append("contains(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 2)) {
+					sb.append(value.substring(1, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else if (operator.equals("startswith")) {
+				sb = new StringBundler();
+
+				sb.append("startswith(");
+				sb.append(entityFieldName);
+				sb.append(",'");
+
+				if ((object != null) && (value.length() > 1)) {
+					sb.append(value.substring(0, value.length() - 1));
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append("')");
+			}
+			else {
+				sb.append("'");
+				sb.append(value);
+				sb.append("'");
+			}
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1486,6 +1563,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				testEntity.setDescription(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setDocumentId(RandomTestUtil.randomLong());
+				testEntity.setExternalReferenceCode(
+					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setId(RandomTestUtil.randomLong());
 				testEntity.setJsonProperty(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
@@ -1509,6 +1588,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				testEntity.setDescription(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setDocumentId(RandomTestUtil.randomLong());
+				testEntity.setExternalReferenceCode(
+					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setId(RandomTestUtil.randomLong());
 				testEntity.setJsonProperty(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
@@ -1532,6 +1613,8 @@ public abstract class BaseTestEntityResourceTestCase {
 				testEntity.setDescription(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setDocumentId(RandomTestUtil.randomLong());
+				testEntity.setExternalReferenceCode(
+					StringUtil.toLowerCase(RandomTestUtil.randomString()));
 				testEntity.setId(RandomTestUtil.randomLong());
 				testEntity.setJsonProperty(
 					StringUtil.toLowerCase(RandomTestUtil.randomString()));
