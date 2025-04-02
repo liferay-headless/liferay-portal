@@ -71,6 +71,88 @@ public abstract class CollectionReference implements Serializable {
 			CollectionReference.class, json);
 	}
 
+	public static Class<? extends CollectionReference> getConcreteClass(
+		Map<String, Object> map) {
+
+		Object discriminatorObj = map.get("collectionType");
+
+		if (discriminatorObj == null) {
+			throw new IllegalArgumentException(
+				"Missing required discriminator field 'collectionType'");
+		}
+
+		String discriminatorValue = discriminatorObj.toString();
+
+		switch (discriminatorValue) {
+			case "Collection":
+				try {
+					String packageName = CollectionReference.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(packageName + ".Collection");
+
+					if (!CollectionReference.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of CollectionReference");
+					}
+
+					return (Class<? extends CollectionReference>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for collectionType: " +
+							discriminatorValue,
+						e);
+				}
+
+			case "CollectionProvider":
+				try {
+					String packageName = CollectionReference.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".CollectionProvider");
+
+					if (!CollectionReference.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of CollectionReference");
+					}
+
+					return (Class<? extends CollectionReference>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for collectionType: " +
+							discriminatorValue,
+						e);
+				}
+
+			default:
+
+				try {
+					String packageName = CollectionReference.class.getPackage(
+					).getName();
+					Class<?> clazz = Class.forName(
+						packageName + "." + discriminatorValue);
+
+					if (!CollectionReference.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of CollectionReference");
+					}
+
+					return (Class<? extends CollectionReference>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"Invalid collectionType value: " + discriminatorValue +
+							". Expected one of: Collection, CollectionProvider");
+				}
+		}
+	}
+
 	@io.swagger.v3.oas.annotations.media.Schema(
 		description = "The collection's type (Collection, CollectionProvider)."
 	)

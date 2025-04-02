@@ -74,6 +74,89 @@ public abstract class PageTemplate implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(PageTemplate.class, json);
 	}
 
+	public static Class<? extends PageTemplate> getConcreteClass(
+		Map<String, Object> map) {
+
+		Object discriminatorObj = map.get("type");
+
+		if (discriminatorObj == null) {
+			throw new IllegalArgumentException(
+				"Missing required discriminator field 'type'");
+		}
+
+		String discriminatorValue = discriminatorObj.toString();
+
+		switch (discriminatorValue) {
+			case "ContentPageTemplate":
+				try {
+					String packageName = PageTemplate.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".ContentPageTemplate");
+
+					if (!PageTemplate.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageTemplate");
+					}
+
+					return (Class<? extends PageTemplate>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			case "WidgetPageTemplate":
+				try {
+					String packageName = PageTemplate.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".WidgetPageTemplate");
+
+					if (!PageTemplate.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageTemplate");
+					}
+
+					return (Class<? extends PageTemplate>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			default:
+
+				try {
+					String packageName = PageTemplate.class.getPackage(
+					).getName();
+					Class<?> clazz = Class.forName(
+						packageName + "." + discriminatorValue);
+
+					if (!PageTemplate.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageTemplate");
+					}
+
+					return (Class<? extends PageTemplate>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"Invalid type value: " + discriminatorValue +
+							". Expected one of: ContentPageTemplate, WidgetPageTemplate");
+				}
+		}
+	}
+
 	@io.swagger.v3.oas.annotations.media.Schema(
 		description = "The page template's creator. It is not returned by default. It can be embedded via nestedFields."
 	)

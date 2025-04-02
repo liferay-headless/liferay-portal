@@ -67,6 +67,89 @@ public abstract class PageSettings implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(PageSettings.class, json);
 	}
 
+	public static Class<? extends PageSettings> getConcreteClass(
+		Map<String, Object> map) {
+
+		Object discriminatorObj = map.get("type");
+
+		if (discriminatorObj == null) {
+			throw new IllegalArgumentException(
+				"Missing required discriminator field 'type'");
+		}
+
+		String discriminatorValue = discriminatorObj.toString();
+
+		switch (discriminatorValue) {
+			case "ContentPageSettings":
+				try {
+					String packageName = PageSettings.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".ContentPageSettings");
+
+					if (!PageSettings.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageSettings");
+					}
+
+					return (Class<? extends PageSettings>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			case "WidgetPageSettings":
+				try {
+					String packageName = PageSettings.class.getPackage(
+					).getName();
+
+					Class<?> clazz = Class.forName(
+						packageName + ".WidgetPageSettings");
+
+					if (!PageSettings.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageSettings");
+					}
+
+					return (Class<? extends PageSettings>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"No concrete class found for type: " +
+							discriminatorValue,
+						e);
+				}
+
+			default:
+
+				try {
+					String packageName = PageSettings.class.getPackage(
+					).getName();
+					Class<?> clazz = Class.forName(
+						packageName + "." + discriminatorValue);
+
+					if (!PageSettings.class.isAssignableFrom(clazz)) {
+						throw new IllegalArgumentException(
+							"Class " + clazz.getName() +
+								" is not a subclass of PageSettings");
+					}
+
+					return (Class<? extends PageSettings>)clazz;
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(
+						"Invalid type value: " + discriminatorValue +
+							". Expected one of: ContentPageSettings, WidgetPageSettings");
+				}
+		}
+	}
+
 	@io.swagger.v3.oas.annotations.media.Schema(
 		description = "A list of custom meta tags this page has."
 	)
