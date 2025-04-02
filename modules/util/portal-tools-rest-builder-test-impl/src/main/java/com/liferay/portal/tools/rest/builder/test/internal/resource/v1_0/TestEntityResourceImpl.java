@@ -5,6 +5,7 @@
 
 package com.liferay.portal.tools.rest.builder.test.internal.resource.v1_0;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.TestEntity;
 import com.liferay.portal.tools.rest.builder.test.internal.entity.v1_0.TestEntityEntityModel;
@@ -14,6 +15,7 @@ import com.liferay.portal.vulcan.pagination.Page;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -57,7 +59,22 @@ public class TestEntityResourceImpl extends BaseTestEntityResourceImpl {
 	}
 
 	@Override
-	public TestEntity postTestEntity(TestEntity testEntity) {
+	public TestEntity postTestEntity(TestEntity testEntity)
+		throws PortalException {
+		TestEntity existingEntity = _fetchByExternalReferenceCode(
+			testEntity.getExternalReferenceCode());
+
+		if (existingEntity != null) {
+			throw new PortalException(
+				"Duplicate test entity with external reference code " +
+				testEntity.getExternalReferenceCode());
+		}
+
+		if (testEntity.getExternalReferenceCode() == null){
+			testEntity.setExternalReferenceCode(UUID.randomUUID().toString());
+		}
+
+
 		_testEntities.add(testEntity);
 
 		testEntity.setDateCreated(new Date());
@@ -79,6 +96,23 @@ public class TestEntityResourceImpl extends BaseTestEntityResourceImpl {
 		testEntity.setId(oldTestEntity.getId());
 
 		return testEntity;
+	}
+
+	private TestEntity _fetchByExternalReferenceCode(String externalReferenceCode) {
+		if (externalReferenceCode == null) {
+			return null;
+		}
+
+		for (TestEntity entity : _testEntities) {
+			String entityERC = entity.getExternalReferenceCode();
+
+			if ((entityERC != null) &&
+				entityERC.equals(externalReferenceCode)) {
+				return entity;
+			}
+		}
+
+		return null;
 	}
 
 	private static final List<TestEntity> _testEntities = new ArrayList<>();
