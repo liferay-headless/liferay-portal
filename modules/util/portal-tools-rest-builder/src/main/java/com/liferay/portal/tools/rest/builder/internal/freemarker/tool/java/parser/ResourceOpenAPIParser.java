@@ -1020,23 +1020,20 @@ public class ResourceOpenAPIParser {
 				if (pathName.endsWith("ExternalReferenceCode") &&
 					ConfigUtil.isVersionCompatible(configYAML, 9)) {
 
-					if (!previousMethodNameSegment.equals("Site")) {
-						String externalReferenceCodeSubjectName =
-							StringUtil.upperCaseFirstLetter(
-								CamelCaseUtil.toCamelCase(
-									pathSegment.replaceAll(
-										"\\{|-?ExternalReferenceCode}", "")));
+					String externalReferenceCodeSubjectName =
+						StringUtil.upperCaseFirstLetter(
+							CamelCaseUtil.toCamelCase(
+								pathSegment.replaceAll(
+									"\\{|-?ExternalReferenceCode}", "")));
 
-						if (previousMethodNameSegment.endsWith(
-								externalReferenceCodeSubjectName)) {
+					if (previousMethodNameSegment.endsWith(
+							externalReferenceCodeSubjectName) ||
+						Objects.equals(previousMethodNameSegment, "Site")) {
 
-							methodNameSegments.add("ByExternalReferenceCode");
-						}
-						else if (!previousMethodNameSegment.endsWith(
-									pathName)) {
-
-							methodNameSegments.add(pathName);
-						}
+						methodNameSegments.add("ByExternalReferenceCode");
+					}
+					else if (!previousMethodNameSegment.endsWith(pathName)) {
+						methodNameSegments.add(pathName);
 					}
 				}
 				else if (!previousMethodNameSegment.endsWith(pathName) &&
