@@ -854,7 +854,7 @@ paths:
             tags: ["SiteTestEntity"]
     /sites/{siteExternalReferenceCode}/erc-site-test-entities:
         get:
-            operationId: getSiteErcSiteTestEntitiesPage
+            operationId: getSiteByExternalReferenceCodeErcSiteTestEntitiesPage
             parameters:
                 -   in: path
                     name: siteExternalReferenceCode
@@ -878,7 +878,7 @@ paths:
                         "OK"
             tags: ["ErcSiteTestEntity"]
         post:
-            operationId: postSiteErcSiteTestEntity
+            operationId: postSiteByExternalReferenceCodeErcSiteTestEntity
             parameters:
                 -   in: path
                     name: siteExternalReferenceCode
@@ -905,7 +905,7 @@ paths:
             tags: ["ErcSiteTestEntity"]
     /sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}:
         get:
-            operationId: getSiteErcSiteTestEntityByExternalReferenceCode
+            operationId: getSiteByExternalReferenceCodeErcSiteTestEntityByExternalReferenceCode
             parameters:
                 -   in: path
                     name: ercSiteTestEntityExternalReferenceCode
@@ -930,7 +930,7 @@ paths:
                         "OK"
             tags: ["ErcSiteTestEntity"]
         put:
-            operationId: putSiteErcSiteTestEntityByExternalReferenceCode
+            operationId: putSiteByExternalReferenceCodeErcSiteTestEntityByExternalReferenceCode
             parameters:
                 -   in: path
                     name: ercSiteTestEntityExternalReferenceCode
@@ -964,7 +964,7 @@ paths:
             tags: ["ErcSiteTestEntity"]
     /sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}/sub-test-entities/{subTestEntityExternalReferenceCode}:
         get:
-            operationId: getSiteErcSiteTestEntityByExternalReferenceCodeSubTestEntityByExternalReferenceCode
+            operationId: getSiteByExternalReferenceCodeErcSiteTestEntityByExternalReferenceCodeSubTestEntityByExternalReferenceCode
             parameters:
                 -   in: path
                     name: ercSiteTestEntityExternalReferenceCode

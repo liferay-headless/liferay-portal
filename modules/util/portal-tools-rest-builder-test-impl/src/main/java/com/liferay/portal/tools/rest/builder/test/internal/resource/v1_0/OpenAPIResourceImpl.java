@@ -91,6 +91,10 @@ public class OpenAPIResourceImpl {
 
 			add(EntityModelResourceTestEntity2ResourceImpl.class);
 
+			add(ErcAssetLibraryTestEntityResourceImpl.class);
+
+			add(ErcSiteTestEntityResourceImpl.class);
+
 			add(FilterResourceImpl.class);
 
 			add(SchemaResourceImpl.class);
@@ -98,6 +102,8 @@ public class OpenAPIResourceImpl {
 			add(SiteTestEntityResourceImpl.class);
 
 			add(SortResourceImpl.class);
+
+			add(SubTestEntityResourceImpl.class);
 
 			add(TestEntityResourceImpl.class);
 
