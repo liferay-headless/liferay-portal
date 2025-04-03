@@ -84,6 +84,10 @@ components:
                     type: array
                 siteExternalReferenceCode:
                     type: string
+                siteId:
+                    format: int64
+                    readOnly: true
+                    type: integer
             type: object
         Filter:
             properties:
@@ -803,6 +807,59 @@ paths:
                     description:
                         "OK"
             tags: ["SubTestEntity"]
+    /sites/{siteId}/erc-site-test-entities:
+        get:
+            operationId: getSiteErcSiteTestEntitiesPage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ErcSiteTestEntity"
+                                type: array
+                        "application/xml":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ErcSiteTestEntity"
+                                type: array
+                    description:
+                        "OK"
+            tags: ["ErcSiteTestEntity"]
+        post:
+            operationId: postSiteErcSiteTestEntity
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ErcSiteTestEntity"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ErcSiteTestEntity"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErcSiteTestEntity"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ErcSiteTestEntity"
+            tags: ["ErcSiteTestEntity"]
     /sites/{siteId}/site-test-entities:
         get:
             operationId: getSiteSiteTestEntitiesPage
