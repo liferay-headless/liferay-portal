@@ -139,6 +139,9 @@ public class ${schemaName}SerDes {
 							sb.append((String)${schemaVarName}.get${capitalizedPropertyName}());
 							sb.append("\"");
 						}
+						else if (${schemaVarName}.get${capitalizedPropertyName}() instanceof Map) {
+							sb.append(_toJSON((Map<String, ?>)${schemaVarName}.get${capitalizedPropertyName}()));
+						}
 						else {
 							sb.append(${schemaVarName}.get${capitalizedPropertyName}());
 						}
@@ -298,7 +301,7 @@ public class ${schemaName}SerDes {
 				if (Objects.equals(jsonParserFieldName, "${fieldName}")) {
 					<#assign propertyType = properties[propertyName]?replace("com.liferay.portal.vulcan.permission.", "${configYAML.apiPackagePath}.client.permission.") />
 
-					<#if stringUtil.startsWith(propertyType, "Map<") || stringUtil.equals(propertyType, "Object[]")>
+					<#if stringUtil.startsWith(propertyType, "Map<") || stringUtil.equals(propertyType, "Object[]") || stringUtil.equals(propertyType, "Object")>
 						return true;
 					<#else>
 						return false;
@@ -416,6 +419,28 @@ public class ${schemaName}SerDes {
 							${schemaVarName}.set${capitalizedPropertyName}(${propertyName}Array);
 						<#elseif enumSchemas?keys?seq_contains(properties[propertyName])>
 							${schemaVarName}.set${capitalizedPropertyName}(${schemaName}.${propertyType}.create((String)jsonParserFieldValue));
+						<#elseif stringUtil.equals(propertyType, "Object")>
+							if (jsonParserFieldValue instanceof String) {
+								String jsonStr = (String)jsonParserFieldValue;
+
+								if ((jsonStr.startsWith("{") && jsonStr.endsWith("}")) ||
+								(jsonStr.startsWith("[") && jsonStr.endsWith("]"))) {
+
+									try {
+											Object parsedValue = parseToMap(jsonStr);
+											${schemaVarName}.set${capitalizedPropertyName}(parsedValue);
+										}
+									catch (Exception e) {
+											${schemaVarName}.set${capitalizedPropertyName}(jsonParserFieldValue);
+										}
+									}
+								else {
+									${schemaVarName}.set${capitalizedPropertyName}(jsonParserFieldValue);
+								}
+							}
+							else {
+								${schemaVarName}.set${capitalizedPropertyName}(jsonParserFieldValue);
+							}
 						<#else>
 							${schemaVarName}.set${capitalizedPropertyName}((${propertyType})jsonParserFieldValue);
 						</#if>
