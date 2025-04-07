@@ -12,6 +12,9 @@ import com.liferay.headless.admin.site.internal.resource.v1_0.util.LayoutStructu
 import com.liferay.layout.util.structure.ColumnLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.LinkedHashMap;
 
 /**
  * @author Eudaldo Alonso
@@ -35,8 +38,20 @@ public class ColumnLayoutStructureItemImporter
 						pageElement, layoutStructure),
 					pageElement.getPosition());
 
-		PageColumnDefinition pageColumnDefinition =
-			(PageColumnDefinition)pageElement.getDefinition();
+		Object definitionObj = pageElement.getDefinition();
+
+		PageColumnDefinition pageColumnDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageColumnDefinition) {
+				pageColumnDefinition = (PageColumnDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageColumnDefinition = objectMapper.convertValue(
+					definitionObj, PageColumnDefinition.class);
+			}
+		}
 
 		if (pageColumnDefinition == null) {
 			return columnLayoutStructureItem;

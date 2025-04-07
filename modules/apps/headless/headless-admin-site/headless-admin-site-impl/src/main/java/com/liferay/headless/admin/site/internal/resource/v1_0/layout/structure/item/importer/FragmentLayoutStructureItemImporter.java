@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.LinkedHashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Eudaldo Alonso
  */
@@ -38,8 +40,21 @@ public class FragmentLayoutStructureItemImporter
 			PageElement pageElement)
 		throws Exception {
 
-		PageFragmentInstanceDefinition pageFragmentInstanceDefinition =
-			(PageFragmentInstanceDefinition)pageElement.getDefinition();
+
+		Object definitionObj = pageElement.getDefinition();
+
+		PageFragmentInstanceDefinition pageFragmentInstanceDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageFragmentInstanceDefinition) {
+				pageFragmentInstanceDefinition = (PageFragmentInstanceDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageFragmentInstanceDefinition = objectMapper.convertValue(
+					definitionObj, PageFragmentInstanceDefinition.class);
+			}
+		}
 
 		if (pageFragmentInstanceDefinition == null) {
 			return null;

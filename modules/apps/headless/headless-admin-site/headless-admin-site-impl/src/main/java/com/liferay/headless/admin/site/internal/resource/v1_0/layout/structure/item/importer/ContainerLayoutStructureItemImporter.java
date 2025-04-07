@@ -12,6 +12,9 @@ import com.liferay.headless.admin.site.internal.resource.v1_0.util.LayoutStructu
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.LinkedHashMap;
 
 /**
  * @author Eudaldo Alonso
@@ -35,8 +38,20 @@ public class ContainerLayoutStructureItemImporter
 						pageElement, layoutStructure),
 					pageElement.getPosition());
 
-		PageContainerDefinition pageContainerDefinition =
-			(PageContainerDefinition)pageElement.getDefinition();
+		Object definitionObj = pageElement.getDefinition();
+
+		PageContainerDefinition pageContainerDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageContainerDefinition) {
+				pageContainerDefinition = (PageContainerDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageContainerDefinition = objectMapper.convertValue(
+					definitionObj, PageContainerDefinition.class);
+			}
+		}
 
 		if (pageContainerDefinition == null) {
 			return containerStyledLayoutStructureItem;

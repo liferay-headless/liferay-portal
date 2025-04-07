@@ -18,6 +18,8 @@ import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
@@ -42,8 +44,20 @@ public class FormLayoutStructureItemImporter
 						pageElement, layoutStructure),
 					pageElement.getPosition());
 
-		PageFormDefinition pageFormDefinition =
-			(PageFormDefinition)pageElement.getDefinition();
+		Object definitionObj = pageElement.getDefinition();
+
+		PageFormDefinition pageFormDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageFormDefinition) {
+				pageFormDefinition = (PageFormDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageFormDefinition = objectMapper.convertValue(
+					definitionObj, PageFormDefinition.class);
+			}
+		}
 
 		if (pageFormDefinition == null) {
 			return formStyledLayoutStructureItem;

@@ -12,6 +12,9 @@ import com.liferay.headless.admin.site.internal.resource.v1_0.util.LayoutStructu
 import com.liferay.layout.util.structure.FragmentDropZoneLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.LinkedHashMap;
 
 /**
  * @author Eudaldo Alonso
@@ -36,8 +39,20 @@ public class FragmentDropZoneLayoutStructureItemImporter
 							pageElement, layoutStructure),
 						pageElement.getPosition());
 
-		PageFragmentDropZoneDefinition pageFragmentDropZoneDefinition =
-			(PageFragmentDropZoneDefinition)pageElement.getDefinition();
+		Object definitionObj = pageElement.getDefinition();
+
+		PageFragmentDropZoneDefinition pageFragmentDropZoneDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageFragmentDropZoneDefinition) {
+				pageFragmentDropZoneDefinition = (PageFragmentDropZoneDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageFragmentDropZoneDefinition = objectMapper.convertValue(
+					definitionObj, PageFragmentDropZoneDefinition.class);
+			}
+		}
 
 		if (pageFragmentDropZoneDefinition == null) {
 			return fragmentDropZoneLayoutStructureItem;

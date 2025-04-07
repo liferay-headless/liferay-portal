@@ -15,7 +15,9 @@ import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.collection.EmptyCollectionOptions;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
@@ -41,8 +43,20 @@ public class CollectionLayoutStructureItemImporter
 							pageElement, layoutStructure),
 						pageElement.getPosition());
 
-		PageCollectionDefinition pageCollectionDefinition =
-			(PageCollectionDefinition)pageElement.getDefinition();
+		Object definitionObj = pageElement.getDefinition();
+
+		PageCollectionDefinition pageCollectionDefinition = null;
+
+		if (definitionObj != null) {
+			if (definitionObj instanceof PageCollectionDefinition) {
+				pageCollectionDefinition = (PageCollectionDefinition)definitionObj;
+			}
+			else if (definitionObj instanceof LinkedHashMap) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				pageCollectionDefinition = objectMapper.convertValue(
+					definitionObj, PageCollectionDefinition.class);
+			}
+		}
 
 		if (pageCollectionDefinition == null) {
 			return collectionStyledLayoutStructureItem;
