@@ -5,6 +5,8 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0.layout.structure.item.importer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.liferay.headless.admin.site.dto.v1_0.PageElement;
 import com.liferay.headless.admin.site.dto.v1_0.PageRowDefinition;
 import com.liferay.headless.admin.site.internal.resource.v1_0.layout.structure.item.importer.context.LayoutStructureItemImporterContext;
@@ -16,7 +18,6 @@ import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
 import com.liferay.portal.kernel.util.SetUtil;
 
 import java.util.LinkedHashMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Eudaldo Alonso
@@ -40,19 +41,20 @@ public class RowLayoutStructureItemImporter
 					LayoutStructureUtil.getParentExternalReferenceCode(
 						pageElement, layoutStructure),
 					pageElement.getPosition());
-		
-		Object definitionObj = pageElement.getDefinition();
+
+		Object definitionObject = pageElement.getDefinition();
 
 		PageRowDefinition pageRowDefinition = null;
 
-		if (definitionObj != null) {
-			if (definitionObj instanceof PageRowDefinition) {
-				pageRowDefinition = (PageRowDefinition)definitionObj;
+		if (definitionObject != null) {
+			if (definitionObject instanceof PageRowDefinition) {
+				pageRowDefinition = (PageRowDefinition)definitionObject;
 			}
-			else if (definitionObj instanceof LinkedHashMap) {
+			else if (definitionObject instanceof LinkedHashMap) {
 				ObjectMapper objectMapper = new ObjectMapper();
+
 				pageRowDefinition = objectMapper.convertValue(
-					definitionObj, PageRowDefinition.class);
+					definitionObject, PageRowDefinition.class);
 			}
 		}
 

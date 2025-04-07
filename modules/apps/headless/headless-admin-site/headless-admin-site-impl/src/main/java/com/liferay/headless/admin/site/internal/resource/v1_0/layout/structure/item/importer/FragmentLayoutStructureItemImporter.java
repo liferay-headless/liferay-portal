@@ -5,6 +5,8 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0.layout.structure.item.importer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.liferay.fragment.contributor.util.FragmentCollectionContributorRegistryUtil;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -25,7 +27,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.LinkedHashMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Eudaldo Alonso
  */
@@ -40,19 +42,20 @@ public class FragmentLayoutStructureItemImporter
 			PageElement pageElement)
 		throws Exception {
 
-
-		Object definitionObj = pageElement.getDefinition();
+		Object definitionObject = pageElement.getDefinition();
 
 		PageFragmentInstanceDefinition pageFragmentInstanceDefinition = null;
 
-		if (definitionObj != null) {
-			if (definitionObj instanceof PageFragmentInstanceDefinition) {
-				pageFragmentInstanceDefinition = (PageFragmentInstanceDefinition)definitionObj;
+		if (definitionObject != null) {
+			if (definitionObject instanceof PageFragmentInstanceDefinition) {
+				pageFragmentInstanceDefinition =
+					(PageFragmentInstanceDefinition)definitionObject;
 			}
-			else if (definitionObj instanceof LinkedHashMap) {
+			else if (definitionObject instanceof LinkedHashMap) {
 				ObjectMapper objectMapper = new ObjectMapper();
+
 				pageFragmentInstanceDefinition = objectMapper.convertValue(
-					definitionObj, PageFragmentInstanceDefinition.class);
+					definitionObject, PageFragmentInstanceDefinition.class);
 			}
 		}
 

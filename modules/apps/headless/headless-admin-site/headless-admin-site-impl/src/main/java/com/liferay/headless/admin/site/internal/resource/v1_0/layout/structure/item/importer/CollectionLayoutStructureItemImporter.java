@@ -5,6 +5,8 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0.layout.structure.item.importer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.liferay.headless.admin.site.dto.v1_0.EmptyCollectionConfig;
 import com.liferay.headless.admin.site.dto.v1_0.PageCollectionDefinition;
 import com.liferay.headless.admin.site.dto.v1_0.PageElement;
@@ -15,7 +17,6 @@ import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.collection.EmptyCollectionOptions;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -43,18 +44,20 @@ public class CollectionLayoutStructureItemImporter
 							pageElement, layoutStructure),
 						pageElement.getPosition());
 
-		Object definitionObj = pageElement.getDefinition();
+		Object definitionObject = pageElement.getDefinition();
 
 		PageCollectionDefinition pageCollectionDefinition = null;
 
-		if (definitionObj != null) {
-			if (definitionObj instanceof PageCollectionDefinition) {
-				pageCollectionDefinition = (PageCollectionDefinition)definitionObj;
+		if (definitionObject != null) {
+			if (definitionObject instanceof PageCollectionDefinition) {
+				pageCollectionDefinition =
+					(PageCollectionDefinition)definitionObject;
 			}
-			else if (definitionObj instanceof LinkedHashMap) {
+			else if (definitionObject instanceof LinkedHashMap) {
 				ObjectMapper objectMapper = new ObjectMapper();
+
 				pageCollectionDefinition = objectMapper.convertValue(
-					definitionObj, PageCollectionDefinition.class);
+					definitionObject, PageCollectionDefinition.class);
 			}
 		}
 
