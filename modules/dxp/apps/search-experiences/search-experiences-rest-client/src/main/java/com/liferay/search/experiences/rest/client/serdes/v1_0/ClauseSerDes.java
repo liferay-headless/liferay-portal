@@ -156,6 +156,9 @@ public class ClauseSerDes {
 				sb.append((String)clause.getQuery());
 				sb.append("\"");
 			}
+			else if (clause.getQuery() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)clause.getQuery()));
+			}
 			else {
 				sb.append(clause.getQuery());
 			}
@@ -326,7 +329,7 @@ public class ClauseSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "query")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {
 				return false;
@@ -386,7 +389,29 @@ public class ClauseSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "query")) {
 				if (jsonParserFieldValue != null) {
-					clause.setQuery((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								clause.setQuery(parsedValue);
+							}
+							catch (Exception e) {
+								clause.setQuery(jsonParserFieldValue);
+							}
+						}
+						else {
+							clause.setQuery(jsonParserFieldValue);
+						}
+					}
+					else {
+						clause.setQuery(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {

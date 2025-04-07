@@ -76,6 +76,12 @@ public class ObjectValidationRuleSettingSerDes {
 				sb.append((String)objectValidationRuleSetting.getValue());
 				sb.append("\"");
 			}
+			else if (objectValidationRuleSetting.getValue() instanceof Map) {
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							objectValidationRuleSetting.getValue()));
+			}
 			else {
 				sb.append(objectValidationRuleSetting.getValue());
 			}
@@ -142,7 +148,7 @@ public class ObjectValidationRuleSettingSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -161,8 +167,33 @@ public class ObjectValidationRuleSettingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					objectValidationRuleSetting.setValue(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								objectValidationRuleSetting.setValue(
+									parsedValue);
+							}
+							catch (Exception e) {
+								objectValidationRuleSetting.setValue(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							objectValidationRuleSetting.setValue(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						objectValidationRuleSetting.setValue(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

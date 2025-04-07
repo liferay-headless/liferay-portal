@@ -60,6 +60,11 @@ public class AggregationConfigurationSerDes {
 				sb.append((String)aggregationConfiguration.getAggs());
 				sb.append("\"");
 			}
+			else if (aggregationConfiguration.getAggs() instanceof Map) {
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)aggregationConfiguration.getAggs()));
+			}
 			else {
 				sb.append(aggregationConfiguration.getAggs());
 			}
@@ -112,7 +117,7 @@ public class AggregationConfigurationSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "aggs")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -125,8 +130,31 @@ public class AggregationConfigurationSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "aggs")) {
 				if (jsonParserFieldValue != null) {
-					aggregationConfiguration.setAggs(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								aggregationConfiguration.setAggs(parsedValue);
+							}
+							catch (Exception e) {
+								aggregationConfiguration.setAggs(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							aggregationConfiguration.setAggs(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						aggregationConfiguration.setAggs(jsonParserFieldValue);
+					}
 				}
 			}
 		}

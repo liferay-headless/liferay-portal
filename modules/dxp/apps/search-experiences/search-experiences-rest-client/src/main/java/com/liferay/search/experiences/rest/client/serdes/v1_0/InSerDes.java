@@ -70,6 +70,9 @@ public class InSerDes {
 				sb.append((String)in.getValue());
 				sb.append("\"");
 			}
+			else if (in.getValue() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)in.getValue()));
+			}
 			else {
 				sb.append(in.getValue());
 			}
@@ -128,7 +131,7 @@ public class InSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -145,7 +148,29 @@ public class InSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					in.setValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								in.setValue(parsedValue);
+							}
+							catch (Exception e) {
+								in.setValue(jsonParserFieldValue);
+							}
+						}
+						else {
+							in.setValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						in.setValue(jsonParserFieldValue);
+					}
 				}
 			}
 		}

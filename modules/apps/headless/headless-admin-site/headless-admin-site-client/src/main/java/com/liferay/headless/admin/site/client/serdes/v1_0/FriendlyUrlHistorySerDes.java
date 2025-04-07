@@ -60,6 +60,14 @@ public class FriendlyUrlHistorySerDes {
 				sb.append((String)friendlyUrlHistory.getFriendlyUrlPath_i18n());
 				sb.append("\"");
 			}
+			else if (friendlyUrlHistory.getFriendlyUrlPath_i18n() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							friendlyUrlHistory.getFriendlyUrlPath_i18n()));
+			}
 			else {
 				sb.append(friendlyUrlHistory.getFriendlyUrlPath_i18n());
 			}
@@ -114,7 +122,7 @@ public class FriendlyUrlHistorySerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "friendlyUrlPath_i18n")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -127,8 +135,33 @@ public class FriendlyUrlHistorySerDes {
 
 			if (Objects.equals(jsonParserFieldName, "friendlyUrlPath_i18n")) {
 				if (jsonParserFieldValue != null) {
-					friendlyUrlHistory.setFriendlyUrlPath_i18n(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								friendlyUrlHistory.setFriendlyUrlPath_i18n(
+									parsedValue);
+							}
+							catch (Exception e) {
+								friendlyUrlHistory.setFriendlyUrlPath_i18n(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							friendlyUrlHistory.setFriendlyUrlPath_i18n(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						friendlyUrlHistory.setFriendlyUrlPath_i18n(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

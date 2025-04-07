@@ -85,6 +85,9 @@ public class SettingsSerDes {
 				sb.append((String)settings.getFavIcon());
 				sb.append("\"");
 			}
+			else if (settings.getFavIcon() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)settings.getFavIcon()));
+			}
 			else {
 				sb.append(settings.getFavIcon());
 			}
@@ -205,6 +208,9 @@ public class SettingsSerDes {
 				sb.append("\"");
 				sb.append((String)settings.getThemeSettings());
 				sb.append("\"");
+			}
+			else if (settings.getThemeSettings() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)settings.getThemeSettings()));
 			}
 			else {
 				sb.append(settings.getThemeSettings());
@@ -359,7 +365,7 @@ public class SettingsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "favIcon")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "globalCSSClientExtensions")) {
@@ -389,7 +395,7 @@ public class SettingsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "themeSettings")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "themeSpritemapClientExtension")) {
@@ -417,7 +423,29 @@ public class SettingsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "favIcon")) {
 				if (jsonParserFieldValue != null) {
-					settings.setFavIcon((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								settings.setFavIcon(parsedValue);
+							}
+							catch (Exception e) {
+								settings.setFavIcon(jsonParserFieldValue);
+							}
+						}
+						else {
+							settings.setFavIcon(jsonParserFieldValue);
+						}
+					}
+					else {
+						settings.setFavIcon(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
@@ -497,7 +525,29 @@ public class SettingsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "themeSettings")) {
 				if (jsonParserFieldValue != null) {
-					settings.setThemeSettings((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								settings.setThemeSettings(parsedValue);
+							}
+							catch (Exception e) {
+								settings.setThemeSettings(jsonParserFieldValue);
+							}
+						}
+						else {
+							settings.setThemeSettings(jsonParserFieldValue);
+						}
+					}
+					else {
+						settings.setThemeSettings(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(

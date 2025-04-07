@@ -56,6 +56,9 @@ public class RescoreSerDes {
 				sb.append((String)rescore.getQuery());
 				sb.append("\"");
 			}
+			else if (rescore.getQuery() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)rescore.getQuery()));
+			}
 			else {
 				sb.append(rescore.getQuery());
 			}
@@ -73,6 +76,9 @@ public class RescoreSerDes {
 				sb.append((String)rescore.getQueryWeight());
 				sb.append("\"");
 			}
+			else if (rescore.getQueryWeight() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)rescore.getQueryWeight()));
+			}
 			else {
 				sb.append(rescore.getQueryWeight());
 			}
@@ -89,6 +95,10 @@ public class RescoreSerDes {
 				sb.append("\"");
 				sb.append((String)rescore.getRescoreQueryWeight());
 				sb.append("\"");
+			}
+			else if (rescore.getRescoreQueryWeight() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)rescore.getRescoreQueryWeight()));
 			}
 			else {
 				sb.append(rescore.getRescoreQueryWeight());
@@ -120,6 +130,9 @@ public class RescoreSerDes {
 				sb.append("\"");
 				sb.append((String)rescore.getWindowSize());
 				sb.append("\"");
+			}
+			else if (rescore.getWindowSize() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)rescore.getWindowSize()));
 			}
 			else {
 				sb.append(rescore.getWindowSize());
@@ -199,21 +212,21 @@ public class RescoreSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "query")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "queryWeight")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "rescoreQueryWeight")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "scoreMode")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "windowSize")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -226,19 +239,86 @@ public class RescoreSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "query")) {
 				if (jsonParserFieldValue != null) {
-					rescore.setQuery((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								rescore.setQuery(parsedValue);
+							}
+							catch (Exception e) {
+								rescore.setQuery(jsonParserFieldValue);
+							}
+						}
+						else {
+							rescore.setQuery(jsonParserFieldValue);
+						}
+					}
+					else {
+						rescore.setQuery(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "queryWeight")) {
 				if (jsonParserFieldValue != null) {
-					rescore.setQueryWeight((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								rescore.setQueryWeight(parsedValue);
+							}
+							catch (Exception e) {
+								rescore.setQueryWeight(jsonParserFieldValue);
+							}
+						}
+						else {
+							rescore.setQueryWeight(jsonParserFieldValue);
+						}
+					}
+					else {
+						rescore.setQueryWeight(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "rescoreQueryWeight")) {
 
 				if (jsonParserFieldValue != null) {
-					rescore.setRescoreQueryWeight((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								rescore.setRescoreQueryWeight(parsedValue);
+							}
+							catch (Exception e) {
+								rescore.setRescoreQueryWeight(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							rescore.setRescoreQueryWeight(jsonParserFieldValue);
+						}
+					}
+					else {
+						rescore.setRescoreQueryWeight(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "scoreMode")) {
@@ -248,7 +328,29 @@ public class RescoreSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "windowSize")) {
 				if (jsonParserFieldValue != null) {
-					rescore.setWindowSize((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								rescore.setWindowSize(parsedValue);
+							}
+							catch (Exception e) {
+								rescore.setWindowSize(jsonParserFieldValue);
+							}
+						}
+						else {
+							rescore.setWindowSize(jsonParserFieldValue);
+						}
+					}
+					else {
+						rescore.setWindowSize(jsonParserFieldValue);
+					}
 				}
 			}
 		}

@@ -118,6 +118,9 @@ public class SearchResultSerDes {
 				sb.append((String)searchResult.getEmbedded());
 				sb.append("\"");
 			}
+			else if (searchResult.getEmbedded() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)searchResult.getEmbedded()));
+			}
 			else {
 				sb.append(searchResult.getEmbedded());
 			}
@@ -298,7 +301,7 @@ public class SearchResultSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "embedded")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "entryClassName")) {
 				return false;
@@ -346,7 +349,29 @@ public class SearchResultSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "embedded")) {
 				if (jsonParserFieldValue != null) {
-					searchResult.setEmbedded((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								searchResult.setEmbedded(parsedValue);
+							}
+							catch (Exception e) {
+								searchResult.setEmbedded(jsonParserFieldValue);
+							}
+						}
+						else {
+							searchResult.setEmbedded(jsonParserFieldValue);
+						}
+					}
+					else {
+						searchResult.setEmbedded(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "entryClassName")) {

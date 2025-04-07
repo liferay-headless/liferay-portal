@@ -128,6 +128,9 @@ public class DSRecipientSerDes {
 				sb.append((String)dsRecipient.getTabs());
 				sb.append("\"");
 			}
+			else if (dsRecipient.getTabs() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)dsRecipient.getTabs()));
+			}
 			else {
 				sb.append(dsRecipient.getTabs());
 			}
@@ -231,7 +234,7 @@ public class DSRecipientSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "tabs")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -269,7 +272,29 @@ public class DSRecipientSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "tabs")) {
 				if (jsonParserFieldValue != null) {
-					dsRecipient.setTabs((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								dsRecipient.setTabs(parsedValue);
+							}
+							catch (Exception e) {
+								dsRecipient.setTabs(jsonParserFieldValue);
+							}
+						}
+						else {
+							dsRecipient.setTabs(jsonParserFieldValue);
+						}
+					}
+					else {
+						dsRecipient.setTabs(jsonParserFieldValue);
+					}
 				}
 			}
 		}

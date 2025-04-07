@@ -58,6 +58,10 @@ public class FragmentImageSerDes {
 				sb.append((String)fragmentImage.getDescription());
 				sb.append("\"");
 			}
+			else if (fragmentImage.getDescription() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)fragmentImage.getDescription()));
+			}
 			else {
 				sb.append(fragmentImage.getDescription());
 			}
@@ -87,6 +91,9 @@ public class FragmentImageSerDes {
 				sb.append((String)fragmentImage.getTitle());
 				sb.append("\"");
 			}
+			else if (fragmentImage.getTitle() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)fragmentImage.getTitle()));
+			}
 			else {
 				sb.append(fragmentImage.getTitle());
 			}
@@ -103,6 +110,9 @@ public class FragmentImageSerDes {
 				sb.append("\"");
 				sb.append((String)fragmentImage.getUrl());
 				sb.append("\"");
+			}
+			else if (fragmentImage.getUrl() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)fragmentImage.getUrl()));
 			}
 			else {
 				sb.append(fragmentImage.getUrl());
@@ -179,7 +189,7 @@ public class FragmentImageSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "description")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "fragmentImageClassPKReference")) {
@@ -187,10 +197,10 @@ public class FragmentImageSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "url")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -203,7 +213,30 @@ public class FragmentImageSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
-					fragmentImage.setDescription((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentImage.setDescription(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentImage.setDescription(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentImage.setDescription(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentImage.setDescription(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
@@ -217,12 +250,56 @@ public class FragmentImageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
 				if (jsonParserFieldValue != null) {
-					fragmentImage.setTitle((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentImage.setTitle(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentImage.setTitle(jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentImage.setTitle(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentImage.setTitle(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "url")) {
 				if (jsonParserFieldValue != null) {
-					fragmentImage.setUrl((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentImage.setUrl(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentImage.setUrl(jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentImage.setUrl(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentImage.setUrl(jsonParserFieldValue);
+					}
 				}
 			}
 		}

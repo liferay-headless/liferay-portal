@@ -84,6 +84,9 @@ public class EqualsSerDes {
 				sb.append((String)equals.getValue());
 				sb.append("\"");
 			}
+			else if (equals.getValue() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)equals.getValue()));
+			}
 			else {
 				sb.append(equals.getValue());
 			}
@@ -152,7 +155,7 @@ public class EqualsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -175,7 +178,29 @@ public class EqualsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					equals.setValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								equals.setValue(parsedValue);
+							}
+							catch (Exception e) {
+								equals.setValue(jsonParserFieldValue);
+							}
+						}
+						else {
+							equals.setValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						equals.setValue(jsonParserFieldValue);
+					}
 				}
 			}
 		}

@@ -62,6 +62,16 @@ public class TaxonomyCategoryBriefSerDes {
 						taxonomyCategoryBrief.getEmbeddedTaxonomyCategory());
 				sb.append("\"");
 			}
+			else if (
+						taxonomyCategoryBrief.
+							getEmbeddedTaxonomyCategory() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							taxonomyCategoryBrief.
+								getEmbeddedTaxonomyCategory()));
+			}
 			else {
 				sb.append(taxonomyCategoryBrief.getEmbeddedTaxonomyCategory());
 			}
@@ -205,7 +215,7 @@ public class TaxonomyCategoryBriefSerDes {
 			if (Objects.equals(
 					jsonParserFieldName, "embeddedTaxonomyCategory")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "taxonomyCategoryId")) {
@@ -240,8 +250,34 @@ public class TaxonomyCategoryBriefSerDes {
 					jsonParserFieldName, "embeddedTaxonomyCategory")) {
 
 				if (jsonParserFieldValue != null) {
-					taxonomyCategoryBrief.setEmbeddedTaxonomyCategory(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								taxonomyCategoryBrief.
+									setEmbeddedTaxonomyCategory(parsedValue);
+							}
+							catch (Exception e) {
+								taxonomyCategoryBrief.
+									setEmbeddedTaxonomyCategory(
+										jsonParserFieldValue);
+							}
+						}
+						else {
+							taxonomyCategoryBrief.setEmbeddedTaxonomyCategory(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						taxonomyCategoryBrief.setEmbeddedTaxonomyCategory(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(

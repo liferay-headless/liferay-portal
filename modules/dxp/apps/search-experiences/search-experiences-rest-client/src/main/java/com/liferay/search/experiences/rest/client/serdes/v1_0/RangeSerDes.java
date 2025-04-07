@@ -70,6 +70,9 @@ public class RangeSerDes {
 				sb.append((String)range.getGt());
 				sb.append("\"");
 			}
+			else if (range.getGt() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)range.getGt()));
+			}
 			else {
 				sb.append(range.getGt());
 			}
@@ -86,6 +89,9 @@ public class RangeSerDes {
 				sb.append("\"");
 				sb.append((String)range.getGte());
 				sb.append("\"");
+			}
+			else if (range.getGte() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)range.getGte()));
 			}
 			else {
 				sb.append(range.getGte());
@@ -104,6 +110,9 @@ public class RangeSerDes {
 				sb.append((String)range.getLt());
 				sb.append("\"");
 			}
+			else if (range.getLt() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)range.getLt()));
+			}
 			else {
 				sb.append(range.getLt());
 			}
@@ -120,6 +129,9 @@ public class RangeSerDes {
 				sb.append("\"");
 				sb.append((String)range.getLte());
 				sb.append("\"");
+			}
+			else if (range.getLte() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)range.getLte()));
 			}
 			else {
 				sb.append(range.getLte());
@@ -221,16 +233,16 @@ public class RangeSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "gt")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "gte")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "lt")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "lte")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "parameterName")) {
 				return false;
@@ -251,22 +263,110 @@ public class RangeSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "gt")) {
 				if (jsonParserFieldValue != null) {
-					range.setGt((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								range.setGt(parsedValue);
+							}
+							catch (Exception e) {
+								range.setGt(jsonParserFieldValue);
+							}
+						}
+						else {
+							range.setGt(jsonParserFieldValue);
+						}
+					}
+					else {
+						range.setGt(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "gte")) {
 				if (jsonParserFieldValue != null) {
-					range.setGte((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								range.setGte(parsedValue);
+							}
+							catch (Exception e) {
+								range.setGte(jsonParserFieldValue);
+							}
+						}
+						else {
+							range.setGte(jsonParserFieldValue);
+						}
+					}
+					else {
+						range.setGte(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "lt")) {
 				if (jsonParserFieldValue != null) {
-					range.setLt((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								range.setLt(parsedValue);
+							}
+							catch (Exception e) {
+								range.setLt(jsonParserFieldValue);
+							}
+						}
+						else {
+							range.setLt(jsonParserFieldValue);
+						}
+					}
+					else {
+						range.setLt(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "lte")) {
 				if (jsonParserFieldValue != null) {
-					range.setLte((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								range.setLte(parsedValue);
+							}
+							catch (Exception e) {
+								range.setLte(jsonParserFieldValue);
+							}
+						}
+						else {
+							range.setLte(jsonParserFieldValue);
+						}
+					}
+					else {
+						range.setLte(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "parameterName")) {

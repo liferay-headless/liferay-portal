@@ -63,6 +63,16 @@ public class WidgetLookAndFeelConfigSerDes {
 					(String)widgetLookAndFeelConfig.getAdvancedStylingConfig());
 				sb.append("\"");
 			}
+			else if (
+						widgetLookAndFeelConfig.
+							getAdvancedStylingConfig() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.
+								getAdvancedStylingConfig()));
+			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getAdvancedStylingConfig());
 			}
@@ -84,6 +94,16 @@ public class WidgetLookAndFeelConfigSerDes {
 						widgetLookAndFeelConfig.getBackgroundStylesConfig());
 				sb.append("\"");
 			}
+			else if (
+						widgetLookAndFeelConfig.
+							getBackgroundStylesConfig() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.
+								getBackgroundStylesConfig()));
+			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getBackgroundStylesConfig());
 			}
@@ -104,6 +124,14 @@ public class WidgetLookAndFeelConfigSerDes {
 					(String)widgetLookAndFeelConfig.getBorderStylesConfig());
 				sb.append("\"");
 			}
+			else if (widgetLookAndFeelConfig.getBorderStylesConfig() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.getBorderStylesConfig()));
+			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getBorderStylesConfig());
 			}
@@ -120,6 +148,14 @@ public class WidgetLookAndFeelConfigSerDes {
 				sb.append("\"");
 				sb.append((String)widgetLookAndFeelConfig.getGeneralConfig());
 				sb.append("\"");
+			}
+			else if (widgetLookAndFeelConfig.getGeneralConfig() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.getGeneralConfig()));
 			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getGeneralConfig());
@@ -142,6 +178,16 @@ public class WidgetLookAndFeelConfigSerDes {
 						widgetLookAndFeelConfig.getMarginAndPaddingConfig());
 				sb.append("\"");
 			}
+			else if (
+						widgetLookAndFeelConfig.
+							getMarginAndPaddingConfig() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.
+								getMarginAndPaddingConfig()));
+			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getMarginAndPaddingConfig());
 			}
@@ -161,6 +207,14 @@ public class WidgetLookAndFeelConfigSerDes {
 				sb.append(
 					(String)widgetLookAndFeelConfig.getTextStylesConfig());
 				sb.append("\"");
+			}
+			else if (widgetLookAndFeelConfig.getTextStylesConfig() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							widgetLookAndFeelConfig.getTextStylesConfig()));
 			}
 			else {
 				sb.append(widgetLookAndFeelConfig.getTextStylesConfig());
@@ -265,28 +319,28 @@ public class WidgetLookAndFeelConfigSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "advancedStylingConfig")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "backgroundStylesConfig")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "borderStylesConfig")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "generalConfig")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "marginAndPaddingConfig")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "textStylesConfig")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -299,44 +353,197 @@ public class WidgetLookAndFeelConfigSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "advancedStylingConfig")) {
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setAdvancedStylingConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.
+									setAdvancedStylingConfig(parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.
+									setAdvancedStylingConfig(
+										jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setAdvancedStylingConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setAdvancedStylingConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "backgroundStylesConfig")) {
 
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setBackgroundStylesConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.
+									setBackgroundStylesConfig(parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.
+									setBackgroundStylesConfig(
+										jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setBackgroundStylesConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setBackgroundStylesConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "borderStylesConfig")) {
 
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setBorderStylesConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.setBorderStylesConfig(
+									parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.setBorderStylesConfig(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setBorderStylesConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setBorderStylesConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "generalConfig")) {
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setGeneralConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.setGeneralConfig(
+									parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.setGeneralConfig(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setGeneralConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setGeneralConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "marginAndPaddingConfig")) {
 
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setMarginAndPaddingConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.
+									setMarginAndPaddingConfig(parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.
+									setMarginAndPaddingConfig(
+										jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setMarginAndPaddingConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setMarginAndPaddingConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "textStylesConfig")) {
 				if (jsonParserFieldValue != null) {
-					widgetLookAndFeelConfig.setTextStylesConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								widgetLookAndFeelConfig.setTextStylesConfig(
+									parsedValue);
+							}
+							catch (Exception e) {
+								widgetLookAndFeelConfig.setTextStylesConfig(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							widgetLookAndFeelConfig.setTextStylesConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						widgetLookAndFeelConfig.setTextStylesConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

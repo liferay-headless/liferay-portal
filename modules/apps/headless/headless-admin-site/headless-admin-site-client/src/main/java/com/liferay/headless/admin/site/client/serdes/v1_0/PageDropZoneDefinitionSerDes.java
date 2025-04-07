@@ -60,6 +60,14 @@ public class PageDropZoneDefinitionSerDes {
 				sb.append((String)pageDropZoneDefinition.getFragmentSettings());
 				sb.append("\"");
 			}
+			else if (pageDropZoneDefinition.getFragmentSettings() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							pageDropZoneDefinition.getFragmentSettings()));
+			}
 			else {
 				sb.append(pageDropZoneDefinition.getFragmentSettings());
 			}
@@ -114,7 +122,7 @@ public class PageDropZoneDefinitionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "fragmentSettings")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -127,8 +135,33 @@ public class PageDropZoneDefinitionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "fragmentSettings")) {
 				if (jsonParserFieldValue != null) {
-					pageDropZoneDefinition.setFragmentSettings(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								pageDropZoneDefinition.setFragmentSettings(
+									parsedValue);
+							}
+							catch (Exception e) {
+								pageDropZoneDefinition.setFragmentSettings(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							pageDropZoneDefinition.setFragmentSettings(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						pageDropZoneDefinition.setFragmentSettings(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

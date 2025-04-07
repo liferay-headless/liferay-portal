@@ -58,6 +58,10 @@ public class SortConfigurationSerDes {
 				sb.append((String)sortConfiguration.getSorts());
 				sb.append("\"");
 			}
+			else if (sortConfiguration.getSorts() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)sortConfiguration.getSorts()));
+			}
 			else {
 				sb.append(sortConfiguration.getSorts());
 			}
@@ -110,7 +114,7 @@ public class SortConfigurationSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "sorts")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -123,7 +127,30 @@ public class SortConfigurationSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "sorts")) {
 				if (jsonParserFieldValue != null) {
-					sortConfiguration.setSorts((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								sortConfiguration.setSorts(parsedValue);
+							}
+							catch (Exception e) {
+								sortConfiguration.setSorts(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							sortConfiguration.setSorts(jsonParserFieldValue);
+						}
+					}
+					else {
+						sortConfiguration.setSorts(jsonParserFieldValue);
+					}
 				}
 			}
 		}

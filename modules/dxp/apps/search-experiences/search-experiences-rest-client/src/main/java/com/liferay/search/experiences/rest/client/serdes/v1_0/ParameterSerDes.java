@@ -56,6 +56,9 @@ public class ParameterSerDes {
 				sb.append((String)parameter.getDefaultValue());
 				sb.append("\"");
 			}
+			else if (parameter.getDefaultValue() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)parameter.getDefaultValue()));
+			}
 			else {
 				sb.append(parameter.getDefaultValue());
 			}
@@ -87,6 +90,9 @@ public class ParameterSerDes {
 				sb.append((String)parameter.getMax());
 				sb.append("\"");
 			}
+			else if (parameter.getMax() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)parameter.getMax()));
+			}
 			else {
 				sb.append(parameter.getMax());
 			}
@@ -103,6 +109,9 @@ public class ParameterSerDes {
 				sb.append("\"");
 				sb.append((String)parameter.getMin());
 				sb.append("\"");
+			}
+			else if (parameter.getMin() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)parameter.getMin()));
 			}
 			else {
 				sb.append(parameter.getMin());
@@ -195,16 +204,16 @@ public class ParameterSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "defaultValue")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "format")) {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "max")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "min")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {
 				return false;
@@ -220,7 +229,29 @@ public class ParameterSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "defaultValue")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setDefaultValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								parameter.setDefaultValue(parsedValue);
+							}
+							catch (Exception e) {
+								parameter.setDefaultValue(jsonParserFieldValue);
+							}
+						}
+						else {
+							parameter.setDefaultValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						parameter.setDefaultValue(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "format")) {
@@ -230,12 +261,56 @@ public class ParameterSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "max")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setMax((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								parameter.setMax(parsedValue);
+							}
+							catch (Exception e) {
+								parameter.setMax(jsonParserFieldValue);
+							}
+						}
+						else {
+							parameter.setMax(jsonParserFieldValue);
+						}
+					}
+					else {
+						parameter.setMax(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "min")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setMin((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								parameter.setMin(parsedValue);
+							}
+							catch (Exception e) {
+								parameter.setMin(jsonParserFieldValue);
+							}
+						}
+						else {
+							parameter.setMin(jsonParserFieldValue);
+						}
+					}
+					else {
+						parameter.setMin(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {

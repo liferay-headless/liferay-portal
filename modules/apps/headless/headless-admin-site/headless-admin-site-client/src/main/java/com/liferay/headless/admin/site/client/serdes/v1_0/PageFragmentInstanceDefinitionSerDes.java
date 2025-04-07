@@ -236,6 +236,16 @@ public class PageFragmentInstanceDefinitionSerDes {
 						pageFragmentInstanceDefinition.getFragmentReference());
 				sb.append("\"");
 			}
+			else if (
+						pageFragmentInstanceDefinition.
+							getFragmentReference() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							pageFragmentInstanceDefinition.
+								getFragmentReference()));
+			}
 			else {
 				sb.append(
 					pageFragmentInstanceDefinition.getFragmentReference());
@@ -594,7 +604,7 @@ public class PageFragmentInstanceDefinitionSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentReference")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentStyle")) {
 				return false;
@@ -705,8 +715,33 @@ public class PageFragmentInstanceDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentReference")) {
 				if (jsonParserFieldValue != null) {
-					pageFragmentInstanceDefinition.setFragmentReference(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								pageFragmentInstanceDefinition.
+									setFragmentReference(parsedValue);
+							}
+							catch (Exception e) {
+								pageFragmentInstanceDefinition.
+									setFragmentReference(jsonParserFieldValue);
+							}
+						}
+						else {
+							pageFragmentInstanceDefinition.setFragmentReference(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						pageFragmentInstanceDefinition.setFragmentReference(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentStyle")) {

@@ -56,6 +56,10 @@ public class FormConfigSerDes {
 				sb.append((String)formConfig.getFormReference());
 				sb.append("\"");
 			}
+			else if (formConfig.getFormReference() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)formConfig.getFormReference()));
+			}
 			else {
 				sb.append(formConfig.getFormReference());
 			}
@@ -72,6 +76,14 @@ public class FormConfigSerDes {
 				sb.append("\"");
 				sb.append((String)formConfig.getFormSuccessSubmissionResult());
 				sb.append("\"");
+			}
+			else if (formConfig.getFormSuccessSubmissionResult() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							formConfig.getFormSuccessSubmissionResult()));
 			}
 			else {
 				sb.append(formConfig.getFormSuccessSubmissionResult());
@@ -171,12 +183,12 @@ public class FormConfigSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "formReference")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "formSuccessSubmissionResult")) {
 
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "formType")) {
 				return false;
@@ -195,15 +207,63 @@ public class FormConfigSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "formReference")) {
 				if (jsonParserFieldValue != null) {
-					formConfig.setFormReference((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								formConfig.setFormReference(parsedValue);
+							}
+							catch (Exception e) {
+								formConfig.setFormReference(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							formConfig.setFormReference(jsonParserFieldValue);
+						}
+					}
+					else {
+						formConfig.setFormReference(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "formSuccessSubmissionResult")) {
 
 				if (jsonParserFieldValue != null) {
-					formConfig.setFormSuccessSubmissionResult(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								formConfig.setFormSuccessSubmissionResult(
+									parsedValue);
+							}
+							catch (Exception e) {
+								formConfig.setFormSuccessSubmissionResult(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							formConfig.setFormSuccessSubmissionResult(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						formConfig.setFormSuccessSubmissionResult(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "formType")) {

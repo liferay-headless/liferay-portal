@@ -58,6 +58,9 @@ public class PageElementSerDes {
 				sb.append((String)pageElement.getDefinition());
 				sb.append("\"");
 			}
+			else if (pageElement.getDefinition() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)pageElement.getDefinition()));
+			}
 			else {
 				sb.append(pageElement.getDefinition());
 			}
@@ -178,7 +181,7 @@ public class PageElementSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "definition")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				return false;
@@ -200,7 +203,29 @@ public class PageElementSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "definition")) {
 				if (jsonParserFieldValue != null) {
-					pageElement.setDefinition((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								pageElement.setDefinition(parsedValue);
+							}
+							catch (Exception e) {
+								pageElement.setDefinition(jsonParserFieldValue);
+							}
+						}
+						else {
+							pageElement.setDefinition(jsonParserFieldValue);
+						}
+					}
+					else {
+						pageElement.setDefinition(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

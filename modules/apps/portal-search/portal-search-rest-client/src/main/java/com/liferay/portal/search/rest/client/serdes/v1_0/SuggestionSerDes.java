@@ -56,6 +56,9 @@ public class SuggestionSerDes {
 				sb.append((String)suggestion.getAttributes());
 				sb.append("\"");
 			}
+			else if (suggestion.getAttributes() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)suggestion.getAttributes()));
+			}
 			else {
 				sb.append(suggestion.getAttributes());
 			}
@@ -143,7 +146,7 @@ public class SuggestionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "score")) {
 				return false;
@@ -162,7 +165,29 @@ public class SuggestionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
 				if (jsonParserFieldValue != null) {
-					suggestion.setAttributes((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								suggestion.setAttributes(parsedValue);
+							}
+							catch (Exception e) {
+								suggestion.setAttributes(jsonParserFieldValue);
+							}
+						}
+						else {
+							suggestion.setAttributes(jsonParserFieldValue);
+						}
+					}
+					else {
+						suggestion.setAttributes(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "score")) {

@@ -70,6 +70,9 @@ public class MappingSerDes {
 				sb.append((String)mapping.getItemReference());
 				sb.append("\"");
 			}
+			else if (mapping.getItemReference() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)mapping.getItemReference()));
+			}
 			else {
 				sb.append(mapping.getItemReference());
 			}
@@ -129,7 +132,7 @@ public class MappingSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "itemReference")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -147,7 +150,29 @@ public class MappingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "itemReference")) {
 				if (jsonParserFieldValue != null) {
-					mapping.setItemReference((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								mapping.setItemReference(parsedValue);
+							}
+							catch (Exception e) {
+								mapping.setItemReference(jsonParserFieldValue);
+							}
+						}
+						else {
+							mapping.setItemReference(jsonParserFieldValue);
+						}
+					}
+					else {
+						mapping.setItemReference(jsonParserFieldValue);
+					}
 				}
 			}
 		}

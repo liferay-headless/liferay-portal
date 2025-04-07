@@ -83,6 +83,9 @@ public class TypeOptionsSerDes {
 				sb.append((String)typeOptions.getMax());
 				sb.append("\"");
 			}
+			else if (typeOptions.getMax() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)typeOptions.getMax()));
+			}
 			else {
 				sb.append(typeOptions.getMax());
 			}
@@ -99,6 +102,9 @@ public class TypeOptionsSerDes {
 				sb.append("\"");
 				sb.append((String)typeOptions.getMin());
 				sb.append("\"");
+			}
+			else if (typeOptions.getMin() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)typeOptions.getMin()));
 			}
 			else {
 				sb.append(typeOptions.getMin());
@@ -156,6 +162,9 @@ public class TypeOptionsSerDes {
 				sb.append("\"");
 				sb.append((String)typeOptions.getStep());
 				sb.append("\"");
+			}
+			else if (typeOptions.getStep() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)typeOptions.getStep()));
 			}
 			else {
 				sb.append(typeOptions.getStep());
@@ -304,10 +313,10 @@ public class TypeOptionsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "max")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "min")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "nullable")) {
 				return false;
@@ -319,7 +328,7 @@ public class TypeOptionsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "step")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "unit")) {
 				return false;
@@ -348,12 +357,56 @@ public class TypeOptionsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "max")) {
 				if (jsonParserFieldValue != null) {
-					typeOptions.setMax((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								typeOptions.setMax(parsedValue);
+							}
+							catch (Exception e) {
+								typeOptions.setMax(jsonParserFieldValue);
+							}
+						}
+						else {
+							typeOptions.setMax(jsonParserFieldValue);
+						}
+					}
+					else {
+						typeOptions.setMax(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "min")) {
 				if (jsonParserFieldValue != null) {
-					typeOptions.setMin((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								typeOptions.setMin(parsedValue);
+							}
+							catch (Exception e) {
+								typeOptions.setMin(jsonParserFieldValue);
+							}
+						}
+						else {
+							typeOptions.setMin(jsonParserFieldValue);
+						}
+					}
+					else {
+						typeOptions.setMin(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "nullable")) {
@@ -384,7 +437,29 @@ public class TypeOptionsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "step")) {
 				if (jsonParserFieldValue != null) {
-					typeOptions.setStep((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								typeOptions.setStep(parsedValue);
+							}
+							catch (Exception e) {
+								typeOptions.setStep(jsonParserFieldValue);
+							}
+						}
+						else {
+							typeOptions.setStep(jsonParserFieldValue);
+						}
+					}
+					else {
+						typeOptions.setStep(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "unit")) {

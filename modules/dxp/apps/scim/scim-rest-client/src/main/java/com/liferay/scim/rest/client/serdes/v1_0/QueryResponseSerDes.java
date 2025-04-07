@@ -58,6 +58,10 @@ public class QueryResponseSerDes {
 				sb.append((String)queryResponse.getResources());
 				sb.append("\"");
 			}
+			else if (queryResponse.getResources() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)queryResponse.getResources()));
+			}
 			else {
 				sb.append(queryResponse.getResources());
 			}
@@ -164,7 +168,7 @@ public class QueryResponseSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "Resources")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "itemsPerPage")) {
 				return false;
@@ -186,7 +190,30 @@ public class QueryResponseSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "Resources")) {
 				if (jsonParserFieldValue != null) {
-					queryResponse.setResources((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								queryResponse.setResources(parsedValue);
+							}
+							catch (Exception e) {
+								queryResponse.setResources(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							queryResponse.setResources(jsonParserFieldValue);
+						}
+					}
+					else {
+						queryResponse.setResources(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "itemsPerPage")) {

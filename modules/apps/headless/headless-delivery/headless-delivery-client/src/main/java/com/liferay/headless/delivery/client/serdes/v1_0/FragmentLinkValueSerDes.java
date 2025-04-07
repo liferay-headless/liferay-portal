@@ -58,6 +58,9 @@ public class FragmentLinkValueSerDes {
 				sb.append((String)fragmentLinkValue.getHref());
 				sb.append("\"");
 			}
+			else if (fragmentLinkValue.getHref() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)fragmentLinkValue.getHref()));
+			}
 			else {
 				sb.append(fragmentLinkValue.getHref());
 			}
@@ -131,7 +134,7 @@ public class FragmentLinkValueSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "href")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "target")) {
 				return false;
@@ -147,7 +150,29 @@ public class FragmentLinkValueSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "href")) {
 				if (jsonParserFieldValue != null) {
-					fragmentLinkValue.setHref((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentLinkValue.setHref(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentLinkValue.setHref(jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentLinkValue.setHref(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentLinkValue.setHref(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "target")) {

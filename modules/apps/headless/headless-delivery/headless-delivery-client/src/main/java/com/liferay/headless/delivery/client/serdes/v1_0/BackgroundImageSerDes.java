@@ -58,6 +58,10 @@ public class BackgroundImageSerDes {
 				sb.append((String)backgroundImage.getDescription());
 				sb.append("\"");
 			}
+			else if (backgroundImage.getDescription() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)backgroundImage.getDescription()));
+			}
 			else {
 				sb.append(backgroundImage.getDescription());
 			}
@@ -75,6 +79,9 @@ public class BackgroundImageSerDes {
 				sb.append((String)backgroundImage.getTitle());
 				sb.append("\"");
 			}
+			else if (backgroundImage.getTitle() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)backgroundImage.getTitle()));
+			}
 			else {
 				sb.append(backgroundImage.getTitle());
 			}
@@ -91,6 +98,9 @@ public class BackgroundImageSerDes {
 				sb.append("\"");
 				sb.append((String)backgroundImage.getUrl());
 				sb.append("\"");
+			}
+			else if (backgroundImage.getUrl() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)backgroundImage.getUrl()));
 			}
 			else {
 				sb.append(backgroundImage.getUrl());
@@ -158,13 +168,13 @@ public class BackgroundImageSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "description")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "url")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -177,18 +187,85 @@ public class BackgroundImageSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
-					backgroundImage.setDescription(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								backgroundImage.setDescription(parsedValue);
+							}
+							catch (Exception e) {
+								backgroundImage.setDescription(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							backgroundImage.setDescription(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						backgroundImage.setDescription(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
 				if (jsonParserFieldValue != null) {
-					backgroundImage.setTitle((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								backgroundImage.setTitle(parsedValue);
+							}
+							catch (Exception e) {
+								backgroundImage.setTitle(jsonParserFieldValue);
+							}
+						}
+						else {
+							backgroundImage.setTitle(jsonParserFieldValue);
+						}
+					}
+					else {
+						backgroundImage.setTitle(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "url")) {
 				if (jsonParserFieldValue != null) {
-					backgroundImage.setUrl((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								backgroundImage.setUrl(parsedValue);
+							}
+							catch (Exception e) {
+								backgroundImage.setUrl(jsonParserFieldValue);
+							}
+						}
+						else {
+							backgroundImage.setUrl(jsonParserFieldValue);
+						}
+					}
+					else {
+						backgroundImage.setUrl(jsonParserFieldValue);
+					}
 				}
 			}
 		}

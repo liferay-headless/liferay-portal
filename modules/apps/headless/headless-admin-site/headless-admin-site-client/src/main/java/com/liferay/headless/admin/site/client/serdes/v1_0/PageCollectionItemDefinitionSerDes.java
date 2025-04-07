@@ -67,6 +67,16 @@ public class PageCollectionItemDefinitionSerDes {
 						pageCollectionItemDefinition.getCollectionItemConfig());
 				sb.append("\"");
 			}
+			else if (
+						pageCollectionItemDefinition.
+							getCollectionItemConfig() instanceof Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							pageCollectionItemDefinition.
+								getCollectionItemConfig()));
+			}
 			else {
 				sb.append(
 					pageCollectionItemDefinition.getCollectionItemConfig());
@@ -124,7 +134,7 @@ public class PageCollectionItemDefinitionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "collectionItemConfig")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -137,8 +147,34 @@ public class PageCollectionItemDefinitionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "collectionItemConfig")) {
 				if (jsonParserFieldValue != null) {
-					pageCollectionItemDefinition.setCollectionItemConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								pageCollectionItemDefinition.
+									setCollectionItemConfig(parsedValue);
+							}
+							catch (Exception e) {
+								pageCollectionItemDefinition.
+									setCollectionItemConfig(
+										jsonParserFieldValue);
+							}
+						}
+						else {
+							pageCollectionItemDefinition.
+								setCollectionItemConfig(jsonParserFieldValue);
+						}
+					}
+					else {
+						pageCollectionItemDefinition.setCollectionItemConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

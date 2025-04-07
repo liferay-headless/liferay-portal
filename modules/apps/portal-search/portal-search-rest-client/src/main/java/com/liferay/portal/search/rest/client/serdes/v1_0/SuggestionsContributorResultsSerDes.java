@@ -66,6 +66,14 @@ public class SuggestionsContributorResultsSerDes {
 					(String)suggestionsContributorResults.getAttributes());
 				sb.append("\"");
 			}
+			else if (suggestionsContributorResults.getAttributes() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							suggestionsContributorResults.getAttributes()));
+			}
 			else {
 				sb.append(suggestionsContributorResults.getAttributes());
 			}
@@ -182,7 +190,7 @@ public class SuggestionsContributorResultsSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "displayGroupName")) {
 				return false;
@@ -201,8 +209,33 @@ public class SuggestionsContributorResultsSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
 				if (jsonParserFieldValue != null) {
-					suggestionsContributorResults.setAttributes(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								suggestionsContributorResults.setAttributes(
+									parsedValue);
+							}
+							catch (Exception e) {
+								suggestionsContributorResults.setAttributes(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							suggestionsContributorResults.setAttributes(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						suggestionsContributorResults.setAttributes(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "displayGroupName")) {

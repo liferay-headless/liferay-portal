@@ -57,6 +57,9 @@ public class FieldSerDes {
 				sb.append((String)field.getDefaultValue());
 				sb.append("\"");
 			}
+			else if (field.getDefaultValue() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)field.getDefaultValue()));
+			}
 			else {
 				sb.append(field.getDefaultValue());
 			}
@@ -278,7 +281,7 @@ public class FieldSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "defaultValue")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "fieldMappings")) {
 				return false;
@@ -315,7 +318,29 @@ public class FieldSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "defaultValue")) {
 				if (jsonParserFieldValue != null) {
-					field.setDefaultValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								field.setDefaultValue(parsedValue);
+							}
+							catch (Exception e) {
+								field.setDefaultValue(jsonParserFieldValue);
+							}
+						}
+						else {
+							field.setDefaultValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						field.setDefaultValue(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "fieldMappings")) {

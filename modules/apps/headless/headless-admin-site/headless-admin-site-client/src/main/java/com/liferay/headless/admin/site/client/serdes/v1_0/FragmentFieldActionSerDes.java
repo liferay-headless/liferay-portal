@@ -58,6 +58,10 @@ public class FragmentFieldActionSerDes {
 				sb.append((String)fragmentFieldAction.getAction());
 				sb.append("\"");
 			}
+			else if (fragmentFieldAction.getAction() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)fragmentFieldAction.getAction()));
+			}
 			else {
 				sb.append(fragmentFieldAction.getAction());
 			}
@@ -94,6 +98,10 @@ public class FragmentFieldActionSerDes {
 				sb.append("\"");
 				sb.append((String)fragmentFieldAction.getText());
 				sb.append("\"");
+			}
+			else if (fragmentFieldAction.getText() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)fragmentFieldAction.getText()));
 			}
 			else {
 				sb.append(fragmentFieldAction.getText());
@@ -171,7 +179,7 @@ public class FragmentFieldActionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "action")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "onError")) {
 				return false;
@@ -180,7 +188,7 @@ public class FragmentFieldActionSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "text")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -193,7 +201,30 @@ public class FragmentFieldActionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "action")) {
 				if (jsonParserFieldValue != null) {
-					fragmentFieldAction.setAction((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentFieldAction.setAction(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentFieldAction.setAction(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentFieldAction.setAction(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentFieldAction.setAction(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "onError")) {
@@ -212,7 +243,30 @@ public class FragmentFieldActionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "text")) {
 				if (jsonParserFieldValue != null) {
-					fragmentFieldAction.setText((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentFieldAction.setText(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentFieldAction.setText(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentFieldAction.setText(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentFieldAction.setText(jsonParserFieldValue);
+					}
 				}
 			}
 		}

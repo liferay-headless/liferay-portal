@@ -94,6 +94,11 @@ public class ObjectDefinitionSettingSerDes {
 				sb.append((String)objectDefinitionSetting.getValue());
 				sb.append("\"");
 			}
+			else if (objectDefinitionSetting.getValue() instanceof Map) {
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)objectDefinitionSetting.getValue()));
+			}
 			else {
 				sb.append(objectDefinitionSetting.getValue());
 			}
@@ -182,7 +187,7 @@ public class ObjectDefinitionSettingSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -215,8 +220,31 @@ public class ObjectDefinitionSettingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					objectDefinitionSetting.setValue(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								objectDefinitionSetting.setValue(parsedValue);
+							}
+							catch (Exception e) {
+								objectDefinitionSetting.setValue(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							objectDefinitionSetting.setValue(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						objectDefinitionSetting.setValue(jsonParserFieldValue);
+					}
 				}
 			}
 		}

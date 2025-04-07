@@ -58,6 +58,9 @@ public class FragmentFieldHTMLSerDes {
 				sb.append((String)fragmentFieldHTML.getHtml());
 				sb.append("\"");
 			}
+			else if (fragmentFieldHTML.getHtml() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)fragmentFieldHTML.getHtml()));
+			}
 			else {
 				sb.append(fragmentFieldHTML.getHtml());
 			}
@@ -110,7 +113,7 @@ public class FragmentFieldHTMLSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "html")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -123,7 +126,29 @@ public class FragmentFieldHTMLSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "html")) {
 				if (jsonParserFieldValue != null) {
-					fragmentFieldHTML.setHtml((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								fragmentFieldHTML.setHtml(parsedValue);
+							}
+							catch (Exception e) {
+								fragmentFieldHTML.setHtml(jsonParserFieldValue);
+							}
+						}
+						else {
+							fragmentFieldHTML.setHtml(jsonParserFieldValue);
+						}
+					}
+					else {
+						fragmentFieldHTML.setHtml(jsonParserFieldValue);
+					}
 				}
 			}
 		}

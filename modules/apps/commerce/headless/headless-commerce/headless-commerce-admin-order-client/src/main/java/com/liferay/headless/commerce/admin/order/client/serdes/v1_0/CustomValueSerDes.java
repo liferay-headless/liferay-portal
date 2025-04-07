@@ -58,6 +58,9 @@ public class CustomValueSerDes {
 				sb.append((String)customValue.getData());
 				sb.append("\"");
 			}
+			else if (customValue.getData() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)customValue.getData()));
+			}
 			else {
 				sb.append(customValue.getData());
 			}
@@ -142,7 +145,7 @@ public class CustomValueSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "data")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "data_i18n")) {
 				return true;
@@ -161,7 +164,29 @@ public class CustomValueSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "data")) {
 				if (jsonParserFieldValue != null) {
-					customValue.setData((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								customValue.setData(parsedValue);
+							}
+							catch (Exception e) {
+								customValue.setData(jsonParserFieldValue);
+							}
+						}
+						else {
+							customValue.setData(jsonParserFieldValue);
+						}
+					}
+					else {
+						customValue.setData(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "data_i18n")) {

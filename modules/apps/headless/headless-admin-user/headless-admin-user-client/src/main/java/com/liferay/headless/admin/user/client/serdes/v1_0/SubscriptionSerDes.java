@@ -64,6 +64,9 @@ public class SubscriptionSerDes {
 				sb.append((String)subscription.getContentId());
 				sb.append("\"");
 			}
+			else if (subscription.getContentId() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)subscription.getContentId()));
+			}
 			else {
 				sb.append(subscription.getContentId());
 			}
@@ -242,7 +245,7 @@ public class SubscriptionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "contentId")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "contentType")) {
 				return false;
@@ -273,7 +276,29 @@ public class SubscriptionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "contentId")) {
 				if (jsonParserFieldValue != null) {
-					subscription.setContentId((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								subscription.setContentId(parsedValue);
+							}
+							catch (Exception e) {
+								subscription.setContentId(jsonParserFieldValue);
+							}
+						}
+						else {
+							subscription.setContentId(jsonParserFieldValue);
+						}
+					}
+					else {
+						subscription.setContentId(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "contentType")) {

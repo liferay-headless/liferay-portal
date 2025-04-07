@@ -58,6 +58,14 @@ public class PageFormStepDefinitionSerDes {
 				sb.append((String)pageFormStepDefinition.getFormStepConfig());
 				sb.append("\"");
 			}
+			else if (pageFormStepDefinition.getFormStepConfig() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							pageFormStepDefinition.getFormStepConfig()));
+			}
 			else {
 				sb.append(pageFormStepDefinition.getFormStepConfig());
 			}
@@ -112,7 +120,7 @@ public class PageFormStepDefinitionSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "formStepConfig")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -125,8 +133,33 @@ public class PageFormStepDefinitionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "formStepConfig")) {
 				if (jsonParserFieldValue != null) {
-					pageFormStepDefinition.setFormStepConfig(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								pageFormStepDefinition.setFormStepConfig(
+									parsedValue);
+							}
+							catch (Exception e) {
+								pageFormStepDefinition.setFormStepConfig(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							pageFormStepDefinition.setFormStepConfig(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						pageFormStepDefinition.setFormStepConfig(
+							jsonParserFieldValue);
+					}
 				}
 			}
 		}

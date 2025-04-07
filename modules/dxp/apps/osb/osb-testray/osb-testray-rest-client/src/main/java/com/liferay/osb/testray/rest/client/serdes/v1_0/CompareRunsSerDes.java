@@ -78,6 +78,9 @@ public class CompareRunsSerDes {
 				sb.append((String)compareRuns.getValues());
 				sb.append("\"");
 			}
+			else if (compareRuns.getValues() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)compareRuns.getValues()));
+			}
 			else {
 				sb.append(compareRuns.getValues());
 			}
@@ -139,7 +142,7 @@ public class CompareRunsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "values")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -158,7 +161,29 @@ public class CompareRunsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "values")) {
 				if (jsonParserFieldValue != null) {
-					compareRuns.setValues((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								compareRuns.setValues(parsedValue);
+							}
+							catch (Exception e) {
+								compareRuns.setValues(jsonParserFieldValue);
+							}
+						}
+						else {
+							compareRuns.setValues(jsonParserFieldValue);
+						}
+					}
+					else {
+						compareRuns.setValues(jsonParserFieldValue);
+					}
 				}
 			}
 		}

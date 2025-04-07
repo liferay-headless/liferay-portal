@@ -58,6 +58,10 @@ public class ContentSetElementSerDes {
 				sb.append((String)contentSetElement.getContent());
 				sb.append("\"");
 			}
+			else if (contentSetElement.getContent() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)contentSetElement.getContent()));
+			}
 			else {
 				sb.append(contentSetElement.getContent());
 			}
@@ -190,7 +194,7 @@ public class ContentSetElementSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "content")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "contentType")) {
 				return false;
@@ -215,7 +219,30 @@ public class ContentSetElementSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "content")) {
 				if (jsonParserFieldValue != null) {
-					contentSetElement.setContent((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								contentSetElement.setContent(parsedValue);
+							}
+							catch (Exception e) {
+								contentSetElement.setContent(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							contentSetElement.setContent(jsonParserFieldValue);
+						}
+					}
+					else {
+						contentSetElement.setContent(jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "contentType")) {

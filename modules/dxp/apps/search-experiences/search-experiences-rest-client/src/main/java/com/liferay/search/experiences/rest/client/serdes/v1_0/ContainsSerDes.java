@@ -70,6 +70,9 @@ public class ContainsSerDes {
 				sb.append((String)contains.getValue());
 				sb.append("\"");
 			}
+			else if (contains.getValue() instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)contains.getValue()));
+			}
 			else {
 				sb.append(contains.getValue());
 			}
@@ -129,7 +132,7 @@ public class ContainsSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -147,7 +150,29 @@ public class ContainsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					contains.setValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								contains.setValue(parsedValue);
+							}
+							catch (Exception e) {
+								contains.setValue(jsonParserFieldValue);
+							}
+						}
+						else {
+							contains.setValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						contains.setValue(jsonParserFieldValue);
+					}
 				}
 			}
 		}

@@ -92,6 +92,10 @@ public class ObjectFieldSettingSerDes {
 				sb.append((String)objectFieldSetting.getValue());
 				sb.append("\"");
 			}
+			else if (objectFieldSetting.getValue() instanceof Map) {
+				sb.append(
+					_toJSON((Map<String, ?>)objectFieldSetting.getValue()));
+			}
 			else {
 				sb.append(objectFieldSetting.getValue());
 			}
@@ -176,7 +180,7 @@ public class ObjectFieldSettingSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
-				return false;
+				return true;
 			}
 
 			return false;
@@ -206,7 +210,30 @@ public class ObjectFieldSettingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					objectFieldSetting.setValue((Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								objectFieldSetting.setValue(parsedValue);
+							}
+							catch (Exception e) {
+								objectFieldSetting.setValue(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							objectFieldSetting.setValue(jsonParserFieldValue);
+						}
+					}
+					else {
+						objectFieldSetting.setValue(jsonParserFieldValue);
+					}
 				}
 			}
 		}

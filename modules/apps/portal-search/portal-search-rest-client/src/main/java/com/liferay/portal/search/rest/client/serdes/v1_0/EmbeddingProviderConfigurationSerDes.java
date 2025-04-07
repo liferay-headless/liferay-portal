@@ -65,6 +65,14 @@ public class EmbeddingProviderConfigurationSerDes {
 					(String)embeddingProviderConfiguration.getAttributes());
 				sb.append("\"");
 			}
+			else if (embeddingProviderConfiguration.getAttributes() instanceof
+						Map) {
+
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							embeddingProviderConfiguration.getAttributes()));
+			}
 			else {
 				sb.append(embeddingProviderConfiguration.getAttributes());
 			}
@@ -247,7 +255,7 @@ public class EmbeddingProviderConfigurationSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "embeddingVectorDimensions")) {
@@ -274,8 +282,33 @@ public class EmbeddingProviderConfigurationSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "attributes")) {
 				if (jsonParserFieldValue != null) {
-					embeddingProviderConfiguration.setAttributes(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								embeddingProviderConfiguration.setAttributes(
+									parsedValue);
+							}
+							catch (Exception e) {
+								embeddingProviderConfiguration.setAttributes(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							embeddingProviderConfiguration.setAttributes(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						embeddingProviderConfiguration.setAttributes(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(

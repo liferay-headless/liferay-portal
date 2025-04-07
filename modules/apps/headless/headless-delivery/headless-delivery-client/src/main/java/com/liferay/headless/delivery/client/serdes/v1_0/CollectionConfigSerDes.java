@@ -58,6 +58,12 @@ public class CollectionConfigSerDes {
 				sb.append((String)collectionConfig.getCollectionReference());
 				sb.append("\"");
 			}
+			else if (collectionConfig.getCollectionReference() instanceof Map) {
+				sb.append(
+					_toJSON(
+						(Map<String, ?>)
+							collectionConfig.getCollectionReference()));
+			}
 			else {
 				sb.append(collectionConfig.getCollectionReference());
 			}
@@ -133,7 +139,7 @@ public class CollectionConfigSerDes {
 		@Override
 		protected boolean parseMaps(String jsonParserFieldName) {
 			if (Objects.equals(jsonParserFieldName, "collectionReference")) {
-				return false;
+				return true;
 			}
 			else if (Objects.equals(jsonParserFieldName, "collectionType")) {
 				return false;
@@ -149,8 +155,33 @@ public class CollectionConfigSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "collectionReference")) {
 				if (jsonParserFieldValue != null) {
-					collectionConfig.setCollectionReference(
-						(Object)jsonParserFieldValue);
+					if (jsonParserFieldValue instanceof String) {
+						String jsonStr = (String)jsonParserFieldValue;
+
+						if ((jsonStr.startsWith("{") &&
+							 jsonStr.endsWith("}")) ||
+							(jsonStr.startsWith("[") &&
+							 jsonStr.endsWith("]"))) {
+
+							try {
+								Object parsedValue = parseToMap(jsonStr);
+								collectionConfig.setCollectionReference(
+									parsedValue);
+							}
+							catch (Exception e) {
+								collectionConfig.setCollectionReference(
+									jsonParserFieldValue);
+							}
+						}
+						else {
+							collectionConfig.setCollectionReference(
+								jsonParserFieldValue);
+						}
+					}
+					else {
+						collectionConfig.setCollectionReference(
+							jsonParserFieldValue);
+					}
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "collectionType")) {
