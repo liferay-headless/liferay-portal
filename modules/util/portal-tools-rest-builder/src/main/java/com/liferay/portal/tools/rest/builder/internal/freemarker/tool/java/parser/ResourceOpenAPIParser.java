@@ -419,6 +419,10 @@ public class ResourceOpenAPIParser {
 				methodName.equals(
 					StringBundler.concat(
 						"getSiteByExternalReferenceCode",
+						TextFormatter.formatPlural(schemaName), "Page")) ||
+				methodName.equals(
+					StringBundler.concat(
+						"getAssetLibraryByExternalReferenceCode",
 						TextFormatter.formatPlural(schemaName), "Page"))) {
 
 				return true;
@@ -481,16 +485,22 @@ public class ResourceOpenAPIParser {
 			batchOperationType = BatchOperationType.EXPORT;
 		}
 		else if (ConfigUtil.isVersionCompatible(configYAML, 9) &&
-				 methodName.equals(
+				 (methodName.equals(
 					 StringBundler.concat(
 						 "getSiteByExternalReferenceCode",
-						 TextFormatter.formatPlural(schemaName), "Page"))) {
+						 TextFormatter.formatPlural(schemaName), "Page")) ||
+				  methodName.equals(
+					  StringBundler.concat(
+						  "getAssetLibraryByExternalReferenceCode",
+						  TextFormatter.formatPlural(schemaName), "Page")))) {
 
 			batchOperationType = BatchOperationType.EXPORT;
 		}
-		else if (ConfigUtil.isVersionCompatible(configYAML, 9) &&
+		else if ((ConfigUtil.isVersionCompatible(configYAML, 9) &&
+				  methodName.equals(
+					  "postSiteByExternalReferenceCode" + schemaName)) ||
 				 methodName.equals(
-					 "postSiteByExternalReferenceCode" + schemaName)) {
+					 "postAssetLibraryByExternalReferenceCode" + schemaName)) {
 
 			batchOperationType = BatchOperationType.IMPORT;
 		}
@@ -1046,7 +1056,9 @@ public class ResourceOpenAPIParser {
 
 					if (previousMethodNameSegment.endsWith(
 							externalReferenceCodeSubjectName) ||
-						Objects.equals(previousMethodNameSegment, "Site")) {
+						Objects.equals(previousMethodNameSegment, "Site") ||
+						Objects.equals(
+							previousMethodNameSegment, "AssetLibrary")) {
 
 						methodNameSegments.add("ByExternalReferenceCode");
 					}
@@ -1222,7 +1234,9 @@ public class ResourceOpenAPIParser {
 
 		basePath = basePath.substring(0, lastIndexOfSlash);
 
-		if (basePath.equals("/asset-libraries/{assetLibraryId}")) {
+		if (basePath.equals("/asset-libraries/{assetLibraryId}") ||
+			basePath.equals("/sites/{assetLibraryExternalReferenceCode}")) {
+
 			return "AssetLibrary";
 		}
 		else if (basePath.equals("/sites/{siteId}") ||

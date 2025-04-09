@@ -165,7 +165,7 @@ public abstract class Base${schemaName}ResourceImpl
 					<#assign getBatchJavaMethodSignature = javaMethodSignature />
 				</#if>
 			</#if>
-		<#elseif stringUtil.equals(javaMethodSignature.methodName, "getSiteByExternalReferenceCode" + schemaNames + "Page")>
+		<#elseif stringUtil.equals(javaMethodSignature.methodName, "getSiteByExternalReferenceCode" + schemaNames + "Page") || stringUtil.equals(javaMethodSignature.methodName, "getAssetLibraryByExternalReferenceCode" + schemaNames + "Page")>
 			<#assign getSiteBatchJavaMethodSignature = javaMethodSignature />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "patch" + schemaName)>
 			<#assign patchBatchJavaMethodSignature = javaMethodSignature />
@@ -181,7 +181,7 @@ public abstract class Base${schemaName}ResourceImpl
 					<#assign postBatchJavaMethodSignature = javaMethodSignature />
 				</#if>
 			</#if>
-		<#elseif stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName)>
+		<#elseif stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName) || stringUtil.equals(javaMethodSignature.methodName, "postAssetLibraryByExternalReferenceCode" + schemaName)>
 			<#assign postSiteBatchJavaMethodSignature = javaMethodSignature />
 		<#elseif stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "ByExternalReferenceCode" + schemaName)>
 			<#assign postParentByExternalReferenceCodeBatchJavaMethodSignatures = postParentByExternalReferenceCodeBatchJavaMethodSignatures + [javaMethodSignature] />
@@ -330,7 +330,7 @@ public abstract class Base${schemaName}ResourceImpl
 				return responseBuilder.entity(
 					vulcanBatchEngineImportTaskResource.deleteImportTask(${javaDataType}.class.getName(), callbackURL, object)
 				).build();
-			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaNames + "PageExportBatch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaNames + "PageExportBatch"))>
+			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaNames + "PageExportBatch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaNames + "PageExportBatch") || stringUtil.equals(javaMethodSignature.methodName, "postAssetLibraryByExternalReferenceCode" + schemaNames + "PageExportBatch"))>
 				vulcanBatchEngineExportTaskResource.setContextAcceptLanguage(contextAcceptLanguage);
 				vulcanBatchEngineExportTaskResource.setContextCompany(contextCompany);
 				vulcanBatchEngineExportTaskResource.setContextHttpServletRequest(contextHttpServletRequest);
@@ -343,7 +343,7 @@ public abstract class Base${schemaName}ResourceImpl
 				return responseBuilder.entity(
 					vulcanBatchEngineExportTaskResource.postExportTask(${javaDataType}.class.getName(), callbackURL, contentType, fieldNames)
 				).build();
-			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "Id" + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName + "Batch"))>
+			<#elseif generateBatch && (stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "post" + parentSchemaName + "Id" + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "postSiteByExternalReferenceCode" + schemaName + "Batch") || stringUtil.equals(javaMethodSignature.methodName, "postAssetLibraryByExternalReferenceCode" + schemaName + "Batch"))>
 				vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(contextAcceptLanguage);
 				vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
 				vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(contextHttpServletRequest);
