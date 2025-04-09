@@ -261,7 +261,7 @@ public abstract class BaseImportTaskResourceImpl
 	@javax.ws.rs.Path("/import-task/{className}")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ImportTask deleteImportTask(
+	public ImportTask deleteImportTaskMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("className")
@@ -438,7 +438,7 @@ public abstract class BaseImportTaskResourceImpl
 	@javax.ws.rs.POST
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public ImportTask postImportTask(
+	public ImportTask postImportTaskMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("className")
@@ -594,7 +594,7 @@ public abstract class BaseImportTaskResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@javax.ws.rs.PUT
 	@Override
-	public ImportTask putImportTask(
+	public ImportTask putImportTaskMultipart(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull
 			@javax.ws.rs.PathParam("className")

@@ -51,6 +51,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1543,6 +1544,43 @@ public class FreeMarkerTool {
 		return false;
 	}
 
+	public List<RestMethodVariants> groupRelatedMethodSignatures(List<JavaMethodSignature> signatures) {
+		Map<String, List<JavaMethodSignature>> methodsByBaseName = new LinkedHashMap<>();
+
+		for (JavaMethodSignature signature : signatures) {
+			String baseName = signature.getMethodName();
+			if (signature.getRequestBodyMediaTypes() == null ||
+				!signature.getRequestBodyMediaTypes().contains("multipart/form-data")) {
+
+				if (!methodsByBaseName.containsKey(baseName)) {
+					methodsByBaseName.put(baseName, new ArrayList<>());
+				}
+
+				methodsByBaseName.get(baseName).add(signature);
+			}
+		}
+
+		List<RestMethodVariants> restMethodVariants = new ArrayList<>();
+		for (Map.Entry<String, List<JavaMethodSignature>> entry : methodsByBaseName.entrySet()) {
+			String baseName = entry.getKey();
+			JavaMethodSignature standard = entry.getValue().get(0);
+
+			JavaMethodSignature multipart = null;
+			for (JavaMethodSignature signature : signatures) {
+				if (signature.getRequestBodyMediaTypes() != null &&
+					signature.getRequestBodyMediaTypes().contains("multipart/form-data") &&
+					signature.getOperation().equals(standard.getOperation())) {
+					multipart = signature;
+					break;
+				}
+			}
+
+			restMethodVariants.add(new RestMethodVariants(standard, multipart));
+		}
+
+		return restMethodVariants;
+	}
+
 	private String _replaceGraphQLParameter(
 		String parameterName, Map<String, String> substitutions) {
 
@@ -1553,6 +1591,34 @@ public class FreeMarkerTool {
 		}
 
 		return parameterName;
+	}
+
+	public class RestMethodVariants {
+		private final JavaMethodSignature standardSignature;
+		private final JavaMethodSignature multipartSignature;
+		private final String baseName;
+
+		public RestMethodVariants(JavaMethodSignature standardSignature,
+								  JavaMethodSignature multipartSignature) {
+			this.standardSignature = standardSignature;
+			this.multipartSignature = multipartSignature;
+			this.baseName = standardSignature.getMethodName();
+		}
+		public JavaMethodSignature getStandardSignature() {
+			return standardSignature;
+		}
+
+		public JavaMethodSignature getMultipartSignature() {
+			return multipartSignature;
+		}
+
+		public boolean hasMultipartVariant() {
+			return multipartSignature != null;
+		}
+
+		public String getBaseName() {
+			return baseName;
+		}
 	}
 
 	private static final DateFormat _dateFormat = _getDateFormat("yyyy-MM-dd");
