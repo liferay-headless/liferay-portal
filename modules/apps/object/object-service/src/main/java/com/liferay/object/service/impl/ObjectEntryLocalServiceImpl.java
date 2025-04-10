@@ -5253,8 +5253,6 @@ public class ObjectEntryLocalServiceImpl
 						"No value was provided for object field \"" +
 							objectField.getName() + "\"");
 				}
-
-				continue;
 			}
 
 			if (Objects.equals(
@@ -5316,8 +5314,7 @@ public class ObjectEntryLocalServiceImpl
 
 			for (ObjectField objectField : objectFields) {
 				if (!objectField.hasUpdateValues() ||
-					objectField.isLocalized() ||
-					!values.containsKey(objectField.getName())) {
+					objectField.isLocalized()) {
 
 					continue;
 				}
