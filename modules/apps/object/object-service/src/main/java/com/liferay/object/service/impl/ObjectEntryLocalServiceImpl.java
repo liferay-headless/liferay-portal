@@ -5253,6 +5253,13 @@ public class ObjectEntryLocalServiceImpl
 						"No value was provided for object field \"" +
 							objectField.getName() + "\"");
 				}
+
+				if (Objects.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+					continue;
+				}
 			}
 
 			if (Objects.equals(
@@ -5314,7 +5321,11 @@ public class ObjectEntryLocalServiceImpl
 
 			for (ObjectField objectField : objectFields) {
 				if (!objectField.hasUpdateValues() ||
-					objectField.isLocalized()) {
+					objectField.isLocalized() ||
+					(!values.containsKey(objectField.getName()) &&
+					 Objects.equals(
+						 objectField.getBusinessType(),
+						 ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) {
 
 					continue;
 				}
