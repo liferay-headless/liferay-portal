@@ -8210,7 +8210,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testPatchSiteScopedCustomObjectEntry() throws Exception {
+	public void testPatchByExternalReferenceCodeSiteScopedCustomObjectEntry() throws Exception {
 		String newObjectFieldValue = RandomTestUtil.randomString();
 
 		JSONObject objectEntryJSONObject = JSONUtil.put(
