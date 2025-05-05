@@ -895,7 +895,8 @@ paths:
                             type: object
             responses:
                 200:
-                    description: "OK"
+                    description:
+                        "OK"
             tags: ["TestEntity"]
     /test-entities/{testEntityId}:
         get:
