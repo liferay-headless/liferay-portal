@@ -580,7 +580,9 @@ public abstract class BaseTestEntityResourceImpl
 
 		UnsafeFunction<TestEntity, TestEntity, Exception>
 			testEntityUnsafeFunction = testEntity -> {
-				deleteTestEntity(testEntity.getId());
+				deleteTestEntity(
+					testEntity.getId(),
+					(Boolean)parameters.getOrDefault("permanent", null));
 
 				return testEntity;
 			};
