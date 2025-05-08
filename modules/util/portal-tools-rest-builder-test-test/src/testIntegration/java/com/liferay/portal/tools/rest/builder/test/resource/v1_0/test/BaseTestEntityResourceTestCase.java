@@ -232,7 +232,7 @@ public abstract class BaseTestEntityResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			testEntityResource.deleteTestEntityHttpResponse(
-				testEntity.getId(), null));
+				testEntity.getId(), testDeleteTestEntity_getPermanent()));
 
 		assertHttpResponseStatusCode(
 			404,
@@ -270,7 +270,7 @@ public abstract class BaseTestEntityResourceTestCase {
 
 		HttpInvoker.HttpResponse httpResponse =
 			testEntityResource.deleteTestEntityBatchHttpResponse(
-				null, null,
+				testDeleteTestEntityBatch_getPermanent(), null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
