@@ -39,4 +39,22 @@ export class JournalEditTemplatePage {
 	async gotoElements() {
 		await this.elementsButton.click();
 	}
+
+	async editTemplate(title?: string, script?: string) {
+		if (title) {
+			await this.page.getByPlaceholder('Untitled Template').fill(title);
+		}
+		if (script) {
+			await this.page.locator('.CodeMirror-lines').dblclick();
+			await this.page.keyboard.press('ControlOrMeta+A');
+			await this.page.keyboard.press('Backspace');
+
+			await this.page.keyboard.type(script);
+		}
+	}
+	async saveTemplate() {
+		await this.page
+			.getByRole('button', {exact: true, name: 'Save'})
+			.click();
+	}
 }

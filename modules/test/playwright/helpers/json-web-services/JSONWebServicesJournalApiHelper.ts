@@ -127,14 +127,19 @@ export class JSONWebServicesJournalApiHelper {
 			...(webContent || {}),
 		};
 
-		urlSearchParams.append(
-			'content',
-			`<root>
-				<dynamic-element field-reference="content" index-type="text" name="content" type="rich_text">
-				<dynamic-content><![CDATA[<p>${webContent.content}</p>]]></dynamic-content>
-				</dynamic-element>
+		if (webContent.content) {
+			urlSearchParams.append(
+				'content',
+				`<root>
+					<dynamic-element field-reference="content" index-type="text" name="content" type="rich_text">
+					<dynamic-content><![CDATA[<p>${webContent.content}</p>]]></dynamic-content>
+					</dynamic-element>
 				</root>`
-		);
+			);
+		}
+		else {
+			urlSearchParams.append('content', '');
+		}
 
 		urlSearchParams.append(
 			'descriptionMap',
