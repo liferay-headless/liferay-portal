@@ -604,7 +604,10 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 		if (Objects.equals(
 				operation.getOperationId(),
-				"putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode")) {
+				StringBundler.concat(
+					"putByExternalReferenceCode",
+					"CurrentExternalReferenceCodeObjectRelationshipName",
+					"RelatedExternalReferenceCode"))) {
 
 			operationId = operationId.concat("ByExternalReferenceCode");
 		}
