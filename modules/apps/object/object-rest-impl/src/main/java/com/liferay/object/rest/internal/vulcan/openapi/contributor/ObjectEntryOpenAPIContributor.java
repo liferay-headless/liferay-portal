@@ -597,14 +597,23 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		ObjectRelationship objectRelationship, Operation operation,
 		String schemaName) {
 
+		String operationId = StringBundler.concat(
+			"put", _objectDefinition.getShortName(),
+			StringUtil.upperCaseFirstLetter(objectRelationship.getName()),
+			schemaName);
+
+		if (Objects.equals(
+				operation.getOperationId(),
+				"putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode")) {
+
+			operationId = operationId.concat("ByExternalReferenceCode");
+		}
+
+		final String finalOperationId = operationId;
+
 		return new Operation() {
 			{
-				operationId(
-					StringBundler.concat(
-						"put", _objectDefinition.getShortName(),
-						StringUtil.upperCaseFirstLetter(
-							objectRelationship.getName()),
-						schemaName));
+				operationId(finalOperationId);
 				parameters(_getParameters(operation, schemaName));
 				responses(
 					_getObjectRelationshipApiResponses(operation, schemaName));
