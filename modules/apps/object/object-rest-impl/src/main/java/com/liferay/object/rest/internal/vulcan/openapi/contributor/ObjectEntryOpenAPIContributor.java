@@ -663,19 +663,6 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		return parameters;
 	}
 
-	private boolean _hasManyToManyExternalReferenceCodeParameters(
-		List<Parameter> parameters) {
-
-		if (parameters.size() != 2) {
-			return false;
-		}
-
-		return Objects.equals(
-			parameters.get(0).getName(), "currentExternalReferenceCode") &&
-			Objects.equals(
-				parameters.get(1).getName(), "relatedExternalReferenceCode");
-	}
-
 	private Map<ObjectRelationship, ObjectDefinition>
 			_getRelatedObjectDefinitionsMap()
 		throws Exception {
@@ -730,6 +717,30 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		Components components = openAPI.getComponents();
 
 		return components.getSchemas();
+	}
+
+	private boolean _hasManyToManyExternalReferenceCodeParameters(
+		List<Parameter> parameters) {
+
+		if (parameters.size() != 2) {
+			return false;
+		}
+
+		if (Objects.equals(
+				parameters.get(
+					0
+				).getName(),
+				"currentExternalReferenceCode") &&
+			Objects.equals(
+				parameters.get(
+					1
+				).getName(),
+				"relatedExternalReferenceCode")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _setBatchUnsupportedFormats(Map<String, Schema> properties) {
