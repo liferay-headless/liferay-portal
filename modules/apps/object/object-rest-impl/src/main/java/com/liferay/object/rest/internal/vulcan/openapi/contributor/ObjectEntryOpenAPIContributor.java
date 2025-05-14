@@ -597,27 +597,23 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		ObjectRelationship objectRelationship, Operation operation,
 		String schemaName) {
 
-		String operationId = StringBundler.concat(
-			"put", _objectDefinition.getShortName(),
+		String prefix = "put";
+
+		List<Parameter> parameters = _getParameters(operation, schemaName);
+
+		if (_hasManyToManyExternalReferenceCodeParameters(parameters)) {
+			prefix = "putByExternalReferenceCode";
+		}
+
+		final String operationId = StringBundler.concat(
+			prefix, _objectDefinition.getShortName(),
 			StringUtil.upperCaseFirstLetter(objectRelationship.getName()),
 			schemaName);
 
-		if (Objects.equals(
-				operation.getOperationId(),
-				StringBundler.concat(
-					"putByExternalReferenceCode",
-					"CurrentExternalReferenceCodeObjectRelationshipName",
-					"RelatedExternalReferenceCode"))) {
-
-			operationId = operationId.concat("ByExternalReferenceCode");
-		}
-
-		final String finalOperationId = operationId;
-
 		return new Operation() {
 			{
-				operationId(finalOperationId);
-				parameters(_getParameters(operation, schemaName));
+				operationId(operationId);
+				parameters(parameters);
 				responses(
 					_getObjectRelationshipApiResponses(operation, schemaName));
 				tags(operation.getTags());
@@ -665,6 +661,19 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		}
 
 		return parameters;
+	}
+
+	private boolean _hasManyToManyExternalReferenceCodeParameters(
+		List<Parameter> parameters) {
+
+		if (parameters.size() != 2) {
+			return false;
+		}
+
+		return Objects.equals(
+			parameters.get(0).getName(), "currentExternalReferenceCode") &&
+			Objects.equals(
+				parameters.get(1).getName(), "relatedExternalReferenceCode");
 	}
 
 	private Map<ObjectRelationship, ObjectDefinition>
