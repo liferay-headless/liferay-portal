@@ -103,6 +103,84 @@ public class BatchEngineAttachmentHelperImpl
 		}
 	}
 
+	@Override
+	public void importAttachments(
+			String portletId, PortletDataContext portletDataContext)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Importing attachments for portlet " + portletId);
+		}
+
+		long globalGroupId = _groupLocalService.getCompanyGroup(
+			portletDataContext.getCompanyId()
+		).getGroupId();
+
+		long originalPlid = portletDataContext.getPlid();
+		String originalPortletId = portletDataContext.getPortletId();
+		long originalGroupId = portletDataContext.getGroupId();
+		long originalScopeGroupId = portletDataContext.getScopeGroupId();
+		String originalScopeType = portletDataContext.getScopeType();
+		String originalScopeLayoutUuid =
+			portletDataContext.getScopeLayoutUuid();
+		boolean originalValidateExistingDataHandler =
+			portletDataContext.isValidateExistingDataHandler();
+
+		portletDataContext.setPlid(0);
+		portletDataContext.setPortletId(portletId);
+		portletDataContext.setGroupId(globalGroupId);
+		portletDataContext.setScopeGroupId(globalGroupId);
+		portletDataContext.setScopeType("");
+		portletDataContext.setScopeLayoutUuid("");
+		portletDataContext.setValidateExistingDataHandler(false);
+
+		try {
+			String path = ExportImportPathUtil.getPortletDataPath(
+				portletDataContext);
+
+			if (portletDataContext.hasPrimaryKey(String.class, path)) {
+				return;
+			}
+
+			String data = portletDataContext.getZipEntryAsString(path);
+
+			if (data == null) {
+				return;
+			}
+
+			Portlet dlPortlet = _portletLocalService.getPortletById(
+				"com_liferay_document_library_web_portlet_DLAdminPortlet");
+
+			PortletDataHandler portletDataHandler =
+				dlPortlet.getPortletDataHandlerInstance();
+
+			javax.portlet.PortletPreferences jxPortletPreferences =
+				PortletPreferencesFactoryUtil.getStrictPortletSetup(
+					portletDataContext.getCompanyId(),
+					portletDataContext.getGroupId(), portletId);
+
+			portletDataHandler.importData(
+				portletDataContext, portletId, jxPortletPreferences, data);
+		}
+		finally {
+			portletDataContext.clearScopedPrimaryKeys();
+
+			portletDataContext.setPlid(originalPlid);
+			portletDataContext.setPortletId(originalPortletId);
+			portletDataContext.setGroupId(originalGroupId);
+			portletDataContext.setScopeGroupId(originalScopeGroupId);
+			portletDataContext.setScopeType(originalScopeType);
+			portletDataContext.setScopeLayoutUuid(originalScopeLayoutUuid);
+			portletDataContext.setValidateExistingDataHandler(
+				originalValidateExistingDataHandler);
+		}
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"Importing attachments finished for portlet " + portletId);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BatchEngineAttachmentHelperImpl.class);
 
