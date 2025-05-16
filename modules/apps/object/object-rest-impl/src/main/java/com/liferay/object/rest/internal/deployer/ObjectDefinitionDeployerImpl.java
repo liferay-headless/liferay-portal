@@ -101,6 +101,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -346,6 +347,19 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			StringUtil.toLowerCase(objectDefinition.getShortName());
 	}
 
+	private boolean _hasAttachmentField(ObjectDefinition objectDefinition) {
+		for (ObjectField objectField :
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId())) {
+
+			if (Objects.equals(objectField.getBusinessType(), "Attachment")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private void _initCustomObjectDefinition(
 		ObjectDefinition objectDefinition) {
 
@@ -521,6 +535,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 								objectDefinition.getScope()
 							).put(
 								"batch.engine.task.item.delegate", "true"
+							).put(
+								"batch.engine.task.item.delegate.attachments." +
+									"supported",
+								_hasAttachmentField(objectDefinition)
 							).put(
 								"batch.engine.task.item.delegate.class.name",
 								ObjectEntry.class.getName()
