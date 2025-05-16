@@ -10,12 +10,16 @@ import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.service.BatchEngineExportTaskService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskService;
+import com.liferay.document.library.exportimport.data.handler.DLExportableRepositoryPublisher;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagListener;
+import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
+
+import java.util.Collections;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -76,6 +80,9 @@ public class BatchEnginePortletDataHandlerRegistry {
 	@Reference
 	private BatchEngineImportTaskService _batchEngineImportTaskService;
 
+	@Reference
+	private RepositoryLocalService _repositoryLocalService;
+
 	private ServiceRegistration<FeatureFlagListener> _serviceRegistration;
 	private ServiceTracker
 		<VulcanBatchEngineTaskItemDelegate,
@@ -97,6 +104,26 @@ public class BatchEnginePortletDataHandlerRegistry {
 			ServiceReference<VulcanBatchEngineTaskItemDelegate>
 				serviceReference) {
 
+			boolean supportsAttachments = (Boolean)serviceReference.getProperty(
+				"batch.engine.task.item.delegate.attachments.supported");
+
+			if (supportsAttachments) {
+				BatchEngineAttachmentDLExportableRepositoryPublisher
+					batchEngineAttachmentExportableRepositoryPublisher =
+						new BatchEngineAttachmentDLExportableRepositoryPublisher(
+							(String)serviceReference.getProperty(
+								"batch.engine.task.item.delegate.portlet.id"),
+							_repositoryLocalService);
+
+				_dlExportableRepositoryPublisherServiceRegistration =
+					_bundleContext.registerService(
+						DLExportableRepositoryPublisher.class,
+						batchEngineAttachmentExportableRepositoryPublisher,
+						HashMapDictionaryBuilder.<String, Object>create(
+							Collections.emptyMap()
+						).build());
+			}
+
 			BatchEnginePortletDataHandler batchEnginePortletDataHandler =
 				new BatchEnginePortletDataHandler(
 					_batchEngineAttachmentHelper,
@@ -109,9 +136,7 @@ public class BatchEnginePortletDataHandlerRegistry {
 					(String)serviceReference.getProperty(
 						"batch.engine.task.item.delegate.item.class.name"),
 					(String)serviceReference.getProperty("batch.engine.scope"),
-					(Boolean)serviceReference.getProperty(
-						"batch.engine.task.item.delegate.attachments." +
-							"supported"),
+					supportsAttachments,
 					(String)serviceReference.getProperty(
 						"batch.engine.task.item.delegate.name"));
 
@@ -145,10 +170,19 @@ public class BatchEnginePortletDataHandlerRegistry {
 				serviceReference,
 			ServiceRegistration<PortletDataHandler> serviceRegistration) {
 
+			if (_dlExportableRepositoryPublisherServiceRegistration != null) {
+				_dlExportableRepositoryPublisherServiceRegistration.
+					unregister();
+
+				_dlExportableRepositoryPublisherServiceRegistration = null;
+			}
+
 			serviceRegistration.unregister();
 		}
 
 		private final BundleContext _bundleContext;
+		private ServiceRegistration<DLExportableRepositoryPublisher>
+			_dlExportableRepositoryPublisherServiceRegistration;
 
 	}
 

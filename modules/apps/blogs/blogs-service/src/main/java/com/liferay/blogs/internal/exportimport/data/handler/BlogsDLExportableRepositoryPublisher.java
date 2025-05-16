@@ -23,7 +23,9 @@ public class BlogsDLExportableRepositoryPublisher
 	implements DLExportableRepositoryPublisher {
 
 	@Override
-	public void publish(long groupId, Consumer<Long> repositoryIdConsumer) {
+	public void publish(
+		long groupId, String portletId, Consumer<Long> repositoryIdConsumer) {
+
 		Repository repository = _repositoryLocalService.fetchRepository(
 			groupId, BlogsConstants.SERVICE_NAME);
 

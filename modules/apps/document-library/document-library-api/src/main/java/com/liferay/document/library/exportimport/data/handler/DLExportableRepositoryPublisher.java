@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  */
 public interface DLExportableRepositoryPublisher {
 
-	public void publish(long groupId, Consumer<Long> repositoryIdConsumer);
+	public void publish(
+		long groupId, String portletId, Consumer<Long> repositoryIdConsumer);
 
 }

@@ -21,6 +21,10 @@ import org.osgi.framework.FrameworkUtil;
 public class DLExportableRepositoryPublisherUtil {
 
 	public static Collection<Long> publish(long groupId) {
+		return publish(groupId, null);
+	}
+
+	public static Collection<Long> publish(long groupId, String portletId) {
 		Collection<Long> exportableRepositoryIds = new HashSet<>();
 
 		exportableRepositoryIds.add(groupId);
@@ -28,7 +32,7 @@ public class DLExportableRepositoryPublisherUtil {
 		_dlExportableRepositoryPublishers.forEach(
 			dlExportableRepositoryPublisher ->
 				dlExportableRepositoryPublisher.publish(
-					groupId, exportableRepositoryIds::add));
+					groupId, portletId, exportableRepositoryIds::add));
 
 		return exportableRepositoryIds;
 	}
