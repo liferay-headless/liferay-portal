@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.exportimport.data.handler;
 
+import com.liferay.batch.engine.BatchEngineAttachmentHelper;
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
@@ -59,19 +60,22 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "4.0.0";
 
 	public BatchEnginePortletDataHandler(
+		BatchEngineAttachmentHelper batchEngineAttachmentHelper,
 		BatchEngineExportTaskExecutor batchEngineExportTaskExecutor,
 		BatchEngineExportTaskService batchEngineExportTaskService,
 		BatchEngineImportTaskExecutor batchEngineImportTaskExecutor,
 		BatchEngineImportTaskService batchEngineImportTaskService,
 		String className, String itemClassName, String scope,
-		String taskItemDelegateName) {
+		boolean supportsAttachments, String taskItemDelegateName) {
 
+		_batchEngineAttachmentHelper = batchEngineAttachmentHelper;
 		_batchEngineExportTaskExecutor = batchEngineExportTaskExecutor;
 		_batchEngineExportTaskService = batchEngineExportTaskService;
 		_batchEngineImportTaskExecutor = batchEngineImportTaskExecutor;
 		_batchEngineImportTaskService = batchEngineImportTaskService;
 		_className = className;
 		_itemClassName = itemClassName;
+		_supportsAttachments = supportsAttachments;
 		_taskItemDelegateName = taskItemDelegateName;
 
 		_deletionsFileName = taskItemDelegateName + "_deletions.json";
@@ -214,6 +218,11 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 		portletDataContext.setValidateExistingDataHandler(true);
 
+		if (_supportsAttachments) {
+			_batchEngineAttachmentHelper.exportAttachments(
+				portletId, portletDataContext);
+		}
+
 		return getExportDataRootElementString(
 			addExportDataRootElement(portletDataContext));
 	}
@@ -330,6 +339,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			fileName);
 	}
 
+	private final BatchEngineAttachmentHelper _batchEngineAttachmentHelper;
 	private final BatchEngineExportTaskExecutor _batchEngineExportTaskExecutor;
 	private final BatchEngineExportTaskService _batchEngineExportTaskService;
 	private final BatchEngineImportTaskExecutor _batchEngineImportTaskExecutor;
@@ -338,6 +348,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 	private final String _deletionsFileName;
 	private final String _fileName;
 	private final String _itemClassName;
+	private final boolean _supportsAttachments;
 	private final String _taskItemDelegateName;
 
 }

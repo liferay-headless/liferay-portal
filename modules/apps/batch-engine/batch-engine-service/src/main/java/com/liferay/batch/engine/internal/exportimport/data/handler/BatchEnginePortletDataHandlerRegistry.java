@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.exportimport.data.handler;
 
+import com.liferay.batch.engine.BatchEngineAttachmentHelper;
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.service.BatchEngineExportTaskService;
@@ -61,6 +62,9 @@ public class BatchEnginePortletDataHandlerRegistry {
 	}
 
 	@Reference
+	private BatchEngineAttachmentHelper _batchEngineAttachmentHelper;
+
+	@Reference
 	private BatchEngineExportTaskExecutor _batchEngineExportTaskExecutor;
 
 	@Reference
@@ -95,6 +99,7 @@ public class BatchEnginePortletDataHandlerRegistry {
 
 			BatchEnginePortletDataHandler batchEnginePortletDataHandler =
 				new BatchEnginePortletDataHandler(
+					_batchEngineAttachmentHelper,
 					_batchEngineExportTaskExecutor,
 					_batchEngineExportTaskService,
 					_batchEngineImportTaskExecutor,
@@ -104,6 +109,9 @@ public class BatchEnginePortletDataHandlerRegistry {
 					(String)serviceReference.getProperty(
 						"batch.engine.task.item.delegate.item.class.name"),
 					(String)serviceReference.getProperty("batch.engine.scope"),
+					(Boolean)serviceReference.getProperty(
+						"batch.engine.task.item.delegate.attachments." +
+							"supported"),
 					(String)serviceReference.getProperty(
 						"batch.engine.task.item.delegate.name"));
 
