@@ -17,7 +17,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -26,10 +25,10 @@ import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.portal.odata.sort.SortParser;
 import com.liferay.portal.odata.sort.SortParserProvider;
-import com.liferay.portal.tools.rest.builder.test.dto.v1_0.ERCSiteTestEntity;
+import com.liferay.portal.tools.rest.builder.test.dto.v1_0.AssetLibraryTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.Filter;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.Sort;
-import com.liferay.portal.tools.rest.builder.test.resource.v1_0.ERCSiteTestEntityResource;
+import com.liferay.portal.tools.rest.builder.test.resource.v1_0.AssetLibraryTestEntityResource;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
@@ -40,17 +39,6 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.UriInfoUtil;
 
-import jakarta.annotation.Generated;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import jakarta.ws.rs.NotSupportedException;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
-
 import java.io.Serializable;
 
 import java.util.Collection;
@@ -60,86 +48,104 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Generated;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import javax.ws.rs.NotSupportedException;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 /**
  * @author Alejandro Tardín
  * @generated
  */
 @Generated("")
-@jakarta.ws.rs.Path("/v1.0")
-public abstract class BaseERCSiteTestEntityResourceImpl
-	implements EntityModelResource, ERCSiteTestEntityResource,
-			   VulcanBatchEngineTaskItemDelegate<ERCSiteTestEntity> {
+@javax.ws.rs.Path("/v1.0")
+public abstract class BaseAssetLibraryTestEntityResourceImpl
+	implements AssetLibraryTestEntityResource, EntityModelResource,
+			   VulcanBatchEngineTaskItemDelegate<AssetLibraryTestEntity> {
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'DELETE' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'DELETE' 'http://localhost:8080/o/test/v1.0/asset-libraries/{assetLibraryId}/asset-library-test-entities/by-external-reference-code/{assetLibraryTestEntityExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "ercSiteTestEntityExternalReferenceCode"
+				name = "assetLibraryId"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
+				name = "assetLibraryTestEntityExternalReferenceCode"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
+			@io.swagger.v3.oas.annotations.tags.Tag(
+				name = "AssetLibraryTestEntity"
+			)
 		}
 	)
 	@javax.ws.rs.DELETE
 	@javax.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}"
+		"/asset-libraries/{assetLibraryId}/asset-library-test-entities/by-external-reference-code/{assetLibraryTestEntityExternalReferenceCode}"
 	)
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public void
-			deleteSiteERCSiteTestEntityErcSiteTestEntityExternalReferenceCode(
+			deleteAssetLibraryAssetLibraryTestEntityByExternalReferenceCodeAssetLibraryTestEntityExternalReferenceCode(
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
-				@javax.ws.rs.PathParam("ercSiteTestEntityExternalReferenceCode")
-				String ercSiteTestEntityExternalReferenceCode,
+				@javax.ws.rs.PathParam("assetLibraryId")
+				Long assetLibraryId,
 				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 				@javax.validation.constraints.NotNull
-				@javax.ws.rs.PathParam("siteExternalReferenceCode")
-				String siteExternalReferenceCode)
+				@javax.ws.rs.PathParam(
+					"assetLibraryTestEntityExternalReferenceCode"
+				)
+				String assetLibraryTestEntityExternalReferenceCode)
 		throws Exception {
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/asset-libraries/{assetLibraryId}/asset-library-test-entities'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
+				name = "assetLibraryId"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
+			@io.swagger.v3.oas.annotations.tags.Tag(
+				name = "AssetLibraryTestEntity"
+			)
 		}
 	)
-	@jakarta.ws.rs.GET
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities"
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path(
+		"/asset-libraries/{assetLibraryId}/asset-library-test-entities"
 	)
-	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Page<ERCSiteTestEntity> getSiteERCSiteTestEntitiesPage(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.validation.constraints.NotNull
-			@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode)
+	public Page<AssetLibraryTestEntity>
+			getAssetLibraryAssetLibraryTestEntitiesPage(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("assetLibraryId")
+				Long assetLibraryId)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -148,58 +154,13 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}'  -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/test/v1.0/asset-libraries/{assetLibraryId}/asset-library-test-entities/export-batch'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "ercSiteTestEntityExternalReferenceCode"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
-		}
-	)
-	@jakarta.ws.rs.GET
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}"
-	)
-	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public ERCSiteTestEntity
-			getSiteERCSiteTestEntityErcSiteTestEntityExternalReferenceCode(
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@jakarta.validation.constraints.NotNull
-				@jakarta.ws.rs.PathParam(
-					"ercSiteTestEntityExternalReferenceCode"
-				)
-				String ercSiteTestEntityExternalReferenceCode,
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@jakarta.validation.constraints.NotNull
-				@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-				String siteExternalReferenceCode)
-		throws Exception {
-
-		return new ERCSiteTestEntity();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities/export-batch'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
+				name = "assetLibraryId"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -217,30 +178,32 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
+			@io.swagger.v3.oas.annotations.tags.Tag(
+				name = "AssetLibraryTestEntity"
+			)
 		}
 	)
-	@jakarta.ws.rs.Consumes("application/json")
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities/export-batch"
+	@javax.ws.rs.Consumes("application/json")
+	@javax.ws.rs.Path(
+		"/asset-libraries/{assetLibraryId}/asset-library-test-entities/export-batch"
 	)
-	@jakarta.ws.rs.POST
-	@jakarta.ws.rs.Produces("application/json")
+	@javax.ws.rs.POST
+	@javax.ws.rs.Produces("application/json")
 	@Override
-	public Response postSiteERCSiteTestEntitiesPageExportBatch(
+	public Response postAssetLibraryAssetLibraryTestEntitiesPageExportBatch(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.validation.constraints.NotNull
-			@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
+			@javax.validation.constraints.NotNull
+			@javax.ws.rs.PathParam("assetLibraryId")
+			Long assetLibraryId,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.ws.rs.QueryParam("callbackURL")
+			@javax.ws.rs.QueryParam("callbackURL")
 			String callbackURL,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.ws.rs.DefaultValue("JSON")
-			@jakarta.ws.rs.QueryParam("contentType")
+			@javax.ws.rs.DefaultValue("JSON")
+			@javax.ws.rs.QueryParam("contentType")
 			String contentType,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.ws.rs.QueryParam("fieldNames")
+			@javax.ws.rs.QueryParam("fieldNames")
 			String fieldNames)
 		throws Exception {
 
@@ -258,200 +221,25 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 
 		return responseBuilder.entity(
 			vulcanBatchEngineExportTaskResource.postExportTask(
-				ERCSiteTestEntity.class.getName(), callbackURL, contentType,
-				fieldNames)
+				AssetLibraryTestEntity.class.getName(), callbackURL,
+				contentType, fieldNames)
 		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "externalReferenceCode": ___, "permissions": ___, "siteExternalReferenceCode": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
-		}
-	)
-	@jakarta.ws.rs.Consumes({"application/json", "application/xml"})
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities"
-	)
-	@jakarta.ws.rs.POST
-	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
-	@Override
-	public ERCSiteTestEntity postSiteERCSiteTestEntity(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.validation.constraints.NotNull
-			@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			ERCSiteTestEntity ercSiteTestEntity)
-		throws Exception {
-
-		return new ERCSiteTestEntity();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities/batch'  -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
-				name = "callbackURL"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
-		}
-	)
-	@jakarta.ws.rs.Consumes("application/json")
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities/batch"
-	)
-	@jakarta.ws.rs.POST
-	@jakarta.ws.rs.Produces("application/json")
-	@Override
-	public Response postSiteERCSiteTestEntityBatch(
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.validation.constraints.NotNull
-			@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-			String siteExternalReferenceCode,
-			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-			@jakarta.ws.rs.QueryParam("callbackURL")
-			String callbackURL,
-			Object object)
-		throws Exception {
-
-		vulcanBatchEngineImportTaskResource.setContextAcceptLanguage(
-			contextAcceptLanguage);
-		vulcanBatchEngineImportTaskResource.setContextCompany(contextCompany);
-		vulcanBatchEngineImportTaskResource.setContextHttpServletRequest(
-			contextHttpServletRequest);
-		vulcanBatchEngineImportTaskResource.setContextUriInfo(contextUriInfo);
-		vulcanBatchEngineImportTaskResource.setContextUser(contextUser);
-
-		Response.ResponseBuilder responseBuilder = Response.accepted();
-
-		return responseBuilder.entity(
-			vulcanBatchEngineImportTaskResource.postImportTask(
-				ERCSiteTestEntity.class.getName(), callbackURL, null, object)
-		).build();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/test/v1.0/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "externalReferenceCode": ___, "permissions": ___, "siteExternalReferenceCode": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
-	 */
-	@io.swagger.v3.oas.annotations.Parameters(
-		value = {
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "ercSiteTestEntityExternalReferenceCode"
-			),
-			@io.swagger.v3.oas.annotations.Parameter(
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "siteExternalReferenceCode"
-			)
-		}
-	)
-	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {
-			@io.swagger.v3.oas.annotations.tags.Tag(name = "ERCSiteTestEntity")
-		}
-	)
-	@jakarta.ws.rs.Consumes({"application/json", "application/xml"})
-	@jakarta.ws.rs.Path(
-		"/sites/{siteExternalReferenceCode}/erc-site-test-entities/{ercSiteTestEntityExternalReferenceCode}"
-	)
-	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
-	@jakarta.ws.rs.PUT
-	@Override
-	public ERCSiteTestEntity
-			putSiteERCSiteTestEntityErcSiteTestEntityExternalReferenceCode(
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@jakarta.validation.constraints.NotNull
-				@jakarta.ws.rs.PathParam(
-					"ercSiteTestEntityExternalReferenceCode"
-				)
-				String ercSiteTestEntityExternalReferenceCode,
-				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
-				@jakarta.validation.constraints.NotNull
-				@jakarta.ws.rs.PathParam("siteExternalReferenceCode")
-				String siteExternalReferenceCode,
-				ERCSiteTestEntity ercSiteTestEntity)
-		throws Exception {
-
-		return new ERCSiteTestEntity();
 	}
 
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<ERCSiteTestEntity> ercSiteTestEntities,
+			Collection<AssetLibraryTestEntity> assetLibraryTestEntities,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeFunction<ERCSiteTestEntity, ERCSiteTestEntity, Exception>
-			ercSiteTestEntityUnsafeFunction = null;
-
-		String createStrategy = (String)parameters.getOrDefault(
-			"createStrategy", "INSERT");
-
-		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
-			if (parameters.containsKey("siteId")) {
-				ercSiteTestEntityUnsafeFunction =
-					ercSiteTestEntity -> postSiteERCSiteTestEntity(
-						(String)parameters.get("siteExternalReferenceCode"),
-						ercSiteTestEntity);
-			}
-			else {
-				throw new NotSupportedException(
-					"One of the following parameters must be specified: [siteId]");
-			}
-		}
-
-		if (ercSiteTestEntityUnsafeFunction == null) {
-			throw new NotSupportedException(
-				"Create strategy \"" + createStrategy +
-					"\" is not supported for ErcSiteTestEntity");
-		}
-
-		if (contextBatchUnsafeBiConsumer != null) {
-			contextBatchUnsafeBiConsumer.accept(
-				ercSiteTestEntities, ercSiteTestEntityUnsafeFunction);
-		}
-		else if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				ercSiteTestEntities, ercSiteTestEntityUnsafeFunction::apply);
-		}
-		else {
-			for (ERCSiteTestEntity ercSiteTestEntity : ercSiteTestEntities) {
-				ercSiteTestEntityUnsafeFunction.apply(ercSiteTestEntity);
-			}
-		}
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Override
 	public void delete(
-			Collection<ERCSiteTestEntity> ercSiteTestEntities,
+			Collection<AssetLibraryTestEntity> assetLibraryTestEntities,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
@@ -460,7 +248,7 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 	}
 
 	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT");
+		return SetUtil.fromArray();
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -483,7 +271,7 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 	}
 
 	public String getResourceName() {
-		return "ERCSiteTestEntity";
+		return "AssetLibraryTestEntity";
 	}
 
 	public String getVersion() {
@@ -491,20 +279,20 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 	}
 
 	@Override
-	public Page<ERCSiteTestEntity> read(
+	public Page<AssetLibraryTestEntity> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
 			com.liferay.portal.kernel.search.Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		if (parameters.containsKey("siteId")) {
-			return getSiteERCSiteTestEntitiesPage(
-				(String)parameters.get("siteExternalReferenceCode"));
+		if (parameters.containsKey("assetLibraryId")) {
+			return getAssetLibraryAssetLibraryTestEntitiesPage(
+				(Long)parameters.get("assetLibraryId"));
 		}
 		else {
 			throw new NotSupportedException(
-				"One of the following parameters must be specified: [siteId]");
+				"One of the following parameters must be specified: [assetLibraryId]");
 		}
 	}
 
@@ -532,7 +320,7 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 
 	@Override
 	public void update(
-			Collection<ERCSiteTestEntity> ercSiteTestEntities,
+			Collection<AssetLibraryTestEntity> assetLibraryTestEntities,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
@@ -546,8 +334,9 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 
 	public void setContextBatchUnsafeBiConsumer(
 		UnsafeBiConsumer
-			<Collection<ERCSiteTestEntity>,
-			 UnsafeFunction<ERCSiteTestEntity, ERCSiteTestEntity, Exception>,
+			<Collection<AssetLibraryTestEntity>,
+			 UnsafeFunction
+				 <AssetLibraryTestEntity, AssetLibraryTestEntity, Exception>,
 			 Exception> contextBatchUnsafeBiConsumer) {
 
 		this.contextBatchUnsafeBiConsumer = contextBatchUnsafeBiConsumer;
@@ -555,8 +344,8 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 
 	public void setContextBatchUnsafeConsumer(
 		UnsafeBiConsumer
-			<Collection<ERCSiteTestEntity>,
-			 UnsafeConsumer<ERCSiteTestEntity, Exception>, Exception>
+			<Collection<AssetLibraryTestEntity>,
+			 UnsafeConsumer<AssetLibraryTestEntity, Exception>, Exception>
 				contextBatchUnsafeConsumer) {
 
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
@@ -823,12 +612,13 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 
 	protected AcceptLanguage contextAcceptLanguage;
 	protected UnsafeBiConsumer
-		<Collection<ERCSiteTestEntity>,
-		 UnsafeFunction<ERCSiteTestEntity, ERCSiteTestEntity, Exception>,
+		<Collection<AssetLibraryTestEntity>,
+		 UnsafeFunction
+			 <AssetLibraryTestEntity, AssetLibraryTestEntity, Exception>,
 		 Exception> contextBatchUnsafeBiConsumer;
 	protected UnsafeBiConsumer
-		<Collection<ERCSiteTestEntity>,
-		 UnsafeConsumer<ERCSiteTestEntity, Exception>, Exception>
+		<Collection<AssetLibraryTestEntity>,
+		 UnsafeConsumer<AssetLibraryTestEntity, Exception>, Exception>
 			contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
 	protected HttpServletRequest contextHttpServletRequest;
@@ -850,6 +640,6 @@ public abstract class BaseERCSiteTestEntityResourceImpl
 		vulcanBatchEngineImportTaskResource;
 
 	private static final com.liferay.portal.kernel.log.Log _log =
-		LogFactoryUtil.getLog(BaseERCSiteTestEntityResourceImpl.class);
+		LogFactoryUtil.getLog(BaseAssetLibraryTestEntityResourceImpl.class);
 
 }
