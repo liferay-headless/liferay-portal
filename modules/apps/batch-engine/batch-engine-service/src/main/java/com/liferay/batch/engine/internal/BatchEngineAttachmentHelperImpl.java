@@ -40,22 +40,22 @@ public class BatchEngineAttachmentHelperImpl
 			portletDataContext.getCompanyId()
 		).getGroupId();
 
+		long originalGroupId = portletDataContext.getGroupId();
 		long originalPlid = portletDataContext.getPlid();
 		String originalPortletId = portletDataContext.getPortletId();
-		long originalGroupId = portletDataContext.getGroupId();
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
-		String originalScopeType = portletDataContext.getScopeType();
 		String originalScopeLayoutUuid =
 			portletDataContext.getScopeLayoutUuid();
+		String originalScopeType = portletDataContext.getScopeType();
 		boolean originalValidateExistingDataHandler =
 			portletDataContext.isValidateExistingDataHandler();
 
+		portletDataContext.setGroupId(globalGroupId);
 		portletDataContext.setPlid(0);
 		portletDataContext.setPortletId(portletId);
-		portletDataContext.setGroupId(globalGroupId);
 		portletDataContext.setScopeGroupId(globalGroupId);
-		portletDataContext.setScopeType("");
 		portletDataContext.setScopeLayoutUuid("");
+		portletDataContext.setScopeType("");
 		portletDataContext.setValidateExistingDataHandler(false);
 
 		try {
@@ -87,12 +87,12 @@ public class BatchEngineAttachmentHelperImpl
 		finally {
 			portletDataContext.clearScopedPrimaryKeys();
 
+			portletDataContext.setGroupId(originalGroupId);
 			portletDataContext.setPlid(originalPlid);
 			portletDataContext.setPortletId(originalPortletId);
-			portletDataContext.setGroupId(originalGroupId);
 			portletDataContext.setScopeGroupId(originalScopeGroupId);
-			portletDataContext.setScopeType(originalScopeType);
 			portletDataContext.setScopeLayoutUuid(originalScopeLayoutUuid);
+			portletDataContext.setScopeType(originalScopeType);
 			portletDataContext.setValidateExistingDataHandler(
 				originalValidateExistingDataHandler);
 		}
@@ -116,22 +116,22 @@ public class BatchEngineAttachmentHelperImpl
 			portletDataContext.getCompanyId()
 		).getGroupId();
 
+		long originalGroupId = portletDataContext.getGroupId();
 		long originalPlid = portletDataContext.getPlid();
 		String originalPortletId = portletDataContext.getPortletId();
-		long originalGroupId = portletDataContext.getGroupId();
 		long originalScopeGroupId = portletDataContext.getScopeGroupId();
-		String originalScopeType = portletDataContext.getScopeType();
 		String originalScopeLayoutUuid =
 			portletDataContext.getScopeLayoutUuid();
+		String originalScopeType = portletDataContext.getScopeType();
 		boolean originalValidateExistingDataHandler =
 			portletDataContext.isValidateExistingDataHandler();
 
+		portletDataContext.setGroupId(globalGroupId);
 		portletDataContext.setPlid(0);
 		portletDataContext.setPortletId(portletId);
-		portletDataContext.setGroupId(globalGroupId);
 		portletDataContext.setScopeGroupId(globalGroupId);
-		portletDataContext.setScopeType("");
 		portletDataContext.setScopeLayoutUuid("");
+		portletDataContext.setScopeType("");
 		portletDataContext.setValidateExistingDataHandler(false);
 
 		try {
@@ -165,12 +165,12 @@ public class BatchEngineAttachmentHelperImpl
 		finally {
 			portletDataContext.clearScopedPrimaryKeys();
 
+			portletDataContext.setGroupId(originalGroupId);
 			portletDataContext.setPlid(originalPlid);
 			portletDataContext.setPortletId(originalPortletId);
-			portletDataContext.setGroupId(originalGroupId);
 			portletDataContext.setScopeGroupId(originalScopeGroupId);
-			portletDataContext.setScopeType(originalScopeType);
 			portletDataContext.setScopeLayoutUuid(originalScopeLayoutUuid);
+			portletDataContext.setScopeType(originalScopeType);
 			portletDataContext.setValidateExistingDataHandler(
 				originalValidateExistingDataHandler);
 		}
