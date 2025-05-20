@@ -29,7 +29,7 @@ public class BatchEngineAttachmentHelperImpl
 
 	@Override
 	public void exportAttachments(
-			String portletId, PortletDataContext portletDataContext)
+			PortletDataContext portletDataContext, String portletId)
 		throws Exception {
 
 		if (_log.isInfoEnabled()) {
@@ -105,7 +105,7 @@ public class BatchEngineAttachmentHelperImpl
 
 	@Override
 	public void importAttachments(
-			String portletId, PortletDataContext portletDataContext)
+			PortletDataContext portletDataContext, String portletId)
 		throws Exception {
 
 		if (_log.isInfoEnabled()) {

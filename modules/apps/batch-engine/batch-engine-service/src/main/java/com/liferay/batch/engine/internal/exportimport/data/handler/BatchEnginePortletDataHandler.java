@@ -220,7 +220,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 		if (_supportsAttachments) {
 			_batchEngineAttachmentHelper.exportAttachments(
-				portletId, portletDataContext);
+				portletDataContext, portletId);
 		}
 
 		return getExportDataRootElementString(
@@ -239,7 +239,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 				() -> {
 					if (_supportsAttachments) {
 						_batchEngineAttachmentHelper.importAttachments(
-							portletId, portletDataContext);
+							portletDataContext, portletId);
 					}
 
 					return null;

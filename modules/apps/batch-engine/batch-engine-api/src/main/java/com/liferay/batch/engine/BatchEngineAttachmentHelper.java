@@ -16,11 +16,11 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BatchEngineAttachmentHelper {
 
 	public void exportAttachments(
-			String portletId, PortletDataContext portletDataContext)
+			PortletDataContext portletDataContext, String portletId)
 		throws Exception;
 
 	public void importAttachments(
-			String portletId, PortletDataContext portletDataContext)
+			PortletDataContext portletDataContext, String portletId)
 		throws Exception;
 
 }
