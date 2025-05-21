@@ -705,7 +705,10 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 		}
 
 		@Override
-		public void publish(long groupId, Consumer<Long> repositoryIdConsumer) {
+		public void publish(
+			long groupId, String portletId,
+			Consumer<Long> repositoryIdConsumer) {
+
 			repositoryIdConsumer.accept(_repositoryId);
 		}
 
@@ -723,7 +726,10 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 		}
 
 		@Override
-		public void publish(long groupId, Consumer<Long> repositoryIdConsumer) {
+		public void publish(
+			long groupId, String portletId,
+			Consumer<Long> repositoryIdConsumer) {
+
 			_atomicInteger.incrementAndGet();
 		}
 
