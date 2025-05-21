@@ -387,7 +387,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			pathItem.delete(
 				_getObjectRelationshipOperation(
 					objectRelationship, existingPathItem.getDelete(), null,
-					schemaName));
+					schemaName, "delete"));
 		}
 
 		if (operations.containsKey(PathItem.HttpMethod.GET)) {
@@ -395,14 +395,14 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 				_getObjectRelationshipOperation(
 					objectRelationship, existingPathItem.getGet(),
 					OpenAPIContributorUtil.getPageSchemaName(schemaName),
-					schemaName));
+					schemaName, "get"));
 		}
 
 		if (operations.containsKey(PathItem.HttpMethod.PUT)) {
 			pathItem.put(
 				_getObjectRelationshipOperation(
 					objectRelationship, existingPathItem.getPut(), schemaName,
-					schemaName));
+					schemaName, "put"));
 		}
 
 		return pathItem;
@@ -557,24 +557,23 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 	private Operation _getObjectRelationshipOperation(
 		ObjectRelationship objectRelationship, Operation operation,
-		String responseSchemaName, String schemaName) {
+		String responseSchemaName, String schemaName, String method) {
+
+		StringBundler operationId = new StringBundler(method);
+
+		if (_getParameters(operation, schemaName).stream().anyMatch((obj -> obj.getName().equals("currentExternalReferenceCode")))) {
+			operationId.append("ByExternalReference");
+		}
+
+		operationId.append(
+			new String[]{_objectDefinition.getShortName(),
+						 StringUtil.upperCaseFirstLetter(objectRelationship.getName())
+				, schemaName});
 
 		return new Operation() {
 			{
 				operationId(
-					StringUtil.replace(
-						operation.getOperationId(),
-						new String[] {
-							"CurrentExternalReferenceCode",
-							"ObjectRelationshipName",
-							"RelatedExternalReferenceCode", "RelatedObjectEntry"
-						},
-						new String[] {
-							_objectDefinition.getShortName(),
-							StringUtil.upperCaseFirstLetter(
-								objectRelationship.getName()),
-							schemaName, schemaName
-						}));
+					operationId.toString());
 				parameters(_getParameters(operation, schemaName));
 				responses(
 					_getObjectRelationshipApiResponses(
