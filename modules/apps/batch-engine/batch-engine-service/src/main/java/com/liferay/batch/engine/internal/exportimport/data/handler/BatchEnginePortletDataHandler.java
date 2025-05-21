@@ -233,20 +233,20 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences, String data)
 		throws Exception {
 
-		try {
-			TransactionInvokerUtil.invoke(
-				transactionConfig,
-				() -> {
-					if (_supportsAttachments) {
+		if (_supportsAttachments) {
+			try {
+				TransactionInvokerUtil.invoke(
+					transactionConfig,
+					() -> {
 						_batchEngineAttachmentHelper.importAttachments(
 							portletDataContext, portletId);
-					}
 
-					return null;
-				});
-		}
-		catch (Throwable throwable) {
-			throw new PortletDataException(throwable);
+						return null;
+					});
+			}
+			catch (Throwable throwable) {
+				throw new PortletDataException(throwable);
+			}
 		}
 
 		String normalizedFileName = _normalize(
