@@ -6,6 +6,7 @@
 package com.liferay.object.rest.internal.deployer;
 
 import com.liferay.headless.object.dto.v1_0.Collaborator;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.model.ObjectDefinition;
@@ -352,7 +353,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				_objectFieldLocalService.getObjectFields(
 					objectDefinition.getObjectDefinitionId())) {
 
-			if (Objects.equals(objectField.getBusinessType(), "Attachment")) {
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
 				return true;
 			}
 		}
