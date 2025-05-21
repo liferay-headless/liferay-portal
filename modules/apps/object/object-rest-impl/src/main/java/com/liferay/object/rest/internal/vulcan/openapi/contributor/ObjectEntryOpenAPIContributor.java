@@ -568,7 +568,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			obj -> Objects.equals(obj.getName(), "currentExternalReferenceCode")
 		)) {
 
-			operationIdSB.append("ByExternalReference");
+			operationIdSB.append("ByExternalReferenceCode");
 		}
 
 		operationIdSB.append(
