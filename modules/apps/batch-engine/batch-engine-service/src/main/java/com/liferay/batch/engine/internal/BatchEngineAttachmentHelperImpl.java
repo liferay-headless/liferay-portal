@@ -11,6 +11,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -36,9 +37,10 @@ public class BatchEngineAttachmentHelperImpl
 			_log.info("Exporting attachments for portlet " + portletId);
 		}
 
-		long globalGroupId = _groupLocalService.getCompanyGroup(
-			portletDataContext.getCompanyId()
-		).getGroupId();
+		Group companyGroup = _groupLocalService.getCompanyGroup(
+			portletDataContext.getCompanyId());
+
+		long globalGroupId = companyGroup.getGroupId();
 
 		long originalGroupId = portletDataContext.getGroupId();
 		long originalPlid = portletDataContext.getPlid();
@@ -112,9 +114,10 @@ public class BatchEngineAttachmentHelperImpl
 			_log.info("Importing attachments for portlet " + portletId);
 		}
 
-		long globalGroupId = _groupLocalService.getCompanyGroup(
-			portletDataContext.getCompanyId()
-		).getGroupId();
+		Group companyGroup = _groupLocalService.getCompanyGroup(
+			portletDataContext.getCompanyId());
+
+		long globalGroupId = companyGroup.getGroupId();
 
 		long originalGroupId = portletDataContext.getGroupId();
 		long originalPlid = portletDataContext.getPlid();
