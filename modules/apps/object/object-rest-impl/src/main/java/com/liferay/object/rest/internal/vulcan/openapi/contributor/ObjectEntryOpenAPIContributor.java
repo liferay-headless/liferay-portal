@@ -578,6 +578,10 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 				schemaName
 			});
 
+		if (method.equals("get")) {
+			operationIdSB.append("Page");
+		}
+
 		return new Operation() {
 			{
 				operationId(operationIdSB.toString());
