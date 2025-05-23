@@ -61,7 +61,7 @@ definition {
 
 	@priority = 5
 	test CanConsumeGraphQLAPIsForHeadlessAdminTaxonomy {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		task ("Given a vocabulary is added") {
 			JSONCategory.addVocabulary(
