@@ -88,12 +88,15 @@ export class WebContentDisplayPage {
 		this.webContentDisplayConfig = page.frameLocator(
 			'iframe[title*="Web Content Display"]'
 		);
-		this.webContentDisplayContent = page.locator(
-			'[id^="portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE"]'
-		);
+		this.webContentDisplayContent = page
+			.locator(
+				'[id^="portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE"]'
+			)
+			.filter({hasText: 'Select web content to make it visible'})
+			.first();
 		this.webContentDisplayOptionsContent =
 			this.webContentDisplayContent.getByLabel('Options');
-		this.webContentDisplayOptionsWidget = page
+		this.webContentDisplayOptionsWidget = this.webContentDisplayContent
 			.locator(
 				'[id^="portlet-topper-toolbar_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_"]'
 			)
@@ -142,13 +145,23 @@ export class WebContentDisplayPage {
 				.click();
 		}
 		else {
-			await this.page
+			for (const topper of await this.page
 				.locator('#wrapper')
 				.getByText('Web Content Display')
-				.last()
-				.locator('..')
-				.getByRole('button', {name: 'Options'})
-				.click();
+				.all()) {
+				try {
+					await topper
+						.locator('..')
+						.locator('..')
+						.locator('..')
+						.filter({hasText: 'Select web content to make it visible.'})
+						.getByRole('button', {name: 'Options'})
+						.click({timeout: 1000});
+					break;
+				}
+				catch {
+				}
+			}
 		}
 
 		await this.configurationOption.click();
@@ -162,13 +175,13 @@ export class WebContentDisplayPage {
 
 		if (webContentName) {
 			await this.selectWebContentInConfigurationFrame
-				.getByText(webContentName)
+				.getByText(webContentName, {exact: true})
 				.waitFor({state: 'visible'});
 			await this.selectWebContentInConfigurationFrame
-				.getByText(webContentName)
+				.getByText(webContentName, {exact: true})
 				.hover();
 			await this.selectWebContentInConfigurationFrame
-				.getByText(webContentName)
+				.getByText(webContentName, {exact: true})
 				.click();
 		}
 		else {
@@ -252,6 +265,7 @@ export class WebContentDisplayPage {
 		await this.page
 			.locator('header')
 			.filter({hasText: 'Web Content Display'})
+			.first()
 			.waitFor({state: 'visible'});
 	}
 }
