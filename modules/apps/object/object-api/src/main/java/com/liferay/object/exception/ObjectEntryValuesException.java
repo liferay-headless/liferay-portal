@@ -337,6 +337,17 @@ public class ObjectEntryValuesException extends PortalException {
 
 	}
 
+	public static class RequiredScopeKey extends ObjectEntryValuesException {
+
+		public RequiredScopeKey(String objectDefinitionName) {
+			super(
+				String.format(
+					"No scope key was provided for the \"%s\" entry.",
+					objectDefinitionName));
+		}
+
+	}
+
 	public static class UniqueValueConstraintViolation
 		extends ObjectEntryValuesException {
 

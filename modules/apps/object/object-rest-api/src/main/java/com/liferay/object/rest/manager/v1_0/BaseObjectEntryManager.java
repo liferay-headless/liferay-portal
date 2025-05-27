@@ -12,6 +12,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -74,7 +75,8 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseObjectEntryManager {
 
 	protected Map<String, String> addDeleteAction(
-		ObjectDefinition objectDefinition, String scopeKey, User user) {
+			ObjectDefinition objectDefinition, String scopeKey, User user)
+		throws Exception {
 
 		if (!_hasPortletResourcePermission(
 				objectDefinition, scopeKey, user, ActionKeys.DELETE)) {
@@ -111,20 +113,27 @@ public abstract class BaseObjectEntryManager {
 	}
 
 	protected long getGroupId(
-		ObjectDefinition objectDefinition, String scopeKey) {
+			ObjectDefinition objectDefinition, String scopeKey)
+		throws Exception {
 
 		return getGroupId(objectDefinition, scopeKey, false);
 	}
 
 	protected long getGroupId(
-		ObjectDefinition objectDefinition, String scopeKey,
-		boolean useCompanyGroup) {
+			ObjectDefinition objectDefinition, String scopeKey,
+			boolean useCompanyGroup)
+		throws Exception {
 
 		ObjectScopeProvider objectScopeProvider =
 			objectScopeProviderRegistry.getObjectScopeProvider(
 				objectDefinition.getScope());
 
 		if (objectScopeProvider.isGroupAware()) {
+			if (scopeKey == null) {
+				throw new ObjectEntryValuesException.RequiredScopeKey(
+					objectDefinition.getName());
+			}
+
 			return GetterUtil.getLong(
 				GroupUtil.getGroupId(
 					objectDefinition.getCompanyId(), scopeKey,
@@ -417,8 +426,9 @@ public abstract class BaseObjectEntryManager {
 	}
 
 	private boolean _hasPortletResourcePermission(
-		ObjectDefinition objectDefinition, String scopeKey, User user,
-		String actionId) {
+			ObjectDefinition objectDefinition, String scopeKey, User user,
+			String actionId)
+		throws Exception {
 
 		PortletResourcePermission portletResourcePermission =
 			getPortletResourcePermission(objectDefinition);

@@ -1465,8 +1465,9 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private long _getFileEntryGroupId(
-		String groupExternalReferenceCode, ObjectDefinition objectDefinition,
-		String scopeKey) {
+			String groupExternalReferenceCode,
+			ObjectDefinition objectDefinition, String scopeKey)
+		throws Exception {
 
 		if (Validator.isNotNull(groupExternalReferenceCode)) {
 			Group group = groupLocalService.fetchGroupByExternalReferenceCode(
