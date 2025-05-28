@@ -6,6 +6,7 @@
 package com.liferay.object.rest.internal.vulcan.openapi.contributor;
 
 import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
@@ -292,8 +293,20 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 			}
 		}
 
+		boolean companyToSiteScoped = false;
+
+		if (Objects.equals(
+				_objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_COMPANY) &&
+			!Objects.equals(
+				objectDefinition.getScope(),
+				ObjectDefinitionConstants.SCOPE_COMPANY)) {
+
+			companyToSiteScoped = true;
+		}
+
 		OpenAPIContributorUtil.copySchemas(
-			schemaName, sourceSchemas,
+			companyToSiteScoped, schemaName, sourceSchemas,
 			objectDefinition.isUnmodifiableSystemObject(), openAPI);
 	}
 

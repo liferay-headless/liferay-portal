@@ -12,6 +12,7 @@ import com.liferay.portal.vulcan.resource.OpenAPIResource;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 
 import java.util.Map;
 
@@ -24,18 +25,23 @@ import org.osgi.framework.ServiceReference;
 public class OpenAPIContributorUtil {
 
 	public static void copySchemas(
-		String schemaName, Map<String, Schema> sourceSchemas, boolean system,
+		boolean companyToSiteScoped, String schemaName,
+		Map<String, Schema> sourceSchemas, boolean system,
 		OpenAPI targetOpenAPI) {
 
 		for (String sourceSchemaName : sourceSchemas.keySet()) {
-			_copySchema(false, sourceSchemaName, sourceSchemas, targetOpenAPI);
+			_copySchema(
+				companyToSiteScoped, false, sourceSchemaName, sourceSchemas,
+				targetOpenAPI);
 		}
 
 		if (!system) {
-			_copySchema(true, schemaName, sourceSchemas, targetOpenAPI);
 			_copySchema(
-				true, getPageSchemaName(schemaName), sourceSchemas,
+				companyToSiteScoped, true, schemaName, sourceSchemas,
 				targetOpenAPI);
+			_copySchema(
+				companyToSiteScoped, true, getPageSchemaName(schemaName),
+				sourceSchemas, targetOpenAPI);
 		}
 	}
 
@@ -64,8 +70,8 @@ public class OpenAPIContributorUtil {
 	}
 
 	private static void _copySchema(
-		boolean force, String schemaName, Map<String, Schema> sourceSchemas,
-		OpenAPI targetOpenAPI) {
+		boolean companyToSiteScoped, boolean force, String schemaName,
+		Map<String, Schema> sourceSchemas, OpenAPI targetOpenAPI) {
 
 		Components targetComponents = targetOpenAPI.getComponents();
 
@@ -73,6 +79,19 @@ public class OpenAPIContributorUtil {
 
 		if (!force && targetSchemas.containsKey(schemaName)) {
 			return;
+		}
+
+		if (companyToSiteScoped) {
+			Schema schema = sourceSchemas.get(schemaName);
+
+			Map<String, Schema> properties = schema.getProperties();
+
+			StringSchema scopeKeySchema = (StringSchema)properties.get(
+				"scopeKey");
+
+			if (scopeKeySchema != null) {
+				scopeKeySchema.setReadOnly(false);
+			}
 		}
 
 		targetSchemas.put(schemaName, sourceSchemas.get(schemaName));
