@@ -10,6 +10,7 @@ import path from 'path';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {dataRemoteApiHelpersTest} from '../../../fixtures/dataRemoteApiHelpersTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
+import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {pageEditorPagesTest} from '../../../fixtures/pageEditorPagesTest';
 import {pageViewModePagesTest} from '../../../fixtures/pageViewModePagesTest';
@@ -34,6 +35,7 @@ export const test = mergeTests(
 		'LPD-35914': {enabled: true, system: true},
 	}),
 	loginTest(),
+	journalPagesTest,
 	pageEditorPagesTest,
 	pageViewModePagesTest,
 	stagingPageTest,
