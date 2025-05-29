@@ -217,12 +217,12 @@ public abstract class BaseAddressResourceTestCase {
 		assertValid(getAddress);
 	}
 
-	protected Long testGetCartBillingAddres_getCartId() throws Exception {
+	protected Address testGetCartBillingAddres_addAddress() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Address testGetCartBillingAddres_addAddress() throws Exception {
+	protected Long testGetCartBillingAddres_getCartId() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
@@ -615,12 +615,12 @@ public abstract class BaseAddressResourceTestCase {
 		assertValid(getAddress);
 	}
 
-	protected Long testGetCartShippingAddres_getCartId() throws Exception {
+	protected Address testGetCartShippingAddres_addAddress() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Address testGetCartShippingAddres_addAddress() throws Exception {
+	protected Long testGetCartShippingAddres_getCartId() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
@@ -798,6 +798,10 @@ public abstract class BaseAddressResourceTestCase {
 	protected void assertValid(Address address) throws Exception {
 		boolean valid = true;
 
+		if (address.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (address.getId() == null) {
 			valid = false;
 		}
@@ -831,16 +835,6 @@ public abstract class BaseAddressResourceTestCase {
 
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (address.getDescription() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (address.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

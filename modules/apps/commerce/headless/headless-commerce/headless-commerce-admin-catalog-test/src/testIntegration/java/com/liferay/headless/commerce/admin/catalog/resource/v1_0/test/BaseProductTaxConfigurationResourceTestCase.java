@@ -194,18 +194,10 @@ public abstract class BaseProductTaxConfigurationResourceTestCase {
 		ProductTaxConfiguration getProductTaxConfiguration =
 			productTaxConfigurationResource.
 				getProductByExternalReferenceCodeTaxConfiguration(
-					testGetProductByExternalReferenceCodeTaxConfiguration_getExternalReferenceCode());
+					postProductTaxConfiguration.getExternalReferenceCode());
 
 		assertEquals(postProductTaxConfiguration, getProductTaxConfiguration);
 		assertValid(getProductTaxConfiguration);
-	}
-
-	protected String
-			testGetProductByExternalReferenceCodeTaxConfiguration_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected ProductTaxConfiguration

@@ -2392,6 +2392,10 @@ public abstract class BaseProductConfigurationResourceTestCase {
 
 		boolean valid = true;
 
+		if (productConfiguration.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (productConfiguration.getId() == null) {
 			valid = false;
 		}
@@ -2505,16 +2509,6 @@ public abstract class BaseProductConfigurationResourceTestCase {
 
 			if (Objects.equals("entityType", additionalAssertFieldName)) {
 				if (productConfiguration.getEntityType() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (productConfiguration.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

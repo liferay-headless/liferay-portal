@@ -671,6 +671,10 @@ public abstract class BaseCollaboratorResourceTestCase {
 	protected void assertValid(Collaborator collaborator) throws Exception {
 		boolean valid = true;
 
+		if (collaborator.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
@@ -700,16 +704,6 @@ public abstract class BaseCollaboratorResourceTestCase {
 
 			if (Objects.equals("dateExpired", additionalAssertFieldName)) {
 				if (collaborator.getDateExpired() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (collaborator.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

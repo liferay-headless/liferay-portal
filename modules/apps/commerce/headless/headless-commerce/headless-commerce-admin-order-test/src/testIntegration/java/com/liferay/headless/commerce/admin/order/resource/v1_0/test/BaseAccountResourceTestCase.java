@@ -435,14 +435,14 @@ public abstract class BaseAccountResourceTestCase {
 		assertValid(getAccount);
 	}
 
-	protected Long testGetOrderRuleAccountAccount_getOrderRuleAccountId()
+	protected Account testGetOrderRuleAccountAccount_addAccount()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Account testGetOrderRuleAccountAccount_addAccount()
+	protected Long testGetOrderRuleAccountAccount_getOrderRuleAccountId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -628,6 +628,10 @@ public abstract class BaseAccountResourceTestCase {
 	protected void assertValid(Account account) throws Exception {
 		boolean valid = true;
 
+		if (account.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (account.getId() == null) {
 			valid = false;
 		}
@@ -645,16 +649,6 @@ public abstract class BaseAccountResourceTestCase {
 
 			if (Objects.equals("emailAddress", additionalAssertFieldName)) {
 				if (account.getEmailAddress() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (account.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

@@ -1294,11 +1294,9 @@ public abstract class BaseCTEntryResourceTestCase {
 										put(
 											"ctCollectionId",
 											ctEntry.getCtCollectionId());
-
 										put(
 											"modelClassNameId",
 											ctEntry.getModelClassNameId());
-
 										put(
 											"modelClassPK",
 											ctEntry.getModelClassPK());
@@ -1325,11 +1323,9 @@ public abstract class BaseCTEntryResourceTestCase {
 											put(
 												"ctCollectionId",
 												ctEntry.getCtCollectionId());
-
 											put(
 												"modelClassNameId",
 												ctEntry.getModelClassNameId());
-
 											put(
 												"modelClassPK",
 												ctEntry.getModelClassPK());

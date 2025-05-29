@@ -1518,17 +1518,17 @@ public abstract class BaseCatalogResourceTestCase {
 			putCatalog.getExternalReferenceCode());
 	}
 
-	protected Catalog testPutCatalogByExternalReferenceCode_createCatalog()
-		throws Exception {
-
-		return randomCatalog();
-	}
-
 	protected Catalog testPutCatalogByExternalReferenceCode_addCatalog()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	protected Catalog testPutCatalogByExternalReferenceCode_createCatalog()
+		throws Exception {
+
+		return randomCatalog();
 	}
 
 	@Rule
@@ -1604,6 +1604,10 @@ public abstract class BaseCatalogResourceTestCase {
 	protected void assertValid(Catalog catalog) throws Exception {
 		boolean valid = true;
 
+		if (catalog.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (catalog.getId() == null) {
 			valid = false;
 		}
@@ -1658,16 +1662,6 @@ public abstract class BaseCatalogResourceTestCase {
 					"defaultLanguageId", additionalAssertFieldName)) {
 
 				if (catalog.getDefaultLanguageId() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (catalog.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

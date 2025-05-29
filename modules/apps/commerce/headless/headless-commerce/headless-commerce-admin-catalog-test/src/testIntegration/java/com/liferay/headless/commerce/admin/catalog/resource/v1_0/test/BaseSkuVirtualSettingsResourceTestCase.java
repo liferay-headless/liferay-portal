@@ -197,18 +197,10 @@ public abstract class BaseSkuVirtualSettingsResourceTestCase {
 		SkuVirtualSettings getSkuVirtualSettings =
 			skuVirtualSettingsResource.
 				getSkuByExternalReferenceCodeSkuVirtualSettings(
-					testGetSkuByExternalReferenceCodeSkuVirtualSettings_getExternalReferenceCode());
+					postSkuVirtualSettings.getExternalReferenceCode());
 
 		assertEquals(postSkuVirtualSettings, getSkuVirtualSettings);
 		assertValid(getSkuVirtualSettings);
-	}
-
-	protected String
-			testGetSkuByExternalReferenceCodeSkuVirtualSettings_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected SkuVirtualSettings

@@ -497,16 +497,16 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		assertValid(getPlacedOrderAddress);
 	}
 
-	protected Long
-			testGetPlacedOrderPlacedOrderBillingAddress_getPlacedOrderId()
+	protected PlacedOrderAddress
+			testGetPlacedOrderPlacedOrderBillingAddress_addPlacedOrderAddress()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected PlacedOrderAddress
-			testGetPlacedOrderPlacedOrderBillingAddress_addPlacedOrderAddress()
+	protected Long
+			testGetPlacedOrderPlacedOrderBillingAddress_getPlacedOrderId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -641,16 +641,16 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		assertValid(getPlacedOrderAddress);
 	}
 
-	protected Long
-			testGetPlacedOrderPlacedOrderShippingAddress_getPlacedOrderId()
+	protected PlacedOrderAddress
+			testGetPlacedOrderPlacedOrderShippingAddress_addPlacedOrderAddress()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected PlacedOrderAddress
-			testGetPlacedOrderPlacedOrderShippingAddress_addPlacedOrderAddress()
+	protected Long
+			testGetPlacedOrderPlacedOrderShippingAddress_getPlacedOrderId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -863,6 +863,10 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 
 		boolean valid = true;
 
+		if (placedOrderAddress.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (placedOrderAddress.getId() == null) {
 			valid = false;
 		}
@@ -896,16 +900,6 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (placedOrderAddress.getDescription() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (placedOrderAddress.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

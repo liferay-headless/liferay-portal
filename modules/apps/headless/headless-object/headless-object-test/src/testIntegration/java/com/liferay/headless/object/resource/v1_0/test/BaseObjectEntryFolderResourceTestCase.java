@@ -790,7 +790,6 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 											"\"" +
 												objectEntryFolder.
 													getScopeKey() + "\"");
-
 										put(
 											"externalReferenceCode",
 											"\"" +
@@ -822,7 +821,6 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 												"\"" +
 													objectEntryFolder.
 														getScopeKey() + "\"");
-
 											put(
 												"externalReferenceCode",
 												"\"" +
@@ -1521,18 +1519,18 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 	}
 
 	protected ObjectEntryFolder
-			testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_createObjectEntryFolder()
-		throws Exception {
-
-		return randomObjectEntryFolder();
-	}
-
-	protected ObjectEntryFolder
 			testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_addObjectEntryFolder()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	protected ObjectEntryFolder
+			testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_createObjectEntryFolder()
+		throws Exception {
+
+		return randomObjectEntryFolder();
 	}
 
 	@Rule
@@ -1634,6 +1632,10 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 			valid = false;
 		}
 
+		if (objectEntryFolder.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (objectEntryFolder.getId() == null) {
 			valid = false;
 		}
@@ -1659,16 +1661,6 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (objectEntryFolder.getDescription() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (objectEntryFolder.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 

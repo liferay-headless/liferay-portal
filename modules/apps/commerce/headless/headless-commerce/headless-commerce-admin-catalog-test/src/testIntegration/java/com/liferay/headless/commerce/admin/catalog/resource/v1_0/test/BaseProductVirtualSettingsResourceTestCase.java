@@ -204,18 +204,10 @@ public abstract class BaseProductVirtualSettingsResourceTestCase {
 		ProductVirtualSettings getProductVirtualSettings =
 			productVirtualSettingsResource.
 				getProductByExternalReferenceCodeProductVirtualSettings(
-					testGetProductByExternalReferenceCodeProductVirtualSettings_getExternalReferenceCode());
+					postProductVirtualSettings.getExternalReferenceCode());
 
 		assertEquals(postProductVirtualSettings, getProductVirtualSettings);
 		assertValid(getProductVirtualSettings);
-	}
-
-	protected String
-			testGetProductByExternalReferenceCodeProductVirtualSettings_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected ProductVirtualSettings

@@ -347,15 +347,15 @@ public abstract class BaseShippingAddressResourceTestCase {
 		assertValid(getShippingAddress);
 	}
 
-	protected Long testGetShipmentShippingAddress_getShipmentId()
+	protected ShippingAddress
+			testGetShipmentShippingAddress_addShippingAddress()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected ShippingAddress
-			testGetShipmentShippingAddress_addShippingAddress()
+	protected Long testGetShipmentShippingAddress_getShipmentId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -629,6 +629,10 @@ public abstract class BaseShippingAddressResourceTestCase {
 
 		boolean valid = true;
 
+		if (shippingAddress.getExternalReferenceCode() == null) {
+			valid = false;
+		}
+
 		if (shippingAddress.getId() == null) {
 			valid = false;
 		}
@@ -654,16 +658,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 
 			if (Objects.equals("description", additionalAssertFieldName)) {
 				if (shippingAddress.getDescription() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (shippingAddress.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 
