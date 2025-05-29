@@ -323,27 +323,25 @@ public abstract class BaseUserGroupResourceTestCase {
 		UserGroup userGroup1 = testDeleteUserGroupBatch_addUserGroup();
 
 		testDeleteUserGroupBatch_deleteUserGroup(
-			"COMPLETED", null, userGroup1.getId());
+			202, userGroup1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
 
-		UserGroup userGroup2 = testDeleteUserGroupBatch_addUserGroup();
+		userGroup1 = testDeleteUserGroupBatch_addUserGroup();
 
-		testDeleteUserGroupBatch_deleteUserGroup(
-			"COMPLETED", userGroup2.getExternalReferenceCode(), null);
+		testDeleteUserGroupBatch_deleteUserGroup(202, null, userGroup1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
-			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
 
 		userGroup1 = testDeleteUserGroupBatch_addUserGroup();
-		userGroup2 = testDeleteUserGroupBatch_addUserGroup();
+		UserGroup userGroup2 = testDeleteUserGroupBatch_addUserGroup();
 
 		testDeleteUserGroupBatch_deleteUserGroup(
-			"COMPLETED", userGroup2.getExternalReferenceCode(),
-			userGroup1.getId());
+			202, userGroup2.getExternalReferenceCode(), userGroup1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -353,8 +351,7 @@ public abstract class BaseUserGroupResourceTestCase {
 			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
 
 		testDeleteUserGroupBatch_deleteUserGroup(
-			"COMPLETED", userGroup2.getExternalReferenceCode(),
-			userGroup1.getId());
+			202, userGroup2.getExternalReferenceCode(), userGroup1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -368,7 +365,7 @@ public abstract class BaseUserGroupResourceTestCase {
 	}
 
 	protected void testDeleteUserGroupBatch_deleteUserGroup(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -381,11 +378,13 @@ public abstract class BaseUserGroupResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

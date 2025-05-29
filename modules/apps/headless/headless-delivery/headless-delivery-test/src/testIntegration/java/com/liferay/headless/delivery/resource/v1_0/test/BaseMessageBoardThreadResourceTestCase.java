@@ -356,7 +356,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			testDeleteMessageBoardThreadBatch_addMessageBoardThread();
 
 		testDeleteMessageBoardThreadBatch_deleteMessageBoardThread(
-			"COMPLETED", null, messageBoardThread1.getId());
+			202, null, messageBoardThread1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -372,7 +372,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected void testDeleteMessageBoardThreadBatch_deleteMessageBoardThread(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -386,11 +386,13 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

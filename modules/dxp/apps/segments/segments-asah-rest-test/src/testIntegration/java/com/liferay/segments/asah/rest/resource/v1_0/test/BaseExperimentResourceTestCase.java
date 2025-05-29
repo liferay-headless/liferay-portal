@@ -306,7 +306,7 @@ public abstract class BaseExperimentResourceTestCase {
 		Experiment experiment1 = testDeleteExperimentBatch_addExperiment();
 
 		testDeleteExperimentBatch_deleteExperiment(
-			"COMPLETED", null, experiment1.getId());
+			202, null, experiment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -320,8 +320,7 @@ public abstract class BaseExperimentResourceTestCase {
 	}
 
 	protected void testDeleteExperimentBatch_deleteExperiment(
-			String expectedExecuteStatus, String externalReferenceCode,
-			String id)
+			int expectedStatusCode, String externalReferenceCode, String id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -334,11 +333,13 @@ public abstract class BaseExperimentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

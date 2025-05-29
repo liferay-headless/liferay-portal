@@ -270,7 +270,7 @@ public abstract class BaseTermOrderTypeResourceTestCase {
 			testDeleteTermOrderTypeBatch_addTermOrderType();
 
 		testDeleteTermOrderTypeBatch_deleteTermOrderType(
-			"COMPLETED", null, termOrderType1.getTermOrderTypeId());
+			202, null, termOrderType1.getTermOrderTypeId());
 	}
 
 	protected TermOrderType testDeleteTermOrderTypeBatch_addTermOrderType()
@@ -280,7 +280,7 @@ public abstract class BaseTermOrderTypeResourceTestCase {
 	}
 
 	protected void testDeleteTermOrderTypeBatch_deleteTermOrderType(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -293,11 +293,13 @@ public abstract class BaseTermOrderTypeResourceTestCase {
 						"termOrderTypeId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -366,7 +366,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceTestCase {
 			testDeleteProductVirtualSettingsFileEntryBatch_addProductVirtualSettingsFileEntry();
 
 		testDeleteProductVirtualSettingsFileEntryBatch_deleteProductVirtualSettingsFileEntry(
-			"COMPLETED", null, productVirtualSettingsFileEntry1.getId());
+			202, null, productVirtualSettingsFileEntry1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -384,8 +384,7 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceTestCase {
 
 	protected void
 			testDeleteProductVirtualSettingsFileEntryBatch_deleteProductVirtualSettingsFileEntry(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -399,11 +398,13 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -336,7 +336,7 @@ public abstract class BaseSXPElementResourceTestCase {
 		SXPElement sxpElement1 = testDeleteSXPElementBatch_addSXPElement();
 
 		testDeleteSXPElementBatch_deleteSXPElement(
-			"COMPLETED", null, sxpElement1.getId());
+			202, null, sxpElement1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -350,7 +350,7 @@ public abstract class BaseSXPElementResourceTestCase {
 	}
 
 	protected void testDeleteSXPElementBatch_deleteSXPElement(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -363,11 +363,13 @@ public abstract class BaseSXPElementResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

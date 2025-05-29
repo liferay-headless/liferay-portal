@@ -326,8 +326,7 @@ public abstract class BaseCTRemoteResourceTestCase {
 	public void testDeleteCTRemoteBatch() throws Exception {
 		CTRemote ctRemote1 = testDeleteCTRemoteBatch_addCTRemote();
 
-		testDeleteCTRemoteBatch_deleteCTRemote(
-			"COMPLETED", null, ctRemote1.getId());
+		testDeleteCTRemoteBatch_deleteCTRemote(202, null, ctRemote1.getId());
 
 		assertHttpResponseStatusCode(
 			404, ctRemoteResource.getCTRemoteHttpResponse(ctRemote1.getId()));
@@ -338,7 +337,7 @@ public abstract class BaseCTRemoteResourceTestCase {
 	}
 
 	protected void testDeleteCTRemoteBatch_deleteCTRemote(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -351,11 +350,13 @@ public abstract class BaseCTRemoteResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

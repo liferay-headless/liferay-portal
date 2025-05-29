@@ -326,27 +326,26 @@ public abstract class BasePriceEntryResourceTestCase {
 		PriceEntry priceEntry1 = testDeletePriceEntryBatch_addPriceEntry();
 
 		testDeletePriceEntryBatch_deletePriceEntry(
-			"COMPLETED", null, priceEntry1.getId());
+			202, priceEntry1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			priceEntryResource.getPriceEntryHttpResponse(priceEntry1.getId()));
 
-		PriceEntry priceEntry2 = testDeletePriceEntryBatch_addPriceEntry();
+		priceEntry1 = testDeletePriceEntryBatch_addPriceEntry();
 
 		testDeletePriceEntryBatch_deletePriceEntry(
-			"COMPLETED", priceEntry2.getExternalReferenceCode(), null);
+			202, null, priceEntry1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
-			priceEntryResource.getPriceEntryHttpResponse(priceEntry2.getId()));
+			priceEntryResource.getPriceEntryHttpResponse(priceEntry1.getId()));
 
 		priceEntry1 = testDeletePriceEntryBatch_addPriceEntry();
-		priceEntry2 = testDeletePriceEntryBatch_addPriceEntry();
+		PriceEntry priceEntry2 = testDeletePriceEntryBatch_addPriceEntry();
 
 		testDeletePriceEntryBatch_deletePriceEntry(
-			"COMPLETED", priceEntry2.getExternalReferenceCode(),
-			priceEntry1.getId());
+			202, priceEntry2.getExternalReferenceCode(), priceEntry1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -356,8 +355,7 @@ public abstract class BasePriceEntryResourceTestCase {
 			priceEntryResource.getPriceEntryHttpResponse(priceEntry2.getId()));
 
 		testDeletePriceEntryBatch_deletePriceEntry(
-			"COMPLETED", priceEntry2.getExternalReferenceCode(),
-			priceEntry1.getId());
+			202, priceEntry2.getExternalReferenceCode(), priceEntry1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -371,7 +369,7 @@ public abstract class BasePriceEntryResourceTestCase {
 	}
 
 	protected void testDeletePriceEntryBatch_deletePriceEntry(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -384,11 +382,13 @@ public abstract class BasePriceEntryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

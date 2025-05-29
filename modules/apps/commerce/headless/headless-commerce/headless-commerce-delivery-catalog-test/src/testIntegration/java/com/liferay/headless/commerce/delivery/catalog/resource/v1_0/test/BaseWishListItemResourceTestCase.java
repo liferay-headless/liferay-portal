@@ -347,13 +347,14 @@ public abstract class BaseWishListItemResourceTestCase {
 			testDeleteWishListItemBatch_addWishListItem();
 
 		testDeleteWishListItemBatch_deleteWishListItem(
-			"COMPLETED", null, wishListItem1.getId());
+			202, null, wishListItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			wishListItemResource.getWishListItemHttpResponse(
-				wishListItem1.getId(), testDeleteWishListItem_getAccountId(),
-				testDeleteWishListItem_getCurrencyCode()));
+				wishListItem1.getId(),
+				testDeleteWishListItemBatch_getAccountId(),
+				testDeleteWishListItemBatch_getCurrencyCode()));
 	}
 
 	protected WishListItem testDeleteWishListItemBatch_addWishListItem()
@@ -363,7 +364,7 @@ public abstract class BaseWishListItemResourceTestCase {
 	}
 
 	protected void testDeleteWishListItemBatch_deleteWishListItem(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -376,11 +377,13 @@ public abstract class BaseWishListItemResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

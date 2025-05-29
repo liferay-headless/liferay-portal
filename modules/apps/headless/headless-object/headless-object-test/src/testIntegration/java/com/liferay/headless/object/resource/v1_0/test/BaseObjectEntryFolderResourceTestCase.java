@@ -355,7 +355,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 			testDeleteObjectEntryFolderBatch_addObjectEntryFolder();
 
 		testDeleteObjectEntryFolderBatch_deleteObjectEntryFolder(
-			"COMPLETED", null, objectEntryFolder1.getId());
+			202, null, objectEntryFolder1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -371,7 +371,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 	}
 
 	protected void testDeleteObjectEntryFolderBatch_deleteObjectEntryFolder(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -384,11 +384,13 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

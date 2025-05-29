@@ -332,7 +332,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 			testDeleteFormDocumentBatch_addFormDocument();
 
 		testDeleteFormDocumentBatch_deleteFormDocument(
-			"COMPLETED", null, formDocument1.getId());
+			202, null, formDocument1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -347,7 +347,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 	}
 
 	protected void testDeleteFormDocumentBatch_deleteFormDocument(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -360,11 +360,13 @@ public abstract class BaseFormDocumentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

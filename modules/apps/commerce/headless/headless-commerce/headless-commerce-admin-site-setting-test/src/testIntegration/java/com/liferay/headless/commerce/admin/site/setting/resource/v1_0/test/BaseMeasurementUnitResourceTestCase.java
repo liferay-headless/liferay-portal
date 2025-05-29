@@ -334,29 +334,29 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 			testDeleteMeasurementUnitBatch_addMeasurementUnit();
 
 		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
-			"COMPLETED", null, measurementUnit1.getId());
+			202, measurementUnit1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			measurementUnitResource.getMeasurementUnitHttpResponse(
 				measurementUnit1.getId()));
 
-		MeasurementUnit measurementUnit2 =
-			testDeleteMeasurementUnitBatch_addMeasurementUnit();
+		measurementUnit1 = testDeleteMeasurementUnitBatch_addMeasurementUnit();
 
 		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
-			"COMPLETED", measurementUnit2.getExternalReferenceCode(), null);
+			202, null, measurementUnit1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			measurementUnitResource.getMeasurementUnitHttpResponse(
-				measurementUnit2.getId()));
+				measurementUnit1.getId()));
 
 		measurementUnit1 = testDeleteMeasurementUnitBatch_addMeasurementUnit();
-		measurementUnit2 = testDeleteMeasurementUnitBatch_addMeasurementUnit();
+		MeasurementUnit measurementUnit2 =
+			testDeleteMeasurementUnitBatch_addMeasurementUnit();
 
 		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
-			"COMPLETED", measurementUnit2.getExternalReferenceCode(),
+			202, measurementUnit2.getExternalReferenceCode(),
 			measurementUnit1.getId());
 
 		assertHttpResponseStatusCode(
@@ -369,7 +369,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 				measurementUnit2.getId()));
 
 		testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
-			"COMPLETED", measurementUnit2.getExternalReferenceCode(),
+			202, measurementUnit2.getExternalReferenceCode(),
 			measurementUnit1.getId());
 
 		assertHttpResponseStatusCode(
@@ -386,7 +386,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	}
 
 	protected void testDeleteMeasurementUnitBatch_deleteMeasurementUnit(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -399,11 +399,13 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -328,29 +328,28 @@ public abstract class BaseOptionValueResourceTestCase {
 		OptionValue optionValue1 = testDeleteOptionValueBatch_addOptionValue();
 
 		testDeleteOptionValueBatch_deleteOptionValue(
-			"COMPLETED", null, optionValue1.getId());
+			202, optionValue1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			optionValueResource.getOptionValueHttpResponse(
 				optionValue1.getId()));
 
-		OptionValue optionValue2 = testDeleteOptionValueBatch_addOptionValue();
+		optionValue1 = testDeleteOptionValueBatch_addOptionValue();
 
 		testDeleteOptionValueBatch_deleteOptionValue(
-			"COMPLETED", optionValue2.getExternalReferenceCode(), null);
+			202, null, optionValue1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			optionValueResource.getOptionValueHttpResponse(
-				optionValue2.getId()));
+				optionValue1.getId()));
 
 		optionValue1 = testDeleteOptionValueBatch_addOptionValue();
-		optionValue2 = testDeleteOptionValueBatch_addOptionValue();
+		OptionValue optionValue2 = testDeleteOptionValueBatch_addOptionValue();
 
 		testDeleteOptionValueBatch_deleteOptionValue(
-			"COMPLETED", optionValue2.getExternalReferenceCode(),
-			optionValue1.getId());
+			202, optionValue2.getExternalReferenceCode(), optionValue1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -362,8 +361,7 @@ public abstract class BaseOptionValueResourceTestCase {
 				optionValue2.getId()));
 
 		testDeleteOptionValueBatch_deleteOptionValue(
-			"COMPLETED", optionValue2.getExternalReferenceCode(),
-			optionValue1.getId());
+			202, optionValue2.getExternalReferenceCode(), optionValue1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -378,7 +376,7 @@ public abstract class BaseOptionValueResourceTestCase {
 	}
 
 	protected void testDeleteOptionValueBatch_deleteOptionValue(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -391,11 +389,13 @@ public abstract class BaseOptionValueResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

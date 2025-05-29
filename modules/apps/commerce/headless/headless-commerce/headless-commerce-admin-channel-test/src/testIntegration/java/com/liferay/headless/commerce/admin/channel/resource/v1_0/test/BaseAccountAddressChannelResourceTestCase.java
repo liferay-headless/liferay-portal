@@ -286,8 +286,7 @@ public abstract class BaseAccountAddressChannelResourceTestCase {
 			testDeleteAccountAddressChannelBatch_addAccountAddressChannel();
 
 		testDeleteAccountAddressChannelBatch_deleteAccountAddressChannel(
-			"COMPLETED", null,
-			accountAddressChannel1.getAccountAddressChannelId());
+			202, null, accountAddressChannel1.getAccountAddressChannelId());
 	}
 
 	protected AccountAddressChannel
@@ -299,8 +298,7 @@ public abstract class BaseAccountAddressChannelResourceTestCase {
 
 	protected void
 			testDeleteAccountAddressChannelBatch_deleteAccountAddressChannel(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -314,11 +312,13 @@ public abstract class BaseAccountAddressChannelResourceTestCase {
 							"accountAddressChannelId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

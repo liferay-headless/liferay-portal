@@ -338,7 +338,7 @@ public abstract class BaseObjectActionResourceTestCase {
 			testDeleteObjectActionBatch_addObjectAction();
 
 		testDeleteObjectActionBatch_deleteObjectAction(
-			"COMPLETED", null, objectAction1.getId());
+			202, null, objectAction1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -353,7 +353,7 @@ public abstract class BaseObjectActionResourceTestCase {
 	}
 
 	protected void testDeleteObjectActionBatch_deleteObjectAction(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -366,11 +366,13 @@ public abstract class BaseObjectActionResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

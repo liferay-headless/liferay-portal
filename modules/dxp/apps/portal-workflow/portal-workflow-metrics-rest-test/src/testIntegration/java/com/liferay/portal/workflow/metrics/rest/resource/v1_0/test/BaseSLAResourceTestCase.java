@@ -316,7 +316,7 @@ public abstract class BaseSLAResourceTestCase {
 	public void testDeleteSLABatch() throws Exception {
 		SLA sla1 = testDeleteSLABatch_addSLA();
 
-		testDeleteSLABatch_deleteSLA("COMPLETED", null, sla1.getId());
+		testDeleteSLABatch_deleteSLA(202, null, sla1.getId());
 
 		assertHttpResponseStatusCode(
 			404, slaResource.getSLAHttpResponse(sla1.getId()));
@@ -327,7 +327,7 @@ public abstract class BaseSLAResourceTestCase {
 	}
 
 	protected void testDeleteSLABatch_deleteSLA(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -340,11 +340,13 @@ public abstract class BaseSLAResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -336,7 +336,7 @@ public abstract class BaseListTypeEntryResourceTestCase {
 			testDeleteListTypeEntryBatch_addListTypeEntry();
 
 		testDeleteListTypeEntryBatch_deleteListTypeEntry(
-			"COMPLETED", null, listTypeEntry1.getId());
+			202, null, listTypeEntry1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -351,7 +351,7 @@ public abstract class BaseListTypeEntryResourceTestCase {
 	}
 
 	protected void testDeleteListTypeEntryBatch_deleteListTypeEntry(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -364,11 +364,13 @@ public abstract class BaseListTypeEntryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

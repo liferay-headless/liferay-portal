@@ -331,29 +331,28 @@ public abstract class BaseCartCommentResourceTestCase {
 		CartComment cartComment1 = testDeleteCartCommentBatch_addCartComment();
 
 		testDeleteCartCommentBatch_deleteCartComment(
-			"COMPLETED", null, cartComment1.getId());
+			202, cartComment1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			cartCommentResource.getCartCommentHttpResponse(
 				cartComment1.getId()));
 
-		CartComment cartComment2 = testDeleteCartCommentBatch_addCartComment();
+		cartComment1 = testDeleteCartCommentBatch_addCartComment();
 
 		testDeleteCartCommentBatch_deleteCartComment(
-			"COMPLETED", cartComment2.getExternalReferenceCode(), null);
+			202, null, cartComment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			cartCommentResource.getCartCommentHttpResponse(
-				cartComment2.getId()));
+				cartComment1.getId()));
 
 		cartComment1 = testDeleteCartCommentBatch_addCartComment();
-		cartComment2 = testDeleteCartCommentBatch_addCartComment();
+		CartComment cartComment2 = testDeleteCartCommentBatch_addCartComment();
 
 		testDeleteCartCommentBatch_deleteCartComment(
-			"COMPLETED", cartComment2.getExternalReferenceCode(),
-			cartComment1.getId());
+			202, cartComment2.getExternalReferenceCode(), cartComment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -365,8 +364,7 @@ public abstract class BaseCartCommentResourceTestCase {
 				cartComment2.getId()));
 
 		testDeleteCartCommentBatch_deleteCartComment(
-			"COMPLETED", cartComment2.getExternalReferenceCode(),
-			cartComment1.getId());
+			202, cartComment2.getExternalReferenceCode(), cartComment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -381,7 +379,7 @@ public abstract class BaseCartCommentResourceTestCase {
 	}
 
 	protected void testDeleteCartCommentBatch_deleteCartComment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -394,11 +392,13 @@ public abstract class BaseCartCommentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

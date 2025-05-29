@@ -322,27 +322,25 @@ public abstract class BaseOrderNoteResourceTestCase {
 		OrderNote orderNote1 = testDeleteOrderNoteBatch_addOrderNote();
 
 		testDeleteOrderNoteBatch_deleteOrderNote(
-			"COMPLETED", null, orderNote1.getId());
+			202, orderNote1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			orderNoteResource.getOrderNoteHttpResponse(orderNote1.getId()));
 
-		OrderNote orderNote2 = testDeleteOrderNoteBatch_addOrderNote();
+		orderNote1 = testDeleteOrderNoteBatch_addOrderNote();
 
-		testDeleteOrderNoteBatch_deleteOrderNote(
-			"COMPLETED", orderNote2.getExternalReferenceCode(), null);
+		testDeleteOrderNoteBatch_deleteOrderNote(202, null, orderNote1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
-			orderNoteResource.getOrderNoteHttpResponse(orderNote2.getId()));
+			orderNoteResource.getOrderNoteHttpResponse(orderNote1.getId()));
 
 		orderNote1 = testDeleteOrderNoteBatch_addOrderNote();
-		orderNote2 = testDeleteOrderNoteBatch_addOrderNote();
+		OrderNote orderNote2 = testDeleteOrderNoteBatch_addOrderNote();
 
 		testDeleteOrderNoteBatch_deleteOrderNote(
-			"COMPLETED", orderNote2.getExternalReferenceCode(),
-			orderNote1.getId());
+			202, orderNote2.getExternalReferenceCode(), orderNote1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -352,8 +350,7 @@ public abstract class BaseOrderNoteResourceTestCase {
 			orderNoteResource.getOrderNoteHttpResponse(orderNote2.getId()));
 
 		testDeleteOrderNoteBatch_deleteOrderNote(
-			"COMPLETED", orderNote2.getExternalReferenceCode(),
-			orderNote1.getId());
+			202, orderNote2.getExternalReferenceCode(), orderNote1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -367,7 +364,7 @@ public abstract class BaseOrderNoteResourceTestCase {
 	}
 
 	protected void testDeleteOrderNoteBatch_deleteOrderNote(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -380,11 +377,13 @@ public abstract class BaseOrderNoteResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

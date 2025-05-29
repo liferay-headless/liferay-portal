@@ -348,7 +348,7 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 			testDeleteKnowledgeBaseFolderBatch_addKnowledgeBaseFolder();
 
 		testDeleteKnowledgeBaseFolderBatch_deleteKnowledgeBaseFolder(
-			"COMPLETED", null, knowledgeBaseFolder1.getId());
+			202, null, knowledgeBaseFolder1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -364,7 +364,7 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 	}
 
 	protected void testDeleteKnowledgeBaseFolderBatch_deleteKnowledgeBaseFolder(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -378,11 +378,13 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

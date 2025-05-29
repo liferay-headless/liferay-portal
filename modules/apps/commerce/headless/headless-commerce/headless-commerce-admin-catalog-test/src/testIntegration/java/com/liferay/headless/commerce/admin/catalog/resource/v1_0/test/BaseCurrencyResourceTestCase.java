@@ -323,25 +323,23 @@ public abstract class BaseCurrencyResourceTestCase {
 		Currency currency1 = testDeleteCurrencyBatch_addCurrency();
 
 		testDeleteCurrencyBatch_deleteCurrency(
-			"COMPLETED", null, currency1.getId());
+			202, currency1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, currencyResource.getCurrencyHttpResponse(currency1.getId()));
 
+		currency1 = testDeleteCurrencyBatch_addCurrency();
+
+		testDeleteCurrencyBatch_deleteCurrency(202, null, currency1.getId());
+
+		assertHttpResponseStatusCode(
+			404, currencyResource.getCurrencyHttpResponse(currency1.getId()));
+
+		currency1 = testDeleteCurrencyBatch_addCurrency();
 		Currency currency2 = testDeleteCurrencyBatch_addCurrency();
 
 		testDeleteCurrencyBatch_deleteCurrency(
-			"COMPLETED", currency2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, currencyResource.getCurrencyHttpResponse(currency2.getId()));
-
-		currency1 = testDeleteCurrencyBatch_addCurrency();
-		currency2 = testDeleteCurrencyBatch_addCurrency();
-
-		testDeleteCurrencyBatch_deleteCurrency(
-			"COMPLETED", currency2.getExternalReferenceCode(),
-			currency1.getId());
+			202, currency2.getExternalReferenceCode(), currency1.getId());
 
 		assertHttpResponseStatusCode(
 			404, currencyResource.getCurrencyHttpResponse(currency1.getId()));
@@ -349,8 +347,7 @@ public abstract class BaseCurrencyResourceTestCase {
 			200, currencyResource.getCurrencyHttpResponse(currency2.getId()));
 
 		testDeleteCurrencyBatch_deleteCurrency(
-			"COMPLETED", currency2.getExternalReferenceCode(),
-			currency1.getId());
+			202, currency2.getExternalReferenceCode(), currency1.getId());
 
 		assertHttpResponseStatusCode(
 			404, currencyResource.getCurrencyHttpResponse(currency2.getId()));
@@ -361,7 +358,7 @@ public abstract class BaseCurrencyResourceTestCase {
 	}
 
 	protected void testDeleteCurrencyBatch_deleteCurrency(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -374,11 +371,13 @@ public abstract class BaseCurrencyResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

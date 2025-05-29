@@ -279,7 +279,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 			testDeleteDiscountOrderTypeBatch_addDiscountOrderType();
 
 		testDeleteDiscountOrderTypeBatch_deleteDiscountOrderType(
-			"COMPLETED", null, discountOrderType1.getDiscountOrderTypeId());
+			202, null, discountOrderType1.getDiscountOrderTypeId());
 	}
 
 	protected DiscountOrderType
@@ -290,7 +290,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	}
 
 	protected void testDeleteDiscountOrderTypeBatch_deleteDiscountOrderType(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -303,11 +303,13 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 						"discountOrderTypeId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

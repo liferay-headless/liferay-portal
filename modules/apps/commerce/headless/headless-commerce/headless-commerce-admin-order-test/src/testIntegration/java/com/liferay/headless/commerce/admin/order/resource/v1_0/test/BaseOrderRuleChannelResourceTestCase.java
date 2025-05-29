@@ -275,7 +275,7 @@ public abstract class BaseOrderRuleChannelResourceTestCase {
 			testDeleteOrderRuleChannelBatch_addOrderRuleChannel();
 
 		testDeleteOrderRuleChannelBatch_deleteOrderRuleChannel(
-			"COMPLETED", null, orderRuleChannel1.getOrderRuleChannelId());
+			202, null, orderRuleChannel1.getOrderRuleChannelId());
 	}
 
 	protected OrderRuleChannel
@@ -286,7 +286,7 @@ public abstract class BaseOrderRuleChannelResourceTestCase {
 	}
 
 	protected void testDeleteOrderRuleChannelBatch_deleteOrderRuleChannel(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -299,11 +299,13 @@ public abstract class BaseOrderRuleChannelResourceTestCase {
 						"orderRuleChannelId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

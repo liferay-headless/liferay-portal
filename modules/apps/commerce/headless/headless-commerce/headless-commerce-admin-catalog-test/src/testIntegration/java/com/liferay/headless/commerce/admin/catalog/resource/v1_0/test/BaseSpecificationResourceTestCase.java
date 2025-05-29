@@ -331,29 +331,29 @@ public abstract class BaseSpecificationResourceTestCase {
 			testDeleteSpecificationBatch_addSpecification();
 
 		testDeleteSpecificationBatch_deleteSpecification(
-			"COMPLETED", null, specification1.getId());
+			202, specification1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			specificationResource.getSpecificationHttpResponse(
 				specification1.getId()));
 
-		Specification specification2 =
-			testDeleteSpecificationBatch_addSpecification();
+		specification1 = testDeleteSpecificationBatch_addSpecification();
 
 		testDeleteSpecificationBatch_deleteSpecification(
-			"COMPLETED", specification2.getExternalReferenceCode(), null);
+			202, null, specification1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			specificationResource.getSpecificationHttpResponse(
-				specification2.getId()));
+				specification1.getId()));
 
 		specification1 = testDeleteSpecificationBatch_addSpecification();
-		specification2 = testDeleteSpecificationBatch_addSpecification();
+		Specification specification2 =
+			testDeleteSpecificationBatch_addSpecification();
 
 		testDeleteSpecificationBatch_deleteSpecification(
-			"COMPLETED", specification2.getExternalReferenceCode(),
+			202, specification2.getExternalReferenceCode(),
 			specification1.getId());
 
 		assertHttpResponseStatusCode(
@@ -366,7 +366,7 @@ public abstract class BaseSpecificationResourceTestCase {
 				specification2.getId()));
 
 		testDeleteSpecificationBatch_deleteSpecification(
-			"COMPLETED", specification2.getExternalReferenceCode(),
+			202, specification2.getExternalReferenceCode(),
 			specification1.getId());
 
 		assertHttpResponseStatusCode(
@@ -382,7 +382,7 @@ public abstract class BaseSpecificationResourceTestCase {
 	}
 
 	protected void testDeleteSpecificationBatch_deleteSpecification(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -395,11 +395,13 @@ public abstract class BaseSpecificationResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -329,7 +329,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 			testDeleteObjectLayoutBatch_addObjectLayout();
 
 		testDeleteObjectLayoutBatch_deleteObjectLayout(
-			"COMPLETED", null, objectLayout1.getId());
+			202, null, objectLayout1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -344,7 +344,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	}
 
 	protected void testDeleteObjectLayoutBatch_deleteObjectLayout(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -357,11 +357,13 @@ public abstract class BaseObjectLayoutResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

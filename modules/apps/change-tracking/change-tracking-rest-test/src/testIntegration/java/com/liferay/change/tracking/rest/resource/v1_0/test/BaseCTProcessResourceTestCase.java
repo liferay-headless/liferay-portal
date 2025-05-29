@@ -322,8 +322,7 @@ public abstract class BaseCTProcessResourceTestCase {
 	public void testDeleteCTProcessBatch() throws Exception {
 		CTProcess ctProcess1 = testDeleteCTProcessBatch_addCTProcess();
 
-		testDeleteCTProcessBatch_deleteCTProcess(
-			"COMPLETED", null, ctProcess1.getId());
+		testDeleteCTProcessBatch_deleteCTProcess(202, null, ctProcess1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -337,7 +336,7 @@ public abstract class BaseCTProcessResourceTestCase {
 	}
 
 	protected void testDeleteCTProcessBatch_deleteCTProcess(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -350,11 +349,13 @@ public abstract class BaseCTProcessResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

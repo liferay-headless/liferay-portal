@@ -331,25 +331,23 @@ public abstract class BaseDiscountResourceTestCase {
 		Discount discount1 = testDeleteDiscountBatch_addDiscount();
 
 		testDeleteDiscountBatch_deleteDiscount(
-			"COMPLETED", null, discount1.getId());
+			202, discount1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, discountResource.getDiscountHttpResponse(discount1.getId()));
 
+		discount1 = testDeleteDiscountBatch_addDiscount();
+
+		testDeleteDiscountBatch_deleteDiscount(202, null, discount1.getId());
+
+		assertHttpResponseStatusCode(
+			404, discountResource.getDiscountHttpResponse(discount1.getId()));
+
+		discount1 = testDeleteDiscountBatch_addDiscount();
 		Discount discount2 = testDeleteDiscountBatch_addDiscount();
 
 		testDeleteDiscountBatch_deleteDiscount(
-			"COMPLETED", discount2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, discountResource.getDiscountHttpResponse(discount2.getId()));
-
-		discount1 = testDeleteDiscountBatch_addDiscount();
-		discount2 = testDeleteDiscountBatch_addDiscount();
-
-		testDeleteDiscountBatch_deleteDiscount(
-			"COMPLETED", discount2.getExternalReferenceCode(),
-			discount1.getId());
+			202, discount2.getExternalReferenceCode(), discount1.getId());
 
 		assertHttpResponseStatusCode(
 			404, discountResource.getDiscountHttpResponse(discount1.getId()));
@@ -357,8 +355,7 @@ public abstract class BaseDiscountResourceTestCase {
 			200, discountResource.getDiscountHttpResponse(discount2.getId()));
 
 		testDeleteDiscountBatch_deleteDiscount(
-			"COMPLETED", discount2.getExternalReferenceCode(),
-			discount1.getId());
+			202, discount2.getExternalReferenceCode(), discount1.getId());
 
 		assertHttpResponseStatusCode(
 			404, discountResource.getDiscountHttpResponse(discount2.getId()));
@@ -369,7 +366,7 @@ public abstract class BaseDiscountResourceTestCase {
 	}
 
 	protected void testDeleteDiscountBatch_deleteDiscount(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -382,11 +379,13 @@ public abstract class BaseDiscountResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

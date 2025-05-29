@@ -325,24 +325,23 @@ public abstract class BaseCatalogResourceTestCase {
 		Catalog catalog1 = testDeleteCatalogBatch_addCatalog();
 
 		testDeleteCatalogBatch_deleteCatalog(
-			"COMPLETED", null, catalog1.getId());
+			202, catalog1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, catalogResource.getCatalogHttpResponse(catalog1.getId()));
 
+		catalog1 = testDeleteCatalogBatch_addCatalog();
+
+		testDeleteCatalogBatch_deleteCatalog(202, null, catalog1.getId());
+
+		assertHttpResponseStatusCode(
+			404, catalogResource.getCatalogHttpResponse(catalog1.getId()));
+
+		catalog1 = testDeleteCatalogBatch_addCatalog();
 		Catalog catalog2 = testDeleteCatalogBatch_addCatalog();
 
 		testDeleteCatalogBatch_deleteCatalog(
-			"COMPLETED", catalog2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, catalogResource.getCatalogHttpResponse(catalog2.getId()));
-
-		catalog1 = testDeleteCatalogBatch_addCatalog();
-		catalog2 = testDeleteCatalogBatch_addCatalog();
-
-		testDeleteCatalogBatch_deleteCatalog(
-			"COMPLETED", catalog2.getExternalReferenceCode(), catalog1.getId());
+			202, catalog2.getExternalReferenceCode(), catalog1.getId());
 
 		assertHttpResponseStatusCode(
 			404, catalogResource.getCatalogHttpResponse(catalog1.getId()));
@@ -350,7 +349,7 @@ public abstract class BaseCatalogResourceTestCase {
 			200, catalogResource.getCatalogHttpResponse(catalog2.getId()));
 
 		testDeleteCatalogBatch_deleteCatalog(
-			"COMPLETED", catalog2.getExternalReferenceCode(), catalog1.getId());
+			202, catalog2.getExternalReferenceCode(), catalog1.getId());
 
 		assertHttpResponseStatusCode(
 			404, catalogResource.getCatalogHttpResponse(catalog2.getId()));
@@ -361,7 +360,7 @@ public abstract class BaseCatalogResourceTestCase {
 	}
 
 	protected void testDeleteCatalogBatch_deleteCatalog(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -374,11 +373,13 @@ public abstract class BaseCatalogResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

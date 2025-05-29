@@ -333,29 +333,29 @@ public abstract class BaseAccountGroupResourceTestCase {
 			testDeleteAccountGroupBatch_addAccountGroup();
 
 		testDeleteAccountGroupBatch_deleteAccountGroup(
-			"COMPLETED", null, accountGroup1.getId());
+			202, accountGroup1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			accountGroupResource.getAccountGroupHttpResponse(
 				accountGroup1.getId()));
 
-		AccountGroup accountGroup2 =
-			testDeleteAccountGroupBatch_addAccountGroup();
+		accountGroup1 = testDeleteAccountGroupBatch_addAccountGroup();
 
 		testDeleteAccountGroupBatch_deleteAccountGroup(
-			"COMPLETED", accountGroup2.getExternalReferenceCode(), null);
+			202, null, accountGroup1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			accountGroupResource.getAccountGroupHttpResponse(
-				accountGroup2.getId()));
+				accountGroup1.getId()));
 
 		accountGroup1 = testDeleteAccountGroupBatch_addAccountGroup();
-		accountGroup2 = testDeleteAccountGroupBatch_addAccountGroup();
+		AccountGroup accountGroup2 =
+			testDeleteAccountGroupBatch_addAccountGroup();
 
 		testDeleteAccountGroupBatch_deleteAccountGroup(
-			"COMPLETED", accountGroup2.getExternalReferenceCode(),
+			202, accountGroup2.getExternalReferenceCode(),
 			accountGroup1.getId());
 
 		assertHttpResponseStatusCode(
@@ -368,7 +368,7 @@ public abstract class BaseAccountGroupResourceTestCase {
 				accountGroup2.getId()));
 
 		testDeleteAccountGroupBatch_deleteAccountGroup(
-			"COMPLETED", accountGroup2.getExternalReferenceCode(),
+			202, accountGroup2.getExternalReferenceCode(),
 			accountGroup1.getId());
 
 		assertHttpResponseStatusCode(
@@ -384,7 +384,7 @@ public abstract class BaseAccountGroupResourceTestCase {
 	}
 
 	protected void testDeleteAccountGroupBatch_deleteAccountGroup(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -397,11 +397,13 @@ public abstract class BaseAccountGroupResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

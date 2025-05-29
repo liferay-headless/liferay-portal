@@ -353,7 +353,7 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 			testDeleteProductConfigurationListBatch_addProductConfigurationList();
 
 		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
-			"COMPLETED", null, productConfigurationList1.getId());
+			202, productConfigurationList1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
@@ -361,26 +361,25 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 				getProductConfigurationListHttpResponse(
 					productConfigurationList1.getId()));
 
-		ProductConfigurationList productConfigurationList2 =
+		productConfigurationList1 =
 			testDeleteProductConfigurationListBatch_addProductConfigurationList();
 
 		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
-			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
-			null);
+			202, null, productConfigurationList1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			productConfigurationListResource.
 				getProductConfigurationListHttpResponse(
-					productConfigurationList2.getId()));
+					productConfigurationList1.getId()));
 
 		productConfigurationList1 =
 			testDeleteProductConfigurationListBatch_addProductConfigurationList();
-		productConfigurationList2 =
+		ProductConfigurationList productConfigurationList2 =
 			testDeleteProductConfigurationListBatch_addProductConfigurationList();
 
 		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
-			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
+			202, productConfigurationList2.getExternalReferenceCode(),
 			productConfigurationList1.getId());
 
 		assertHttpResponseStatusCode(
@@ -395,7 +394,7 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 					productConfigurationList2.getId()));
 
 		testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
-			"COMPLETED", productConfigurationList2.getExternalReferenceCode(),
+			202, productConfigurationList2.getExternalReferenceCode(),
 			productConfigurationList1.getId());
 
 		assertHttpResponseStatusCode(
@@ -414,8 +413,7 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 
 	protected void
 			testDeleteProductConfigurationListBatch_deleteProductConfigurationList(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -429,11 +427,13 @@ public abstract class BaseProductConfigurationListResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -324,8 +324,7 @@ public abstract class BaseWarehouseResourceTestCase {
 	public void testDeleteWarehouseBatch() throws Exception {
 		Warehouse warehouse1 = testDeleteWarehouseBatch_addWarehouse();
 
-		testDeleteWarehouseBatch_deleteWarehouse(
-			"COMPLETED", null, warehouse1.getId());
+		testDeleteWarehouseBatch_deleteWarehouse(202, null, warehouse1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -339,7 +338,7 @@ public abstract class BaseWarehouseResourceTestCase {
 	}
 
 	protected void testDeleteWarehouseBatch_deleteWarehouse(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -352,11 +351,13 @@ public abstract class BaseWarehouseResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

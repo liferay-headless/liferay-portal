@@ -328,29 +328,29 @@ public abstract class BaseEmailAddressResourceTestCase {
 			testDeleteEmailAddressBatch_addEmailAddress();
 
 		testDeleteEmailAddressBatch_deleteEmailAddress(
-			"COMPLETED", null, emailAddress1.getId());
+			202, emailAddress1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			emailAddressResource.getEmailAddressHttpResponse(
 				emailAddress1.getId()));
 
-		EmailAddress emailAddress2 =
-			testDeleteEmailAddressBatch_addEmailAddress();
+		emailAddress1 = testDeleteEmailAddressBatch_addEmailAddress();
 
 		testDeleteEmailAddressBatch_deleteEmailAddress(
-			"COMPLETED", emailAddress2.getExternalReferenceCode(), null);
+			202, null, emailAddress1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			emailAddressResource.getEmailAddressHttpResponse(
-				emailAddress2.getId()));
+				emailAddress1.getId()));
 
 		emailAddress1 = testDeleteEmailAddressBatch_addEmailAddress();
-		emailAddress2 = testDeleteEmailAddressBatch_addEmailAddress();
+		EmailAddress emailAddress2 =
+			testDeleteEmailAddressBatch_addEmailAddress();
 
 		testDeleteEmailAddressBatch_deleteEmailAddress(
-			"COMPLETED", emailAddress2.getExternalReferenceCode(),
+			202, emailAddress2.getExternalReferenceCode(),
 			emailAddress1.getId());
 
 		assertHttpResponseStatusCode(
@@ -363,7 +363,7 @@ public abstract class BaseEmailAddressResourceTestCase {
 				emailAddress2.getId()));
 
 		testDeleteEmailAddressBatch_deleteEmailAddress(
-			"COMPLETED", emailAddress2.getExternalReferenceCode(),
+			202, emailAddress2.getExternalReferenceCode(),
 			emailAddress1.getId());
 
 		assertHttpResponseStatusCode(
@@ -379,7 +379,7 @@ public abstract class BaseEmailAddressResourceTestCase {
 	}
 
 	protected void testDeleteEmailAddressBatch_deleteEmailAddress(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -392,11 +392,13 @@ public abstract class BaseEmailAddressResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

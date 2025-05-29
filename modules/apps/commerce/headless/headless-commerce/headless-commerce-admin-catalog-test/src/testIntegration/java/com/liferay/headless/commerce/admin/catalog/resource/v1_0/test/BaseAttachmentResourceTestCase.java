@@ -272,23 +272,21 @@ public abstract class BaseAttachmentResourceTestCase {
 		Attachment attachment1 = testDeleteAttachmentBatch_addAttachment();
 
 		testDeleteAttachmentBatch_deleteAttachment(
-			"COMPLETED", null, attachment1.getId());
+			202, attachment1.getExternalReferenceCode(), null);
 
+		attachment1 = testDeleteAttachmentBatch_addAttachment();
+
+		testDeleteAttachmentBatch_deleteAttachment(
+			202, null, attachment1.getId());
+
+		attachment1 = testDeleteAttachmentBatch_addAttachment();
 		Attachment attachment2 = testDeleteAttachmentBatch_addAttachment();
 
 		testDeleteAttachmentBatch_deleteAttachment(
-			"COMPLETED", attachment2.getExternalReferenceCode(), null);
-
-		attachment1 = testDeleteAttachmentBatch_addAttachment();
-		attachment2 = testDeleteAttachmentBatch_addAttachment();
+			202, attachment2.getExternalReferenceCode(), attachment1.getId());
 
 		testDeleteAttachmentBatch_deleteAttachment(
-			"COMPLETED", attachment2.getExternalReferenceCode(),
-			attachment1.getId());
-
-		testDeleteAttachmentBatch_deleteAttachment(
-			"COMPLETED", attachment2.getExternalReferenceCode(),
-			attachment1.getId());
+			202, attachment2.getExternalReferenceCode(), attachment1.getId());
 	}
 
 	protected Attachment testDeleteAttachmentBatch_addAttachment()
@@ -298,7 +296,7 @@ public abstract class BaseAttachmentResourceTestCase {
 	}
 
 	protected void testDeleteAttachmentBatch_deleteAttachment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -311,11 +309,13 @@ public abstract class BaseAttachmentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

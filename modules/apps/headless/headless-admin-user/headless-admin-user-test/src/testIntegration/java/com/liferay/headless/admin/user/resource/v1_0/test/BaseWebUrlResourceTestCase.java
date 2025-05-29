@@ -314,24 +314,24 @@ public abstract class BaseWebUrlResourceTestCase {
 	public void testDeleteWebUrlBatch() throws Exception {
 		WebUrl webUrl1 = testDeleteWebUrlBatch_addWebUrl();
 
-		testDeleteWebUrlBatch_deleteWebUrl("COMPLETED", null, webUrl1.getId());
+		testDeleteWebUrlBatch_deleteWebUrl(
+			202, webUrl1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
 
+		webUrl1 = testDeleteWebUrlBatch_addWebUrl();
+
+		testDeleteWebUrlBatch_deleteWebUrl(202, null, webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+
+		webUrl1 = testDeleteWebUrlBatch_addWebUrl();
 		WebUrl webUrl2 = testDeleteWebUrlBatch_addWebUrl();
 
 		testDeleteWebUrlBatch_deleteWebUrl(
-			"COMPLETED", webUrl2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
-
-		webUrl1 = testDeleteWebUrlBatch_addWebUrl();
-		webUrl2 = testDeleteWebUrlBatch_addWebUrl();
-
-		testDeleteWebUrlBatch_deleteWebUrl(
-			"COMPLETED", webUrl2.getExternalReferenceCode(), webUrl1.getId());
+			202, webUrl2.getExternalReferenceCode(), webUrl1.getId());
 
 		assertHttpResponseStatusCode(
 			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
@@ -339,7 +339,7 @@ public abstract class BaseWebUrlResourceTestCase {
 			200, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
 
 		testDeleteWebUrlBatch_deleteWebUrl(
-			"COMPLETED", webUrl2.getExternalReferenceCode(), webUrl1.getId());
+			202, webUrl2.getExternalReferenceCode(), webUrl1.getId());
 
 		assertHttpResponseStatusCode(
 			404, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
@@ -350,7 +350,7 @@ public abstract class BaseWebUrlResourceTestCase {
 	}
 
 	protected void testDeleteWebUrlBatch_deleteWebUrl(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -363,11 +363,13 @@ public abstract class BaseWebUrlResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -555,29 +555,28 @@ public abstract class BaseUserAccountResourceTestCase {
 		UserAccount userAccount1 = testDeleteUserAccountBatch_addUserAccount();
 
 		testDeleteUserAccountBatch_deleteUserAccount(
-			"COMPLETED", null, userAccount1.getId());
+			202, userAccount1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			userAccountResource.getUserAccountHttpResponse(
 				userAccount1.getId()));
 
-		UserAccount userAccount2 = testDeleteUserAccountBatch_addUserAccount();
+		userAccount1 = testDeleteUserAccountBatch_addUserAccount();
 
 		testDeleteUserAccountBatch_deleteUserAccount(
-			"COMPLETED", userAccount2.getExternalReferenceCode(), null);
+			202, null, userAccount1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			userAccountResource.getUserAccountHttpResponse(
-				userAccount2.getId()));
+				userAccount1.getId()));
 
 		userAccount1 = testDeleteUserAccountBatch_addUserAccount();
-		userAccount2 = testDeleteUserAccountBatch_addUserAccount();
+		UserAccount userAccount2 = testDeleteUserAccountBatch_addUserAccount();
 
 		testDeleteUserAccountBatch_deleteUserAccount(
-			"COMPLETED", userAccount2.getExternalReferenceCode(),
-			userAccount1.getId());
+			202, userAccount2.getExternalReferenceCode(), userAccount1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -589,8 +588,7 @@ public abstract class BaseUserAccountResourceTestCase {
 				userAccount2.getId()));
 
 		testDeleteUserAccountBatch_deleteUserAccount(
-			"COMPLETED", userAccount2.getExternalReferenceCode(),
-			userAccount1.getId());
+			202, userAccount2.getExternalReferenceCode(), userAccount1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -605,7 +603,7 @@ public abstract class BaseUserAccountResourceTestCase {
 	}
 
 	protected void testDeleteUserAccountBatch_deleteUserAccount(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -618,11 +616,13 @@ public abstract class BaseUserAccountResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

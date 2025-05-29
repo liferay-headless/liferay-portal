@@ -285,8 +285,7 @@ public abstract class BaseOrderRuleAccountGroupResourceTestCase {
 			testDeleteOrderRuleAccountGroupBatch_addOrderRuleAccountGroup();
 
 		testDeleteOrderRuleAccountGroupBatch_deleteOrderRuleAccountGroup(
-			"COMPLETED", null,
-			orderRuleAccountGroup1.getOrderRuleAccountGroupId());
+			202, null, orderRuleAccountGroup1.getOrderRuleAccountGroupId());
 	}
 
 	protected OrderRuleAccountGroup
@@ -298,8 +297,7 @@ public abstract class BaseOrderRuleAccountGroupResourceTestCase {
 
 	protected void
 			testDeleteOrderRuleAccountGroupBatch_deleteOrderRuleAccountGroup(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -313,11 +311,13 @@ public abstract class BaseOrderRuleAccountGroupResourceTestCase {
 							"orderRuleAccountGroupId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

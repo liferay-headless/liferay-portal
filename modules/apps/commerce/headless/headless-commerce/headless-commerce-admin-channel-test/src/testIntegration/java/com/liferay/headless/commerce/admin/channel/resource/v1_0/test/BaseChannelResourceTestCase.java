@@ -327,24 +327,23 @@ public abstract class BaseChannelResourceTestCase {
 		Channel channel1 = testDeleteChannelBatch_addChannel();
 
 		testDeleteChannelBatch_deleteChannel(
-			"COMPLETED", null, channel1.getId());
+			202, channel1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, channelResource.getChannelHttpResponse(channel1.getId()));
 
+		channel1 = testDeleteChannelBatch_addChannel();
+
+		testDeleteChannelBatch_deleteChannel(202, null, channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+
+		channel1 = testDeleteChannelBatch_addChannel();
 		Channel channel2 = testDeleteChannelBatch_addChannel();
 
 		testDeleteChannelBatch_deleteChannel(
-			"COMPLETED", channel2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, channelResource.getChannelHttpResponse(channel2.getId()));
-
-		channel1 = testDeleteChannelBatch_addChannel();
-		channel2 = testDeleteChannelBatch_addChannel();
-
-		testDeleteChannelBatch_deleteChannel(
-			"COMPLETED", channel2.getExternalReferenceCode(), channel1.getId());
+			202, channel2.getExternalReferenceCode(), channel1.getId());
 
 		assertHttpResponseStatusCode(
 			404, channelResource.getChannelHttpResponse(channel1.getId()));
@@ -352,7 +351,7 @@ public abstract class BaseChannelResourceTestCase {
 			200, channelResource.getChannelHttpResponse(channel2.getId()));
 
 		testDeleteChannelBatch_deleteChannel(
-			"COMPLETED", channel2.getExternalReferenceCode(), channel1.getId());
+			202, channel2.getExternalReferenceCode(), channel1.getId());
 
 		assertHttpResponseStatusCode(
 			404, channelResource.getChannelHttpResponse(channel2.getId()));
@@ -363,7 +362,7 @@ public abstract class BaseChannelResourceTestCase {
 	}
 
 	protected void testDeleteChannelBatch_deleteChannel(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -376,11 +375,13 @@ public abstract class BaseChannelResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

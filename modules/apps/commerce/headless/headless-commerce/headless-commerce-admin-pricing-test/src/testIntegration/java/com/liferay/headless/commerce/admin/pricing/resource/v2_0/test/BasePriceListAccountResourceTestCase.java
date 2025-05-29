@@ -276,7 +276,7 @@ public abstract class BasePriceListAccountResourceTestCase {
 			testDeletePriceListAccountBatch_addPriceListAccount();
 
 		testDeletePriceListAccountBatch_deletePriceListAccount(
-			"COMPLETED", null, priceListAccount1.getPriceListAccountId());
+			202, null, priceListAccount1.getPriceListAccountId());
 	}
 
 	protected PriceListAccount
@@ -287,7 +287,7 @@ public abstract class BasePriceListAccountResourceTestCase {
 	}
 
 	protected void testDeletePriceListAccountBatch_deletePriceListAccount(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -300,11 +300,13 @@ public abstract class BasePriceListAccountResourceTestCase {
 						"priceListAccountId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -331,25 +331,23 @@ public abstract class BaseShipmentResourceTestCase {
 		Shipment shipment1 = testDeleteShipmentBatch_addShipment();
 
 		testDeleteShipmentBatch_deleteShipment(
-			"COMPLETED", null, shipment1.getId());
+			202, shipment1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
 
+		shipment1 = testDeleteShipmentBatch_addShipment();
+
+		testDeleteShipmentBatch_deleteShipment(202, null, shipment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
+
+		shipment1 = testDeleteShipmentBatch_addShipment();
 		Shipment shipment2 = testDeleteShipmentBatch_addShipment();
 
 		testDeleteShipmentBatch_deleteShipment(
-			"COMPLETED", shipment2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
-
-		shipment1 = testDeleteShipmentBatch_addShipment();
-		shipment2 = testDeleteShipmentBatch_addShipment();
-
-		testDeleteShipmentBatch_deleteShipment(
-			"COMPLETED", shipment2.getExternalReferenceCode(),
-			shipment1.getId());
+			202, shipment2.getExternalReferenceCode(), shipment1.getId());
 
 		assertHttpResponseStatusCode(
 			404, shipmentResource.getShipmentHttpResponse(shipment1.getId()));
@@ -357,8 +355,7 @@ public abstract class BaseShipmentResourceTestCase {
 			200, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
 
 		testDeleteShipmentBatch_deleteShipment(
-			"COMPLETED", shipment2.getExternalReferenceCode(),
-			shipment1.getId());
+			202, shipment2.getExternalReferenceCode(), shipment1.getId());
 
 		assertHttpResponseStatusCode(
 			404, shipmentResource.getShipmentHttpResponse(shipment2.getId()));
@@ -369,7 +366,7 @@ public abstract class BaseShipmentResourceTestCase {
 	}
 
 	protected void testDeleteShipmentBatch_deleteShipment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -382,11 +379,13 @@ public abstract class BaseShipmentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

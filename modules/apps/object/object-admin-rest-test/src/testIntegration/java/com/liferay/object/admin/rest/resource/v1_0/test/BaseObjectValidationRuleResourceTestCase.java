@@ -354,7 +354,7 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 			testDeleteObjectValidationRuleBatch_addObjectValidationRule();
 
 		testDeleteObjectValidationRuleBatch_deleteObjectValidationRule(
-			"COMPLETED", null, objectValidationRule1.getId());
+			202, null, objectValidationRule1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -371,8 +371,7 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 
 	protected void
 			testDeleteObjectValidationRuleBatch_deleteObjectValidationRule(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -386,11 +385,13 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

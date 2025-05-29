@@ -286,8 +286,7 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 			testDeletePriceModifierCategoryBatch_addPriceModifierCategory();
 
 		testDeletePriceModifierCategoryBatch_deletePriceModifierCategory(
-			"COMPLETED", null,
-			priceModifierCategory1.getPriceModifierCategoryId());
+			202, null, priceModifierCategory1.getPriceModifierCategoryId());
 	}
 
 	protected PriceModifierCategory
@@ -299,8 +298,7 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 
 	protected void
 			testDeletePriceModifierCategoryBatch_deletePriceModifierCategory(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -314,11 +312,13 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 							"priceModifierCategoryId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

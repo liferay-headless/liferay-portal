@@ -399,24 +399,24 @@ public abstract class BaseRoleResourceTestCase {
 	public void testDeleteRoleBatch() throws Exception {
 		Role role1 = testDeleteRoleBatch_addRole();
 
-		testDeleteRoleBatch_deleteRole("COMPLETED", null, role1.getId());
+		testDeleteRoleBatch_deleteRole(
+			202, role1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, roleResource.getRoleHttpResponse(role1.getId()));
 
+		role1 = testDeleteRoleBatch_addRole();
+
+		testDeleteRoleBatch_deleteRole(202, null, role1.getId());
+
+		assertHttpResponseStatusCode(
+			404, roleResource.getRoleHttpResponse(role1.getId()));
+
+		role1 = testDeleteRoleBatch_addRole();
 		Role role2 = testDeleteRoleBatch_addRole();
 
 		testDeleteRoleBatch_deleteRole(
-			"COMPLETED", role2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, roleResource.getRoleHttpResponse(role2.getId()));
-
-		role1 = testDeleteRoleBatch_addRole();
-		role2 = testDeleteRoleBatch_addRole();
-
-		testDeleteRoleBatch_deleteRole(
-			"COMPLETED", role2.getExternalReferenceCode(), role1.getId());
+			202, role2.getExternalReferenceCode(), role1.getId());
 
 		assertHttpResponseStatusCode(
 			404, roleResource.getRoleHttpResponse(role1.getId()));
@@ -424,7 +424,7 @@ public abstract class BaseRoleResourceTestCase {
 			200, roleResource.getRoleHttpResponse(role2.getId()));
 
 		testDeleteRoleBatch_deleteRole(
-			"COMPLETED", role2.getExternalReferenceCode(), role1.getId());
+			202, role2.getExternalReferenceCode(), role1.getId());
 
 		assertHttpResponseStatusCode(
 			404, roleResource.getRoleHttpResponse(role2.getId()));
@@ -435,7 +435,7 @@ public abstract class BaseRoleResourceTestCase {
 	}
 
 	protected void testDeleteRoleBatch_deleteRole(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -448,11 +448,13 @@ public abstract class BaseRoleResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

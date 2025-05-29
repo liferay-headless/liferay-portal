@@ -271,7 +271,7 @@ public abstract class BaseGroupedProductResourceTestCase {
 			testDeleteGroupedProductBatch_addGroupedProduct();
 
 		testDeleteGroupedProductBatch_deleteGroupedProduct(
-			"COMPLETED", null, groupedProduct1.getId());
+			202, null, groupedProduct1.getId());
 	}
 
 	protected GroupedProduct testDeleteGroupedProductBatch_addGroupedProduct()
@@ -281,7 +281,7 @@ public abstract class BaseGroupedProductResourceTestCase {
 	}
 
 	protected void testDeleteGroupedProductBatch_deleteGroupedProduct(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -294,11 +294,13 @@ public abstract class BaseGroupedProductResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

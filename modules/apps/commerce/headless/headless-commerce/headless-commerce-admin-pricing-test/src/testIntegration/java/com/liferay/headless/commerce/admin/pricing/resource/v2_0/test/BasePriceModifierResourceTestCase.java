@@ -338,29 +338,29 @@ public abstract class BasePriceModifierResourceTestCase {
 			testDeletePriceModifierBatch_addPriceModifier();
 
 		testDeletePriceModifierBatch_deletePriceModifier(
-			"COMPLETED", null, priceModifier1.getId());
+			202, priceModifier1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			priceModifierResource.getPriceModifierHttpResponse(
 				priceModifier1.getId()));
 
-		PriceModifier priceModifier2 =
-			testDeletePriceModifierBatch_addPriceModifier();
+		priceModifier1 = testDeletePriceModifierBatch_addPriceModifier();
 
 		testDeletePriceModifierBatch_deletePriceModifier(
-			"COMPLETED", priceModifier2.getExternalReferenceCode(), null);
+			202, null, priceModifier1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			priceModifierResource.getPriceModifierHttpResponse(
-				priceModifier2.getId()));
+				priceModifier1.getId()));
 
 		priceModifier1 = testDeletePriceModifierBatch_addPriceModifier();
-		priceModifier2 = testDeletePriceModifierBatch_addPriceModifier();
+		PriceModifier priceModifier2 =
+			testDeletePriceModifierBatch_addPriceModifier();
 
 		testDeletePriceModifierBatch_deletePriceModifier(
-			"COMPLETED", priceModifier2.getExternalReferenceCode(),
+			202, priceModifier2.getExternalReferenceCode(),
 			priceModifier1.getId());
 
 		assertHttpResponseStatusCode(
@@ -373,7 +373,7 @@ public abstract class BasePriceModifierResourceTestCase {
 				priceModifier2.getId()));
 
 		testDeletePriceModifierBatch_deletePriceModifier(
-			"COMPLETED", priceModifier2.getExternalReferenceCode(),
+			202, priceModifier2.getExternalReferenceCode(),
 			priceModifier1.getId());
 
 		assertHttpResponseStatusCode(
@@ -389,7 +389,7 @@ public abstract class BasePriceModifierResourceTestCase {
 	}
 
 	protected void testDeletePriceModifierBatch_deletePriceModifier(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -402,11 +402,13 @@ public abstract class BasePriceModifierResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

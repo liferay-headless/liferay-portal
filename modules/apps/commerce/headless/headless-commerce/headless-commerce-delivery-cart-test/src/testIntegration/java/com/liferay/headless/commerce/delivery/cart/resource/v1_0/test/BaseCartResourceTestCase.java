@@ -361,24 +361,24 @@ public abstract class BaseCartResourceTestCase {
 	public void testDeleteCartBatch() throws Exception {
 		Cart cart1 = testDeleteCartBatch_addCart();
 
-		testDeleteCartBatch_deleteCart("COMPLETED", null, cart1.getId());
+		testDeleteCartBatch_deleteCart(
+			202, cart1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, cartResource.getCartHttpResponse(cart1.getId()));
 
+		cart1 = testDeleteCartBatch_addCart();
+
+		testDeleteCartBatch_deleteCart(202, null, cart1.getId());
+
+		assertHttpResponseStatusCode(
+			404, cartResource.getCartHttpResponse(cart1.getId()));
+
+		cart1 = testDeleteCartBatch_addCart();
 		Cart cart2 = testDeleteCartBatch_addCart();
 
 		testDeleteCartBatch_deleteCart(
-			"COMPLETED", cart2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, cartResource.getCartHttpResponse(cart2.getId()));
-
-		cart1 = testDeleteCartBatch_addCart();
-		cart2 = testDeleteCartBatch_addCart();
-
-		testDeleteCartBatch_deleteCart(
-			"COMPLETED", cart2.getExternalReferenceCode(), cart1.getId());
+			202, cart2.getExternalReferenceCode(), cart1.getId());
 
 		assertHttpResponseStatusCode(
 			404, cartResource.getCartHttpResponse(cart1.getId()));
@@ -386,7 +386,7 @@ public abstract class BaseCartResourceTestCase {
 			200, cartResource.getCartHttpResponse(cart2.getId()));
 
 		testDeleteCartBatch_deleteCart(
-			"COMPLETED", cart2.getExternalReferenceCode(), cart1.getId());
+			202, cart2.getExternalReferenceCode(), cart1.getId());
 
 		assertHttpResponseStatusCode(
 			404, cartResource.getCartHttpResponse(cart2.getId()));
@@ -397,7 +397,7 @@ public abstract class BaseCartResourceTestCase {
 	}
 
 	protected void testDeleteCartBatch_deleteCart(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -410,11 +410,13 @@ public abstract class BaseCartResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

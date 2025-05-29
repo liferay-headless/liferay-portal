@@ -276,7 +276,7 @@ public abstract class BaseWarehouseChannelResourceTestCase {
 			testDeleteWarehouseChannelBatch_addWarehouseChannel();
 
 		testDeleteWarehouseChannelBatch_deleteWarehouseChannel(
-			"COMPLETED", null, warehouseChannel1.getWarehouseChannelId());
+			202, null, warehouseChannel1.getWarehouseChannelId());
 	}
 
 	protected WarehouseChannel
@@ -287,7 +287,7 @@ public abstract class BaseWarehouseChannelResourceTestCase {
 	}
 
 	protected void testDeleteWarehouseChannelBatch_deleteWarehouseChannel(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -300,11 +300,13 @@ public abstract class BaseWarehouseChannelResourceTestCase {
 						"warehouseChannelId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

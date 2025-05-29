@@ -358,7 +358,7 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 			testDeleteMessageBoardAttachmentBatch_addMessageBoardAttachment();
 
 		testDeleteMessageBoardAttachmentBatch_deleteMessageBoardAttachment(
-			"COMPLETED", null, messageBoardAttachment1.getId());
+			202, null, messageBoardAttachment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -376,8 +376,7 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 
 	protected void
 			testDeleteMessageBoardAttachmentBatch_deleteMessageBoardAttachment(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -391,11 +390,13 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

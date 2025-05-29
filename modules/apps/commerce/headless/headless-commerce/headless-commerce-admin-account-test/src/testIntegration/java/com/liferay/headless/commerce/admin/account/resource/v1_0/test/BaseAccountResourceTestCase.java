@@ -324,24 +324,23 @@ public abstract class BaseAccountResourceTestCase {
 		Account account1 = testDeleteAccountBatch_addAccount();
 
 		testDeleteAccountBatch_deleteAccount(
-			"COMPLETED", null, account1.getId());
+			202, account1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, accountResource.getAccountHttpResponse(account1.getId()));
 
+		account1 = testDeleteAccountBatch_addAccount();
+
+		testDeleteAccountBatch_deleteAccount(202, null, account1.getId());
+
+		assertHttpResponseStatusCode(
+			404, accountResource.getAccountHttpResponse(account1.getId()));
+
+		account1 = testDeleteAccountBatch_addAccount();
 		Account account2 = testDeleteAccountBatch_addAccount();
 
 		testDeleteAccountBatch_deleteAccount(
-			"COMPLETED", account2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, accountResource.getAccountHttpResponse(account2.getId()));
-
-		account1 = testDeleteAccountBatch_addAccount();
-		account2 = testDeleteAccountBatch_addAccount();
-
-		testDeleteAccountBatch_deleteAccount(
-			"COMPLETED", account2.getExternalReferenceCode(), account1.getId());
+			202, account2.getExternalReferenceCode(), account1.getId());
 
 		assertHttpResponseStatusCode(
 			404, accountResource.getAccountHttpResponse(account1.getId()));
@@ -349,7 +348,7 @@ public abstract class BaseAccountResourceTestCase {
 			200, accountResource.getAccountHttpResponse(account2.getId()));
 
 		testDeleteAccountBatch_deleteAccount(
-			"COMPLETED", account2.getExternalReferenceCode(), account1.getId());
+			202, account2.getExternalReferenceCode(), account1.getId());
 
 		assertHttpResponseStatusCode(
 			404, accountResource.getAccountHttpResponse(account2.getId()));
@@ -360,7 +359,7 @@ public abstract class BaseAccountResourceTestCase {
 	}
 
 	protected void testDeleteAccountBatch_deleteAccount(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -373,11 +372,13 @@ public abstract class BaseAccountResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

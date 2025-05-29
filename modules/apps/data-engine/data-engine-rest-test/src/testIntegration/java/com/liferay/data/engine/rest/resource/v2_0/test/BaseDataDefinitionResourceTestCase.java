@@ -344,7 +344,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 			testDeleteDataDefinitionBatch_addDataDefinition();
 
 		testDeleteDataDefinitionBatch_deleteDataDefinition(
-			"COMPLETED", null, dataDefinition1.getId());
+			202, null, dataDefinition1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -359,7 +359,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	}
 
 	protected void testDeleteDataDefinitionBatch_deleteDataDefinition(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -372,11 +372,13 @@ public abstract class BaseDataDefinitionResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

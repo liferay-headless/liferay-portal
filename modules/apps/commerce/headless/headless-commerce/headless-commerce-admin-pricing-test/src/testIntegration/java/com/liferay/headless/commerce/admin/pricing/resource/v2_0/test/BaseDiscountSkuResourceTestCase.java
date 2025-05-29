@@ -273,7 +273,7 @@ public abstract class BaseDiscountSkuResourceTestCase {
 		DiscountSku discountSku1 = testDeleteDiscountSkuBatch_addDiscountSku();
 
 		testDeleteDiscountSkuBatch_deleteDiscountSku(
-			"COMPLETED", null, discountSku1.getDiscountSkuId());
+			202, null, discountSku1.getDiscountSkuId());
 	}
 
 	protected DiscountSku testDeleteDiscountSkuBatch_addDiscountSku()
@@ -283,7 +283,7 @@ public abstract class BaseDiscountSkuResourceTestCase {
 	}
 
 	protected void testDeleteDiscountSkuBatch_deleteDiscountSku(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -296,11 +296,13 @@ public abstract class BaseDiscountSkuResourceTestCase {
 						"discountSkuId", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -408,29 +408,29 @@ public abstract class BaseOrganizationResourceTestCase {
 			testDeleteOrganizationBatch_addOrganization();
 
 		testDeleteOrganizationBatch_deleteOrganization(
-			"COMPLETED", null, organization1.getId());
+			202, organization1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			organizationResource.getOrganizationHttpResponse(
 				organization1.getId()));
 
-		Organization organization2 =
-			testDeleteOrganizationBatch_addOrganization();
+		organization1 = testDeleteOrganizationBatch_addOrganization();
 
 		testDeleteOrganizationBatch_deleteOrganization(
-			"COMPLETED", organization2.getExternalReferenceCode(), null);
+			202, null, organization1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			organizationResource.getOrganizationHttpResponse(
-				organization2.getId()));
+				organization1.getId()));
 
 		organization1 = testDeleteOrganizationBatch_addOrganization();
-		organization2 = testDeleteOrganizationBatch_addOrganization();
+		Organization organization2 =
+			testDeleteOrganizationBatch_addOrganization();
 
 		testDeleteOrganizationBatch_deleteOrganization(
-			"COMPLETED", organization2.getExternalReferenceCode(),
+			202, organization2.getExternalReferenceCode(),
 			organization1.getId());
 
 		assertHttpResponseStatusCode(
@@ -443,7 +443,7 @@ public abstract class BaseOrganizationResourceTestCase {
 				organization2.getId()));
 
 		testDeleteOrganizationBatch_deleteOrganization(
-			"COMPLETED", organization2.getExternalReferenceCode(),
+			202, organization2.getExternalReferenceCode(),
 			organization1.getId());
 
 		assertHttpResponseStatusCode(
@@ -459,8 +459,7 @@ public abstract class BaseOrganizationResourceTestCase {
 	}
 
 	protected void testDeleteOrganizationBatch_deleteOrganization(
-			String expectedExecuteStatus, String externalReferenceCode,
-			String id)
+			int expectedStatusCode, String externalReferenceCode, String id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -473,11 +472,13 @@ public abstract class BaseOrganizationResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

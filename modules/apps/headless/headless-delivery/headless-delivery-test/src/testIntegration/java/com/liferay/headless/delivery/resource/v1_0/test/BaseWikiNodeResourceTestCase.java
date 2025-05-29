@@ -358,8 +358,7 @@ public abstract class BaseWikiNodeResourceTestCase {
 	public void testDeleteWikiNodeBatch() throws Exception {
 		WikiNode wikiNode1 = testDeleteWikiNodeBatch_addWikiNode();
 
-		testDeleteWikiNodeBatch_deleteWikiNode(
-			"COMPLETED", null, wikiNode1.getId());
+		testDeleteWikiNodeBatch_deleteWikiNode(202, null, wikiNode1.getId());
 
 		assertHttpResponseStatusCode(
 			404, wikiNodeResource.getWikiNodeHttpResponse(wikiNode1.getId()));
@@ -370,7 +369,7 @@ public abstract class BaseWikiNodeResourceTestCase {
 	}
 
 	protected void testDeleteWikiNodeBatch_deleteWikiNode(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -383,11 +382,13 @@ public abstract class BaseWikiNodeResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

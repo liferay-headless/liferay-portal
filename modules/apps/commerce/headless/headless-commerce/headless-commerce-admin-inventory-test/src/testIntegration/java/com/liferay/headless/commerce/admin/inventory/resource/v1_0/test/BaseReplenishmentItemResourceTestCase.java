@@ -344,31 +344,31 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 			testDeleteReplenishmentItemBatch_addReplenishmentItem();
 
 		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
-			"COMPLETED", null, replenishmentItem1.getId());
+			202, replenishmentItem1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			replenishmentItemResource.getReplenishmentItemHttpResponse(
 				replenishmentItem1.getId()));
 
-		ReplenishmentItem replenishmentItem2 =
+		replenishmentItem1 =
 			testDeleteReplenishmentItemBatch_addReplenishmentItem();
 
 		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
-			"COMPLETED", replenishmentItem2.getExternalReferenceCode(), null);
+			202, null, replenishmentItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			replenishmentItemResource.getReplenishmentItemHttpResponse(
-				replenishmentItem2.getId()));
+				replenishmentItem1.getId()));
 
 		replenishmentItem1 =
 			testDeleteReplenishmentItemBatch_addReplenishmentItem();
-		replenishmentItem2 =
+		ReplenishmentItem replenishmentItem2 =
 			testDeleteReplenishmentItemBatch_addReplenishmentItem();
 
 		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
-			"COMPLETED", replenishmentItem2.getExternalReferenceCode(),
+			202, replenishmentItem2.getExternalReferenceCode(),
 			replenishmentItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -381,7 +381,7 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 				replenishmentItem2.getId()));
 
 		testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
-			"COMPLETED", replenishmentItem2.getExternalReferenceCode(),
+			202, replenishmentItem2.getExternalReferenceCode(),
 			replenishmentItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -398,7 +398,7 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 	}
 
 	protected void testDeleteReplenishmentItemBatch_deleteReplenishmentItem(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -411,11 +411,13 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

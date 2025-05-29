@@ -282,8 +282,7 @@ public abstract class BaseDiscountAccountGroupResourceTestCase {
 			testDeleteDiscountAccountGroupBatch_addDiscountAccountGroup();
 
 		testDeleteDiscountAccountGroupBatch_deleteDiscountAccountGroup(
-			"COMPLETED", null,
-			discountAccountGroup1.getDiscountAccountGroupId());
+			202, null, discountAccountGroup1.getDiscountAccountGroupId());
 	}
 
 	protected DiscountAccountGroup
@@ -295,8 +294,7 @@ public abstract class BaseDiscountAccountGroupResourceTestCase {
 
 	protected void
 			testDeleteDiscountAccountGroupBatch_deleteDiscountAccountGroup(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -310,11 +308,13 @@ public abstract class BaseDiscountAccountGroupResourceTestCase {
 							"discountAccountGroupId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

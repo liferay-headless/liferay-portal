@@ -287,7 +287,7 @@ public abstract class BasePaymentMethodGroupRelTermResourceTestCase {
 			testDeletePaymentMethodGroupRelTermBatch_addPaymentMethodGroupRelTerm();
 
 		testDeletePaymentMethodGroupRelTermBatch_deletePaymentMethodGroupRelTerm(
-			"COMPLETED", null,
+			202, null,
 			paymentMethodGroupRelTerm1.getPaymentMethodGroupRelTermId());
 	}
 
@@ -300,8 +300,7 @@ public abstract class BasePaymentMethodGroupRelTermResourceTestCase {
 
 	protected void
 			testDeletePaymentMethodGroupRelTermBatch_deletePaymentMethodGroupRelTerm(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -315,11 +314,13 @@ public abstract class BasePaymentMethodGroupRelTermResourceTestCase {
 							"paymentMethodGroupRelTermId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

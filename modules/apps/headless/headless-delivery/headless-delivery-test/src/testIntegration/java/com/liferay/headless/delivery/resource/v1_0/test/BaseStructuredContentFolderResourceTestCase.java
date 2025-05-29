@@ -471,7 +471,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 			testDeleteStructuredContentFolderBatch_addStructuredContentFolder();
 
 		testDeleteStructuredContentFolderBatch_deleteStructuredContentFolder(
-			"COMPLETED", null, structuredContentFolder1.getId());
+			202, null, structuredContentFolder1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -489,8 +489,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 
 	protected void
 			testDeleteStructuredContentFolderBatch_deleteStructuredContentFolder(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -504,11 +503,13 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

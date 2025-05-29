@@ -328,29 +328,29 @@ public abstract class BaseProductGroupResourceTestCase {
 			testDeleteProductGroupBatch_addProductGroup();
 
 		testDeleteProductGroupBatch_deleteProductGroup(
-			"COMPLETED", null, productGroup1.getId());
+			202, productGroup1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			productGroupResource.getProductGroupHttpResponse(
 				productGroup1.getId()));
 
-		ProductGroup productGroup2 =
-			testDeleteProductGroupBatch_addProductGroup();
+		productGroup1 = testDeleteProductGroupBatch_addProductGroup();
 
 		testDeleteProductGroupBatch_deleteProductGroup(
-			"COMPLETED", productGroup2.getExternalReferenceCode(), null);
+			202, null, productGroup1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			productGroupResource.getProductGroupHttpResponse(
-				productGroup2.getId()));
+				productGroup1.getId()));
 
 		productGroup1 = testDeleteProductGroupBatch_addProductGroup();
-		productGroup2 = testDeleteProductGroupBatch_addProductGroup();
+		ProductGroup productGroup2 =
+			testDeleteProductGroupBatch_addProductGroup();
 
 		testDeleteProductGroupBatch_deleteProductGroup(
-			"COMPLETED", productGroup2.getExternalReferenceCode(),
+			202, productGroup2.getExternalReferenceCode(),
 			productGroup1.getId());
 
 		assertHttpResponseStatusCode(
@@ -363,7 +363,7 @@ public abstract class BaseProductGroupResourceTestCase {
 				productGroup2.getId()));
 
 		testDeleteProductGroupBatch_deleteProductGroup(
-			"COMPLETED", productGroup2.getExternalReferenceCode(),
+			202, productGroup2.getExternalReferenceCode(),
 			productGroup1.getId());
 
 		assertHttpResponseStatusCode(
@@ -379,7 +379,7 @@ public abstract class BaseProductGroupResourceTestCase {
 	}
 
 	protected void testDeleteProductGroupBatch_deleteProductGroup(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -392,11 +392,13 @@ public abstract class BaseProductGroupResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

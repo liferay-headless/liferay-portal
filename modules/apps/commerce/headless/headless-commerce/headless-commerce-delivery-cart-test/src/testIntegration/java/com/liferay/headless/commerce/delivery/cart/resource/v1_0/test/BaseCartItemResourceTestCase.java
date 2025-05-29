@@ -341,25 +341,23 @@ public abstract class BaseCartItemResourceTestCase {
 		CartItem cartItem1 = testDeleteCartItemBatch_addCartItem();
 
 		testDeleteCartItemBatch_deleteCartItem(
-			"COMPLETED", null, cartItem1.getId());
+			202, cartItem1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, cartItemResource.getCartItemHttpResponse(cartItem1.getId()));
 
+		cartItem1 = testDeleteCartItemBatch_addCartItem();
+
+		testDeleteCartItemBatch_deleteCartItem(202, null, cartItem1.getId());
+
+		assertHttpResponseStatusCode(
+			404, cartItemResource.getCartItemHttpResponse(cartItem1.getId()));
+
+		cartItem1 = testDeleteCartItemBatch_addCartItem();
 		CartItem cartItem2 = testDeleteCartItemBatch_addCartItem();
 
 		testDeleteCartItemBatch_deleteCartItem(
-			"COMPLETED", cartItem2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, cartItemResource.getCartItemHttpResponse(cartItem2.getId()));
-
-		cartItem1 = testDeleteCartItemBatch_addCartItem();
-		cartItem2 = testDeleteCartItemBatch_addCartItem();
-
-		testDeleteCartItemBatch_deleteCartItem(
-			"COMPLETED", cartItem2.getExternalReferenceCode(),
-			cartItem1.getId());
+			202, cartItem2.getExternalReferenceCode(), cartItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404, cartItemResource.getCartItemHttpResponse(cartItem1.getId()));
@@ -367,8 +365,7 @@ public abstract class BaseCartItemResourceTestCase {
 			200, cartItemResource.getCartItemHttpResponse(cartItem2.getId()));
 
 		testDeleteCartItemBatch_deleteCartItem(
-			"COMPLETED", cartItem2.getExternalReferenceCode(),
-			cartItem1.getId());
+			202, cartItem2.getExternalReferenceCode(), cartItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404, cartItemResource.getCartItemHttpResponse(cartItem2.getId()));
@@ -379,7 +376,7 @@ public abstract class BaseCartItemResourceTestCase {
 	}
 
 	protected void testDeleteCartItemBatch_deleteCartItem(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -392,11 +389,13 @@ public abstract class BaseCartItemResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -347,32 +347,31 @@ public abstract class BaseProductSpecificationResourceTestCase {
 			testDeleteProductSpecificationBatch_addProductSpecification();
 
 		testDeleteProductSpecificationBatch_deleteProductSpecification(
-			"COMPLETED", null, productSpecification1.getId());
+			202, productSpecification1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			productSpecificationResource.getProductSpecificationHttpResponse(
 				productSpecification1.getId()));
 
-		ProductSpecification productSpecification2 =
+		productSpecification1 =
 			testDeleteProductSpecificationBatch_addProductSpecification();
 
 		testDeleteProductSpecificationBatch_deleteProductSpecification(
-			"COMPLETED", productSpecification2.getExternalReferenceCode(),
-			null);
+			202, null, productSpecification1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			productSpecificationResource.getProductSpecificationHttpResponse(
-				productSpecification2.getId()));
+				productSpecification1.getId()));
 
 		productSpecification1 =
 			testDeleteProductSpecificationBatch_addProductSpecification();
-		productSpecification2 =
+		ProductSpecification productSpecification2 =
 			testDeleteProductSpecificationBatch_addProductSpecification();
 
 		testDeleteProductSpecificationBatch_deleteProductSpecification(
-			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			202, productSpecification2.getExternalReferenceCode(),
 			productSpecification1.getId());
 
 		assertHttpResponseStatusCode(
@@ -385,7 +384,7 @@ public abstract class BaseProductSpecificationResourceTestCase {
 				productSpecification2.getId()));
 
 		testDeleteProductSpecificationBatch_deleteProductSpecification(
-			"COMPLETED", productSpecification2.getExternalReferenceCode(),
+			202, productSpecification2.getExternalReferenceCode(),
 			productSpecification1.getId());
 
 		assertHttpResponseStatusCode(
@@ -403,8 +402,7 @@ public abstract class BaseProductSpecificationResourceTestCase {
 
 	protected void
 			testDeleteProductSpecificationBatch_deleteProductSpecification(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -418,11 +416,13 @@ public abstract class BaseProductSpecificationResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

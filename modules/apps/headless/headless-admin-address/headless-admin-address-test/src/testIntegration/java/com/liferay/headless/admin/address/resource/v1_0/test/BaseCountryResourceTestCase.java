@@ -318,8 +318,7 @@ public abstract class BaseCountryResourceTestCase {
 	public void testDeleteCountryBatch() throws Exception {
 		Country country1 = testDeleteCountryBatch_addCountry();
 
-		testDeleteCountryBatch_deleteCountry(
-			"COMPLETED", null, country1.getId());
+		testDeleteCountryBatch_deleteCountry(202, null, country1.getId());
 
 		assertHttpResponseStatusCode(
 			404, countryResource.getCountryHttpResponse(country1.getId()));
@@ -330,7 +329,7 @@ public abstract class BaseCountryResourceTestCase {
 	}
 
 	protected void testDeleteCountryBatch_deleteCountry(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -343,11 +342,13 @@ public abstract class BaseCountryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

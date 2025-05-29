@@ -355,7 +355,7 @@ public abstract class BaseDataListViewResourceTestCase {
 			testDeleteDataListViewBatch_addDataListView();
 
 		testDeleteDataListViewBatch_deleteDataListView(
-			"COMPLETED", null, dataListView1.getId());
+			202, null, dataListView1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -370,7 +370,7 @@ public abstract class BaseDataListViewResourceTestCase {
 	}
 
 	protected void testDeleteDataListViewBatch_deleteDataListView(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -383,11 +383,13 @@ public abstract class BaseDataListViewResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

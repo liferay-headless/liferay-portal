@@ -336,29 +336,29 @@ public abstract class BaseCTCollectionResourceTestCase {
 			testDeleteCTCollectionBatch_addCTCollection();
 
 		testDeleteCTCollectionBatch_deleteCTCollection(
-			"COMPLETED", null, ctCollection1.getId());
+			202, ctCollection1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			ctCollectionResource.getCTCollectionHttpResponse(
 				ctCollection1.getId()));
 
-		CTCollection ctCollection2 =
-			testDeleteCTCollectionBatch_addCTCollection();
+		ctCollection1 = testDeleteCTCollectionBatch_addCTCollection();
 
 		testDeleteCTCollectionBatch_deleteCTCollection(
-			"COMPLETED", ctCollection2.getExternalReferenceCode(), null);
+			202, null, ctCollection1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			ctCollectionResource.getCTCollectionHttpResponse(
-				ctCollection2.getId()));
+				ctCollection1.getId()));
 
 		ctCollection1 = testDeleteCTCollectionBatch_addCTCollection();
-		ctCollection2 = testDeleteCTCollectionBatch_addCTCollection();
+		CTCollection ctCollection2 =
+			testDeleteCTCollectionBatch_addCTCollection();
 
 		testDeleteCTCollectionBatch_deleteCTCollection(
-			"COMPLETED", ctCollection2.getExternalReferenceCode(),
+			202, ctCollection2.getExternalReferenceCode(),
 			ctCollection1.getId());
 
 		assertHttpResponseStatusCode(
@@ -371,7 +371,7 @@ public abstract class BaseCTCollectionResourceTestCase {
 				ctCollection2.getId()));
 
 		testDeleteCTCollectionBatch_deleteCTCollection(
-			"COMPLETED", ctCollection2.getExternalReferenceCode(),
+			202, ctCollection2.getExternalReferenceCode(),
 			ctCollection1.getId());
 
 		assertHttpResponseStatusCode(
@@ -387,7 +387,7 @@ public abstract class BaseCTCollectionResourceTestCase {
 	}
 
 	protected void testDeleteCTCollectionBatch_deleteCTCollection(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -400,11 +400,13 @@ public abstract class BaseCTCollectionResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -360,8 +360,7 @@ public abstract class BaseWikiPageResourceTestCase {
 	public void testDeleteWikiPageBatch() throws Exception {
 		WikiPage wikiPage1 = testDeleteWikiPageBatch_addWikiPage();
 
-		testDeleteWikiPageBatch_deleteWikiPage(
-			"COMPLETED", null, wikiPage1.getId());
+		testDeleteWikiPageBatch_deleteWikiPage(202, null, wikiPage1.getId());
 
 		assertHttpResponseStatusCode(
 			404, wikiPageResource.getWikiPageHttpResponse(wikiPage1.getId()));
@@ -372,7 +371,7 @@ public abstract class BaseWikiPageResourceTestCase {
 	}
 
 	protected void testDeleteWikiPageBatch_deleteWikiPage(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -385,11 +384,13 @@ public abstract class BaseWikiPageResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

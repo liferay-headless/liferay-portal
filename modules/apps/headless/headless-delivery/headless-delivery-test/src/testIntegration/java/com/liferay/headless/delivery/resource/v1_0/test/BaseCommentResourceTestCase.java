@@ -317,8 +317,7 @@ public abstract class BaseCommentResourceTestCase {
 	public void testDeleteCommentBatch() throws Exception {
 		Comment comment1 = testDeleteCommentBatch_addComment();
 
-		testDeleteCommentBatch_deleteComment(
-			"COMPLETED", null, comment1.getId());
+		testDeleteCommentBatch_deleteComment(202, null, comment1.getId());
 
 		assertHttpResponseStatusCode(
 			404, commentResource.getCommentHttpResponse(comment1.getId()));
@@ -329,7 +328,7 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	protected void testDeleteCommentBatch_deleteComment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -342,11 +341,13 @@ public abstract class BaseCommentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

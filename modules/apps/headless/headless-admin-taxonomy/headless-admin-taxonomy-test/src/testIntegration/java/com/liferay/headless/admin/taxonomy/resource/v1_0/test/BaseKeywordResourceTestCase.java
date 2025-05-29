@@ -395,8 +395,7 @@ public abstract class BaseKeywordResourceTestCase {
 	public void testDeleteKeywordBatch() throws Exception {
 		Keyword keyword1 = testDeleteKeywordBatch_addKeyword();
 
-		testDeleteKeywordBatch_deleteKeyword(
-			"COMPLETED", null, keyword1.getId());
+		testDeleteKeywordBatch_deleteKeyword(202, null, keyword1.getId());
 
 		assertHttpResponseStatusCode(
 			404, keywordResource.getKeywordHttpResponse(keyword1.getId()));
@@ -407,7 +406,7 @@ public abstract class BaseKeywordResourceTestCase {
 	}
 
 	protected void testDeleteKeywordBatch_deleteKeyword(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -420,11 +419,13 @@ public abstract class BaseKeywordResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

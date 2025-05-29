@@ -332,7 +332,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 			testDeleteDiscountRuleBatch_addDiscountRule();
 
 		testDeleteDiscountRuleBatch_deleteDiscountRule(
-			"COMPLETED", null, discountRule1.getId());
+			202, null, discountRule1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -347,7 +347,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	}
 
 	protected void testDeleteDiscountRuleBatch_deleteDiscountRule(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -360,11 +360,13 @@ public abstract class BaseDiscountRuleResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

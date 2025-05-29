@@ -329,7 +329,7 @@ public abstract class BaseRelatedProductResourceTestCase {
 			testDeleteRelatedProductBatch_addRelatedProduct();
 
 		testDeleteRelatedProductBatch_deleteRelatedProduct(
-			"COMPLETED", null, relatedProduct1.getId());
+			202, null, relatedProduct1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -344,7 +344,7 @@ public abstract class BaseRelatedProductResourceTestCase {
 	}
 
 	protected void testDeleteRelatedProductBatch_deleteRelatedProduct(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -357,11 +357,13 @@ public abstract class BaseRelatedProductResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -316,7 +316,7 @@ public abstract class BaseRegionResourceTestCase {
 	public void testDeleteRegionBatch() throws Exception {
 		Region region1 = testDeleteRegionBatch_addRegion();
 
-		testDeleteRegionBatch_deleteRegion("COMPLETED", null, region1.getId());
+		testDeleteRegionBatch_deleteRegion(202, null, region1.getId());
 
 		assertHttpResponseStatusCode(
 			404, regionResource.getRegionHttpResponse(region1.getId()));
@@ -327,7 +327,7 @@ public abstract class BaseRegionResourceTestCase {
 	}
 
 	protected void testDeleteRegionBatch_deleteRegion(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -340,11 +340,13 @@ public abstract class BaseRegionResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -351,24 +351,23 @@ public abstract class BasePaymentResourceTestCase {
 		Payment payment1 = testDeletePaymentBatch_addPayment();
 
 		testDeletePaymentBatch_deletePayment(
-			"COMPLETED", null, payment1.getId());
+			202, payment1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
 
+		payment1 = testDeletePaymentBatch_addPayment();
+
+		testDeletePaymentBatch_deletePayment(202, null, payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+
+		payment1 = testDeletePaymentBatch_addPayment();
 		Payment payment2 = testDeletePaymentBatch_addPayment();
 
 		testDeletePaymentBatch_deletePayment(
-			"COMPLETED", payment2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, paymentResource.getPaymentHttpResponse(payment2.getId()));
-
-		payment1 = testDeletePaymentBatch_addPayment();
-		payment2 = testDeletePaymentBatch_addPayment();
-
-		testDeletePaymentBatch_deletePayment(
-			"COMPLETED", payment2.getExternalReferenceCode(), payment1.getId());
+			202, payment2.getExternalReferenceCode(), payment1.getId());
 
 		assertHttpResponseStatusCode(
 			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
@@ -376,7 +375,7 @@ public abstract class BasePaymentResourceTestCase {
 			200, paymentResource.getPaymentHttpResponse(payment2.getId()));
 
 		testDeletePaymentBatch_deletePayment(
-			"COMPLETED", payment2.getExternalReferenceCode(), payment1.getId());
+			202, payment2.getExternalReferenceCode(), payment1.getId());
 
 		assertHttpResponseStatusCode(
 			404, paymentResource.getPaymentHttpResponse(payment2.getId()));
@@ -387,7 +386,7 @@ public abstract class BasePaymentResourceTestCase {
 	}
 
 	protected void testDeletePaymentBatch_deletePayment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -400,11 +399,13 @@ public abstract class BasePaymentResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

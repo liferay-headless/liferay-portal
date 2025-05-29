@@ -334,29 +334,29 @@ public abstract class BaseWarehouseItemResourceTestCase {
 			testDeleteWarehouseItemBatch_addWarehouseItem();
 
 		testDeleteWarehouseItemBatch_deleteWarehouseItem(
-			"COMPLETED", null, warehouseItem1.getId());
+			202, warehouseItem1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			warehouseItemResource.getWarehouseItemHttpResponse(
 				warehouseItem1.getId()));
 
-		WarehouseItem warehouseItem2 =
-			testDeleteWarehouseItemBatch_addWarehouseItem();
+		warehouseItem1 = testDeleteWarehouseItemBatch_addWarehouseItem();
 
 		testDeleteWarehouseItemBatch_deleteWarehouseItem(
-			"COMPLETED", warehouseItem2.getExternalReferenceCode(), null);
+			202, null, warehouseItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			warehouseItemResource.getWarehouseItemHttpResponse(
-				warehouseItem2.getId()));
+				warehouseItem1.getId()));
 
 		warehouseItem1 = testDeleteWarehouseItemBatch_addWarehouseItem();
-		warehouseItem2 = testDeleteWarehouseItemBatch_addWarehouseItem();
+		WarehouseItem warehouseItem2 =
+			testDeleteWarehouseItemBatch_addWarehouseItem();
 
 		testDeleteWarehouseItemBatch_deleteWarehouseItem(
-			"COMPLETED", warehouseItem2.getExternalReferenceCode(),
+			202, warehouseItem2.getExternalReferenceCode(),
 			warehouseItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -369,7 +369,7 @@ public abstract class BaseWarehouseItemResourceTestCase {
 				warehouseItem2.getId()));
 
 		testDeleteWarehouseItemBatch_deleteWarehouseItem(
-			"COMPLETED", warehouseItem2.getExternalReferenceCode(),
+			202, warehouseItem2.getExternalReferenceCode(),
 			warehouseItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -385,7 +385,7 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	}
 
 	protected void testDeleteWarehouseItemBatch_deleteWarehouseItem(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -398,11 +398,13 @@ public abstract class BaseWarehouseItemResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

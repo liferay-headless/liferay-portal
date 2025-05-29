@@ -268,7 +268,7 @@ public abstract class BaseDiscountCategoryResourceTestCase {
 			testDeleteDiscountCategoryBatch_addDiscountCategory();
 
 		testDeleteDiscountCategoryBatch_deleteDiscountCategory(
-			"COMPLETED", null, discountCategory1.getId());
+			202, null, discountCategory1.getId());
 	}
 
 	protected DiscountCategory
@@ -279,7 +279,7 @@ public abstract class BaseDiscountCategoryResourceTestCase {
 	}
 
 	protected void testDeleteDiscountCategoryBatch_deleteDiscountCategory(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -292,11 +292,13 @@ public abstract class BaseDiscountCategoryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

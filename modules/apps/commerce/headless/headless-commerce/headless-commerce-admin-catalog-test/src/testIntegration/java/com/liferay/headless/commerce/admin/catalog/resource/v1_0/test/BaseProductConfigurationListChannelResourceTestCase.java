@@ -301,7 +301,7 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 			testDeleteProductConfigurationListChannelBatch_addProductConfigurationListChannel();
 
 		testDeleteProductConfigurationListChannelBatch_deleteProductConfigurationListChannel(
-			"COMPLETED", null,
+			202, null,
 			productConfigurationListChannel1.
 				getProductConfigurationListChannelId());
 	}
@@ -315,8 +315,7 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 
 	protected void
 			testDeleteProductConfigurationListChannelBatch_deleteProductConfigurationListChannel(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -330,11 +329,13 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 							"productConfigurationListChannelId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

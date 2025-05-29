@@ -316,24 +316,24 @@ public abstract class BasePhoneResourceTestCase {
 	public void testDeletePhoneBatch() throws Exception {
 		Phone phone1 = testDeletePhoneBatch_addPhone();
 
-		testDeletePhoneBatch_deletePhone("COMPLETED", null, phone1.getId());
+		testDeletePhoneBatch_deletePhone(
+			202, phone1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, phoneResource.getPhoneHttpResponse(phone1.getId()));
 
+		phone1 = testDeletePhoneBatch_addPhone();
+
+		testDeletePhoneBatch_deletePhone(202, null, phone1.getId());
+
+		assertHttpResponseStatusCode(
+			404, phoneResource.getPhoneHttpResponse(phone1.getId()));
+
+		phone1 = testDeletePhoneBatch_addPhone();
 		Phone phone2 = testDeletePhoneBatch_addPhone();
 
 		testDeletePhoneBatch_deletePhone(
-			"COMPLETED", phone2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, phoneResource.getPhoneHttpResponse(phone2.getId()));
-
-		phone1 = testDeletePhoneBatch_addPhone();
-		phone2 = testDeletePhoneBatch_addPhone();
-
-		testDeletePhoneBatch_deletePhone(
-			"COMPLETED", phone2.getExternalReferenceCode(), phone1.getId());
+			202, phone2.getExternalReferenceCode(), phone1.getId());
 
 		assertHttpResponseStatusCode(
 			404, phoneResource.getPhoneHttpResponse(phone1.getId()));
@@ -341,7 +341,7 @@ public abstract class BasePhoneResourceTestCase {
 			200, phoneResource.getPhoneHttpResponse(phone2.getId()));
 
 		testDeletePhoneBatch_deletePhone(
-			"COMPLETED", phone2.getExternalReferenceCode(), phone1.getId());
+			202, phone2.getExternalReferenceCode(), phone1.getId());
 
 		assertHttpResponseStatusCode(
 			404, phoneResource.getPhoneHttpResponse(phone2.getId()));
@@ -352,7 +352,7 @@ public abstract class BasePhoneResourceTestCase {
 	}
 
 	protected void testDeletePhoneBatch_deletePhone(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -365,11 +365,13 @@ public abstract class BasePhoneResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

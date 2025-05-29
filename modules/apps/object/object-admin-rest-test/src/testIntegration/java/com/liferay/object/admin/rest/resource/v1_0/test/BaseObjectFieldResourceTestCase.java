@@ -344,7 +344,7 @@ public abstract class BaseObjectFieldResourceTestCase {
 		ObjectField objectField1 = testDeleteObjectFieldBatch_addObjectField();
 
 		testDeleteObjectFieldBatch_deleteObjectField(
-			"COMPLETED", null, objectField1.getId());
+			202, null, objectField1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -359,7 +359,7 @@ public abstract class BaseObjectFieldResourceTestCase {
 	}
 
 	protected void testDeleteObjectFieldBatch_deleteObjectField(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -372,11 +372,13 @@ public abstract class BaseObjectFieldResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

@@ -254,7 +254,7 @@ public abstract class BasePinResourceTestCase {
 	public void testDeletePinBatch() throws Exception {
 		Pin pin1 = testDeletePinBatch_addPin();
 
-		testDeletePinBatch_deletePin("COMPLETED", null, pin1.getId());
+		testDeletePinBatch_deletePin(202, null, pin1.getId());
 	}
 
 	protected Pin testDeletePinBatch_addPin() throws Exception {
@@ -262,7 +262,7 @@ public abstract class BasePinResourceTestCase {
 	}
 
 	protected void testDeletePinBatch_deletePin(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -275,11 +275,13 @@ public abstract class BasePinResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

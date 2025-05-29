@@ -339,7 +339,7 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 			testDeleteCategoryDisplayPageBatch_addCategoryDisplayPage();
 
 		testDeleteCategoryDisplayPageBatch_deleteCategoryDisplayPage(
-			"COMPLETED", null, categoryDisplayPage1.getId());
+			202, null, categoryDisplayPage1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -355,7 +355,7 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 	}
 
 	protected void testDeleteCategoryDisplayPageBatch_deleteCategoryDisplayPage(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -369,11 +369,13 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

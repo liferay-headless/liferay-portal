@@ -341,29 +341,29 @@ public abstract class BaseShipmentItemResourceTestCase {
 			testDeleteShipmentItemBatch_addShipmentItem();
 
 		testDeleteShipmentItemBatch_deleteShipmentItem(
-			"COMPLETED", null, shipmentItem1.getId());
+			202, shipmentItem1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			shipmentItemResource.getShipmentItemHttpResponse(
 				shipmentItem1.getId()));
 
-		ShipmentItem shipmentItem2 =
-			testDeleteShipmentItemBatch_addShipmentItem();
+		shipmentItem1 = testDeleteShipmentItemBatch_addShipmentItem();
 
 		testDeleteShipmentItemBatch_deleteShipmentItem(
-			"COMPLETED", shipmentItem2.getExternalReferenceCode(), null);
+			202, null, shipmentItem1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			shipmentItemResource.getShipmentItemHttpResponse(
-				shipmentItem2.getId()));
+				shipmentItem1.getId()));
 
 		shipmentItem1 = testDeleteShipmentItemBatch_addShipmentItem();
-		shipmentItem2 = testDeleteShipmentItemBatch_addShipmentItem();
+		ShipmentItem shipmentItem2 =
+			testDeleteShipmentItemBatch_addShipmentItem();
 
 		testDeleteShipmentItemBatch_deleteShipmentItem(
-			"COMPLETED", shipmentItem2.getExternalReferenceCode(),
+			202, shipmentItem2.getExternalReferenceCode(),
 			shipmentItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -376,7 +376,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 				shipmentItem2.getId()));
 
 		testDeleteShipmentItemBatch_deleteShipmentItem(
-			"COMPLETED", shipmentItem2.getExternalReferenceCode(),
+			202, shipmentItem2.getExternalReferenceCode(),
 			shipmentItem1.getId());
 
 		assertHttpResponseStatusCode(
@@ -392,7 +392,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 	}
 
 	protected void testDeleteShipmentItemBatch_deleteShipmentItem(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -405,11 +405,13 @@ public abstract class BaseShipmentItemResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

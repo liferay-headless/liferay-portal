@@ -318,24 +318,24 @@ public abstract class BaseOptionResourceTestCase {
 	public void testDeleteOptionBatch() throws Exception {
 		Option option1 = testDeleteOptionBatch_addOption();
 
-		testDeleteOptionBatch_deleteOption("COMPLETED", null, option1.getId());
+		testDeleteOptionBatch_deleteOption(
+			202, option1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, optionResource.getOptionHttpResponse(option1.getId()));
 
+		option1 = testDeleteOptionBatch_addOption();
+
+		testDeleteOptionBatch_deleteOption(202, null, option1.getId());
+
+		assertHttpResponseStatusCode(
+			404, optionResource.getOptionHttpResponse(option1.getId()));
+
+		option1 = testDeleteOptionBatch_addOption();
 		Option option2 = testDeleteOptionBatch_addOption();
 
 		testDeleteOptionBatch_deleteOption(
-			"COMPLETED", option2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, optionResource.getOptionHttpResponse(option2.getId()));
-
-		option1 = testDeleteOptionBatch_addOption();
-		option2 = testDeleteOptionBatch_addOption();
-
-		testDeleteOptionBatch_deleteOption(
-			"COMPLETED", option2.getExternalReferenceCode(), option1.getId());
+			202, option2.getExternalReferenceCode(), option1.getId());
 
 		assertHttpResponseStatusCode(
 			404, optionResource.getOptionHttpResponse(option1.getId()));
@@ -343,7 +343,7 @@ public abstract class BaseOptionResourceTestCase {
 			200, optionResource.getOptionHttpResponse(option2.getId()));
 
 		testDeleteOptionBatch_deleteOption(
-			"COMPLETED", option2.getExternalReferenceCode(), option1.getId());
+			202, option2.getExternalReferenceCode(), option1.getId());
 
 		assertHttpResponseStatusCode(
 			404, optionResource.getOptionHttpResponse(option2.getId()));
@@ -354,7 +354,7 @@ public abstract class BaseOptionResourceTestCase {
 	}
 
 	protected void testDeleteOptionBatch_deleteOption(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -367,11 +367,13 @@ public abstract class BaseOptionResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

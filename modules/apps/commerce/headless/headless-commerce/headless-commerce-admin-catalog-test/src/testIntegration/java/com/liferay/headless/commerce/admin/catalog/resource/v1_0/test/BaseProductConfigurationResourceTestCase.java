@@ -347,32 +347,31 @@ public abstract class BaseProductConfigurationResourceTestCase {
 			testDeleteProductConfigurationBatch_addProductConfiguration();
 
 		testDeleteProductConfigurationBatch_deleteProductConfiguration(
-			"COMPLETED", null, productConfiguration1.getId());
+			202, productConfiguration1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			productConfigurationResource.getProductConfigurationHttpResponse(
 				productConfiguration1.getId()));
 
-		ProductConfiguration productConfiguration2 =
+		productConfiguration1 =
 			testDeleteProductConfigurationBatch_addProductConfiguration();
 
 		testDeleteProductConfigurationBatch_deleteProductConfiguration(
-			"COMPLETED", productConfiguration2.getExternalReferenceCode(),
-			null);
+			202, null, productConfiguration1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			productConfigurationResource.getProductConfigurationHttpResponse(
-				productConfiguration2.getId()));
+				productConfiguration1.getId()));
 
 		productConfiguration1 =
 			testDeleteProductConfigurationBatch_addProductConfiguration();
-		productConfiguration2 =
+		ProductConfiguration productConfiguration2 =
 			testDeleteProductConfigurationBatch_addProductConfiguration();
 
 		testDeleteProductConfigurationBatch_deleteProductConfiguration(
-			"COMPLETED", productConfiguration2.getExternalReferenceCode(),
+			202, productConfiguration2.getExternalReferenceCode(),
 			productConfiguration1.getId());
 
 		assertHttpResponseStatusCode(
@@ -385,7 +384,7 @@ public abstract class BaseProductConfigurationResourceTestCase {
 				productConfiguration2.getId()));
 
 		testDeleteProductConfigurationBatch_deleteProductConfiguration(
-			"COMPLETED", productConfiguration2.getExternalReferenceCode(),
+			202, productConfiguration2.getExternalReferenceCode(),
 			productConfiguration1.getId());
 
 		assertHttpResponseStatusCode(
@@ -403,8 +402,7 @@ public abstract class BaseProductConfigurationResourceTestCase {
 
 	protected void
 			testDeleteProductConfigurationBatch_deleteProductConfiguration(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -418,11 +416,13 @@ public abstract class BaseProductConfigurationResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

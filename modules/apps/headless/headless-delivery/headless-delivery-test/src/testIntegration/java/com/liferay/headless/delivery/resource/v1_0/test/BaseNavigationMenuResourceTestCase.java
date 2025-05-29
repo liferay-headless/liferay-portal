@@ -341,7 +341,7 @@ public abstract class BaseNavigationMenuResourceTestCase {
 			testDeleteNavigationMenuBatch_addNavigationMenu();
 
 		testDeleteNavigationMenuBatch_deleteNavigationMenu(
-			"COMPLETED", null, navigationMenu1.getId());
+			202, null, navigationMenu1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -356,7 +356,7 @@ public abstract class BaseNavigationMenuResourceTestCase {
 	}
 
 	protected void testDeleteNavigationMenuBatch_deleteNavigationMenu(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -369,11 +369,13 @@ public abstract class BaseNavigationMenuResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

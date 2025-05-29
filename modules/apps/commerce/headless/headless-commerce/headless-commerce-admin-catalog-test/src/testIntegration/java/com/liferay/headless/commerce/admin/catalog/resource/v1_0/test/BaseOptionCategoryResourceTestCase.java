@@ -331,29 +331,29 @@ public abstract class BaseOptionCategoryResourceTestCase {
 			testDeleteOptionCategoryBatch_addOptionCategory();
 
 		testDeleteOptionCategoryBatch_deleteOptionCategory(
-			"COMPLETED", null, optionCategory1.getId());
+			202, optionCategory1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			optionCategoryResource.getOptionCategoryHttpResponse(
 				optionCategory1.getId()));
 
-		OptionCategory optionCategory2 =
-			testDeleteOptionCategoryBatch_addOptionCategory();
+		optionCategory1 = testDeleteOptionCategoryBatch_addOptionCategory();
 
 		testDeleteOptionCategoryBatch_deleteOptionCategory(
-			"COMPLETED", optionCategory2.getExternalReferenceCode(), null);
+			202, null, optionCategory1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			optionCategoryResource.getOptionCategoryHttpResponse(
-				optionCategory2.getId()));
+				optionCategory1.getId()));
 
 		optionCategory1 = testDeleteOptionCategoryBatch_addOptionCategory();
-		optionCategory2 = testDeleteOptionCategoryBatch_addOptionCategory();
+		OptionCategory optionCategory2 =
+			testDeleteOptionCategoryBatch_addOptionCategory();
 
 		testDeleteOptionCategoryBatch_deleteOptionCategory(
-			"COMPLETED", optionCategory2.getExternalReferenceCode(),
+			202, optionCategory2.getExternalReferenceCode(),
 			optionCategory1.getId());
 
 		assertHttpResponseStatusCode(
@@ -366,7 +366,7 @@ public abstract class BaseOptionCategoryResourceTestCase {
 				optionCategory2.getId()));
 
 		testDeleteOptionCategoryBatch_deleteOptionCategory(
-			"COMPLETED", optionCategory2.getExternalReferenceCode(),
+			202, optionCategory2.getExternalReferenceCode(),
 			optionCategory1.getId());
 
 		assertHttpResponseStatusCode(
@@ -382,7 +382,7 @@ public abstract class BaseOptionCategoryResourceTestCase {
 	}
 
 	protected void testDeleteOptionCategoryBatch_deleteOptionCategory(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -395,11 +395,13 @@ public abstract class BaseOptionCategoryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

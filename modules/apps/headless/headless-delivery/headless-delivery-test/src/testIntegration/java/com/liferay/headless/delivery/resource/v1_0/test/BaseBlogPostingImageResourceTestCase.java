@@ -352,7 +352,7 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 			testDeleteBlogPostingImageBatch_addBlogPostingImage();
 
 		testDeleteBlogPostingImageBatch_deleteBlogPostingImage(
-			"COMPLETED", null, blogPostingImage1.getId());
+			202, null, blogPostingImage1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -368,7 +368,7 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 	}
 
 	protected void testDeleteBlogPostingImageBatch_deleteBlogPostingImage(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -381,11 +381,13 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

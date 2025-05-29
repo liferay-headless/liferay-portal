@@ -329,27 +329,25 @@ public abstract class BaseOrderRuleResourceTestCase {
 		OrderRule orderRule1 = testDeleteOrderRuleBatch_addOrderRule();
 
 		testDeleteOrderRuleBatch_deleteOrderRule(
-			"COMPLETED", null, orderRule1.getId());
+			202, orderRule1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			orderRuleResource.getOrderRuleHttpResponse(orderRule1.getId()));
 
-		OrderRule orderRule2 = testDeleteOrderRuleBatch_addOrderRule();
+		orderRule1 = testDeleteOrderRuleBatch_addOrderRule();
 
-		testDeleteOrderRuleBatch_deleteOrderRule(
-			"COMPLETED", orderRule2.getExternalReferenceCode(), null);
+		testDeleteOrderRuleBatch_deleteOrderRule(202, null, orderRule1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
-			orderRuleResource.getOrderRuleHttpResponse(orderRule2.getId()));
+			orderRuleResource.getOrderRuleHttpResponse(orderRule1.getId()));
 
 		orderRule1 = testDeleteOrderRuleBatch_addOrderRule();
-		orderRule2 = testDeleteOrderRuleBatch_addOrderRule();
+		OrderRule orderRule2 = testDeleteOrderRuleBatch_addOrderRule();
 
 		testDeleteOrderRuleBatch_deleteOrderRule(
-			"COMPLETED", orderRule2.getExternalReferenceCode(),
-			orderRule1.getId());
+			202, orderRule2.getExternalReferenceCode(), orderRule1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -359,8 +357,7 @@ public abstract class BaseOrderRuleResourceTestCase {
 			orderRuleResource.getOrderRuleHttpResponse(orderRule2.getId()));
 
 		testDeleteOrderRuleBatch_deleteOrderRule(
-			"COMPLETED", orderRule2.getExternalReferenceCode(),
-			orderRule1.getId());
+			202, orderRule2.getExternalReferenceCode(), orderRule1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -374,7 +371,7 @@ public abstract class BaseOrderRuleResourceTestCase {
 	}
 
 	protected void testDeleteOrderRuleBatch_deleteOrderRule(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -387,11 +384,13 @@ public abstract class BaseOrderRuleResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

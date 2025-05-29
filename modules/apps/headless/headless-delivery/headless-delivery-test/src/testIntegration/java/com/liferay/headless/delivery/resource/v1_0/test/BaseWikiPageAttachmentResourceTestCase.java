@@ -405,7 +405,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 			testDeleteWikiPageAttachmentBatch_addWikiPageAttachment();
 
 		testDeleteWikiPageAttachmentBatch_deleteWikiPageAttachment(
-			"COMPLETED", null, wikiPageAttachment1.getId());
+			202, null, wikiPageAttachment1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -421,7 +421,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	}
 
 	protected void testDeleteWikiPageAttachmentBatch_deleteWikiPageAttachment(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -435,11 +435,13 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 							"id", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

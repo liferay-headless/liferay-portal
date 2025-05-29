@@ -393,24 +393,24 @@ public abstract class BaseOrderResourceTestCase {
 	public void testDeleteOrderBatch() throws Exception {
 		Order order1 = testDeleteOrderBatch_addOrder();
 
-		testDeleteOrderBatch_deleteOrder("COMPLETED", null, order1.getId());
+		testDeleteOrderBatch_deleteOrder(
+			202, order1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404, orderResource.getOrderHttpResponse(order1.getId()));
 
+		order1 = testDeleteOrderBatch_addOrder();
+
+		testDeleteOrderBatch_deleteOrder(202, null, order1.getId());
+
+		assertHttpResponseStatusCode(
+			404, orderResource.getOrderHttpResponse(order1.getId()));
+
+		order1 = testDeleteOrderBatch_addOrder();
 		Order order2 = testDeleteOrderBatch_addOrder();
 
 		testDeleteOrderBatch_deleteOrder(
-			"COMPLETED", order2.getExternalReferenceCode(), null);
-
-		assertHttpResponseStatusCode(
-			404, orderResource.getOrderHttpResponse(order2.getId()));
-
-		order1 = testDeleteOrderBatch_addOrder();
-		order2 = testDeleteOrderBatch_addOrder();
-
-		testDeleteOrderBatch_deleteOrder(
-			"COMPLETED", order2.getExternalReferenceCode(), order1.getId());
+			202, order2.getExternalReferenceCode(), order1.getId());
 
 		assertHttpResponseStatusCode(
 			404, orderResource.getOrderHttpResponse(order1.getId()));
@@ -418,7 +418,7 @@ public abstract class BaseOrderResourceTestCase {
 			200, orderResource.getOrderHttpResponse(order2.getId()));
 
 		testDeleteOrderBatch_deleteOrder(
-			"COMPLETED", order2.getExternalReferenceCode(), order1.getId());
+			202, order2.getExternalReferenceCode(), order1.getId());
 
 		assertHttpResponseStatusCode(
 			404, orderResource.getOrderHttpResponse(order2.getId()));
@@ -429,7 +429,7 @@ public abstract class BaseOrderResourceTestCase {
 	}
 
 	protected void testDeleteOrderBatch_deleteOrder(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -442,11 +442,13 @@ public abstract class BaseOrderResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

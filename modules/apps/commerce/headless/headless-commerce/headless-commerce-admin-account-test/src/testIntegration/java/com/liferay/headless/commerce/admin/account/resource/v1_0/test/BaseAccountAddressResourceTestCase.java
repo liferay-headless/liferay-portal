@@ -347,29 +347,29 @@ public abstract class BaseAccountAddressResourceTestCase {
 			testDeleteAccountAddressBatch_addAccountAddress();
 
 		testDeleteAccountAddressBatch_deleteAccountAddress(
-			"COMPLETED", null, accountAddress1.getId());
+			202, accountAddress1.getExternalReferenceCode(), null);
 
 		assertHttpResponseStatusCode(
 			404,
 			accountAddressResource.getAccountAddressHttpResponse(
 				accountAddress1.getId()));
 
-		AccountAddress accountAddress2 =
-			testDeleteAccountAddressBatch_addAccountAddress();
+		accountAddress1 = testDeleteAccountAddressBatch_addAccountAddress();
 
 		testDeleteAccountAddressBatch_deleteAccountAddress(
-			"COMPLETED", accountAddress2.getExternalReferenceCode(), null);
+			202, null, accountAddress1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
 			accountAddressResource.getAccountAddressHttpResponse(
-				accountAddress2.getId()));
+				accountAddress1.getId()));
 
 		accountAddress1 = testDeleteAccountAddressBatch_addAccountAddress();
-		accountAddress2 = testDeleteAccountAddressBatch_addAccountAddress();
+		AccountAddress accountAddress2 =
+			testDeleteAccountAddressBatch_addAccountAddress();
 
 		testDeleteAccountAddressBatch_deleteAccountAddress(
-			"COMPLETED", accountAddress2.getExternalReferenceCode(),
+			202, accountAddress2.getExternalReferenceCode(),
 			accountAddress1.getId());
 
 		assertHttpResponseStatusCode(
@@ -382,7 +382,7 @@ public abstract class BaseAccountAddressResourceTestCase {
 				accountAddress2.getId()));
 
 		testDeleteAccountAddressBatch_deleteAccountAddress(
-			"COMPLETED", accountAddress2.getExternalReferenceCode(),
+			202, accountAddress2.getExternalReferenceCode(),
 			accountAddress1.getId());
 
 		assertHttpResponseStatusCode(
@@ -398,7 +398,7 @@ public abstract class BaseAccountAddressResourceTestCase {
 	}
 
 	protected void testDeleteAccountAddressBatch_deleteAccountAddress(
-			String expectedExecuteStatus, String externalReferenceCode, Long id)
+			int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -411,11 +411,13 @@ public abstract class BaseAccountAddressResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

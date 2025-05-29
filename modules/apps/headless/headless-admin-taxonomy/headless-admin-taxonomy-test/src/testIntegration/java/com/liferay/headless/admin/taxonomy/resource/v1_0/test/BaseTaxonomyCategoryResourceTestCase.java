@@ -337,7 +337,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			testDeleteTaxonomyCategoryBatch_addTaxonomyCategory();
 
 		testDeleteTaxonomyCategoryBatch_deleteTaxonomyCategory(
-			"COMPLETED", null, taxonomyCategory1.getId());
+			202, null, taxonomyCategory1.getId());
 
 		assertHttpResponseStatusCode(
 			404,
@@ -353,8 +353,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 	}
 
 	protected void testDeleteTaxonomyCategoryBatch_deleteTaxonomyCategory(
-			String expectedExecuteStatus, String externalReferenceCode,
-			String id)
+			int expectedStatusCode, String externalReferenceCode, String id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -367,11 +366,13 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 						"id", () -> id
 					)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test

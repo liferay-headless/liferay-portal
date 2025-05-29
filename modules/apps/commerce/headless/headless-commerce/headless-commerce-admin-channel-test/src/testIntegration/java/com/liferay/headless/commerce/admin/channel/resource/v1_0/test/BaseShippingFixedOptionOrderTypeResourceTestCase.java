@@ -292,7 +292,7 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 			testDeleteShippingFixedOptionOrderTypeBatch_addShippingFixedOptionOrderType();
 
 		testDeleteShippingFixedOptionOrderTypeBatch_deleteShippingFixedOptionOrderType(
-			"COMPLETED", null,
+			202, null,
 			shippingFixedOptionOrderType1.getShippingFixedOptionOrderTypeId());
 	}
 
@@ -305,8 +305,7 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 
 	protected void
 			testDeleteShippingFixedOptionOrderTypeBatch_deleteShippingFixedOptionOrderType(
-				String expectedExecuteStatus, String externalReferenceCode,
-				Long id)
+				int expectedStatusCode, String externalReferenceCode, Long id)
 		throws Exception {
 
 		HttpInvoker.HttpResponse httpResponse =
@@ -320,11 +319,13 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 							"shippingFixedOptionOrderTypeId", () -> id
 						)));
 
-		Assert.assertEquals(202, httpResponse.getStatusCode());
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		waitForFinish(
-			expectedExecuteStatus,
-			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		if (expectedStatusCode == 202) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Test
