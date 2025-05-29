@@ -63,6 +63,8 @@ test(
 			name: 'site-' + getRandomString(),
 		});
 
+		apiHelpers.data.push({id: site.id, type: 'site'});
+
 		const layouts: Array<Layout> = [];
 
 		for (const i of [1, 2, 3]) {
