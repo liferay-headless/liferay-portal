@@ -829,6 +829,11 @@ public abstract class BaseFormRecordResourceTestCase {
 		return testPostFormFormRecord_addFormRecord(randomFormRecord());
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected FormRecord testGraphQLFormRecord_addFormRecord()
 		throws Exception {
 

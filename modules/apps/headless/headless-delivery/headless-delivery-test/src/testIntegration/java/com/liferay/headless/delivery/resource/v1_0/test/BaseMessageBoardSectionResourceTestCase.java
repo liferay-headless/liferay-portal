@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardSection;
@@ -381,11 +382,9 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -2222,6 +2221,63 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 
 		return messageBoardSectionResource.postSiteMessageBoardSection(
 			testGroup.getGroupId(), randomMessageBoardSection());
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		MessageBoardSection messageBoardSection1 =
+			testBatchEngineDeleteImportTask_addMessageBoardSection();
+
+		testBatchEngineDeleteImportTask_deleteMessageBoardSection(
+			200, null, messageBoardSection1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			messageBoardSectionResource.getMessageBoardSectionHttpResponse(
+				messageBoardSection1.getId()));
+	}
+
+	protected MessageBoardSection
+			testBatchEngineDeleteImportTask_addMessageBoardSection()
+		throws Exception {
+
+		return testDeleteMessageBoardSection_addMessageBoardSection();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteMessageBoardSection(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.delivery.dto.v1_0.MessageBoardSection",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

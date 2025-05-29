@@ -20,6 +20,7 @@ import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.resource.v1_0.UserAccountResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.UserAccountSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -618,11 +619,9 @@ public abstract class BaseUserAccountResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -5880,6 +5879,96 @@ public abstract class BaseUserAccountResourceTestCase {
 		throws Exception {
 
 		return randomUserAccount();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		UserAccount userAccount1 =
+			testBatchEngineDeleteImportTask_addUserAccount();
+
+		testBatchEngineDeleteImportTask_deleteUserAccount(
+			200, userAccount1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount1.getId()));
+
+		userAccount1 = testBatchEngineDeleteImportTask_addUserAccount();
+
+		testBatchEngineDeleteImportTask_deleteUserAccount(
+			200, null, userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount1.getId()));
+
+		userAccount1 = testBatchEngineDeleteImportTask_addUserAccount();
+		UserAccount userAccount2 =
+			testBatchEngineDeleteImportTask_addUserAccount();
+
+		testBatchEngineDeleteImportTask_deleteUserAccount(
+			200, userAccount2.getExternalReferenceCode(), userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount1.getId()));
+		assertHttpResponseStatusCode(
+			200,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteUserAccount(
+			200, userAccount2.getExternalReferenceCode(), userAccount1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userAccountResource.getUserAccountHttpResponse(
+				userAccount2.getId()));
+	}
+
+	protected UserAccount testBatchEngineDeleteImportTask_addUserAccount()
+		throws Exception {
+
+		return testDeleteUserAccount_addUserAccount();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteUserAccount(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.user.dto.v1_0.UserAccount", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectValidationRule;
@@ -387,11 +388,9 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1616,6 +1615,63 @@ public abstract class BaseObjectValidationRuleResourceTestCase {
 
 		return testPostObjectDefinitionObjectValidationRule_addObjectValidationRule(
 			randomObjectValidationRule());
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		ObjectValidationRule objectValidationRule1 =
+			testBatchEngineDeleteImportTask_addObjectValidationRule();
+
+		testBatchEngineDeleteImportTask_deleteObjectValidationRule(
+			200, null, objectValidationRule1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectValidationRuleResource.getObjectValidationRuleHttpResponse(
+				objectValidationRule1.getId()));
+	}
+
+	protected ObjectValidationRule
+			testBatchEngineDeleteImportTask_addObjectValidationRule()
+		throws Exception {
+
+		return testDeleteObjectValidationRule_addObjectValidationRule();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteObjectValidationRule(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.object.admin.rest.dto.v1_0.ObjectValidationRule",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected ObjectValidationRule

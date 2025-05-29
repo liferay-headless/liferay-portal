@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectView;
@@ -350,11 +351,9 @@ public abstract class BaseObjectViewResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1433,6 +1432,61 @@ public abstract class BaseObjectViewResourceTestCase {
 	protected ObjectView testPutObjectView_addObjectView() throws Exception {
 		return testPostObjectDefinitionObjectView_addObjectView(
 			randomObjectView());
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		ObjectView objectView1 =
+			testBatchEngineDeleteImportTask_addObjectView();
+
+		testBatchEngineDeleteImportTask_deleteObjectView(
+			200, null, objectView1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			objectViewResource.getObjectViewHttpResponse(objectView1.getId()));
+	}
+
+	protected ObjectView testBatchEngineDeleteImportTask_addObjectView()
+		throws Exception {
+
+		return testDeleteObjectView_addObjectView();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteObjectView(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.object.admin.rest.dto.v1_0.ObjectView", null, null,
+				null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected ObjectView testGraphQLObjectView_addObjectView()

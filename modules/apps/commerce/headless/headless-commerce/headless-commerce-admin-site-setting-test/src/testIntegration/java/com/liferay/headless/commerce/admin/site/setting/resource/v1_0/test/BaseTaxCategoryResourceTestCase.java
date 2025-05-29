@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.site.setting.client.dto.v1_0.TaxCategory;
 import com.liferay.headless.commerce.admin.site.setting.client.http.HttpInvoker;
@@ -350,11 +351,9 @@ public abstract class BaseTaxCategoryResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -875,6 +874,62 @@ public abstract class BaseTaxCategoryResourceTestCase {
 	@Test
 	public void testPutTaxCategory() throws Exception {
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		TaxCategory taxCategory1 =
+			testBatchEngineDeleteImportTask_addTaxCategory();
+
+		testBatchEngineDeleteImportTask_deleteTaxCategory(
+			200, null, taxCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			taxCategoryResource.getTaxCategoryHttpResponse(
+				taxCategory1.getId()));
+	}
+
+	protected TaxCategory testBatchEngineDeleteImportTask_addTaxCategory()
+		throws Exception {
+
+		return testDeleteTaxCategory_addTaxCategory();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteTaxCategory(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.site.setting.dto.v1_0.TaxCategory",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected TaxCategory testGraphQLTaxCategory_addTaxCategory()

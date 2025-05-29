@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseArticle;
@@ -394,11 +395,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -2973,6 +2972,63 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 		return knowledgeBaseArticleResource.postSiteKnowledgeBaseArticle(
 			testGroup.getGroupId(), randomKnowledgeBaseArticle());
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		KnowledgeBaseArticle knowledgeBaseArticle1 =
+			testBatchEngineDeleteImportTask_addKnowledgeBaseArticle();
+
+		testBatchEngineDeleteImportTask_deleteKnowledgeBaseArticle(
+			200, null, knowledgeBaseArticle1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			knowledgeBaseArticleResource.getKnowledgeBaseArticleHttpResponse(
+				knowledgeBaseArticle1.getId()));
+	}
+
+	protected KnowledgeBaseArticle
+			testBatchEngineDeleteImportTask_addKnowledgeBaseArticle()
+		throws Exception {
+
+		return testDeleteKnowledgeBaseArticle_addKnowledgeBaseArticle();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteKnowledgeBaseArticle(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseArticle",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

@@ -1398,6 +1398,11 @@ public abstract class BaseCTEntryResourceTestCase {
 		return testGraphQLCTEntry_addCTEntry();
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 

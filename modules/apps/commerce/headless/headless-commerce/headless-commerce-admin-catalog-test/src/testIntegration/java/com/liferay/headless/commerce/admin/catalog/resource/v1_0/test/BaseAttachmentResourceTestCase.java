@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Attachment;
 import com.liferay.headless.commerce.admin.catalog.client.http.HttpInvoker;
@@ -311,11 +312,9 @@ public abstract class BaseAttachmentResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1516,6 +1515,72 @@ public abstract class BaseAttachmentResourceTestCase {
 		throws Exception {
 
 		return randomAttachment();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Attachment attachment1 =
+			testBatchEngineDeleteImportTask_addAttachment();
+
+		testBatchEngineDeleteImportTask_deleteAttachment(
+			200, attachment1.getExternalReferenceCode(), null);
+
+		attachment1 = testBatchEngineDeleteImportTask_addAttachment();
+
+		testBatchEngineDeleteImportTask_deleteAttachment(
+			200, null, attachment1.getId());
+
+		attachment1 = testBatchEngineDeleteImportTask_addAttachment();
+		Attachment attachment2 =
+			testBatchEngineDeleteImportTask_addAttachment();
+
+		testBatchEngineDeleteImportTask_deleteAttachment(
+			200, attachment2.getExternalReferenceCode(), attachment1.getId());
+
+		testBatchEngineDeleteImportTask_deleteAttachment(
+			200, attachment2.getExternalReferenceCode(), attachment1.getId());
+	}
+
+	protected Attachment testBatchEngineDeleteImportTask_addAttachment()
+		throws Exception {
+
+		return testDeleteAttachment_addAttachment();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteAttachment(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.Attachment",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected Attachment testGraphQLAttachment_addAttachment()

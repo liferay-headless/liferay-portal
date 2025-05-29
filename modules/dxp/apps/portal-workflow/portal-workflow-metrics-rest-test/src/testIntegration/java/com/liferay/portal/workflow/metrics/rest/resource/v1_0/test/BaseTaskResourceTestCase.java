@@ -487,6 +487,11 @@ public abstract class BaseTaskResourceTestCase {
 		Assert.assertTrue(false);
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Task testGraphQLTask_addTask() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");

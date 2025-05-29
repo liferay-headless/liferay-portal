@@ -292,6 +292,11 @@ public abstract class BaseNodeResourceTestCase {
 			testGetProcessNodesPage_getProcessId(), node);
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Node testGraphQLNode_addNode() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");

@@ -20,6 +20,7 @@ import com.liferay.change.tracking.rest.client.pagination.Pagination;
 import com.liferay.change.tracking.rest.client.resource.v1_0.CTRemoteResource;
 import com.liferay.change.tracking.rest.client.serdes.v1_0.CTRemoteSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -352,11 +353,9 @@ public abstract class BaseCTRemoteResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -957,6 +956,59 @@ public abstract class BaseCTRemoteResourceTestCase {
 	protected CTRemote testPutCTRemote_addCTRemote() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		CTRemote ctRemote1 = testBatchEngineDeleteImportTask_addCTRemote();
+
+		testBatchEngineDeleteImportTask_deleteCTRemote(
+			200, null, ctRemote1.getId());
+
+		assertHttpResponseStatusCode(
+			404, ctRemoteResource.getCTRemoteHttpResponse(ctRemote1.getId()));
+	}
+
+	protected CTRemote testBatchEngineDeleteImportTask_addCTRemote()
+		throws Exception {
+
+		return testDeleteCTRemote_addCTRemote();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteCTRemote(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.change.tracking.rest.dto.v1_0.CTRemote", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected CTRemote testGraphQLCTRemote_addCTRemote() throws Exception {

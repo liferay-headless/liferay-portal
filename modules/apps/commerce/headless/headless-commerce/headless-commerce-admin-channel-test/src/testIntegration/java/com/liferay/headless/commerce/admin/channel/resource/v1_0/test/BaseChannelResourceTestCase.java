@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.channel.client.dto.v1_0.Channel;
 import com.liferay.headless.commerce.admin.channel.client.http.HttpInvoker;
@@ -377,11 +378,9 @@ public abstract class BaseChannelResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1494,6 +1493,84 @@ public abstract class BaseChannelResourceTestCase {
 		throws Exception {
 
 		return randomChannel();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Channel channel1 = testBatchEngineDeleteImportTask_addChannel();
+
+		testBatchEngineDeleteImportTask_deleteChannel(
+			200, channel1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+
+		channel1 = testBatchEngineDeleteImportTask_addChannel();
+
+		testBatchEngineDeleteImportTask_deleteChannel(
+			200, null, channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+
+		channel1 = testBatchEngineDeleteImportTask_addChannel();
+		Channel channel2 = testBatchEngineDeleteImportTask_addChannel();
+
+		testBatchEngineDeleteImportTask_deleteChannel(
+			200, channel2.getExternalReferenceCode(), channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel1.getId()));
+		assertHttpResponseStatusCode(
+			200, channelResource.getChannelHttpResponse(channel2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteChannel(
+			200, channel2.getExternalReferenceCode(), channel1.getId());
+
+		assertHttpResponseStatusCode(
+			404, channelResource.getChannelHttpResponse(channel2.getId()));
+	}
+
+	protected Channel testBatchEngineDeleteImportTask_addChannel()
+		throws Exception {
+
+		return testDeleteChannel_addChannel();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteChannel(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.channel.dto.v1_0.Channel",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

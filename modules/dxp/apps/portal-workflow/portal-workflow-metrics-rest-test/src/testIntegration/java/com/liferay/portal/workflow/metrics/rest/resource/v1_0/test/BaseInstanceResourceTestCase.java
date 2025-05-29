@@ -717,6 +717,11 @@ public abstract class BaseInstanceResourceTestCase {
 			testGetProcessInstancesPage_getProcessId(), instance);
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Instance testGraphQLInstance_addInstance() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");

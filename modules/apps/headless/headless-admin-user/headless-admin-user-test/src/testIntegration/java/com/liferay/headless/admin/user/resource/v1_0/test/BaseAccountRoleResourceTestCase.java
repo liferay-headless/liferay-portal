@@ -1764,6 +1764,11 @@ public abstract class BaseAccountRoleResourceTestCase {
 		return testPostAccountAccountRole_addAccountRole(randomAccountRole());
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 

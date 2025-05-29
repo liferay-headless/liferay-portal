@@ -1047,6 +1047,11 @@ public abstract class BaseSkuResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Sku testGraphQLSku_addSku() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");

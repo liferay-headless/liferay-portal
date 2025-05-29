@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.OrderType;
 import com.liferay.headless.commerce.admin.order.client.http.HttpInvoker;
@@ -376,11 +377,9 @@ public abstract class BaseOrderTypeResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1643,6 +1642,89 @@ public abstract class BaseOrderTypeResourceTestCase {
 		throws Exception {
 
 		return randomOrderType();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		OrderType orderType1 = testBatchEngineDeleteImportTask_addOrderType();
+
+		testBatchEngineDeleteImportTask_deleteOrderType(
+			200, orderType1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType1.getId()));
+
+		orderType1 = testBatchEngineDeleteImportTask_addOrderType();
+
+		testBatchEngineDeleteImportTask_deleteOrderType(
+			200, null, orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType1.getId()));
+
+		orderType1 = testBatchEngineDeleteImportTask_addOrderType();
+		OrderType orderType2 = testBatchEngineDeleteImportTask_addOrderType();
+
+		testBatchEngineDeleteImportTask_deleteOrderType(
+			200, orderType2.getExternalReferenceCode(), orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType1.getId()));
+		assertHttpResponseStatusCode(
+			200,
+			orderTypeResource.getOrderTypeHttpResponse(orderType2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteOrderType(
+			200, orderType2.getExternalReferenceCode(), orderType1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			orderTypeResource.getOrderTypeHttpResponse(orderType2.getId()));
+	}
+
+	protected OrderType testBatchEngineDeleteImportTask_addOrderType()
+		throws Exception {
+
+		return testDeleteOrderType_addOrderType();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteOrderType(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.order.dto.v1_0.OrderType",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

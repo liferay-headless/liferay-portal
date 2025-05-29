@@ -21,6 +21,7 @@ import com.liferay.data.engine.rest.client.permission.Permission;
 import com.liferay.data.engine.rest.client.resource.v2_0.DataDefinitionResource;
 import com.liferay.data.engine.rest.client.serdes.v2_0.DataDefinitionSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -374,11 +375,9 @@ public abstract class BaseDataDefinitionResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -2099,6 +2098,62 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		throws Exception {
 
 		return randomDataDefinition();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		DataDefinition dataDefinition1 =
+			testBatchEngineDeleteImportTask_addDataDefinition();
+
+		testBatchEngineDeleteImportTask_deleteDataDefinition(
+			200, null, dataDefinition1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			dataDefinitionResource.getDataDefinitionHttpResponse(
+				dataDefinition1.getId()));
+	}
+
+	protected DataDefinition testBatchEngineDeleteImportTask_addDataDefinition()
+		throws Exception {
+
+		return testDeleteDataDefinition_addDataDefinition();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteDataDefinition(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.data.engine.rest.dto.v2_0.DataDefinition", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected DataDefinition testGraphQLDataDefinition_addDataDefinition()

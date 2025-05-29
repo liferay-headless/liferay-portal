@@ -20,6 +20,7 @@ import com.liferay.headless.admin.address.client.pagination.Pagination;
 import com.liferay.headless.admin.address.client.resource.v1_0.RegionResource;
 import com.liferay.headless.admin.address.client.serdes.v1_0.RegionSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -342,11 +343,9 @@ public abstract class BaseRegionResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1443,6 +1442,59 @@ public abstract class BaseRegionResourceTestCase {
 
 	protected Region testPutRegion_addRegion() throws Exception {
 		return testPostCountryRegion_addRegion(randomRegion());
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Region region1 = testBatchEngineDeleteImportTask_addRegion();
+
+		testBatchEngineDeleteImportTask_deleteRegion(
+			200, null, region1.getId());
+
+		assertHttpResponseStatusCode(
+			404, regionResource.getRegionHttpResponse(region1.getId()));
+	}
+
+	protected Region testBatchEngineDeleteImportTask_addRegion()
+		throws Exception {
+
+		return testDeleteRegion_addRegion();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteRegion(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.address.dto.v1_0.Region", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected Region testGraphQLRegion_addRegion() throws Exception {

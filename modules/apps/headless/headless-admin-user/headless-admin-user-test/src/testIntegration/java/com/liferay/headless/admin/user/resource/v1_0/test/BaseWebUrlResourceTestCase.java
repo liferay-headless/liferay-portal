@@ -19,6 +19,7 @@ import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.resource.v1_0.WebUrlResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -365,11 +366,9 @@ public abstract class BaseWebUrlResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1373,6 +1372,84 @@ public abstract class BaseWebUrlResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		WebUrl webUrl1 = testBatchEngineDeleteImportTask_addWebUrl();
+
+		testBatchEngineDeleteImportTask_deleteWebUrl(
+			200, webUrl1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+
+		webUrl1 = testBatchEngineDeleteImportTask_addWebUrl();
+
+		testBatchEngineDeleteImportTask_deleteWebUrl(
+			200, null, webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+
+		webUrl1 = testBatchEngineDeleteImportTask_addWebUrl();
+		WebUrl webUrl2 = testBatchEngineDeleteImportTask_addWebUrl();
+
+		testBatchEngineDeleteImportTask_deleteWebUrl(
+			200, webUrl2.getExternalReferenceCode(), webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl1.getId()));
+		assertHttpResponseStatusCode(
+			200, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteWebUrl(
+			200, webUrl2.getExternalReferenceCode(), webUrl1.getId());
+
+		assertHttpResponseStatusCode(
+			404, webUrlResource.getWebUrlHttpResponse(webUrl2.getId()));
+	}
+
+	protected WebUrl testBatchEngineDeleteImportTask_addWebUrl()
+		throws Exception {
+
+		return testDeleteWebUrl_addWebUrl();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteWebUrl(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.user.dto.v1_0.WebUrl", null, null,
+				null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected WebUrl testGraphQLWebUrl_addWebUrl() throws Exception {

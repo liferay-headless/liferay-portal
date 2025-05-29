@@ -20,6 +20,7 @@ import com.liferay.headless.admin.list.type.client.pagination.Pagination;
 import com.liferay.headless.admin.list.type.client.resource.v1_0.ListTypeDefinitionResource;
 import com.liferay.headless.admin.list.type.client.serdes.v1_0.ListTypeDefinitionSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -377,11 +378,9 @@ public abstract class BaseListTypeDefinitionResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1476,6 +1475,63 @@ public abstract class BaseListTypeDefinitionResourceTestCase {
 		throws Exception {
 
 		return randomListTypeDefinition();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		ListTypeDefinition listTypeDefinition1 =
+			testBatchEngineDeleteImportTask_addListTypeDefinition();
+
+		testBatchEngineDeleteImportTask_deleteListTypeDefinition(
+			200, null, listTypeDefinition1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			listTypeDefinitionResource.getListTypeDefinitionHttpResponse(
+				listTypeDefinition1.getId()));
+	}
+
+	protected ListTypeDefinition
+			testBatchEngineDeleteImportTask_addListTypeDefinition()
+		throws Exception {
+
+		return testDeleteListTypeDefinition_addListTypeDefinition();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteListTypeDefinition(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

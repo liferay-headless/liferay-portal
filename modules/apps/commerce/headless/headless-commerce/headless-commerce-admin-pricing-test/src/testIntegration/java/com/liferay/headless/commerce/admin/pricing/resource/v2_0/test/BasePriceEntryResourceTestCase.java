@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.PriceEntry;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
@@ -405,11 +406,9 @@ public abstract class BasePriceEntryResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1856,6 +1855,98 @@ public abstract class BasePriceEntryResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		PriceEntry priceEntry1 =
+			testBatchEngineDeleteImportTask_addPriceEntry();
+
+		testBatchEngineDeleteImportTask_deletePriceEntry(
+			200, priceEntry1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry1.getPriceEntryId()));
+
+		priceEntry1 = testBatchEngineDeleteImportTask_addPriceEntry();
+
+		testBatchEngineDeleteImportTask_deletePriceEntry(
+			200, null, priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry1.getPriceEntryId()));
+
+		priceEntry1 = testBatchEngineDeleteImportTask_addPriceEntry();
+		PriceEntry priceEntry2 =
+			testBatchEngineDeleteImportTask_addPriceEntry();
+
+		testBatchEngineDeleteImportTask_deletePriceEntry(
+			200, priceEntry2.getExternalReferenceCode(),
+			priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry1.getPriceEntryId()));
+		assertHttpResponseStatusCode(
+			200,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry2.getPriceEntryId()));
+
+		testBatchEngineDeleteImportTask_deletePriceEntry(
+			200, priceEntry2.getExternalReferenceCode(),
+			priceEntry1.getPriceEntryId());
+
+		assertHttpResponseStatusCode(
+			404,
+			priceEntryResource.getPriceEntryHttpResponse(
+				priceEntry2.getPriceEntryId()));
+	}
+
+	protected PriceEntry testBatchEngineDeleteImportTask_addPriceEntry()
+		throws Exception {
+
+		return testDeletePriceEntry_addPriceEntry();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deletePriceEntry(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceEntry",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"priceEntryId", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

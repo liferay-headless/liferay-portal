@@ -621,6 +621,11 @@ public abstract class BaseAttachmentResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Attachment testGraphQLAttachment_addAttachment()
 		throws Exception {
 

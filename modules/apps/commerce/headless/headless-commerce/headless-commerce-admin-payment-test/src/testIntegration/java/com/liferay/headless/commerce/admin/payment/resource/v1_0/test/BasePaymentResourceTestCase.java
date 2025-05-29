@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.headless.commerce.admin.payment.client.dto.v1_0.Payment;
 import com.liferay.headless.commerce.admin.payment.client.http.HttpInvoker;
@@ -401,11 +402,9 @@ public abstract class BasePaymentResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1396,6 +1395,84 @@ public abstract class BasePaymentResourceTestCase {
 		throws Exception {
 
 		return randomPayment();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Payment payment1 = testBatchEngineDeleteImportTask_addPayment();
+
+		testBatchEngineDeleteImportTask_deletePayment(
+			200, payment1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+
+		payment1 = testBatchEngineDeleteImportTask_addPayment();
+
+		testBatchEngineDeleteImportTask_deletePayment(
+			200, null, payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+
+		payment1 = testBatchEngineDeleteImportTask_addPayment();
+		Payment payment2 = testBatchEngineDeleteImportTask_addPayment();
+
+		testBatchEngineDeleteImportTask_deletePayment(
+			200, payment2.getExternalReferenceCode(), payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment1.getId()));
+		assertHttpResponseStatusCode(
+			200, paymentResource.getPaymentHttpResponse(payment2.getId()));
+
+		testBatchEngineDeleteImportTask_deletePayment(
+			200, payment2.getExternalReferenceCode(), payment1.getId());
+
+		assertHttpResponseStatusCode(
+			404, paymentResource.getPaymentHttpResponse(payment2.getId()));
+	}
+
+	protected Payment testBatchEngineDeleteImportTask_addPayment()
+		throws Exception {
+
+		return testDeletePayment_addPayment();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deletePayment(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.commerce.admin.payment.dto.v1_0.Payment",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

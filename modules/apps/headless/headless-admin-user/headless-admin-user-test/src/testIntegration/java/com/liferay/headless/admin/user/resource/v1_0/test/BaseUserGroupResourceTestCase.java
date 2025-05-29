@@ -20,6 +20,7 @@ import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.resource.v1_0.UserGroupResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.UserGroupSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -380,11 +381,9 @@ public abstract class BaseUserGroupResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1560,6 +1559,89 @@ public abstract class BaseUserGroupResourceTestCase {
 		throws Exception {
 
 		return randomUserGroup();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		UserGroup userGroup1 = testBatchEngineDeleteImportTask_addUserGroup();
+
+		testBatchEngineDeleteImportTask_deleteUserGroup(
+			200, userGroup1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
+
+		userGroup1 = testBatchEngineDeleteImportTask_addUserGroup();
+
+		testBatchEngineDeleteImportTask_deleteUserGroup(
+			200, null, userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
+
+		userGroup1 = testBatchEngineDeleteImportTask_addUserGroup();
+		UserGroup userGroup2 = testBatchEngineDeleteImportTask_addUserGroup();
+
+		testBatchEngineDeleteImportTask_deleteUserGroup(
+			200, userGroup2.getExternalReferenceCode(), userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup1.getId()));
+		assertHttpResponseStatusCode(
+			200,
+			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteUserGroup(
+			200, userGroup2.getExternalReferenceCode(), userGroup1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			userGroupResource.getUserGroupHttpResponse(userGroup2.getId()));
+	}
+
+	protected UserGroup testBatchEngineDeleteImportTask_addUserGroup()
+		throws Exception {
+
+		return testDeleteUserGroup_addUserGroup();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteUserGroup(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.user.dto.v1_0.UserGroup", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

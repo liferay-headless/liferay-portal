@@ -21,6 +21,7 @@ import com.liferay.headless.admin.taxonomy.client.permission.Permission;
 import com.liferay.headless.admin.taxonomy.client.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyCategorySerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -368,11 +369,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -2160,6 +2159,63 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		throws Exception {
 
 		return randomTaxonomyCategory();
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		TaxonomyCategory taxonomyCategory1 =
+			testBatchEngineDeleteImportTask_addTaxonomyCategory();
+
+		testBatchEngineDeleteImportTask_deleteTaxonomyCategory(
+			200, null, taxonomyCategory1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			taxonomyCategoryResource.getTaxonomyCategoryHttpResponse(
+				taxonomyCategory1.getId()));
+	}
+
+	protected TaxonomyCategory
+			testBatchEngineDeleteImportTask_addTaxonomyCategory()
+		throws Exception {
+
+		return testDeleteTaxonomyCategory_addTaxonomyCategory();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteTaxonomyCategory(
+			int expectedStatusCode, String externalReferenceCode, String id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory",
+				null, null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	@Rule

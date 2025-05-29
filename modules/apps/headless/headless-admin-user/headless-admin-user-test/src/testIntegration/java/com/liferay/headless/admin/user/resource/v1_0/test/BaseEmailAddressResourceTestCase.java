@@ -19,6 +19,7 @@ import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.resource.v1_0.EmailAddressResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.EmailAddressSerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -394,11 +395,9 @@ public abstract class BaseEmailAddressResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1489,6 +1488,98 @@ public abstract class BaseEmailAddressResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		EmailAddress emailAddress1 =
+			testBatchEngineDeleteImportTask_addEmailAddress();
+
+		testBatchEngineDeleteImportTask_deleteEmailAddress(
+			200, emailAddress1.getExternalReferenceCode(), null);
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress1.getId()));
+
+		emailAddress1 = testBatchEngineDeleteImportTask_addEmailAddress();
+
+		testBatchEngineDeleteImportTask_deleteEmailAddress(
+			200, null, emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress1.getId()));
+
+		emailAddress1 = testBatchEngineDeleteImportTask_addEmailAddress();
+		EmailAddress emailAddress2 =
+			testBatchEngineDeleteImportTask_addEmailAddress();
+
+		testBatchEngineDeleteImportTask_deleteEmailAddress(
+			200, emailAddress2.getExternalReferenceCode(),
+			emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress1.getId()));
+		assertHttpResponseStatusCode(
+			200,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress2.getId()));
+
+		testBatchEngineDeleteImportTask_deleteEmailAddress(
+			200, emailAddress2.getExternalReferenceCode(),
+			emailAddress1.getId());
+
+		assertHttpResponseStatusCode(
+			404,
+			emailAddressResource.getEmailAddressHttpResponse(
+				emailAddress2.getId()));
+	}
+
+	protected EmailAddress testBatchEngineDeleteImportTask_addEmailAddress()
+		throws Exception {
+
+		return testDeleteEmailAddress_addEmailAddress();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteEmailAddress(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.user.dto.v1_0.EmailAddress", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected EmailAddress testGraphQLEmailAddress_addEmailAddress()

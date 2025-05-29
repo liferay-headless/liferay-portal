@@ -762,6 +762,11 @@ public abstract class BaseWorkflowDefinitionLinkResourceTestCase {
 		return randomWorkflowDefinitionLink();
 	}
 
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected WorkflowDefinitionLink
 			testGraphQLWorkflowDefinitionLink_addWorkflowDefinitionLink()
 		throws Exception {

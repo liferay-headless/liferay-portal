@@ -20,6 +20,7 @@ import com.liferay.headless.admin.address.client.pagination.Pagination;
 import com.liferay.headless.admin.address.client.resource.v1_0.CountryResource;
 import com.liferay.headless.admin.address.client.serdes.v1_0.CountrySerDes;
 import com.liferay.headless.batch.engine.client.dto.v1_0.ImportTask;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker.HttpResponse;
 import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -344,11 +345,9 @@ public abstract class BaseCountryResourceTestCase {
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
-		if (expectedStatusCode == 202) {
-			waitForFinish(
-				"COMPLETED",
-				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
-		}
+		waitForFinish(
+			"COMPLETED",
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	@Test
@@ -1454,6 +1453,59 @@ public abstract class BaseCountryResourceTestCase {
 	protected Country testPutCountry_addCountry() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		Country country1 = testBatchEngineDeleteImportTask_addCountry();
+
+		testBatchEngineDeleteImportTask_deleteCountry(
+			200, null, country1.getId());
+
+		assertHttpResponseStatusCode(
+			404, countryResource.getCountryHttpResponse(country1.getId()));
+	}
+
+	protected Country testBatchEngineDeleteImportTask_addCountry()
+		throws Exception {
+
+		return testDeleteCountry_addCountry();
+	}
+
+	protected void testBatchEngineDeleteImportTask_deleteCountry(
+			int expectedStatusCode, String externalReferenceCode, Long id,
+			String... parameters)
+		throws Exception {
+
+		ImportTaskResource scopedImportTaskResource =
+			ImportTaskResource.builder(
+			).authentication(
+				_testCompanyAdminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(), 8080, "http"
+			).parameters(
+				parameters
+			).build();
+
+		HttpResponse httpResponse =
+			scopedImportTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.headless.admin.address.dto.v1_0.Country", null,
+				null, null, null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", () -> externalReferenceCode
+					).put(
+						"id", () -> id
+					)));
+
+		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
+
+		if (expectedStatusCode == 200) {
+			waitForFinish(
+				"COMPLETED",
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
 	}
 
 	protected Country testGraphQLCountry_addCountry() throws Exception {
