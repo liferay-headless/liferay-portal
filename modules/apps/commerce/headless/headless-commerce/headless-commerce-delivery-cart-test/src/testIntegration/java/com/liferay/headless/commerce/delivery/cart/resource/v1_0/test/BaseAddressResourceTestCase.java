@@ -339,19 +339,10 @@ public abstract class BaseAddressResourceTestCase {
 
 		Address getAddress =
 			addressResource.getCartByExternalReferenceCodeBillingAddress(
-				testGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-					postAddress));
+				postAddress.getExternalReferenceCode());
 
 		assertEquals(postAddress, getAddress);
 		assertValid(getAddress);
-	}
-
-	protected String
-			testGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return address.getExternalReferenceCode();
 	}
 
 	protected Address
@@ -384,8 +375,9 @@ public abstract class BaseAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-													address) + "\"");
+												address.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -409,22 +401,15 @@ public abstract class BaseAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-														address) + "\"");
+													address.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryCart_v1_0",
 						"Object/cartByExternalReferenceCodeBillingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return address.getExternalReferenceCode();
 	}
 
 	@Test
@@ -491,19 +476,10 @@ public abstract class BaseAddressResourceTestCase {
 
 		Address getAddress =
 			addressResource.getCartByExternalReferenceCodeShippingAddress(
-				testGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-					postAddress));
+				postAddress.getExternalReferenceCode());
 
 		assertEquals(postAddress, getAddress);
 		assertValid(getAddress);
-	}
-
-	protected String
-			testGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return address.getExternalReferenceCode();
 	}
 
 	protected Address
@@ -536,8 +512,9 @@ public abstract class BaseAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-													address) + "\"");
+												address.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -561,22 +538,15 @@ public abstract class BaseAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-														address) + "\"");
+													address.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryCart_v1_0",
 						"Object/cartByExternalReferenceCodeShippingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return address.getExternalReferenceCode();
 	}
 
 	@Test

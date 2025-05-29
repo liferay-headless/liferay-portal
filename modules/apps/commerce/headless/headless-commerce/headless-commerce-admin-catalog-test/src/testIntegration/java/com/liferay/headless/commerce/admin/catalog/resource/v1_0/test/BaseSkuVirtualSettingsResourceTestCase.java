@@ -346,17 +346,10 @@ public abstract class BaseSkuVirtualSettingsResourceTestCase {
 
 		SkuVirtualSettings getSkuVirtualSettings =
 			skuVirtualSettingsResource.getSkuIdSkuVirtualSettings(
-				testGetSkuIdSkuVirtualSettings_getId(postSkuVirtualSettings));
+				postSkuVirtualSettings.getId());
 
 		assertEquals(postSkuVirtualSettings, getSkuVirtualSettings);
 		assertValid(getSkuVirtualSettings);
-	}
-
-	protected Long testGetSkuIdSkuVirtualSettings_getId(
-			SkuVirtualSettings skuVirtualSettings)
-		throws Exception {
-
-		return skuVirtualSettings.getId();
 	}
 
 	protected SkuVirtualSettings
@@ -384,10 +377,7 @@ public abstract class BaseSkuVirtualSettingsResourceTestCase {
 								"skuIdSkuVirtualSettings",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetSkuIdSkuVirtualSettings_getId(
-												skuVirtualSettings));
+										put("id", skuVirtualSettings.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -409,21 +399,13 @@ public abstract class BaseSkuVirtualSettingsResourceTestCase {
 										{
 											put(
 												"id",
-												testGraphQLGetSkuIdSkuVirtualSettings_getId(
-													skuVirtualSettings));
+												skuVirtualSettings.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/skuIdSkuVirtualSettings"))));
-	}
-
-	protected Long testGraphQLGetSkuIdSkuVirtualSettings_getId(
-			SkuVirtualSettings skuVirtualSettings)
-		throws Exception {
-
-		return skuVirtualSettings.getId();
 	}
 
 	@Test

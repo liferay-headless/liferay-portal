@@ -1256,30 +1256,12 @@ public abstract class BaseCTEntryResourceTestCase {
 		CTEntry getCTEntry =
 			ctEntryResource.
 				getCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK(
-					testGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getCtCollectionId(
-						postCTEntry),
-					testGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getModelClassNameId(
-						postCTEntry),
+					postCTEntry.getCtCollectionId(),
+					postCTEntry.getModelClassNameId(),
 					postCTEntry.getModelClassPK());
 
 		assertEquals(postCTEntry, getCTEntry);
 		assertValid(getCTEntry);
-	}
-
-	protected Long
-			testGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getCtCollectionId(
-				CTEntry ctEntry)
-		throws Exception {
-
-		return ctEntry.getCtCollectionId();
-	}
-
-	protected Long
-			testGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getModelClassNameId(
-				CTEntry ctEntry)
-		throws Exception {
-
-		return ctEntry.getModelClassNameId();
 	}
 
 	protected CTEntry
@@ -1311,13 +1293,11 @@ public abstract class BaseCTEntryResourceTestCase {
 									{
 										put(
 											"ctCollectionId",
-											testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getCtCollectionId(
-												ctEntry));
+											ctEntry.getCtCollectionId());
 
 										put(
 											"modelClassNameId",
-											testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getModelClassNameId(
-												ctEntry));
+											ctEntry.getModelClassNameId());
 
 										put(
 											"modelClassPK",
@@ -1344,13 +1324,11 @@ public abstract class BaseCTEntryResourceTestCase {
 										{
 											put(
 												"ctCollectionId",
-												testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getCtCollectionId(
-													ctEntry));
+												ctEntry.getCtCollectionId());
 
 											put(
 												"modelClassNameId",
-												testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getModelClassNameId(
-													ctEntry));
+												ctEntry.getModelClassNameId());
 
 											put(
 												"modelClassPK",
@@ -1360,22 +1338,6 @@ public abstract class BaseCTEntryResourceTestCase {
 									getGraphQLFields()))),
 						"JSONObject/data", "JSONObject/changeTracking_v1_0",
 						"Object/ctCollectionCTEntryByModelClassNameByModelClassPkModelClassPK"))));
-	}
-
-	protected Long
-			testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getCtCollectionId(
-				CTEntry ctEntry)
-		throws Exception {
-
-		return ctEntry.getCtCollectionId();
-	}
-
-	protected Long
-			testGraphQLGetCtCollectionCTEntryByModelClassNameByModelClassPkModelClassPK_getModelClassNameId(
-				CTEntry ctEntry)
-		throws Exception {
-
-		return ctEntry.getModelClassNameId();
 	}
 
 	@Test

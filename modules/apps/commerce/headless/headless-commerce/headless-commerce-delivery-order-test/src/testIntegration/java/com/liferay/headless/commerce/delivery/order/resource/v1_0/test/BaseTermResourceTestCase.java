@@ -189,19 +189,10 @@ public abstract class BaseTermResourceTestCase {
 
 		Term getTerm =
 			termResource.getPlacedOrderByExternalReferenceCodeDeliveryTerm(
-				testGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-					postTerm));
+				postTerm.getExternalReferenceCode());
 
 		assertEquals(postTerm, getTerm);
 		assertValid(getTerm);
-	}
-
-	protected String
-			testGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return term.getExternalReferenceCode();
 	}
 
 	protected Term
@@ -234,8 +225,9 @@ public abstract class BaseTermResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-													term) + "\"");
+												term.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -259,22 +251,15 @@ public abstract class BaseTermResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-														term) + "\"");
+													term.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryOrder_v1_0",
 						"Object/placedOrderByExternalReferenceCodeDeliveryTerm"))));
-	}
-
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return term.getExternalReferenceCode();
 	}
 
 	@Test
@@ -341,19 +326,10 @@ public abstract class BaseTermResourceTestCase {
 
 		Term getTerm =
 			termResource.getPlacedOrderByExternalReferenceCodePaymentTerm(
-				testGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-					postTerm));
+				postTerm.getExternalReferenceCode());
 
 		assertEquals(postTerm, getTerm);
 		assertValid(getTerm);
-	}
-
-	protected String
-			testGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return term.getExternalReferenceCode();
 	}
 
 	protected Term
@@ -386,8 +362,9 @@ public abstract class BaseTermResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-													term) + "\"");
+												term.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -411,22 +388,15 @@ public abstract class BaseTermResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-														term) + "\"");
+													term.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryOrder_v1_0",
 						"Object/placedOrderByExternalReferenceCodePaymentTerm"))));
-	}
-
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return term.getExternalReferenceCode();
 	}
 
 	@Test

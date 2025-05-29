@@ -189,19 +189,10 @@ public abstract class BaseAccountResourceTestCase {
 
 		Account getAccount =
 			accountResource.getOrderByExternalReferenceCodeAccount(
-				testGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-					postAccount));
+				postAccount.getExternalReferenceCode());
 
 		assertEquals(postAccount, getAccount);
 		assertValid(getAccount);
-	}
-
-	protected String
-			testGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-				Account account)
-		throws Exception {
-
-		return account.getExternalReferenceCode();
 	}
 
 	protected Account testGetOrderByExternalReferenceCodeAccount_addAccount()
@@ -233,8 +224,9 @@ public abstract class BaseAccountResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-													account) + "\"");
+												account.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -258,22 +250,15 @@ public abstract class BaseAccountResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-														account) + "\"");
+													account.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderByExternalReferenceCodeAccount"))));
-	}
-
-	protected String
-			testGraphQLGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-				Account account)
-		throws Exception {
-
-		return account.getExternalReferenceCode();
 	}
 
 	@Test
@@ -336,16 +321,10 @@ public abstract class BaseAccountResourceTestCase {
 		Account postAccount = testGetOrderIdAccount_addAccount();
 
 		Account getAccount = accountResource.getOrderIdAccount(
-			testGetOrderIdAccount_getId(postAccount));
+			postAccount.getId());
 
 		assertEquals(postAccount, getAccount);
 		assertValid(getAccount);
-	}
-
-	protected Long testGetOrderIdAccount_getId(Account account)
-		throws Exception {
-
-		return account.getId();
 	}
 
 	protected Account testGetOrderIdAccount_addAccount() throws Exception {
@@ -369,10 +348,7 @@ public abstract class BaseAccountResourceTestCase {
 								"orderIdAccount",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetOrderIdAccount_getId(
-												account));
+										put("id", account.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -392,22 +368,13 @@ public abstract class BaseAccountResourceTestCase {
 									"orderIdAccount",
 									new HashMap<String, Object>() {
 										{
-											put(
-												"id",
-												testGraphQLGetOrderIdAccount_getId(
-													account));
+											put("id", account.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderIdAccount"))));
-	}
-
-	protected Long testGraphQLGetOrderIdAccount_getId(Account account)
-		throws Exception {
-
-		return account.getId();
 	}
 
 	@Test

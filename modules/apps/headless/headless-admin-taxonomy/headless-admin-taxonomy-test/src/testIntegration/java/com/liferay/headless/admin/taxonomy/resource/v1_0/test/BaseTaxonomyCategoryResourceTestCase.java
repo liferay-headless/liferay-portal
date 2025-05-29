@@ -386,32 +386,20 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			204,
 			taxonomyCategoryResource.
 				deleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCodeHttpResponse(
-					testDeleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						taxonomyCategory),
+					taxonomyCategory.getTaxonomyVocabularyId(),
 					taxonomyCategory.getExternalReferenceCode()));
 
 		assertHttpResponseStatusCode(
 			404,
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCodeHttpResponse(
-					testDeleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						taxonomyCategory),
+					taxonomyCategory.getTaxonomyVocabularyId(),
 					taxonomyCategory.getExternalReferenceCode()));
 		assertHttpResponseStatusCode(
 			404,
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCodeHttpResponse(
-					testDeleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						taxonomyCategory),
-					"-"));
-	}
-
-	protected Long
-			testDeleteTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-				TaxonomyCategory taxonomyCategory)
-		throws Exception {
-
-		return taxonomyCategory.getTaxonomyVocabularyId();
+					taxonomyCategory.getTaxonomyVocabularyId(), "-"));
 	}
 
 	protected TaxonomyCategory
@@ -1720,8 +1708,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		TaxonomyCategory getTaxonomyCategory =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						postTaxonomyCategory),
+					postTaxonomyCategory.getTaxonomyVocabularyId(),
 					postTaxonomyCategory.getExternalReferenceCode());
 
 		assertEquals(postTaxonomyCategory, getTaxonomyCategory);
@@ -1732,19 +1719,10 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		getTaxonomyCategory =
 			permissionsTaxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						postTaxonomyCategory),
+					postTaxonomyCategory.getTaxonomyVocabularyId(),
 					postTaxonomyCategory.getExternalReferenceCode());
 
 		Assert.assertNotNull(getTaxonomyCategory.getPermissions());
-	}
-
-	protected Long
-			testGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-				TaxonomyCategory taxonomyCategory)
-		throws Exception {
-
-		return taxonomyCategory.getTaxonomyVocabularyId();
 	}
 
 	protected TaxonomyCategory
@@ -1776,8 +1754,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 									{
 										put(
 											"taxonomyVocabularyId",
-											testGraphQLGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-												taxonomyCategory));
+											taxonomyCategory.
+												getTaxonomyVocabularyId());
 
 										put(
 											"externalReferenceCode",
@@ -1807,8 +1785,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 										{
 											put(
 												"taxonomyVocabularyId",
-												testGraphQLGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-													taxonomyCategory));
+												taxonomyCategory.
+													getTaxonomyVocabularyId());
 
 											put(
 												"externalReferenceCode",
@@ -1822,14 +1800,6 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 						"JSONObject/data",
 						"JSONObject/headlessAdminTaxonomy_v1_0",
 						"Object/taxonomyVocabularyTaxonomyCategoryByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-				TaxonomyCategory taxonomyCategory)
-		throws Exception {
-
-		return taxonomyCategory.getTaxonomyVocabularyId();
 	}
 
 	@Test
@@ -2109,8 +2079,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		TaxonomyCategory putTaxonomyCategory =
 			taxonomyCategoryResource.
 				putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						postTaxonomyCategory),
+					postTaxonomyCategory.getTaxonomyVocabularyId(),
 					postTaxonomyCategory.getExternalReferenceCode(),
 					randomTaxonomyCategory);
 
@@ -2122,8 +2091,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		TaxonomyCategory getTaxonomyCategory =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						putTaxonomyCategory),
+					putTaxonomyCategory.getTaxonomyVocabularyId(),
 					putTaxonomyCategory.getExternalReferenceCode());
 
 		assertEquals(randomTaxonomyCategory, getTaxonomyCategory);
@@ -2135,8 +2103,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		putTaxonomyCategory =
 			taxonomyCategoryResource.
 				putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						postTaxonomyCategory),
+					postTaxonomyCategory.getTaxonomyVocabularyId(),
 					postTaxonomyCategory.getExternalReferenceCode(),
 					randomPermissionsTaxonomyCategory);
 
@@ -2148,8 +2115,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		putTaxonomyCategory =
 			permissionsTaxonomyCategoryResource.
 				putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						postTaxonomyCategory),
+					postTaxonomyCategory.getTaxonomyVocabularyId(),
 					postTaxonomyCategory.getExternalReferenceCode(),
 					randomPermissionsTaxonomyCategory);
 
@@ -2161,8 +2127,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		putTaxonomyCategory =
 			taxonomyCategoryResource.
 				putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						newTaxonomyCategory),
+					newTaxonomyCategory.getTaxonomyVocabularyId(),
 					newTaxonomyCategory.getExternalReferenceCode(),
 					newTaxonomyCategory);
 
@@ -2172,8 +2137,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		getTaxonomyCategory =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-					testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-						putTaxonomyCategory),
+					putTaxonomyCategory.getTaxonomyVocabularyId(),
 					putTaxonomyCategory.getExternalReferenceCode());
 
 		assertEquals(newTaxonomyCategory, getTaxonomyCategory);
@@ -2181,14 +2145,6 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		Assert.assertEquals(
 			newTaxonomyCategory.getExternalReferenceCode(),
 			putTaxonomyCategory.getExternalReferenceCode());
-	}
-
-	protected Long
-			testPutTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode_getTaxonomyVocabularyId(
-				TaxonomyCategory taxonomyCategory)
-		throws Exception {
-
-		return taxonomyCategory.getTaxonomyVocabularyId();
 	}
 
 	protected TaxonomyCategory

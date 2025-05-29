@@ -1218,20 +1218,10 @@ public abstract class BaseCatalogResourceTestCase {
 
 		Catalog getCatalog =
 			catalogResource.getProductByExternalReferenceCodeCatalog(
-				testGetProductByExternalReferenceCodeCatalog_getExternalReferenceCode(
-					postCatalog),
-				Pagination.of(1, 2));
+				postCatalog.getExternalReferenceCode(), Pagination.of(1, 2));
 
 		assertEquals(postCatalog, getCatalog);
 		assertValid(getCatalog);
-	}
-
-	protected String
-			testGetProductByExternalReferenceCodeCatalog_getExternalReferenceCode(
-				Catalog catalog)
-		throws Exception {
-
-		return catalog.getExternalReferenceCode();
 	}
 
 	protected Catalog testGetProductByExternalReferenceCodeCatalog_addCatalog()
@@ -1263,8 +1253,9 @@ public abstract class BaseCatalogResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetProductByExternalReferenceCodeCatalog_getExternalReferenceCode(
-													catalog) + "\"");
+												catalog.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -1288,22 +1279,15 @@ public abstract class BaseCatalogResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetProductByExternalReferenceCodeCatalog_getExternalReferenceCode(
-														catalog) + "\"");
+													catalog.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/productByExternalReferenceCodeCatalog"))));
-	}
-
-	protected String
-			testGraphQLGetProductByExternalReferenceCodeCatalog_getExternalReferenceCode(
-				Catalog catalog)
-		throws Exception {
-
-		return catalog.getExternalReferenceCode();
 	}
 
 	@Test
@@ -1366,16 +1350,10 @@ public abstract class BaseCatalogResourceTestCase {
 		Catalog postCatalog = testGetProductIdCatalog_addCatalog();
 
 		Catalog getCatalog = catalogResource.getProductIdCatalog(
-			testGetProductIdCatalog_getId(postCatalog), Pagination.of(1, 2));
+			postCatalog.getId(), Pagination.of(1, 2));
 
 		assertEquals(postCatalog, getCatalog);
 		assertValid(getCatalog);
-	}
-
-	protected Long testGetProductIdCatalog_getId(Catalog catalog)
-		throws Exception {
-
-		return catalog.getId();
 	}
 
 	protected Catalog testGetProductIdCatalog_addCatalog() throws Exception {
@@ -1399,10 +1377,7 @@ public abstract class BaseCatalogResourceTestCase {
 								"productIdCatalog",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetProductIdCatalog_getId(
-												catalog));
+										put("id", catalog.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -1422,22 +1397,13 @@ public abstract class BaseCatalogResourceTestCase {
 									"productIdCatalog",
 									new HashMap<String, Object>() {
 										{
-											put(
-												"id",
-												testGraphQLGetProductIdCatalog_getId(
-													catalog));
+											put("id", catalog.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/productIdCatalog"))));
-	}
-
-	protected Long testGraphQLGetProductIdCatalog_getId(Catalog catalog)
-		throws Exception {
-
-		return catalog.getId();
 	}
 
 	@Test

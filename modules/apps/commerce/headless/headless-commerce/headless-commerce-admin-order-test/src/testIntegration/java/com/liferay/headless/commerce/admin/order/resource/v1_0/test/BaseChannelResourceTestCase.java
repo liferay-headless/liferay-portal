@@ -189,19 +189,10 @@ public abstract class BaseChannelResourceTestCase {
 
 		Channel getChannel =
 			channelResource.getOrderByExternalReferenceCodeChannel(
-				testGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-					postChannel));
+				postChannel.getExternalReferenceCode());
 
 		assertEquals(postChannel, getChannel);
 		assertValid(getChannel);
-	}
-
-	protected String
-			testGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-				Channel channel)
-		throws Exception {
-
-		return channel.getExternalReferenceCode();
 	}
 
 	protected Channel testGetOrderByExternalReferenceCodeChannel_addChannel()
@@ -233,8 +224,9 @@ public abstract class BaseChannelResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-													channel) + "\"");
+												channel.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -258,22 +250,15 @@ public abstract class BaseChannelResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-														channel) + "\"");
+													channel.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderByExternalReferenceCodeChannel"))));
-	}
-
-	protected String
-			testGraphQLGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-				Channel channel)
-		throws Exception {
-
-		return channel.getExternalReferenceCode();
 	}
 
 	@Test
@@ -336,16 +321,10 @@ public abstract class BaseChannelResourceTestCase {
 		Channel postChannel = testGetOrderIdChannel_addChannel();
 
 		Channel getChannel = channelResource.getOrderIdChannel(
-			testGetOrderIdChannel_getId(postChannel));
+			postChannel.getId());
 
 		assertEquals(postChannel, getChannel);
 		assertValid(getChannel);
-	}
-
-	protected Long testGetOrderIdChannel_getId(Channel channel)
-		throws Exception {
-
-		return channel.getId();
 	}
 
 	protected Channel testGetOrderIdChannel_addChannel() throws Exception {
@@ -369,10 +348,7 @@ public abstract class BaseChannelResourceTestCase {
 								"orderIdChannel",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetOrderIdChannel_getId(
-												channel));
+										put("id", channel.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -392,22 +368,13 @@ public abstract class BaseChannelResourceTestCase {
 									"orderIdChannel",
 									new HashMap<String, Object>() {
 										{
-											put(
-												"id",
-												testGraphQLGetOrderIdChannel_getId(
-													channel));
+											put("id", channel.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderIdChannel"))));
-	}
-
-	protected Long testGraphQLGetOrderIdChannel_getId(Channel channel)
-		throws Exception {
-
-		return channel.getId();
 	}
 
 	@Test

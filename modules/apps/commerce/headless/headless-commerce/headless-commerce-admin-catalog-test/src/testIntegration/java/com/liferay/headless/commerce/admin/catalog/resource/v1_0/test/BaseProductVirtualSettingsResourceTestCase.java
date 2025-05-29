@@ -353,18 +353,10 @@ public abstract class BaseProductVirtualSettingsResourceTestCase {
 
 		ProductVirtualSettings getProductVirtualSettings =
 			productVirtualSettingsResource.getProductIdProductVirtualSettings(
-				testGetProductIdProductVirtualSettings_getId(
-					postProductVirtualSettings));
+				postProductVirtualSettings.getId());
 
 		assertEquals(postProductVirtualSettings, getProductVirtualSettings);
 		assertValid(getProductVirtualSettings);
-	}
-
-	protected Long testGetProductIdProductVirtualSettings_getId(
-			ProductVirtualSettings productVirtualSettings)
-		throws Exception {
-
-		return productVirtualSettings.getId();
 	}
 
 	protected ProductVirtualSettings
@@ -396,8 +388,7 @@ public abstract class BaseProductVirtualSettingsResourceTestCase {
 									{
 										put(
 											"id",
-											testGraphQLGetProductIdProductVirtualSettings_getId(
-												productVirtualSettings));
+											productVirtualSettings.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -420,21 +411,13 @@ public abstract class BaseProductVirtualSettingsResourceTestCase {
 										{
 											put(
 												"id",
-												testGraphQLGetProductIdProductVirtualSettings_getId(
-													productVirtualSettings));
+												productVirtualSettings.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/productIdProductVirtualSettings"))));
-	}
-
-	protected Long testGraphQLGetProductIdProductVirtualSettings_getId(
-			ProductVirtualSettings productVirtualSettings)
-		throws Exception {
-
-		return productVirtualSettings.getId();
 	}
 
 	@Test

@@ -206,19 +206,10 @@ public abstract class BaseShippingAddressResourceTestCase {
 		ShippingAddress getShippingAddress =
 			shippingAddressResource.
 				getShipmentByExternalReferenceCodeShippingAddress(
-					testGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-						postShippingAddress));
+					postShippingAddress.getExternalReferenceCode());
 
 		assertEquals(postShippingAddress, getShippingAddress);
 		assertValid(getShippingAddress);
-	}
-
-	protected String
-			testGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				ShippingAddress shippingAddress)
-		throws Exception {
-
-		return shippingAddress.getExternalReferenceCode();
 	}
 
 	protected ShippingAddress
@@ -251,8 +242,9 @@ public abstract class BaseShippingAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-													shippingAddress) + "\"");
+												shippingAddress.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -276,8 +268,8 @@ public abstract class BaseShippingAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-														shippingAddress) +
+													shippingAddress.
+														getExternalReferenceCode() +
 															"\"");
 										}
 									},
@@ -285,14 +277,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminShipment_v1_0",
 						"Object/shipmentByExternalReferenceCodeShippingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				ShippingAddress shippingAddress)
-		throws Exception {
-
-		return shippingAddress.getExternalReferenceCode();
 	}
 
 	@Test

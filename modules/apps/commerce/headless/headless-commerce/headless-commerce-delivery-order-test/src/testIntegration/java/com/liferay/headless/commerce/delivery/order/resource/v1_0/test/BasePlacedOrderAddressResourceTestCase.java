@@ -218,19 +218,10 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		PlacedOrderAddress getPlacedOrderAddress =
 			placedOrderAddressResource.
 				getPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress(
-					testGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-						postPlacedOrderAddress));
+					postPlacedOrderAddress.getExternalReferenceCode());
 
 		assertEquals(postPlacedOrderAddress, getPlacedOrderAddress);
 		assertValid(getPlacedOrderAddress);
-	}
-
-	protected String
-			testGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return placedOrderAddress.getExternalReferenceCode();
 	}
 
 	protected PlacedOrderAddress
@@ -263,8 +254,9 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-													placedOrderAddress) + "\"");
+												placedOrderAddress.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -288,8 +280,8 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-														placedOrderAddress) +
+													placedOrderAddress.
+														getExternalReferenceCode() +
 															"\"");
 										}
 									},
@@ -297,14 +289,6 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryOrder_v1_0",
 						"Object/placedOrderByExternalReferenceCodePlacedOrderBillingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return placedOrderAddress.getExternalReferenceCode();
 	}
 
 	@Test
@@ -372,19 +356,10 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 		PlacedOrderAddress getPlacedOrderAddress =
 			placedOrderAddressResource.
 				getPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress(
-					testGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-						postPlacedOrderAddress));
+					postPlacedOrderAddress.getExternalReferenceCode());
 
 		assertEquals(postPlacedOrderAddress, getPlacedOrderAddress);
 		assertValid(getPlacedOrderAddress);
-	}
-
-	protected String
-			testGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return placedOrderAddress.getExternalReferenceCode();
 	}
 
 	protected PlacedOrderAddress
@@ -417,8 +392,9 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-													placedOrderAddress) + "\"");
+												placedOrderAddress.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -442,8 +418,8 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-														placedOrderAddress) +
+													placedOrderAddress.
+														getExternalReferenceCode() +
 															"\"");
 										}
 									},
@@ -451,14 +427,6 @@ public abstract class BasePlacedOrderAddressResourceTestCase {
 						"JSONObject/data",
 						"JSONObject/headlessCommerceDeliveryOrder_v1_0",
 						"Object/placedOrderByExternalReferenceCodePlacedOrderShippingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return placedOrderAddress.getExternalReferenceCode();
 	}
 
 	@Test

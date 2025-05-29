@@ -391,19 +391,10 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 
 		DataRecordCollection getDataRecordCollection =
 			dataRecordCollectionResource.getDataDefinitionDataRecordCollection(
-				testGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-					postDataRecordCollection));
+				postDataRecordCollection.getDataDefinitionId());
 
 		assertEquals(postDataRecordCollection, getDataRecordCollection);
 		assertValid(getDataRecordCollection);
-	}
-
-	protected Long
-			testGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getDataDefinitionId();
 	}
 
 	protected DataRecordCollection
@@ -435,8 +426,8 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 									{
 										put(
 											"dataDefinitionId",
-											testGraphQLGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-												dataRecordCollection));
+											dataRecordCollection.
+												getDataDefinitionId());
 									}
 								},
 								getGraphQLFields())),
@@ -459,21 +450,13 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 										{
 											put(
 												"dataDefinitionId",
-												testGraphQLGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-													dataRecordCollection));
+												dataRecordCollection.
+													getDataDefinitionId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data", "JSONObject/dataEngine_v2_0",
 						"Object/dataDefinitionDataRecordCollection"))));
-	}
-
-	protected Long
-			testGraphQLGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getDataDefinitionId();
 	}
 
 	@Test
@@ -1115,20 +1098,11 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		DataRecordCollection getDataRecordCollection =
 			dataRecordCollectionResource.
 				getSiteDataRecordCollectionByDataRecordCollectionKey(
-					testGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-						postDataRecordCollection),
+					postDataRecordCollection.getSiteId(),
 					postDataRecordCollection.getDataRecordCollectionKey());
 
 		assertEquals(postDataRecordCollection, getDataRecordCollection);
 		assertValid(getDataRecordCollection);
-	}
-
-	protected Long
-			testGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getSiteId();
 	}
 
 	protected DataRecordCollection
@@ -1161,9 +1135,8 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 										put(
 											"siteKey",
 											"\"" +
-												testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-													dataRecordCollection) +
-														"\"");
+												dataRecordCollection.
+													getSiteId() + "\"");
 
 										put(
 											"dataRecordCollectionKey",
@@ -1194,9 +1167,8 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 											put(
 												"siteKey",
 												"\"" +
-													testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-														dataRecordCollection) +
-															"\"");
+													dataRecordCollection.
+														getSiteId() + "\"");
 
 											put(
 												"dataRecordCollectionKey",
@@ -1209,14 +1181,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 									getGraphQLFields()))),
 						"JSONObject/data", "JSONObject/dataEngine_v2_0",
 						"Object/dataRecordCollectionByDataRecordCollectionKey"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getSiteId();
 	}
 
 	@Test

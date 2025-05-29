@@ -403,32 +403,20 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 			204,
 			objectEntryFolderResource.
 				deleteScopeScopeKeyObjectEntryFolderByExternalReferenceCodeHttpResponse(
-					testDeleteScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						objectEntryFolder),
+					objectEntryFolder.getScopeKey(),
 					objectEntryFolder.getExternalReferenceCode()));
 
 		assertHttpResponseStatusCode(
 			404,
 			objectEntryFolderResource.
 				getScopeScopeKeyObjectEntryFolderByExternalReferenceCodeHttpResponse(
-					testDeleteScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						objectEntryFolder),
+					objectEntryFolder.getScopeKey(),
 					objectEntryFolder.getExternalReferenceCode()));
 		assertHttpResponseStatusCode(
 			404,
 			objectEntryFolderResource.
 				getScopeScopeKeyObjectEntryFolderByExternalReferenceCodeHttpResponse(
-					testDeleteScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						objectEntryFolder),
-					"-"));
-	}
-
-	protected String
-			testDeleteScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-				ObjectEntryFolder objectEntryFolder)
-		throws Exception {
-
-		return objectEntryFolder.getScopeKey();
+					objectEntryFolder.getScopeKey(), "-"));
 	}
 
 	protected ObjectEntryFolder
@@ -763,20 +751,11 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		ObjectEntryFolder getObjectEntryFolder =
 			objectEntryFolderResource.
 				getScopeScopeKeyObjectEntryFolderByExternalReferenceCode(
-					testGetScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						postObjectEntryFolder),
+					postObjectEntryFolder.getScopeKey(),
 					postObjectEntryFolder.getExternalReferenceCode());
 
 		assertEquals(postObjectEntryFolder, getObjectEntryFolder);
 		assertValid(getObjectEntryFolder);
-	}
-
-	protected String
-			testGetScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-				ObjectEntryFolder objectEntryFolder)
-		throws Exception {
-
-		return objectEntryFolder.getScopeKey();
 	}
 
 	protected ObjectEntryFolder
@@ -809,8 +788,8 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 										put(
 											"scopeKey",
 											"\"" +
-												testGraphQLGetScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-													objectEntryFolder) + "\"");
+												objectEntryFolder.
+													getScopeKey() + "\"");
 
 										put(
 											"externalReferenceCode",
@@ -841,9 +820,8 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 											put(
 												"scopeKey",
 												"\"" +
-													testGraphQLGetScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-														objectEntryFolder) +
-															"\"");
+													objectEntryFolder.
+														getScopeKey() + "\"");
 
 											put(
 												"externalReferenceCode",
@@ -856,14 +834,6 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 									getGraphQLFields()))),
 						"JSONObject/data", "JSONObject/headlessObject_v1_0",
 						"Object/scopeScopeKeyObjectEntryFolderByExternalReferenceCode"))));
-	}
-
-	protected String
-			testGraphQLGetScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-				ObjectEntryFolder objectEntryFolder)
-		throws Exception {
-
-		return objectEntryFolder.getScopeKey();
 	}
 
 	@Test
@@ -1508,8 +1478,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		ObjectEntryFolder putObjectEntryFolder =
 			objectEntryFolderResource.
 				putScopeScopeKeyObjectEntryFolderByExternalReferenceCode(
-					testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						postObjectEntryFolder),
+					postObjectEntryFolder.getScopeKey(),
 					postObjectEntryFolder.getExternalReferenceCode(),
 					randomObjectEntryFolder);
 
@@ -1519,8 +1488,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		ObjectEntryFolder getObjectEntryFolder =
 			objectEntryFolderResource.
 				getScopeScopeKeyObjectEntryFolderByExternalReferenceCode(
-					testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						putObjectEntryFolder),
+					putObjectEntryFolder.getScopeKey(),
 					putObjectEntryFolder.getExternalReferenceCode());
 
 		assertEquals(randomObjectEntryFolder, getObjectEntryFolder);
@@ -1532,8 +1500,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		putObjectEntryFolder =
 			objectEntryFolderResource.
 				putScopeScopeKeyObjectEntryFolderByExternalReferenceCode(
-					testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						newObjectEntryFolder),
+					newObjectEntryFolder.getScopeKey(),
 					newObjectEntryFolder.getExternalReferenceCode(),
 					newObjectEntryFolder);
 
@@ -1543,8 +1510,7 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		getObjectEntryFolder =
 			objectEntryFolderResource.
 				getScopeScopeKeyObjectEntryFolderByExternalReferenceCode(
-					testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-						putObjectEntryFolder),
+					putObjectEntryFolder.getScopeKey(),
 					putObjectEntryFolder.getExternalReferenceCode());
 
 		assertEquals(newObjectEntryFolder, getObjectEntryFolder);
@@ -1552,14 +1518,6 @@ public abstract class BaseObjectEntryFolderResourceTestCase {
 		Assert.assertEquals(
 			newObjectEntryFolder.getExternalReferenceCode(),
 			putObjectEntryFolder.getExternalReferenceCode());
-	}
-
-	protected String
-			testPutScopeScopeKeyObjectEntryFolderByExternalReferenceCode_getScopeKey(
-				ObjectEntryFolder objectEntryFolder)
-		throws Exception {
-
-		return objectEntryFolder.getScopeKey();
 	}
 
 	protected ObjectEntryFolder

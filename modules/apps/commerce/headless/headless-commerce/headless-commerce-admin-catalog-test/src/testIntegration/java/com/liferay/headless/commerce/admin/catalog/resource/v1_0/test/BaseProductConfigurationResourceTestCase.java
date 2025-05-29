@@ -469,19 +469,10 @@ public abstract class BaseProductConfigurationResourceTestCase {
 		ProductConfiguration getProductConfiguration =
 			productConfigurationResource.
 				getProductByExternalReferenceCodeConfiguration(
-					testGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-						postProductConfiguration));
+					postProductConfiguration.getExternalReferenceCode());
 
 		assertEquals(postProductConfiguration, getProductConfiguration);
 		assertValid(getProductConfiguration);
-	}
-
-	protected String
-			testGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-				ProductConfiguration productConfiguration)
-		throws Exception {
-
-		return productConfiguration.getExternalReferenceCode();
 	}
 
 	protected ProductConfiguration
@@ -514,8 +505,8 @@ public abstract class BaseProductConfigurationResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-													productConfiguration) +
+												productConfiguration.
+													getExternalReferenceCode() +
 														"\"");
 									}
 								},
@@ -540,8 +531,8 @@ public abstract class BaseProductConfigurationResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-														productConfiguration) +
+													productConfiguration.
+														getExternalReferenceCode() +
 															"\"");
 										}
 									},
@@ -549,14 +540,6 @@ public abstract class BaseProductConfigurationResourceTestCase {
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/productByExternalReferenceCodeConfiguration"))));
-	}
-
-	protected String
-			testGraphQLGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-				ProductConfiguration productConfiguration)
-		throws Exception {
-
-		return productConfiguration.getExternalReferenceCode();
 	}
 
 	@Test
@@ -2061,17 +2044,10 @@ public abstract class BaseProductConfigurationResourceTestCase {
 
 		ProductConfiguration getProductConfiguration =
 			productConfigurationResource.getProductIdConfiguration(
-				testGetProductIdConfiguration_getId(postProductConfiguration));
+				postProductConfiguration.getId());
 
 		assertEquals(postProductConfiguration, getProductConfiguration);
 		assertValid(getProductConfiguration);
-	}
-
-	protected Long testGetProductIdConfiguration_getId(
-			ProductConfiguration productConfiguration)
-		throws Exception {
-
-		return productConfiguration.getId();
 	}
 
 	protected ProductConfiguration
@@ -2099,10 +2075,7 @@ public abstract class BaseProductConfigurationResourceTestCase {
 								"productIdConfiguration",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetProductIdConfiguration_getId(
-												productConfiguration));
+										put("id", productConfiguration.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -2124,21 +2097,13 @@ public abstract class BaseProductConfigurationResourceTestCase {
 										{
 											put(
 												"id",
-												testGraphQLGetProductIdConfiguration_getId(
-													productConfiguration));
+												productConfiguration.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminCatalog_v1_0",
 						"Object/productIdConfiguration"))));
-	}
-
-	protected Long testGraphQLGetProductIdConfiguration_getId(
-			ProductConfiguration productConfiguration)
-		throws Exception {
-
-		return productConfiguration.getId();
 	}
 
 	@Test

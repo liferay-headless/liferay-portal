@@ -210,19 +210,10 @@ public abstract class BaseBillingAddressResourceTestCase {
 		BillingAddress getBillingAddress =
 			billingAddressResource.
 				getOrderByExternalReferenceCodeBillingAddress(
-					testGetOrderByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-						postBillingAddress));
+					postBillingAddress.getExternalReferenceCode());
 
 		assertEquals(postBillingAddress, getBillingAddress);
 		assertValid(getBillingAddress);
-	}
-
-	protected String
-			testGetOrderByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-				BillingAddress billingAddress)
-		throws Exception {
-
-		return billingAddress.getExternalReferenceCode();
 	}
 
 	protected BillingAddress
@@ -255,8 +246,9 @@ public abstract class BaseBillingAddressResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetOrderByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-													billingAddress) + "\"");
+												billingAddress.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
@@ -280,22 +272,15 @@ public abstract class BaseBillingAddressResourceTestCase {
 											put(
 												"externalReferenceCode",
 												"\"" +
-													testGraphQLGetOrderByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-														billingAddress) + "\"");
+													billingAddress.
+														getExternalReferenceCode() +
+															"\"");
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderByExternalReferenceCodeBillingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetOrderByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-				BillingAddress billingAddress)
-		throws Exception {
-
-		return billingAddress.getExternalReferenceCode();
 	}
 
 	@Test
@@ -360,17 +345,10 @@ public abstract class BaseBillingAddressResourceTestCase {
 
 		BillingAddress getBillingAddress =
 			billingAddressResource.getOrderIdBillingAddress(
-				testGetOrderIdBillingAddress_getId(postBillingAddress));
+				postBillingAddress.getId());
 
 		assertEquals(postBillingAddress, getBillingAddress);
 		assertValid(getBillingAddress);
-	}
-
-	protected Long testGetOrderIdBillingAddress_getId(
-			BillingAddress billingAddress)
-		throws Exception {
-
-		return billingAddress.getId();
 	}
 
 	protected BillingAddress testGetOrderIdBillingAddress_addBillingAddress()
@@ -397,10 +375,7 @@ public abstract class BaseBillingAddressResourceTestCase {
 								"orderIdBillingAddress",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetOrderIdBillingAddress_getId(
-												billingAddress));
+										put("id", billingAddress.getId());
 									}
 								},
 								getGraphQLFields())),
@@ -420,23 +395,13 @@ public abstract class BaseBillingAddressResourceTestCase {
 									"orderIdBillingAddress",
 									new HashMap<String, Object>() {
 										{
-											put(
-												"id",
-												testGraphQLGetOrderIdBillingAddress_getId(
-													billingAddress));
+											put("id", billingAddress.getId());
 										}
 									},
 									getGraphQLFields()))),
 						"JSONObject/data",
 						"JSONObject/headlessCommerceAdminOrder_v1_0",
 						"Object/orderIdBillingAddress"))));
-	}
-
-	protected Long testGraphQLGetOrderIdBillingAddress_getId(
-			BillingAddress billingAddress)
-		throws Exception {
-
-		return billingAddress.getId();
 	}
 
 	@Test
