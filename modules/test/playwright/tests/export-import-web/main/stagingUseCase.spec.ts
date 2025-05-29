@@ -222,7 +222,7 @@ test(
 		}
 
 		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
-			name: 'Remote Site Name',
+			name: getRandomString(),
 		});
 
 		await remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
@@ -233,20 +233,21 @@ test(
 			remotePort,
 		});
 
-		await remoteStagingPage.publishToLive({
-			layoutFriendlyURL: '',
-			siteFriendlyUrl: site.friendlyUrlPath,
-		});
-
 		const remoteUrl = remoteApiHelpers.baseUrl.substring(
 			0,
 			remoteApiHelpers.baseUrl.length - 3
 		);
+		for (const layout of layouts) {
 
-		await remotePage.goto(`${remoteUrl}/web${remoteSite.friendlyUrlPath}`);
+			await remoteStagingPage.publishToLive({
+				layoutFriendlyURL: layout.friendlyURL,
+				siteFriendlyUrl: site.friendlyUrlPath,
+			});
+		}
+		await remotePage.goto(`${remoteUrl}/web${remoteSite.friendlyUrlPath}${layouts[0].friendlyURL}`);
 
 		for (const num of [111, 21, 3]) {
-			const element = await page.getByLabel(`Open page ${num}`).click();
+			const element = await page.getByLabel(`Openpage${num}`).click();
 
 			if (await element.isVisible()) {
 				await element.click();
