@@ -198,6 +198,15 @@ public class OpenAPIResourceTest {
 						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 						"field1", "field1", false)),
 				ObjectDefinitionConstants.SCOPE_COMPANY);
+		ObjectDefinition relatedObjectDefinition7 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				"Object8",
+				Collections.singletonList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
+						"field", "field", false)),
+				ObjectDefinitionConstants.SCOPE_SITE);
 
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
@@ -255,6 +264,13 @@ public class OpenAPIResourceTest {
 			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
 			LocalizedMapUtil.getLocalizedMap("relationship8"), "relationship8",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
+		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
+			null, TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(),
+			relatedObjectDefinition7.getObjectDefinitionId(), 0,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			LocalizedMapUtil.getLocalizedMap("relationship9"), "relationship9",
+			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
 		ObjectFieldUtil.createObjectField(
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
@@ -264,16 +280,7 @@ public class OpenAPIResourceTest {
 		_assertOpenAPI("expected_openapi.json", _objectDefinition);
 		_assertOpenAPI(
 			"expected_openapi_related.json", relatedObjectDefinition1);
-		_assertOpenAPI(
-			"expected_openapi_site.json",
-			ObjectDefinitionTestUtil.publishObjectDefinition(
-				"Object8",
-				Collections.singletonList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
-						"field", "field", false)),
-				ObjectDefinitionConstants.SCOPE_SITE));
+		_assertOpenAPI("expected_openapi_site.json", relatedObjectDefinition7);
 
 		ObjectDefinition categorizationDisabledObjectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
