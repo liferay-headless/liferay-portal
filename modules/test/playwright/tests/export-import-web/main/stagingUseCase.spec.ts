@@ -10,20 +10,23 @@ import path from 'path';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {dataRemoteApiHelpersTest} from '../../../fixtures/dataRemoteApiHelpersTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
-import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {pageEditorPagesTest} from '../../../fixtures/pageEditorPagesTest';
 import {pageViewModePagesTest} from '../../../fixtures/pageViewModePagesTest';
 import {remotePageTest} from '../../../fixtures/remotePageTest';
 import {webContentDisplayPageTest} from '../../../fixtures/webContentDisplayPageTest';
 import getRandomString from '../../../utils/getRandomString';
+import {reloadUntilVisible} from '../../../utils/reloadUntilVisible';
 import getBasicWebContentStructureId from '../../../utils/structured-content/getBasicWebContentStructureId';
 import {remoteStagingPagesTest} from '../../export-import-service/main/fixtures/remoteStagingPagesTest';
+import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
 import getDataStructureDefinition from '../../journal-web/main/utils/getDataStructureDefinition';
 import {exportImportConfig} from './export_import.config';
 import {stagingConfigurationPageTest} from './fixtures/stagingConfigurationPageTest';
 import {stagingPageTest} from './fixtures/stagingPageTest';
 import {unzipAndCheckFolder} from './utils/stagingUtil';
+import {waitForAlert} from '../../../utils/waitForAlert';
+
 
 const remotePort = '9080';
 const remotePage = remotePageTest(remotePort);
@@ -95,6 +98,18 @@ test(
 			}
 		}
 
+		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
+			name: getRandomString(),
+		});
+
+		await remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
+
+		await apiHelpers.jsonWebServicesStaging.enableRemoteStaging({
+			groupId: site.id,
+			remoteGroupId: remoteSite.id,
+			remotePort,
+		});
+
 		for (const layout of layouts) {
 			await pageEditorPage.goto(layout, site.friendlyUrlPath);
 
@@ -155,11 +170,17 @@ test(
 
 		await page.getByLabel('Select and Confirm Publish').click();
 		await page.getByRole('menuitem', {name: 'Publish'}).click();
-
+	
+		await waitForAlert(
+			page,
+			'Success'
+		);
+		
+	
 		const fields2: Array<any> = [];
 
-		fields2.push({name: 'Title', repeatable: false});
-		fields2.push({name: 'Content', repeatable: false});
+		fields2.push({name: 'Content1', repeatable: false});
+		fields2.push({name: 'Content2', repeatable: false});
 
 		const dataDefinition2 = getDataStructureDefinition({
 			defaultLanguageId: 'en_US',
@@ -172,7 +193,9 @@ test(
 			site.id,
 			dataDefinition2
 		);
-		await page.waitForTimeout(1000);
+
+		await webContentDisplayPage.gotoWebContentAdmin(site.name);
+
 		for (const num of pageNumbers) {
 			await apiHelpers.jsonWebServicesJournal.addWebContent({
 				ddmStructureId: structure2.id,
@@ -180,19 +203,42 @@ test(
 				groupId: site.id,
 				titleMap: {en_US: `Title-${num}`},
 			});
-			await page.waitForTimeout(1000);
-			await webContentDisplayPage.gotoWebContentAdmin(site.name);
-			await page.getByRole('link', {name: `Title-${num}`}).click();
+
+			await reloadUntilVisible({
+				myLocator: page
+					.getByRole('link', {name: `Title-${num}`}),
+				page,
+			});
+
+			let resultVisible = false;
+			 while (!resultVisible){
+				await page.getByRole('link', {name: `Title-${num}`}).click({timeout: 500});
+				await page.waitForTimeout(1000);
+
+				resultVisible = await page.getByLabel('Select and Confirm Publish').isVisible();
+			}
+			
+
+			await reloadUntilVisible({
+				myLocator: page
+					.getByLabel(`Content2`, {exact: true}),
+				page,
+			});
 
 			await page
-				.getByRole('textbox', {exact: true, name: 'Title'})
+				.getByLabel(`Content1`, {exact: true})
 				.fill(`Content-${num}`);
 			await page
-				.getByLabel(`Content`, {exact: true})
+				.getByLabel(`Content2`, {exact: true})
 				.fill(`Text Content-${num}`);
 
 			await page.getByLabel('Select and Confirm Publish').click();
 			await page.getByRole('menuitem', {name: 'Publish'}).click();
+
+			await waitForAlert(
+				page,
+				`Success:Title-${num}`
+			);			
 		}
 
 		const templateScript2 =
@@ -213,40 +259,30 @@ test(
 				webContentName: webContentTitle,
 			});
 
-			await page.waitForTimeout(500);
+			await page.waitForTimeout(2000);
 			await page.reload();
 			await webContentDisplayPage.addWebContentWithDisplay({
 				pageType: 'content',
 				webContentName: `Title-${pageNumbers[i]}`,
 			});
-
+			await page.waitForTimeout(2000);
 			i++;
 		}
-
-		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
-			name: getRandomString(),
-		});
-
-		await remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
-
-		await apiHelpers.jsonWebServicesStaging.enableRemoteStaging({
-			groupId: site.id,
-			remoteGroupId: remoteSite.id,
-			remotePort,
-		});
 
 		const remoteUrl = remoteApiHelpers.baseUrl.substring(
 			0,
 			remoteApiHelpers.baseUrl.length - 3
 		);
 		for (const layout of layouts) {
-
 			await remoteStagingPage.publishToLive({
 				layoutFriendlyURL: layout.friendlyURL,
 				siteFriendlyUrl: site.friendlyUrlPath,
 			});
+			await page.waitForTimeout(500);
 		}
-		await remotePage.goto(`${remoteUrl}/web${remoteSite.friendlyUrlPath}${layouts[0].friendlyURL}`);
+		await remotePage.goto(
+			`${remoteUrl}/web${remoteSite.friendlyUrlPath}${layouts[0].friendlyURL}`
+		);
 
 		for (const num of [111, 21, 3]) {
 			const element = await page.getByLabel(`Openpage${num}`).click();
