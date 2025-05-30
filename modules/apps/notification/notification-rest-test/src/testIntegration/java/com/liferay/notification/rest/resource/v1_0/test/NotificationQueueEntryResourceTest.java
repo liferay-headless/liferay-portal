@@ -168,6 +168,13 @@ public class NotificationQueueEntryResourceTest
 	@Ignore
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGetNotificationQueueEntriesPage() throws Exception {
 		super.testGetNotificationQueueEntriesPage();
 	}

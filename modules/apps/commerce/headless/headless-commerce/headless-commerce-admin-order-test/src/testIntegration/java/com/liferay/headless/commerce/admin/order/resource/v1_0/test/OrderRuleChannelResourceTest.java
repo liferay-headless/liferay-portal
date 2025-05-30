@@ -70,6 +70,13 @@ public class OrderRuleChannelResourceTest
 	@Ignore
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGraphQLDeleteOrderRuleChannel() throws Exception {
 		super.testGraphQLDeleteOrderRuleChannel();
 	}

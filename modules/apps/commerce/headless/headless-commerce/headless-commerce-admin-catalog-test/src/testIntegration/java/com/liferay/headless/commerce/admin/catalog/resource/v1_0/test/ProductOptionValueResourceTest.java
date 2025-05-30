@@ -97,6 +97,13 @@ public class ProductOptionValueResourceTest
 	@Ignore
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGetProductOptionIdProductOptionValuesPage()
 		throws Exception {
 

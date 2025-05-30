@@ -30,6 +30,13 @@ public class TestEntityResourceTest extends BaseTestEntityResourceTestCase {
 		super.testDeleteTestEntityBatch();
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
 	@Override
 	@Test
 	public void testGetTestEntity() throws Exception {

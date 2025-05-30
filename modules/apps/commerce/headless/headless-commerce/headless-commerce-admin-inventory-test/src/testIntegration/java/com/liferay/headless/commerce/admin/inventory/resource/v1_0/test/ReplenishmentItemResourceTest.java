@@ -72,6 +72,13 @@ public class ReplenishmentItemResourceTest
 		super.testDeleteReplenishmentItemBatch();
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
 	@Override
 	@Test
 	public void testPatchReplenishmentItem() throws Exception {

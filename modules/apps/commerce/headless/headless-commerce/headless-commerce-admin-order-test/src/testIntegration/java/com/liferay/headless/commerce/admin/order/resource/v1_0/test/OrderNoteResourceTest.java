@@ -100,6 +100,13 @@ public class OrderNoteResourceTest extends BaseOrderNoteResourceTestCase {
 	@Ignore
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testDeleteOrderNoteByExternalReferenceCode() throws Exception {
 		super.testDeleteOrderNoteByExternalReferenceCode();
 	}

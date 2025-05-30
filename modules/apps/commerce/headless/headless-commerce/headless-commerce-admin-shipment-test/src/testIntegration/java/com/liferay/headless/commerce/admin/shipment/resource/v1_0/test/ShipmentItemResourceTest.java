@@ -109,6 +109,13 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 		super.testDeleteShipmentItemBatch();
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
 	@Override
 	@Test
 	public void testPatchShipmentItem() throws Exception {

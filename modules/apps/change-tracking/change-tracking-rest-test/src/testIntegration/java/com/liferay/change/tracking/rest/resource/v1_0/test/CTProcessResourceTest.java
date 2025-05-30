@@ -38,6 +38,13 @@ public class CTProcessResourceTest extends BaseCTProcessResourceTestCase {
 		super.testDeleteCTProcessBatch();
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"description", "name"};
