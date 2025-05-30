@@ -94,6 +94,13 @@ public class ProductConfigurationResourceTest
 	@FeatureFlag("LPD-10889")
 	@Override
 	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@FeatureFlag("LPD-10889")
+	@Override
+	@Test
 	public void testDeleteProductConfiguration() throws Exception {
 		super.testDeleteProductConfiguration();
 	}
