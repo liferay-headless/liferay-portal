@@ -2662,8 +2662,7 @@ public class StructuredContentResourceTest
 		StructuredContent putStructuredContent =
 			structuredContentResource.
 				putSiteStructuredContentByExternalReferenceCode(
-					testPutSiteStructuredContentByExternalReferenceCode_getSiteId(
-						postStructuredContent),
+					postStructuredContent.getSiteId(),
 					postStructuredContent.getExternalReferenceCode(),
 					randomStructuredContent);
 
