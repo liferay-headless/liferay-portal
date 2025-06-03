@@ -227,12 +227,35 @@ public class LayoutSetPrototypeMergeBackgroundTaskExecutor
 		}
 	}
 
+	@Override
+	public String generateLockKey(BackgroundTask backgroundTask) {
+		try {
+			ExportImportConfiguration exportImportConfiguration =
+				getExportImportConfiguration(backgroundTask);
+
+			Map<String, Serializable> settingsMap =
+				exportImportConfiguration.getSettingsMap();
+
+			Map<String, String[]> parameterMap =
+				(Map<String, String[]>)settingsMap.get("parameterMap");
+
+			long layoutSetPrototypeId = MapUtil.getLong(
+				parameterMap, "layoutSetPrototypeId");
+
+			return "LayoutSetPrototype#" + layoutSetPrototypeId;
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(
+				"Unable to generate lock key", exception);
+		}
+	}
+
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		setBackgroundTaskStatusMessageTranslator(
 			new LayoutExportImportBackgroundTaskStatusMessageTranslator());
 
-		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_COMPANY);
+		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_CUSTOM);
 	}
 
 	private static final String _TEMP_DIR =
