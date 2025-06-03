@@ -123,18 +123,40 @@ test(
 			fields.push({name: `URL${num}`, repeatable: false});
 		}
 
-		await journalStructuresPage.goto(site.friendlyUrlPath);
 		const dataDefinition = getDataStructureDefinition({
 			defaultLanguageId: 'en_US',
 
 			fields,
 			name: getRandomString(),
 		});
-
 		const structure = await apiHelpers.dataEngine.createStructure(
 			site.id,
 			dataDefinition
 		);
+
+		let i = 0;
+		const contentFields: Array<any> = [];
+		for (const layout of layouts) {
+			contentFields.push({
+				name: `Openpage${pageNumbers[i]}`,
+				value: layout.nameCurrentValue,
+			});
+			contentFields.push({
+				name: `URL${pageNumbers[i]}`,
+				value: `/web${site.friendlyUrlPath}` + layout.friendlyURL,
+			});
+			i++;
+		}
+		const webContentTitle = getRandomString();
+		await apiHelpers.jsonWebServicesJournal.addWebContent({
+			contentFields,
+			ddmStructureId: structure.id,
+			ddmTemplateKey: null,
+			groupId: site.id,
+			titleMap: {en_US: webContentTitle},
+		});
+
+		await journalStructuresPage.goto(site.friendlyUrlPath);
 
 		const templateScript =
 			'<p> <a href="${URL1.getData()}">${Openpage1.getData()}</a> </p><p> <a href="${URL2.getData()}">${Openpage2.getData()}</a> </p><p> <a href="${URL3.getData()}">${Openpage3.getData()}</a> </p><p> <a href="${URL11.getData()}">${Openpage11.getData()}</a> </p><p> <a href="${URL12.getData()}">${Openpage12.getData()}</a> </p><p> <a href="${URL111.getData()}">${Openpage111.getData()}</a> </p><p> <a href="${URL21.getData()}">${Openpage21.getData()}</a> </p><p> <a href="${URL22.getData()}">${Openpage22.getData()}</a> </p><p> <a href="${URL31.getData()}">${Openpage31.getData()}</a> </p><p> <a href="${URL32.getData()}">${Openpage32.getData()}</a> </p>';
@@ -146,31 +168,7 @@ test(
 		);
 		await journalEditTemplatePage.saveTemplate();
 
-		const webContentTitle = getRandomString();
-		await apiHelpers.jsonWebServicesJournal.addWebContent({
-			ddmStructureId: structure.id,
-			ddmTemplateKey: null,
-			groupId: site.id,
-			titleMap: {en_US: webContentTitle},
-		});
 		await webContentDisplayPage.gotoWebContentAdmin(site.name);
-		await page.getByRole('link', {name: webContentTitle}).click();
-
-		let i = 0;
-		for (const layout of layouts) {
-			await page
-				.getByLabel(`Openpage${pageNumbers[i]}`, {exact: true})
-				.fill(layout.nameCurrentValue);
-			await page
-				.getByLabel(`URL${pageNumbers[i]}`, {exact: true})
-				.fill(`/web${site.friendlyUrlPath}` + layout.friendlyURL);
-			i++;
-		}
-
-		await page.getByLabel('Select and Confirm Publish').click();
-		await page.getByRole('menuitem', {name: 'Publish'}).click();
-
-		await waitForAlert(page, 'Success');
 
 		const fields2: Array<any> = [];
 
@@ -192,7 +190,16 @@ test(
 		await webContentDisplayPage.gotoWebContentAdmin(site.name);
 
 		for (const num of pageNumbers) {
+			const contentFields3: Array<any> = [];
+
+			contentFields3.push({name: `Content1`, value: `Content-${num}`});
+			contentFields3.push({
+				name: `Content2`,
+				value: `Text Content-${num}`,
+			});
+
 			await apiHelpers.jsonWebServicesJournal.addWebContent({
+				contentFields: contentFields3,
 				ddmStructureId: structure2.id,
 				ddmTemplateKey: null,
 				groupId: site.id,
@@ -203,35 +210,6 @@ test(
 				myLocator: page.getByRole('link', {name: `Title-${num}`}),
 				page,
 			});
-
-			let resultVisible = false;
-			while (!resultVisible) {
-				await page
-					.getByRole('link', {name: `Title-${num}`})
-					.click({timeout: 500});
-				await page.waitForTimeout(1000);
-
-				resultVisible = await page
-					.getByLabel('Select and Confirm Publish')
-					.isVisible();
-			}
-
-			await reloadUntilVisible({
-				myLocator: page.getByLabel(`Content2`, {exact: true}),
-				page,
-			});
-
-			await page
-				.getByLabel(`Content1`, {exact: true})
-				.fill(`Content-${num}`);
-			await page
-				.getByLabel(`Content2`, {exact: true})
-				.fill(`Text Content-${num}`);
-
-			await page.getByLabel('Select and Confirm Publish').click();
-			await page.getByRole('menuitem', {name: 'Publish'}).click();
-
-			await waitForAlert(page, `Success:Title-${num}`);
 		}
 
 		const templateScript2 =
