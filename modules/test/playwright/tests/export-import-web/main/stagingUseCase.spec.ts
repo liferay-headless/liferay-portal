@@ -18,6 +18,7 @@ import {webContentDisplayPageTest} from '../../../fixtures/webContentDisplayPage
 import getRandomString from '../../../utils/getRandomString';
 import {reloadUntilVisible} from '../../../utils/reloadUntilVisible';
 import getBasicWebContentStructureId from '../../../utils/structured-content/getBasicWebContentStructureId';
+import {waitForAlert} from '../../../utils/waitForAlert';
 import {remoteStagingPagesTest} from '../../export-import-service/main/fixtures/remoteStagingPagesTest';
 import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
 import getDataStructureDefinition from '../../journal-web/main/utils/getDataStructureDefinition';
@@ -25,8 +26,6 @@ import {exportImportConfig} from './export_import.config';
 import {stagingConfigurationPageTest} from './fixtures/stagingConfigurationPageTest';
 import {stagingPageTest} from './fixtures/stagingPageTest';
 import {unzipAndCheckFolder} from './utils/stagingUtil';
-import {waitForAlert} from '../../../utils/waitForAlert';
-
 
 const remotePort = '9080';
 const remotePage = remotePageTest(remotePort);
@@ -170,13 +169,9 @@ test(
 
 		await page.getByLabel('Select and Confirm Publish').click();
 		await page.getByRole('menuitem', {name: 'Publish'}).click();
-	
-		await waitForAlert(
-			page,
-			'Success'
-		);
-		
-	
+
+		await waitForAlert(page, 'Success');
+
 		const fields2: Array<any> = [];
 
 		fields2.push({name: 'Content1', repeatable: false});
@@ -205,23 +200,24 @@ test(
 			});
 
 			await reloadUntilVisible({
-				myLocator: page
-					.getByRole('link', {name: `Title-${num}`}),
+				myLocator: page.getByRole('link', {name: `Title-${num}`}),
 				page,
 			});
 
 			let resultVisible = false;
-			 while (!resultVisible){
-				await page.getByRole('link', {name: `Title-${num}`}).click({timeout: 500});
+			while (!resultVisible) {
+				await page
+					.getByRole('link', {name: `Title-${num}`})
+					.click({timeout: 500});
 				await page.waitForTimeout(1000);
 
-				resultVisible = await page.getByLabel('Select and Confirm Publish').isVisible();
+				resultVisible = await page
+					.getByLabel('Select and Confirm Publish')
+					.isVisible();
 			}
-			
 
 			await reloadUntilVisible({
-				myLocator: page
-					.getByLabel(`Content2`, {exact: true}),
+				myLocator: page.getByLabel(`Content2`, {exact: true}),
 				page,
 			});
 
@@ -235,10 +231,7 @@ test(
 			await page.getByLabel('Select and Confirm Publish').click();
 			await page.getByRole('menuitem', {name: 'Publish'}).click();
 
-			await waitForAlert(
-				page,
-				`Success:Title-${num}`
-			);			
+			await waitForAlert(page, `Success:Title-${num}`);
 		}
 
 		const templateScript2 =

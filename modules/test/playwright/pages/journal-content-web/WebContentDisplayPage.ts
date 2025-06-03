@@ -154,13 +154,14 @@ export class WebContentDisplayPage {
 						.locator('..')
 						.locator('..')
 						.locator('..')
-						.filter({hasText: 'Select web content to make it visible.'})
+						.filter({
+							hasText: 'Select web content to make it visible.',
+						})
 						.getByRole('button', {name: 'Options'})
 						.click({timeout: 1000});
 					break;
 				}
-				catch {
-				}
+				catch {}
 			}
 		}
 
