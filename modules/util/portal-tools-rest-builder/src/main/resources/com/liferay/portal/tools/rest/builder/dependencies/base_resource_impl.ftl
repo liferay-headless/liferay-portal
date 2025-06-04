@@ -116,8 +116,10 @@ public abstract class Base${schemaName}ResourceImpl
 	/>
 
 	<#if generateBatch>
-		, EntityModelResource, VulcanBatchEngineTaskItemDelegate<${javaDataType}>
+		, VulcanBatchEngineTaskItemDelegate<${javaDataType}>
 	</#if>
+
+	, EntityModelResource
 
 	<#if generateCRUD>
 		, VulcanCRUDItemDelegate<${javaDataType}>
@@ -1090,19 +1092,6 @@ public abstract class Base${schemaName}ResourceImpl
 		}
 
 		@Override
-		public EntityModel getEntityModel(MultivaluedMap multivaluedMap) throws Exception {
-			return null;
-		}
-
-		public String getResourceName() {
-			return "${schemaName}";
-		}
-
-		public String getVersion() {
-			return "${freeMarkerTool.getVersion(openAPIYAML)}";
-		}
-
-		@Override
 		public Page<${javaDataType}> read(com.liferay.portal.kernel.search.filter.Filter filter, Pagination pagination, com.liferay.portal.kernel.search.Sort[] sorts, Map<String, Serializable> parameters, String search) throws Exception {
 			<#if freeMarkerTool.hasReadVulcanBatchImplementation(javaMethodSignatures)>
 				<#assign parentParameterNames = [] />
@@ -1511,6 +1500,19 @@ public abstract class Base${schemaName}ResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) throws Exception {
+		return null;
+	}
+
+	public String getResourceName() {
+		return "${schemaName}";
+	}
+
+	public String getVersion() {
+		return "${freeMarkerTool.getVersion(openAPIYAML)}";
 	}
 
 	<#if freeMarkerTool.isVersionCompatible(configYAML, 7)>
