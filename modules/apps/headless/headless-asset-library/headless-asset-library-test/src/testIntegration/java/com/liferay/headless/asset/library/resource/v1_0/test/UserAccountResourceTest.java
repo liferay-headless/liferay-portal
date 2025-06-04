@@ -10,11 +10,7 @@ import com.liferay.headless.asset.library.client.dto.v1_0.UserAccount;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.FeatureFlag;
-
-import java.util.Collection;
-import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
