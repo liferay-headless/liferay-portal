@@ -35,11 +35,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() {
-		return Collections.emptyList();
-	}
-
-	@Override
 	protected UserAccount randomIrrelevantUserAccount() throws Exception {
 		return _addUserAccount();
 	}

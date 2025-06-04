@@ -118,11 +118,6 @@ public class ShipmentResourceTest extends BaseShipmentResourceTestCase {
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		return new ArrayList<>();
-	}
-
-	@Override
 	protected Shipment randomShipment() throws Exception {
 		return new Shipment() {
 			{

@@ -77,11 +77,6 @@ public class AssetLibraryResourceTest extends BaseAssetLibraryResourceTestCase {
 		testGroup = originalTestGroup;
 	}
 
-	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		return new ArrayList<>();
-	}
-
 	protected AssetLibrary randomAssetLibrary() throws Exception {
 		AssetLibrary assetLibrary = super.randomAssetLibrary();
 

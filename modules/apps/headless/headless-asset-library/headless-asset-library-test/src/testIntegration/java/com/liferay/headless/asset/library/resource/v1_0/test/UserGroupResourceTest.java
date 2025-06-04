@@ -41,11 +41,6 @@ public class UserGroupResourceTest extends BaseUserGroupResourceTestCase {
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() {
-		return Collections.emptyList();
-	}
-
-	@Override
 	protected UserGroup randomIrrelevantUserGroup() throws Exception {
 		return _addUserGroup();
 	}
