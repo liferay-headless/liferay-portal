@@ -1137,12 +1137,18 @@ public abstract class BasePageSpecificationResourceTestCase {
 
 		boolean valid = true;
 
-		if (pageSpecification.getExternalReferenceCode() == null) {
-			valid = false;
-		}
-
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (pageSpecification.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("settings", additionalAssertFieldName)) {
 				if (pageSpecification.getSettings() == null) {
