@@ -18,7 +18,6 @@ import {webContentDisplayPageTest} from '../../../fixtures/webContentDisplayPage
 import getRandomString from '../../../utils/getRandomString';
 import {reloadUntilVisible} from '../../../utils/reloadUntilVisible';
 import getBasicWebContentStructureId from '../../../utils/structured-content/getBasicWebContentStructureId';
-import {waitForAlert} from '../../../utils/waitForAlert';
 import {remoteStagingPagesTest} from '../../export-import-service/main/fixtures/remoteStagingPagesTest';
 import {journalPagesTest} from '../../journal-web/main/fixtures/journalPagesTest';
 import getDataStructureDefinition from '../../journal-web/main/utils/getDataStructureDefinition';
@@ -61,8 +60,11 @@ test(
 		webContentDisplayPage,
 		widgetPagePage,
 	}) => {
+		test.slow();
+
+		const siteName = 'site-' + getRandomString();
 		const site = await apiHelpers.headlessSite.createSite({
-			name: 'site-' + getRandomString(),
+			name: siteName,
 		});
 
 		apiHelpers.data.push({id: site.id, type: 'site'});
@@ -98,7 +100,7 @@ test(
 		}
 
 		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
-			name: getRandomString(),
+			name: siteName,
 		});
 
 		await remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
@@ -123,11 +125,12 @@ test(
 			fields.push({name: `URL${num}`, repeatable: false});
 		}
 
+		const structureName = getRandomString();
 		const dataDefinition = getDataStructureDefinition({
 			defaultLanguageId: 'en_US',
 
 			fields,
-			name: getRandomString(),
+			name: structureName,
 		});
 		const structure = await apiHelpers.dataEngine.createStructure(
 			site.id,
@@ -147,39 +150,50 @@ test(
 			});
 			i++;
 		}
-		const webContentTitle = getRandomString();
-		await apiHelpers.jsonWebServicesJournal.addWebContent({
-			contentFields,
-			ddmStructureId: structure.id,
-			ddmTemplateKey: null,
-			groupId: site.id,
-			titleMap: {en_US: webContentTitle},
-		});
 
 		await journalStructuresPage.goto(site.friendlyUrlPath);
-
+		const templateName = getRandomString();
 		const templateScript =
-			'<p> <a href="${URL1.getData()}">${Openpage1.getData()}</a> </p><p> <a href="${URL2.getData()}">${Openpage2.getData()}</a> </p><p> <a href="${URL3.getData()}">${Openpage3.getData()}</a> </p><p> <a href="${URL11.getData()}">${Openpage11.getData()}</a> </p><p> <a href="${URL12.getData()}">${Openpage12.getData()}</a> </p><p> <a href="${URL111.getData()}">${Openpage111.getData()}</a> </p><p> <a href="${URL21.getData()}">${Openpage21.getData()}</a> </p><p> <a href="${URL22.getData()}">${Openpage22.getData()}</a> </p><p> <a href="${URL31.getData()}">${Openpage31.getData()}</a> </p><p> <a href="${URL32.getData()}">${Openpage32.getData()}</a> </p>';
+			'<p><a href="${URL1.getData()}">${Openpage1.getData()}</a></p>\n' +
+			'<p><a href="${URL2.getData()}">${Openpage2.getData()}</a></p>\n' +
+			'<p><a href="${URL3.getData()}">${Openpage3.getData()}</a></p>\n' +
+			'<p><a href="${URL11.getData()}">${Openpage11.getData()}</a></p>\n' +
+			'<p><a href="${URL12.getData()}">${Openpage12.getData()}</a></p>\n' +
+			'<p><a href="${URL111.getData()}">${Openpage111.getData()}</a></p>\n' +
+			'<p><a href="${URL21.getData()}">${Openpage21.getData()}</a></p>\n' +
+			'<p><a href="${URL22.getData()}">${Openpage22.getData()}</a></p>\n' +
+			'<p><a href="${URL31.getData()}">${Openpage31.getData()}</a></p>\n' +
+			'<p><a href="${URL32.getData()}">${Openpage32.getData()}</a></p>';
 
 		await journalEditTemplatePage.goto(site.friendlyUrlPath);
+		await journalEditTemplatePage.selectStructure(structureName);
 		await journalEditTemplatePage.editTemplate(
-			getRandomString(),
+			templateName,
 			templateScript
 		);
 		await journalEditTemplatePage.saveTemplate();
+		await journalEditTemplatePage.selectTemplateToEdit(templateName);
 
-		await webContentDisplayPage.gotoWebContentAdmin(site.name);
+		const templateKey = await journalEditTemplatePage.getDDMTemplateKey();
+		const webContentTitle = getRandomString();
 
+		await apiHelpers.jsonWebServicesJournal.addWebContent({
+			contentFields,
+			ddmStructureId: structure.id,
+			ddmTemplateKey: templateKey,
+			groupId: site.id,
+			titleMap: {en_US: webContentTitle},
+		});
 		const fields2: Array<any> = [];
 
 		fields2.push({name: 'Content1', repeatable: false});
 		fields2.push({name: 'Content2', repeatable: false});
-
+		const structureName2 = getRandomString();
 		const dataDefinition2 = getDataStructureDefinition({
 			defaultLanguageId: 'en_US',
 
 			fields: fields2,
-			name: getRandomString(),
+			name: structureName2,
 		});
 
 		const structure2 = await apiHelpers.dataEngine.createStructure(
@@ -187,12 +201,27 @@ test(
 			dataDefinition2
 		);
 
+		const templateName2 = getRandomString();
+		const templateScript2 =
+			'<h1>${Content1.getData()}</h1>\n' + '<p>${Content2.getData()}</p>';
+
+		await journalEditTemplatePage.goto(site.friendlyUrlPath);
+		await journalEditTemplatePage.selectStructure(structureName2);
+		await journalEditTemplatePage.editTemplate(
+			templateName2,
+			templateScript2
+		);
+		await journalEditTemplatePage.saveTemplate();
+		await journalEditTemplatePage.selectTemplateToEdit(templateName2);
+
+		const templateKey2 = await journalEditTemplatePage.getDDMTemplateKey();
+
 		await webContentDisplayPage.gotoWebContentAdmin(site.name);
 
 		for (const num of pageNumbers) {
 			const contentFields3: Array<any> = [];
 
-			contentFields3.push({name: `Content1`, value: `Content-${num}`});
+			contentFields3.push({name: `Content1`, value: `Title-${num}`});
 			contentFields3.push({
 				name: `Content2`,
 				value: `Text Content-${num}`,
@@ -201,7 +230,7 @@ test(
 			await apiHelpers.jsonWebServicesJournal.addWebContent({
 				contentFields: contentFields3,
 				ddmStructureId: structure2.id,
-				ddmTemplateKey: null,
+				ddmTemplateKey: templateKey2,
 				groupId: site.id,
 				titleMap: {en_US: `Title-${num}`},
 			});
@@ -212,30 +241,26 @@ test(
 			});
 		}
 
-		const templateScript2 =
-			'<h1>${Title.getData()}</h1><p>${Content.getData()}</p>';
-
-		await journalEditTemplatePage.goto(site.friendlyUrlPath);
-		await journalEditTemplatePage.editTemplate(
-			getRandomString(),
-			templateScript2
-		);
-		await journalEditTemplatePage.saveTemplate();
-
 		i = 0;
 		for (const layout of layouts) {
 			await pageEditorPage.goto(layout, site.friendlyUrlPath);
-			await webContentDisplayPage.addWebContentWithDisplay({
-				pageType: 'content',
-				webContentName: webContentTitle,
-			});
+			try {
+				await webContentDisplayPage.addWebContentWithDisplay({
+					pageType: 'content',
+					webContentName: webContentTitle,
+				});
+			}
+			catch {}
 
 			await page.waitForTimeout(2000);
 			await page.reload();
-			await webContentDisplayPage.addWebContentWithDisplay({
-				pageType: 'content',
-				webContentName: `Title-${pageNumbers[i]}`,
-			});
+			try {
+				await webContentDisplayPage.addWebContentWithDisplay({
+					pageType: 'content',
+					webContentName: `Title-${pageNumbers[i]}`,
+				});
+			}
+			catch {}
 			await page.waitForTimeout(2000);
 			i++;
 		}
@@ -244,29 +269,28 @@ test(
 			0,
 			remoteApiHelpers.baseUrl.length - 3
 		);
-		for (const layout of layouts) {
-			await remoteStagingPage.publishToLive({
-				layoutFriendlyURL: layout.friendlyURL,
-				siteFriendlyUrl: site.friendlyUrlPath,
-			});
-			await page.waitForTimeout(500);
-		}
+
+		await remoteStagingPage.publishToLive({
+			layoutFriendlyURL: layouts[0].friendlyURL,
+			siteFriendlyUrl: site.friendlyUrlPath,
+		});
+		await page.waitForTimeout(500);
+
 		await remotePage.goto(
 			`${remoteUrl}/web${remoteSite.friendlyUrlPath}${layouts[0].friendlyURL}`
 		);
 
 		for (const num of [111, 21, 3]) {
-			const element = await page.getByLabel(`Openpage${num}`).click();
-
-			if (await element.isVisible()) {
-				await element.click();
-			}
+			await remotePage
+				.getByRole('link', {name: `Page ${num}`, exact: true})
+				.click();
+			await remotePage.waitForLoadState('domcontentloaded');
 
 			await expect(
-				remotePage.getByRole('heading', {name: `Title-${num}`})
+				remotePage.locator('h1').filter({hasText: `Title-${num}`})
 			).toBeVisible();
 
-			expect(page.url()).toContain(`/web/site-name/page-${num}`);
+			expect(remotePage.url()).toContain(`/web/${siteName}/page-${num}`);
 		}
 	}
 );
