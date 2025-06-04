@@ -456,21 +456,6 @@ public abstract class BaseDiscountChannelResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "DiscountChannel";
-	}
-
-	public String getVersion() {
-		return "v2.0";
-	}
-
-	@Override
 	public Page<DiscountChannel> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -600,6 +585,21 @@ public abstract class BaseDiscountChannelResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "DiscountChannel";
+	}
+
+	public String getVersion() {
+		return "v2.0";
 	}
 
 	protected String getApplicationPath() {

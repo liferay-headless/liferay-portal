@@ -953,21 +953,6 @@ public abstract class BaseSkuResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "Sku";
-	}
-
-	public String getVersion() {
-		return "v1.0";
-	}
-
-	@Override
 	public Page<Sku> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -1133,6 +1118,21 @@ public abstract class BaseSkuResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "Sku";
+	}
+
+	public String getVersion() {
+		return "v1.0";
 	}
 
 	protected String getApplicationPath() {

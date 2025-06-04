@@ -2068,21 +2068,6 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "KnowledgeBaseArticle";
-	}
-
-	public String getVersion() {
-		return "v1.0";
-	}
-
-	@Override
 	public Page<KnowledgeBaseArticle> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -2462,6 +2447,21 @@ public abstract class BaseKnowledgeBaseArticleResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "KnowledgeBaseArticle";
+	}
+
+	public String getVersion() {
+		return "v1.0";
 	}
 
 	protected String getApplicationPath() {

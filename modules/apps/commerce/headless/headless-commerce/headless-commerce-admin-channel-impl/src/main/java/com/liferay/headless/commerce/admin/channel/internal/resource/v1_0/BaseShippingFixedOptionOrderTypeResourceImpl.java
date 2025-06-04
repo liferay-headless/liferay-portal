@@ -320,21 +320,6 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "ShippingFixedOptionOrderType";
-	}
-
-	public String getVersion() {
-		return "v1.0";
-	}
-
-	@Override
 	public Page<ShippingFixedOptionOrderType> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -467,6 +452,21 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "ShippingFixedOptionOrderType";
+	}
+
+	public String getVersion() {
+		return "v1.0";
 	}
 
 	protected String getApplicationPath() {

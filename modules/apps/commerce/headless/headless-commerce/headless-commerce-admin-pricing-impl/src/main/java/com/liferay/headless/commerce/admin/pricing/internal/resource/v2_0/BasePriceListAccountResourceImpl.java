@@ -450,21 +450,6 @@ public abstract class BasePriceListAccountResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "PriceListAccount";
-	}
-
-	public String getVersion() {
-		return "v2.0";
-	}
-
-	@Override
 	public Page<PriceListAccount> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -594,6 +579,21 @@ public abstract class BasePriceListAccountResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "PriceListAccount";
+	}
+
+	public String getVersion() {
+		return "v2.0";
 	}
 
 	protected String getApplicationPath() {

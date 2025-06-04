@@ -911,21 +911,6 @@ public abstract class BaseDataRecordResourceImpl
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
-	public String getResourceName() {
-		return "DataRecord";
-	}
-
-	public String getVersion() {
-		return "v2.0";
-	}
-
-	@Override
 	public Page<DataRecord> read(
 			com.liferay.portal.kernel.search.filter.Filter filter,
 			Pagination pagination,
@@ -1118,6 +1103,21 @@ public abstract class BaseDataRecordResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "DataRecord";
+	}
+
+	public String getVersion() {
+		return "v2.0";
 	}
 
 	protected String getApplicationPath() {

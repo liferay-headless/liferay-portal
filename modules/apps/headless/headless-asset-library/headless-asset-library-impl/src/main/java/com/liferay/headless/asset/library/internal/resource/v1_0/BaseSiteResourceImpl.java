@@ -17,12 +17,14 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
@@ -31,6 +33,7 @@ import jakarta.annotation.Generated;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 
 import java.lang.reflect.Array;
@@ -46,7 +49,8 @@ import java.util.Map;
  */
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
-public abstract class BaseSiteResourceImpl implements SiteResource {
+public abstract class BaseSiteResourceImpl
+	implements EntityModelResource, SiteResource {
 
 	/**
 	 * Invoke this method with the command line:
@@ -467,6 +471,21 @@ public abstract class BaseSiteResourceImpl implements SiteResource {
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	public String getResourceName() {
+		return "Site";
+	}
+
+	public String getVersion() {
+		return "v1.0";
 	}
 
 	protected Map<String, String> addAction(
