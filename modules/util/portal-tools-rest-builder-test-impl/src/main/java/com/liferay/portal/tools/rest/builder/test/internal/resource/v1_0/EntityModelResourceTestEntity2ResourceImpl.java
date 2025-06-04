@@ -28,7 +28,7 @@ public class EntityModelResourceTestEntity2ResourceImpl
 	implements EntityModelResource {
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
 		throws Exception {
 
 		return new EntityModelResourceTestEntity2EntityModel();
