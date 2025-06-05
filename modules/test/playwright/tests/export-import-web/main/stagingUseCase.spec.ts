@@ -11,6 +11,7 @@ import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {dataRemoteApiHelpersTest} from '../../../fixtures/dataRemoteApiHelpersTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
 import {loginTest} from '../../../fixtures/loginTest';
+import {isolatedSiteTest} from '../../../fixtures/isolatedSiteTest';
 import {pageEditorPagesTest} from '../../../fixtures/pageEditorPagesTest';
 import {pageViewModePagesTest} from '../../../fixtures/pageViewModePagesTest';
 import {remotePageTest} from '../../../fixtures/remotePageTest';
@@ -36,6 +37,7 @@ export const test = mergeTests(
 		'LPD-35914': {enabled: true, system: true},
 	}),
 	loginTest(),
+	isolatedSiteTest,
 	journalPagesTest,
 	pageEditorPagesTest,
 	pageViewModePagesTest,
@@ -57,17 +59,26 @@ test(
 		remoteApiHelpers,
 		remotePage,
 		remoteStagingPage,
+		site,
 		webContentDisplayPage,
 		widgetPagePage,
 	}) => {
 		test.slow();
-
-		const siteName = 'site-' + getRandomString();
-		const site = await apiHelpers.headlessSite.createSite({
-			name: siteName,
-		});
-
+		
 		apiHelpers.data.push({id: site.id, type: 'site'});
+
+		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
+			name: site.name,
+		});
+		console.log(remoteSite);
+
+		remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
+			
+		await apiHelpers.jsonWebServicesStaging.enableRemoteStaging({
+			groupId: site.id,
+			remoteGroupId: remoteSite.id,
+			remotePort,
+		});
 
 		const layouts: Array<Layout> = [];
 
@@ -99,17 +110,7 @@ test(
 			}
 		}
 
-		const remoteSite = await remoteApiHelpers.headlessSite.createSite({
-			name: siteName,
-		});
-
-		await remoteApiHelpers.data.push({id: remoteSite.id, type: 'site'});
-
-		await apiHelpers.jsonWebServicesStaging.enableRemoteStaging({
-			groupId: site.id,
-			remoteGroupId: remoteSite.id,
-			remotePort,
-		});
+		
 
 		for (const layout of layouts) {
 			await pageEditorPage.goto(layout, site.friendlyUrlPath);
@@ -290,7 +291,7 @@ test(
 				remotePage.locator('h1').filter({hasText: `Title-${num}`})
 			).toBeVisible();
 
-			expect(remotePage.url()).toContain(`/web/${siteName}/page-${num}`);
+			expect(remotePage.url()).toContain(`/web/${site.name}/page-${num}`);
 		}
 	}
 );
