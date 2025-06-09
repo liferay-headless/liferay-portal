@@ -420,11 +420,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		return super.getEntityFields();
-	}
-
-	@Override
 	protected SitePage randomSitePage() {
 		return new SitePage() {
 			{

@@ -212,14 +212,6 @@ public class DisplayPageTemplateResourceTest
 		Assert.assertEquals(1, contentStructuresJSONObject.get("totalCount"));
 	}
 
-	@Override
-	protected Collection<EntityField> getEntityFields() {
-		return Collections.singleton(
-			new EntityField(
-				"title", EntityField.Type.STRING, o -> null, o -> null,
-				o -> null));
-	}
-
 	@Inject
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;

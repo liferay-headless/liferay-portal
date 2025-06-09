@@ -139,18 +139,6 @@ public class ProductOptionResourceTest
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		try {
-			return super.getEntityFields();
-		}
-		catch (NullPointerException nullPointerException) {
-			Map<String, EntityField> entityFieldsMap = new HashMap<>();
-
-			return entityFieldsMap.values();
-		}
-	}
-
-	@Override
 	protected ProductOption randomProductOption() throws Exception {
 		CPOption cpOption = CPTestUtil.addCPOption(
 			testGroup.getGroupId(), false);

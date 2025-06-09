@@ -93,11 +93,6 @@ public class PriceListOrderTypeResourceTest
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		return new ArrayList<>();
-	}
-
-	@Override
 	protected PriceListOrderType randomPriceListOrderType() throws Exception {
 		DateConfig displayDateConfig = DateConfig.toDisplayDateConfig(
 			RandomTestUtil.nextDate(), _user.getTimeZone());
