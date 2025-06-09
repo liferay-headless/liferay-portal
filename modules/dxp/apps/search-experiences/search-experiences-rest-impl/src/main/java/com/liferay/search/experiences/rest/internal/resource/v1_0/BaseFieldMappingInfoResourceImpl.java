@@ -233,13 +233,6 @@ public abstract class BaseFieldMappingInfoResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "FieldMappingInfo";
 	}
@@ -324,6 +317,7 @@ public abstract class BaseFieldMappingInfoResourceImpl
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -388,6 +382,13 @@ public abstract class BaseFieldMappingInfoResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {

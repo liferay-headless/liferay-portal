@@ -15,10 +15,12 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.UriInfoUtil;
 
@@ -27,6 +29,7 @@ import jakarta.annotation.Generated;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 
 import java.util.Collection;
@@ -40,7 +43,7 @@ import java.util.Map;
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseOrderAccountGroupResourceImpl
-	implements OrderAccountGroupResource {
+	implements EntityModelResource, OrderAccountGroupResource {
 
 	/**
 	 * Invoke this method with the command line:
@@ -80,6 +83,7 @@ public abstract class BaseOrderAccountGroupResourceImpl
 		this.contextAcceptLanguage = contextAcceptLanguage;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -144,6 +148,13 @@ public abstract class BaseOrderAccountGroupResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {

@@ -1114,13 +1114,6 @@ public abstract class BaseNavigationMenuResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "NavigationMenu";
 	}
@@ -1411,6 +1404,7 @@ public abstract class BaseNavigationMenuResourceImpl
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -1475,6 +1469,13 @@ public abstract class BaseNavigationMenuResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {

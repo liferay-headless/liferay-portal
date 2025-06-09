@@ -316,13 +316,6 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "PaymentMethodGroupRelTerm";
 	}
@@ -399,6 +392,7 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -463,6 +457,13 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {

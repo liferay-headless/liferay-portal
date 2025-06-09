@@ -529,13 +529,6 @@ public abstract class BaseFragmentCompositionResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "FragmentComposition";
 	}
@@ -611,6 +604,7 @@ public abstract class BaseFragmentCompositionResourceImpl
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -675,6 +669,13 @@ public abstract class BaseFragmentCompositionResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {

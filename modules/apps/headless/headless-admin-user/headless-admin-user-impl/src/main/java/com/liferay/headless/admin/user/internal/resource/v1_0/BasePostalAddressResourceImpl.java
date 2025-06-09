@@ -1274,13 +1274,6 @@ public abstract class BasePostalAddressResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "PostalAddress";
 	}
@@ -1419,6 +1412,7 @@ public abstract class BasePostalAddressResourceImpl
 		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
+	@Override
 	public void setContextCompany(
 		com.liferay.portal.kernel.model.Company contextCompany) {
 
@@ -1483,6 +1477,13 @@ public abstract class BasePostalAddressResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	protected String getApplicationPath() {
