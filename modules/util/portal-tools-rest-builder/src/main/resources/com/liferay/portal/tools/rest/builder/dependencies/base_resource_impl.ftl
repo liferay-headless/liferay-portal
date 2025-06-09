@@ -116,8 +116,10 @@ public abstract class Base${schemaName}ResourceImpl
 	/>
 
 	<#if generateBatch>
-		, EntityModelResource, VulcanBatchEngineTaskItemDelegate<${javaDataType}>
+		, VulcanBatchEngineTaskItemDelegate<${javaDataType}>
 	</#if>
+
+	, EntityModelResource
 
 	<#if generateCRUD>
 		, VulcanCRUDItemDelegate<${javaDataType}>
@@ -1089,11 +1091,6 @@ public abstract class Base${schemaName}ResourceImpl
 			return getEntityModel(new MultivaluedHashMap<String, Object>(multivaluedMap));
 		}
 
-		@Override
-		public EntityModel getEntityModel(MultivaluedMap multivaluedMap) throws Exception {
-			return null;
-		}
-
 		public String getResourceName() {
 			return "${schemaName}";
 		}
@@ -1455,6 +1452,7 @@ public abstract class Base${schemaName}ResourceImpl
 		}
 	</#if>
 
+	@Override
 	public void setContextCompany(com.liferay.portal.kernel.model.Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
@@ -1511,6 +1509,11 @@ public abstract class Base${schemaName}ResourceImpl
 
 	public void setSortParserProvider(SortParserProvider sortParserProvider) {
 		this.sortParserProvider = sortParserProvider;
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap<?, ?> multivaluedMap) throws Exception {
+		return null;
 	}
 
 	<#if freeMarkerTool.isVersionCompatible(configYAML, 7)>
