@@ -557,11 +557,25 @@ public abstract class BaseProductGroupResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				productGroupUnsafeFunction = productGroup -> {
 					ProductGroup persistedProductGroup = null;
+					ProductGroup getProductGroup = null;
 
 					try {
-						ProductGroup getProductGroup =
-							getProductGroupByExternalReferenceCode(
-								productGroup.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(productGroup.getExternalReferenceCode() != null)) {
+
+							getProductGroup =
+								getProductGroupByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													productGroup.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						patchProductGroup(
 							getProductGroup.getId() != null ?
@@ -580,9 +594,24 @@ public abstract class BaseProductGroupResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				productGroupUnsafeFunction =
-					productGroup -> putProductGroupByExternalReferenceCode(
-						productGroup.getExternalReferenceCode(), productGroup);
+				productGroupUnsafeFunction = productGroup -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(productGroup.getExternalReferenceCode() != null)) {
+
+						return putProductGroupByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											productGroup.
+												getExternalReferenceCode(),
+							productGroup);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

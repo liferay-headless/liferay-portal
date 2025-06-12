@@ -2500,8 +2500,8 @@ public abstract class BaseDocumentShortcutResourceTestCase {
 	protected DocumentShortcut randomDocumentShortcut() throws Exception {
 		return new DocumentShortcut() {
 			{
-				assetLibraryKey = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				assetLibraryKey = String.valueOf(
+					testDepotEntry.getDepotEntryId());
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				externalReferenceCode = StringUtil.toLowerCase(

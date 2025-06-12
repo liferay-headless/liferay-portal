@@ -717,10 +717,24 @@ public abstract class BasePaymentResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				paymentUnsafeFunction = payment -> {
 					Payment persistedPayment = null;
+					Payment getPayment = null;
 
 					try {
-						Payment getPayment = getPaymentByExternalReferenceCode(
-							payment.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(payment.getExternalReferenceCode() != null)) {
+
+							getPayment = getPaymentByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												payment.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedPayment = patchPayment(
 							getPayment.getId() != null ? getPayment.getId() :
@@ -736,9 +750,23 @@ public abstract class BasePaymentResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				paymentUnsafeFunction =
-					payment -> putPaymentByExternalReferenceCode(
-						payment.getExternalReferenceCode(), payment);
+				paymentUnsafeFunction = payment -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(payment.getExternalReferenceCode() != null)) {
+
+						return putPaymentByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											payment.getExternalReferenceCode(),
+							payment);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

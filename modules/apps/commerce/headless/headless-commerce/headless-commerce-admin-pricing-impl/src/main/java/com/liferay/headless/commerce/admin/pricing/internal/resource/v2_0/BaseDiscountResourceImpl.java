@@ -655,11 +655,24 @@ public abstract class BaseDiscountResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				discountUnsafeFunction = discount -> {
 					Discount persistedDiscount = null;
+					Discount getDiscount = null;
 
 					try {
-						Discount getDiscount =
-							getDiscountByExternalReferenceCode(
-								discount.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(discount.getExternalReferenceCode() != null)) {
+
+							getDiscount = getDiscountByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												discount.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedDiscount = patchDiscount(
 							getDiscount.getId() != null ? getDiscount.getId() :
@@ -676,9 +689,23 @@ public abstract class BaseDiscountResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				discountUnsafeFunction =
-					discount -> putDiscountByExternalReferenceCode(
-						discount.getExternalReferenceCode(), discount);
+				discountUnsafeFunction = discount -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(discount.getExternalReferenceCode() != null)) {
+
+						return putDiscountByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											discount.getExternalReferenceCode(),
+							discount);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

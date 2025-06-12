@@ -998,11 +998,17 @@ public abstract class BaseWikiPageResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				wikiPageUnsafeFunction =
-					wikiPage -> putSiteWikiPageByExternalReferenceCode(
-						wikiPage.getSiteId() != null ? wikiPage.getSiteId() :
+				wikiPageUnsafeFunction = wikiPage -> {
+					if (parameters.containsKey("siteId")) {
+						return putSiteWikiPageByExternalReferenceCode(
 							(Long)parameters.get("siteId"),
-						wikiPage.getExternalReferenceCode(), wikiPage);
+							wikiPage.getExternalReferenceCode(), wikiPage);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [siteId]");
+					}
+				};
 			}
 		}
 

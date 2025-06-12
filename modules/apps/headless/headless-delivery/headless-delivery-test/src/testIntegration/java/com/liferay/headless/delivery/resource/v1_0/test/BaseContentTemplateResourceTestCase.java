@@ -2328,8 +2328,8 @@ public abstract class BaseContentTemplateResourceTestCase {
 	protected ContentTemplate randomContentTemplate() throws Exception {
 		return new ContentTemplate() {
 			{
-				assetLibraryKey = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				assetLibraryKey = String.valueOf(
+					testDepotEntry.getDepotEntryId());
 				contentStructureId = RandomTestUtil.randomLong();
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();

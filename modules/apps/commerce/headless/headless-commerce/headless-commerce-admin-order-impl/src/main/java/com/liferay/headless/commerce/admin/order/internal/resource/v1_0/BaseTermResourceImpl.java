@@ -606,10 +606,24 @@ public abstract class BaseTermResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				termUnsafeFunction = term -> {
 					Term persistedTerm = null;
+					Term getTerm = null;
 
 					try {
-						Term getTerm = getTermByExternalReferenceCode(
-							term.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(term.getExternalReferenceCode() != null)) {
+
+							getTerm = getTermByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												term.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedTerm = patchTerm(
 							getTerm.getId() != null ? getTerm.getId() :
@@ -625,8 +639,23 @@ public abstract class BaseTermResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				termUnsafeFunction = term -> putTermByExternalReferenceCode(
-					term.getExternalReferenceCode(), term);
+				termUnsafeFunction = term -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(term.getExternalReferenceCode() != null)) {
+
+						return putTermByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											term.getExternalReferenceCode(),
+							term);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

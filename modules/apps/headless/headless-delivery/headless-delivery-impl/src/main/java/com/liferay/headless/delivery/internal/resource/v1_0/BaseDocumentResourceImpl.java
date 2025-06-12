@@ -2186,14 +2186,25 @@ public abstract class BaseDocumentResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				documentUnsafeFunction = document -> {
 					Document persistedDocument = null;
+					Document getDocument = null;
 
 					try {
-						Document getDocument =
-							getSiteDocumentByExternalReferenceCode(
-								document.getSiteId() != null ?
-									document.getSiteId() :
-										(Long)parameters.get("siteId"),
-								document.getExternalReferenceCode());
+						if (parameters.containsKey("assetLibraryId")) {
+							getDocument =
+								getAssetLibraryDocumentByExternalReferenceCode(
+									(Long)parameters.get("assetLibraryId"),
+									document.getExternalReferenceCode());
+						}
+						else if (parameters.containsKey("siteId")) {
+							getDocument =
+								getSiteDocumentByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									document.getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [assetLibraryId, siteId]");
+						}
 
 						persistedDocument = patchDocument(
 							getDocument.getId() != null ? getDocument.getId() :
@@ -2229,11 +2240,22 @@ public abstract class BaseDocumentResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				documentUnsafeFunction =
-					document -> putSiteDocumentByExternalReferenceCode(
-						document.getSiteId() != null ? document.getSiteId() :
+				documentUnsafeFunction = document -> {
+					if (parameters.containsKey("assetLibraryId")) {
+						return putAssetLibraryDocumentByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							document.getExternalReferenceCode(), null);
+					}
+					else if (parameters.containsKey("siteId")) {
+						return putSiteDocumentByExternalReferenceCode(
 							(Long)parameters.get("siteId"),
-						document.getExternalReferenceCode(), null);
+							document.getExternalReferenceCode(), null);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [assetLibraryId, siteId]");
+					}
+				};
 			}
 		}
 

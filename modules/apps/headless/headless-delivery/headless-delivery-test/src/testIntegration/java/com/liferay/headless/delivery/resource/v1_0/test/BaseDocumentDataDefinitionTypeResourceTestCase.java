@@ -3104,8 +3104,8 @@ public abstract class BaseDocumentDataDefinitionTypeResourceTestCase {
 
 		return new DocumentDataDefinitionType() {
 			{
-				assetLibraryKey = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				assetLibraryKey = String.valueOf(
+					testDepotEntry.getDepotEntryId());
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(

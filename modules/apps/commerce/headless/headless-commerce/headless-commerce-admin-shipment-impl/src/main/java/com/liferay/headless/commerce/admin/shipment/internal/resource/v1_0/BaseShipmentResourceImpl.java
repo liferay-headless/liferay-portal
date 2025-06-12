@@ -792,11 +792,24 @@ public abstract class BaseShipmentResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				shipmentUnsafeFunction = shipment -> {
 					Shipment persistedShipment = null;
+					Shipment getShipment = null;
 
 					try {
-						Shipment getShipment =
-							getShipmentByExternalReferenceCode(
-								shipment.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(shipment.getExternalReferenceCode() != null)) {
+
+							getShipment = getShipmentByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												shipment.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedShipment = patchShipment(
 							getShipment.getId() != null ? getShipment.getId() :
@@ -813,9 +826,23 @@ public abstract class BaseShipmentResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				shipmentUnsafeFunction =
-					shipment -> putShipmentByExternalReferenceCode(
-						shipment.getExternalReferenceCode(), shipment);
+				shipmentUnsafeFunction = shipment -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(shipment.getExternalReferenceCode() != null)) {
+
+						return putShipmentByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											shipment.getExternalReferenceCode(),
+							shipment);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

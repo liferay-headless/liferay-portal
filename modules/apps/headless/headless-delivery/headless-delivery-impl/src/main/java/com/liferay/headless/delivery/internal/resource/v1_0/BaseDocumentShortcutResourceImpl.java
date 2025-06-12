@@ -934,14 +934,20 @@ public abstract class BaseDocumentShortcutResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				documentShortcutUnsafeFunction = documentShortcut -> {
 					DocumentShortcut persistedDocumentShortcut = null;
+					DocumentShortcut getDocumentShortcut = null;
 
 					try {
-						DocumentShortcut getDocumentShortcut =
-							getSiteDocumentShortcutByExternalReferenceCode(
-								documentShortcut.getSiteId() != null ?
-									documentShortcut.getSiteId() :
-										(Long)parameters.get("siteId"),
-								documentShortcut.getExternalReferenceCode());
+						if (parameters.containsKey("siteId")) {
+							getDocumentShortcut =
+								getSiteDocumentShortcutByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									documentShortcut.
+										getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [siteId]");
+						}
 
 						persistedDocumentShortcut = patchDocumentShortcut(
 							getDocumentShortcut.getId() != null ?
@@ -975,13 +981,18 @@ public abstract class BaseDocumentShortcutResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				documentShortcutUnsafeFunction = documentShortcut ->
-					putSiteDocumentShortcutByExternalReferenceCode(
-						documentShortcut.getSiteId() != null ?
-							documentShortcut.getSiteId() :
-								(Long)parameters.get("siteId"),
-						documentShortcut.getExternalReferenceCode(),
-						documentShortcut);
+				documentShortcutUnsafeFunction = documentShortcut -> {
+					if (parameters.containsKey("siteId")) {
+						return putSiteDocumentShortcutByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							documentShortcut.getExternalReferenceCode(),
+							documentShortcut);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [siteId]");
+					}
+				};
 			}
 		}
 

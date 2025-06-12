@@ -2908,8 +2908,8 @@ public abstract class BaseDocumentMetadataSetResourceTestCase {
 	protected DocumentMetadataSet randomDocumentMetadataSet() throws Exception {
 		return new DocumentMetadataSet() {
 			{
-				assetLibraryKey = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				assetLibraryKey = String.valueOf(
+					testDepotEntry.getDepotEntryId());
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(

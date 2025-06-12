@@ -2257,14 +2257,27 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				taxonomyVocabularyUnsafeFunction = taxonomyVocabulary -> {
 					TaxonomyVocabulary persistedTaxonomyVocabulary = null;
+					TaxonomyVocabulary getTaxonomyVocabulary = null;
 
 					try {
-						TaxonomyVocabulary getTaxonomyVocabulary =
-							getSiteTaxonomyVocabularyByExternalReferenceCode(
-								taxonomyVocabulary.getSiteId() != null ?
-									taxonomyVocabulary.getSiteId() :
-										(Long)parameters.get("siteId"),
-								taxonomyVocabulary.getExternalReferenceCode());
+						if (parameters.containsKey("assetLibraryId")) {
+							getTaxonomyVocabulary =
+								getAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
+									(Long)parameters.get("assetLibraryId"),
+									taxonomyVocabulary.
+										getExternalReferenceCode());
+						}
+						else if (parameters.containsKey("siteId")) {
+							getTaxonomyVocabulary =
+								getSiteTaxonomyVocabularyByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									taxonomyVocabulary.
+										getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [assetLibraryId, siteId]");
+						}
 
 						persistedTaxonomyVocabulary = patchTaxonomyVocabulary(
 							getTaxonomyVocabulary.getId() != null ?
@@ -2297,13 +2310,24 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				taxonomyVocabularyUnsafeFunction = taxonomyVocabulary ->
-					putSiteTaxonomyVocabularyByExternalReferenceCode(
-						taxonomyVocabulary.getSiteId() != null ?
-							taxonomyVocabulary.getSiteId() :
-								(Long)parameters.get("siteId"),
-						taxonomyVocabulary.getExternalReferenceCode(),
-						taxonomyVocabulary);
+				taxonomyVocabularyUnsafeFunction = taxonomyVocabulary -> {
+					if (parameters.containsKey("assetLibraryId")) {
+						return putAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							taxonomyVocabulary.getExternalReferenceCode(),
+							taxonomyVocabulary);
+					}
+					else if (parameters.containsKey("siteId")) {
+						return putSiteTaxonomyVocabularyByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							taxonomyVocabulary.getExternalReferenceCode(),
+							taxonomyVocabulary);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [assetLibraryId, siteId]");
+					}
+				};
 			}
 		}
 

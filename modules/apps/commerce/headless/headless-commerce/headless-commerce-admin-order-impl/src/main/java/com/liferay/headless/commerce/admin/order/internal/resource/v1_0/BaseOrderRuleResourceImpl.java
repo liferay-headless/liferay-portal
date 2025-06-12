@@ -604,11 +604,24 @@ public abstract class BaseOrderRuleResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				orderRuleUnsafeFunction = orderRule -> {
 					OrderRule persistedOrderRule = null;
+					OrderRule getOrderRule = null;
 
 					try {
-						OrderRule getOrderRule =
-							getOrderRuleByExternalReferenceCode(
-								orderRule.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(orderRule.getExternalReferenceCode() != null)) {
+
+							getOrderRule = getOrderRuleByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												orderRule.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedOrderRule = patchOrderRule(
 							getOrderRule.getId() != null ?
@@ -626,9 +639,24 @@ public abstract class BaseOrderRuleResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				orderRuleUnsafeFunction =
-					orderRule -> putOrderRuleByExternalReferenceCode(
-						orderRule.getExternalReferenceCode(), orderRule);
+				orderRuleUnsafeFunction = orderRule -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(orderRule.getExternalReferenceCode() != null)) {
+
+						return putOrderRuleByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											orderRule.
+												getExternalReferenceCode(),
+							orderRule);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

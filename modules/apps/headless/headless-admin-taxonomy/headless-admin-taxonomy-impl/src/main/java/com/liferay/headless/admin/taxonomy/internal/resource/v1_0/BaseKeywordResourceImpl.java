@@ -1728,11 +1728,22 @@ public abstract class BaseKeywordResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				keywordUnsafeFunction =
-					keyword -> putSiteKeywordByExternalReferenceCode(
-						keyword.getSiteId() != null ? keyword.getSiteId() :
+				keywordUnsafeFunction = keyword -> {
+					if (parameters.containsKey("assetLibraryId")) {
+						return putAssetLibraryKeywordByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							keyword.getExternalReferenceCode(), keyword);
+					}
+					else if (parameters.containsKey("siteId")) {
+						return putSiteKeywordByExternalReferenceCode(
 							(Long)parameters.get("siteId"),
-						keyword.getExternalReferenceCode(), keyword);
+							keyword.getExternalReferenceCode(), keyword);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [assetLibraryId, siteId]");
+					}
+				};
 			}
 		}
 

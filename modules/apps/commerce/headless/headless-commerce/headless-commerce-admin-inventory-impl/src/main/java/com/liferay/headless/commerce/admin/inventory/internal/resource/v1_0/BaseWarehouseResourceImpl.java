@@ -504,9 +504,24 @@ public abstract class BaseWarehouseResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				warehouseUnsafeFunction =
-					warehouse -> putWarehouseByExternalReferenceCode(
-						warehouse.getExternalReferenceCode(), warehouse);
+				warehouseUnsafeFunction = warehouse -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(warehouse.getExternalReferenceCode() != null)) {
+
+						return putWarehouseByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											warehouse.
+												getExternalReferenceCode(),
+							warehouse);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

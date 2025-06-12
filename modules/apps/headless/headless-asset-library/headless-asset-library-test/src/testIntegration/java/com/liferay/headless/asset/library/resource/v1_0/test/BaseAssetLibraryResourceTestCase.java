@@ -858,7 +858,7 @@ public abstract class BaseAssetLibraryResourceTestCase {
 
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		AssetLibrary patchAssetLibrary = assetLibraryResource.patchAssetLibrary(
-			postAssetLibrary.getId(), randomPatchAssetLibrary);
+			testDepotEntry.getDepotEntryId(), randomPatchAssetLibrary);
 
 		AssetLibrary expectedPatchAssetLibrary = postAssetLibrary.clone();
 
@@ -866,7 +866,7 @@ public abstract class BaseAssetLibraryResourceTestCase {
 			randomPatchAssetLibrary, expectedPatchAssetLibrary);
 
 		AssetLibrary getAssetLibrary = assetLibraryResource.getAssetLibrary(
-			patchAssetLibrary.getId());
+			testDepotEntry.getDepotEntryId());
 
 		assertEquals(expectedPatchAssetLibrary, getAssetLibrary);
 		assertValid(getAssetLibrary);

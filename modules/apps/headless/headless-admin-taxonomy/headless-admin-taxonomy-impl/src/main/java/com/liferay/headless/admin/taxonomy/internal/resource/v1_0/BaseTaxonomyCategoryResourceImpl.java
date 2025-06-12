@@ -1317,18 +1317,22 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				taxonomyCategoryUnsafeFunction = taxonomyCategory -> {
 					TaxonomyCategory persistedTaxonomyCategory = null;
+					TaxonomyCategory getTaxonomyCategory = null;
 
 					try {
-						TaxonomyCategory getTaxonomyCategory =
-							getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-								taxonomyCategory.getTaxonomyVocabularyId() !=
-									null ?
-										taxonomyCategory.
-											getTaxonomyVocabularyId() :
-												_parseLong(
-													(String)parameters.get(
-														"taxonomyVocabularyId")),
-								taxonomyCategory.getExternalReferenceCode());
+						if (parameters.containsKey("taxonomyVocabularyId")) {
+							getTaxonomyCategory =
+								getTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+									_parseLong(
+										(String)parameters.get(
+											"taxonomyVocabularyId")),
+									taxonomyCategory.
+										getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [taxonomyVocabularyId]");
+						}
 
 						persistedTaxonomyCategory = patchTaxonomyCategory(
 							getTaxonomyCategory.getId() != null ?
@@ -1357,15 +1361,19 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				taxonomyCategoryUnsafeFunction = taxonomyCategory ->
-					putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
-						taxonomyCategory.getTaxonomyVocabularyId() != null ?
-							taxonomyCategory.getTaxonomyVocabularyId() :
-								_parseLong(
-									(String)parameters.get(
-										"taxonomyVocabularyId")),
-						taxonomyCategory.getExternalReferenceCode(),
-						taxonomyCategory);
+				taxonomyCategoryUnsafeFunction = taxonomyCategory -> {
+					if (parameters.containsKey("taxonomyVocabularyId")) {
+						return putTaxonomyVocabularyTaxonomyCategoryByExternalReferenceCode(
+							_parseLong(
+								(String)parameters.get("taxonomyVocabularyId")),
+							taxonomyCategory.getExternalReferenceCode(),
+							taxonomyCategory);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [taxonomyVocabularyId]");
+					}
+				};
 			}
 		}
 

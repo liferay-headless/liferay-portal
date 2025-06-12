@@ -674,11 +674,26 @@ public abstract class BaseReplenishmentItemResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				replenishmentItemUnsafeFunction = replenishmentItem -> {
 					ReplenishmentItem persistedReplenishmentItem = null;
+					ReplenishmentItem getReplenishmentItem = null;
 
 					try {
-						ReplenishmentItem getReplenishmentItem =
-							getReplenishmentItemByExternalReferenceCode(
-								replenishmentItem.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(replenishmentItem.getExternalReferenceCode() !=
+								null)) {
+
+							getReplenishmentItem =
+								getReplenishmentItemByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													replenishmentItem.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedReplenishmentItem = patchReplenishmentItem(
 							getReplenishmentItem.getId() != null ?
@@ -699,10 +714,25 @@ public abstract class BaseReplenishmentItemResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				replenishmentItemUnsafeFunction = replenishmentItem ->
-					putReplenishmentItemByExternalReferenceCode(
-						replenishmentItem.getExternalReferenceCode(),
-						replenishmentItem);
+				replenishmentItemUnsafeFunction = replenishmentItem -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(replenishmentItem.getExternalReferenceCode() !=
+							null)) {
+
+						return putReplenishmentItemByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											replenishmentItem.
+												getExternalReferenceCode(),
+							replenishmentItem);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

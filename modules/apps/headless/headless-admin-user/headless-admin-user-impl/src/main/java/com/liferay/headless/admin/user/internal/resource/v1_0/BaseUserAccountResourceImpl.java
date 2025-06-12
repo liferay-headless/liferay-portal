@@ -2523,6 +2523,13 @@ public abstract class BaseUserAccountResourceImpl
 						_parseLong((String)parameters.get("accountId")),
 						userAccount);
 			}
+			else if (parameters.containsKey("externalReferenceCode")) {
+				userAccountUnsafeFunction =
+					userAccount ->
+						postAccountUserAccountByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode"),
+							userAccount);
+			}
 		}
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
@@ -2532,11 +2539,25 @@ public abstract class BaseUserAccountResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				userAccountUnsafeFunction = userAccount -> {
 					UserAccount persistedUserAccount = null;
+					UserAccount getUserAccount = null;
 
 					try {
-						UserAccount getUserAccount =
-							getUserAccountByExternalReferenceCode(
-								userAccount.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(userAccount.getExternalReferenceCode() != null)) {
+
+							getUserAccount =
+								getUserAccountByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													userAccount.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedUserAccount = patchUserAccount(
 							getUserAccount.getId() != null ?
@@ -2552,6 +2573,15 @@ public abstract class BaseUserAccountResourceImpl
 								_parseLong((String)parameters.get("accountId")),
 								userAccount);
 						}
+						else if (parameters.containsKey(
+									"externalReferenceCode")) {
+
+							persistedUserAccount =
+								postAccountUserAccountByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode"),
+									userAccount);
+						}
 						else {
 							persistedUserAccount = postUserAccount(userAccount);
 						}
@@ -2562,9 +2592,24 @@ public abstract class BaseUserAccountResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				userAccountUnsafeFunction =
-					userAccount -> putUserAccountByExternalReferenceCode(
-						userAccount.getExternalReferenceCode(), userAccount);
+				userAccountUnsafeFunction = userAccount -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(userAccount.getExternalReferenceCode() != null)) {
+
+						return putUserAccountByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											userAccount.
+												getExternalReferenceCode(),
+							userAccount);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

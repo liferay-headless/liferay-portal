@@ -1281,10 +1281,24 @@ public abstract class BaseRoleResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				roleUnsafeFunction = role -> {
 					Role persistedRole = null;
+					Role getRole = null;
 
 					try {
-						Role getRole = getRoleByExternalReferenceCode(
-							role.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(role.getExternalReferenceCode() != null)) {
+
+							getRole = getRoleByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												role.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedRole = patchRole(
 							getRole.getId() != null ? getRole.getId() :
@@ -1300,8 +1314,23 @@ public abstract class BaseRoleResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				roleUnsafeFunction = role -> putRoleByExternalReferenceCode(
-					role.getExternalReferenceCode(), role);
+				roleUnsafeFunction = role -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(role.getExternalReferenceCode() != null)) {
+
+						return putRoleByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											role.getExternalReferenceCode(),
+							role);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

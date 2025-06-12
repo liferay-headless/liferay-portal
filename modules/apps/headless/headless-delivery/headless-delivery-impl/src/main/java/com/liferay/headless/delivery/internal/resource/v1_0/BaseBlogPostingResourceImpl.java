@@ -1361,14 +1361,19 @@ public abstract class BaseBlogPostingResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				blogPostingUnsafeFunction = blogPosting -> {
 					BlogPosting persistedBlogPosting = null;
+					BlogPosting getBlogPosting = null;
 
 					try {
-						BlogPosting getBlogPosting =
-							getSiteBlogPostingByExternalReferenceCode(
-								blogPosting.getSiteId() != null ?
-									blogPosting.getSiteId() :
-										(Long)parameters.get("siteId"),
-								blogPosting.getExternalReferenceCode());
+						if (parameters.containsKey("siteId")) {
+							getBlogPosting =
+								getSiteBlogPostingByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									blogPosting.getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [siteId]");
+						}
 
 						persistedBlogPosting = patchBlogPosting(
 							getBlogPosting.getId() != null ?
@@ -1390,12 +1395,18 @@ public abstract class BaseBlogPostingResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				blogPostingUnsafeFunction =
-					blogPosting -> putSiteBlogPostingByExternalReferenceCode(
-						blogPosting.getSiteId() != null ?
-							blogPosting.getSiteId() :
-								(Long)parameters.get("siteId"),
-						blogPosting.getExternalReferenceCode(), blogPosting);
+				blogPostingUnsafeFunction = blogPosting -> {
+					if (parameters.containsKey("siteId")) {
+						return putSiteBlogPostingByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							blogPosting.getExternalReferenceCode(),
+							blogPosting);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [siteId]");
+					}
+				};
 			}
 		}
 

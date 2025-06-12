@@ -445,10 +445,26 @@ public abstract class BaseWorkflowDefinitionLinkResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				workflowDefinitionLinkUnsafeFunction = workflowDefinitionLink ->
-					putWorkflowDefinitionLinkByExternalReferenceCode(
-						workflowDefinitionLink.getExternalReferenceCode(),
-						workflowDefinitionLink);
+				workflowDefinitionLinkUnsafeFunction =
+					workflowDefinitionLink -> {
+						if (parameters.containsKey("externalReferenceCode") ||
+							(workflowDefinitionLink.
+								getExternalReferenceCode() != null)) {
+
+							return putWorkflowDefinitionLinkByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												workflowDefinitionLink.
+													getExternalReferenceCode(),
+								workflowDefinitionLink);
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
+					};
 			}
 		}
 

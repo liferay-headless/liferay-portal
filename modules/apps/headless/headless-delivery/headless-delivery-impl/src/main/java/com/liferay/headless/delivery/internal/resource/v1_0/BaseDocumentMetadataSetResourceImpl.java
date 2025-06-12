@@ -989,13 +989,24 @@ public abstract class BaseDocumentMetadataSetResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				documentMetadataSetUnsafeFunction = documentMetadataSet ->
-					putSiteDocumentMetadataSetByExternalReferenceCode(
-						documentMetadataSet.getSiteId() != null ?
-							documentMetadataSet.getSiteId() :
-								(Long)parameters.get("siteId"),
-						documentMetadataSet.getExternalReferenceCode(),
-						documentMetadataSet);
+				documentMetadataSetUnsafeFunction = documentMetadataSet -> {
+					if (parameters.containsKey("assetLibraryId")) {
+						return putAssetLibraryDocumentMetadataSetByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							documentMetadataSet.getExternalReferenceCode(),
+							documentMetadataSet);
+					}
+					else if (parameters.containsKey("siteId")) {
+						return putSiteDocumentMetadataSetByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							documentMetadataSet.getExternalReferenceCode(),
+							documentMetadataSet);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [assetLibraryId, siteId]");
+					}
+				};
 			}
 		}
 

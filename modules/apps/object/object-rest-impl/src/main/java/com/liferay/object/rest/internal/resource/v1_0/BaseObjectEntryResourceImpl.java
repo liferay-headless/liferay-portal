@@ -1849,9 +1849,24 @@ public abstract class BaseObjectEntryResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				objectEntryUnsafeFunction =
-					objectEntry -> putByExternalReferenceCode(
-						objectEntry.getExternalReferenceCode(), objectEntry);
+				objectEntryUnsafeFunction = objectEntry -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(objectEntry.getExternalReferenceCode() != null)) {
+
+						return putByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											objectEntry.
+												getExternalReferenceCode(),
+							objectEntry);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

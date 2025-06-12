@@ -826,11 +826,24 @@ public abstract class BaseUserGroupResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				userGroupUnsafeFunction = userGroup -> {
 					UserGroup persistedUserGroup = null;
+					UserGroup getUserGroup = null;
 
 					try {
-						UserGroup getUserGroup =
-							getUserGroupByExternalReferenceCode(
-								userGroup.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(userGroup.getExternalReferenceCode() != null)) {
+
+							getUserGroup = getUserGroupByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												userGroup.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedUserGroup = patchUserGroup(
 							getUserGroup.getId() != null ?
@@ -848,9 +861,24 @@ public abstract class BaseUserGroupResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				userGroupUnsafeFunction =
-					userGroup -> putUserGroupByExternalReferenceCode(
-						userGroup.getExternalReferenceCode(), userGroup);
+				userGroupUnsafeFunction = userGroup -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(userGroup.getExternalReferenceCode() != null)) {
+
+						return putUserGroupByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											userGroup.
+												getExternalReferenceCode(),
+							userGroup);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

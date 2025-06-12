@@ -558,11 +558,25 @@ public abstract class BaseObjectFolderResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				objectFolderUnsafeFunction = objectFolder -> {
 					ObjectFolder persistedObjectFolder = null;
+					ObjectFolder getObjectFolder = null;
 
 					try {
-						ObjectFolder getObjectFolder =
-							getObjectFolderByExternalReferenceCode(
-								objectFolder.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(objectFolder.getExternalReferenceCode() != null)) {
+
+							getObjectFolder =
+								getObjectFolderByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													objectFolder.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedObjectFolder = patchObjectFolder(
 							getObjectFolder.getId() != null ?
@@ -581,9 +595,24 @@ public abstract class BaseObjectFolderResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				objectFolderUnsafeFunction =
-					objectFolder -> putObjectFolderByExternalReferenceCode(
-						objectFolder.getExternalReferenceCode(), objectFolder);
+				objectFolderUnsafeFunction = objectFolder -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(objectFolder.getExternalReferenceCode() != null)) {
+
+						return putObjectFolderByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											objectFolder.
+												getExternalReferenceCode(),
+							objectFolder);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

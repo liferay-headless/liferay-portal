@@ -989,10 +989,24 @@ public abstract class BaseOrderResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				orderUnsafeFunction = order -> {
 					Order persistedOrder = null;
+					Order getOrder = null;
 
 					try {
-						Order getOrder = getOrderByExternalReferenceCode(
-							order.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(order.getExternalReferenceCode() != null)) {
+
+							getOrder = getOrderByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												order.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedOrder = patchOrder(
 							getOrder.getId() != null ? getOrder.getId() :
@@ -1008,8 +1022,23 @@ public abstract class BaseOrderResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				orderUnsafeFunction = order -> putOrderByExternalReferenceCode(
-					order.getExternalReferenceCode(), order);
+				orderUnsafeFunction = order -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(order.getExternalReferenceCode() != null)) {
+
+						return putOrderByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											order.getExternalReferenceCode(),
+							order);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

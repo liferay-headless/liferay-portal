@@ -1150,11 +1150,26 @@ public abstract class BasePostalAddressResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				postalAddressUnsafeFunction = postalAddress -> {
 					PostalAddress persistedPostalAddress = null;
+					PostalAddress getPostalAddress = null;
 
 					try {
-						PostalAddress getPostalAddress =
-							getPostalAddressByExternalReferenceCode(
-								postalAddress.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(postalAddress.getExternalReferenceCode() !=
+								null)) {
+
+							getPostalAddress =
+								getPostalAddressByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													postalAddress.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedPostalAddress = patchPostalAddress(
 							getPostalAddress.getId() != null ?
@@ -1181,10 +1196,24 @@ public abstract class BasePostalAddressResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				postalAddressUnsafeFunction =
-					postalAddress -> putPostalAddressByExternalReferenceCode(
-						postalAddress.getExternalReferenceCode(),
-						postalAddress);
+				postalAddressUnsafeFunction = postalAddress -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(postalAddress.getExternalReferenceCode() != null)) {
+
+						return putPostalAddressByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											postalAddress.
+												getExternalReferenceCode(),
+							postalAddress);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

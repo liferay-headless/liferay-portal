@@ -838,10 +838,23 @@ public abstract class BaseSkuResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				skuUnsafeFunction = sku -> {
 					Sku persistedSku = null;
+					Sku getSku = null;
 
 					try {
-						Sku getSku = getSkuByExternalReferenceCode(
-							sku.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(sku.getExternalReferenceCode() != null)) {
+
+							getSku = getSkuByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												sku.getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedSku = patchSku(
 							getSku.getId() != null ? getSku.getId() :
@@ -867,8 +880,23 @@ public abstract class BaseSkuResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				skuUnsafeFunction = sku -> putSkuByExternalReferenceCode(
-					sku.getExternalReferenceCode(), sku);
+				skuUnsafeFunction = sku -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(sku.getExternalReferenceCode() != null)) {
+
+						return putSkuByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											sku.getExternalReferenceCode(),
+							sku);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

@@ -635,11 +635,24 @@ public abstract class BasePriceListResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				priceListUnsafeFunction = priceList -> {
 					PriceList persistedPriceList = null;
+					PriceList getPriceList = null;
 
 					try {
-						PriceList getPriceList =
-							getPriceListByExternalReferenceCode(
-								priceList.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(priceList.getExternalReferenceCode() != null)) {
+
+							getPriceList = getPriceListByExternalReferenceCode(
+								(String)parameters.get(
+									"externalReferenceCode") != null ?
+										(String)parameters.get(
+											"externalReferenceCode") :
+												priceList.
+													getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedPriceList = patchPriceList(
 							getPriceList.getId() != null ?
@@ -657,9 +670,24 @@ public abstract class BasePriceListResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				priceListUnsafeFunction =
-					priceList -> putPriceListByExternalReferenceCode(
-						priceList.getExternalReferenceCode(), priceList);
+				priceListUnsafeFunction = priceList -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(priceList.getExternalReferenceCode() != null)) {
+
+						return putPriceListByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											priceList.
+												getExternalReferenceCode(),
+							priceList);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

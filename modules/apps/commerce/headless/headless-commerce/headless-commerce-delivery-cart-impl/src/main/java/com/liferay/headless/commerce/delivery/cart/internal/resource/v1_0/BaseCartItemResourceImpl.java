@@ -762,9 +762,23 @@ public abstract class BaseCartItemResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				cartItemUnsafeFunction =
-					cartItem -> putCartItemByExternalReferenceCode(
-						cartItem.getExternalReferenceCode(), cartItem);
+				cartItemUnsafeFunction = cartItem -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(cartItem.getExternalReferenceCode() != null)) {
+
+						return putCartItemByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											cartItem.getExternalReferenceCode(),
+							cartItem);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

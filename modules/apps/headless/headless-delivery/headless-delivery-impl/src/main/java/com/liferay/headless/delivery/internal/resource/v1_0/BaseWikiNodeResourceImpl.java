@@ -1067,11 +1067,17 @@ public abstract class BaseWikiNodeResourceImpl
 				"updateStrategy", "UPDATE");
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				wikiNodeUnsafeFunction =
-					wikiNode -> putSiteWikiNodeByExternalReferenceCode(
-						wikiNode.getSiteId() != null ? wikiNode.getSiteId() :
+				wikiNodeUnsafeFunction = wikiNode -> {
+					if (parameters.containsKey("siteId")) {
+						return putSiteWikiNodeByExternalReferenceCode(
 							(Long)parameters.get("siteId"),
-						wikiNode.getExternalReferenceCode(), wikiNode);
+							wikiNode.getExternalReferenceCode(), wikiNode);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [siteId]");
+					}
+				};
 			}
 		}
 

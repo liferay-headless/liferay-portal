@@ -2007,18 +2007,28 @@ public abstract class BaseStructuredContentFolderResourceImpl
 					structuredContentFolder -> {
 						StructuredContentFolder
 							persistedStructuredContentFolder = null;
+						StructuredContentFolder getStructuredContentFolder =
+							null;
 
 						try {
-							StructuredContentFolder getStructuredContentFolder =
-								getSiteStructuredContentFolderByExternalReferenceCode(
-									structuredContentFolder.getSiteId() !=
-										null ?
-											structuredContentFolder.
-												getSiteId() :
-													(Long)parameters.get(
-														"siteId"),
-									structuredContentFolder.
-										getExternalReferenceCode());
+							if (parameters.containsKey("assetLibraryId")) {
+								getStructuredContentFolder =
+									getAssetLibraryStructuredContentFolderByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										structuredContentFolder.
+											getExternalReferenceCode());
+							}
+							else if (parameters.containsKey("siteId")) {
+								getStructuredContentFolder =
+									getSiteStructuredContentFolderByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										structuredContentFolder.
+											getExternalReferenceCode());
+							}
+							else {
+								throw new NotSupportedException(
+									"One of the following parameters must be specified: [assetLibraryId, siteId]");
+							}
 
 							persistedStructuredContentFolder =
 								patchStructuredContentFolder(
@@ -2054,13 +2064,26 @@ public abstract class BaseStructuredContentFolderResourceImpl
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
 				structuredContentFolderUnsafeFunction =
-					structuredContentFolder ->
-						putSiteStructuredContentFolderByExternalReferenceCode(
-							structuredContentFolder.getSiteId() != null ?
-								structuredContentFolder.getSiteId() :
-									(Long)parameters.get("siteId"),
-							structuredContentFolder.getExternalReferenceCode(),
-							structuredContentFolder);
+					structuredContentFolder -> {
+						if (parameters.containsKey("assetLibraryId")) {
+							return putAssetLibraryStructuredContentFolderByExternalReferenceCode(
+								(Long)parameters.get("assetLibraryId"),
+								structuredContentFolder.
+									getExternalReferenceCode(),
+								structuredContentFolder);
+						}
+						else if (parameters.containsKey("siteId")) {
+							return putSiteStructuredContentFolderByExternalReferenceCode(
+								(Long)parameters.get("siteId"),
+								structuredContentFolder.
+									getExternalReferenceCode(),
+								structuredContentFolder);
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [assetLibraryId, siteId]");
+						}
+					};
 			}
 		}
 

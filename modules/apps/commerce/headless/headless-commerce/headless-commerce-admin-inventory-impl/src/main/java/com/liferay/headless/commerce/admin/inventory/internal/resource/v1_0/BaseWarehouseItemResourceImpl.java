@@ -660,9 +660,15 @@ public abstract class BaseWarehouseItemResourceImpl
 						(String)parameters.get("externalReferenceCode"),
 						warehouseItem);
 			}
+			else if (parameters.containsKey("externalReferenceCode")) {
+				warehouseItemUnsafeFunction =
+					warehouseItem -> postWarehouseItemByExternalReferenceCode(
+						(String)parameters.get("externalReferenceCode"),
+						warehouseItem);
+			}
 			else {
 				throw new NotSupportedException(
-					"One of the following parameters must be specified: [externalReferenceCode]");
+					"One of the following parameters must be specified: [externalReferenceCode, externalReferenceCode]");
 			}
 		}
 
@@ -673,11 +679,26 @@ public abstract class BaseWarehouseItemResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				warehouseItemUnsafeFunction = warehouseItem -> {
 					WarehouseItem persistedWarehouseItem = null;
+					WarehouseItem getWarehouseItem = null;
 
 					try {
-						WarehouseItem getWarehouseItem =
-							getWarehouseItemByExternalReferenceCode(
-								warehouseItem.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(warehouseItem.getExternalReferenceCode() !=
+								null)) {
+
+							getWarehouseItem =
+								getWarehouseItemByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													warehouseItem.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						patchWarehouseItem(
 							getWarehouseItem.getId() != null ?
@@ -695,9 +716,18 @@ public abstract class BaseWarehouseItemResourceImpl
 										"externalReferenceCode"),
 									warehouseItem);
 						}
+						else if (parameters.containsKey(
+									"externalReferenceCode")) {
+
+							persistedWarehouseItem =
+								postWarehouseItemByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode"),
+									warehouseItem);
+						}
 						else {
 							throw new NotSupportedException(
-								"One of the following parameters must be specified: [externalReferenceCode]");
+								"One of the following parameters must be specified: [externalReferenceCode, externalReferenceCode]");
 						}
 					}
 
@@ -706,10 +736,24 @@ public abstract class BaseWarehouseItemResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				warehouseItemUnsafeFunction =
-					warehouseItem -> putWarehouseItemByExternalReferenceCode(
-						warehouseItem.getExternalReferenceCode(),
-						warehouseItem);
+				warehouseItemUnsafeFunction = warehouseItem -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(warehouseItem.getExternalReferenceCode() != null)) {
+
+						return putWarehouseItemByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											warehouseItem.
+												getExternalReferenceCode(),
+							warehouseItem);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

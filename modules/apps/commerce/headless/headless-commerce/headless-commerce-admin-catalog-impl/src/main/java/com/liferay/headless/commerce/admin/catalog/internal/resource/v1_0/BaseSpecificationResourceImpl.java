@@ -623,11 +623,26 @@ public abstract class BaseSpecificationResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				specificationUnsafeFunction = specification -> {
 					Specification persistedSpecification = null;
+					Specification getSpecification = null;
 
 					try {
-						Specification getSpecification =
-							getSpecificationByExternalReferenceCode(
-								specification.getExternalReferenceCode());
+						if (parameters.containsKey("externalReferenceCode") ||
+							(specification.getExternalReferenceCode() !=
+								null)) {
+
+							getSpecification =
+								getSpecificationByExternalReferenceCode(
+									(String)parameters.get(
+										"externalReferenceCode") != null ?
+											(String)parameters.get(
+												"externalReferenceCode") :
+													specification.
+														getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [externalReferenceCode]");
+						}
 
 						persistedSpecification = patchSpecification(
 							getSpecification.getId() != null ?
@@ -647,10 +662,24 @@ public abstract class BaseSpecificationResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				specificationUnsafeFunction =
-					specification -> putSpecificationByExternalReferenceCode(
-						specification.getExternalReferenceCode(),
-						specification);
+				specificationUnsafeFunction = specification -> {
+					if (parameters.containsKey("externalReferenceCode") ||
+						(specification.getExternalReferenceCode() != null)) {
+
+						return putSpecificationByExternalReferenceCode(
+							(String)parameters.get("externalReferenceCode") !=
+								null ?
+									(String)parameters.get(
+										"externalReferenceCode") :
+											specification.
+												getExternalReferenceCode(),
+							specification);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [externalReferenceCode]");
+					}
+				};
 			}
 		}
 

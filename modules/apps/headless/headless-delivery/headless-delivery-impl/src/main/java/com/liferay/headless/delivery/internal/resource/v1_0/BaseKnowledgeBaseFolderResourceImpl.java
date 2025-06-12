@@ -1231,14 +1231,20 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
 				knowledgeBaseFolderUnsafeFunction = knowledgeBaseFolder -> {
 					KnowledgeBaseFolder persistedKnowledgeBaseFolder = null;
+					KnowledgeBaseFolder getKnowledgeBaseFolder = null;
 
 					try {
-						KnowledgeBaseFolder getKnowledgeBaseFolder =
-							getSiteKnowledgeBaseFolderByExternalReferenceCode(
-								knowledgeBaseFolder.getSiteId() != null ?
-									knowledgeBaseFolder.getSiteId() :
-										(Long)parameters.get("siteId"),
-								knowledgeBaseFolder.getExternalReferenceCode());
+						if (parameters.containsKey("siteId")) {
+							getKnowledgeBaseFolder =
+								getSiteKnowledgeBaseFolderByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									knowledgeBaseFolder.
+										getExternalReferenceCode());
+						}
+						else {
+							throw new NotSupportedException(
+								"One of the following parameters must be specified: [siteId]");
+						}
 
 						persistedKnowledgeBaseFolder = patchKnowledgeBaseFolder(
 							getKnowledgeBaseFolder.getId() != null ?
@@ -1262,13 +1268,18 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			}
 
 			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
-				knowledgeBaseFolderUnsafeFunction = knowledgeBaseFolder ->
-					putSiteKnowledgeBaseFolderByExternalReferenceCode(
-						knowledgeBaseFolder.getSiteId() != null ?
-							knowledgeBaseFolder.getSiteId() :
-								(Long)parameters.get("siteId"),
-						knowledgeBaseFolder.getExternalReferenceCode(),
-						knowledgeBaseFolder);
+				knowledgeBaseFolderUnsafeFunction = knowledgeBaseFolder -> {
+					if (parameters.containsKey("siteId")) {
+						return putSiteKnowledgeBaseFolderByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							knowledgeBaseFolder.getExternalReferenceCode(),
+							knowledgeBaseFolder);
+					}
+					else {
+						throw new NotSupportedException(
+							"One of the following parameters must be specified: [siteId]");
+					}
+				};
 			}
 		}
 
