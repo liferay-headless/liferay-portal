@@ -1171,16 +1171,13 @@ public class DefaultObjectEntryManagerImpl
 					if ((scopeKey == null) &&
 						!Objects.equals(
 							relatedObjectDefinition.getScope(),
-							ObjectDefinitionConstants.SCOPE_COMPANY) &&
-						Objects.equals(
-							objectDefinition.getScope(),
 							ObjectDefinitionConstants.SCOPE_COMPANY)) {
 
 						Map<String, Object> nestedObjectEntryProperties =
 							nestedObjectEntry.getProperties();
 
-						scopeKey = (String)nestedObjectEntryProperties.get(
-							"scopeKey");
+						scopeKey = GetterUtil.getString(
+							nestedObjectEntryProperties.get("scopeKey"), null);
 					}
 
 					try {
