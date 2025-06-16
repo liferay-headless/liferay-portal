@@ -33,7 +33,6 @@ import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
 import com.liferay.object.exception.ObjectDefinitionPanelCategoryKeyException;
 import com.liferay.object.exception.ObjectDefinitionPluralLabelException;
-import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionSettingNameException;
 import com.liferay.object.exception.ObjectDefinitionSettingValueException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
@@ -41,6 +40,7 @@ import com.liferay.object.exception.ObjectDefinitionSystemException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectRelationshipEdgeException;
+import com.liferay.object.exception.ObjectScopeException;
 import com.liferay.object.field.builder.BooleanObjectFieldBuilder;
 import com.liferay.object.field.builder.DateObjectFieldBuilder;
 import com.liferay.object.field.builder.DateTimeObjectFieldBuilder;
@@ -297,7 +297,7 @@ public class ObjectDefinitionLocalServiceTest {
 		// Scope is null
 
 		AssertUtils.assertFailure(
-			ObjectDefinitionScopeException.class, "Scope is null",
+			ObjectScopeException.class, "Scope is null",
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, false, true, false,
 				false, false, null,
@@ -318,7 +318,7 @@ public class ObjectDefinitionLocalServiceTest {
 		String scope = RandomTestUtil.randomString();
 
 		AssertUtils.assertFailure(
-			ObjectDefinitionScopeException.class,
+			ObjectScopeException.class,
 			"No object scope provider found with key " + scope,
 			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), 0, null, false, false, true, false,
@@ -336,7 +336,7 @@ public class ObjectDefinitionLocalServiceTest {
 						StringUtil.randomId()))));
 
 		AssertUtils.assertFailure(
-			ObjectDefinitionScopeException.class,
+			ObjectScopeException.class,
 			StringBundler.concat(
 				"Scope \"", ObjectDefinitionConstants.SCOPE_SITE,
 				"\" cannot be associated with storage type \"",
@@ -1484,7 +1484,7 @@ public class ObjectDefinitionLocalServiceTest {
 		// Scope is null
 
 		AssertUtils.assertFailure(
-			ObjectDefinitionScopeException.class, "Scope is null",
+			ObjectScopeException.class, "Scope is null",
 			() ->
 				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
 					null, TestPropsValues.getUserId(), "Test", null,
@@ -1500,7 +1500,7 @@ public class ObjectDefinitionLocalServiceTest {
 		String scope = RandomTestUtil.randomString();
 
 		AssertUtils.assertFailure(
-			ObjectDefinitionScopeException.class,
+			ObjectScopeException.class,
 			"No object scope provider found with key " + scope,
 			() ->
 				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
