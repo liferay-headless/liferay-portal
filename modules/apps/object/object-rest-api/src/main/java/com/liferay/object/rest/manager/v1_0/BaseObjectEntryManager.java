@@ -12,7 +12,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
-import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectScopeException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
@@ -130,8 +130,10 @@ public abstract class BaseObjectEntryManager {
 
 		if (objectScopeProvider.isGroupAware()) {
 			if (scopeKey == null) {
-				throw new ObjectEntryValuesException.RequiredScopeKey(
-					objectDefinition.getName());
+				throw new ObjectScopeException(
+					StringBundler.concat(
+						"No scope key was provided for the \"",
+						objectDefinition.getName(), "\" entry."));
 			}
 
 			return GetterUtil.getLong(
