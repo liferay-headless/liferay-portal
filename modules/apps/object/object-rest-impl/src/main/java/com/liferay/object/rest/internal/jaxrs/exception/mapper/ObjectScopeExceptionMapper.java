@@ -8,7 +8,9 @@ package com.liferay.object.rest.internal.jaxrs.exception.mapper;
 import com.liferay.object.exception.ObjectScopeException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
+
 import jakarta.ws.rs.ext.ExceptionMapper;
+
 import org.osgi.service.component.annotations.Component;
 
 /**
