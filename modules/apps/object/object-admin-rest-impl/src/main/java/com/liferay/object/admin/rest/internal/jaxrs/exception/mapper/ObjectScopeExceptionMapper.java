@@ -6,6 +6,7 @@
 package com.liferay.object.admin.rest.internal.jaxrs.exception.mapper;
 
 import com.liferay.object.exception.ObjectScopeException;
+import com.liferay.object.jaxrs.exception.mapper.util.ObjectExceptionMapperUtil;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
@@ -29,7 +30,8 @@ public class ObjectScopeExceptionMapper
 
 	@Override
 	protected Problem getProblem(ObjectScopeException objectScopeException) {
-		return new Problem(objectScopeException);
+		return ObjectExceptionMapperUtil.getObjectScopeExceptionProblem(
+			objectScopeException);
 	}
 
 }
