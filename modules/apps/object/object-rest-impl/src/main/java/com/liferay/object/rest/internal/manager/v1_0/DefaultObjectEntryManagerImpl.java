@@ -1168,7 +1168,9 @@ public class DefaultObjectEntryManagerImpl
 							serviceBuilderObjectEntry.getPrimaryKey());
 					}
 
-					if ((scopeKey == null) &&
+					if (Objects.equals(
+							objectDefinition.getScope(),
+							ObjectDefinitionConstants.SCOPE_COMPANY) &&
 						!Objects.equals(
 							relatedObjectDefinition.getScope(),
 							ObjectDefinitionConstants.SCOPE_COMPANY)) {
