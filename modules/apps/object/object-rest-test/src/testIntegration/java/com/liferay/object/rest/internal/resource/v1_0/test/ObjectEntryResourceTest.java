@@ -9495,6 +9495,8 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			JSONCompareMode.LENIENT);
 
+		// No scopeKey
+
 		JSONAssert.assertEquals(
 			JSONUtil.put(
 				"status", "BAD_REQUEST"
@@ -9517,6 +9519,35 @@ public class ObjectEntryResourceTest {
 						).put(
 							"externalReferenceCode",
 							"c" + RandomTestUtil.randomString()
+						))
+				).toString(),
+				_objectDefinition1.getRESTContextPath(), Http.Method.POST
+			).toString(),
+			JSONCompareMode.LENIENT);
+
+		// Empty scopeKey
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"status", "BAD_REQUEST"
+			).put(
+				"title", "Group ID 0 is not valid for scope \"site\""
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				JSONUtil.put(
+					_OBJECT_FIELD_NAME_1, _OBJECT_TEXT_FIELD_VALUE_1
+				).put(
+					"externalReferenceCode", _ERC_VALUE_3
+				).put(
+					_objectRelationship1.getName(),
+					JSONUtil.putAll(
+						JSONUtil.put(
+							_OBJECT_FIELD_NAME_1, _OBJECT_TEXT_FIELD_VALUE_2
+						).put(
+							"externalReferenceCode",
+							"c" + RandomTestUtil.randomString()
+						).put(
+							"scopeKey", ""
 						))
 				).toString(),
 				_objectDefinition1.getRESTContextPath(), Http.Method.POST
