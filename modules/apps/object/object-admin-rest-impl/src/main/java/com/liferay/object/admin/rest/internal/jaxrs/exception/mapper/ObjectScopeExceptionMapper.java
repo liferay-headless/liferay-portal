@@ -14,7 +14,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Pedro Tavares
+ * @author Javier Gamarra
  */
 @Component(
 	property = {
