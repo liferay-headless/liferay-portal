@@ -5,11 +5,9 @@
 
 package com.liferay.object.jaxrs.exception.mapper.util;
 
-import com.liferay.object.exception.ObjectScopeException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
 import java.util.List;
 
@@ -17,12 +15,6 @@ import java.util.List;
  * @author Murilo Stodolni
  */
 public class ObjectExceptionMapperUtil {
-
-	public static Problem getObjectScopeExceptionProblem(
-		ObjectScopeException objectScopeException) {
-
-		return new Problem(objectScopeException);
-	}
 
 	public static String getTitle(
 		AcceptLanguage acceptLanguage, List<Object> arguments,
