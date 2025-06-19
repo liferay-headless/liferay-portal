@@ -10,6 +10,8 @@ import {waitForAlert} from '../../utils/waitForAlert';
 export class AssetPublisherPage {
 	readonly page: Page;
 
+	readonly collectionInput: Locator;
+	readonly collectionSelectorIframe: FrameLocator;
 	readonly configurationIframe: FrameLocator;
 	readonly itemSelector: Locator;
 
@@ -20,6 +22,13 @@ export class AssetPublisherPage {
 			'iframe[title*="Configuration"]'
 		);
 		this.itemSelector = this.page.getByLabel('Select Items');
+		this.collectionInput = this.configurationIframe.getByLabel(
+			'Collection',
+			{exact: true}
+		);
+		this.collectionSelectorIframe = this.configurationIframe.frameLocator(
+			'iframe[title="Select Collection"]'
+		);
 	}
 
 	async changeAssetSelection(type: 'Collection' | 'Dynamic' | 'Manual') {
@@ -97,5 +106,12 @@ export class AssetPublisherPage {
 			this.configurationIframe,
 			'Success:You have successfully updated the setup.'
 		);
+	}
+
+	async selectCollection(assetListEntryName: string) {
+		await this.collectionInput.click();
+		await this.collectionSelectorIframe
+			.getByRole('button', {name: `${assetListEntryName}`})
+			.click();
 	}
 }
