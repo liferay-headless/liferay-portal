@@ -10,21 +10,12 @@ import com.liferay.object.jaxrs.exception.mapper.util.ObjectExceptionMapperUtil;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
-import jakarta.ws.rs.ext.ExceptionMapper;
-
-import org.osgi.service.component.annotations.Component;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * @author Alberto Javier Moreno Lage
  */
-@Component(
-	property = {
-		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Object.Admin.REST)",
-		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Object.Admin.REST.ObjectDefinitionScopeExceptionMapper"
-	},
-	service = ExceptionMapper.class
-)
+@Provider
 public class ObjectScopeExceptionMapper
 	extends BaseExceptionMapper<ObjectScopeException> {
 
