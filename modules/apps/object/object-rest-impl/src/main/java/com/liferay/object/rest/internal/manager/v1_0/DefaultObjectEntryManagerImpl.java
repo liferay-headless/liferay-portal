@@ -99,6 +99,7 @@ import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -1175,11 +1176,9 @@ public class DefaultObjectEntryManagerImpl
 							relatedObjectDefinition.getScope(),
 							ObjectDefinitionConstants.SCOPE_COMPANY)) {
 
-						Map<String, Object> nestedObjectEntryProperties =
-							nestedObjectEntry.getProperties();
-
-						scopeKey = GetterUtil.getString(
-							nestedObjectEntryProperties.get("scopeKey"), null);
+						scopeKey = MapUtil.getString(
+							nestedObjectEntry.getProperties(), "scopeKey",
+							null);
 					}
 
 					try {
