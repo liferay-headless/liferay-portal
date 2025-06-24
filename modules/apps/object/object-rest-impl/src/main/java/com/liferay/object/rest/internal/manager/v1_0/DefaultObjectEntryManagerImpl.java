@@ -1793,6 +1793,8 @@ public class DefaultObjectEntryManagerImpl
 			Map<String, Serializable> localizedValues =
 				(Map<String, Serializable>)propertyValue;
 
+			boolean updated = false;
+
 			for (Map.Entry<String, Serializable> entry :
 					localizedValues.entrySet()) {
 
@@ -1802,7 +1804,14 @@ public class DefaultObjectEntryManagerImpl
 
 				if (fileEntryId > 0) {
 					entry.setValue(fileEntryId);
+
+					updated = true;
 				}
+			}
+
+			if (updated) {
+				properties.put(
+					objectField.getI18nObjectFieldName(), propertyValue);
 			}
 
 			return;
