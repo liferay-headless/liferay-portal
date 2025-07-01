@@ -855,13 +855,6 @@ public abstract class BaseObjectEntryFolderResourceImpl
 			new MultivaluedHashMap<String, Object>(multivaluedMap));
 	}
 
-	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
-
-		return null;
-	}
-
 	public String getResourceName() {
 		return "ObjectEntryFolder";
 	}
@@ -941,6 +934,13 @@ public abstract class BaseObjectEntryFolderResourceImpl
 				objectEntryFolderUnsafeFunction.apply(objectEntryFolder);
 			}
 		}
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
 	}
 
 	@Override
