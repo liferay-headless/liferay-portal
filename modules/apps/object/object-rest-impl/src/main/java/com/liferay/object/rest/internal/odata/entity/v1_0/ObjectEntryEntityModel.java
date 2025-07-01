@@ -285,13 +285,25 @@ public class ObjectEntryEntityModel implements EntityModel {
 						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
 					objectField);
 
-			entityFieldsMap.put(
-				objectRelationshipERCObjectFieldName,
-				new ReferenceStringEntityField(
+			if (_isSystemObjectERCField(
+					objectDefinition, objectField,
+					objectRelationshipERCObjectFieldName)) {
+
+				entityFieldsMap.put(
 					objectRelationshipERCObjectFieldName,
-					_getExternalReferenceCodeFunction(),
-					objectFieldName.split(StringPool.UNDERLINE)[1] +
-						"/externalReferenceCode"));
+					new StringEntityField(
+						objectRelationshipERCObjectFieldName,
+						locale -> objectRelationshipERCObjectFieldName));
+			}
+			else {
+				entityFieldsMap.put(
+					objectRelationshipERCObjectFieldName,
+					new ReferenceStringEntityField(
+						objectRelationshipERCObjectFieldName,
+						_getExternalReferenceCodeFunction(),
+						objectFieldName.split(StringPool.UNDERLINE)[1] +
+							"/externalReferenceCode"));
+			}
 
 			String relationshipIdName = objectFieldName.substring(
 				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);
@@ -304,6 +316,31 @@ public class ObjectEntryEntityModel implements EntityModel {
 		}
 
 		return entityFieldsMap;
+	}
+
+	private boolean _isSystemObjectERCField(
+		ObjectDefinition objectDefinition, ObjectField objectField,
+		String ercFieldName) {
+
+		if (!ercFieldName.endsWith("EntryERC")) {
+			return false;
+		}
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipLocalServiceUtil.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+		if (objectRelationship == null) {
+			return false;
+		}
+
+		ObjectDefinition relatedObjectDefinition =
+			ObjectRelationshipUtil.getRelatedObjectDefinition(
+				objectDefinition, objectRelationship);
+
+		return relatedObjectDefinition.isUnmodifiableSystemObject();
+		
 	}
 
 	private final Map<String, EntityField> _entityFieldsMap;

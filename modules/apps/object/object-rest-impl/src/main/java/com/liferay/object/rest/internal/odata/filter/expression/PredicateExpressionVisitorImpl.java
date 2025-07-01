@@ -435,9 +435,17 @@ public class PredicateExpressionVisitorImpl
 		EntityField entityField = _getEntityField(
 			(String)fieldName, objectDefinition);
 
+		String fieldNameForColumn = entityField.getFilterableName(null);
+		
+		if (fieldName instanceof String && 
+			((String)fieldName).endsWith("EntryERC") &&
+			fieldNameForColumn.equals(fieldName)) {
+			fieldNameForColumn = ((String)fieldName).replace("ERC", "Id");
+		}
+
 		return (Column<?, Object>)_objectFieldLocalService.getColumn(
 			objectDefinition.getObjectDefinitionId(),
-			entityField.getFilterableName(null));
+			fieldNameForColumn);
 	}
 
 	private EntityField _getEntityField(
@@ -678,9 +686,19 @@ public class PredicateExpressionVisitorImpl
 			(String)left, objectDefinition);
 
 		try {
+			String fieldNameForLookup = entityField.getFilterableName(null);
+			String valueKey = entityField.getName();
+			
+			if (left instanceof String && 
+				((String)left).endsWith("EntryERC") &&
+				fieldNameForLookup.equals(left)) {
+				fieldNameForLookup = ((String)left).replace("ERC", "Id");
+				valueKey = (String)left;
+			}
+
 			ObjectField objectField = _objectFieldLocalService.getObjectField(
 				objectDefinition.getObjectDefinitionId(),
-				entityField.getFilterableName(null));
+				fieldNameForLookup);
 
 			ObjectFieldBusinessType objectFieldBusinessType =
 				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
@@ -688,7 +706,7 @@ public class PredicateExpressionVisitorImpl
 
 			Object value = objectFieldBusinessType.getValue(
 				null, objectField, PrincipalThreadLocal.getUserId(),
-				Collections.singletonMap(entityField.getName(), right));
+				Collections.singletonMap(valueKey, right));
 
 			if (value == null) {
 				value = right;
