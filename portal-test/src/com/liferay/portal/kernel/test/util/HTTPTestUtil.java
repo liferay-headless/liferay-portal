@@ -47,6 +47,21 @@ public class HTTPTestUtil {
 		return response.getResponseCode();
 	}
 
+	public static int invokeToHttpCode(
+			String body, String endpoint, Map<String, String> headers,
+			Http.Method httpMethod)
+		throws Exception {
+
+		Http.Options options = _getHttpOptions(
+			body, endpoint, headers, httpMethod);
+
+		HttpUtil.URLtoString(options);
+
+		Http.Response response = options.getResponse();
+
+		return response.getResponseCode();
+	}
+
 	public static InputStream invokeToInputStream(
 			String body, String endpoint, Http.Method httpMethod)
 		throws Exception {
