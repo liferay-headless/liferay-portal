@@ -92,6 +92,25 @@ public class HeadlessDiscoveryAPIApplication extends Application {
 		}
 
 		if ((accept != null) && accept.contains(MediaType.TEXT_HTML)) {
+			String originHttpServletRequest = httpServletRequest.getHeader(
+				"Origin");
+			String refererHttpServletRequest = httpServletRequest.getHeader(
+				"Referer");
+
+			String portalURL = _portal.getPortalURL(httpServletRequest);
+
+			if (((originHttpServletRequest == null) &&
+				 (refererHttpServletRequest == null)) ||
+				((originHttpServletRequest != null) &&
+				 !originHttpServletRequest.startsWith(portalURL)) ||
+				((refererHttpServletRequest != null) &&
+				 !refererHttpServletRequest.startsWith(portalURL))) {
+
+				return Response.status(
+					403
+				).build();
+			}
+
 			URL url = _getURL("index.html");
 
 			if (url == null) {
