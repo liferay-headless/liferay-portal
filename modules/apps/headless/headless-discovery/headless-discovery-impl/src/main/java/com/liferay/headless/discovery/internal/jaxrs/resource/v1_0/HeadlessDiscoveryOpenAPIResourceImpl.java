@@ -203,7 +203,7 @@ public class HeadlessDiscoveryOpenAPIResourceImpl {
 
 			String path = resourceMethodInfoDTO.path;
 
-			if (path.contains("/openapi")) {
+			if (path.contains("/openapi") && paths.isEmpty()) {
 				String openAPIPath = StringUtil.replace(
 					resourceMethodInfoDTO.path, "{type:json|yaml}", "yaml");
 
