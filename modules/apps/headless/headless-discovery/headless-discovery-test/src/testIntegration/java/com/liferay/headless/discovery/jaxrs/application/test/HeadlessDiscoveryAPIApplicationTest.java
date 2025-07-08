@@ -12,8 +12,6 @@ import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,25 +26,18 @@ public class HeadlessDiscoveryAPIApplicationTest {
 	@Test
 	@TestInfo("LPD-59421")
 	public void test() throws Exception {
-		Map<String, String> headers = HashMapBuilder.put(
-			"Accept", "text/html"
-		).put(
-			"Referer", "http://attacker.local:8087"
-		).build();
-
 		Assert.assertEquals(
 			403,
 			HTTPTestUtil.invokeToHttpCode(
 				null,
 				"api?endpoint=http://attacker.local:8087/o/batch-planner/v1.0" +
 					"/openapi.json",
-				headers, Http.Method.GET));
-
-		headers = HashMapBuilder.put(
-			"Accept", "text/html"
-		).put(
-			"Referer", "http://localhost:8080"
-		).build();
+				HashMapBuilder.put(
+					"Accept", "text/html"
+				).put(
+					"Referer", "http://attacker.local:8087"
+				).build(),
+				Http.Method.GET));
 
 		Assert.assertEquals(
 			200,
@@ -54,7 +45,12 @@ public class HeadlessDiscoveryAPIApplicationTest {
 				null,
 				"api?endpoint=http://localhost:8080/o/batch-planner/v1.0" +
 					"/openapi.json",
-				headers, Http.Method.GET));
+				HashMapBuilder.put(
+					"Accept", "text/html"
+				).put(
+					"Referer", "http://localhost:8080"
+				).build(),
+				Http.Method.GET));
 	}
 
 }
