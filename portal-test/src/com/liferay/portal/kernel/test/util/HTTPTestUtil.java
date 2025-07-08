@@ -37,14 +37,7 @@ public class HTTPTestUtil {
 			String body, String endpoint, Http.Method httpMethod)
 		throws Exception {
 
-		Http.Options options = _getHttpOptions(
-			body, endpoint, null, httpMethod);
-
-		HttpUtil.URLtoString(options);
-
-		Http.Response response = options.getResponse();
-
-		return response.getResponseCode();
+		return invokeToHttpCode(body, endpoint, null, httpMethod);
 	}
 
 	public static int invokeToHttpCode(
