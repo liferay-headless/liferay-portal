@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Magdalena Jedraszak
  */
-@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class HeadlessDiscoveryAPIApplicationTest {
 
