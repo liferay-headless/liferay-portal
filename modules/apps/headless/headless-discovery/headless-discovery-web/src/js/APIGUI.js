@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayLayout from '@clayui/layout';
@@ -16,8 +15,6 @@ import Icon from './Icon';
 import apiFetch from './util/apiFetch';
 
 import 'graphiql/graphiql.css';
-
-import helpInputSwaggerUIPlugin from './swagger-ui/plugins/helpInput';
 
 const APIGUI = () => {
 	const contextPath = window.location.pathname.substring(
@@ -32,7 +29,6 @@ const APIGUI = () => {
 	const [showHeaders, setShowHeaders] = useState(false);
 	const [showGraphQL, setShowGraphQL] = useState(false);
 	const [headers, setHeaders] = useState([{key: '', value: ''}]);
-	const [origin, setOrigin] = useState('');
 
 	const {observer, onClose} = useModal({
 		onClose: () => setShowHeaders(false),
@@ -46,12 +42,6 @@ const APIGUI = () => {
 
 	useEffect(() => {
 		apiFetch(contextPath + '/o/openapi', 'get', {}).then((response) => {
-			setOrigin(
-				Object.values(response)[0][0].substring(
-					0,
-					Object.values(response)[0][0].indexOf('/o/')
-				)
-			);
 			setEndpoints(
 				Object.keys(response)
 					.flatMap((key) => response[key])
@@ -303,18 +293,9 @@ const APIGUI = () => {
 					</ClayModal>
 				)}
 
-				{showGraphQL ? (
-					<ClayLayout.Row className="vh-100">
-						<GraphiQL fetcher={graphQLFetcher} />
-					</ClayLayout.Row>
-				) : endpoint && !endpoint.startsWith(origin) ? (
-					<ClayAlert className="mt-4" displayType="danger">
-						Forbidden access.
-					</ClayAlert>
-				) : (
+				{!showGraphQL && (
 					<SwaggerUI
 						displayOperationId={true}
-						plugins={[helpInputSwaggerUIPlugin(contextPath)]}
 						requestInterceptor={requestInterceptor}
 						supportedSubmitMethods={[
 							'get',
@@ -331,6 +312,12 @@ const APIGUI = () => {
 							)
 						}
 					/>
+				)}
+
+				{showGraphQL && (
+					<ClayLayout.Row className="vh-100">
+						<GraphiQL fetcher={graphQLFetcher} />
+					</ClayLayout.Row>
 				)}
 			</ClayLayout.ContainerFluid>
 		</div>
