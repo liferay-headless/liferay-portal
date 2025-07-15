@@ -18,9 +18,11 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.module.util.BundleUtil;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,19 +94,14 @@ public class HeadlessDiscoveryAPIApplication extends Application {
 		}
 
 		if ((accept != null) && accept.contains(MediaType.TEXT_HTML)) {
-			String originHttpServletRequest = httpServletRequest.getHeader(
-				"Origin");
-			String refererHttpServletRequest = httpServletRequest.getHeader(
-				"Referer");
+			String endPoint = ParamUtil.getString(
+				httpServletRequest, "endpoint");
 
 			String portalURL = _portal.getPortalURL(httpServletRequest);
 
-			if (((originHttpServletRequest == null) &&
-				 (refererHttpServletRequest == null)) ||
-				((originHttpServletRequest != null) &&
-				 !originHttpServletRequest.startsWith(portalURL)) ||
-				((refererHttpServletRequest != null) &&
-				 !refererHttpServletRequest.startsWith(portalURL))) {
+			if (Validator.isNotNull(endPoint) &&
+				(!endPoint.startsWith(portalURL) ||
+				 !endPoint.startsWith(portalURL))) {
 
 				return Response.status(
 					403
