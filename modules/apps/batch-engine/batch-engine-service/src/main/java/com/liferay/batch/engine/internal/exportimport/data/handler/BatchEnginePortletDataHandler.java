@@ -98,6 +98,9 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		}
 
 		setEmptyControlsAllowed(true);
+
+		setPortletId(
+			exportImportVulcanBatchEngineTaskItemDelegate.getPortletId());
 	}
 
 	public void exportDeletionSystemEvents(
