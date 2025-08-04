@@ -11,6 +11,7 @@ import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.headless.admin.user.client.dto.v1_0.Role;
 import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.pagination.Pagination;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +50,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.permission.PermissionUtil;
+import com.liferay.roles.admin.constants.RolesAdminPortletKeys;
 
 import java.text.DateFormat;
 
@@ -898,14 +898,13 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 
 		role.setPermissions(new Permission[] {permission1, permission2});
 
-		waitForFinish(
-			"COMPLETED",
-			HTTPTestUtil.invokeToJSONObject(
-				JSONUtil.put(
-					"items",
-					JSONUtil.put(_jsonFactory.createJSONObject(role.toString()))
-				).toString(),
-				"headless-admin-user/v1.0/roles/batch", Http.Method.POST));
+		ExportImportTestUtil.Status status =
+			ExportImportTestUtil.importJSONArray(
+				TestPropsValues.getCompanyId(),
+				JSONUtil.put(_jsonFactory.createJSONObject(role.toString())),
+				RolesAdminPortletKeys.ROLES_ADMIN);
+
+		Assert.assertEquals(ExportImportTestUtil.Status.SUCCESS, status);
 
 		com.liferay.portal.kernel.model.Role serviceBuilderRole2 =
 			_roleLocalService.fetchRoleByExternalReferenceCode(

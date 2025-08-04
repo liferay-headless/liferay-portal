@@ -6,6 +6,7 @@
 package com.liferay.headless.admin.user.resource.v1_0.test;
 
 import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryModel;
 import com.liferay.account.model.AccountEntryOrganizationRel;
@@ -35,6 +36,7 @@ import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.expando.test.util.ExpandoTestUtil;
+import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.headless.admin.user.client.custom.field.CustomField;
 import com.liferay.headless.admin.user.client.custom.field.CustomValue;
 import com.liferay.headless.admin.user.client.dto.v1_0.Account;
@@ -78,7 +80,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
@@ -91,7 +92,6 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -1952,15 +1952,13 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 				}
 			});
 
-		waitForFinish(
-			"COMPLETED",
-			HTTPTestUtil.invokeToJSONObject(
-				JSONUtil.put(
-					"items",
-					JSONUtil.put(
-						_jsonFactory.createJSONObject(account.toString()))
-				).toString(),
-				"headless-admin-user/v1.0/accounts/batch", Http.Method.POST));
+		ExportImportTestUtil.Status status =
+			ExportImportTestUtil.importJSONArray(
+				TestPropsValues.getCompanyId(),
+				JSONUtil.put(_jsonFactory.createJSONObject(account.toString())),
+				AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN);
+
+		Assert.assertEquals(ExportImportTestUtil.Status.SUCCESS, status);
 
 		AccountGroup accountGroup2 =
 			_accountGroupLocalService.fetchAccountGroupByExternalReferenceCode(
