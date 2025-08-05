@@ -258,15 +258,6 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		}
 	}
 
-	@FeatureFlag("LPD-47858")
-	@Override
-	@Test
-	public void testPostRole() throws Exception {
-		super.testPostRole();
-
-		_testPostRoleBatch();
-	}
-
 	@Override
 	@Test
 	public void testPostRoleByExternalReferenceCodeUserAccountAssociation()
@@ -421,6 +412,15 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 					_getRoleId(_addRole(true, RoleConstants.TYPE_ORGANIZATION)),
 					_user.getUserId(), testGroup.getGroupId()));
 		}
+	}
+
+	@FeatureFlag("LPD-47858")
+	@Override
+	@Test
+	public void testPutRoleByExternalReferenceCode() throws Exception {
+		super.testPutRoleByExternalReferenceCode();
+
+		_testPutRoleByExternalReferenceCodeImportUsingBatch();
 	}
 
 	@Override
@@ -870,7 +870,9 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 					Objects.equals(permission.getActionIds()[0], "DELETE")));
 	}
 
-	private void _testPostRoleBatch() throws Exception {
+	private void _testPutRoleByExternalReferenceCodeImportUsingBatch()
+		throws Exception {
+
 		Role role = randomRole();
 
 		com.liferay.portal.kernel.model.Role serviceBuilderRole1 =

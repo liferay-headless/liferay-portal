@@ -408,13 +408,11 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 				_accountEntry.getAccountEntryId(), "-"));
 	}
 
-	@FeatureFlag("LPD-47858")
 	@Override
 	@Test
 	public void testPostOrganization() throws Exception {
 		super.testPostOrganization();
 
-		_testPostOrganizationBatch();
 		_testPostOrganizationWithCustomFields();
 		_testPostOrganizationWithNameOverMaximumLength();
 		_testPostOrganizationWithImageExternalReferenceCode();
@@ -526,11 +524,13 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		_testPutOrganizationWithImageExternalReferenceCode();
 	}
 
+	@FeatureFlag("LPD-47858")
 	@Override
 	@Test
 	public void testPutOrganizationByExternalReferenceCode() throws Exception {
 		super.testPutOrganizationByExternalReferenceCode();
 
+		_testPutOrganizationByExternalReferenceCodeImportUsingBatch();
 		_testPutOrganizationByExternalReferenceCodeKeepsExternalReferenceCode();
 		_testPutOrganizationByExternalReferenceCodeWithImageExternalReferenceCode();
 	}
@@ -1197,7 +1197,95 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			ArrayUtil.containsAll(patchOrganization.getKeywords(), keywords));
 	}
 
-	private void _testPostOrganizationBatch() throws Exception {
+	private void _testPostOrganizationWithCustomFields() throws Exception {
+		ExpandoTable expandoTable = _expandoTableLocalService.addTable(
+			testGroup.getCompanyId(),
+			_classNameLocalService.getClassNameId(
+				com.liferay.portal.kernel.model.Organization.class),
+			"CUSTOM_FIELDS");
+
+		ExpandoColumn expandoColumn = _expandoColumnLocalService.addColumn(
+			expandoTable.getTableId(), "A" + RandomTestUtil.randomString(),
+			ExpandoColumnConstants.STRING);
+
+		UnicodeProperties unicodeProperties =
+			expandoColumn.getTypeSettingsProperties();
+
+		unicodeProperties.setProperty(
+			ExpandoColumnConstants.INDEX_TYPE,
+			String.valueOf(ExpandoColumnConstants.INDEX_TYPE_KEYWORD));
+
+		expandoColumn.setTypeSettingsProperties(unicodeProperties);
+
+		_expandoColumnLocalService.updateExpandoColumn(expandoColumn);
+
+		Organization randomOrganization = randomOrganization();
+
+		String value = RandomTestUtil.randomString();
+
+		randomOrganization.setCustomFields(
+			() -> new CustomField[] {
+				new CustomField() {
+					{
+						customValue = new CustomValue() {
+							{
+								data = value;
+							}
+						};
+						dataType = "Text";
+						name = expandoColumn.getName();
+					}
+				}
+			});
+
+		Organization postOrganization = testPostOrganization_addOrganization(
+			randomOrganization);
+
+		assertEquals(randomOrganization, postOrganization);
+		assertValid(postOrganization);
+
+		Assert.assertNotNull(postOrganization.getCustomFields());
+
+		CustomField postOrganizationCustomField =
+			postOrganization.getCustomFields()[0];
+
+		Assert.assertEquals(
+			expandoColumn.getName(), postOrganizationCustomField.getName());
+	}
+
+	private void _testPostOrganizationWithImageExternalReferenceCode()
+		throws Exception {
+
+		Organization randomOrganization = randomOrganization();
+
+		FileEntry fileEntry = _addImageFileEntry();
+
+		randomOrganization.setImageExternalReferenceCode(
+			fileEntry.getExternalReferenceCode());
+
+		randomOrganization.setImageId(0L);
+
+		Organization postOrganization = organizationResource.postOrganization(
+			randomOrganization);
+
+		Assert.assertTrue(postOrganization.getImageId() > 0);
+	}
+
+	private void _testPostOrganizationWithNameOverMaximumLength()
+		throws Exception {
+
+		Organization organization = randomOrganization();
+
+		organization.setName(RandomTestUtil.randomString(101));
+
+		assertHttpResponseStatusCode(
+			400,
+			organizationResource.postOrganizationHttpResponse(organization));
+	}
+
+	private void _testPutOrganizationByExternalReferenceCodeImportUsingBatch()
+		throws Exception {
+
 		Organization organization = randomOrganization();
 
 		AccountEntry accountEntry1 = _accountEntryLocalService.addAccountEntry(
@@ -1501,92 +1589,6 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 						assetCategory3.getCategoryId()));
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_EMPTY, assetCategory3.getStatus());
-	}
-
-	private void _testPostOrganizationWithCustomFields() throws Exception {
-		ExpandoTable expandoTable = _expandoTableLocalService.addTable(
-			testGroup.getCompanyId(),
-			_classNameLocalService.getClassNameId(
-				com.liferay.portal.kernel.model.Organization.class),
-			"CUSTOM_FIELDS");
-
-		ExpandoColumn expandoColumn = _expandoColumnLocalService.addColumn(
-			expandoTable.getTableId(), "A" + RandomTestUtil.randomString(),
-			ExpandoColumnConstants.STRING);
-
-		UnicodeProperties unicodeProperties =
-			expandoColumn.getTypeSettingsProperties();
-
-		unicodeProperties.setProperty(
-			ExpandoColumnConstants.INDEX_TYPE,
-			String.valueOf(ExpandoColumnConstants.INDEX_TYPE_KEYWORD));
-
-		expandoColumn.setTypeSettingsProperties(unicodeProperties);
-
-		_expandoColumnLocalService.updateExpandoColumn(expandoColumn);
-
-		Organization randomOrganization = randomOrganization();
-
-		String value = RandomTestUtil.randomString();
-
-		randomOrganization.setCustomFields(
-			() -> new CustomField[] {
-				new CustomField() {
-					{
-						customValue = new CustomValue() {
-							{
-								data = value;
-							}
-						};
-						dataType = "Text";
-						name = expandoColumn.getName();
-					}
-				}
-			});
-
-		Organization postOrganization = testPostOrganization_addOrganization(
-			randomOrganization);
-
-		assertEquals(randomOrganization, postOrganization);
-		assertValid(postOrganization);
-
-		Assert.assertNotNull(postOrganization.getCustomFields());
-
-		CustomField postOrganizationCustomField =
-			postOrganization.getCustomFields()[0];
-
-		Assert.assertEquals(
-			expandoColumn.getName(), postOrganizationCustomField.getName());
-	}
-
-	private void _testPostOrganizationWithImageExternalReferenceCode()
-		throws Exception {
-
-		Organization randomOrganization = randomOrganization();
-
-		FileEntry fileEntry = _addImageFileEntry();
-
-		randomOrganization.setImageExternalReferenceCode(
-			fileEntry.getExternalReferenceCode());
-
-		randomOrganization.setImageId(0L);
-
-		Organization postOrganization = organizationResource.postOrganization(
-			randomOrganization);
-
-		Assert.assertTrue(postOrganization.getImageId() > 0);
-	}
-
-	private void _testPostOrganizationWithNameOverMaximumLength()
-		throws Exception {
-
-		Organization organization = randomOrganization();
-
-		organization.setName(RandomTestUtil.randomString(101));
-
-		assertHttpResponseStatusCode(
-			400,
-			organizationResource.postOrganizationHttpResponse(organization));
 	}
 
 	private void _testPutOrganizationByExternalReferenceCodeKeepsExternalReferenceCode()

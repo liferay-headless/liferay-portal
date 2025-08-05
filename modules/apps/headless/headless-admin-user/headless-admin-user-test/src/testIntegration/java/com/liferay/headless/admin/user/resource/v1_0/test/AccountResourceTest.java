@@ -476,13 +476,11 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 					organization2.getOrganizationId()));
 	}
 
-	@FeatureFlag("LPD-47858")
 	@Override
 	@Test
 	public void testPostAccount() throws Exception {
 		super.testPostAccount();
 
-		_testPostAccountBatch();
 		_testPostAccountDuplicateExternalReferenceCode();
 		_testPostAccountWithContactInformation();
 		_testPostAccountWithMoreExternalReferenceCodes();
@@ -626,11 +624,13 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		_testPutAccountWithoutName();
 	}
 
+	@FeatureFlag("LPD-47858")
 	@Override
 	@Test
 	public void testPutAccountByExternalReferenceCode() throws Exception {
 		super.testPutAccountByExternalReferenceCode();
 
+		_testPutAccountByExternalReferenceCodeImportUsingBatch();
 		_testPutAccountByExternalReferenceCodeWithContactInformation();
 		_testPutAccountByExternalReferenceCodeWithMoreExternalReferenceCodes();
 		_testPutAccountByExternalReferenceCodeWithoutName();
@@ -1828,7 +1828,145 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 			postalAddress.getPhoneNumber(), address.getPhoneNumber());
 	}
 
-	private void _testPostAccountBatch() throws Exception {
+	private void _testPostAccountDuplicateExternalReferenceCode()
+		throws Exception {
+
+		Account account1 = randomAccount();
+
+		Account postAccount = accountResource.postAccount(account1);
+
+		Assert.assertEquals(
+			account1.getExternalReferenceCode(),
+			postAccount.getExternalReferenceCode());
+
+		try {
+			Account account2 = randomAccount();
+
+			account2.setExternalReferenceCode(
+				postAccount.getExternalReferenceCode());
+
+			_postAccount(account2);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals(
+				problem.getTitle(),
+				"An account already exists with the same external reference " +
+					"code");
+		}
+	}
+
+	private void _testPostAccountWithContactInformation() throws Exception {
+		Account account = randomAccount();
+
+		AccountContactInformation accountContactInformation =
+			_randomAccountContactInformation();
+
+		account.setAccountContactInformation(accountContactInformation);
+
+		Account postAccount = accountResource.postAccount(account);
+
+		_assertEquals(
+			accountContactInformation,
+			postAccount.getAccountContactInformation());
+	}
+
+	private void _testPostAccountWithMoreExternalReferenceCodes()
+		throws Exception {
+
+		Account randomAccount = randomAccount();
+
+		Organization organization1 = OrganizationTestUtil.addOrganization();
+
+		Address billingAddress = OrganizationTestUtil.addAddress(organization1);
+
+		randomAccount.setDefaultBillingAddressExternalReferenceCode(
+			billingAddress.getExternalReferenceCode());
+
+		randomAccount.setDefaultBillingAddressId(0L);
+
+		Organization organization2 = OrganizationTestUtil.addOrganization();
+
+		Address shippingAddress = OrganizationTestUtil.addAddress(
+			organization2);
+
+		randomAccount.setDefaultShippingAddressExternalReferenceCode(
+			shippingAddress.getExternalReferenceCode());
+
+		randomAccount.setDefaultShippingAddressId(0L);
+
+		FileEntry fileEntry = _addImageFileEntry();
+
+		randomAccount.setLogoExternalReferenceCode(
+			fileEntry.getExternalReferenceCode());
+
+		randomAccount.setLogoId(0L);
+		randomAccount.setOrganizationExternalReferenceCodes(
+			new String[] {
+				organization1.getExternalReferenceCode(),
+				organization2.getExternalReferenceCode()
+			});
+		randomAccount.setOrganizationIds(new Long[0]);
+
+		Account parentAccount = randomAccount();
+
+		Account postParentAccount = testPostAccount_addAccount(parentAccount);
+
+		randomAccount.setParentAccountExternalReferenceCode(
+			postParentAccount.getExternalReferenceCode());
+
+		randomAccount.setParentAccountId(0L);
+
+		Account postAccount = testPostAccount_addAccount(randomAccount);
+
+		Arrays.sort(postAccount.getOrganizationIds());
+
+		Assert.assertArrayEquals(
+			new Long[] {
+				Long.valueOf(organization1.getOrganizationId()),
+				Long.valueOf(organization2.getOrganizationId())
+			},
+			postAccount.getOrganizationIds());
+		Assert.assertEquals(
+			Long.valueOf(billingAddress.getAddressId()),
+			postAccount.getDefaultBillingAddressId());
+		Assert.assertEquals(
+			Long.valueOf(shippingAddress.getAddressId()),
+			postAccount.getDefaultShippingAddressId());
+		Assert.assertEquals(
+			postParentAccount.getId(), postAccount.getParentAccountId());
+		Assert.assertTrue(postAccount.getLogoId() > 0);
+	}
+
+	private void _testPostAccountWithPostalAddressPhoneNumber()
+		throws Exception {
+
+		Account account = randomAccount();
+
+		PostalAddress postalAddress = _randomPostalAddress();
+
+		postalAddress.setPhoneNumber(RandomTestUtil.randomString());
+
+		account.setPostalAddresses(new PostalAddress[] {postalAddress});
+
+		Account postAccount = accountResource.postAccount(account);
+
+		List<Address> addresses = _addressLocalService.getAddresses(
+			TestPropsValues.getCompanyId(), AccountEntry.class.getName(),
+			postAccount.getId());
+
+		Address address = addresses.get(0);
+
+		Assert.assertEquals(
+			postalAddress.getPhoneNumber(), address.getPhoneNumber());
+	}
+
+	private void _testPutAccountByExternalReferenceCodeImportUsingBatch()
+		throws Exception {
+
 		Account account = randomAccount();
 
 		AccountGroup accountGroup1 = _accountGroupLocalService.addAccountGroup(
@@ -2163,142 +2301,6 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 						assetCategory3.getCategoryId()));
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_EMPTY, assetCategory3.getStatus());
-	}
-
-	private void _testPostAccountDuplicateExternalReferenceCode()
-		throws Exception {
-
-		Account account1 = randomAccount();
-
-		Account postAccount = accountResource.postAccount(account1);
-
-		Assert.assertEquals(
-			account1.getExternalReferenceCode(),
-			postAccount.getExternalReferenceCode());
-
-		try {
-			Account account2 = randomAccount();
-
-			account2.setExternalReferenceCode(
-				postAccount.getExternalReferenceCode());
-
-			_postAccount(account2);
-
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Problem problem = problemException.getProblem();
-
-			Assert.assertEquals(
-				problem.getTitle(),
-				"An account already exists with the same external reference " +
-					"code");
-		}
-	}
-
-	private void _testPostAccountWithContactInformation() throws Exception {
-		Account account = randomAccount();
-
-		AccountContactInformation accountContactInformation =
-			_randomAccountContactInformation();
-
-		account.setAccountContactInformation(accountContactInformation);
-
-		Account postAccount = accountResource.postAccount(account);
-
-		_assertEquals(
-			accountContactInformation,
-			postAccount.getAccountContactInformation());
-	}
-
-	private void _testPostAccountWithMoreExternalReferenceCodes()
-		throws Exception {
-
-		Account randomAccount = randomAccount();
-
-		Organization organization1 = OrganizationTestUtil.addOrganization();
-
-		Address billingAddress = OrganizationTestUtil.addAddress(organization1);
-
-		randomAccount.setDefaultBillingAddressExternalReferenceCode(
-			billingAddress.getExternalReferenceCode());
-
-		randomAccount.setDefaultBillingAddressId(0L);
-
-		Organization organization2 = OrganizationTestUtil.addOrganization();
-
-		Address shippingAddress = OrganizationTestUtil.addAddress(
-			organization2);
-
-		randomAccount.setDefaultShippingAddressExternalReferenceCode(
-			shippingAddress.getExternalReferenceCode());
-
-		randomAccount.setDefaultShippingAddressId(0L);
-
-		FileEntry fileEntry = _addImageFileEntry();
-
-		randomAccount.setLogoExternalReferenceCode(
-			fileEntry.getExternalReferenceCode());
-
-		randomAccount.setLogoId(0L);
-		randomAccount.setOrganizationExternalReferenceCodes(
-			new String[] {
-				organization1.getExternalReferenceCode(),
-				organization2.getExternalReferenceCode()
-			});
-		randomAccount.setOrganizationIds(new Long[0]);
-
-		Account parentAccount = randomAccount();
-
-		Account postParentAccount = testPostAccount_addAccount(parentAccount);
-
-		randomAccount.setParentAccountExternalReferenceCode(
-			postParentAccount.getExternalReferenceCode());
-
-		randomAccount.setParentAccountId(0L);
-
-		Account postAccount = testPostAccount_addAccount(randomAccount);
-
-		Arrays.sort(postAccount.getOrganizationIds());
-
-		Assert.assertArrayEquals(
-			new Long[] {
-				Long.valueOf(organization1.getOrganizationId()),
-				Long.valueOf(organization2.getOrganizationId())
-			},
-			postAccount.getOrganizationIds());
-		Assert.assertEquals(
-			Long.valueOf(billingAddress.getAddressId()),
-			postAccount.getDefaultBillingAddressId());
-		Assert.assertEquals(
-			Long.valueOf(shippingAddress.getAddressId()),
-			postAccount.getDefaultShippingAddressId());
-		Assert.assertEquals(
-			postParentAccount.getId(), postAccount.getParentAccountId());
-		Assert.assertTrue(postAccount.getLogoId() > 0);
-	}
-
-	private void _testPostAccountWithPostalAddressPhoneNumber()
-		throws Exception {
-
-		Account account = randomAccount();
-
-		PostalAddress postalAddress = _randomPostalAddress();
-
-		postalAddress.setPhoneNumber(RandomTestUtil.randomString());
-
-		account.setPostalAddresses(new PostalAddress[] {postalAddress});
-
-		Account postAccount = accountResource.postAccount(account);
-
-		List<Address> addresses = _addressLocalService.getAddresses(
-			TestPropsValues.getCompanyId(), AccountEntry.class.getName(),
-			postAccount.getId());
-
-		Address address = addresses.get(0);
-
-		Assert.assertEquals(
-			postalAddress.getPhoneNumber(), address.getPhoneNumber());
 	}
 
 	private void _testPutAccountByExternalReferenceCodeWithContactInformation()

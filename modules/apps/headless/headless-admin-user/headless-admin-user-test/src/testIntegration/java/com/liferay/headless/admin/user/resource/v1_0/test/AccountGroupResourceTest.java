@@ -124,15 +124,6 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 		_testPatchAccountGroupByExternalReferenceCodeWithoutName();
 	}
 
-	@FeatureFlag("LPD-47858")
-	@Override
-	@Test
-	public void testPostAccountGroup() throws Exception {
-		super.testPostAccountGroup();
-
-		_testPostAccountGroupBatch();
-	}
-
 	@Override
 	@Test
 	public void testPostAccountGroupByExternalReferenceCodeAccountByExternalReferenceCode()
@@ -163,12 +154,14 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 		_testPutAccountGroupWithoutName();
 	}
 
+	@FeatureFlag("LPD-47858")
 	@Override
 	@Test
 	public void testPutAccountGroupByExternalReferenceCode() throws Exception {
 		super.testPutAccountGroupByExternalReferenceCode();
 
-		_testPutAccountGroupByExternalReferenceWithoutName();
+		_testPutAccountGroupByExternalReferenceCodeImportUsingBatch();
+		_testPutAccountGroupByExternalReferenceCodeWithoutName();
 	}
 
 	@Override
@@ -579,7 +572,9 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 		assertValid(getAccountGroup);
 	}
 
-	private void _testPostAccountGroupBatch() throws Exception {
+	private void _testPutAccountGroupByExternalReferenceCodeImportUsingBatch()
+		throws Exception {
+
 		AccountGroup randomAccountGroup = randomAccountGroup();
 
 		AccountEntry serviceBuilderAccountEntry1 =
@@ -747,7 +742,7 @@ public class AccountGroupResourceTest extends BaseAccountGroupResourceTestCase {
 			WorkflowConstants.STATUS_EMPTY, serviceBuilderRole3.getStatus());
 	}
 
-	private void _testPutAccountGroupByExternalReferenceWithoutName()
+	private void _testPutAccountGroupByExternalReferenceCodeWithoutName()
 		throws Exception {
 
 		AccountGroup postAccountGroup = _postAccountGroup(randomAccountGroup());
