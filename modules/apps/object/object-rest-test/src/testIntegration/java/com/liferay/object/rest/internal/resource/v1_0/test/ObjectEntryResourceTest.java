@@ -7173,6 +7173,12 @@ public class ObjectEntryResourceTest {
 			).toString(),
 			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
 
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
+			).toString(),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
 		jsonObject = HTTPTestUtil.invokeToJSONObject(
 			null,
 			_objectDefinition1.getRESTContextPath() + StringPool.SLASH +
