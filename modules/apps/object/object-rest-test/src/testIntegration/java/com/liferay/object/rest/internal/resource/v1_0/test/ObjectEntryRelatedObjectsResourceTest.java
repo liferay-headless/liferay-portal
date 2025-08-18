@@ -474,9 +474,105 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		_objectEntry1 = ObjectEntryTestUtil.addObjectEntry(
 			_objectDefinition1, _OBJECT_FIELD_NAME_1, _OBJECT_FIELD_VALUE_1);
 
+		_objectEntry2 = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition2, _OBJECT_FIELD_NAME_2, _OBJECT_FIELD_VALUE_2);
+
+		_objectEntry3 = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition2, _OBJECT_FIELD_NAME_2,
+			RandomTestUtil.randomString());
+
 		ObjectRelationshipTestUtil.relateObjectEntries(
 			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
 			objectRelationship, TestPropsValues.getUserId());
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			_objectEntry1.getPrimaryKey(), _objectEntry3.getPrimaryKey(),
+			objectRelationship, TestPropsValues.getUserId());
+
+		// LPD-62302
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?nestedFields=",
+				objectRelationship.getName()),
+			Http.Method.GET);
+
+		JSONObject objectEntryJSONObject = null;
+
+		for (int i = 0;
+			 i < jsonObject.getJSONArray(
+				 "items"
+			 ).length(); i++) {
+
+			JSONObject itemsJSONObject = jsonObject.getJSONArray(
+				"items"
+			).getJSONObject(
+				i
+			);
+
+			if (itemsJSONObject.getLong("id") ==
+					_objectEntry1.getObjectEntryId()) {
+
+				objectEntryJSONObject = itemsJSONObject;
+
+				break;
+			}
+		}
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				objectRelationship.getName(),
+				JSONUtil.putAll(
+					JSONUtil.put("id", _objectEntry2.getObjectEntryId()),
+					JSONUtil.put("id", _objectEntry3.getObjectEntryId()))
+			).toString(),
+			objectEntryJSONObject.toString(), JSONCompareMode.LENIENT);
+
+		Assert.assertEquals(
+			204,
+			HTTPTestUtil.invokeToHttpCode(
+				null,
+				StringBundler.concat(
+					_objectDefinition2.getRESTContextPath(),
+					"/by-external-reference-code/",
+					_objectEntry3.getExternalReferenceCode()),
+				Http.Method.DELETE));
+
+		jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null,
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), "?nestedFields=",
+				objectRelationship.getName()),
+			Http.Method.GET);
+
+		objectEntryJSONObject = null;
+
+		for (int i = 0;
+			 i < jsonObject.getJSONArray(
+				 "items"
+			 ).length(); i++) {
+
+			JSONObject itemsJSONObject = jsonObject.getJSONArray(
+				"items"
+			).getJSONObject(
+				i
+			);
+
+			if (itemsJSONObject.getLong("id") ==
+					_objectEntry1.getObjectEntryId()) {
+
+				objectEntryJSONObject = itemsJSONObject;
+
+				break;
+			}
+		}
+
+		Assert.assertEquals(
+			1,
+			objectEntryJSONObject.getJSONArray(
+				objectRelationship.getName()
+			).length());
 
 		HTTPTestUtil.customize(
 		).withCredentials(
@@ -638,6 +734,115 @@ public class ObjectEntryRelatedObjectsResourceTest {
 						Http.Method.GET));
 			}
 		);
+	}
+
+	@Test
+	@TestInfo("LPD-62302")
+	public void testGetRelatedCustomObjectEntriesAsNestedFields()
+		throws Exception {
+
+		// Many to many relationships
+
+		ObjectRelationship objectRelationship = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		JSONObject jsonObject = null;
+
+		for (int i = 0;
+			 i < HTTPTestUtil.invokeToJSONObject(
+				 null,
+				 StringBundler.concat(
+					 _objectDefinition2.getRESTContextPath(), "?nestedFields=",
+					 objectRelationship.getName()),
+				 Http.Method.GET
+			 ).getJSONArray(
+				 "items"
+			 ).length(); i++) {
+
+			JSONObject itemsJSONObject = HTTPTestUtil.invokeToJSONObject(
+				null,
+				StringBundler.concat(
+					_objectDefinition2.getRESTContextPath(), "?nestedFields=",
+					objectRelationship.getName()),
+				Http.Method.GET
+			).getJSONArray(
+				"items"
+			).getJSONObject(
+				i
+			);
+
+			if (itemsJSONObject.getLong("id") ==
+					_objectEntry2.getObjectEntryId()) {
+
+				jsonObject = itemsJSONObject;
+
+				break;
+			}
+		}
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				objectRelationship.getName(),
+				JSONUtil.putAll(
+					JSONUtil.put("id", _objectEntry1.getObjectEntryId()))
+			).toString(),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
+
+		// One to many relationships
+
+		objectRelationship = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		ObjectRelationshipTestUtil.relateObjectEntries(
+			_objectEntry1.getPrimaryKey(), _objectEntry3.getPrimaryKey(),
+			objectRelationship, TestPropsValues.getUserId());
+
+		jsonObject = null;
+
+		for (int i = 0;
+			 i < HTTPTestUtil.invokeToJSONObject(
+				 null,
+				 StringBundler.concat(
+					 _objectDefinition1.getRESTContextPath(), "?nestedFields=",
+					 objectRelationship.getName()),
+				 Http.Method.GET
+			 ).getJSONArray(
+				 "items"
+			 ).length(); i++) {
+
+			JSONObject itemsJSONObject = HTTPTestUtil.invokeToJSONObject(
+				null,
+				StringBundler.concat(
+					_objectDefinition1.getRESTContextPath(), "?nestedFields=",
+					objectRelationship.getName()),
+				Http.Method.GET
+			).getJSONArray(
+				"items"
+			).getJSONObject(
+				i
+			);
+
+			if (itemsJSONObject.getLong("id") ==
+					_objectEntry1.getObjectEntryId()) {
+
+				jsonObject = itemsJSONObject;
+
+				break;
+			}
+		}
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				objectRelationship.getName(),
+				JSONUtil.putAll(
+					JSONUtil.put("id", _objectEntry2.getObjectEntryId()),
+					JSONUtil.put("id", _objectEntry3.getObjectEntryId()))
+			).toString(),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
 	}
 
 	@Test
