@@ -9,9 +9,11 @@ import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
@@ -84,8 +86,9 @@ public class CustomFieldsUtil {
 	}
 
 	public static Map<String, Serializable> toMap(
-		String className, long companyId, CustomField[] customFields,
-		Locale locale) {
+			String className, long companyId, CustomField[] customFields,
+			Locale locale)
+		throws PortalException {
 
 		if (customFields == null) {
 			return null;
@@ -108,6 +111,16 @@ public class CustomFieldsUtil {
 			}
 
 			String name = customField.getName();
+
+			if (!expandoBridge.hasAttribute(name) &&
+				LazyReferencingThreadLocal.isEnabled()) {
+
+				expandoBridge.addAttribute(
+					name, customField.getAttributeType(), true);
+
+				// should we add something in the import report about this
+				// "empty" expando attribute?
+			}
 
 			int attributeType = expandoBridge.getAttributeType(name);
 
@@ -347,11 +360,12 @@ public class CustomFieldsUtil {
 
 		String key = entry.getKey();
 
-		int attributeType = expandoBridge.getAttributeType(key);
+		int type = expandoBridge.getAttributeType(key);
 
-		if (ExpandoColumnConstants.GEOLOCATION == attributeType) {
+		if (ExpandoColumnConstants.GEOLOCATION == type) {
 			return new CustomField() {
 				{
+					setAttributeType(() -> type);
 					setCustomValue(
 						() -> {
 							JSONObject jsonObject =
@@ -382,25 +396,25 @@ public class CustomFieldsUtil {
 
 		return new CustomField() {
 			{
+				setAttributeType(() -> type);
 				setCustomValue(
 					() -> new CustomValue() {
 						{
 							setData(
 								() -> _getValue(
-									attributeType, locale,
+									type, locale,
 									_getValue(
-										attributeType, displayType, entry,
-										expandoBridge, key)));
+										type, displayType, entry, expandoBridge,
+										key)));
 							setData_i18n(
 								() -> _getLocalizedValues(
-									acceptAllLanguages, attributeType,
+									acceptAllLanguages, type,
 									_getValue(
-										attributeType, displayType, entry,
-										expandoBridge, key)));
+										type, displayType, entry, expandoBridge,
+										key)));
 						}
 					});
-				setDataType(
-					() -> ExpandoColumnConstants.getDataType(attributeType));
+				setDataType(() -> ExpandoColumnConstants.getDataType(type));
 				setName(entry::getKey);
 			}
 		};
