@@ -53,7 +53,7 @@ export const test = mergeTests(
 	exportImportPagesTest,
 	featureFlagsTest({
 		'LPD-35013': {enabled: true},
-		'LPD-35914': {enabled: false, system: true},
+		'LPD-35914': {enabled: false},
 		'LPD-44307': {enabled: true},
 		'LPD-44771': {enabled: true},
 	}),
@@ -76,7 +76,7 @@ export const testWithExportImportAtInstanceLevelFF = mergeTests(
 	styleBookPageTest,
 	systemSettingsPageTest,
 	featureFlagsTest({
-		'LPD-35914': {enabled: true, system: true},
+		'LPD-35914': {enabled: true},
 		'LPD-44307': {enabled: true},
 		'LPD-44771': {enabled: true},
 		'LPD-45276': {enabled: true},
@@ -89,7 +89,7 @@ const testWithDeprecationFFDisabled = mergeTests(
 	exportImportPagesTest,
 	dataApiHelpersTest,
 	featureFlagsTest({
-		'LPD-35914': {enabled: true, system: true},
+		'LPD-35914': {enabled: true},
 		'LPD-44307': {enabled: false},
 		'LPD-44771': {enabled: false},
 	}),
@@ -101,7 +101,7 @@ const testWithDeprecationFF = mergeTests(
 	exportImportPagesTest,
 	dataApiHelpersTest,
 	featureFlagsTest({
-		'LPD-35914': {enabled: true, system: true},
+		'LPD-35914': {enabled: true},
 		'LPD-44307': {enabled: true},
 		'LPD-44771': {enabled: true},
 	}),
