@@ -294,19 +294,14 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		DocumentFolder documentFolder1 =
 			testGraphQLDeleteDocumentFolder_addDocumentFolder();
 
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteDocumentFolder",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"documentFolderId",
-									documentFolder1.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteDocumentFolder"));
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"deleteDocumentFolder",
+				new HashMap<String, Object>() {
+					{
+						put("documentFolderId", documentFolder1.getId());
+					}
+				}));
 
 		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
@@ -327,22 +322,16 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		DocumentFolder documentFolder2 =
 			testGraphQLDeleteDocumentFolder_addDocumentFolder();
 
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"headlessDelivery_v1_0",
-						new GraphQLField(
-							"deleteDocumentFolder",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"documentFolderId",
-										documentFolder2.getId());
-								}
-							}))),
-				"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
-				"Object/deleteDocumentFolder"));
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"headlessDelivery_v1_0",
+				new GraphQLField(
+					"deleteDocumentFolder",
+					new HashMap<String, Object>() {
+						{
+							put("documentFolderId", documentFolder2.getId());
+						}
+					})));
 
 		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
@@ -439,6 +428,79 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLDeleteDocumentFolderMyRating() throws Exception {
+
+		// No namespace
+
+		DocumentFolder documentFolder1 =
+			testGraphQLDeleteDocumentFolderMyRating_addDocumentFolder();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"deleteDocumentFolderMyRating",
+				new HashMap<String, Object>() {
+					{
+						put("documentFolderId", documentFolder1.getId());
+					}
+				}));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"documentFolderMyRating",
+					new HashMap<String, Object>() {
+						{
+							put("documentFolderId", documentFolder1.getId());
+						}
+					},
+					getGraphQLFields())),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessDelivery_v1_0
+
+		DocumentFolder documentFolder2 =
+			testGraphQLDeleteDocumentFolderMyRating_addDocumentFolder();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"headlessDelivery_v1_0",
+				new GraphQLField(
+					"deleteDocumentFolderMyRating",
+					new HashMap<String, Object>() {
+						{
+							put("documentFolderId", documentFolder2.getId());
+						}
+					})));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessDelivery_v1_0",
+					new GraphQLField(
+						"documentFolderMyRating",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"documentFolderId",
+									documentFolder2.getId());
+							}
+						},
+						getGraphQLFields()))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected DocumentFolder
+			testGraphQLDeleteDocumentFolderMyRating_addDocumentFolder()
+		throws Exception {
+
+		return testGraphQLDocumentFolder_addDocumentFolder();
+	}
+
+	@Test
 	public void testDeleteSiteDocumentsFolderByExternalReferenceCode()
 		throws Exception {
 
@@ -475,6 +537,105 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLDeleteSiteDocumentsFolderByExternalReferenceCode()
+		throws Exception {
+
+		// No namespace
+
+		DocumentFolder documentFolder1 =
+			testGraphQLDeleteSiteDocumentsFolderByExternalReferenceCode_addDocumentFolder();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"deleteSiteDocumentsFolderByExternalReferenceCode",
+				new HashMap<String, Object>() {
+					{
+						put(
+							"siteKey",
+							"\"" + documentFolder1.getSiteId() + "\"");
+						put(
+							"externalReferenceCode",
+							"\"" + documentFolder1.getExternalReferenceCode() +
+								"\"");
+					}
+				}));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"documentsFolderByExternalReferenceCode",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"siteKey",
+								"\"" + documentFolder1.getSiteId() + "\"");
+							put(
+								"externalReferenceCode",
+								"\"" +
+									documentFolder1.getExternalReferenceCode() +
+										"\"");
+						}
+					},
+					getGraphQLFields())),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessDelivery_v1_0
+
+		DocumentFolder documentFolder2 =
+			testGraphQLDeleteSiteDocumentsFolderByExternalReferenceCode_addDocumentFolder();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"headlessDelivery_v1_0",
+				new GraphQLField(
+					"deleteSiteDocumentsFolderByExternalReferenceCode",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"siteKey",
+								"\"" + documentFolder2.getSiteId() + "\"");
+							put(
+								"externalReferenceCode",
+								"\"" +
+									documentFolder2.getExternalReferenceCode() +
+										"\"");
+						}
+					})));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessDelivery_v1_0",
+					new GraphQLField(
+						"documentsFolderByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"siteKey",
+									"\"" + documentFolder2.getSiteId() + "\"");
+								put(
+									"externalReferenceCode",
+									"\"" +
+										documentFolder2.
+											getExternalReferenceCode() + "\"");
+							}
+						},
+						getGraphQLFields()))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected DocumentFolder
+			testGraphQLDeleteSiteDocumentsFolderByExternalReferenceCode_addDocumentFolder()
+		throws Exception {
+
+		return testGraphQLSiteDocumentFolder_addDocumentFolder();
+	}
+
+	@Test
 	public void testGetAssetLibraryDocumentFolderPermissionsPage()
 		throws Exception {
 
@@ -495,6 +656,42 @@ public abstract class BaseDocumentFolderResourceTestCase {
 
 		return documentFolderResource.postAssetLibraryDocumentFolder(
 			testDepotEntry.getDepotEntryId(), randomDocumentFolder());
+	}
+
+	@Test
+	public void testGraphQLGetAssetLibraryDocumentFolderPermissionsPage()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentFolder postDocumentFolder =
+			testGetAssetLibraryDocumentFolderPermissionsPage_addDocumentFolder();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"assetLibraryDocumentFolderPermissions",
+			new HashMap<String, Object>() {
+				{
+					put(
+						"assetLibraryId",
+						"\"" +
+							testGraphQLGetAssetLibraryDocumentFolderPermissionsPage_getAssetLibraryId() +
+								"\"");
+				}
+			},
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		JSONObject assetLibraryDocumentFolderPermissionsJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/assetLibraryDocumentFolderPermissions");
+
+		Assert.assertNotNull(assetLibraryDocumentFolderPermissionsJSONObject);
+	}
+
+	protected Long
+			testGraphQLGetAssetLibraryDocumentFolderPermissionsPage_getAssetLibraryId()
+		throws Exception {
+
+		return testDepotEntry.getDepotEntryId();
 	}
 
 	@Test
@@ -959,6 +1156,87 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLGetAssetLibraryDocumentFoldersPage()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryDocumentFoldersPage_getAssetLibraryId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"assetLibraryDocumentFolders",
+			new HashMap<String, Object>() {
+				{
+					put("assetLibraryId", "\"" + assetLibraryId + "\"");
+					put("search", null);
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject assetLibraryDocumentFoldersJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/assetLibraryDocumentFolders");
+
+		long totalCount = assetLibraryDocumentFoldersJSONObject.getLong(
+			"totalCount");
+
+		DocumentFolder documentFolder1 =
+			testGraphQLAssetLibraryDocumentFolder_addDocumentFolder(
+				assetLibraryId, randomDocumentFolder());
+
+		DocumentFolder documentFolder2 =
+			testGraphQLAssetLibraryDocumentFolder_addDocumentFolder(
+				assetLibraryId, randomDocumentFolder());
+
+		assetLibraryDocumentFoldersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/assetLibraryDocumentFolders");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			assetLibraryDocumentFoldersJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersJSONObject.getString("items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersJSONObject.getString("items"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		assetLibraryDocumentFoldersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField("headlessDelivery_v1_0", graphQLField)),
+			"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+			"JSONObject/assetLibraryDocumentFolders");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			assetLibraryDocumentFoldersJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersJSONObject.getString("items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersJSONObject.getString("items"))));
+	}
+
+	@Test
 	public void testGetAssetLibraryDocumentFoldersRatedByMePage()
 		throws Exception {
 
@@ -1158,6 +1436,95 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		throws Exception {
 
 		return irrelevantDepotEntry.getDepotEntryId();
+	}
+
+	@Test
+	public void testGraphQLGetAssetLibraryDocumentFoldersRatedByMePage()
+		throws Exception {
+
+		Long assetLibraryId =
+			testGetAssetLibraryDocumentFoldersRatedByMePage_getAssetLibraryId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"assetLibraryDocumentFoldersRatedByMe",
+			new HashMap<String, Object>() {
+				{
+					put("assetLibraryId", "\"" + assetLibraryId + "\"");
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject assetLibraryDocumentFoldersRatedByMeJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/assetLibraryDocumentFoldersRatedByMe");
+
+		long totalCount =
+			assetLibraryDocumentFoldersRatedByMeJSONObject.getLong(
+				"totalCount");
+
+		DocumentFolder documentFolder1 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				assetLibraryId, randomDocumentFolder());
+
+		DocumentFolder documentFolder2 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				assetLibraryId, randomDocumentFolder());
+
+		assetLibraryDocumentFoldersRatedByMeJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/assetLibraryDocumentFoldersRatedByMe");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			assetLibraryDocumentFoldersRatedByMeJSONObject.getLong(
+				"totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersRatedByMeJSONObject.getString(
+						"items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersRatedByMeJSONObject.getString(
+						"items"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		assetLibraryDocumentFoldersRatedByMeJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(
+					new GraphQLField("headlessDelivery_v1_0", graphQLField)),
+				"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+				"JSONObject/assetLibraryDocumentFoldersRatedByMe");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			assetLibraryDocumentFoldersRatedByMeJSONObject.getLong(
+				"totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersRatedByMeJSONObject.getString(
+						"items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					assetLibraryDocumentFoldersRatedByMeJSONObject.getString(
+						"items"))));
 	}
 
 	@Test
@@ -1929,6 +2296,91 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLGetDocumentFolderDocumentFoldersPage()
+		throws Exception {
+
+		Long parentDocumentFolderId =
+			testGetDocumentFolderDocumentFoldersPage_getParentDocumentFolderId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"documentFolderDocumentFolders",
+			new HashMap<String, Object>() {
+				{
+					put("parentDocumentFolderId", parentDocumentFolderId);
+					put("search", null);
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject documentFolderDocumentFoldersJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/documentFolderDocumentFolders");
+
+		long totalCount = documentFolderDocumentFoldersJSONObject.getLong(
+			"totalCount");
+
+		DocumentFolder documentFolder1 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				parentDocumentFolderId, randomDocumentFolder());
+
+		DocumentFolder documentFolder2 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				parentDocumentFolderId, randomDocumentFolder());
+
+		documentFolderDocumentFoldersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/documentFolderDocumentFolders");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			documentFolderDocumentFoldersJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFolderDocumentFoldersJSONObject.getString(
+						"items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFolderDocumentFoldersJSONObject.getString(
+						"items"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		documentFolderDocumentFoldersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField("headlessDelivery_v1_0", graphQLField)),
+			"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+			"JSONObject/documentFolderDocumentFolders");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			documentFolderDocumentFoldersJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFolderDocumentFoldersJSONObject.getString(
+						"items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFolderDocumentFoldersJSONObject.getString(
+						"items"))));
+	}
+
+	@Test
 	public void testGetDocumentFolderPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		DocumentFolder postDocumentFolder =
@@ -1950,6 +2402,29 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLGetDocumentFolderPermissionsPage() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentFolder postDocumentFolder =
+			testGetDocumentFolderPermissionsPage_addDocumentFolder();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"documentFolderPermissions",
+			new HashMap<String, Object>() {
+				{
+					put("documentFolderId", postDocumentFolder.getId());
+				}
+			},
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		JSONObject documentFolderPermissionsJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/documentFolderPermissions");
+
+		Assert.assertNotNull(documentFolderPermissionsJSONObject);
+	}
+
+	@Test
 	public void testGetSiteDocumentFolderPermissionsPage() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		DocumentFolder postDocumentFolder =
@@ -1968,6 +2443,33 @@ public abstract class BaseDocumentFolderResourceTestCase {
 
 		return documentFolderResource.postSiteDocumentFolder(
 			testGroup.getGroupId(), randomDocumentFolder());
+	}
+
+	@Test
+	public void testGraphQLGetSiteDocumentFolderPermissionsPage()
+		throws Exception {
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DocumentFolder postDocumentFolder =
+			testGetSiteDocumentFolderPermissionsPage_addDocumentFolder();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"siteDocumentFolderPermissions",
+			new HashMap<String, Object>() {
+				{
+					put(
+						"siteKey",
+						"\"" + postDocumentFolder.getSiteId() + "\"");
+				}
+			},
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		JSONObject siteDocumentFolderPermissionsJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/siteDocumentFolderPermissions");
+
+		Assert.assertNotNull(siteDocumentFolderPermissionsJSONObject);
 	}
 
 	@Test
@@ -2421,10 +2923,10 @@ public abstract class BaseDocumentFolderResourceTestCase {
 			"documentFolders",
 			new HashMap<String, Object>() {
 				{
+					put("siteKey", "\"" + siteId + "\"");
+					put("search", null);
 					put("page", 1);
 					put("pageSize", 10);
-
-					put("siteKey", "\"" + siteId + "\"");
 				}
 			},
 			new GraphQLField("items", getGraphQLFields()),
@@ -2439,9 +2941,12 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		long totalCount = documentFoldersJSONObject.getLong("totalCount");
 
 		DocumentFolder documentFolder1 =
-			testGraphQLGetSiteDocumentFoldersPage_addDocumentFolder();
+			testGraphQLSiteDocumentFolder_addDocumentFolder(
+				siteId, randomDocumentFolder());
+
 		DocumentFolder documentFolder2 =
-			testGraphQLGetSiteDocumentFoldersPage_addDocumentFolder();
+			testGraphQLSiteDocumentFolder_addDocumentFolder(
+				siteId, randomDocumentFolder());
 
 		documentFoldersJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -2482,13 +2987,6 @@ public abstract class BaseDocumentFolderResourceTestCase {
 			Arrays.asList(
 				DocumentFolderSerDes.toDTOs(
 					documentFoldersJSONObject.getString("items"))));
-	}
-
-	protected DocumentFolder
-			testGraphQLGetSiteDocumentFoldersPage_addDocumentFolder()
-		throws Exception {
-
-		return testGraphQLDocumentFolder_addDocumentFolder();
 	}
 
 	@Test
@@ -2677,6 +3175,85 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLGetSiteDocumentFoldersRatedByMePage()
+		throws Exception {
+
+		Long siteId = testGetSiteDocumentFoldersRatedByMePage_getSiteId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"documentFoldersRatedByMe",
+			new HashMap<String, Object>() {
+				{
+					put("siteKey", "\"" + siteId + "\"");
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject documentFoldersRatedByMeJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/documentFoldersRatedByMe");
+
+		long totalCount = documentFoldersRatedByMeJSONObject.getLong(
+			"totalCount");
+
+		DocumentFolder documentFolder1 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				siteId, randomDocumentFolder());
+
+		DocumentFolder documentFolder2 =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				siteId, randomDocumentFolder());
+
+		documentFoldersRatedByMeJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/documentFoldersRatedByMe");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			documentFoldersRatedByMeJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFoldersRatedByMeJSONObject.getString("items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFoldersRatedByMeJSONObject.getString("items"))));
+
+		// Using the namespace headlessDelivery_v1_0
+
+		documentFoldersRatedByMeJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField("headlessDelivery_v1_0", graphQLField)),
+			"JSONObject/data", "JSONObject/headlessDelivery_v1_0",
+			"JSONObject/documentFoldersRatedByMe");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			documentFoldersRatedByMeJSONObject.getLong("totalCount"));
+
+		assertContains(
+			documentFolder1,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFoldersRatedByMeJSONObject.getString("items"))));
+		assertContains(
+			documentFolder2,
+			Arrays.asList(
+				DocumentFolderSerDes.toDTOs(
+					documentFoldersRatedByMeJSONObject.getString("items"))));
+	}
+
+	@Test
 	public void testGetSiteDocumentsFolderByExternalReferenceCode()
 		throws Exception {
 
@@ -2827,7 +3404,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 			testGraphQLGetSiteDocumentsFolderByExternalReferenceCode_addDocumentFolder()
 		throws Exception {
 
-		return testGraphQLDocumentFolder_addDocumentFolder();
+		return testGraphQLSiteDocumentFolder_addDocumentFolder();
 	}
 
 	@Test
@@ -2885,6 +3462,17 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLPostAssetLibraryDocumentFolder() throws Exception {
+		DocumentFolder randomDocumentFolder = randomDocumentFolder();
+
+		DocumentFolder documentFolder =
+			testGraphQLAssetLibraryDocumentFolder_addDocumentFolder(
+				testDepotEntry.getDepotEntryId(), randomDocumentFolder);
+
+		Assert.assertTrue(equals(randomDocumentFolder, documentFolder));
+	}
+
+	@Test
 	public void testPostDocumentFolderDocumentFolder() throws Exception {
 		DocumentFolder randomDocumentFolder = randomDocumentFolder();
 
@@ -2904,6 +3492,17 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		return documentFolderResource.postDocumentFolderDocumentFolder(
 			testGetDocumentFolderDocumentFoldersPage_getParentDocumentFolderId(),
 			documentFolder);
+	}
+
+	@Test
+	public void testGraphQLPostDocumentFolderDocumentFolder() throws Exception {
+		DocumentFolder randomDocumentFolder = randomDocumentFolder();
+
+		DocumentFolder documentFolder =
+			testGraphQLDocumentFolder_addDocumentFolder(
+				testGroup.getGroupId(), randomDocumentFolder);
+
+		Assert.assertTrue(equals(randomDocumentFolder, documentFolder));
 	}
 
 	@Test
@@ -2930,7 +3529,8 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		DocumentFolder randomDocumentFolder = randomDocumentFolder();
 
 		DocumentFolder documentFolder =
-			testGraphQLDocumentFolder_addDocumentFolder(randomDocumentFolder);
+			testGraphQLSiteDocumentFolder_addDocumentFolder(
+				testGroup.getGroupId(), randomDocumentFolder);
 
 		Assert.assertTrue(equals(randomDocumentFolder, documentFolder));
 	}
@@ -3332,6 +3932,176 @@ public abstract class BaseDocumentFolderResourceTestCase {
 			documentFolderId, rating);
 	}
 
+	protected DocumentFolder testGraphQLDocumentFolder_addDocumentFolder()
+		throws Exception {
+
+		return testGraphQLDocumentFolder_addDocumentFolder(
+			testGroup.getGroupId(), randomDocumentFolder());
+	}
+
+	protected DocumentFolder testGraphQLDocumentFolder_addDocumentFolder(
+			Long siteId, DocumentFolder documentFolder)
+		throws Exception {
+
+		JSONDeserializer<DocumentFolder> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(DocumentFolder.class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			appendGraphQLFieldValue(sb, field.get(documentFolder));
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createSiteDocumentFolder",
+						new HashMap<String, Object>() {
+							{
+								put("siteKey", "\"" + siteId + "\"");
+								put("documentFolder", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createSiteDocumentFolder"),
+			DocumentFolder.class);
+	}
+
+	protected DocumentFolder testGraphQLSiteDocumentFolder_addDocumentFolder()
+		throws Exception {
+
+		return testGraphQLSiteDocumentFolder_addDocumentFolder(
+			testGroup.getGroupId(), randomDocumentFolder());
+	}
+
+	protected DocumentFolder testGraphQLSiteDocumentFolder_addDocumentFolder(
+			Long siteId, DocumentFolder documentFolder)
+		throws Exception {
+
+		JSONDeserializer<DocumentFolder> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(DocumentFolder.class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			appendGraphQLFieldValue(sb, field.get(documentFolder));
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createSiteDocumentFolder",
+						new HashMap<String, Object>() {
+							{
+								put("siteKey", "\"" + siteId + "\"");
+								put("documentFolder", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createSiteDocumentFolder"),
+			DocumentFolder.class);
+	}
+
+	protected DocumentFolder
+			testGraphQLAssetLibraryDocumentFolder_addDocumentFolder()
+		throws Exception {
+
+		return testGraphQLAssetLibraryDocumentFolder_addDocumentFolder(
+			testDepotEntry.getDepotEntryId(), randomDocumentFolder());
+	}
+
+	protected DocumentFolder
+			testGraphQLAssetLibraryDocumentFolder_addDocumentFolder(
+				Long assetLibraryId, DocumentFolder documentFolder)
+		throws Exception {
+
+		JSONDeserializer<DocumentFolder> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(DocumentFolder.class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			appendGraphQLFieldValue(sb, field.get(documentFolder));
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createAssetLibraryDocumentFolder",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"assetLibraryId",
+									"\"" + assetLibraryId + "\"");
+								put("documentFolder", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data",
+				"JSONObject/createAssetLibraryDocumentFolder"),
+			DocumentFolder.class);
+	}
+
 	protected void appendGraphQLFieldValue(StringBuilder sb, Object value)
 		throws Exception {
 
@@ -3375,63 +4145,6 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		else {
 			sb.append(value);
 		}
-	}
-
-	protected DocumentFolder testGraphQLDocumentFolder_addDocumentFolder()
-		throws Exception {
-
-		return testGraphQLDocumentFolder_addDocumentFolder(
-			randomDocumentFolder());
-	}
-
-	protected DocumentFolder testGraphQLDocumentFolder_addDocumentFolder(
-			DocumentFolder documentFolder)
-		throws Exception {
-
-		JSONDeserializer<DocumentFolder> jsonDeserializer =
-			JSONFactoryUtil.createJSONDeserializer();
-
-		StringBuilder sb = new StringBuilder("{");
-
-		for (java.lang.reflect.Field field :
-				getDeclaredFields(DocumentFolder.class)) {
-
-			if (!ArrayUtil.contains(
-					getAdditionalAssertFieldNames(), field.getName())) {
-
-				continue;
-			}
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(field.getName());
-			sb.append(": ");
-
-			appendGraphQLFieldValue(sb, field.get(documentFolder));
-		}
-
-		sb.append("}");
-
-		List<GraphQLField> graphQLFields = getGraphQLFields();
-
-		return jsonDeserializer.deserialize(
-			JSONUtil.getValueAsString(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"createSiteDocumentFolder",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"siteKey",
-									"\"" + testGroup.getGroupId() + "\"");
-								put("documentFolder", sb.toString());
-							}
-						},
-						graphQLFields)),
-				"JSONObject/data", "JSONObject/createSiteDocumentFolder"),
-			DocumentFolder.class);
 	}
 
 	protected void assertContains(

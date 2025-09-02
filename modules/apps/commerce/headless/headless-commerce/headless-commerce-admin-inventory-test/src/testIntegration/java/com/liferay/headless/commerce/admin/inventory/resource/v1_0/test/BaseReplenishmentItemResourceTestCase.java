@@ -27,6 +27,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -260,19 +261,14 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 		ReplenishmentItem replenishmentItem1 =
 			testGraphQLDeleteReplenishmentItem_addReplenishmentItem();
 
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteReplenishmentItem",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"replenishmentItemId",
-									replenishmentItem1.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteReplenishmentItem"));
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"deleteReplenishmentItem",
+				new HashMap<String, Object>() {
+					{
+						put("replenishmentItemId", replenishmentItem1.getId());
+					}
+				}));
 
 		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
@@ -295,23 +291,18 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 		ReplenishmentItem replenishmentItem2 =
 			testGraphQLDeleteReplenishmentItem_addReplenishmentItem();
 
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"headlessCommerceAdminInventory_v1_0",
-						new GraphQLField(
-							"deleteReplenishmentItem",
-							new HashMap<String, Object>() {
-								{
-									put(
-										"replenishmentItemId",
-										replenishmentItem2.getId());
-								}
-							}))),
-				"JSONObject/data",
-				"JSONObject/headlessCommerceAdminInventory_v1_0",
-				"Object/deleteReplenishmentItem"));
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"headlessCommerceAdminInventory_v1_0",
+				new GraphQLField(
+					"deleteReplenishmentItem",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"replenishmentItemId",
+								replenishmentItem2.getId());
+						}
+					})));
 
 		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
@@ -450,6 +441,94 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLDeleteReplenishmentItemByExternalReferenceCode()
+		throws Exception {
+
+		// No namespace
+
+		ReplenishmentItem replenishmentItem1 =
+			testGraphQLDeleteReplenishmentItemByExternalReferenceCode_addReplenishmentItem();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"deleteReplenishmentItemByExternalReferenceCode",
+				new HashMap<String, Object>() {
+					{
+						put(
+							"externalReferenceCode",
+							"\"" +
+								replenishmentItem1.getExternalReferenceCode() +
+									"\"");
+					}
+				}));
+
+		JSONArray errorsJSONArray1 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"replenishmentItemByExternalReferenceCode",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"externalReferenceCode",
+								"\"" +
+									replenishmentItem1.
+										getExternalReferenceCode() + "\"");
+						}
+					},
+					getGraphQLFields())),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray1.length() > 0);
+
+		// Using the namespace headlessCommerceAdminInventory_v1_0
+
+		ReplenishmentItem replenishmentItem2 =
+			testGraphQLDeleteReplenishmentItemByExternalReferenceCode_addReplenishmentItem();
+
+		invokeGraphQLMutation(
+			new GraphQLField(
+				"headlessCommerceAdminInventory_v1_0",
+				new GraphQLField(
+					"deleteReplenishmentItemByExternalReferenceCode",
+					new HashMap<String, Object>() {
+						{
+							put(
+								"externalReferenceCode",
+								"\"" +
+									replenishmentItem2.
+										getExternalReferenceCode() + "\"");
+						}
+					})));
+
+		JSONArray errorsJSONArray2 = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessCommerceAdminInventory_v1_0",
+					new GraphQLField(
+						"replenishmentItemByExternalReferenceCode",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"externalReferenceCode",
+									"\"" +
+										replenishmentItem2.
+											getExternalReferenceCode() + "\"");
+							}
+						},
+						getGraphQLFields()))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray2.length() > 0);
+	}
+
+	protected ReplenishmentItem
+			testGraphQLDeleteReplenishmentItemByExternalReferenceCode_addReplenishmentItem()
+		throws Exception {
+
+		return testGraphQLReplenishmentItem_addReplenishmentItem();
 	}
 
 	@Test
@@ -1095,10 +1174,9 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 			"replenishmentItems",
 			new HashMap<String, Object>() {
 				{
+					put("sku", "\"" + RandomTestUtil.randomString() + "\"");
 					put("page", 1);
 					put("pageSize", 10);
-
-					put("sku", "\"" + sku + "\"");
 				}
 			},
 			new GraphQLField("items", getGraphQLFields()),
@@ -1113,9 +1191,12 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 		long totalCount = replenishmentItemsJSONObject.getLong("totalCount");
 
 		ReplenishmentItem replenishmentItem1 =
-			testGraphQLGetReplenishmentItemsPage_addReplenishmentItem();
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				sku, randomReplenishmentItem());
+
 		ReplenishmentItem replenishmentItem2 =
-			testGraphQLGetReplenishmentItemsPage_addReplenishmentItem();
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				sku, randomReplenishmentItem());
 
 		replenishmentItemsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -1157,13 +1238,6 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 			Arrays.asList(
 				ReplenishmentItemSerDes.toDTOs(
 					replenishmentItemsJSONObject.getString("items"))));
-	}
-
-	protected ReplenishmentItem
-			testGraphQLGetReplenishmentItemsPage_addReplenishmentItem()
-		throws Exception {
-
-		return testGraphQLReplenishmentItem_addReplenishmentItem();
 	}
 
 	@Test
@@ -1363,6 +1437,91 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 	}
 
 	@Test
+	public void testGraphQLGetWarehouseIdReplenishmentItemsPage()
+		throws Exception {
+
+		Long warehouseId =
+			testGetWarehouseIdReplenishmentItemsPage_getWarehouseId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"warehouseIdReplenishmentItems",
+			new HashMap<String, Object>() {
+				{
+					put("warehouseId", warehouseId);
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject warehouseIdReplenishmentItemsJSONObject =
+			JSONUtil.getValueAsJSONObject(
+				invokeGraphQLQuery(graphQLField), "JSONObject/data",
+				"JSONObject/warehouseIdReplenishmentItems");
+
+		long totalCount = warehouseIdReplenishmentItemsJSONObject.getLong(
+			"totalCount");
+
+		ReplenishmentItem replenishmentItem1 =
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				warehouseId, randomReplenishmentItem());
+
+		ReplenishmentItem replenishmentItem2 =
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				warehouseId, randomReplenishmentItem());
+
+		warehouseIdReplenishmentItemsJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/warehouseIdReplenishmentItems");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			warehouseIdReplenishmentItemsJSONObject.getLong("totalCount"));
+
+		assertContains(
+			replenishmentItem1,
+			Arrays.asList(
+				ReplenishmentItemSerDes.toDTOs(
+					warehouseIdReplenishmentItemsJSONObject.getString(
+						"items"))));
+		assertContains(
+			replenishmentItem2,
+			Arrays.asList(
+				ReplenishmentItemSerDes.toDTOs(
+					warehouseIdReplenishmentItemsJSONObject.getString(
+						"items"))));
+
+		// Using the namespace headlessCommerceAdminInventory_v1_0
+
+		warehouseIdReplenishmentItemsJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"headlessCommerceAdminInventory_v1_0", graphQLField)),
+			"JSONObject/data", "JSONObject/headlessCommerceAdminInventory_v1_0",
+			"JSONObject/warehouseIdReplenishmentItems");
+
+		Assert.assertEquals(
+			totalCount + 2,
+			warehouseIdReplenishmentItemsJSONObject.getLong("totalCount"));
+
+		assertContains(
+			replenishmentItem1,
+			Arrays.asList(
+				ReplenishmentItemSerDes.toDTOs(
+					warehouseIdReplenishmentItemsJSONObject.getString(
+						"items"))));
+		assertContains(
+			replenishmentItem2,
+			Arrays.asList(
+				ReplenishmentItemSerDes.toDTOs(
+					warehouseIdReplenishmentItemsJSONObject.getString(
+						"items"))));
+	}
+
+	@Test
 	public void testPatchReplenishmentItem() throws Exception {
 		ReplenishmentItem postReplenishmentItem =
 			testPatchReplenishmentItem_addReplenishmentItem();
@@ -1455,6 +1614,17 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLPostReplenishmentItem() throws Exception {
+		ReplenishmentItem randomReplenishmentItem = randomReplenishmentItem();
+
+		ReplenishmentItem replenishmentItem =
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				null, null, randomReplenishmentItem);
+
+		Assert.assertTrue(equals(randomReplenishmentItem, replenishmentItem));
 	}
 
 	@Test
@@ -1620,8 +1790,104 @@ public abstract class BaseReplenishmentItemResourceTestCase {
 			testGraphQLReplenishmentItem_addReplenishmentItem()
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return testGraphQLReplenishmentItem_addReplenishmentItem(
+			null, null, randomReplenishmentItem());
+	}
+
+	protected ReplenishmentItem
+			testGraphQLReplenishmentItem_addReplenishmentItem(
+				Long warehouseId, String sku,
+				ReplenishmentItem replenishmentItem)
+		throws Exception {
+
+		JSONDeserializer<ReplenishmentItem> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(ReplenishmentItem.class)) {
+
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append(field.getName());
+			sb.append(": ");
+
+			appendGraphQLFieldValue(sb, field.get(replenishmentItem));
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createReplenishmentItem",
+						new HashMap<String, Object>() {
+							{
+								put("warehouseId", warehouseId);
+								put("sku", "\"" + sku + "\"");
+								put("replenishmentItem", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createReplenishmentItem"),
+			ReplenishmentItem.class);
+	}
+
+	protected void appendGraphQLFieldValue(StringBuilder sb, Object value)
+		throws Exception {
+
+		if (value instanceof Object[]) {
+			StringBuilder arraySB = new StringBuilder("[");
+
+			for (Object object : (Object[])value) {
+				if (arraySB.length() > 1) {
+					arraySB.append(", ");
+				}
+
+				arraySB.append("{");
+
+				Class<?> clazz = object.getClass();
+
+				for (java.lang.reflect.Field field :
+						getDeclaredFields(clazz.getSuperclass())) {
+
+					arraySB.append(field.getName());
+					arraySB.append(": ");
+
+					appendGraphQLFieldValue(arraySB, field.get(object));
+
+					arraySB.append(", ");
+				}
+
+				arraySB.setLength(arraySB.length() - 2);
+
+				arraySB.append("}");
+			}
+
+			arraySB.append("]");
+
+			sb.append(arraySB.toString());
+		}
+		else if (value instanceof String) {
+			sb.append("\"");
+			sb.append(value);
+			sb.append("\"");
+		}
+		else {
+			sb.append(value);
+		}
 	}
 
 	protected void assertContains(
