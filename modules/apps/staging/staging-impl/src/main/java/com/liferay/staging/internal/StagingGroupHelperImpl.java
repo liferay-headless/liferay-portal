@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Portlet;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -49,8 +51,37 @@ public class StagingGroupHelperImpl implements StagingGroupHelper {
 			return null;
 		}
 
-		return _groupLocalService.fetchFriendlyURLGroup(
+		Group group = _groupLocalService.fetchFriendlyURLGroup(
 			companyId, CompanyGroupConstants.FRIENDLY_URL);
+
+		if (group != null) {
+			return group;
+		}
+
+		try {
+			group = _groupLocalService.addGroup(
+				_userLocalService.getGuestUserId(companyId),
+				GroupConstants.DEFAULT_PARENT_GROUP_ID,
+				StagingGroupHelper.class.getName(), CompanyConstants.SYSTEM,
+				GroupConstants.DEFAULT_LIVE_GROUP_ID, null, null,
+				GroupConstants.TYPE_SITE_RESTRICTED, true,
+				GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
+				CompanyGroupConstants.FRIENDLY_URL, false, true, null);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Could not add the company group possibly due to  " +
+						"concurrent request created it. Trying to fetch the " +
+							"existing one.",
+					exception);
+			}
+
+			group = _groupLocalService.fetchFriendlyURLGroup(
+				companyId, CompanyGroupConstants.FRIENDLY_URL);
+		}
+
+		return group;
 	}
 
 	@Override
@@ -425,5 +456,8 @@ public class StagingGroupHelperImpl implements StagingGroupHelper {
 
 	@Reference
 	private StagingURLHelper _stagingURLHelper;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
