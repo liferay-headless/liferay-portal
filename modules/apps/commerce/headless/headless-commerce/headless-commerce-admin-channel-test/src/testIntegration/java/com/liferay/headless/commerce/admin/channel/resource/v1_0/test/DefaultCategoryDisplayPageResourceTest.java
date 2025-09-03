@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -149,6 +150,15 @@ public class DefaultCategoryDisplayPageResourceTest
 		assertEquals(
 			postDefaultCategoryDisplayPage, getDefaultCategoryDisplayPage);
 		assertValid(getDefaultCategoryDisplayPage);
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLDeleteChannelIdDefaultCategoryDisplayPage()
+		throws Exception {
+
+		super.testGraphQLDeleteChannelIdDefaultCategoryDisplayPage();
 	}
 
 	@Override

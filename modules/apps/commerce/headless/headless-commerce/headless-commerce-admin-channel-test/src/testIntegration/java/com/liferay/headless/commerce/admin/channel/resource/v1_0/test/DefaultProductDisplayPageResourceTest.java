@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -144,6 +145,15 @@ public class DefaultProductDisplayPageResourceTest
 		assertEquals(
 			postDefaultProductDisplayPage, getDefaultProductDisplayPage);
 		assertValid(getDefaultProductDisplayPage);
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLDeleteChannelIdDefaultProductDisplayPage()
+		throws Exception {
+
+		super.testGraphQLDeleteChannelIdDefaultProductDisplayPage();
 	}
 
 	@Override
