@@ -14,7 +14,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -24,13 +23,6 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class DispatchTriggerResourceTest
 	extends BaseDispatchTriggerResourceTestCase {
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetDispatchTriggersPage() throws Exception {
-		super.testGraphQLGetDispatchTriggersPage();
-	}
 
 	@Override
 	@Test
