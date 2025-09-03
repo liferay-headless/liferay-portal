@@ -57,9 +57,7 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -179,76 +177,6 @@ public class TermResourceTest extends BaseTermResourceTestCase {
 					true, null, "money-order", 1, null);
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm()
-		throws Exception {
-
-		super.testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTermNotFound()
-		throws Exception {
-
-		super.
-			testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTermNotFound();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm()
-		throws Exception {
-
-		super.testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTermNotFound()
-		throws Exception {
-
-		super.
-			testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTermNotFound();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderDeliveryTerm() throws Exception {
-		super.testGraphQLGetPlacedOrderDeliveryTerm();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderDeliveryTermNotFound()
-		throws Exception {
-
-		super.testGraphQLGetPlacedOrderDeliveryTermNotFound();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderPaymentTerm() throws Exception {
-		super.testGraphQLGetPlacedOrderPaymentTerm();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetPlacedOrderPaymentTermNotFound()
-		throws Exception {
-
-		super.testGraphQLGetPlacedOrderPaymentTermNotFound();
-	}
-
 	@Override
 	protected Term
 			testGetPlacedOrderByExternalReferenceCodeDeliveryTerm_addTerm()
@@ -302,68 +230,6 @@ public class TermResourceTest extends BaseTermResourceTestCase {
 
 	@Override
 	protected Long testGetPlacedOrderPaymentTerm_getPlacedOrderId()
-		throws Exception {
-
-		return _commerceOrder.getCommerceOrderId();
-	}
-
-	@Override
-	protected Term
-			testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm_addTerm()
-		throws Exception {
-
-		return _addDeliveryTerm();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodeDeliveryTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return _commerceOrder.getExternalReferenceCode();
-	}
-
-	@Override
-	protected Term
-			testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm_addTerm()
-		throws Exception {
-
-		return _addPaymentTerm();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePaymentTerm_getExternalReferenceCode(
-				Term term)
-		throws Exception {
-
-		return _commerceOrder.getExternalReferenceCode();
-	}
-
-	@Override
-	protected Term testGraphQLGetPlacedOrderDeliveryTerm_addTerm()
-		throws Exception {
-
-		return _addDeliveryTerm();
-	}
-
-	@Override
-	protected Long testGraphQLGetPlacedOrderDeliveryTerm_getPlacedOrderId()
-		throws Exception {
-
-		return _commerceOrder.getCommerceOrderId();
-	}
-
-	@Override
-	protected Term testGraphQLGetPlacedOrderPaymentTerm_addTerm()
-		throws Exception {
-
-		return _addPaymentTerm();
-	}
-
-	@Override
-	protected Long testGraphQLGetPlacedOrderPaymentTerm_getPlacedOrderId()
 		throws Exception {
 
 		return _commerceOrder.getCommerceOrderId();

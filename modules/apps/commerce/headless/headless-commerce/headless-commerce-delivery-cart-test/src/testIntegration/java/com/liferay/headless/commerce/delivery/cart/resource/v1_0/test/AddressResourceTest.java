@@ -175,43 +175,6 @@ public class AddressResourceTest extends BaseAddressResourceTestCase {
 		return _getCartShippingAddres_getCartId();
 	}
 
-	@Override
-	protected Address testGraphQLAddress_addAddress() throws Exception {
-		return _toAddress(_getCommerceAddress());
-	}
-
-	@Override
-	protected Long testGraphQLGetCartBillingAddres_getCartId()
-		throws Exception {
-
-		return _getCartBillingAddres_getCartId();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetCartByExternalReferenceCodeBillingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return _getCartBillingAddress_getCartExternalReferenceCode();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetCartByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				Address address)
-		throws Exception {
-
-		return _getCartShippingAddress_getCartExternalReferenceCode();
-	}
-
-	@Override
-	protected Long testGraphQLGetCartShippingAddres_getCartId()
-		throws Exception {
-
-		return _getCartShippingAddres_getCartId();
-	}
-
 	private long _getCartBillingAddres_getCartId() throws Exception {
 		_commerceOrder = _getCommerceOrder();
 

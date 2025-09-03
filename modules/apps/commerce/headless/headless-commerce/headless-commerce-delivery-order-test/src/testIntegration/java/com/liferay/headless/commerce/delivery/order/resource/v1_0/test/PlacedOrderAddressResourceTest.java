@@ -218,48 +218,6 @@ public class PlacedOrderAddressResourceTest
 		return _commerceOrder.getCommerceOrderId();
 	}
 
-	@Override
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderBillingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return _commerceOrder.getExternalReferenceCode();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetPlacedOrderByExternalReferenceCodePlacedOrderShippingAddress_getExternalReferenceCode(
-				PlacedOrderAddress placedOrderAddress)
-		throws Exception {
-
-		return _commerceOrder.getExternalReferenceCode();
-	}
-
-	@Override
-	protected Long
-			testGraphQLGetPlacedOrderPlacedOrderBillingAddress_getPlacedOrderId()
-		throws Exception {
-
-		return _commerceOrder.getCommerceOrderId();
-	}
-
-	@Override
-	protected Long
-			testGraphQLGetPlacedOrderPlacedOrderShippingAddress_getPlacedOrderId()
-		throws Exception {
-
-		return _commerceOrder.getCommerceOrderId();
-	}
-
-	@Override
-	protected PlacedOrderAddress
-			testGraphQLPlacedOrderAddress_addPlacedOrderAddress()
-		throws Exception {
-
-		return _updateBillingAndShippingAddresses();
-	}
-
 	private PlacedOrderAddress _updateBillingAndShippingAddresses()
 		throws Exception {
 

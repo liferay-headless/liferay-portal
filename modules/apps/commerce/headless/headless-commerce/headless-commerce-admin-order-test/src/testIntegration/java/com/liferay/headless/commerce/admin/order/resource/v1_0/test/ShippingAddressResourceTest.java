@@ -200,29 +200,6 @@ public class ShippingAddressResourceTest
 		super.testGetOrderItemShippingAddress();
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
-		super.testGraphQLGetOrderByExternalReferenceCodeShippingAddress();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderIdShippingAddress() throws Exception {
-		super.testGraphQLGetOrderIdShippingAddress();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderItemShippingAddress() throws Exception {
-		super.testGraphQLGetOrderItemShippingAddress();
-	}
-
 	@Override
 	@Test
 	public void testPatchOrderByExternalReferenceCodeShippingAddress()

@@ -79,22 +79,6 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		super.testGetOrderIdAccount();
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderByExternalReferenceCodeAccount()
-		throws Exception {
-
-		super.testGraphQLGetOrderByExternalReferenceCodeAccount();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderIdAccount() throws Exception {
-		super.testGraphQLGetOrderIdAccount();
-	}
-
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"emailAddress", "name"};

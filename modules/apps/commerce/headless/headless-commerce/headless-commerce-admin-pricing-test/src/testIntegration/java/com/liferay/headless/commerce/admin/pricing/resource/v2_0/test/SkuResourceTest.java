@@ -134,13 +134,6 @@ public class SkuResourceTest extends BaseSkuResourceTestCase {
 	}
 
 	@Override
-	protected Long testGraphQLGetPriceEntryIdSku_getPriceEntryId()
-		throws Exception {
-
-		return _commerceBasePriceListPriceEntry.getCommercePriceEntryId();
-	}
-
-	@Override
 	protected Sku testGraphQLSku_addSku() throws Exception {
 		return _addSku();
 	}

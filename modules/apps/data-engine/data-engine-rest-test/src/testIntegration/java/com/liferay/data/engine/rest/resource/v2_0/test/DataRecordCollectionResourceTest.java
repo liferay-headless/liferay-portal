@@ -112,7 +112,6 @@ public class DataRecordCollectionResourceTest
 		Assert.assertNotNull(page);
 	}
 
-	@Override
 	@Test
 	public void testGraphQLGetDataDefinitionDataRecordCollection()
 		throws Exception {

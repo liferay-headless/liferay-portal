@@ -205,25 +205,6 @@ public class ProductConfigurationResourceTest
 	@FeatureFlag("LPD-10889")
 	@Override
 	@Test
-	public void testGraphQLGetProductByExternalReferenceCodeConfiguration()
-		throws Exception {
-
-		super.testGraphQLGetProductByExternalReferenceCodeConfiguration();
-	}
-
-	@FeatureFlag("LPD-10889")
-	@Override
-	@Test
-	public void testGraphQLGetProductByExternalReferenceCodeConfigurationNotFound()
-		throws Exception {
-
-		super.
-			testGraphQLGetProductByExternalReferenceCodeConfigurationNotFound();
-	}
-
-	@FeatureFlag("LPD-10889")
-	@Override
-	@Test
 	public void testGraphQLGetProductConfiguration() throws Exception {
 		super.testGraphQLGetProductConfiguration();
 	}
@@ -235,22 +216,6 @@ public class ProductConfigurationResourceTest
 		throws Exception {
 
 		super.testGraphQLGetProductConfigurationByExternalReferenceCode();
-	}
-
-	@FeatureFlag("LPD-10889")
-	@Override
-	@Test
-	public void testGraphQLGetProductIdConfiguration() throws Exception {
-		super.testGraphQLGetProductIdConfiguration();
-	}
-
-	@FeatureFlag("LPD-10889")
-	@Override
-	@Test
-	public void testGraphQLGetProductIdConfigurationNotFound()
-		throws Exception {
-
-		super.testGraphQLGetProductIdConfigurationNotFound();
 	}
 
 	@Override
@@ -540,54 +505,6 @@ public class ProductConfigurationResourceTest
 
 	@Override
 	protected Long testGetProductIdConfiguration_getId(
-			ProductConfiguration productConfiguration)
-		throws Exception {
-
-		CProduct cProduct =
-			_cProductLocalService.getCProductByExternalReferenceCode(
-				productConfiguration.getEntityExternalReferenceCode(),
-				_cpConfigurationList.getCompanyId());
-
-		return cProduct.getCProductId();
-	}
-
-	@Override
-	protected ProductConfiguration
-			testGraphQLGetProductByExternalReferenceCodeConfiguration_addProductConfiguration()
-		throws Exception {
-
-		return testGraphQLGetProductIdConfiguration_addProductConfiguration();
-	}
-
-	@Override
-	protected String
-			testGraphQLGetProductByExternalReferenceCodeConfiguration_getExternalReferenceCode(
-				ProductConfiguration productConfiguration)
-		throws Exception {
-
-		return productConfiguration.getEntityExternalReferenceCode();
-	}
-
-	@Override
-	protected ProductConfiguration
-			testGraphQLGetProductIdConfiguration_addProductConfiguration()
-		throws Exception {
-
-		CPDefinition cpDefinition = CPTestUtil.addCPDefinition(
-			_commerceCatalog.getGroupId(), "simple");
-
-		CPConfigurationEntry cpConfigurationEntry =
-			_cpConfigurationEntryLocalService.getCPConfigurationEntry(
-				_classNameLocalService.getClassNameId(CPDefinition.class),
-				cpDefinition.getCPDefinitionId(),
-				_masterCPConfigurationList.getCPConfigurationListId());
-
-		return productConfigurationResource.getProductConfiguration(
-			cpConfigurationEntry.getCPConfigurationEntryId());
-	}
-
-	@Override
-	protected Long testGraphQLGetProductIdConfiguration_getId(
 			ProductConfiguration productConfiguration)
 		throws Exception {
 

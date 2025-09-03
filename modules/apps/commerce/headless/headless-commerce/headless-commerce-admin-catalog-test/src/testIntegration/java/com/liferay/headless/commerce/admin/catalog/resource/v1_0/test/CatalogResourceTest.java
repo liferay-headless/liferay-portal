@@ -150,38 +150,6 @@ public class CatalogResourceTest extends BaseCatalogResourceTestCase {
 		super.testGraphQLGetCatalogsPage();
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetProductByExternalReferenceCodeCatalog()
-		throws Exception {
-
-		super.testGraphQLGetProductByExternalReferenceCodeCatalog();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetProductByExternalReferenceCodeCatalogNotFound()
-		throws Exception {
-
-		super.testGraphQLGetProductByExternalReferenceCodeCatalogNotFound();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetProductIdCatalog() throws Exception {
-		super.testGraphQLGetProductIdCatalog();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetProductIdCatalogNotFound() throws Exception {
-		super.testGraphQLGetProductIdCatalogNotFound();
-	}
-
 	@Override
 	@Test
 	public void testPatchCatalog() throws Exception {

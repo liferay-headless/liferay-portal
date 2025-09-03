@@ -128,22 +128,6 @@ public class BillingAddressResourceTest
 		super.testGetOrderIdBillingAddress();
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderByExternalReferenceCodeBillingAddress()
-		throws Exception {
-
-		super.testGraphQLGetOrderByExternalReferenceCodeBillingAddress();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderIdBillingAddress() throws Exception {
-		super.testGraphQLGetOrderIdBillingAddress();
-	}
-
 	@Override
 	@Test
 	public void testPatchOrderByExternalReferenceCodeBillingAddress()
@@ -240,13 +224,6 @@ public class BillingAddressResourceTest
 
 	@Override
 	protected BillingAddress testGetOrderIdBillingAddress_addBillingAddress()
-		throws Exception {
-
-		return _addAddress();
-	}
-
-	@Override
-	protected BillingAddress testGraphQLBillingAddress_addBillingAddress()
 		throws Exception {
 
 		return _addAddress();

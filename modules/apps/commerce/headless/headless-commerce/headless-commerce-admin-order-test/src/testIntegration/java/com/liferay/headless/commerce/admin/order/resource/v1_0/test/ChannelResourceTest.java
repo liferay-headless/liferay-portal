@@ -110,22 +110,6 @@ public class ChannelResourceTest extends BaseChannelResourceTestCase {
 		super.testGetOrderIdChannel();
 	}
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderByExternalReferenceCodeChannel()
-		throws Exception {
-
-		super.testGraphQLGetOrderByExternalReferenceCodeChannel();
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetOrderIdChannel() throws Exception {
-		super.testGraphQLGetOrderIdChannel();
-	}
-
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"currencyCode", "name"};
