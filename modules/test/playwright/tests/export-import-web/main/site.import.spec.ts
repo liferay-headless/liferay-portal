@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ObjectDefinitionAPI} from '@liferay/object-admin-rest-client-js';
+import {
+	ObjectDefinitionAPI,
+	ObjectRelationshipAPI,
+} from '@liferay/object-admin-rest-client-js';
 import {Page, expect, mergeTests} from '@playwright/test';
 import fs from 'fs/promises';
 import * as path from 'path';
@@ -22,10 +25,13 @@ import {objectPagesTest} from '../../../fixtures/objectPagesTest';
 import {pageTemplatesPagesTest} from '../../../fixtures/pageTemplatesPagesTest';
 import {pageViewModePagesTest} from '../../../fixtures/pageViewModePagesTest';
 import {productMenuPageTest} from '../../../fixtures/productMenuPageTest';
+import {styleBookPageTest} from '../../../fixtures/styleBookPageTest';
+import {systemSettingsPageTest} from '../../../fixtures/systemSettingsPageTest';
 import {uiElementsPageTest} from '../../../fixtures/uiElementsTest';
 import {usersAndOrganizationsPagesTest} from '../../../fixtures/usersAndOrganizationsPagesTest';
 import {wikiPagesTest} from '../../../fixtures/wikiPagesTest';
 import {HomePage} from '../../../pages/portal-web/HomePage';
+import {getRandomInt} from '../../../utils/getRandomInt';
 import getRandomString from '../../../utils/getRandomString';
 import {openFieldset} from '../../../utils/openFieldset';
 import {getTempDir} from '../../../utils/temp';
@@ -67,10 +73,13 @@ export const testWithExportImportAtInstanceLevelFF = mergeTests(
 	companyExportImportPageTest,
 	exportImportPagesTest,
 	dataApiHelpersTest,
+	styleBookPageTest,
+	systemSettingsPageTest,
 	featureFlagsTest({
 		'LPD-35914': {enabled: true, system: true},
 		'LPD-44307': {enabled: true},
 		'LPD-44771': {enabled: true},
+		'LPD-45276': {enabled: true},
 	}),
 	loginTest(),
 	uiElementsPageTest
@@ -409,6 +418,222 @@ test('can import a lar file selecting some items to import', async ({
 			.getByText('Successful')
 	).toBeVisible();
 });
+
+testWithExportImportAtInstanceLevelFF(
+	'can export and import a site created with clarity site initializer',
+	{tag: '@LPD-64056'},
+	async ({
+		apiHelpers,
+		exportImportPage,
+		styleBooksPage,
+		systemSettingsPage,
+	}) => {
+		test.setTimeout(180000);
+
+		await systemSettingsPage.goToSystemSetting(
+			'Infrastructure',
+			'Upload Servlet Request'
+		);
+
+		const originalOverallMaximumUploadRequestSize =
+			await systemSettingsPage.page
+				.getByLabel('Overall Maximum Upload Request Size')
+				.textContent();
+
+		await systemSettingsPage.page
+			.getByLabel('Overall Maximum Upload Request Size')
+			.fill('200000000');
+
+		await systemSettingsPage.page
+			.getByRole('button', {name: 'Save'})
+			.or(systemSettingsPage.page.getByRole('button', {name: 'Update'}))
+			.click();
+
+		const objectFolder1 =
+			await apiHelpers.objectAdmin.postRandomObjectFolder();
+
+		apiHelpers.data.push({id: objectFolder1.id, type: 'objectFolder'});
+
+		const objectDefinition1 =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder1.externalReferenceCode,
+				scope: 'site',
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition1.id,
+			type: 'objectDefinition',
+		});
+
+		const objectFolder2 =
+			await apiHelpers.objectAdmin.postRandomObjectFolder();
+
+		apiHelpers.data.push({id: objectFolder2.id, type: 'objectFolder'});
+
+		const objectDefinition2 =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder2.externalReferenceCode,
+				scope: 'site',
+				status: {code: 0},
+			});
+
+		apiHelpers.data.push({
+			id: objectDefinition2.id,
+			type: 'objectDefinition',
+		});
+
+		const objectRelationshipLabel =
+			'objectRelationshipLabel' + getRandomInt();
+		const objectRelationshipName =
+			'objectRelationshipName' + Math.floor(Math.random() * 99);
+
+		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
+			ObjectRelationshipAPI
+		);
+
+		const objectRelationship =
+			await objectRelationshipAPIClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				objectDefinition1.externalReferenceCode,
+				{
+					label: {
+						en_US: objectRelationshipLabel,
+					},
+					name: objectRelationshipName,
+					objectDefinitionExternalReferenceCode1:
+						objectDefinition1.externalReferenceCode,
+					objectDefinitionExternalReferenceCode2:
+						objectDefinition2.externalReferenceCode,
+					objectDefinitionId1: objectDefinition1.id,
+					objectDefinitionId2: objectDefinition2.id,
+					objectDefinitionName2: objectDefinition2.name,
+					type: 'oneToMany',
+				}
+			);
+
+		const site1 = await apiHelpers.headlessSite.createSite({
+			name: getRandomString(),
+			templateKey: 'com.liferay.site.initializer.teaser.showcase',
+			templateType: 'site-initializer',
+		});
+
+		apiHelpers.data.push({id: site1.id, type: 'site'});
+
+		await apiHelpers.objectEntry.postObjectEntry(
+			{
+				textField: getRandomString(),
+				[objectRelationship.body.name]: [
+					{
+						textField: getRandomString(),
+					},
+				],
+			},
+			'c/' +
+				objectDefinition1.name.toLowerCase() +
+				's' +
+				'/scopes/' +
+				site1.name
+		);
+
+		await styleBooksPage.goto(site1.friendlyUrlPath);
+
+		await styleBooksPage.create(getRandomString());
+
+		await exportImportPage.goToExport(site1.friendlyUrlPath);
+
+		const exportableItems1 = await exportImportPage.getExportableItems();
+
+		expect(exportableItems1.size).toBeGreaterThan(0);
+
+		expect(exportableItems1.has(objectDefinition1.name)).toBe(true);
+
+		expect(exportableItems1.has(objectDefinition2.name)).toBe(true);
+
+		expect(exportableItems1.has('Style Books')).toBe(true);
+
+		const exportName = 'MyExport-' + getRandomString();
+
+		await exportImportPage.exportAll(exportName);
+
+		await expect(
+			exportImportPage.page
+				.locator('//h2[span[normalize-space()="' + exportName + '"]]')
+				.first()
+				.locator('../..')
+				.getByText('Successful')
+		).toBeVisible({timeout: 30000});
+
+		const exportFilePath =
+			await exportImportPage.downloadExportProcess(exportName);
+
+		const site2 = await apiHelpers.headlessSite.createSite({
+			name: getRandomString(),
+		});
+
+		apiHelpers.data.push({id: site2.id, type: 'site'});
+
+		await exportImportPage.goToExport(site2.friendlyUrlPath);
+
+		const exportableItems2 = await exportImportPage.getExportableItems();
+
+		await exportImportPage.goToImport(site2.friendlyUrlPath);
+
+		await exportImportPage.import(exportFilePath);
+
+		await expect(
+			exportImportPage.page
+				.getByText(exportName)
+				.locator('../../..')
+				.getByText('Successful')
+		).toBeVisible({timeout: 30000});
+
+		await exportImportPage.goToExport(site2.friendlyUrlPath);
+
+		const exportableItems3 = await exportImportPage.getExportableItems();
+
+		expect(exportableItems3.size).toEqual(exportableItems1.size);
+
+		for (const [name, count] of exportableItems1.entries()) {
+
+			// TODO LPD-64899
+
+			if (name === 'Calendar') {
+				continue;
+			}
+			else if (name === 'Pages') {
+				expect(exportableItems3.get(name)).toBe(
+					count + exportableItems2.get('Pages')
+				);
+			}
+			else if (name === 'Style Books') {
+
+				// TODO LPD-64905
+
+				expect(exportableItems3.get(name)).toBeGreaterThanOrEqual(
+					count
+				);
+			}
+			else {
+				expect(exportableItems3.get(name)).toBe(count);
+			}
+		}
+
+		await systemSettingsPage.goToSystemSetting(
+			'Infrastructure',
+			'Upload Servlet Request'
+		);
+
+		await systemSettingsPage.page
+			.getByLabel('Overall Maximum Upload Request Size')
+			.fill(originalOverallMaximumUploadRequestSize);
+
+		await systemSettingsPage.page
+			.getByRole('button', {name: 'Update'})
+			.click();
+	}
+);
 
 [
 	{name: 'com.liferay.site.initializer.masterclass', shouldFail: true},
