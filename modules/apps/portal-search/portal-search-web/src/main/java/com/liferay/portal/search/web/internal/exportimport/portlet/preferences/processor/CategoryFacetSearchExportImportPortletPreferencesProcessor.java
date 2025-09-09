@@ -25,7 +25,9 @@ import com.liferay.portal.search.web.internal.category.facet.portlet.CategoryFac
 
 import jakarta.portlet.PortletPreferences;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
@@ -154,26 +156,15 @@ public class CategoryFacetSearchExportImportPortletPreferencesProcessor
 		String[] oldValues = StringUtil.split(
 			portletPreferencesOldExternalReferenceCode, StringPool.POUND);
 
-		Group group = null;
-
-		if (oldValues.length > 1) {
-			Map<Long, Long> newPrimaryKeysMap =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					Group.class);
-
-			long groupId = MapUtil.getLong(
-				newPrimaryKeysMap, GetterUtil.getLong(oldValues[1]));
-
-			if (groupId != 0) {
-				group = _groupLocalService.fetchGroup(groupId);
-			}
+		if (oldValues.length == 1) {
+			return _getAssetVocabularyPortletPreferenceNewValue(
+				GetterUtil.getLong(oldValues[0]), portletDataContext);
+		}
+		else if (oldValues.length == 3) {
+			return oldValues[2] + "&&" + oldValues[0];
 		}
 
-		if (group != null) {
-			return group.getExternalReferenceCode() + "&&" + oldValues[0];
-		}
-
-		return oldValues[2] + "&&" + oldValues[0];
+		return null;
 	}
 
 	@Override
@@ -186,6 +177,68 @@ public class CategoryFacetSearchExportImportPortletPreferencesProcessor
 		throw new Exception(
 			"This method is deprecated and replaced by " +
 				"getImportPortletPreferencesNewExternalReferenceCode");
+	}
+
+	private String _getAssetVocabularyPortletPreferenceNewValue(
+		long oldAssetVocabularyId, PortletDataContext portletDataContext) {
+
+		Map<Long, Long> newPrimaryKeysMap =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetVocabulary.class);
+
+		long newAssetVocabularyId = MapUtil.getLong(
+			newPrimaryKeysMap, oldAssetVocabularyId);
+
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.fetchAssetVocabulary(
+				newAssetVocabularyId);
+
+		if (assetVocabulary != null) {
+			Group group = _groupLocalService.fetchGroup(
+				assetVocabulary.getGroupId());
+
+			return group.getExternalReferenceCode() + "&&" +
+				assetVocabulary.getExternalReferenceCode();
+		}
+
+		return null;
+	}
+
+	private String[] _getGroupVocabularyExternalReferenceCodes(
+		String[] vocabularyIds) {
+
+		if (vocabularyIds == null) {
+			return null;
+		}
+
+		List<String> values = new ArrayList<>();
+
+		for (String vocabularyId : vocabularyIds) {
+			AssetVocabulary assetVocabulary =
+				_assetVocabularyLocalService.fetchAssetVocabulary(
+					GetterUtil.getLong(vocabularyId));
+
+			if (assetVocabulary == null) {
+				continue;
+			}
+
+			Group group = _groupLocalService.fetchGroup(
+				assetVocabulary.getGroupId());
+
+			if (group == null) {
+				continue;
+			}
+
+			values.add(
+				StringUtil.merge(
+					new Object[] {
+						assetVocabulary.getExternalReferenceCode(),
+						group.getGroupId(), group.getExternalReferenceCode()
+					},
+					StringPool.POUND));
+		}
+
+		return values.toArray(new String[0]);
 	}
 
 	private PortletPreferences _updateExportPortletPreferences(
@@ -204,6 +257,19 @@ public class CategoryFacetSearchExportImportPortletPreferencesProcessor
 			if (name.equals(
 					CategoryFacetPortletPreferences.
 						PREFERENCE_GROUP_VOCABULARY_EXTERNAL_REFERENCE_CODES)) {
+
+				updateExportPortletPreferencesExternalReferenceCodes(
+					portletDataContext, portlet, portletPreferences, name,
+					AssetVocabulary.class.getName());
+			}
+			else if (name.equals("vocabularyIds")) {
+				portletPreferences.setValues(
+					CategoryFacetPortletPreferences.
+						PREFERENCE_GROUP_VOCABULARY_EXTERNAL_REFERENCE_CODES,
+					_getGroupVocabularyExternalReferenceCodes(
+						portletPreferences.getValues("vocabularyIds", null)));
+
+				portletPreferences.reset("vocabularyIds");
 
 				updateExportPortletPreferencesExternalReferenceCodes(
 					portletDataContext, portlet, portletPreferences, name,
