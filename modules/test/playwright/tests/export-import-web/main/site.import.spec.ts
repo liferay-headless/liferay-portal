@@ -482,11 +482,6 @@ testWithExportImportAtInstanceLevelFF(
 			type: 'objectDefinition',
 		});
 
-		const objectRelationshipLabel =
-			'objectRelationshipLabel' + getRandomInt();
-		const objectRelationshipName =
-			'objectRelationshipName' + Math.floor(Math.random() * 99);
-
 		const objectRelationshipAPIClient = await apiHelpers.buildRestClient(
 			ObjectRelationshipAPI
 		);
@@ -496,9 +491,9 @@ testWithExportImportAtInstanceLevelFF(
 				objectDefinition1.externalReferenceCode,
 				{
 					label: {
-						en_US: objectRelationshipLabel,
+						en_US: `objectRelationshipLabel${getRandomInt()}`,
 					},
-					name: objectRelationshipName,
+					name: `objectRelationshipName${Math.floor(Math.random() * 99)}`,
 					objectDefinitionExternalReferenceCode1:
 						objectDefinition1.externalReferenceCode,
 					objectDefinitionExternalReferenceCode2:
@@ -573,8 +568,6 @@ testWithExportImportAtInstanceLevelFF(
 
 		await exportImportPage.goToExport(site2.friendlyUrlPath);
 
-		const exportableItems2 = await exportImportPage.getExportableItems();
-
 		await exportImportPage.goToImport(site2.friendlyUrlPath);
 
 		await exportImportPage.import(exportFilePath);
@@ -601,7 +594,10 @@ testWithExportImportAtInstanceLevelFF(
 			}
 			else if (name === 'Pages') {
 				expect(exportableItems3.get(name)).toBe(
-					count + exportableItems2.get('Pages')
+					count +
+						(await exportImportPage.getExportableItems()).get(
+							'Pages'
+						)
 				);
 			}
 			else if (name === 'Style Books') {
