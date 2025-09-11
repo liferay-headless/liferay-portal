@@ -76,8 +76,8 @@ public class EventListenerRegistration
 
 			super.destroy();
 
-			if (_classes.contains(HttpSessionBindingListener.class) ||
-				_classes.contains(HttpSessionAttributeListener.class) ||
+			if (_classes.contains(HttpSessionAttributeListener.class) ||
+				_classes.contains(HttpSessionBindingListener.class) ||
 				_classes.contains(HttpSessionListener.class)) {
 
 				Map<String, HttpSessionWrapper> activeSessions =

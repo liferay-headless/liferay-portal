@@ -73,7 +73,7 @@ public abstract class BaseServiceTrackerCustomizer
 				 !pattern.equals(StringPool.SLASH))) {
 
 				throw new IllegalArgumentException(
-					"Invalid pattern '" + pattern + "'");
+					"Invalid pattern: " + pattern);
 			}
 		}
 	}
