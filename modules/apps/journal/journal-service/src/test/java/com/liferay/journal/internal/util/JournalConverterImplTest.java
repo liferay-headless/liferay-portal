@@ -152,11 +152,9 @@ public class JournalConverterImplTest {
 			optionReferenceElements.toString(), 1,
 			optionReferenceElements.size());
 
-		Assert.assertEquals(
-			optionReference,
-			optionReferenceElements.get(
-				0
-			).getText());
+		Element optionReferenceElement = optionReferenceElements.get(0);
+
+		Assert.assertEquals(optionReference, optionReferenceElement.getText());
 	}
 
 }
