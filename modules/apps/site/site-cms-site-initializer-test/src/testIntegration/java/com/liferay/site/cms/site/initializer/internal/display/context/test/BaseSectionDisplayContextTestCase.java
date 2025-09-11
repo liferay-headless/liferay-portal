@@ -553,8 +553,7 @@ public abstract class BaseSectionDisplayContextTestCase
 		Map<String, ?> expectedMap, Map<String, ?> actualMap) {
 
 		Assert.assertEquals(
-			"The maps have different sizes", expectedMap.size(),
-			actualMap.size());
+			actualMap.toString(), expectedMap.size(), actualMap.size());
 
 		JSONObject expectedJSONObject = _jsonFactory.createJSONObject(
 			expectedMap);
