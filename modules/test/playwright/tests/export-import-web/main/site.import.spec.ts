@@ -444,10 +444,7 @@ testWithExportImportAtInstanceLevelFF(
 			.getByLabel('Overall Maximum Upload Request Size')
 			.fill('200000000');
 
-		await systemSettingsPage.page
-			.getByRole('button', {name: 'Save'})
-			.or(systemSettingsPage.page.getByRole('button', {name: 'Update'}))
-			.click();
+		await systemSettingsPage.saveButton.click();
 
 		const objectFolder1 =
 			await apiHelpers.objectAdmin.postRandomObjectFolder();
@@ -629,9 +626,7 @@ testWithExportImportAtInstanceLevelFF(
 			.getByLabel('Overall Maximum Upload Request Size')
 			.fill(originalOverallMaximumUploadRequestSize);
 
-		await systemSettingsPage.page
-			.getByRole('button', {name: 'Update'})
-			.click();
+		await systemSettingsPage.saveButton.click();
 	}
 );
 
