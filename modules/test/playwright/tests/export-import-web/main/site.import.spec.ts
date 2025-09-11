@@ -522,11 +522,7 @@ testWithExportImportAtInstanceLevelFF(
 					},
 				],
 			},
-			'c/' +
-				objectDefinition1.name.toLowerCase() +
-				's' +
-				'/scopes/' +
-				site1.name
+			`c/${objectDefinition1.name.toLowerCase()}s/scopes/${site1.name}`
 		);
 
 		await styleBooksPage.goto(site1.friendlyUrlPath);
@@ -545,7 +541,7 @@ testWithExportImportAtInstanceLevelFF(
 
 		expect(exportableItems1.has('Style Books')).toBe(true);
 
-		const exportName = 'MyExport-' + getRandomString();
+		const exportName = `MyExport-${getRandomString()}`;
 
 		await exportImportPage.exportAll(exportName);
 
