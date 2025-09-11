@@ -161,20 +161,19 @@ public class HttpSessionWrapper implements HttpSession, Serializable {
 					HttpSessionBindingEvent sessionBindingEvent =
 						new HttpSessionBindingEvent(this, attributeName);
 
-					if (clazz.equals(HttpSessionBindingListener.class)) {
-						HttpSessionBindingListener httpSessionBindingListener =
-							(HttpSessionBindingListener)eventListener;
-
-						httpSessionBindingListener.valueUnbound(
-							sessionBindingEvent);
-					}
-
 					if (clazz.equals(HttpSessionAttributeListener.class)) {
 						HttpSessionAttributeListener
 							httpSessionAttributeListener =
 								(HttpSessionAttributeListener)eventListener;
 
 						httpSessionAttributeListener.attributeRemoved(
+							sessionBindingEvent);
+					}
+					else if (clazz.equals(HttpSessionBindingListener.class)) {
+						HttpSessionBindingListener httpSessionBindingListener =
+							(HttpSessionBindingListener)eventListener;
+
+						httpSessionBindingListener.valueUnbound(
 							sessionBindingEvent);
 					}
 				}
