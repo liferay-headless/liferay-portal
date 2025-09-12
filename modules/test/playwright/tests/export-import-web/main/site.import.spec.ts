@@ -428,8 +428,6 @@ testWithExportImportAtInstanceLevelFF(
 		styleBooksPage,
 		systemSettingsPage,
 	}) => {
-		test.setTimeout(180000);
-
 		await systemSettingsPage.goToSystemSetting(
 			'Infrastructure',
 			'Upload Servlet Request'
