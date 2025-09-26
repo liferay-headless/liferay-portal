@@ -1469,19 +1469,16 @@ public class BatchEnginePortletDataHandlerTest {
 				TestPropsValues.getUserId());
 		}
 
-		// TODO: Export both portlets at once after LPD-62165 is fixed
-
-		File larFile1 = _exportLayouts(
-			false, group.getGroupId(), false, new long[0], objectDefinition1);
-		File larFile2 = _exportLayouts(
-			false, group.getGroupId(), false, new long[0], objectDefinition2);
+		File larFile = _exportLayouts(
+			false, group.getGroupId(), false, new long[0], objectDefinition1,
+			objectDefinition2);
 
 		_deleteObjectEntries(objectEntries1);
 		_deleteObjectEntries(objectEntries2);
 
 		if (childFirst) {
 			_importLayouts(
-				false, false, larFile2, group.getGroupId(), objectDefinition2);
+				false, false, larFile, group.getGroupId(), objectDefinition2);
 
 			_assertObjectEntries(
 				true, objectDefinition1.getObjectDefinitionId(),
@@ -1491,7 +1488,7 @@ public class BatchEnginePortletDataHandlerTest {
 				objectEntries2);
 
 			_importLayouts(
-				false, false, larFile1, group.getGroupId(), objectDefinition1);
+				false, false, larFile, group.getGroupId(), objectDefinition1);
 
 			_assertObjectEntries(
 				false, objectDefinition1.getObjectDefinitionId(),
@@ -1499,7 +1496,7 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 		else {
 			_importLayouts(
-				false, false, larFile1, group.getGroupId(), objectDefinition1);
+				false, false, larFile, group.getGroupId(), objectDefinition1);
 
 			_assertObjectEntries(
 				false, objectDefinition1.getObjectDefinitionId(),
@@ -1534,7 +1531,7 @@ public class BatchEnginePortletDataHandlerTest {
 			}
 
 			_importLayouts(
-				false, false, larFile2, group.getGroupId(), objectDefinition2);
+				false, false, larFile, group.getGroupId(), objectDefinition2);
 
 			_assertObjectEntries(
 				false, objectDefinition2.getObjectDefinitionId(),
