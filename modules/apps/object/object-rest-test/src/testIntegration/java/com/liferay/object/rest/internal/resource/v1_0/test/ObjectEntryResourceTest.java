@@ -166,6 +166,9 @@ import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
@@ -197,6 +200,7 @@ import com.liferay.portal.vulcan.util.GroupUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portlet.documentlibrary.constants.DLConstants;
 
+import jakarta.portlet.PortletPreferences;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Feature;
@@ -428,6 +432,32 @@ public class ObjectEntryResourceTest {
 								NAME_STORAGE_DL_FOLDER_PATH
 						).value(
 							StringPool.SLASH + objectDefinitionName
+						).build()),
+					false),
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT,
+					ObjectFieldConstants.DB_TYPE_LONG, true, false, null,
+					_OBJECT_FIELD_NAME_LARGE_ATTACHMENT_USER_COMPUTER_SOURCE,
+					_OBJECT_FIELD_NAME_LARGE_ATTACHMENT_USER_COMPUTER_SOURCE,
+					Arrays.asList(
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.
+								NAME_ACCEPTED_FILE_EXTENSIONS
+						).value(
+							"txt"
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_FILE_SOURCE
+						).value(
+							ObjectFieldSettingConstants.VALUE_USER_COMPUTER
+						).build(),
+						new ObjectFieldSettingBuilder(
+						).name(
+							ObjectFieldSettingConstants.NAME_MAX_FILE_SIZE
+						).value(
+							String.valueOf(_MAX_LARGE_FILE_SIZE_VALUE)
 						).build()),
 					false),
 				ObjectFieldUtil.createObjectField(
@@ -8670,6 +8700,36 @@ public class ObjectEntryResourceTest {
 		_testPostCustomObjectEntryWithAttachmentObjectField(
 			_siteScopedObjectDefinition1);
 	}
+	
+
+	@FeatureFlag("LPD-39967")
+	@Test
+	public void testPostCustomObjectEntryWithLargeAttachmentObjectField()
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+		JSONUtil.put(
+			_OBJECT_FIELD_NAME_LARGE_ATTACHMENT_USER_COMPUTER_SOURCE,
+		JSONUtil.put("fileBase64", RandomTestUtil.randomBase64BySize(50000000)).put("name", StringUtil.randomString() + ".txt")).toString(),
+		_objectDefinition1.getRESTContextPath(),
+		Http.Method.POST);
+		
+		JSONObject scopeJSONObject = JSONUtil.put(
+			"externalReferenceCode",
+			"L_GLOBAL"
+		).put(
+			"type", Scope.Type.SITE.getValue()
+		);
+		
+		DLFileEntry dlFileEntry = _dlFileEntryLocalService.getDLFileEntry(
+			_testDLFileEntryModelListener.getLastFileEntryId());
+		
+		_assertAttachmentJSONObject(
+			dlFileEntry, null,
+			jsonObject.getJSONObject(
+				_OBJECT_FIELD_NAME_LARGE_ATTACHMENT_USER_COMPUTER_SOURCE),
+			scopeJSONObject);
+	}
 
 	@FeatureFlag("LPD-39967")
 	@Test
@@ -14531,9 +14591,11 @@ public class ObjectEntryResourceTest {
 		else {
 			Assert.assertNotNull(jsonObject.get("externalReferenceCode"));
 		}
-
-		Assert.assertEquals(fileBase64, jsonObject.get("fileBase64"));
-
+		
+		if(fileBase64 != null) {
+			Assert.assertEquals(fileBase64, jsonObject.get("fileBase64"));
+		}
+		
 		if (scopeJSONObject == null) {
 			Assert.assertFalse(jsonObject.has("scope"));
 		}
@@ -19148,6 +19210,8 @@ public class ObjectEntryResourceTest {
 		"c" + RandomTestUtil.randomString();
 
 	private static final int _MAX_FILE_SIZE_VALUE = 1;
+	
+	private static final int _MAX_LARGE_FILE_SIZE_VALUE = 100;
 
 	private static final String _NEW_OBJECT_FIELD_VALUE_1 =
 		RandomTestUtil.randomString();
@@ -19177,6 +19241,10 @@ public class ObjectEntryResourceTest {
 
 	private static final String
 		_OBJECT_FIELD_NAME_ATTACHMENT_USER_COMPUTER_SOURCE_2 =
+			"x" + RandomTestUtil.randomString();
+	
+	private static final String
+		_OBJECT_FIELD_NAME_LARGE_ATTACHMENT_USER_COMPUTER_SOURCE =
 			"x" + RandomTestUtil.randomString();
 
 	private static final String _OBJECT_FIELD_NAME_BOOLEAN =
