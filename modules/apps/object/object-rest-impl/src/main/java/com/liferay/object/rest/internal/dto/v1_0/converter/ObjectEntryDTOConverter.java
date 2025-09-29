@@ -15,6 +15,7 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.exportimport.attachment.ExportImportAttachmentManager;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
@@ -87,6 +88,7 @@ import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -615,13 +617,24 @@ public class ObjectEntryDTOConverter
 										primaryKey);
 						}
 
-						relatedObjectEntryAtomicReference.set(
-							toDTO(
-								_getDTOConverterContext(
-									dtoConverterContext,
-									serviceBuilderObjectEntry.
-										getObjectEntryId()),
-								serviceBuilderObjectEntry));
+						if (ExportImportThreadLocal.isExportInProcess()) {
+							relatedObjectEntryAtomicReference.set(
+								(Serializable)_toERCAndScope(
+									_objectDefinitionLocalService.
+										getObjectDefinition(
+											objectRelationship.
+												getObjectDefinitionId1()),
+									serviceBuilderObjectEntry));
+						}
+						else {
+							relatedObjectEntryAtomicReference.set(
+								toDTO(
+									_getDTOConverterContext(
+										dtoConverterContext,
+										serviceBuilderObjectEntry.
+											getObjectEntryId()),
+									serviceBuilderObjectEntry));
+						}
 					}
 
 					return relatedObjectEntryAtomicReference.get();
@@ -736,20 +749,12 @@ public class ObjectEntryDTOConverter
 
 		UriInfo uriInfo = dtoConverterContext.getUriInfo();
 
-		DTOConverterContext defaultDTOConverterContext =
-			new DefaultDTOConverterContext(
-				dtoConverterContext.isAcceptAllLanguages(), null,
-				dtoConverterContext.getDTOConverterRegistry(),
-				dtoConverterContext.getHttpServletRequest(), objectEntryId,
-				dtoConverterContext.getLocale(), uriInfo,
-				dtoConverterContext.getUser());
-
-		defaultDTOConverterContext.setAttribute(
-			"preferApproved",
-			GetterUtil.getBoolean(
-				dtoConverterContext.getAttribute("preferApproved")));
-
-		return defaultDTOConverterContext;
+		return new DefaultDTOConverterContext(
+			dtoConverterContext.isAcceptAllLanguages(), null,
+			dtoConverterContext.getDTOConverterRegistry(),
+			dtoConverterContext.getHttpServletRequest(), objectEntryId,
+			dtoConverterContext.getLocale(), uriInfo,
+			dtoConverterContext.getUser());
 	}
 
 	private FileEntry _getFileEntry(
@@ -1022,19 +1027,33 @@ public class ObjectEntryDTOConverter
 						Object.class);
 				}
 
+				if (!ExportImportThreadLocal.isExportInProcess()) {
+					return () -> TransformUtil.transformToArray(
+						relatedModels,
+						relatedModel -> {
+							com.liferay.object.model.ObjectEntry objectEntry =
+								(com.liferay.object.model.ObjectEntry)
+									relatedModel;
+
+							return toDTO(
+								_getDTOConverterContext(
+									dtoConverterContext,
+									objectEntry.getObjectEntryId()),
+								objectEntry);
+						},
+						ObjectEntry.class);
+				}
+
 				return () -> TransformUtil.transformToArray(
 					relatedModels,
 					relatedModel -> {
 						com.liferay.object.model.ObjectEntry objectEntry =
 							(com.liferay.object.model.ObjectEntry)relatedModel;
 
-						return toDTO(
-							_getDTOConverterContext(
-								dtoConverterContext,
-								objectEntry.getObjectEntryId()),
-							objectEntry);
+						return _toERCAndScope(
+							relatedObjectDefinition, objectEntry);
 					},
-					ObjectEntry.class);
+					Object.class);
 			});
 	}
 
@@ -1317,6 +1336,21 @@ public class ObjectEntryDTOConverter
 			AuditFieldChange.class);
 	}
 
+	private Map<String, Object> _toERCAndScope(
+		ObjectDefinition relatedObjectDefinition,
+		com.liferay.object.model.ObjectEntry relatedObjectEntry) {
+
+		return HashMapBuilder.<String, Object>put(
+			"externalReferenceCode",
+			relatedObjectEntry.getExternalReferenceCode()
+		).put(
+			"scopeId", relatedObjectEntry.getGroupId()
+		).put(
+			"scopeKey",
+			_getScopeKey(relatedObjectDefinition, relatedObjectEntry)
+		).build();
+	}
+
 	private ExtendedEntity _toExtendedEntity(
 			BaseModel<?> baseModel, DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition,
@@ -1506,7 +1540,7 @@ public class ObjectEntryDTOConverter
 		Map<String, UnsafeSupplier<Object, Exception>>
 			nestedFieldsRelatedProperties = _getNestedFieldsRelatedProperties(
 				dtoConverterContext, objectEntry.getGroupId(), objectDefinition,
-				objectEntry.getHeadObjectEntryId());
+				objectEntry.getObjectEntryId());
 
 		if (nestedFieldsRelatedProperties != null) {
 			unsafeSuppliers.putAll(nestedFieldsRelatedProperties);
