@@ -270,8 +270,11 @@ public class MasterPageResourceImpl
 			return _addMasterPage(groupId, masterPage);
 		}
 
+		ServiceContext serviceContext = _getServiceContext(groupId, masterPage);
+
 		long previewFileEntryId = FileEntryUtil.getPreviewFileEntryId(
-			groupId, masterPage.getThumbnail());
+			groupId, getResourceName(), serviceContext,
+			masterPage.getThumbnail(), contextUser);
 
 		if (previewFileEntryId !=
 				layoutPageTemplateEntry.getPreviewFileEntryId()) {
@@ -284,8 +287,6 @@ public class MasterPageResourceImpl
 
 		Layout layout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
-
-		ServiceContext serviceContext = _getServiceContext(groupId, masterPage);
 
 		layout = LayoutUtil.updateContentLayout(
 			_cetManager, _infoItemServiceRegistry, layout, layout.getNameMap(),
@@ -388,7 +389,8 @@ public class MasterPageResourceImpl
 				masterPage.getKey(), 0, 0, masterPage.getName(),
 				LayoutPageTemplateEntryTypeConstants.MASTER_LAYOUT,
 				FileEntryUtil.getPreviewFileEntryId(
-					groupId, masterPage.getThumbnail()),
+					groupId, getResourceName(), serviceContext,
+					masterPage.getThumbnail(), contextUser),
 				defaultTemplate, 0,
 				_getLayoutPlid(groupId, masterPage, serviceContext), 0,
 				PageSpecificationUtil.getPublishedStatus(
