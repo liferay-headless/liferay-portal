@@ -107,7 +107,7 @@ public class UtilityPageResourceImpl
 			@Override
 			public List<String> getNestedFields() {
 				return List.of(
-					"friendlyUrlHistory", "pageSpecifications");
+					"friendlyUrlHistory", "pageSpecifications", "thumbnail");
 			}
 
 			@Override
@@ -300,8 +300,9 @@ public class UtilityPageResourceImpl
 		}
 
 		long previewFileEntryId = FileEntryUtil.getPreviewFileEntryId(
-			groupId, getResourceName(), _getServiceContext(groupId, utilityPage), utilityPage.getThumbnail(),
-			contextUser);
+			groupId, getResourceName(),
+			_getServiceContext(groupId, utilityPage),
+			utilityPage.getThumbnail(), contextUser);
 
 		if (previewFileEntryId !=
 				layoutUtilityPageEntry.getPreviewFileEntryId()) {
@@ -371,8 +372,9 @@ public class UtilityPageResourceImpl
 				utilityPage.getExternalReferenceCode(), groupId,
 				_getLayoutPlid(groupId, utilityPage, serviceContext),
 				FileEntryUtil.getPreviewFileEntryId(
-					groupId, getResourceName(), _getServiceContext(groupId, utilityPage), utilityPage.getThumbnail(),
-					contextUser),
+					groupId, getResourceName(),
+					_getServiceContext(groupId, utilityPage),
+					utilityPage.getThumbnail(), contextUser),
 				utilityPage.getMarkedAsDefault(), utilityPage.getName(),
 				_getType(utilityPage.getType()), 0L, serviceContext));
 	}
