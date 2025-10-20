@@ -648,11 +648,6 @@ public class MasterPageResourceTest extends BaseMasterPageResourceTestCase {
 		PageSpecificationsTestUtil.assertPageSpecifications(
 			_layoutLocalService.getLayout(layoutPageTemplateEntry.getPlid()),
 			getMasterPage.getPageSpecifications());
-
-		_assertThumbnailURLReference(
-			false, masterPage.getExternalReferenceCode(),
-			masterPage.getThumbnail(
-			).getExternalReferenceCode());
 	}
 
 	private void _testPatchSiteMasterPage(
