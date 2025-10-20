@@ -1163,11 +1163,30 @@ public class BatchEngineBrokerTest {
 					value
 				).find()) {
 
-				value = _htmlBreakPattern.matcher(
-					value
-				).replaceAll(
-					"$1\n\n$3"
-				);
+				if (_HTML_NORMALIZATION_MODE ==
+						HtmlNormalizationMode.BLOCK_NEWLINES) {
+
+					value = _htmlBreakPattern.matcher(
+						value
+					).replaceAll(
+						StringBundler.concat("$1", _NEWLINE, _NEWLINE, "$3")
+					);
+				}
+				else if (_HTML_NORMALIZATION_MODE ==
+							HtmlNormalizationMode.PRESERVE_SINGLELINE) {
+
+					value = _htmlBreakPattern.matcher(
+						value
+					).replaceAll(
+						StringBundler.concat("$1", _NEWLINE, "$3")
+					);
+				}
+				else if (_HTML_NORMALIZATION_MODE ==
+							HtmlNormalizationMode.NONE) {
+
+					// No normalization performed
+
+				}
 			}
 
 			normalizedValues.add(value);
@@ -1177,16 +1196,7 @@ public class BatchEngineBrokerTest {
 	}
 
 	private CSVParser _parseCSV(String csvString) throws Exception {
-		return CSVParser.parse(
-			csvString,
-			CSVFormat.Builder.create(
-			).setDelimiter(
-				_DELIMITER_VALUE
-			).setIgnoreEmptyLines(
-				true
-			).setQuote(
-				_ENCLOSING_CHARACTER_VALUE.charAt(0)
-			).build());
+		return CSVParser.parse(csvString, _CSV_FORMAT);
 	}
 
 	private ObjectDefinition _publishObjectDefinition(
@@ -1604,9 +1614,23 @@ public class BatchEngineBrokerTest {
 		return csvRecord.toList();
 	}
 
+	private static final CSVFormat _CSV_FORMAT = CSVFormat.Builder.create(
+	).setDelimiter(
+		BatchEngineBrokerTest._DELIMITER_VALUE
+	).setIgnoreEmptyLines(
+		true
+	).setQuote(
+		BatchEngineBrokerTest._ENCLOSING_CHARACTER_VALUE.charAt(0)
+	).build();
+
 	private static final String _DELIMITER_VALUE = StringPool.COMMA;
 
 	private static final String _ENCLOSING_CHARACTER_VALUE = StringPool.QUOTE;
+
+	private static final HtmlNormalizationMode _HTML_NORMALIZATION_MODE =
+		HtmlNormalizationMode.BLOCK_NEWLINES;
+
+	private static final String _NEWLINE = "\n";
 
 	private static final String _OBJECT_DEFINITION_1_ERC =
 		"TEST-OBJECT-DEFINITION-1";
@@ -1823,5 +1847,11 @@ public class BatchEngineBrokerTest {
 
 	@Inject
 	private UserLocalService _userLocalService;
+
+	private enum HtmlNormalizationMode {
+
+		BLOCK_NEWLINES, NONE, PRESERVE_SINGLELINE
+
+	}
 
 }
