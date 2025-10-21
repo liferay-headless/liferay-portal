@@ -8838,40 +8838,9 @@ paths:
                     description:
                         default response
             tags: ["Site"]
-        put:
-            description:
-                Adds or update a new site
-            operationId: putSiteByExternalReferenceCode
-            parameters:
-                -   in: path
-                    name: externalReferenceCode
-                    required: true
-                    schema:
-                        type: string
-            requestBody:
-                content:
-                    multipart/form-data:
-                        schema:
-                            properties:
-                                file:
-                                    format: binary
-                                    type: string
-                            type: object
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Site"
-                    description:
-                        default response
-            tags: ["Site"]
-    /sites/{externalReferenceCode}/site-initializer:
+    /sites/{externalReferenceCode}/as-site-initializer:
         get:
-            operationId: getSiteSiteInitializer
+            operationId: getSiteAsSiteInitializer
             parameters:
                 -   in: path
                     name: externalReferenceCode
@@ -8886,6 +8855,7 @@ paths:
                                 format: binary
                                 type: string
             tags: ["Site"]
+    /sites/{externalReferenceCode}/site-initializer:
         post:
             description:
                 Adds a new site based on a multipart/form-data
@@ -8906,6 +8876,37 @@ paths:
                                     type: string
                                 site:
                                     $ref: "#/components/schemas/Site"
+                            type: object
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Site"
+                    description:
+                        default response
+            tags: ["Site"]
+        put:
+            description:
+                Adds or update a new site
+            operationId: putSiteSiteInitializer
+            parameters:
+                -   in: path
+                    name: externalReferenceCode
+                    required: true
+                    schema:
+                        type: string
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            properties:
+                                file:
+                                    format: binary
+                                    type: string
                             type: object
             responses:
                 200:
