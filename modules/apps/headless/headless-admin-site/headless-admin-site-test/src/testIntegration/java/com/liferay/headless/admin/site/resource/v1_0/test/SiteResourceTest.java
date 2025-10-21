@@ -128,35 +128,12 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 	public void testDeleteSite() throws Exception {
 		super.testDeleteSite();
 
-		// Nonexistent site ID
-
-		long siteId = RandomTestUtil.randomLong();
-
-		try {
-			siteResource.deleteSite(siteId);
-
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Problem problem = problemException.getProblem();
-
-			Assert.assertEquals("NOT_FOUND", problem.getStatus());
-			Assert.assertNull(problem.getTitle());
-		}
-	}
-
-	@Override
-	@Test
-	public void testDeleteSiteByExternalReferenceCode() throws Exception {
-		super.testDeleteSiteByExternalReferenceCode();
-
 		// Nonexistent external reference code
 
 		String externalReferenceCode = RandomTestUtil.randomString(10);
 
 		try {
-			siteResource.deleteSiteByExternalReferenceCode(
-				externalReferenceCode);
+			siteResource.deleteSite(externalReferenceCode);
 
 			Assert.fail();
 		}
@@ -170,17 +147,16 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 
 	@Override
 	@Test
-	public void testGetSiteByExternalReferenceCode() throws Exception {
-		super.testGetSiteByExternalReferenceCode();
+	public void testGetSite() throws Exception {
+		super.testGetSite();
 
-		_testGetSiteByExternalReferenceCodeWithDollar();
+		_testGetSiteWithDollar();
 	}
 
 	@Ignore
 	@Override
 	@Test
-	public void testGetSiteByExternalReferenceCodeSiteInitializer()
-		throws Exception {
+	public void testGetSiteAsSiteInitializer() throws Exception {
 	}
 
 	@Override
@@ -289,26 +265,12 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 
 	@Override
 	protected Site testDeleteSite_addSite() throws Exception {
-		return testPutSiteByExternalReferenceCode_addSite();
-	}
-
-	@Override
-	protected Site testDeleteSiteByExternalReferenceCode_addSite()
-		throws Exception {
-
-		return testPutSiteByExternalReferenceCode_addSite();
+		return testPutSiteSiteInitializer_addSite();
 	}
 
 	@Override
 	protected Site testGetSite_addSite() throws Exception {
 		return testPostSite_addSite(randomSite());
-	}
-
-	@Override
-	protected Site testGetSiteByExternalReferenceCode_addSite()
-		throws Exception {
-
-		return testPutSiteByExternalReferenceCode_addSite();
 	}
 
 	@Override
@@ -335,7 +297,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		throws Exception {
 
 		Site postSite = siteResource.postSiteSiteInitializer(
-			site, multipartFiles);
+			site.getExternalReferenceCode(), site, multipartFiles);
 
 		_sites.add(postSite);
 
@@ -348,10 +310,8 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 	}
 
 	@Override
-	protected Site testPutSiteByExternalReferenceCode_addSite()
-		throws Exception {
-
-		return siteResource.putSiteByExternalReferenceCode(
+	protected Site testPutSiteSiteInitializer_addSite() throws Exception {
+		return siteResource.putSiteSiteInitializer(
 			RandomTestUtil.randomString(), randomSite(), getMultipartFiles());
 	}
 
@@ -375,20 +335,6 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 				GroupConstants.getTypeLabel(group.getType())));
 		Assert.assertEquals(
 			site.getName(), group.getName(LocaleUtil.getDefault()));
-	}
-
-	private void _testGetSiteByExternalReferenceCodeWithDollar()
-		throws Exception {
-
-		Site postSite = siteResource.putSiteByExternalReferenceCode(
-			RandomTestUtil.randomString() + StringPool.DOLLAR, randomSite(),
-			getMultipartFiles());
-
-		Site getSite = siteResource.getSiteByExternalReferenceCode(
-			postSite.getExternalReferenceCode());
-
-		assertEquals(postSite, getSite);
-		assertValid(getSite);
 	}
 
 	private void _testGetSitesPageWithActiveAndInactiveSites()
@@ -515,6 +461,18 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		assertEquals(postSite, items.get(0));
 	}
 
+	private void _testGetSiteWithDollar() throws Exception {
+		Site postSite = siteResource.putSiteSiteInitializer(
+			RandomTestUtil.randomString() + StringPool.DOLLAR, randomSite(),
+			getMultipartFiles());
+
+		Site getSite = siteResource.getSite(
+			postSite.getExternalReferenceCode());
+
+		assertEquals(postSite, getSite);
+		assertValid(getSite);
+	}
+
 	private Site _testPostSite_addSite(Site site) throws Exception {
 		Site postSite = siteResource.postSite(site);
 
@@ -539,9 +497,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 
 		_assertEquals(group, site);
 
-		_sites.add(
-			siteResource.getSiteByExternalReferenceCode(
-				site.getExternalReferenceCode()));
+		_sites.add(siteResource.getSite(site.getExternalReferenceCode()));
 	}
 
 	private void _testPostSiteDuplicateFriendlyURL() throws Exception {
@@ -1076,9 +1032,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 
 		_assertEquals(group, site);
 
-		_sites.add(
-			siteResource.getSiteByExternalReferenceCode(
-				site.getExternalReferenceCode()));
+		_sites.add(siteResource.getSite(site.getExternalReferenceCode()));
 
 		Site updatedSite = randomSite();
 
@@ -1099,8 +1053,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		_assertEquals(group, updatedSite);
 
 		_sites.add(
-			siteResource.getSiteByExternalReferenceCode(
-				updatedSite.getExternalReferenceCode()));
+			siteResource.getSite(updatedSite.getExternalReferenceCode()));
 	}
 
 	private void _testPutSiteBatchWithParentSiteExternalReferenceCode()
