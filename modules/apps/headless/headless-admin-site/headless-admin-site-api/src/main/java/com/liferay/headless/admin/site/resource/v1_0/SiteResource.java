@@ -47,21 +47,14 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface SiteResource {
 
-	public void deleteSite(Long siteId) throws Exception;
+	public void deleteSite(String siteExternalReferenceCode) throws Exception;
 
 	public Response deleteSiteBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public void deleteSiteByExternalReferenceCode(String externalReferenceCode)
-		throws Exception;
+	public Site getSite(String siteExternalReferenceCode) throws Exception;
 
-	public Site getSite(Long siteId) throws Exception;
-
-	public Site getSiteByExternalReferenceCode(String externalReferenceCode)
-		throws Exception;
-
-	public Response getSiteByExternalReferenceCodeSiteInitializer(
-			String externalReferenceCode)
+	public Response getSiteAsSiteInitializer(String siteExternalReferenceCode)
 		throws Exception;
 
 	public Page<Site> getSitesPage(
@@ -73,7 +66,8 @@ public interface SiteResource {
 	public Response postSiteBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public Site postSiteSiteInitializer(MultipartBody multipartBody)
+	public Site postSiteSiteInitializer(
+			String siteExternalReferenceCode, MultipartBody multipartBody)
 		throws Exception;
 
 	public Response postSitesPageExportBatch(
@@ -86,8 +80,8 @@ public interface SiteResource {
 	public Response putSiteBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public Site putSiteByExternalReferenceCode(
-			String externalReferenceCode, MultipartBody multipartBody)
+	public Site putSiteSiteInitializer(
+			String siteExternalReferenceCode, MultipartBody multipartBody)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
