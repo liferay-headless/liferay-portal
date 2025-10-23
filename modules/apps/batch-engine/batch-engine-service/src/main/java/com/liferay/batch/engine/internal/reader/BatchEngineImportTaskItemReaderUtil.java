@@ -55,18 +55,17 @@ public class BatchEngineImportTaskItemReaderUtil {
 			List<ItemReaderPostAction> itemReaderPostActions)
 		throws BatchEngineImportTaskExecutorException {
 
-		T item = null;
+		final Object[] itemObject = new Object[1];
 
 		try {
-			item = _convertValue(
+			return _convertValue(
 				batchEngineImportTask, itemClass, fieldNameValueMap,
-				itemReaderPostActions);
+				itemReaderPostActions, itemObject);
 		}
 		catch (Exception exception) {
-			throw new BatchEngineImportTaskExecutorException(item, exception);
+			throw new BatchEngineImportTaskExecutorException(
+				itemObject[0], exception);
 		}
-
-		return item;
 	}
 
 	public static Map<String, Object> mapFieldNames(
@@ -158,7 +157,8 @@ public class BatchEngineImportTaskItemReaderUtil {
 	private static <T> T _convertValue(
 			BatchEngineImportTask batchEngineImportTask, Class<T> itemClass,
 			Map<String, Object> fieldNameValueMap,
-			List<ItemReaderPostAction> itemReaderPostActions)
+			List<ItemReaderPostAction> itemReaderPostActions,
+			Object[] itemObject)
 		throws Exception {
 
 		Map<String, Serializable> extendedProperties = new HashMap<>();
@@ -184,6 +184,8 @@ public class BatchEngineImportTaskItemReaderUtil {
 
 		T item = resolvedClass.getDeclaredConstructor(
 		).newInstance();
+
+		itemObject[0] = item;
 
 		Set<String> batchRestrictFields = _getBatchRestrictFields(
 			batchEngineImportTask);
