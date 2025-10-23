@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,16 +56,16 @@ public class BatchEngineImportTaskItemReaderUtil {
 			List<ItemReaderPostAction> itemReaderPostActions)
 		throws BatchEngineImportTaskExecutorException {
 
-		final Object[] itemObject = new Object[1];
+		AtomicReference<T> atomicReference = new AtomicReference<>();
 
 		try {
 			return _convertValue(
 				batchEngineImportTask, itemClass, fieldNameValueMap,
-				itemReaderPostActions, itemObject);
+				itemReaderPostActions, atomicReference);
 		}
 		catch (Exception exception) {
 			throw new BatchEngineImportTaskExecutorException(
-				itemObject[0], exception);
+				atomicReference.get(), exception);
 		}
 	}
 
@@ -158,7 +159,7 @@ public class BatchEngineImportTaskItemReaderUtil {
 			BatchEngineImportTask batchEngineImportTask, Class<T> itemClass,
 			Map<String, Object> fieldNameValueMap,
 			List<ItemReaderPostAction> itemReaderPostActions,
-			Object[] itemObject)
+			AtomicReference<T> atomicReference)
 		throws Exception {
 
 		Map<String, Serializable> extendedProperties = new HashMap<>();
@@ -185,7 +186,7 @@ public class BatchEngineImportTaskItemReaderUtil {
 		T item = resolvedClass.getDeclaredConstructor(
 		).newInstance();
 
-		itemObject[0] = item;
+		atomicReference.set(item);
 
 		Set<String> batchRestrictFields = _getBatchRestrictFields(
 			batchEngineImportTask);
