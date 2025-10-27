@@ -124,6 +124,29 @@ public class MCPServerTest {
 				"items"
 			));
 
+		callToolResult = mcpSyncClient.callTool(
+			new McpSchema.CallToolRequest(
+				"call-http-endpoint",
+				HashMapBuilder.<String, Object>put(
+					"method", "GET"
+				).put(
+					"path", "/test/v1.0/child/../test-entities"
+				).put(
+					"payload", ""
+				).build()));
+
+		Assert.assertTrue(callToolResult.isError());
+
+		contents = callToolResult.content();
+
+		content = (McpSchema.TextContent)contents.get(0);
+
+		Assert.assertTrue(
+			content.text(
+			).contains(
+				"Forbidden"
+			));
+
 		mcpSyncClient.closeGracefully();
 	}
 
