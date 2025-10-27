@@ -141,6 +141,10 @@ public class MCPServerServlet extends HttpServlet {
 			(mcpSyncServerExchange, monos) -> {
 				String path = String.valueOf(monos.get("path"));
 
+				if (path.contains(StringPool.DOUBLE_PERIOD)) {
+					return new McpSchema.CallToolResult("Forbidden", true);
+				}
+
 				if (!path.startsWith("/")) {
 					path = "/" + path;
 				}
