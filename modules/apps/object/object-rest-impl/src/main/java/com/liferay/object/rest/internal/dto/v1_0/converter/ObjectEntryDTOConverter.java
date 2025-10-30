@@ -1586,30 +1586,7 @@ public class ObjectEntryDTOConverter
 			int versionInt)
 		throws Exception {
 
-		SystemProperties systemProperties = new SystemProperties();
-
-		systemProperties.setScope(
-			() -> {
-				Group group = _groupLocalService.fetchGroup(groupId);
-
-				if (group == null) {
-					return null;
-				}
-
-				Scope scope = new Scope();
-
-				scope.setExternalReferenceCode(group::getExternalReferenceCode);
-				scope.setType(
-					() -> {
-						if (group.getType() == GroupConstants.TYPE_DEPOT) {
-							return Scope.Type.ASSET_LIBRARY;
-						}
-
-						return Scope.Type.SITE;
-					});
-
-				return scope;
-			});
+		Group group = _groupLocalService.fetchGroup(groupId);
 
 		ObjectDefinitionBrief objectDefinitionBrief =
 			NestedFieldsSupplier.supply(
@@ -1617,12 +1594,43 @@ public class ObjectEntryDTOConverter
 				nestedField -> _toObjectDefinitionBrief(
 					locale, objectDefinition));
 
+		boolean enableObjectEntryVersioning =
+			objectDefinition.isEnableObjectEntryVersioning();
+
+		if ((group == null) && (objectDefinitionBrief == null) &&
+			!enableObjectEntryVersioning) {
+
+			return null;
+		}
+
+		SystemProperties systemProperties = new SystemProperties();
+
+		if (group != null) {
+			systemProperties.setScope(
+				() -> {
+					Scope scope = new Scope();
+
+					scope.setExternalReferenceCode(
+						group::getExternalReferenceCode);
+					scope.setType(
+						() -> {
+							if (group.getType() == GroupConstants.TYPE_DEPOT) {
+								return Scope.Type.ASSET_LIBRARY;
+							}
+
+							return Scope.Type.SITE;
+						});
+
+					return scope;
+				});
+		}
+
 		if (objectDefinitionBrief != null) {
 			systemProperties.setObjectDefinitionBrief(
 				() -> objectDefinitionBrief);
 		}
 
-		if (objectDefinition.isEnableObjectEntryVersioning()) {
+		if (enableObjectEntryVersioning) {
 			systemProperties.setVersion(
 				() -> new Version() {
 					{
