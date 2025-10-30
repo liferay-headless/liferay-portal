@@ -1586,30 +1586,7 @@ public class ObjectEntryDTOConverter
 			int versionInt)
 		throws Exception {
 
-		SystemProperties systemProperties = new SystemProperties();
-
-		systemProperties.setScope(
-			() -> {
-				Group group = _groupLocalService.fetchGroup(groupId);
-
-				if (group == null) {
-					return null;
-				}
-
-				Scope scope = new Scope();
-
-				scope.setExternalReferenceCode(group::getExternalReferenceCode);
-				scope.setType(
-					() -> {
-						if (group.getType() == GroupConstants.TYPE_DEPOT) {
-							return Scope.Type.ASSET_LIBRARY;
-						}
-
-						return Scope.Type.SITE;
-					});
-
-				return scope;
-			});
+		boolean hasObjectDefinitionBrief = false;
 
 		ObjectDefinitionBrief objectDefinitionBrief =
 			NestedFieldsSupplier.supply(
@@ -1618,11 +1595,54 @@ public class ObjectEntryDTOConverter
 					locale, objectDefinition));
 
 		if (objectDefinitionBrief != null) {
+			hasObjectDefinitionBrief = true;
+		}
+
+		boolean hasScope = false;
+
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		if (group != null) {
+			hasScope = true;
+		}
+
+		boolean enableObjectEntryVersioning =
+			objectDefinition.isEnableObjectEntryVersioning();
+
+		if (!hasScope && !hasObjectDefinitionBrief &&
+			!enableObjectEntryVersioning) {
+
+			return null;
+		}
+
+		SystemProperties systemProperties = new SystemProperties();
+
+		if (hasScope) {
+			systemProperties.setScope(
+				() -> {
+					Scope scope = new Scope();
+
+					scope.setExternalReferenceCode(
+						group::getExternalReferenceCode);
+					scope.setType(
+						() -> {
+							if (group.getType() == GroupConstants.TYPE_DEPOT) {
+								return Scope.Type.ASSET_LIBRARY;
+							}
+
+							return Scope.Type.SITE;
+						});
+
+					return scope;
+				});
+		}
+
+		if (hasObjectDefinitionBrief) {
 			systemProperties.setObjectDefinitionBrief(
 				() -> objectDefinitionBrief);
 		}
 
-		if (objectDefinition.isEnableObjectEntryVersioning()) {
+		if (enableObjectEntryVersioning) {
 			systemProperties.setVersion(
 				() -> new Version() {
 					{
