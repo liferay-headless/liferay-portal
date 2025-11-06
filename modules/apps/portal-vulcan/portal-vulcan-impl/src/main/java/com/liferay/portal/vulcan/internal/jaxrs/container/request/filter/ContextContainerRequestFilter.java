@@ -39,6 +39,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.sse.SseEventSink;
 
 import java.io.IOException;
 
@@ -109,8 +110,16 @@ public class ContextContainerRequestFilter
 			ContainerResponseContext containerResponseContext)
 		throws IOException {
 
-		ContextProviderUtil.releaseResourceInstance(
-			JAXRSUtils.getContextMessage(JAXRSUtils.getCurrentMessage()));
+		Message message = JAXRSUtils.getContextMessage(
+			JAXRSUtils.getCurrentMessage());
+
+		SseEventSink sseEventSink = message.get(SseEventSink.class);
+
+		if (sseEventSink != null) {
+			return;
+		}
+
+		ContextProviderUtil.releaseResourceInstance(message);
 	}
 
 	public void handleMessage(

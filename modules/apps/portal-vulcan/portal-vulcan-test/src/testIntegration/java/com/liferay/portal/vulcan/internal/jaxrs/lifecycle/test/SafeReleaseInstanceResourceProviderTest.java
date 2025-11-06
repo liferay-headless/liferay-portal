@@ -16,7 +16,9 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.jaxrs.sse.SseEventSinkDecoratorFactory;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import jakarta.ws.rs.GET;
@@ -181,7 +183,7 @@ public class SafeReleaseInstanceResourceProviderTest {
 	public static class TestApplication extends Application {
 	}
 
-	public static class TestResource implements EntityModelResource {
+	public class TestResource implements EntityModelResource {
 
 		public TestResource() {
 			_instancesCountDownLatch = new CountDownLatch(
@@ -219,9 +221,12 @@ public class SafeReleaseInstanceResourceProviderTest {
 		@Path("/sse")
 		@Produces("text/event-stream")
 		public void testServerSentEvents(@Context SseEventSink sseEventSink) {
-			Assert.assertNotNull(_contextCompany);
+			SseEventSink decoratedSseEventSink =
+				_sseEventSinkDecoratorFactory.decorate(sseEventSink);
 
-			sseEventSink.close();
+			decoratedSseEventSink.close();
+
+			Assert.assertNotNull(_contextCompany);
 		}
 
 		@Override
@@ -240,5 +245,8 @@ public class SafeReleaseInstanceResourceProviderTest {
 
 	private ServiceRegistration<Application> _applicationServiceRegistration;
 	private ServiceRegistration<TestResource> _resourceServiceRegistration;
+
+	@Inject
+	private SseEventSinkDecoratorFactory _sseEventSinkDecoratorFactory;
 
 }

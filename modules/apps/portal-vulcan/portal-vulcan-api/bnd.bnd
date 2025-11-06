@@ -29,6 +29,7 @@ Export-Package:\
 	com.liferay.portal.vulcan.jaxrs.exception.mapper,\
 	com.liferay.portal.vulcan.jaxrs.extension,\
 	com.liferay.portal.vulcan.jaxrs.serializer,\
+	com.liferay.portal.vulcan.jaxrs.sse,\
 	com.liferay.portal.vulcan.list.type,\
 	com.liferay.portal.vulcan.multipart,\
 	com.liferay.portal.vulcan.openapi,\

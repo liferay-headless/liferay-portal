@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
+import com.liferay.portal.vulcan.jaxrs.sse.SseEventSinkDecoratorFactory;
 
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.sse.Sse;
@@ -46,7 +47,8 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		SseUtil.initialize(_sse, sseEventSink);
+		SseUtil.initialize(
+			_sse, _sseEventSinkDecoratorFactory.decorate(sseEventSink));
 	}
 
 	@Override
@@ -103,6 +105,9 @@ public class TaskResourceImpl extends BaseTaskResourceImpl {
 
 	@Context
 	private Sse _sse;
+
+	@Reference
+	private SseEventSinkDecoratorFactory _sseEventSinkDecoratorFactory;
 
 	@Reference
 	private WorkflowInstanceManager _workflowInstanceManager;
