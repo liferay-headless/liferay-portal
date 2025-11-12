@@ -681,13 +681,13 @@ export class DataApiHelpers extends ApiHelpers {
 		}
 	}
 
-	removeData(id: number, type: string) {
-		const filtered = this.data.filter(
-			(item) => item.id !== id || item.type !== type
-		);
+	// removeData(id: number, type: string) {
+	// 	const filtered = this.data.filter(
+	// 		(item) => item.id !== id || item.type !== type
+	// 	);
 
-		this.data.splice(0, this.data.length, ...filtered);
-	}
+	// 	this.data.splice(0, this.data.length, ...filtered);
+	// }
 
 	setData(data: TDataApiHelpersData[]) {
 		this.data.length = 0;

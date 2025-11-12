@@ -1059,11 +1059,12 @@ test('can only import custom object entries when their definitions are already i
 		'Tests 1 Items',
 	]);
 
-	const deletionResponse = await objectActionAPIClient.deleteObjectDefinition(objectDefinition.id);
+	// const deletionResponse = 
+	await objectActionAPIClient.deleteObjectDefinition(objectDefinition.id);
 
-	if (deletionResponse.response.status === 204) {
-		apiHelpers.removeData(objectDefinition.id, 'objectDefinition');
-	}
+	// if (deletionResponse.response.status === 204) {
+	// 	apiHelpers.removeData(objectDefinition.id, 'objectDefinition');
+	// }
 
 	await companyExportImportPage.import(
 		exportFilePath,
