@@ -149,8 +149,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/user-account.properties",
-	property = "nested.field.support=true", scope = ServiceScope.PROTOTYPE,
-	service = UserAccountResource.class
+	property = {
+		"export.import.vulcan.batch.engine.task.item.delegate=true",
+		"nested.field.support=true"
+	},
+	scope = ServiceScope.PROTOTYPE, service = UserAccountResource.class
 )
 public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 
