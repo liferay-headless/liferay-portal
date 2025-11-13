@@ -71,6 +71,15 @@ public class AssetVocabularyStagedModelDataHandler
 	}
 
 	@Override
+	public AssetVocabulary fetchStagedModelByExternalReferenceCodeAndGroupId(
+		String externalReferenceCode, long groupId) {
+
+		return _assetVocabularyLocalService.
+			fetchAssetVocabularyByExternalReferenceCode(
+				externalReferenceCode, groupId);
+	}
+
+	@Override
 	public AssetVocabulary fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
@@ -199,8 +208,8 @@ public class AssetVocabularyStagedModelDataHandler
 
 		AssetVocabulary importedVocabulary = null;
 
-		AssetVocabulary existingVocabulary = fetchStagedModelByUuidAndGroupId(
-			vocabulary.getUuid(), portletDataContext.getScopeGroupId());
+		AssetVocabulary existingVocabulary = fetchExistingStagedModel(
+			vocabulary, portletDataContext.getScopeGroupId());
 
 		if (existingVocabulary == null) {
 			String name = _getVocabularyName(
