@@ -18,6 +18,7 @@ import com.liferay.captcha.rest.resource.v1_0.CaptchaResource;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
 import com.liferay.headless.admin.user.dto.v1_0.AccountBrief;
 import com.liferay.headless.admin.user.dto.v1_0.EmailAddress;
@@ -120,6 +121,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.user.associated.data.anonymizer.UADAnonymousUserProvider;
+import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -155,7 +157,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 	},
 	scope = ServiceScope.PROTOTYPE, service = UserAccountResource.class
 )
-public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
+public class UserAccountResourceImpl
+	extends BaseUserAccountResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate<UserAccount> {
 
 	@Override
 	public void
@@ -341,6 +345,33 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 				_portal.getClassNameId(User.class.getName()),
 				contextCompany.getCompanyId(), _expandoBridgeIndexer,
 				_expandoColumnLocalService, _expandoTableLocalService));
+	}
+
+	@Override
+	public ExportImportDescriptor getExportImportDescriptor() {
+		return new ExportImportDescriptor() {
+
+			@Override
+			public String getModelClassName() {
+				return User.class.getName();
+			}
+
+			@Override
+			public String getPortletId() {
+				return UsersAdminPortletKeys.USER_ADMIN;
+			}
+
+			@Override
+			public String getResourceClassName() {
+				return UserAccountResource.class.getName();
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.SITE;
+			}
+
+		};
 	}
 
 	@Override
