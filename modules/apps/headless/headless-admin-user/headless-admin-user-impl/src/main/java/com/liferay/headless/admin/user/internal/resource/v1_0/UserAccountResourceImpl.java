@@ -992,131 +992,22 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 	}
 
 	@Override
+	public UserAccount postSiteUserAccount(
+			Long siteId, String captchaAnswer, String captchaToken,
+			UserAccount userAccount)
+		throws Exception {
+
+		return _postUserAccount(
+			captchaAnswer, captchaToken, new long[] {siteId}, userAccount);
+	}
+
+	@Override
 	public UserAccount postUserAccount(
 			String captchaAnswer, String captchaToken, UserAccount userAccount)
 		throws Exception {
 
-		User user = null;
-
-		boolean autoPassword = false;
-		String password = userAccount.getPassword();
-
-		if (Validator.isNull(password)) {
-			autoPassword = true;
-		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			contextHttpServletRequest);
-
-		serviceContext.setExpandoBridgeAttributes(
-			CustomFieldsUtil.toMap(
-				User.class.getName(), contextCompany.getCompanyId(),
-				userAccount.getCustomFields(),
-				contextAcceptLanguage.getPreferredLocale()));
-
-		if (Validator.isNull(serviceContext.getPathMain()) ||
-			Validator.isNull(serviceContext.getPortalURL())) {
-
-			Company company = _companyService.getCompanyById(
-				contextCompany.getCompanyId());
-
-			serviceContext.setPathMain(Portal.PATH_MAIN);
-			serviceContext.setPortalURL(company.getPortalURL(0));
-		}
-
-		if (contextUser.isGuestUser()) {
-			if (_captchaSettings.isCreateAccountCaptchaEnabled()) {
-				try {
-					_captchaResource.setContextCompany(contextCompany);
-					_captchaResource.setContextUser(contextUser);
-
-					_captchaResource.postCaptchaResponse(
-						new Captcha() {
-							{
-								setAnswer(() -> captchaAnswer);
-								setToken(() -> captchaToken);
-							}
-						});
-				}
-				catch (Exception exception) {
-					throw new CaptchaException(exception);
-				}
-			}
-
-			user = _userService.addUserWithWorkflow(
-				contextCompany.getCompanyId(), autoPassword, password, password,
-				false, userAccount.getAlternateName(),
-				userAccount.getEmailAddress(), _getLocale(userAccount),
-				userAccount.getGivenName(), userAccount.getAdditionalName(),
-				userAccount.getFamilyName(), _getPrefixId(null, userAccount),
-				_getSuffixId(null, userAccount),
-				_isMale(true, userAccount.getGender()),
-				_getBirthdayMonth(Calendar.JANUARY, userAccount),
-				_getBirthdayDay(1, userAccount),
-				_getBirthdayYear(1977, userAccount), userAccount.getJobTitle(),
-				new long[0], new long[0], new long[0], new long[0], true,
-				serviceContext);
-
-			PermissionThreadLocal.setPermissionChecker(
-				_permissionCheckerFactory.create(user));
-
-			UsersAdminUtil.updateAddresses(
-				Contact.class.getName(), user.getContactId(),
-				_getAddresses(null, userAccount),
-				ListTypeConstants.CONTACT_ADDRESS);
-			UsersAdminUtil.updateEmailAddresses(
-				Contact.class.getName(), user.getContactId(),
-				_getServiceBuilderEmailAddresses(null, userAccount));
-			UsersAdminUtil.updatePhones(
-				Contact.class.getName(), user.getContactId(),
-				_getServiceBuilderPhones(null, userAccount));
-			UsersAdminUtil.updateWebsites(
-				Contact.class.getName(), user.getContactId(),
-				_getWebsites(null, userAccount));
-		}
-		else {
-			user = _userService.addUserWithWorkflow(
-				contextCompany.getCompanyId(), autoPassword, password, password,
-				false, userAccount.getAlternateName(),
-				userAccount.getEmailAddress(), _getLocale(userAccount),
-				userAccount.getGivenName(), userAccount.getAdditionalName(),
-				userAccount.getFamilyName(), _getPrefixId(null, userAccount),
-				_getSuffixId(null, userAccount),
-				_isMale(true, userAccount.getGender()),
-				_getBirthdayMonth(Calendar.JANUARY, userAccount),
-				_getBirthdayDay(1, userAccount),
-				_getBirthdayYear(1977, userAccount), userAccount.getJobTitle(),
-				new long[0], new long[0], new long[0], new long[0],
-				_getAddresses(null, userAccount),
-				_getServiceBuilderEmailAddresses(null, userAccount),
-				_getServiceBuilderPhones(null, userAccount),
-				_getWebsites(null, userAccount), Collections.emptyList(), true,
-				serviceContext);
-		}
-
-		user = _userService.updateExternalReferenceCode(
-			user, userAccount.getExternalReferenceCode());
-		user = _userService.updatePortrait(
-			user.getUserId(), _getPortraitBytes(false, null, userAccount));
-
-		UserAccountContactInformation userAccountContactInformation =
-			userAccount.getUserAccountContactInformation();
-
-		if (userAccountContactInformation != null) {
-			Contact contact = user.getContact();
-
-			contact.setSmsSn(userAccountContactInformation.getSms());
-			contact.setFacebookSn(userAccountContactInformation.getFacebook());
-			contact.setJabberSn(userAccountContactInformation.getJabber());
-			contact.setSkypeSn(userAccountContactInformation.getSkype());
-			contact.setTwitterSn(userAccountContactInformation.getTwitter());
-
-			_contactLocalService.updateContact(contact);
-
-			user = _userService.getUserById(user.getUserId());
-		}
-
-		return _toUserAccount(user);
+		return _postUserAccount(
+			captchaAnswer, captchaToken, new long[0], userAccount);
 	}
 
 	@Override
@@ -1781,6 +1672,134 @@ public class UserAccountResourceImpl extends BaseUserAccountResourceImpl {
 		}
 
 		return false;
+	}
+
+	private UserAccount _postUserAccount(
+			String captchaAnswer, String captchaToken, long[] groupIds,
+			UserAccount userAccount)
+		throws Exception {
+
+		User user = null;
+
+		boolean autoPassword = false;
+		String password = userAccount.getPassword();
+
+		if (Validator.isNull(password)) {
+			autoPassword = true;
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			contextHttpServletRequest);
+
+		serviceContext.setExpandoBridgeAttributes(
+			CustomFieldsUtil.toMap(
+				User.class.getName(), contextCompany.getCompanyId(),
+				userAccount.getCustomFields(),
+				contextAcceptLanguage.getPreferredLocale()));
+
+		if (Validator.isNull(serviceContext.getPathMain()) ||
+			Validator.isNull(serviceContext.getPortalURL())) {
+
+			Company company = _companyService.getCompanyById(
+				contextCompany.getCompanyId());
+
+			serviceContext.setPathMain(Portal.PATH_MAIN);
+			serviceContext.setPortalURL(company.getPortalURL(0));
+		}
+
+		if (contextUser.isGuestUser()) {
+			if (_captchaSettings.isCreateAccountCaptchaEnabled()) {
+				try {
+					_captchaResource.setContextCompany(contextCompany);
+					_captchaResource.setContextUser(contextUser);
+
+					_captchaResource.postCaptchaResponse(
+						new Captcha() {
+							{
+								setAnswer(() -> captchaAnswer);
+								setToken(() -> captchaToken);
+							}
+						});
+				}
+				catch (Exception exception) {
+					throw new CaptchaException(exception);
+				}
+			}
+
+			user = _userService.addUserWithWorkflow(
+				contextCompany.getCompanyId(), autoPassword, password, password,
+				false, userAccount.getAlternateName(),
+				userAccount.getEmailAddress(), _getLocale(userAccount),
+				userAccount.getGivenName(), userAccount.getAdditionalName(),
+				userAccount.getFamilyName(), _getPrefixId(null, userAccount),
+				_getSuffixId(null, userAccount),
+				_isMale(true, userAccount.getGender()),
+				_getBirthdayMonth(Calendar.JANUARY, userAccount),
+				_getBirthdayDay(1, userAccount),
+				_getBirthdayYear(1977, userAccount), userAccount.getJobTitle(),
+				groupIds, new long[0], new long[0], new long[0], true,
+				serviceContext);
+
+			PermissionThreadLocal.setPermissionChecker(
+				_permissionCheckerFactory.create(user));
+
+			UsersAdminUtil.updateAddresses(
+				Contact.class.getName(), user.getContactId(),
+				_getAddresses(null, userAccount),
+				ListTypeConstants.CONTACT_ADDRESS);
+			UsersAdminUtil.updateEmailAddresses(
+				Contact.class.getName(), user.getContactId(),
+				_getServiceBuilderEmailAddresses(null, userAccount));
+			UsersAdminUtil.updatePhones(
+				Contact.class.getName(), user.getContactId(),
+				_getServiceBuilderPhones(null, userAccount));
+			UsersAdminUtil.updateWebsites(
+				Contact.class.getName(), user.getContactId(),
+				_getWebsites(null, userAccount));
+		}
+		else {
+			user = _userService.addUserWithWorkflow(
+				contextCompany.getCompanyId(), autoPassword, password, password,
+				false, userAccount.getAlternateName(),
+				userAccount.getEmailAddress(), _getLocale(userAccount),
+				userAccount.getGivenName(), userAccount.getAdditionalName(),
+				userAccount.getFamilyName(), _getPrefixId(null, userAccount),
+				_getSuffixId(null, userAccount),
+				_isMale(true, userAccount.getGender()),
+				_getBirthdayMonth(Calendar.JANUARY, userAccount),
+				_getBirthdayDay(1, userAccount),
+				_getBirthdayYear(1977, userAccount), userAccount.getJobTitle(),
+				groupIds, new long[0], new long[0], new long[0],
+				_getAddresses(null, userAccount),
+				_getServiceBuilderEmailAddresses(null, userAccount),
+				_getServiceBuilderPhones(null, userAccount),
+				_getWebsites(null, userAccount), Collections.emptyList(), true,
+				serviceContext);
+		}
+
+		user = _userService.updateExternalReferenceCode(
+			user, userAccount.getExternalReferenceCode());
+		user = _userService.updatePortrait(
+			user.getUserId(), _getPortraitBytes(false, null, userAccount));
+
+		UserAccountContactInformation userAccountContactInformation =
+			userAccount.getUserAccountContactInformation();
+
+		if (userAccountContactInformation != null) {
+			Contact contact = user.getContact();
+
+			contact.setSmsSn(userAccountContactInformation.getSms());
+			contact.setFacebookSn(userAccountContactInformation.getFacebook());
+			contact.setJabberSn(userAccountContactInformation.getJabber());
+			contact.setSkypeSn(userAccountContactInformation.getSkype());
+			contact.setTwitterSn(userAccountContactInformation.getTwitter());
+
+			_contactLocalService.updateContact(contact);
+
+			user = _userService.getUserById(user.getUserId());
+		}
+
+		return _toUserAccount(user);
 	}
 
 	private UserAccount _toUserAccount(
