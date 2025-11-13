@@ -19,15 +19,12 @@ import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.vulcan.internal.template.servlet.RESTClientHttpRequestDelegate;
 import com.liferay.portal.vulcan.internal.template.servlet.RESTClientHttpResponse;
+import com.liferay.portal.vulcan.internal.template.servlet.RESTClientHttpServletRequestWrapper;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
@@ -97,20 +94,8 @@ public class RESTClientTemplateContextContributor
 				AccessControlUtil.setAccessControlContext(null);
 
 				requestDispatcher.forward(
-					new HttpServletRequestWrapper(
-						ProxyUtil.newDelegateProxyInstance(
-							HttpServletRequest.class.getClassLoader(),
-							HttpServletRequest.class,
-							new RESTClientHttpRequestDelegate(
-								_contextObjects, _httpServletRequest, path),
-							_httpServletRequest)) {
-
-						@Override
-						public ServletRequest getRequest() {
-							return _httpServletRequest;
-						}
-
-					},
+					new RESTClientHttpServletRequestWrapper(
+						_contextObjects, _httpServletRequest, path),
 					httpServletResponse);
 			}
 			finally {

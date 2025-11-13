@@ -28,7 +28,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 /**
  * @author Petteri Karttunen
  */
-public class RESTClientHttpRequestDelegateTest {
+public class RESTClientHttpServletRequestWrapperTest {
 
 	@ClassRule
 	@Rule
@@ -56,8 +56,8 @@ public class RESTClientHttpRequestDelegateTest {
 		mockHttpServletRequest.setParameter(
 			parameterName, RandomTestUtil.randomString());
 
-		RESTClientHttpRequestDelegate restClientHttpRequestDelegate =
-			new RESTClientHttpRequestDelegate(
+		RESTClientHttpServletRequestWrapper restClientHttpRequestDelegate =
+			new RESTClientHttpServletRequestWrapper(
 				new HashMap<>(), mockHttpServletRequest,
 				RandomTestUtil.randomString());
 
