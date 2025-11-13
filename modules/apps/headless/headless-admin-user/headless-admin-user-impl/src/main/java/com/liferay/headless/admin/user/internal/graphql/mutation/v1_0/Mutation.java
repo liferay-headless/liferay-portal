@@ -2885,6 +2885,27 @@ public class Mutation {
 					externalReferenceCode, userAccount));
 	}
 
+	@GraphQLField(description = "Overrides the userAccount permissions")
+	public java.util.Collection<com.liferay.portal.vulcan.permission.Permission>
+			updateUserAccountPermissionsPage(
+				@GraphQLName("userAccountId") Long userAccountId,
+				@GraphQLName("permissions")
+					com.liferay.portal.vulcan.permission.Permission[]
+						permissions)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_userAccountResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userAccountResource -> {
+				Page paginationPage =
+					userAccountResource.putUserAccountPermissionsPage(
+						userAccountId, permissions);
+
+				return paginationPage.getItems();
+			});
+	}
+
 	@GraphQLField
 	public boolean deleteUserGroup(@GraphQLName("userGroupId") Long userGroupId)
 		throws Exception {

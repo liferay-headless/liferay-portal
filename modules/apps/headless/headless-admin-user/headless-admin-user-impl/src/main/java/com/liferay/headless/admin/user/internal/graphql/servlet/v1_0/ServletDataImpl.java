@@ -956,6 +956,11 @@ public class ServletDataImpl implements ServletData {
 							UserAccountResourceImpl.class,
 							"putUserAccountByExternalReferenceCode"));
 					put(
+						"mutation#updateUserAccountPermissionsPage",
+						new ObjectValuePair<>(
+							UserAccountResourceImpl.class,
+							"putUserAccountPermissionsPage"));
+					put(
 						"mutation#deleteUserGroup",
 						new ObjectValuePair<>(
 							UserGroupResourceImpl.class, "deleteUserGroup"));
@@ -1443,6 +1448,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							UserAccountResourceImpl.class,
 							"getUserAccountByExternalReferenceCode"));
+					put(
+						"query#userAccountPermissions",
+						new ObjectValuePair<>(
+							UserAccountResourceImpl.class,
+							"getUserAccountPermissionsPage"));
 					put(
 						"query#userAccountsByStatus",
 						new ObjectValuePair<>(

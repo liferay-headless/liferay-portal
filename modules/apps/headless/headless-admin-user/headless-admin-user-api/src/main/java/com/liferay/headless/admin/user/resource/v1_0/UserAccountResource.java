@@ -147,6 +147,10 @@ public interface UserAccountResource {
 			String externalReferenceCode)
 		throws Exception;
 
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getUserAccountPermissionsPage(Long userAccountId, String roleNames)
+		throws Exception;
+
 	public Page<UserAccount> getUserAccountsByStatusPage(
 			String status, String search,
 			com.liferay.portal.kernel.search.filter.Filter filter,
@@ -290,6 +294,12 @@ public interface UserAccountResource {
 
 	public UserAccount putUserAccountByExternalReferenceCode(
 			String externalReferenceCode, UserAccount userAccount)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putUserAccountPermissionsPage(
+				Long userAccountId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
