@@ -6948,6 +6948,45 @@ paths:
                                     $ref: "#/components/schemas/UserAccount"
                                 type: array
             tags: ["UserAccount"]
+        post:
+            description:
+                Creates a user account associated to a specific site.
+            operationId: postSiteUserAccount
+            parameters:
+                -   in: path
+                    name: siteId
+                    required: true
+                    schema:
+                        format: int64
+                        type: integer
+                -   in: query
+                    name: captchaAnswer
+                    required: false
+                    schema:
+                        type: string
+                -   in: query
+                    name: captchaToken
+                    required: false
+                    schema:
+                        type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserAccount"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/UserAccount"
+            responses:
+                201:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserAccount"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/UserAccount"
+            tags: ["UserAccount"]
     "/sites/{siteId}/user-accounts/{userAccountId}/segments":
         get:
             # @review
