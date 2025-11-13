@@ -1168,6 +1168,23 @@ public class UserAccountResourceImpl
 	}
 
 	@Override
+	protected Long getPermissionCheckerGroupId(Object id) throws Exception {
+		User user = _userService.getUserById((Long)id);
+
+		return user.getGroupId();
+	}
+
+	@Override
+	protected String getPermissionCheckerPortletName(Object id) {
+		return "com.liferay.portal.kernel.model.User";
+	}
+
+	@Override
+	protected String getPermissionCheckerResourceName(Object id) {
+		return User.class.getName();
+	}
+
+	@Override
 	protected void preparePatch(
 		UserAccount userAccount, UserAccount existingUserAccount) {
 
