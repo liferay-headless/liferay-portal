@@ -908,6 +908,16 @@ public class ServletDataImpl implements ServletData {
 							UserAccountResourceImpl.class,
 							"postOrganizationUserAccountsPageExportBatch"));
 					put(
+						"mutation#createSiteUserAccount",
+						new ObjectValuePair<>(
+							UserAccountResourceImpl.class,
+							"postSiteUserAccount"));
+					put(
+						"mutation#createSiteUserAccountBatch",
+						new ObjectValuePair<>(
+							UserAccountResourceImpl.class,
+							"postSiteUserAccountBatch"));
+					put(
 						"mutation#createSiteUserAccountsPageExportBatch",
 						new ObjectValuePair<>(
 							UserAccountResourceImpl.class,

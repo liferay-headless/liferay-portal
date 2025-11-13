@@ -244,6 +244,16 @@ public interface UserAccountResource {
 			String contentType, String fieldNames)
 		throws Exception;
 
+	public UserAccount postSiteUserAccount(
+			Long siteId, String captchaAnswer, String captchaToken,
+			UserAccount userAccount)
+		throws Exception;
+
+	public Response postSiteUserAccountBatch(
+			Long siteId, String captchaAnswer, String captchaToken,
+			String callbackURL, Object object)
+		throws Exception;
+
 	public Response postSiteUserAccountsPageExportBatch(
 			Long siteId, String search,
 			com.liferay.portal.kernel.search.filter.Filter filter,

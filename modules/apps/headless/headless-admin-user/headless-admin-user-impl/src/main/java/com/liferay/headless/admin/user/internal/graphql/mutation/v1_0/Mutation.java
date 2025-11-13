@@ -2719,6 +2719,41 @@ public class Mutation {
 					callbackURL, contentType, fieldNames));
 	}
 
+	@GraphQLField(
+		description = "Creates a user account associated to a specific site."
+	)
+	public UserAccount createSiteUserAccount(
+			@GraphQLName("siteKey") @NotEmpty String siteKey,
+			@GraphQLName("captchaAnswer") String captchaAnswer,
+			@GraphQLName("captchaToken") String captchaToken,
+			@GraphQLName("userAccount") UserAccount userAccount)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_userAccountResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userAccountResource -> userAccountResource.postSiteUserAccount(
+				Long.valueOf(siteKey), captchaAnswer, captchaToken,
+				userAccount));
+	}
+
+	@GraphQLField
+	public Response createSiteUserAccountBatch(
+			@GraphQLName("siteKey") @NotEmpty String siteKey,
+			@GraphQLName("captchaAnswer") String captchaAnswer,
+			@GraphQLName("captchaToken") String captchaToken,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_userAccountResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userAccountResource -> userAccountResource.postSiteUserAccountBatch(
+				Long.valueOf(siteKey), captchaAnswer, captchaToken, callbackURL,
+				object));
+	}
+
 	@GraphQLField
 	public Response createSiteUserAccountsPageExportBatch(
 			@GraphQLName("siteKey") @NotEmpty String siteKey,

@@ -3640,6 +3640,15 @@ public abstract class BaseUserAccountResourceTestCase {
 
 		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
+		Map createBatchAction = new HashMap<>();
+		createBatchAction.put("method", "POST");
+		createBatchAction.put(
+			"href",
+			"http://localhost:8080/o/headless-admin-user/v1.0/sites/{siteId}/user-accounts/batch".
+				replace("{siteId}", String.valueOf(siteId)));
+
+		expectedActions.put("createBatch", createBatchAction);
+
 		return expectedActions;
 	}
 
@@ -3982,6 +3991,78 @@ public abstract class BaseUserAccountResourceTestCase {
 		throws Exception {
 
 		return irrelevantGroup.getGroupId();
+	}
+
+	@Test
+	public void testGraphQLGetSiteUserAccountsPage() throws Exception {
+		Long siteId = testGetSiteUserAccountsPage_getSiteId();
+
+		GraphQLField graphQLField = new GraphQLField(
+			"siteUserAccounts",
+			new HashMap<String, Object>() {
+				{
+					put("siteKey", "\"" + siteId + "\"");
+					put("search", null);
+					put("page", 1);
+					put("pageSize", 10);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
+
+		// No namespace
+
+		JSONObject siteUserAccountsJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/siteUserAccounts");
+
+		long totalCount = siteUserAccountsJSONObject.getLong("totalCount");
+
+		UserAccount userAccount1 = testGraphQLSiteUserAccount_addUserAccount(
+			siteId, randomUserAccount());
+
+		UserAccount userAccount2 = testGraphQLSiteUserAccount_addUserAccount(
+			siteId, randomUserAccount());
+
+		siteUserAccountsJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/siteUserAccounts");
+
+		Assert.assertEquals(
+			totalCount + 2, siteUserAccountsJSONObject.getLong("totalCount"));
+
+		assertContains(
+			userAccount1,
+			Arrays.asList(
+				UserAccountSerDes.toDTOs(
+					siteUserAccountsJSONObject.getString("items"))));
+		assertContains(
+			userAccount2,
+			Arrays.asList(
+				UserAccountSerDes.toDTOs(
+					siteUserAccountsJSONObject.getString("items"))));
+
+		// Using the namespace headlessAdminUser_v1_0
+
+		siteUserAccountsJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField("headlessAdminUser_v1_0", graphQLField)),
+			"JSONObject/data", "JSONObject/headlessAdminUser_v1_0",
+			"JSONObject/siteUserAccounts");
+
+		Assert.assertEquals(
+			totalCount + 2, siteUserAccountsJSONObject.getLong("totalCount"));
+
+		assertContains(
+			userAccount1,
+			Arrays.asList(
+				UserAccountSerDes.toDTOs(
+					siteUserAccountsJSONObject.getString("items"))));
+		assertContains(
+			userAccount2,
+			Arrays.asList(
+				UserAccountSerDes.toDTOs(
+					siteUserAccountsJSONObject.getString("items"))));
 	}
 
 	@Test
@@ -6671,6 +6752,35 @@ public abstract class BaseUserAccountResourceTestCase {
 	}
 
 	@Test
+	public void testPostSiteUserAccount() throws Exception {
+		UserAccount randomUserAccount = randomUserAccount();
+
+		UserAccount postUserAccount = testPostSiteUserAccount_addUserAccount(
+			randomUserAccount);
+
+		assertEquals(randomUserAccount, postUserAccount);
+		assertValid(postUserAccount);
+	}
+
+	protected UserAccount testPostSiteUserAccount_addUserAccount(
+			UserAccount userAccount)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLPostSiteUserAccount() throws Exception {
+		UserAccount randomUserAccount = randomUserAccount();
+
+		UserAccount userAccount = testGraphQLSiteUserAccount_addUserAccount(
+			testGroup.getGroupId(), randomUserAccount);
+
+		Assert.assertTrue(equals(randomUserAccount, userAccount));
+	}
+
+	@Test
 	public void testPostUserAccount() throws Exception {
 		UserAccount randomUserAccount = randomUserAccount();
 
@@ -6979,6 +7089,56 @@ public abstract class BaseUserAccountResourceTestCase {
 						},
 						graphQLFields)),
 				"JSONObject/data", "JSONObject/createUserAccount"),
+			UserAccount.class);
+	}
+
+	protected UserAccount testGraphQLSiteUserAccount_addUserAccount()
+		throws Exception {
+
+		return testGraphQLSiteUserAccount_addUserAccount(
+			testGroup.getGroupId(), randomUserAccount());
+	}
+
+	protected UserAccount testGraphQLSiteUserAccount_addUserAccount(
+			Long siteId, UserAccount userAccount)
+		throws Exception {
+
+		JSONDeserializer<UserAccount> jsonDeserializer =
+			JSONFactoryUtil.createJSONDeserializer();
+
+		StringBuilder sb = new StringBuilder("{");
+
+		for (java.lang.reflect.Field field :
+				getDeclaredFields(UserAccount.class)) {
+
+			if (getGraphQLValue(field.get(userAccount)) != null) {
+				if (sb.length() > 1) {
+					sb.append(", ");
+				}
+
+				sb.append(field.getName());
+				sb.append(": ");
+				sb.append(getGraphQLValue(field.get(userAccount)));
+			}
+		}
+
+		sb.append("}");
+
+		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		return jsonDeserializer.deserialize(
+			JSONUtil.getValueAsString(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"createSiteUserAccount",
+						new HashMap<String, Object>() {
+							{
+								put("siteKey", "\"" + siteId + "\"");
+								put("userAccount", sb.toString());
+							}
+						},
+						graphQLFields)),
+				"JSONObject/data", "JSONObject/createSiteUserAccount"),
 			UserAccount.class);
 	}
 
