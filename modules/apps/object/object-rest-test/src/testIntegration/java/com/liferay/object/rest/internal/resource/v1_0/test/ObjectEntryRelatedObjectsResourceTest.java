@@ -991,6 +991,226 @@ public class ObjectEntryRelatedObjectsResourceTest {
 	}
 
 	@Test
+	public void testGetRelatedObjectEntriesWithPermissionBasedVisibility()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		String password = RandomTestUtil.randomString();
+
+		User user1 = UserTestUtil.addUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			password, RandomTestUtil.randomString() + "@liferay.com",
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			ServiceContextTestUtil.getServiceContext());
+
+		user1.setEmailAddressVerified(true);
+
+		user1 = UserLocalServiceUtil.updateUser(user1);
+
+		UserLocalServiceUtil.addRoleUser(role.getRoleId(), user1.getUserId());
+
+		ResourcePermissionLocalServiceUtil.setResourcePermissions(
+			TestPropsValues.getCompanyId(), _objectEntry1.getModelClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(_objectEntry1.getPrimaryKey()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		// Many to many relationship, custom object, default user
+
+		ObjectRelationship objectRelationship1 = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		JSONObject jsonObject1 = HTTPTestUtil.invokeToJSONObject(
+			null,
+			_getEndpoint(
+				String.valueOf(_objectEntry1.getObjectEntryId()),
+				objectRelationship1, _objectDefinition1),
+			Http.Method.GET);
+
+		JSONArray jsonArray1 = jsonObject1.getJSONArray(
+			objectRelationship1.getName());
+
+		Assert.assertNotNull(jsonArray1);
+
+		Assert.assertEquals(1, jsonArray1.length());
+
+		// One to many relationship, system object, default user
+
+		ObjectRelationship objectRelationship2 = _addObjectRelationship(
+			_objectDefinition1, _userSystemObjectDefinition,
+			_objectEntry1.getPrimaryKey(), _user2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		jsonObject1 = HTTPTestUtil.invokeToJSONObject(
+			null,
+			_getEndpoint(
+				String.valueOf(_objectEntry1.getObjectEntryId()),
+				objectRelationship2, _objectDefinition1),
+			Http.Method.GET);
+
+		jsonArray1 = jsonObject1.getJSONArray(objectRelationship2.getName());
+
+		Assert.assertNotNull(jsonArray1);
+
+		Assert.assertEquals(1, jsonArray1.length());
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user1.getEmailAddress(), password
+		).apply(
+			() -> {
+
+				// Many to many relationship, custom object, regular role
+
+				JSONObject jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					_getEndpoint(
+						String.valueOf(_objectEntry1.getObjectEntryId()),
+						objectRelationship1, _objectDefinition1),
+					Http.Method.GET);
+
+				JSONArray jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship1.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(0, jsonArray2.length());
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					StringBundler.concat(
+						_objectDefinition1.getRESTContextPath(),
+						"?nestedFields=", objectRelationship1.getName()),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray("items");
+
+				jsonObject2 = jsonArray2.getJSONObject(0);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship1.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(0, jsonArray2.length());
+
+				ResourcePermissionLocalServiceUtil.setResourcePermissions(
+					TestPropsValues.getCompanyId(),
+					_objectEntry2.getModelClassName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(_objectEntry2.getPrimaryKey()),
+					role.getRoleId(), new String[] {ActionKeys.VIEW});
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					_getEndpoint(
+						String.valueOf(_objectEntry1.getObjectEntryId()),
+						objectRelationship1, _objectDefinition1),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship1.getName());
+
+				Assert.assertEquals(1, jsonArray2.length());
+
+				Assert.assertEquals(
+					_objectEntry2.getPrimaryKey(),
+					jsonArray2.getJSONObject(
+						0
+					).getLong(
+						"id"
+					));
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					StringBundler.concat(
+						_objectDefinition1.getRESTContextPath(),
+						"?nestedFields=", objectRelationship1.getName()),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray("items");
+
+				jsonObject2 = jsonArray2.getJSONObject(0);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship1.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(1, jsonArray2.length());
+
+				// One to many relationship, system object, regular role
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					_getEndpoint(
+						String.valueOf(_objectEntry1.getObjectEntryId()),
+						objectRelationship2, _objectDefinition1),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship2.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(0, jsonArray2.length());
+
+				ResourcePermissionLocalServiceUtil.setResourcePermissions(
+					TestPropsValues.getCompanyId(), _user2.getModelClassName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(_user2.getPrimaryKey()), role.getRoleId(),
+					new String[] {ActionKeys.VIEW});
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					_getEndpoint(
+						String.valueOf(_objectEntry1.getObjectEntryId()),
+						objectRelationship2, _objectDefinition1),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship2.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(1, jsonArray2.length());
+
+				Assert.assertEquals(
+					_user2.getPrimaryKey(),
+					jsonArray2.getJSONObject(
+						0
+					).getLong(
+						"id"
+					));
+
+				User user2 = UserTestUtil.addUser();
+
+				ObjectRelationshipTestUtil.relateObjectEntries(
+					_objectEntry1.getPrimaryKey(), user2.getUserId(),
+					objectRelationship2, TestPropsValues.getUserId());
+
+				jsonObject2 = HTTPTestUtil.invokeToJSONObject(
+					null,
+					_getEndpoint(
+						String.valueOf(_objectEntry1.getObjectEntryId()),
+						objectRelationship2, _objectDefinition1),
+					Http.Method.GET);
+
+				jsonArray2 = jsonObject2.getJSONArray(
+					objectRelationship2.getName());
+
+				Assert.assertNotNull(jsonArray2);
+
+				Assert.assertEquals(1, jsonArray2.length());
+			}
+		);
+	}
+
+	@Test
 	public void testGetRelatedSystemObjectsWhenRelationExists()
 		throws Exception {
 
