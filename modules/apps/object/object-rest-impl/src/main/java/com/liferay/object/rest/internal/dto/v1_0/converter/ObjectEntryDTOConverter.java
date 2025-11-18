@@ -81,6 +81,10 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionRegistryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PermissionService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -129,6 +133,7 @@ import java.sql.Timestamp;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -1027,19 +1032,45 @@ public class ObjectEntryDTOConverter
 						null);
 
 				if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
+					PermissionChecker permissionChecker =
+						GuestOrUserUtil.getPermissionChecker();
+
+					ModelResourcePermission<?>
+						objectEntryModelResourcePermission =
+							ModelResourcePermissionRegistryUtil.
+								getModelResourcePermission(
+									relatedObjectDefinition.getClassName());
+
 					SystemObjectDefinitionManager
 						systemObjectDefinitionManager =
 							_systemObjectDefinitionManagerRegistry.
 								getSystemObjectDefinitionManager(
 									relatedObjectDefinition.getName());
 
-					return () -> TransformUtil.transformToArray(
-						relatedModels,
-						relatedModel -> _toExtendedEntity(
-							(BaseModel<?>)relatedModel, dtoConverterContext,
-							relatedObjectDefinition,
-							systemObjectDefinitionManager),
-						Object.class);
+					return () -> {
+						List<Object> filteredModels = new ArrayList<>();
+
+						for (Object relatedModel : relatedModels) {
+							BaseModel<?> baseModel = (BaseModel<?>)relatedModel;
+
+							if ((objectEntryModelResourcePermission != null) &&
+								objectEntryModelResourcePermission.contains(
+									permissionChecker,
+									(Long)baseModel.getPrimaryKeyObj(),
+									ActionKeys.VIEW)) {
+
+								filteredModels.add(relatedModel);
+							}
+						}
+
+						return TransformUtil.transformToArray(
+							filteredModels,
+							filteredModel -> _toExtendedEntity(
+								(BaseModel<?>)filteredModel,
+								dtoConverterContext, relatedObjectDefinition,
+								systemObjectDefinitionManager),
+							Object.class);
+					};
 				}
 
 				return () -> TransformUtil.transformToArray(
