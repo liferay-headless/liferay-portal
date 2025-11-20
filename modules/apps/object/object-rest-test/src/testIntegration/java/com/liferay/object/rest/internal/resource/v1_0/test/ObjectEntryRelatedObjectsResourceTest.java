@@ -1066,21 +1066,21 @@ public class ObjectEntryRelatedObjectsResourceTest {
 
 				// Many to many relationship, custom object, regular role
 
-				_assertNestedFieldsVisibilityNoPermissions(
-					objectRelationship1, _objectDefinition1);
+				_assertNestedFieldsVisibilityInGetObjectEntriesPage(
+					objectRelationship1, _objectDefinition1, 0);
 
-				_assertNestedFieldsVisibilityWithPermissionsGranted(
+				_assertNestedFieldsVisibilityInGetObjectEntryWithPermissionsGranted(
 					role, objectRelationship1,
 					_objectEntry2.getModelClassName(),
 					_objectEntry2.getPrimaryKey(), _objectDefinition1,
 					_objectEntry1.getObjectEntryId());
 
-				_assertNestedFieldsVisibility(
-					objectRelationship1, _objectDefinition1);
+				_assertNestedFieldsVisibilityInGetObjectEntriesPage(
+					objectRelationship1, _objectDefinition1, 1);
 
 				// One to many relationship, system object, regular role
 
-				_assertNestedFieldsVisibilityWithPermissionsGranted(
+				_assertNestedFieldsVisibilityInGetObjectEntryWithPermissionsGranted(
 					role, objectRelationship2, _user2.getModelClassName(),
 					_user2.getPrimaryKey(), _objectDefinition1,
 					_objectEntry1.getObjectEntryId());
@@ -1785,9 +1785,9 @@ public class ObjectEntryRelatedObjectsResourceTest {
 			baseModel.getPrimaryKeyObj(), jsonObject.getLong("id"));
 	}
 
-	private void _assertNestedFieldsVisibility(
+	private void _assertNestedFieldsVisibilityInGetObjectEntriesPage(
 			ObjectRelationship objectRelationship,
-			ObjectDefinition objectDefinition)
+			ObjectDefinition objectDefinition, int count)
 		throws Exception {
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
@@ -1804,35 +1804,14 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		jsonArray = jsonObject.getJSONArray(objectRelationship.getName());
 
 		Assert.assertNotNull(jsonArray);
-		Assert.assertEquals(1, jsonArray.length());
+		Assert.assertEquals(count, jsonArray.length());
 	}
 
-	private void _assertNestedFieldsVisibilityNoPermissions(
-			ObjectRelationship objectRelationship,
-			ObjectDefinition objectDefinition)
-		throws Exception {
-
-		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-			null,
-			StringBundler.concat(
-				objectDefinition.getRESTContextPath(), "?nestedFields=",
-				objectRelationship.getName()),
-			Http.Method.GET);
-
-		JSONArray jsonArray = jsonObject.getJSONArray("items");
-
-		jsonObject = jsonArray.getJSONObject(0);
-
-		jsonArray = jsonObject.getJSONArray(objectRelationship.getName());
-
-		Assert.assertNotNull(jsonArray);
-		Assert.assertEquals(0, jsonArray.length());
-	}
-
-	private void _assertNestedFieldsVisibilityWithPermissionsGranted(
-			Role role, ObjectRelationship objectRelationship,
-			String modelClassName, long primaryKey,
-			ObjectDefinition objectDefinition, long objectEntryId)
+	private void
+			_assertNestedFieldsVisibilityInGetObjectEntryWithPermissionsGranted(
+				Role role, ObjectRelationship objectRelationship,
+				String modelClassName, long primaryKey,
+				ObjectDefinition objectDefinition, long objectEntryId)
 		throws Exception {
 
 		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
