@@ -1050,10 +1050,16 @@ public class ObjectEntryDTOConverter
 					return () -> {
 						List<Object> filteredModels = new ArrayList<>();
 
+						boolean hasModelResourcePermission = false;
+
+						if (objectEntryModelResourcePermission != null) {
+							hasModelResourcePermission = true;
+						}
+
 						for (Object relatedModel : relatedModels) {
 							BaseModel<?> baseModel = (BaseModel<?>)relatedModel;
 
-							if ((objectEntryModelResourcePermission != null) &&
+							if (hasModelResourcePermission &&
 								objectEntryModelResourcePermission.contains(
 									permissionChecker,
 									(Long)baseModel.getPrimaryKeyObj(),
