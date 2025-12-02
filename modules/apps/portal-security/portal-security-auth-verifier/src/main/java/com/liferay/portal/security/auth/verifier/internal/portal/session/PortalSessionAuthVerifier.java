@@ -61,7 +61,7 @@ public class PortalSessionAuthVerifier implements AuthVerifier {
 				properties.get("check.csrf.token"), true);
 
 			if (checkCSRFToken) {
-				HttpServletRequest originalHttpServletRequest =
+				HttpServletRequest originalHttpServletRequest = // TODO Here we get the wrong request
 					_portal.getOriginalServletRequest(httpServletRequest);
 
 				String requestURI = originalHttpServletRequest.getRequestURI();

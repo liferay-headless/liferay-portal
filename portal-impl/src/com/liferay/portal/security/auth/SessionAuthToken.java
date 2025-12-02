@@ -178,7 +178,7 @@ public class SessionAuthToken implements AuthToken {
 				httpServletRequest.getHeader("X-CSRF-Token"));
 		}
 
-		if (!csrfToken.equals(sessionToken)) {
+		if (!csrfToken.equals(sessionToken)) { // TODO And here the csrf token is empty
 			throw new PrincipalException.MustHaveValidCSRFToken(
 				PortalUtil.getUserId(httpServletRequest), origin);
 		}
