@@ -5,6 +5,7 @@
 
 package com.liferay.exportimport.kernel.lar;
 
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.exception.handler.ImportStagedModelExceptionHandler;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
@@ -83,10 +84,9 @@ public class StagedModelDataHandlerUtil {
 				stagedModel, PortletDataContext.REFERENCE_TYPE_WEAK, true);
 		}
 
-		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
-				portletDataContext, stagedModel) ||
-			!ExportImportHelperUtil.isReferenceWithinExportScope(
-				portletDataContext, stagedModel)) {
+		if (_isMissingReference(
+				portletDataContext, portletDataContext.getRootPortletId(),
+				stagedModel)) {
 
 			return portletDataContext.addReferenceElement(
 				referrerPortlet, portletDataContext.getExportDataRootElement(),
@@ -107,24 +107,9 @@ public class StagedModelDataHandlerUtil {
 				U stagedModel, String referenceType)
 		throws PortletDataException {
 
-		Element referrerStagedModelElement =
-			portletDataContext.getExportDataElement(referrerStagedModel);
-
-		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
-				portletDataContext, stagedModel) ||
-			!ExportImportHelperUtil.isReferenceWithinExportScope(
-				portletDataContext, stagedModel)) {
-
-			return portletDataContext.addReferenceElement(
-				referrerStagedModel, referrerStagedModelElement, stagedModel,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
-		}
-
-		exportStagedModel(portletDataContext, stagedModel);
-
-		return portletDataContext.addReferenceElement(
-			referrerStagedModel, referrerStagedModelElement, stagedModel,
-			referenceType, false);
+		return _exportReferenceStagedModel(
+			portletDataContext, referenceType, referrerStagedModel,
+			portletDataContext.getRootPortletId(), stagedModel);
 	}
 
 	public static <T extends StagedModel, U extends StagedModel> Element
@@ -133,24 +118,9 @@ public class StagedModelDataHandlerUtil {
 				U stagedModel, String referenceType, String portletId)
 		throws PortletDataException {
 
-		Element referrerStagedModelElement =
-			portletDataContext.getExportDataElement(referrerStagedModel);
-
-		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
-				portletDataContext, stagedModel, portletId) ||
-			!ExportImportHelperUtil.isReferenceWithinExportScope(
-				portletDataContext, stagedModel)) {
-
-			return portletDataContext.addReferenceElement(
-				referrerStagedModel, referrerStagedModelElement, stagedModel,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
-		}
-
-		exportStagedModel(portletDataContext, stagedModel);
-
-		return portletDataContext.addReferenceElement(
-			referrerStagedModel, referrerStagedModelElement, stagedModel,
-			referenceType, false);
+		return _exportReferenceStagedModel(
+			portletDataContext, referenceType, referrerStagedModel, portletId,
+			stagedModel);
 	}
 
 	public static <T extends StagedModel> void exportStagedModel(
@@ -332,8 +302,9 @@ public class StagedModelDataHandlerUtil {
 			}
 
 			if (portletDataContext.isMissingReference(referenceElement)) {
-				stagedModelDataHandler.importMissingReference(
-					portletDataContext, referenceElement);
+				_importMissingReference(
+					referenceElement, portletDataContext,
+					stagedModelDataHandler);
 
 				continue;
 			}
@@ -417,8 +388,8 @@ public class StagedModelDataHandlerUtil {
 		}
 
 		if (portletDataContext.isMissingReference(referenceElement)) {
-			stagedModelDataHandler.importMissingReference(
-				portletDataContext, referenceElement);
+			_importMissingReference(
+				referenceElement, portletDataContext, stagedModelDataHandler);
 
 			return;
 		}
@@ -573,6 +544,30 @@ public class StagedModelDataHandlerUtil {
 		return false;
 	}
 
+	private static <T extends StagedModel, U extends StagedModel> Element
+			_exportReferenceStagedModel(
+				PortletDataContext portletDataContext, String referenceType,
+				T referrerStagedModel, String rootPortletId, U stagedModel)
+		throws PortletDataException {
+
+		Element referrerStagedModelElement =
+			portletDataContext.getExportDataElement(referrerStagedModel);
+
+		if (_isMissingReference(
+				portletDataContext, rootPortletId, stagedModel)) {
+
+			return portletDataContext.addReferenceElement(
+				referrerStagedModel, referrerStagedModelElement, stagedModel,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+		}
+
+		exportStagedModel(portletDataContext, stagedModel);
+
+		return portletDataContext.addReferenceElement(
+			referrerStagedModel, referrerStagedModelElement, stagedModel,
+			referenceType, false);
+	}
+
 	private static StagedModel _getReferenceStagedModel(
 		PortletDataContext portletDataContext, Element element) {
 
@@ -632,6 +627,65 @@ public class StagedModelDataHandlerUtil {
 		return (StagedModelDataHandler<T>)
 			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
 				ExportImportClassedModelUtil.getClassName(stagedModel));
+	}
+
+	private static void _importMissingReference(
+			Element element, PortletDataContext portletDataContext,
+			StagedModelDataHandler<?> stagedModelDataHandler)
+		throws PortletDataException {
+
+		try {
+			stagedModelDataHandler.importMissingReference(
+				portletDataContext, element);
+		}
+		catch (PortletDataException portletDataException) {
+			Throwable throwable = portletDataException.getCause();
+
+			if (throwable instanceof
+					MissingReferenceException missingReferenceException) {
+
+				String className = element.attributeValue("class-name");
+
+				long classPK = GetterUtil.getLong(
+					element.attributeValue("class-pk"));
+
+				String externalReferenceCode = GetterUtil.getString(
+					element.attributeValue("external-reference-code"));
+
+				for (ImportStagedModelExceptionHandler
+						importStagedModelExceptionHandler :
+							_serviceTrackerList) {
+
+					importStagedModelExceptionHandler.handle(
+						classPK, missingReferenceException,
+						externalReferenceCode, className, portletDataContext);
+				}
+			}
+			else {
+				throw portletDataException;
+			}
+		}
+	}
+
+	private static <T extends StagedModel, U extends StagedModel> boolean
+		_isMissingReference(
+			PortletDataContext portletDataContext, String rootPortletId,
+			U stagedModel) {
+
+		if (!Validator.isBlank(rootPortletId) ||
+			!ExportImportHelperUtil.isAlwaysIncludeReference(
+				portletDataContext, stagedModel, rootPortletId) ||
+			!ExportImportHelperUtil.isReferenceWithinExportScope(
+				portletDataContext, stagedModel) ||
+			(!ExportImportThreadLocal.isStagingInProcess() &&
+			 ExportImportHelperUtil.isBatchEngineExportable(
+				 stagedModel.getModelClassName(),
+				 stagedModel.getCompanyId()))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
