@@ -15,6 +15,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
@@ -68,6 +69,15 @@ public class AssetCategoryStagedModelDataHandler
 		if (category != null) {
 			deleteStagedModel(category);
 		}
+	}
+
+	@Override
+	public AssetCategory fetchStagedModelByExternalReferenceCodeAndGroupId(
+		String externalReferenceCode, long groupId) {
+
+		return _assetCategoryLocalService.
+			fetchAssetCategoryByExternalReferenceCode(
+				externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -198,6 +208,29 @@ public class AssetCategoryStagedModelDataHandler
 	}
 
 	@Override
+	protected void doImportMissingReferenceByExternalReferenceCode(
+			long classPK, String externalReferenceCode, long groupId,
+			PortletDataContext portletDataContext)
+		throws Exception {
+
+		AssetCategory existingCategory =
+			fetchMissingReferenceByExternalReferenceCode(
+				externalReferenceCode, groupId);
+
+		if (existingCategory == null) {
+			throw new MissingReferenceException(
+				"The asset category reference " + externalReferenceCode +
+					" could not be found.");
+		}
+
+		Map<Long, Long> map =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetCategory.class);
+
+		map.put(classPK, existingCategory.getCategoryId());
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, AssetCategory category)
 		throws Exception {
@@ -243,8 +276,8 @@ public class AssetCategoryStagedModelDataHandler
 
 		AssetCategory importedCategory = null;
 
-		AssetCategory existingCategory = fetchStagedModelByUuidAndGroupId(
-			category.getUuid(), portletDataContext.getScopeGroupId());
+		AssetCategory existingCategory = fetchExistingStagedModel(
+			category, portletDataContext.getScopeGroupId());
 
 		if (existingCategory == null) {
 			String name = _getCategoryName(

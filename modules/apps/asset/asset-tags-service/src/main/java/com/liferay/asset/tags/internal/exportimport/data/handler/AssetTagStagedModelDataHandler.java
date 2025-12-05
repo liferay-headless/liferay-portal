@@ -10,6 +10,7 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.tags.internal.configuration.AssetTagsServiceConfigurationValues;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
@@ -53,6 +54,14 @@ public class AssetTagStagedModelDataHandler
 		if (assetTag != null) {
 			deleteStagedModel(assetTag);
 		}
+	}
+
+	@Override
+	public AssetTag fetchStagedModelByExternalReferenceCodeAndGroupId(
+		String externalReferenceCode, long groupId) {
+
+		return _assetTagLocalService.fetchAssetTagByExternalReferenceCode(
+			externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -120,6 +129,28 @@ public class AssetTagStagedModelDataHandler
 	}
 
 	@Override
+	protected void doImportMissingReferenceByExternalReferenceCode(
+			long classPK, String externalReferenceCode, long groupId,
+			PortletDataContext portletDataContext)
+		throws Exception {
+
+		AssetTag existingTag = fetchMissingReferenceByExternalReferenceCode(
+			externalReferenceCode, groupId);
+
+		if (existingTag == null) {
+			throw new MissingReferenceException(
+				"The asset tag reference " + externalReferenceCode +
+					" could not be found.");
+		}
+
+		Map<Long, Long> map =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetTag.class);
+
+		map.put(classPK, existingTag.getTagId());
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, AssetTag assetTag)
 		throws Exception {
@@ -129,15 +160,8 @@ public class AssetTagStagedModelDataHandler
 		ServiceContext serviceContext = _createServiceContext(
 			portletDataContext, assetTag);
 
-		AssetTag existingAssetTag =
-			_assetTagLocalService.fetchAssetTagByExternalReferenceCode(
-				assetTag.getExternalReferenceCode(),
-				portletDataContext.getScopeGroupId());
-
-		if (existingAssetTag == null) {
-			existingAssetTag = fetchStagedModelByUuidAndGroupId(
-				assetTag.getUuid(), portletDataContext.getScopeGroupId());
-		}
+		AssetTag existingAssetTag = fetchExistingStagedModel(
+			assetTag, portletDataContext.getScopeGroupId());
 
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();

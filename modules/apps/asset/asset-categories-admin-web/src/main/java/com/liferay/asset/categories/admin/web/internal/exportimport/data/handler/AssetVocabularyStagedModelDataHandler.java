@@ -10,6 +10,7 @@ import com.liferay.asset.categories.admin.web.internal.exportimport.data.handler
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -68,6 +68,15 @@ public class AssetVocabularyStagedModelDataHandler
 		if (vocabulary != null) {
 			deleteStagedModel(vocabulary);
 		}
+	}
+
+	@Override
+	public AssetVocabulary fetchStagedModelByExternalReferenceCodeAndGroupId(
+		String externalReferenceCode, long groupId) {
+
+		return _assetVocabularyLocalService.
+			fetchAssetVocabularyByExternalReferenceCode(
+				externalReferenceCode, groupId);
 	}
 
 	@Override
@@ -185,6 +194,29 @@ public class AssetVocabularyStagedModelDataHandler
 	}
 
 	@Override
+	protected void doImportMissingReferenceByExternalReferenceCode(
+			long classPK, String externalReferenceCode, long groupId,
+			PortletDataContext portletDataContext)
+		throws Exception {
+
+		AssetVocabulary existingVocabulary =
+			fetchMissingReferenceByExternalReferenceCode(
+				externalReferenceCode, groupId);
+
+		if (existingVocabulary == null) {
+			throw new MissingReferenceException(
+				"The asset vocabulary reference " + externalReferenceCode +
+					" could not be found.");
+		}
+
+		Map<Long, Long> map =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetVocabulary.class);
+
+		map.put(classPK, existingVocabulary.getVocabularyId());
+	}
+
+	@Override
 	protected void doImportStagedModel(
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary)
 		throws Exception {
@@ -199,8 +231,8 @@ public class AssetVocabularyStagedModelDataHandler
 
 		AssetVocabulary importedVocabulary = null;
 
-		AssetVocabulary existingVocabulary = fetchStagedModelByUuidAndGroupId(
-			vocabulary.getUuid(), portletDataContext.getScopeGroupId());
+		AssetVocabulary existingVocabulary = fetchExistingStagedModel(
+			vocabulary, portletDataContext.getScopeGroupId());
 
 		if (existingVocabulary == null) {
 			String name = _getVocabularyName(
@@ -220,8 +252,8 @@ public class AssetVocabularyStagedModelDataHandler
 		}
 		else {
 			String name = _getVocabularyName(
-				vocabulary.getUuid(), portletDataContext.getScopeGroupId(),
-				vocabulary.getName(), 2);
+				vocabulary.getExternalReferenceCode(),
+				portletDataContext.getScopeGroupId(), vocabulary.getName(), 2);
 
 			importedVocabulary = _assetVocabularyLocalService.updateVocabulary(
 				existingVocabulary.getExternalReferenceCode(),
@@ -309,21 +341,23 @@ public class AssetVocabularyStagedModelDataHandler
 	}
 
 	private String _getVocabularyName(
-			String uuid, long groupId, String name, int count)
+			String externalReferenceCode, long groupId, String name, int count)
 		throws Exception {
 
 		AssetVocabulary vocabulary =
 			_assetVocabularyLocalService.fetchGroupVocabulary(groupId, name);
 
 		if ((vocabulary == null) ||
-			(Validator.isNotNull(uuid) && uuid.equals(vocabulary.getUuid()))) {
+			Objects.equals(
+				externalReferenceCode, vocabulary.getExternalReferenceCode())) {
 
 			return name;
 		}
 
 		name = StringUtil.appendParentheticalSuffix(name, count);
 
-		return _getVocabularyName(uuid, groupId, name, ++count);
+		return _getVocabularyName(
+			externalReferenceCode, groupId, name, ++count);
 	}
 
 	private Map<Locale, String> _getVocabularyTitleMap(
