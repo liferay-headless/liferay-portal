@@ -14,6 +14,10 @@ import com.liferay.portal.kernel.model.StagedModel;
  */
 public interface ImportStagedModelExceptionHandler {
 
+	public void handle(
+		long classPK, Exception exception, String externalReferenceCode,
+		String modelClassName, PortletDataContext portletDataContext);
+
 	public <T extends StagedModel> void handle(
 		PortletDataContext portletDataContext,
 		PortletDataException portletDataException, T stagedModel);
