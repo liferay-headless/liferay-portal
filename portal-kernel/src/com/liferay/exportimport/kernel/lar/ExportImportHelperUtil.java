@@ -337,6 +337,15 @@ public class ExportImportHelperUtil {
 			portletDataContext, referenceStagedModel, rootPortletId);
 	}
 
+	public static <U extends StagedModel> boolean isBatchEngineExportable(
+		String className, long companyId) {
+
+		ExportImportHelper exportImportHelper =
+			_exportImportHelperSnapshot.get();
+
+		return exportImportHelper.isBatchEngineExportable(className, companyId);
+	}
+
 	public static boolean isExportPortletData(
 		PortletDataContext portletDataContext) {
 

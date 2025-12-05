@@ -7,6 +7,7 @@ package com.liferay.exportimport.internal.lar;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.exportimport.constants.ExportImportBackgroundTaskContextMapConstants;
+import com.liferay.exportimport.internal.data.handler.BatchEnginePortletDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
@@ -725,6 +726,11 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return false;
+	}
+
+	public boolean isBatchEngineExportable(String className, long companyId) {
+		return BatchEnginePortletDataHandlerRegistryUtil.hasByClassName(
+			className, companyId);
 	}
 
 	@Override
