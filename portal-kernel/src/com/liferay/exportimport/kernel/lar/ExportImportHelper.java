@@ -149,6 +149,8 @@ public interface ExportImportHelper {
 		PortletDataContext portletDataContext, StagedModel referenceStagedModel,
 		String rootPortletId);
 
+	public boolean isBatchEngineExportable(String className, long companyId);
+
 	public boolean isExportPortletData(PortletDataContext portletDataContext);
 
 	public boolean isLayoutRevisionInReview(Layout layout);
