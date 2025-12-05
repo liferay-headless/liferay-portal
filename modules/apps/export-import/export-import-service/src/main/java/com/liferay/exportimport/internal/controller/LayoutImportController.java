@@ -9,6 +9,7 @@ import com.liferay.asset.link.model.adapter.StagedAssetLink;
 import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.controller.PortletImportController;
+import com.liferay.exportimport.internal.data.handler.BatchEnginePortletDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.controller.ExportImportController;
 import com.liferay.exportimport.kernel.controller.ImportController;
 import com.liferay.exportimport.kernel.exception.LARFileException;
@@ -283,6 +284,9 @@ public class LayoutImportController implements ImportController {
 
 			Map<String, MissingReference> dependencyMissingReferences =
 				missingReferences.getDependencyMissingReferences();
+
+			_removeBatchExportableReferences(
+				portletDataContext.getCompanyId(), dependencyMissingReferences);
 
 			if (!dependencyMissingReferences.isEmpty()) {
 				if (isValidateMissingReferences()) {
@@ -1295,6 +1299,25 @@ public class LayoutImportController implements ImportController {
 			_portletImportController.importServicePortletPreferences(
 				portletDataContext, serviceElement);
 		}
+	}
+
+	private void _removeBatchExportableReferences(
+		long companyId,
+		Map<String, MissingReference> dependencyMissingReferences) {
+
+		if (dependencyMissingReferences.isEmpty()) {
+			return;
+		}
+
+		dependencyMissingReferences.entrySet(
+		).removeIf(
+			entry -> {
+				MissingReference missingReference = entry.getValue();
+
+				return BatchEnginePortletDataHandlerRegistryUtil.hasByClassName(
+					missingReference.getClassName(), companyId);
+			}
+		);
 	}
 
 	private void _validateLayoutPrototypes(
