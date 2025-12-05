@@ -17,9 +17,11 @@ import com.liferay.portal.kernel.comment.DiscussionStagingHandler;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.AuditedModel;
+import com.liferay.portal.kernel.model.ExternalReferenceCodeModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LocalizedModel;
 import com.liferay.portal.kernel.model.ResourcedModel;
@@ -33,6 +35,7 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TransientValue;
 import com.liferay.portal.kernel.util.Validator;
@@ -244,6 +247,51 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 	}
 
 	@Override
+	public T fetchMissingReferenceByExternalReferenceCode(
+		String externalReferenceCode, long groupId) {
+
+		T stagedModel = fetchStagedModelByExternalReferenceCodeAndGroupId(
+			externalReferenceCode, groupId);
+
+		if ((stagedModel != null) && !isStagedModelInTrash(stagedModel)) {
+			return stagedModel;
+		}
+
+		try {
+			Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+			Group parentGroup = group.getParentGroup();
+
+			while (parentGroup != null) {
+				stagedModel = fetchStagedModelByExternalReferenceCodeAndGroupId(
+					externalReferenceCode, parentGroup.getGroupId());
+
+				if ((stagedModel != null) &&
+					!isStagedModelInTrash(stagedModel)) {
+
+					return stagedModel;
+				}
+
+				parentGroup = parentGroup.getParentGroup();
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Unable to fetch missing reference staged model for ",
+						"external reference code ", externalReferenceCode,
+						"from group ", String.valueOf(groupId)));
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public T fetchStagedModelByUuidAndGroupId(String uuid, long groupId) {
 		return null;
 	}
@@ -310,6 +358,30 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 		}
 		catch (PortletDataException portletDataException) {
 			throw portletDataException;
+		}
+		catch (Exception exception) {
+			throw new PortletDataException(exception);
+		}
+	}
+
+	public void importMissingReferenceByExternalReferenceCode(
+			long classPK, String externalReferenceCode, long groupId,
+			PortletDataContext portletDataContext)
+		throws PortletDataException {
+
+		if (!isEnabled(_getCompanyId(portletDataContext))) {
+			return;
+		}
+
+		try {
+			doImportMissingReferenceByExternalReferenceCode(
+				classPK, externalReferenceCode, groupId, portletDataContext);
+		}
+		catch (PortletDataException portletDataException) {
+			throw portletDataException;
+		}
+		catch (UnsupportedOperationException unsupportedOperationException) {
+			throw new UnsupportedOperationException();
 		}
 		catch (Exception exception) {
 			throw new PortletDataException(exception);
@@ -537,15 +609,57 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 		groupId = MapUtil.getLong(groupIds, groupId);
 
+		String className = GetterUtil.getString(
+			referenceElement.attributeValue("class-name"));
+
 		long classPK = GetterUtil.getLong(
 			referenceElement.attributeValue("class-pk"));
 
-		importMissingReference(portletDataContext, uuid, groupId, classPK);
+		String externalReferenceCode = GetterUtil.getString(
+			referenceElement.attributeValue("external-reference-code"));
+
+		if (!Validator.isBlank(className) &&
+			!Validator.isBlank(externalReferenceCode) &&
+			ExportImportHelperUtil.isBatchEngineExportable(
+				className, portletDataContext.getCompanyId())) {
+
+			try {
+				importMissingReferenceByExternalReferenceCode(
+					classPK, externalReferenceCode, groupId,
+					portletDataContext);
+			}
+			catch (UnsupportedOperationException
+						unsupportedOperationException) {
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							className,
+							" does not support importing references by ",
+							"external reference code. Falling back to ",
+							"importing reference by uuid"));
+				}
+
+				importMissingReference(
+					portletDataContext, uuid, groupId, classPK);
+			}
+		}
+		else {
+			importMissingReference(portletDataContext, uuid, groupId, classPK);
+		}
 	}
 
 	protected void doImportMissingReference(
 			PortletDataContext portletDataContext, String uuid, long groupId,
 			long classPK)
+		throws Exception {
+
+		throw new UnsupportedOperationException();
+	}
+
+	protected void doImportMissingReferenceByExternalReferenceCode(
+			long classPK, String externalReferenceCode, long groupId,
+			PortletDataContext portletDataContext)
 		throws Exception {
 
 		throw new UnsupportedOperationException();
@@ -644,6 +758,27 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 				portletDataContext, stagedModel, ratingsEntry,
 				PortletDataContext.REFERENCE_TYPE_WEAK);
 		}
+	}
+
+	protected T fetchExistingStagedModel(
+		StagedModel stagedModel, long groupId) {
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				stagedModel.getCompanyId(), "LPD-35914") &&
+			(stagedModel instanceof
+				ExternalReferenceCodeModel externalReferenceCodeModel)) {
+
+			T existingStagedModel =
+				fetchStagedModelByExternalReferenceCodeAndGroupId(
+					externalReferenceCodeModel.getExternalReferenceCode(),
+					groupId);
+
+			if (existingStagedModel != null) {
+				return existingStagedModel;
+			}
+		}
+
+		return fetchStagedModelByUuidAndGroupId(stagedModel.getUuid(), groupId);
 	}
 
 	protected int getProcessFlag() {
