@@ -31,6 +31,27 @@ public class ImportStagedModelExceptionHandlerImpl
 	implements ImportStagedModelExceptionHandler {
 
 	@Override
+	public void handle(
+		long classPK, Exception exception, String externalReferenceCode,
+		String modelClassName, PortletDataContext portletDataContext) {
+
+		long groupId = portletDataContext.getGroupId();
+
+		if (ExportImportReportEntryUtil.isCompanyScoped(
+				groupId, _groupLocalService)) {
+
+			groupId = 0;
+		}
+
+		_exportImportReportEntryLocalService.addErrorExportImportReportEntry(
+			groupId, portletDataContext.getCompanyId(), externalReferenceCode,
+			0L, classPK,
+			GetterUtil.getLong(portletDataContext.getExportImportProcessId()),
+			exception.getMessage(), _getErrorStackTrace(exception),
+			modelClassName, ExportImportReportEntryUtil.getOrigin());
+	}
+
+	@Override
 	public <T extends StagedModel> void handle(
 		PortletDataContext portletDataContext,
 		PortletDataException portletDataException, T stagedModel) {
