@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.model.ExternalReferenceCodeModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.GroupedModel;
@@ -2252,6 +2253,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 			"class-pk", String.valueOf(classedModel.getPrimaryKeyObj()));
 
 		_populateClassNameAttribute(classedModel, referenceElement);
+
+		if (classedModel instanceof
+				ExternalReferenceCodeModel externalReferenceCodeModel) {
+
+			referenceElement.addAttribute(
+				"external-reference-code",
+				externalReferenceCodeModel.getExternalReferenceCode());
+		}
 
 		if (missing) {
 			if (classedModel instanceof StagedModel) {
