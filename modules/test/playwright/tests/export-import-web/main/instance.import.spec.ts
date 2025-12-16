@@ -938,19 +938,28 @@ test('Can only import custom object entries when their definitions are already i
 		await objectActionAPIClient.postObjectDefinition(
 			objectDefinitionRequestBody
 		);
+	let objectEntry;
+	let exportFilePath;
 
-	// Ensure cleanup if test execution stops before removing the object definition.
+	try {
+		objectEntry = await apiHelpers.objectEntry.postObjectEntry(
+			{externalReferenceCode: 'testERC', textField: 'test'},
+			'c/tests'
+		);
 
-	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+		exportFilePath = await companyExportImportPage.export([
+			'Tests 1 Items',
+		]);
+	}
+	catch {
 
-	const objectEntry = await apiHelpers.objectEntry.postObjectEntry(
-		{externalReferenceCode: 'testERC', textField: 'test'},
-		'c/tests'
-	);
+		// Ensure cleanup if test execution stops before removing the object definition.
 
-	const exportFilePath = await companyExportImportPage.export([
-		'Tests 1 Items',
-	]);
+		apiHelpers.data.push({
+			id: objectDefinition.id,
+			type: 'objectDefinition',
+		});
+	}
 
 	await objectActionAPIClient.deleteObjectDefinition(objectDefinition.id);
 
