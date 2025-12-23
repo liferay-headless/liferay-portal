@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {ObjectDefinitionAPI} from '@liferay/object-admin-rest-client-js';
 import {expect, mergeTests} from '@playwright/test';
 import * as path from 'path';
 
@@ -32,7 +31,6 @@ import {readFileFromZip} from '../../../utils/zip';
 import {companyExportImportPageTest} from './fixtures/companyExportImportPagesTest';
 import {exportImportPagesTest} from './fixtures/exportImportPagesTest';
 import {stagingPageTest} from './fixtures/stagingPageTest';
-import {objectDefitionRequestData} from './utils/objectDefitionRequestData';
 import {openImportFieldset} from './utils/openImportFieldset';
 
 export const test = mergeTests(
@@ -105,18 +103,8 @@ const testWithDeprecationFF = mergeTests(
 testWithExportImportAtInstanceLevelFF(
 	'Can export and import custom object entries at site level',
 	async ({apiHelpers, exportImportPage}) => {
-		const objectFolder =
-			await apiHelpers.objectAdmin.postRandomObjectFolder();
-
-		apiHelpers.data.push({
-			id: objectFolder.id,
-			type: 'objectFolder',
-		});
-
 		const objectDefinition =
 			await apiHelpers.objectAdmin.postRandomObjectDefinition({
-				objectFolderExternalReferenceCode:
-					objectFolder.externalReferenceCode,
 				scope: 'site',
 				status: {code: 0},
 			});
@@ -171,13 +159,10 @@ testWithExportImportAtInstanceLevelFF(
 testWithExportImportAtInstanceLevelFF(
 	'Cannot import an instance scoped lar file',
 	async ({apiHelpers, applicationsMenuPage, exportImportPage, page}) => {
-		const objectActionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		const {body: objectDefinition} =
-			await objectActionAPIClient.postObjectDefinition(
-				objectDefitionRequestData()
-			);
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				status: {code: 0},
+			});
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
@@ -185,8 +170,8 @@ testWithExportImportAtInstanceLevelFF(
 		});
 
 		await apiHelpers.objectEntry.postObjectEntry(
-			{externalReferenceCode: '', name: 'test'},
-			'c/tests'
+			{externalReferenceCode: '', textField: objectDefinition.name},
+			`${normalizeRestPath(objectDefinition.restContextPath)}`
 		);
 
 		const homePage = new HomePage(page);
@@ -194,7 +179,7 @@ testWithExportImportAtInstanceLevelFF(
 		await applicationsMenuPage.goToExport();
 
 		const exportFilePath = await exportImportPage.export({
-			portletLabels: ['Tests 1 Items'],
+			portletLabels: [`${objectDefinition.name} 1 Items`],
 		});
 
 		await homePage.goto();
@@ -352,15 +337,15 @@ test('Can see corresponding elements at site level', async ({
 	apiHelpers,
 	exportImportPage,
 }) => {
-	const objectActionAPIClient =
-		await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition({
+			status: {code: 0},
+		});
 
-	const {body: objectDefinition} =
-		await objectActionAPIClient.postObjectDefinition(
-			objectDefitionRequestData()
-		);
-
-	apiHelpers.data.push({id: objectDefinition.id, type: 'objectDefinition'});
+	apiHelpers.data.push({
+		id: objectDefinition.id,
+		type: 'objectDefinition',
+	});
 
 	await exportImportPage.goToExport();
 
@@ -402,13 +387,10 @@ testWithDeprecationFFDisabled(
 	"Hide 'Delete Application Data' checkbox and 'Copy as New' radio button when deprecation FF is false",
 	{tag: ['@LPD-44771', '@LPD-44307']},
 	async ({apiHelpers, exportImportPage}) => {
-		const objectActionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		const {body: objectDefinition} =
-			await objectActionAPIClient.postObjectDefinition(
-				objectDefitionRequestData()
-			);
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				status: {code: 0},
+			});
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
@@ -435,13 +417,21 @@ testWithDeprecationFF(
 	'Show modal warning at site level',
 	{tag: ['@LPD-54835', '@LPD-54836']},
 	async ({apiHelpers, exportImportPage, page, uiElementsPage}) => {
-		const objectActionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
+		const objectFolder =
+			await apiHelpers.objectAdmin.postRandomObjectFolder();
 
-		const {body: objectDefinition} =
-			await objectActionAPIClient.postObjectDefinition(
-				objectDefitionRequestData({scope: 'site'})
-			);
+		apiHelpers.data.push({
+			id: objectFolder.id,
+			type: 'objectFolder',
+		});
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				objectFolderExternalReferenceCode:
+					objectFolder.externalReferenceCode,
+				scope: 'site',
+				status: {code: 0},
+			});
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
@@ -453,12 +443,12 @@ testWithDeprecationFF(
 		const exportName = 'MyExport-' + getRandomString();
 
 		await apiHelpers.objectEntry.postObjectEntry(
-			{externalReferenceCode: '', name: 'test'},
-			'c/tests/scopes/Guest'
+			{externalReferenceCode: '', textField: objectDefinition.name},
+			`${normalizeRestPath(objectDefinition.restContextPath)}/scopes/Guest`
 		);
 
 		const exportFilePath = await exportImportPage.export({
-			portletLabels: ['Tests 1 Items'],
+			portletLabels: [`${objectDefinition.name} 1 Items`],
 			taskName: exportName,
 		});
 
@@ -611,13 +601,11 @@ testWithDeprecationFFDisabled(
 	'Show modal warning at site level - FF disabled',
 	{tag: ['@LPD-54835', '@LPD-54836']},
 	async ({apiHelpers, exportImportPage, page, uiElementsPage}) => {
-		const objectActionAPIClient =
-			await apiHelpers.buildRestClient(ObjectDefinitionAPI);
-
-		const {body: objectDefinition} =
-			await objectActionAPIClient.postObjectDefinition(
-				objectDefitionRequestData({scope: 'site'})
-			);
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition({
+				scope: 'site',
+				status: {code: 0},
+			});
 
 		apiHelpers.data.push({
 			id: objectDefinition.id,
@@ -627,12 +615,12 @@ testWithDeprecationFFDisabled(
 		await exportImportPage.goToExport();
 
 		await apiHelpers.objectEntry.postObjectEntry(
-			{externalReferenceCode: '', name: 'test'},
-			'c/tests/scopes/Guest'
+			{externalReferenceCode: '', textField: objectDefinition.name},
+			`${normalizeRestPath(objectDefinition.restContextPath)}/scopes/Guest`
 		);
 
 		const exportFilePath = await exportImportPage.export({
-			portletLabels: ['Tests 1 Items'],
+			portletLabels: [`${objectDefinition.name} 1 Items`],
 		});
 
 		await exportImportPage.goToImport();
