@@ -131,6 +131,16 @@ definition {
 			key_objectLabel = "API Builder",
 			locator1 = "ObjectPortlet#OBJECT_PORTLET_HEADER");
 
+		while ((IsElementNotPresent(key_title = ${key_title}, locator1 = "APIBuilder#DROPDOWN_MENU")) && (maxIterations = "5")) {
+			Refresh();
+
+			WaitForSPARefresh();
+		}
+
+		WaitForVisible(
+			key_title = ${key_title},
+			locator1 = "APIBuilder#DROPDOWN_MENU");
+
 		Click(
 			key_title = ${key_title},
 			locator1 = "APIBuilder#DROPDOWN_MENU");
@@ -328,6 +338,16 @@ definition {
 			panel = "Control Panel",
 			portlet = "API Builder");
 
+		while ((IsElementNotPresent(key_title = ${key_title}, locator1 = "APIBuilder#DROPDOWN_MENU")) && (maxIterations = "5")) {
+			Refresh();
+
+			WaitForSPARefresh();
+		}
+
+		WaitForVisible(
+			key_title = ${key_title},
+			locator1 = "APIBuilder#DROPDOWN_MENU");
+
 		Click(
 			key_title = ${key_title},
 			locator1 = "APIBuilder#DROPDOWN_MENU");
@@ -441,6 +461,16 @@ definition {
 		WaitForElementPresent(
 			key_objectLabel = "API Builder",
 			locator1 = "ObjectPortlet#OBJECT_PORTLET_HEADER");
+
+		while ((IsElementNotPresent(key_title = ${key_title}, locator1 = "APIBuilder#DROPDOWN_MENU")) && (maxIterations = "5")) {
+			Refresh();
+
+			WaitForSPARefresh();
+		}
+
+		WaitForVisible(
+			key_title = ${key_title},
+			locator1 = "APIBuilder#DROPDOWN_MENU");
 
 		Click(
 			key_title = ${key_title},
