@@ -930,6 +930,9 @@ public class LayoutImportController implements ImportController {
 					publicLayoutSet.setThemeId(
 						GetterUtil.getString(
 							headerElement.attributeValue("theme-id")));
+					publicLayoutSet.setColorSchemeId(
+						GetterUtil.getString(
+							headerElement.attributeValue("color-scheme-id")));
 
 					_layoutSetLocalService.updateLayoutSet(publicLayoutSet);
 				}
@@ -942,6 +945,9 @@ public class LayoutImportController implements ImportController {
 					privateLayoutSet.setThemeId(
 						GetterUtil.getString(
 							headerElement.attributeValue("theme-id")));
+					privateLayoutSet.setColorSchemeId(
+						GetterUtil.getString(
+							headerElement.attributeValue("color-scheme-id")));
 
 					_layoutSetLocalService.updateLayoutSet(privateLayoutSet);
 				}
@@ -958,6 +964,9 @@ public class LayoutImportController implements ImportController {
 					layoutSet.setThemeId(
 						GetterUtil.getString(
 							headerElement.attributeValue("theme-id")));
+					layoutSet.setColorSchemeId(
+						GetterUtil.getString(
+							headerElement.attributeValue("color-scheme-id")));
 
 					_layoutSetLocalService.updateLayoutSet(layoutSet);
 				}
