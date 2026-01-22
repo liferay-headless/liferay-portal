@@ -10,6 +10,7 @@ import * as path from 'path';
 import {accountSettingsPagesTest} from '../../../fixtures/accountSettingsPagesTest';
 import {accountsPagesTest} from '../../../fixtures/accountsPagesTest';
 import {applicationsMenuPageTest} from '../../../fixtures/applicationsMenuPageTest';
+import {createCategories} from '../../../helpers/CreateCategories';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {depotAdminPageTest} from '../../../fixtures/depotAdminPageTest';
 import {documentLibraryPagesTest} from '../../../fixtures/documentLibraryPages.fixtures';
@@ -76,6 +77,7 @@ export const testWithExportImportAtInstanceLevelFF = mergeTests(
 		'LPD-44771': {enabled: true},
 		'LPD-45276': {enabled: true},
 	}),
+	isolatedSiteTest,
 	loginTest(),
 	styleBookPageTest,
 	uiElementsPageTest
@@ -160,6 +162,61 @@ testWithExportImportAtInstanceLevelFF(
 				textField: objectEntry.textField,
 			})
 		);
+	}
+);
+
+testWithExportImportAtInstanceLevelFF(
+	'Can export and import vocabularies and categories',
+	async ({apiHelpers, exportImportPage, site}) => {
+		const categoryNames = [
+			{name: getRandomString()},
+			{name: getRandomString()},
+		];
+		const vocabularyName = getRandomString();
+
+		const categories: Array<any> = await createCategories({
+			apiHelpers,
+			categoryNames,
+			siteId: site.id,
+			vocabularyName,
+		});
+
+		apiHelpers.data.push({
+			id: categories[0].vocabularyId,
+			type: 'taxonomyVocabulary',
+		});
+
+		await exportImportPage.goToExport(site.friendlyUrlPath);
+
+		const exportFilePath = await exportImportPage.export({
+			portletLabels: [`Categories 3 Items`],
+		});
+
+		const vocabularyContent = await readFileFromZip(
+			`com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyVocabulary.json`,
+			exportFilePath
+		);
+
+		const vocabularyJson = JSON.parse(vocabularyContent);
+
+		expect(vocabularyJson.length).toBe(1);
+
+		const categoryContent = await readFileFromZip(
+			`com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory.json`,
+			exportFilePath
+		);
+
+		const categoryJson = JSON.parse(categoryContent);
+
+		expect(categoryJson.length).toBe(2);
+
+		expect(
+			await apiHelpers.headlessAdminTaxonomy.deleteTaxonomyVocabulary(categories[0].vocabularyId)
+		).toBeOK();
+
+		await exportImportPage.goToImport(site.friendlyUrlPath);
+
+		await exportImportPage.import({filePath: exportFilePath, taskStatus: 'completedWithErrors'});
 	}
 );
 
