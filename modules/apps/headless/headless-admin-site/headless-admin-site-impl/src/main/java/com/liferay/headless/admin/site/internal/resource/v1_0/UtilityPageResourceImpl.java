@@ -127,6 +127,11 @@ public class UtilityPageResourceImpl
 			}
 
 			@Override
+			public String getSectionLanguageKey() {
+				return SECTION_NAME_SITE_BUILDER;
+			}
+
+			@Override
 			public boolean isActive(PortletDataContext portletDataContext) {
 				return FeatureFlagManagerUtil.isEnabled("LPD-35443");
 			}

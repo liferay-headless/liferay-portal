@@ -220,6 +220,11 @@ public class SitePageResourceImpl
 			}
 
 			@Override
+			public String getSectionLanguageKey() {
+				return SECTION_NAME_SITE_BUILDER;
+			}
+
+			@Override
 			public boolean isActive(PortletDataContext portletDataContext) {
 				if (!portletDataContext.isPrivateLayout() &&
 					FeatureFlagManagerUtil.isEnabled("LPD-35443")) {
