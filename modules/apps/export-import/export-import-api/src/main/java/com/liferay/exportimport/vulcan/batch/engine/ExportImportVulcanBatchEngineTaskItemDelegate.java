@@ -20,6 +20,17 @@ import java.util.Map;
 public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 	extends VulcanBatchEngineTaskItemDelegate<T> {
 
+	public static String SECTION_NAME_CONTENT =
+		"category.site_administration.content";
+
+	public static String SECTION_NAME_DESIGN =
+		"category.site_administration.design";
+
+	public static String SECTION_NAME_OBJECTS = "objects";
+
+	public static String SECTION_NAME_SITE_BUILDER =
+		"category.site_administration.build";
+
 	public ExportImportDescriptor getExportImportDescriptor();
 
 	public interface ExportImportDescriptor {
@@ -55,6 +66,10 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 		public String getResourceClassName();
 
 		public Scope getScope();
+
+		public default String getSectionLanguageKey() {
+			return SECTION_NAME_CONTENT;
+		}
 
 		public default String getTag(Locale locale) {
 			return null;
