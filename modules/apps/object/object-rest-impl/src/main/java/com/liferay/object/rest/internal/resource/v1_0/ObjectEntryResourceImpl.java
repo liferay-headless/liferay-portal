@@ -590,6 +590,11 @@ public class ObjectEntryResourceImpl
 			}
 
 			@Override
+			public String getSectionLanguageKey() {
+				return SECTION_NAME_OBJECTS;
+			}
+
+			@Override
 			public String getTag(Locale locale) {
 				if (!_objectDefinition.isRootNode()) {
 					return null;
