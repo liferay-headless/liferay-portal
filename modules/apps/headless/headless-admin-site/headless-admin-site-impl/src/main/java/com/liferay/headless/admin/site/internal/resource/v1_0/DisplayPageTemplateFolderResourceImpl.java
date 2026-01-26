@@ -104,6 +104,11 @@ public class DisplayPageTemplateFolderResourceImpl
 			}
 
 			@Override
+			public String getSectionLanguageKey() {
+				return SECTION_NAME_DESIGN;
+			}
+
+			@Override
 			public boolean isActive(PortletDataContext portletDataContext) {
 				return FeatureFlagManagerUtil.isEnabled("LPD-35443");
 			}
