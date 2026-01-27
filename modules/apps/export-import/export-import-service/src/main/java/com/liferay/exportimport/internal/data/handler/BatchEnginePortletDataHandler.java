@@ -178,7 +178,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			return null;
 		}
 
-		return _getSoleProperty(
+		return _getFirstProperty(
 			ExportImportVulcanBatchEngineTaskItemDelegate.
 				ExportImportDescriptor::getSectionLanguageKey);
 	}
@@ -660,6 +660,21 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		return unsyncByteArrayOutputStream.toByteArray();
 	}
 
+	private <T> T _getFirstProperty(
+		Function
+			<ExportImportVulcanBatchEngineTaskItemDelegate.
+				ExportImportDescriptor,
+			 T> function) {
+
+		if (_registrations.isEmpty()) {
+			return null;
+		}
+
+		Registration registration = _registrations.get(0);
+
+		return function.apply(registration.getExportImportDescriptor());
+	}
+
 	private PortletDataHandlerControl _getPortletDataHandlerControl(
 		Registration registration) {
 
@@ -682,9 +697,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			return null;
 		}
 
-		Registration registration = _registrations.get(0);
-
-		return function.apply(registration.getExportImportDescriptor());
+		return _getFirstProperty(function);
 	}
 
 	private long _getUserId() {
