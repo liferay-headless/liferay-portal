@@ -1630,7 +1630,14 @@ public class BatchEnginePortletDataHandlerTest {
 		String portletId = RandomTestUtil.randomString();
 		String sectionLanguageKey = RandomTestUtil.randomString();
 
-		try (SafeCloseable safeCloseable = _register(
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionLanguageKey(
+					sectionLanguageKey
+				).build());
+			SafeCloseable safeCloseable2 = _register(
 				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
 				).withPortletId(
 					portletId
