@@ -1625,6 +1625,29 @@ public class BatchEnginePortletDataHandlerTest {
 	}
 
 	@Test
+	@TestInfo("LPD-76858")
+	public void testGetSectionName() throws Exception {
+		String portletId = RandomTestUtil.randomString();
+		String sectionLanguageKey = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionLanguageKey(
+					sectionLanguageKey
+				).build())) {
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId);
+
+			Assert.assertEquals(
+				sectionLanguageKey, portletDataHandler.getSectionName());
+		}
+	}
+
+	@Test
 	@TestInfo("LPD-49421")
 	public void testImportIndividualDeletionsCompanyGroup() throws Exception {
 		Group group = _stagingGroupHelper.fetchCompanyGroup(
@@ -3429,11 +3452,12 @@ public class BatchEnginePortletDataHandlerTest {
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegate(
 			Function<Filter, Page<TestItem>> function, String portletId,
-			Integer rank, boolean stagingSupported) {
+			Integer rank, String sectionLanguageKey, boolean stagingSupported) {
 
 			_function = function;
 			_portletId = portletId;
 			_rank = rank;
+			_sectionLanguageKey = sectionLanguageKey;
 			_stagingSupported = stagingSupported;
 		}
 
@@ -3497,6 +3521,11 @@ public class BatchEnginePortletDataHandlerTest {
 				@Override
 				public Scope getScope() {
 					return Scope.COMPANY;
+				}
+
+				@Override
+				public String getSectionLanguageKey() {
+					return _sectionLanguageKey;
 				}
 
 				@Override
@@ -3589,6 +3618,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private final String _portletId;
 		private final Integer _rank;
 		private final String _resourceClassName = RandomTestUtil.randomString();
+		private final String _sectionLanguageKey;
 		private final boolean _stagingSupported;
 
 	}
@@ -3602,7 +3632,8 @@ public class BatchEnginePortletDataHandlerTest {
 			}
 
 			return new TestExportImportVulcanBatchEngineTaskItemDelegate(
-				_function, _portletId, _rank, _stagingSupported);
+				_function, _portletId, _rank, _sectionLanguageKey,
+				_stagingSupported);
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
@@ -3630,6 +3661,14 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
+			withSectionLanguageKey(String sectionLanguageKey) {
+
+			_sectionLanguageKey = sectionLanguageKey;
+
+			return this;
+		}
+
+		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
 			withStagingSupported(boolean stagingSupported) {
 
 			_stagingSupported = stagingSupported;
@@ -3640,6 +3679,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private Function<Filter, Page<TestItem>> _function;
 		private String _portletId;
 		private Integer _rank;
+		private String _sectionLanguageKey;
 		private boolean _stagingSupported;
 
 	}
