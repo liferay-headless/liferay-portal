@@ -28,8 +28,14 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 
 	public static String SECTION_NAME_OBJECTS = "objects";
 
+	public static String SECTION_NAME_OTHERS = "others";
+
+	public static String SECTION_NAME_PAGES = "pages";
+
 	public static String SECTION_NAME_SITE_BUILDER =
 		"category.site_administration.build";
+
+	public static String SECTION_NAME_SITES = "sites";
 
 	public ExportImportDescriptor getExportImportDescriptor();
 
@@ -68,7 +74,7 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 		public Scope getScope();
 
 		public default String getSectionLanguageKey() {
-			return SECTION_NAME_CONTENT;
+			return SECTION_NAME_OTHERS;
 		}
 
 		public default String getTag(Locale locale) {
