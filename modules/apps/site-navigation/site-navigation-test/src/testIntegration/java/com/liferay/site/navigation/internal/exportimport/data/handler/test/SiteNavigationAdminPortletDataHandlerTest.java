@@ -149,7 +149,7 @@ public class SiteNavigationAdminPortletDataHandlerTest {
 			portletDataHandler.getClassNames()[0]);
 		Assert.assertEquals(
 			SiteNavigationAdminPortletKeys.SITE_NAVIGATION_ADMIN,
-			portletDataHandler.getName());
+			portletDataHandler.getPortletId());
 	}
 
 	@Inject
