@@ -5,6 +5,7 @@
 
 package com.liferay.exportimport.vulcan.batch.engine;
 
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 
@@ -19,23 +20,6 @@ import java.util.Map;
  */
 public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 	extends VulcanBatchEngineTaskItemDelegate<T> {
-
-	public static String SECTION_NAME_CONTENT =
-		"category.site_administration.content";
-
-	public static String SECTION_NAME_DESIGN =
-		"category.site_administration.design";
-
-	public static String SECTION_NAME_OBJECTS = "objects";
-
-	public static String SECTION_NAME_OTHERS = "others";
-
-	public static String SECTION_NAME_PAGES = "pages";
-
-	public static String SECTION_NAME_SITE_BUILDER =
-		"category.site_administration.build";
-
-	public static String SECTION_NAME_SITES = "sites";
 
 	public ExportImportDescriptor getExportImportDescriptor();
 
@@ -74,7 +58,7 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 		public Scope getScope();
 
 		public default String getSectionLanguageKey() {
-			return SECTION_NAME_OTHERS;
+			return ExportImportConstants.SECTION_NAME_OTHERS;
 		}
 
 		public default String getTag(Locale locale) {
