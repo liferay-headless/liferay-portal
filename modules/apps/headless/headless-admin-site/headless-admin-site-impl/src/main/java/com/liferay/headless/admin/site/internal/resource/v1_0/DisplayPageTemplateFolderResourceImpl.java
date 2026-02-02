@@ -5,6 +5,7 @@
 
 package com.liferay.headless.admin.site.internal.resource.v1_0;
 
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.headless.admin.site.dto.v1_0.DisplayPageTemplateFolder;
@@ -105,7 +106,7 @@ public class DisplayPageTemplateFolderResourceImpl
 
 			@Override
 			public String getSectionLanguageKey() {
-				return SECTION_NAME_DESIGN;
+				return ExportImportConstants.SECTION_NAME_DESIGN;
 			}
 
 			@Override

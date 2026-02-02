@@ -5,6 +5,7 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.exception.ObjectEntryValidationException;
@@ -591,7 +592,7 @@ public class ObjectEntryResourceImpl
 
 			@Override
 			public String getSectionLanguageKey() {
-				return SECTION_NAME_OBJECTS;
+				return ExportImportConstants.SECTION_NAME_OBJECTS;
 			}
 
 			@Override

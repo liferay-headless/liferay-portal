@@ -6,6 +6,7 @@
 package com.liferay.headless.admin.site.internal.resource.v1_0;
 
 import com.liferay.client.extension.type.manager.CETManager;
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
@@ -221,7 +222,7 @@ public class SitePageResourceImpl
 
 			@Override
 			public String getSectionLanguageKey() {
-				return SECTION_NAME_SITE_BUILDER;
+				return ExportImportConstants.SECTION_NAME_SITE_BUILDER;
 			}
 
 			@Override
