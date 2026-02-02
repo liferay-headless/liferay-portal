@@ -174,10 +174,6 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	public String getSectionName() {
-		if (_registrations.isEmpty()) {
-			return null;
-		}
-
 		return _getFirstProperty(
 			ExportImportVulcanBatchEngineTaskItemDelegate.
 				ExportImportDescriptor::getSectionLanguageKey);
