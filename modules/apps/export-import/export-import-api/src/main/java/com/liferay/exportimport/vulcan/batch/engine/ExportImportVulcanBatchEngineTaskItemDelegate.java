@@ -5,7 +5,6 @@
 
 package com.liferay.exportimport.vulcan.batch.engine;
 
-import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 
@@ -58,7 +57,7 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 		public Scope getScope();
 
 		public default String getSectionLanguageKey() {
-			return ExportImportConstants.SECTION_NAME_OTHERS;
+			return null;
 		}
 
 		public default String getTag(Locale locale) {
