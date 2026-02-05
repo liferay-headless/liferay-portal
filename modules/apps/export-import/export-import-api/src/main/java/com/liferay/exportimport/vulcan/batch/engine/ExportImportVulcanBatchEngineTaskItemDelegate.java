@@ -56,7 +56,7 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 
 		public Scope getScope();
 
-		public default String getSectionLanguageKey() {
+		public default String getSectionKey() {
 			return null;
 		}
 

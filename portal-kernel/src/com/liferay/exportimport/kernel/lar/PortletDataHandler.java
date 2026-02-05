@@ -233,7 +233,7 @@ public interface PortletDataHandler {
 	 */
 	public String getSchemaVersion();
 
-	public default String getSectionName() {
+	public default String getSectionKey() {
 		return null;
 	}
 

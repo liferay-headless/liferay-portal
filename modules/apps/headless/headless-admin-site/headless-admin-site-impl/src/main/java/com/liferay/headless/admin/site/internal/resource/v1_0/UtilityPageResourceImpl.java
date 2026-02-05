@@ -128,8 +128,8 @@ public class UtilityPageResourceImpl
 			}
 
 			@Override
-			public String getSectionLanguageKey() {
-				return ExportImportConstants.SECTION_NAME_SITE_BUILDER;
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_SITE_BUILDER;
 			}
 
 			@Override

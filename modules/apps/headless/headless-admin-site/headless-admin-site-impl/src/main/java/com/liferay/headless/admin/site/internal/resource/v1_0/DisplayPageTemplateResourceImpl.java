@@ -149,8 +149,8 @@ public class DisplayPageTemplateResourceImpl
 			}
 
 			@Override
-			public String getSectionLanguageKey() {
-				return ExportImportConstants.SECTION_NAME_DESIGN;
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_DESIGN;
 			}
 
 			@Override

@@ -591,8 +591,8 @@ public class ObjectEntryResourceImpl
 			}
 
 			@Override
-			public String getSectionLanguageKey() {
-				return ExportImportConstants.SECTION_NAME_OBJECTS;
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_OBJECTS;
 			}
 
 			@Override
