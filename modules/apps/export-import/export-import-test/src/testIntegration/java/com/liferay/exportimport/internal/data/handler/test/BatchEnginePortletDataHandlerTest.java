@@ -1626,31 +1626,30 @@ public class BatchEnginePortletDataHandlerTest {
 
 	@Test
 	@TestInfo("LPD-76858")
-	public void testGetSectionName() throws Exception {
+	public void testGetSectionKey() throws Exception {
 		String portletId = RandomTestUtil.randomString();
-		String sectionLanguageKey = RandomTestUtil.randomString();
+		String sectionKey = RandomTestUtil.randomString();
 
 		try (SafeCloseable safeCloseable1 = _register(
 				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
 				).withPortletId(
 					portletId
-				).withSectionLanguageKey(
-					sectionLanguageKey
+				).withSectionKey(
+					sectionKey
 				).build());
 			SafeCloseable safeCloseable2 = _register(
 				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
 				).withPortletId(
 					portletId
-				).withSectionLanguageKey(
-					sectionLanguageKey
+				).withSectionKey(
+					sectionKey
 				).build())) {
 
 			PortletDataHandler portletDataHandler =
 				_portletDataHandlerProvider.provide(
 					TestPropsValues.getCompanyId(), portletId);
 
-			Assert.assertEquals(
-				sectionLanguageKey, portletDataHandler.getSectionName());
+			Assert.assertEquals(sectionKey, portletDataHandler.getSectionKey());
 		}
 	}
 
@@ -3459,12 +3458,12 @@ public class BatchEnginePortletDataHandlerTest {
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegate(
 			Function<Filter, Page<TestItem>> function, String portletId,
-			Integer rank, String sectionLanguageKey, boolean stagingSupported) {
+			Integer rank, String sectionKey, boolean stagingSupported) {
 
 			_function = function;
 			_portletId = portletId;
 			_rank = rank;
-			_sectionLanguageKey = sectionLanguageKey;
+			_sectionKey = sectionKey;
 			_stagingSupported = stagingSupported;
 		}
 
@@ -3531,8 +3530,8 @@ public class BatchEnginePortletDataHandlerTest {
 				}
 
 				@Override
-				public String getSectionLanguageKey() {
-					return _sectionLanguageKey;
+				public String getSectionKey() {
+					return _sectionKey;
 				}
 
 				@Override
@@ -3625,7 +3624,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private final String _portletId;
 		private final Integer _rank;
 		private final String _resourceClassName = RandomTestUtil.randomString();
-		private final String _sectionLanguageKey;
+		private final String _sectionKey;
 		private final boolean _stagingSupported;
 
 	}
@@ -3639,8 +3638,7 @@ public class BatchEnginePortletDataHandlerTest {
 			}
 
 			return new TestExportImportVulcanBatchEngineTaskItemDelegate(
-				_function, _portletId, _rank, _sectionLanguageKey,
-				_stagingSupported);
+				_function, _portletId, _rank, _sectionKey, _stagingSupported);
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
@@ -3668,9 +3666,9 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
-			withSectionLanguageKey(String sectionLanguageKey) {
+			withSectionKey(String sectionKey) {
 
-			_sectionLanguageKey = sectionLanguageKey;
+			_sectionKey = sectionKey;
 
 			return this;
 		}
@@ -3686,7 +3684,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private Function<Filter, Page<TestItem>> _function;
 		private String _portletId;
 		private Integer _rank;
-		private String _sectionLanguageKey;
+		private String _sectionKey;
 		private boolean _stagingSupported;
 
 	}
