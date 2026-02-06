@@ -637,8 +637,8 @@ public class PortletExportControllerImpl implements PortletExportController {
 
 		Date originalStartDate = portletDataContext.getStartDate();
 
-		Date portletLastPublishDate = ExportImportDateUtil.getLastPublishDate(
-			portletDataContext, jxPortletPreferences);
+		Date portletLastPublishDate = _getPortletLastPublishDate(
+			jxPortletPreferences, portletDataContext);
 
 		portletDataContext.setStartDate(portletLastPublishDate);
 
@@ -1244,13 +1244,57 @@ public class PortletExportControllerImpl implements PortletExportController {
 	private PortletDataHandler _getPortletDataHandler(
 		PortletDataContext portletDataContext, Portlet portlet) {
 
-		portlet = _replacePortlet(portletDataContext, portlet);
+		if (!ExportImportDateUtil.isRangeFromLastPublishDate(
+				portletDataContext)) {
 
-		if (portlet != null) {
 			return portlet.getPortletDataHandlerInstance();
 		}
 
-		return null;
+		String changesetPortletId = ChangesetPortletKeys.CHANGESET;
+
+		if (ExportImportThreadLocal.isPortletStagingInProcess()) {
+			Portlet changesetPortlet = _portletLocalService.getPortletById(
+				changesetPortletId);
+
+			return changesetPortlet.getPortletDataHandlerInstance();
+		}
+
+		PortletDataHandler portletDataHandler =
+			portlet.getPortletDataHandlerInstance();
+
+		if (ExportImportThreadLocal.isLayoutStagingInProcess() &&
+			!changesetPortletId.equals(portlet.getPortletId()) &&
+			!portletDataHandler.isBatch()) {
+
+			return null;
+		}
+
+		return portletDataHandler;
+	}
+
+	private Date _getPortletLastPublishDate(
+			jakarta.portlet.PortletPreferences jxPortletPreferences,
+			PortletDataContext portletDataContext)
+		throws Exception {
+
+		if (ExportImportDateUtil.isRangeFromLastPublishDate(
+				portletDataContext)) {
+
+			if (jxPortletPreferences != null) {
+				return ExportImportDateUtil.getLastPublishDate(
+					portletDataContext, jxPortletPreferences);
+			}
+
+			long changesetLastPublishDate = MapUtil.getLong(
+				portletDataContext.getParameterMap(),
+				"changesetLastPublishDate");
+
+			if (changesetLastPublishDate > 0) {
+				return new Date(changesetLastPublishDate);
+			}
+		}
+
+		return portletDataContext.getStartDate();
 	}
 
 	private boolean _hasPortletId(
@@ -1304,28 +1348,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		}
 
 		return false;
-	}
-
-	private Portlet _replacePortlet(
-		PortletDataContext portletDataContext, Portlet portlet) {
-
-		if (ExportImportDateUtil.isRangeFromLastPublishDate(
-				portletDataContext)) {
-
-			String changesetPortletId = ChangesetPortletKeys.CHANGESET;
-
-			if (ExportImportThreadLocal.isPortletStagingInProcess()) {
-				return _portletLocalService.getPortletById(changesetPortletId);
-			}
-
-			if (ExportImportThreadLocal.isLayoutStagingInProcess() &&
-				!changesetPortletId.equals(portlet.getPortletId())) {
-
-				return null;
-			}
-		}
-
-		return portlet;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
