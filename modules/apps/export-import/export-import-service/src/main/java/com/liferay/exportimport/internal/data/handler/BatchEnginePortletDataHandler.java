@@ -713,6 +713,11 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 					_registrations, this::_getPortletDataHandlerControl,
 					PortletDataHandlerControl.class));
 		}
+		else if (_registrations.size() == 1) {
+			setEmptyControlsAllowed(false);
+			setExportPortletDataHandlerControls(
+				_getPortletDataHandlerControl(_registrations.get(0)));
+		}
 		else {
 			setEmptyControlsAllowed(true);
 			setExportPortletDataHandlerControls();
