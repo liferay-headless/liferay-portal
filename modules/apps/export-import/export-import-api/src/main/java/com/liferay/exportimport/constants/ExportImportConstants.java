@@ -18,6 +18,8 @@ public class ExportImportConstants {
 	public static final String SECTION_KEY_DESIGN =
 		"category.site_administration.design";
 
+	public static final String SECTION_KEY_MULTIPLE = "multiple-sections";
+
 	public static final String SECTION_KEY_OBJECTS = "objects";
 
 	public static final String SECTION_KEY_OTHERS = "others";

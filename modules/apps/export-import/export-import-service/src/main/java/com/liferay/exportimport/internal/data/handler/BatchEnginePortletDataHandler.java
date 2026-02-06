@@ -15,6 +15,7 @@ import com.liferay.batch.engine.model.BatchEngineExportTask;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskService;
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.internal.lar.ExportImportDescriptorThreadLocal;
 import com.liferay.exportimport.internal.lar.PortletDataContextImpl;
 import com.liferay.exportimport.internal.lar.PortletDataContextThreadLocal;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.staging.StagingGroupHelper;
 
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -174,9 +177,28 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	public String getSectionKey() {
-		return _getFirstProperty(
-			ExportImportVulcanBatchEngineTaskItemDelegate.
-				ExportImportDescriptor::getSectionKey);
+		Set<String> sectionKeys = SetUtil.fromList(
+			TransformUtil.transform(
+				_registrations,
+				registration -> {
+					ExportImportVulcanBatchEngineTaskItemDelegate.
+						ExportImportDescriptor exportImportDescriptor =
+							registration.getExportImportDescriptor();
+
+					return exportImportDescriptor.getSectionKey();
+				}));
+
+		if (sectionKeys.isEmpty()) {
+			return ExportImportConstants.SECTION_KEY_OTHERS;
+		}
+
+		if (sectionKeys.size() > 1) {
+			return ExportImportConstants.SECTION_KEY_MULTIPLE;
+		}
+
+		Iterator<String> iterator = sectionKeys.iterator();
+
+		return iterator.next();
 	}
 
 	@Override
