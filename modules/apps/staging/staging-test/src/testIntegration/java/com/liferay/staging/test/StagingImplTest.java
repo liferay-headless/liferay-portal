@@ -8,10 +8,13 @@ package com.liferay.staging.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
+import com.liferay.asset.tags.constants.AssetTagsAdminPortletKeys;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
@@ -50,9 +53,11 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.GroupUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -61,6 +66,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -74,6 +80,8 @@ import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactory;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -330,14 +338,71 @@ public class StagingImplTest {
 		enableLocalStaging(false);
 	}
 
+	@FeatureFlags(
+		featureFlags = {@FeatureFlag("LPD-35443"), @FeatureFlag("LPD-35914")}
+	)
 	@Test
-	public void testLocalStagingAssetCategories() throws Exception {
-		enableLocalStagingWithContent(false, true, false);
+	@TestInfo("LPD-75738")
+	public void testLocalStagingAssetTagsFromLastPublishDateWithBatchEngine()
+		throws Exception {
+
+		FeatureFlagTestUtil.invokeFeatureFlagListeners(
+			TestPropsValues.getCompanyId(), true, "LPD-35914");
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		_assetTagLocalService.addTag(
+			externalReferenceCode, TestPropsValues.getUserId(),
+			_group.getGroupId(), RandomTestUtil.randomString(),
+			ServiceContextTestUtil.getServiceContext());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		Map<String, Serializable> attributes = serviceContext.getAttributes();
+
+		List<String> portletIds = ListUtil.fromArray(
+			AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN);
+
+		Map<String, String[]> parameters =
+			ExportImportConfigurationParameterMapFactoryUtil.buildParameterMap(
+				PortletDataHandlerKeys.DATA_STRATEGY_MIRROR_OVERWRITE, false,
+				false, false, false, false, false, false, false, true, false,
+				portletIds, true, false, portletIds, false, portletIds,
+				ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE, false, true,
+				UserIdStrategy.CURRENT_USER_ID);
+
+		attributes.putAll(parameters);
+
+		enableLocalStaging(false, serviceContext);
+
+		Group stagingGroup = _group.getStagingGroup();
+
+		AssetTag stagingAssetTag =
+			_assetTagLocalService.getAssetTagByExternalReferenceCode(
+				externalReferenceCode, stagingGroup.getGroupId());
+
+		stagingAssetTag.setName(RandomTestUtil.randomString());
+
+		stagingAssetTag = _assetTagLocalService.updateAssetTag(stagingAssetTag);
+
+		StagingUtil.publishLayouts(
+			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
+			_group.getGroupId(), false, parameters);
+
+		AssetTag liveAssetTag =
+			_assetTagLocalService.getAssetTagByExternalReferenceCode(
+				externalReferenceCode, _group.getGroupId());
+
+		Assert.assertEquals(stagingAssetTag.getName(), liveAssetTag.getName());
+
+		FeatureFlagTestUtil.invokeFeatureFlagListeners(
+			TestPropsValues.getCompanyId(), false, "LPD-35914");
 	}
 
 	@Test
 	public void testLocalStagingJournal() throws Exception {
-		enableLocalStagingWithContent(true, false, false);
+		enableLocalStagingWithContent(true, false);
 	}
 
 	@Test
@@ -356,7 +421,7 @@ public class StagingImplTest {
 
 	@Test
 	public void testLocalStagingUpdateLastPublishDate() throws Exception {
-		enableLocalStagingWithContent(true, false, false);
+		enableLocalStagingWithContent(true, false);
 
 		Group stagingGroup = _group.getStagingGroup();
 
@@ -395,12 +460,12 @@ public class StagingImplTest {
 	public void testLocalStagingWithLayoutVersioningAssetCategories()
 		throws Exception {
 
-		enableLocalStagingWithContent(false, true, true);
+		enableLocalStagingWithContent(false, true);
 	}
 
 	@Test
 	public void testLocalStagingWithLayoutVersioningJournal() throws Exception {
-		enableLocalStagingWithContent(true, false, true);
+		enableLocalStagingWithContent(true, true);
 	}
 
 	@Test
@@ -633,8 +698,7 @@ public class StagingImplTest {
 	}
 
 	protected void enableLocalStagingWithContent(
-			boolean stageJournal, boolean stageAssetCategories,
-			boolean branching)
+			boolean stageJournal, boolean branching)
 		throws Exception {
 
 		// Layouts
@@ -985,6 +1049,9 @@ public class StagingImplTest {
 	private static final Locale[] _locales = {
 		LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US
 	};
+
+	@Inject
+	private AssetTagLocalService _assetTagLocalService;
 
 	@DeleteAfterTestRun
 	private Group _group;
