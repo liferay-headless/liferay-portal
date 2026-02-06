@@ -678,21 +678,6 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		return unsyncByteArrayOutputStream.toByteArray();
 	}
 
-	private <T> T _getFirstProperty(
-		Function
-			<ExportImportVulcanBatchEngineTaskItemDelegate.
-				ExportImportDescriptor,
-			 T> function) {
-
-		if (_registrations.isEmpty()) {
-			return null;
-		}
-
-		Registration registration = _registrations.get(0);
-
-		return function.apply(registration.getExportImportDescriptor());
-	}
-
 	private PortletDataHandlerControl _getPortletDataHandlerControl(
 		Registration registration) {
 
@@ -715,7 +700,9 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			return null;
 		}
 
-		return _getFirstProperty(function);
+		Registration registration = _registrations.get(0);
+
+		return function.apply(registration.getExportImportDescriptor());
 	}
 
 	private long _getUserId() {
