@@ -184,7 +184,8 @@ public class KeywordResourceImpl
 
 							return ParameterUtil.
 								buildFilterParameterFromChangeset(
-									_assetTagService::getTag,
+									_assetTagService::
+										fetchAssetTagByExternalReferenceCode,
 									getModelClassName(), portletDataContext);
 						}
 

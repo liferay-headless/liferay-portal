@@ -8,7 +8,7 @@ package com.liferay.portal.vulcan.util;
 import com.liferay.changeset.model.ChangesetEntry;
 import com.liferay.changeset.service.ChangesetEntryLocalServiceUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -29,8 +29,9 @@ import java.util.Set;
 public class ParameterUtil {
 
 	public static String buildFilterParameterFromChangeset(
-		UnsafeFunction<Long, ExternalReferenceCodeModel, PortalException>
-			unsafeFunction,
+		UnsafeBiFunction
+			<String, Long, ExternalReferenceCodeModel, PortalException>
+				unsafeBiFunction,
 		String modelClassName, PortletDataContext portletDataContext) {
 
 		long changesetCollectionId = MapUtil.getLong(
@@ -52,7 +53,9 @@ public class ParameterUtil {
 		for (ChangesetEntry changesetEntry : changesetEntries) {
 			try {
 				ExternalReferenceCodeModel externalReferenceCodeModel =
-					unsafeFunction.apply(changesetEntry.getClassPK());
+					unsafeBiFunction.apply(
+						changesetEntry.getClassExternalReferenceCode(),
+						changesetEntry.getGroupId());
 
 				if (externalReferenceCodeModel != null) {
 					externalReferenceCodes.add(

@@ -174,7 +174,8 @@ public class TaxonomyCategoryResourceImpl
 
 							return ParameterUtil.
 								buildFilterParameterFromChangeset(
-									_assetCategoryService::getCategory,
+									_assetCategoryService::
+										fetchCategoryByExternalReferenceCode,
 									getModelClassName(), portletDataContext);
 						}
 

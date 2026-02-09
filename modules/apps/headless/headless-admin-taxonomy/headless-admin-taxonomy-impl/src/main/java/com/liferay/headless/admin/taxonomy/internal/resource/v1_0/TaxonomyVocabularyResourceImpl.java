@@ -169,7 +169,8 @@ public class TaxonomyVocabularyResourceImpl
 
 							return ParameterUtil.
 								buildFilterParameterFromChangeset(
-									_assetVocabularyService::getVocabulary,
+									_assetVocabularyService::
+										fetchVocabularyByExternalReferenceCode,
 									getModelClassName(), portletDataContext);
 						}
 
