@@ -62,6 +62,35 @@ public class ChangesetEntryLocalServiceImpl
 	}
 
 	@Override
+	public ChangesetEntry addChangesetEntry(
+			long userId, long changesetCollectionId,
+			String classExternalReferenceCode, long classNameId, long classPK)
+		throws PortalException {
+
+		User user = _userLocalService.getUser(userId);
+		ChangesetCollection changesetCollection =
+			_changesetCollectionPersistence.fetchByPrimaryKey(
+				changesetCollectionId);
+
+		long changesetEntryId = counterLocalService.increment();
+
+		ChangesetEntry changesetEntry = changesetEntryPersistence.create(
+			changesetEntryId);
+
+		changesetEntry.setGroupId(changesetCollection.getGroupId());
+		changesetEntry.setCompanyId(user.getCompanyId());
+		changesetEntry.setUserId(user.getUserId());
+		changesetEntry.setUserName(user.getFullName());
+		changesetEntry.setChangesetCollectionId(changesetCollectionId);
+		changesetEntry.setClassExternalReferenceCode(
+			classExternalReferenceCode);
+		changesetEntry.setClassNameId(classNameId);
+		changesetEntry.setClassPK(classPK);
+
+		return changesetEntryPersistence.update(changesetEntry);
+	}
+
+	@Override
 	public void deleteChangesetEntries(long changesetCollectionId) {
 		changesetEntryPersistence.removeByChangesetCollectionId(
 			changesetCollectionId);
@@ -103,6 +132,15 @@ public class ChangesetEntryLocalServiceImpl
 	}
 
 	@Override
+	public ChangesetEntry fetchChangesetEntry(
+		long changesetCollectionId, String classExternalReferenceCode,
+		long classNameId) {
+
+		return changesetEntryPersistence.fetchByC_CERC_C(
+			changesetCollectionId, classExternalReferenceCode, classNameId);
+	}
+
+	@Override
 	public ChangesetEntry fetchOrAddChangesetEntry(
 			long changesetCollectionId, long classNameId, long classPK)
 		throws PortalException {
@@ -124,6 +162,37 @@ public class ChangesetEntryLocalServiceImpl
 
 		return changesetEntryLocalService.addChangesetEntry(
 			user.getUserId(), changesetCollectionId, classNameId, classPK);
+	}
+
+	@Override
+	public ChangesetEntry fetchOrAddChangesetEntry(
+			long changesetCollectionId, String classExternalReferenceCode,
+			long classNameId, long classPK)
+		throws PortalException {
+
+		ChangesetEntry changesetEntry =
+			changesetEntryLocalService.fetchChangesetEntry(
+				changesetCollectionId, classNameId, classPK);
+
+		if (changesetEntry != null) {
+			changesetEntry = changesetEntryLocalService.fetchChangesetEntry(
+				changesetCollectionId, classExternalReferenceCode, classNameId);
+		}
+
+		if (changesetEntry != null) {
+			return changesetEntry;
+		}
+
+		ChangesetCollection changesetCollection =
+			_changesetCollectionPersistence.findByPrimaryKey(
+				changesetCollectionId);
+
+		User user = _userLocalService.getGuestUser(
+			changesetCollection.getCompanyId());
+
+		return changesetEntryLocalService.addChangesetEntry(
+			user.getUserId(), changesetCollectionId, classExternalReferenceCode,
+			classNameId, classPK);
 	}
 
 	@Override
