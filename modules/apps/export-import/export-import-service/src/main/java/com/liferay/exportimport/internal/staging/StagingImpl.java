@@ -80,6 +80,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.ExternalReferenceCodeModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutBranch;
@@ -262,11 +263,23 @@ public class StagingImpl implements Staging {
 
 		long classPK = (long)stagedGroupedModel.getPrimaryKeyObj();
 
-		_changesetEntryLocalService.fetchOrAddChangesetEntry(
-			changesetCollection.getChangesetCollectionId(),
-			_classNameLocalService.getClassNameId(
-				stagedGroupedModel.getModelClassName()),
-			classPK);
+		if (model instanceof
+				ExternalReferenceCodeModel externalReferenceCodeModel) {
+
+			_changesetEntryLocalService.fetchOrAddChangesetEntry(
+				changesetCollection.getChangesetCollectionId(),
+				externalReferenceCodeModel.getExternalReferenceCode(),
+				_classNameLocalService.getClassNameId(
+					stagedGroupedModel.getModelClassName()),
+				classPK);
+		}
+		else {
+			_changesetEntryLocalService.fetchOrAddChangesetEntry(
+				changesetCollection.getChangesetCollectionId(),
+				_classNameLocalService.getClassNameId(
+					stagedGroupedModel.getModelClassName()),
+				classPK);
+		}
 	}
 
 	@Override
