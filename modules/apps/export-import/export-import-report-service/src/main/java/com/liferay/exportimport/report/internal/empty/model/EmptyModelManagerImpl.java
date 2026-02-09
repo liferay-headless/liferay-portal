@@ -97,16 +97,16 @@ public class EmptyModelManagerImpl implements EmptyModelManager {
 			return model;
 		}
 
-		Group group = _groupLocalService.fetchGroup(groupId);
-
-		if (group != null) {
-			companyId = group.getCompanyId();
-		}
-
 		try (SafeCloseable safeCloseable =
 				EmptyModelThreadLocal.setEmptyModelWithSafeCloseable(true)) {
 
 			if (ExportImportThreadLocal.isImportInProcess()) {
+				Group group = _groupLocalService.fetchGroup(groupId);
+
+				if (group != null) {
+					companyId = group.getCompanyId();
+				}
+
 				_exportImportReportEntryLocalService.
 					addEmptyExportImportReportEntry(
 						groupId, companyId, externalReferenceCode,
