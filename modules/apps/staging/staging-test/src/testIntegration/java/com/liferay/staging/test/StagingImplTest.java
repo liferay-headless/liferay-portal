@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -349,7 +350,8 @@ public class StagingImplTest {
 		FeatureFlagTestUtil.invokeFeatureFlagListeners(
 			TestPropsValues.getCompanyId(), true, "LPD-35914");
 
-		String externalReferenceCode = RandomTestUtil.randomString();
+		String externalReferenceCode = StringUtil.toLowerCase(
+			RandomTestUtil.randomString());
 
 		_assetTagLocalService.addTag(
 			externalReferenceCode, TestPropsValues.getUserId(),
