@@ -129,9 +129,14 @@ public class ChangesetEntryPersistenceTest {
 
 		newChangesetEntry.setChangesetCollectionId(RandomTestUtil.nextLong());
 
+		newChangesetEntry.setClassExternalReferenceCode(
+			RandomTestUtil.randomString());
+
 		newChangesetEntry.setClassNameId(RandomTestUtil.nextLong());
 
 		newChangesetEntry.setClassPK(RandomTestUtil.nextLong());
+
+		newChangesetEntry.setName(RandomTestUtil.randomString());
 
 		_changesetEntries.add(_persistence.update(newChangesetEntry));
 
@@ -162,11 +167,16 @@ public class ChangesetEntryPersistenceTest {
 			existingChangesetEntry.getChangesetCollectionId(),
 			newChangesetEntry.getChangesetCollectionId());
 		Assert.assertEquals(
+			existingChangesetEntry.getClassExternalReferenceCode(),
+			newChangesetEntry.getClassExternalReferenceCode());
+		Assert.assertEquals(
 			existingChangesetEntry.getClassNameId(),
 			newChangesetEntry.getClassNameId());
 		Assert.assertEquals(
 			existingChangesetEntry.getClassPK(),
 			newChangesetEntry.getClassPK());
+		Assert.assertEquals(
+			existingChangesetEntry.getName(), newChangesetEntry.getName());
 	}
 
 	@Test
@@ -207,6 +217,16 @@ public class ChangesetEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByC_CERC_C() throws Exception {
+		_persistence.countByC_CERC_C(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.nextLong());
+
+		_persistence.countByC_CERC_C(0L, "null", 0L);
+
+		_persistence.countByC_CERC_C(0L, (String)null, 0L);
+	}
+
+	@Test
 	public void testCountByC_C_C() throws Exception {
 		_persistence.countByC_C_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
@@ -243,7 +263,8 @@ public class ChangesetEntryPersistenceTest {
 			"ChangesetEntry", "changesetEntryId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "changesetCollectionId", true,
-			"classNameId", true, "classPK", true);
+			"classExternalReferenceCode", true, "classNameId", true, "classPK",
+			true, "name", true);
 	}
 
 	@Test
@@ -517,6 +538,22 @@ public class ChangesetEntryPersistenceTest {
 				changesetEntry, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "changesetCollectionId"));
 		Assert.assertEquals(
+			changesetEntry.getClassExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				changesetEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "classExternalReferenceCode"));
+		Assert.assertEquals(
+			Long.valueOf(changesetEntry.getClassNameId()),
+			ReflectionTestUtil.<Long>invoke(
+				changesetEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "classNameId"));
+
+		Assert.assertEquals(
+			Long.valueOf(changesetEntry.getChangesetCollectionId()),
+			ReflectionTestUtil.<Long>invoke(
+				changesetEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "changesetCollectionId"));
+		Assert.assertEquals(
 			Long.valueOf(changesetEntry.getClassNameId()),
 			ReflectionTestUtil.<Long>invoke(
 				changesetEntry, "getColumnOriginalValue",
@@ -547,9 +584,14 @@ public class ChangesetEntryPersistenceTest {
 
 		changesetEntry.setChangesetCollectionId(RandomTestUtil.nextLong());
 
+		changesetEntry.setClassExternalReferenceCode(
+			RandomTestUtil.randomString());
+
 		changesetEntry.setClassNameId(RandomTestUtil.nextLong());
 
 		changesetEntry.setClassPK(RandomTestUtil.nextLong());
+
+		changesetEntry.setName(RandomTestUtil.randomString());
 
 		_changesetEntries.add(_persistence.update(changesetEntry));
 

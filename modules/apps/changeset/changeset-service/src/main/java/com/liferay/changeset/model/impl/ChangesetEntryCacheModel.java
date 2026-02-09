@@ -53,7 +53,7 @@ public class ChangesetEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{changesetEntryId=");
 		sb.append(changesetEntryId);
@@ -71,10 +71,14 @@ public class ChangesetEntryCacheModel
 		sb.append(modifiedDate);
 		sb.append(", changesetCollectionId=");
 		sb.append(changesetCollectionId);
+		sb.append(", classExternalReferenceCode=");
+		sb.append(classExternalReferenceCode);
 		sb.append(", classNameId=");
 		sb.append(classNameId);
 		sb.append(", classPK=");
 		sb.append(classPK);
+		sb.append(", name=");
+		sb.append(name);
 		sb.append("}");
 
 		return sb.toString();
@@ -111,8 +115,24 @@ public class ChangesetEntryCacheModel
 		}
 
 		changesetEntryImpl.setChangesetCollectionId(changesetCollectionId);
+
+		if (classExternalReferenceCode == null) {
+			changesetEntryImpl.setClassExternalReferenceCode("");
+		}
+		else {
+			changesetEntryImpl.setClassExternalReferenceCode(
+				classExternalReferenceCode);
+		}
+
 		changesetEntryImpl.setClassNameId(classNameId);
 		changesetEntryImpl.setClassPK(classPK);
+
+		if (name == null) {
+			changesetEntryImpl.setName("");
+		}
+		else {
+			changesetEntryImpl.setName(name);
+		}
 
 		changesetEntryImpl.resetOriginalValues();
 
@@ -133,10 +153,12 @@ public class ChangesetEntryCacheModel
 		modifiedDate = objectInput.readLong();
 
 		changesetCollectionId = objectInput.readLong();
+		classExternalReferenceCode = objectInput.readUTF();
 
 		classNameId = objectInput.readLong();
 
 		classPK = objectInput.readLong();
+		name = objectInput.readUTF();
 	}
 
 	@Override
@@ -161,9 +183,23 @@ public class ChangesetEntryCacheModel
 
 		objectOutput.writeLong(changesetCollectionId);
 
+		if (classExternalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(classExternalReferenceCode);
+		}
+
 		objectOutput.writeLong(classNameId);
 
 		objectOutput.writeLong(classPK);
+
+		if (name == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(name);
+		}
 	}
 
 	public long changesetEntryId;
@@ -174,7 +210,9 @@ public class ChangesetEntryCacheModel
 	public long createDate;
 	public long modifiedDate;
 	public long changesetCollectionId;
+	public String classExternalReferenceCode;
 	public long classNameId;
 	public long classPK;
+	public String name;
 
 }

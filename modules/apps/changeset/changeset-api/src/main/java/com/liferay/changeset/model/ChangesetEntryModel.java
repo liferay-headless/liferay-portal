@@ -193,6 +193,22 @@ public interface ChangesetEntryModel
 	public void setChangesetCollectionId(long changesetCollectionId);
 
 	/**
+	 * Returns the class external reference code of this changeset entry.
+	 *
+	 * @return the class external reference code of this changeset entry
+	 */
+	@AutoEscape
+	public String getClassExternalReferenceCode();
+
+	/**
+	 * Sets the class external reference code of this changeset entry.
+	 *
+	 * @param classExternalReferenceCode the class external reference code of this changeset entry
+	 */
+	public void setClassExternalReferenceCode(
+		String classExternalReferenceCode);
+
+	/**
 	 * Returns the fully qualified class name of this changeset entry.
 	 *
 	 * @return the fully qualified class name of this changeset entry
@@ -233,6 +249,21 @@ public interface ChangesetEntryModel
 	 */
 	@Override
 	public void setClassPK(long classPK);
+
+	/**
+	 * Returns the name of this changeset entry.
+	 *
+	 * @return the name of this changeset entry
+	 */
+	@AutoEscape
+	public String getName();
+
+	/**
+	 * Sets the name of this changeset entry.
+	 *
+	 * @param name the name of this changeset entry
+	 */
+	public void setName(String name);
 
 	@Override
 	public ChangesetEntry cloneWithOriginalValues();

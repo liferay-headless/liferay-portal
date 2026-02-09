@@ -43,10 +43,16 @@ public class ChangesetEntryTable extends BaseTable<ChangesetEntryTable> {
 		createColumn(
 			"changesetCollectionId", Long.class, Types.BIGINT,
 			Column.FLAG_DEFAULT);
+	public final Column<ChangesetEntryTable, String>
+		classExternalReferenceCode = createColumn(
+			"classExternalReferenceCode", String.class, Types.VARCHAR,
+			Column.FLAG_DEFAULT);
 	public final Column<ChangesetEntryTable, Long> classNameId = createColumn(
 		"classNameId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<ChangesetEntryTable, Long> classPK = createColumn(
 		"classPK", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
+	public final Column<ChangesetEntryTable, String> name = createColumn(
+		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 
 	private ChangesetEntryTable() {
 		super("ChangesetEntry", ChangesetEntryTable::new);

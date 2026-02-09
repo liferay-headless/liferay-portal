@@ -41,8 +41,11 @@ public class ChangesetEntryWrapper
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("changesetCollectionId", getChangesetCollectionId());
+		attributes.put(
+			"classExternalReferenceCode", getClassExternalReferenceCode());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
+		attributes.put("name", getName());
 
 		return attributes;
 	}
@@ -98,6 +101,13 @@ public class ChangesetEntryWrapper
 			setChangesetCollectionId(changesetCollectionId);
 		}
 
+		String classExternalReferenceCode = (String)attributes.get(
+			"classExternalReferenceCode");
+
+		if (classExternalReferenceCode != null) {
+			setClassExternalReferenceCode(classExternalReferenceCode);
+		}
+
 		Long classNameId = (Long)attributes.get("classNameId");
 
 		if (classNameId != null) {
@@ -108,6 +118,12 @@ public class ChangesetEntryWrapper
 
 		if (classPK != null) {
 			setClassPK(classPK);
+		}
+
+		String name = (String)attributes.get("name");
+
+		if (name != null) {
+			setName(name);
 		}
 	}
 
@@ -134,6 +150,16 @@ public class ChangesetEntryWrapper
 	@Override
 	public long getChangesetEntryId() {
 		return model.getChangesetEntryId();
+	}
+
+	/**
+	 * Returns the class external reference code of this changeset entry.
+	 *
+	 * @return the class external reference code of this changeset entry
+	 */
+	@Override
+	public String getClassExternalReferenceCode() {
+		return model.getClassExternalReferenceCode();
 	}
 
 	/**
@@ -207,6 +233,16 @@ public class ChangesetEntryWrapper
 	}
 
 	/**
+	 * Returns the name of this changeset entry.
+	 *
+	 * @return the name of this changeset entry
+	 */
+	@Override
+	public String getName() {
+		return model.getName();
+	}
+
+	/**
 	 * Returns the primary key of this changeset entry.
 	 *
 	 * @return the primary key of this changeset entry
@@ -269,6 +305,18 @@ public class ChangesetEntryWrapper
 	@Override
 	public void setChangesetEntryId(long changesetEntryId) {
 		model.setChangesetEntryId(changesetEntryId);
+	}
+
+	/**
+	 * Sets the class external reference code of this changeset entry.
+	 *
+	 * @param classExternalReferenceCode the class external reference code of this changeset entry
+	 */
+	@Override
+	public void setClassExternalReferenceCode(
+		String classExternalReferenceCode) {
+
+		model.setClassExternalReferenceCode(classExternalReferenceCode);
 	}
 
 	@Override
@@ -334,6 +382,16 @@ public class ChangesetEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the name of this changeset entry.
+	 *
+	 * @param name the name of this changeset entry
+	 */
+	@Override
+	public void setName(String name) {
+		model.setName(name);
 	}
 
 	/**
