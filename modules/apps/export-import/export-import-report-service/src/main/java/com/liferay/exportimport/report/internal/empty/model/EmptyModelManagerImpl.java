@@ -59,7 +59,7 @@ public class EmptyModelManagerImpl implements EmptyModelManager {
 		try (SafeCloseable safeCloseable =
 				EmptyModelThreadLocal.setEmptyModelWithSafeCloseable(true)) {
 
-			if (ExportImportThreadLocal.isImportInProcess()) {
+			if (!ExportImportThreadLocal.isImportInProcess()) {
 				return emptyModelUnsafeSupplier.get();
 			}
 
@@ -111,7 +111,7 @@ public class EmptyModelManagerImpl implements EmptyModelManager {
 		try (SafeCloseable safeCloseable =
 				EmptyModelThreadLocal.setEmptyModelWithSafeCloseable(true)) {
 
-			if (ExportImportThreadLocal.isImportInProcess()) {
+			if (!ExportImportThreadLocal.isImportInProcess()) {
 				return emptyModelUnsafeSupplier.get();
 			}
 
