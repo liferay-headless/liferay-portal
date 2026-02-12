@@ -789,11 +789,11 @@ public class EmptyModelManagerImplTest {
 			classNameId
 		);
 
-		ExportImportReportEntry mockEntry = Mockito.mock(
+		ExportImportReportEntry mockedExportImportReportEntry = Mockito.mock(
 			ExportImportReportEntry.class);
 
 		Mockito.when(
-			mockEntry.getExportImportConfigurationId()
+			mockedExportImportReportEntry.getExportImportConfigurationId()
 		).thenReturn(
 			entryExportImportConfigurationId
 		);
@@ -803,7 +803,7 @@ public class EmptyModelManagerImplTest {
 				fetchEmptyExportImportReportEntryByG_C_C_C(
 					0L, companyId, externalReferenceCode, classNameId)
 		).thenReturn(
-			mockEntry
+			mockedExportImportReportEntry
 		);
 
 		Assert.assertSame(
@@ -829,12 +829,12 @@ public class EmptyModelManagerImplTest {
 			Mockito.verify(
 				_exportImportReportEntryLocalService
 			).deleteExportImportReportEntry(
-				mockEntry
+				mockedExportImportReportEntry
 			);
 		}
 		else {
 			Mockito.verify(
-				mockEntry
+				mockedExportImportReportEntry
 			).setStatus(
 				ExportImportReportEntryConstants.STATUS_RESOLVED
 			);
@@ -842,7 +842,7 @@ public class EmptyModelManagerImplTest {
 			Mockito.verify(
 				_exportImportReportEntryLocalService
 			).updateExportImportReportEntry(
-				mockEntry
+				mockedExportImportReportEntry
 			);
 		}
 	}
