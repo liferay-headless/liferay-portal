@@ -59,6 +59,10 @@ public class EmptyModelManagerImpl implements EmptyModelManager {
 		try (SafeCloseable safeCloseable =
 				EmptyModelThreadLocal.setEmptyModelWithSafeCloseable(true)) {
 
+			if (ExportImportThreadLocal.isImportInProcess()) {
+				return emptyModelUnsafeSupplier.get();
+			}
+
 			long classNameId = _classNameLocalService.getClassNameId(
 				clazz.getName());
 
@@ -104,14 +108,18 @@ public class EmptyModelManagerImpl implements EmptyModelManager {
 			return model;
 		}
 
-		Group group = _groupLocalService.fetchGroup(groupId);
-
-		if (group != null) {
-			companyId = group.getCompanyId();
-		}
-
 		try (SafeCloseable safeCloseable =
 				EmptyModelThreadLocal.setEmptyModelWithSafeCloseable(true)) {
+
+			if (ExportImportThreadLocal.isImportInProcess()) {
+				return emptyModelUnsafeSupplier.get();
+			}
+
+			Group group = _groupLocalService.fetchGroup(groupId);
+
+			if (group != null) {
+				companyId = group.getCompanyId();
+			}
 
 			long classNameId = _classNameLocalService.getClassNameId(className);
 
