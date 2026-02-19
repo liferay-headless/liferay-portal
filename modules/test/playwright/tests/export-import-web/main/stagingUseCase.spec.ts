@@ -69,7 +69,8 @@ const testWithBatchStagingFF = mergeTests(
 	}),
 	loginTest(),
 	stagingConfigurationPageTest,
-	stagingPageTest
+	stagingPageTest,
+	uiElementsPageTest
 );
 
 testWithBatchStagingFF(
@@ -258,7 +259,7 @@ testWithBatchStagingFF(
 
 		await stagingPage.goto(`${site.name}-staging`);
 
-		await page.getByRole('link', {name: 'Custom Publish Process'}).click();
+		await uiElementsPage.newButton.click();
 
 		await page.waitForTimeout(2000);
 
