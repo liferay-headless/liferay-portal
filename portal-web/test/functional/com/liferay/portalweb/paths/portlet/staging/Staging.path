@@ -158,11 +158,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>LIVE_DROP_DOWN_BUTTON</td>
-	<td>//a[contains(@class,'staging-link') and contains(@class,'dropdown-toggle')]/span[contains(.,'Live')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>STAGING_BUTTON</td>
 	<td>//a[contains(@value,'staging')]</td>
 	<td></td>
