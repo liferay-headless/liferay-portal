@@ -1841,7 +1841,7 @@ definition {
 	macro viewStagingLocalLiveVariationMessagePG(sitePagesVariationName = null, pagesVariationName = null, pageName = null) {
 		if (IsElementNotPresent(locator1 = "Staging#LIVE_MENU_MESSAGE")) {
 			AssertClick(
-				locator1 = "Staging#LIVE_DROP_DOWN_BUTTON",
+				locator1 = "Staging#LIVE_BUTTON",
 				value1 = "Live");
 		}
 
