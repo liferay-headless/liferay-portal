@@ -89,17 +89,6 @@ public class PropagationMessageDisplayContext {
 	}
 
 	protected boolean isTriggerPropagation(long companyId) {
-		try {
-			LayoutSetPrototypeConfiguration layoutSetPrototypeConfiguration =
-				ConfigurationProviderUtil.getCompanyConfiguration(
-					LayoutSetPrototypeConfiguration.class, companyId);
-
-			return layoutSetPrototypeConfiguration.triggerPropagation();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
 		return false;
 	}
 

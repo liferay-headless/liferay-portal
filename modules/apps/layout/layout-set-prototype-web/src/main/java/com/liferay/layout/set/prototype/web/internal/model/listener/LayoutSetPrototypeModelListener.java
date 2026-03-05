@@ -73,18 +73,6 @@ public class LayoutSetPrototypeModelListener
 	}
 
 	protected boolean isTriggerPropagation() {
-		try {
-			LayoutSetPrototypeConfiguration layoutSetPrototypeConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					LayoutSetPrototypeConfiguration.class,
-					CompanyThreadLocal.getCompanyId());
-
-			return layoutSetPrototypeConfiguration.triggerPropagation();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
 		return false;
 	}
 

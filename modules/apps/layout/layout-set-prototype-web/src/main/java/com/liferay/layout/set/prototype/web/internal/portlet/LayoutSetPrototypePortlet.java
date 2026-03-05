@@ -283,13 +283,6 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 	}
 
 	protected boolean isTriggerPropagation() {
-		try {
-			return _layoutSetPrototypeConfiguration.triggerPropagation();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
 		return false;
 	}
 
