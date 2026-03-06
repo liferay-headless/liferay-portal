@@ -464,8 +464,7 @@ public class SitesImpl implements Sites {
 
 		boolean readyForPropagation = GetterUtil.getBoolean(
 			layoutSetPrototypeSettingsUnicodeProperties.getProperty(
-				"readyForPropagation"),
-			true);
+				"readyForPropagation"));
 
 		if (!readyForPropagation && !(lastMergeTime == 0)) {
 			return false;

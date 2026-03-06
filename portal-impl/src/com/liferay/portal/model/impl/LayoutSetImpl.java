@@ -422,7 +422,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 				"readyForPropagation");
 
 			if (Validator.isNotNull(readyForPropagation)) {
-				return GetterUtil.getBoolean(readyForPropagation, true);
+				return GetterUtil.getBoolean(readyForPropagation);
 			}
 		}
 		catch (Exception exception) {
@@ -431,7 +431,7 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override

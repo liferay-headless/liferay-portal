@@ -160,7 +160,7 @@ public class LayoutSetPrototypeStagedModelDataHandler
 		boolean layoutsUpdateable = GetterUtil.getBoolean(
 			settingsUnicodeProperties.getProperty("layoutsUpdateable"), true);
 		boolean readyForPropagation = GetterUtil.getBoolean(
-			settingsUnicodeProperties.getProperty("readyForPropagation"), true);
+			settingsUnicodeProperties.getProperty("readyForPropagation"));
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			layoutSetPrototype);

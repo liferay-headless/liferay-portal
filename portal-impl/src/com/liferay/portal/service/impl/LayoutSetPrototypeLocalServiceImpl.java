@@ -114,7 +114,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 		return addLayoutSetPrototype(
 			userId, companyId, nameMap, descriptionMap, active,
-			layoutsUpdateable, true, serviceContext);
+			layoutsUpdateable, false, serviceContext);
 	}
 
 	@Override
@@ -264,7 +264,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 		return updateLayoutSetPrototype(
 			layoutSetPrototypeId, nameMap, descriptionMap, active,
-			layoutsUpdateable, true, serviceContext);
+			layoutsUpdateable, false, serviceContext);
 	}
 
 	@Override

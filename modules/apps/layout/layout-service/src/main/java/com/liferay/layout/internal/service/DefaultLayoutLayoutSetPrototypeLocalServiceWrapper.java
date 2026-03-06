@@ -76,7 +76,7 @@ public class DefaultLayoutLayoutSetPrototypeLocalServiceWrapper
 
 		return addLayoutSetPrototype(
 			userId, companyId, nameMap, descriptionMap, active,
-			layoutsUpdateable, true, serviceContext);
+			layoutsUpdateable, false, serviceContext);
 	}
 
 	@Reference
