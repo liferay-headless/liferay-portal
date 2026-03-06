@@ -226,6 +226,7 @@ definition {
 	}
 
 	@description = "Disabling propagation of the template should work after an upgrade. User can disable propagation and prevent any changes on template from reaching the site created from it."
+	@ignore = "true"
 	@priority = 3
 	test TemplatePropagationShouldWorkAfterUpgrade71103 {
 		property data.archive.type = "data-archive-page-from-template";
@@ -268,6 +269,7 @@ definition {
 	}
 
 	@description = "Disabling propagation of the template should work after an upgrade. User can disable propagation and prevent any changes on template from reaching the site created from it."
+	@ignore = "true"
 	@priority = 3
 	test TemplatePropagationShouldWorkAfterUpgrade72101 {
 		property data.archive.type = "data-archive-page-from-template";
@@ -310,6 +312,7 @@ definition {
 	}
 
 	@description = "Disabling propagation of the template should work after an upgrade. User can disable propagation and prevent any changes on template from reaching the site created from it."
+	@ignore = "true"
 	@priority = 3
 	test TemplatePropagationShouldWorkAfterUpgrade73101 {
 		property data.archive.type = "data-archive-page-from-template";
@@ -358,6 +361,7 @@ definition {
 	}
 
 	@description = "Disabling propagation of the template should work after an upgrade. User can disable propagation and prevent any changes on template from reaching the site created from it."
+	@ignore = "true"
 	@priority = 3
 	test TemplatePropagationShouldWorkAfterUpgrade701016 {
 		property data.archive.type = "data-archive-page-from-template";

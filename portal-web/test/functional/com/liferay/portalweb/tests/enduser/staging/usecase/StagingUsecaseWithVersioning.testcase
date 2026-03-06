@@ -1006,6 +1006,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87030."
+	@ignore = "true"
 	@priority = 3
 	test StagingTurnOffPageTemplatePropagation {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name-staging");

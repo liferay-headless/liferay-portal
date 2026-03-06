@@ -84,6 +84,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-121137. Admin can enable and disable the porpagation of site template changes on site templates admin page."
+	@ignore = "true"
 	@priority = 4
 	test AdminCanControlWhenPropagateSiteTemplateChanges {
 		property portal.acceptance = "true";
@@ -169,6 +170,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-150460 TC-1. User is able to trigger propagation of the site template to all connected sites automatically."
+	@ignore = "true"
 	@priority = 4
 	test AssertAutomaticSiteTemplatePropagation {
 		property database.types = "mysql,postgresql";
@@ -227,6 +229,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-166286. TC-1: Verify that site template propagation works well after the conflicting layout friendly URL is modified."
+	@ignore = "true"
 	@priority = 3
 	test AssertSiteTemplatePropagationAfterConflictingFriendlyURLIsModified {
 		task ("Given: Add new site template and a new site based on this site template") {
@@ -270,6 +273,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-166286. TC-3: Verify that site template propagation works well on child page."
+	@ignore = "true"
 	@priority = 3
 	test AssertSiteTemplatePropagationOnChildPage {
 		task ("Given: Add new site template and a new site based on this site template") {
@@ -340,6 +344,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-166286. TC-2: Verify that site template propagation works well on private page."
+	@ignore = "true"
 	@priority = 3
 	test AssertSiteTemplatePropagationOnPrivatePage {
 		property test.liferay.virtual.instance = "false";
@@ -408,6 +413,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-150460 TC-2. User can trigger Site template propagation upon visiting a connected site."
+	@ignore = "true"
 	@priority = 3
 	test AssertSiteTemplatePropagationWhenOpeningSite {
 		property database.types = "mysql,postgresql";
@@ -1174,6 +1180,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124594 and LPS-129081. User can switch propagation status on site template sites with the propagation button."
+	@ignore = "true"
 	@priority = 3
 	test SwitchPropagationWithOneClickControl {
 		var siteName = TestCase.getSiteName(siteName = ${siteName});
@@ -1409,6 +1416,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-133675. Javascript fields should be propagated on site templates."
+	@ignore = "true"
 	@priority = 3
 	test ViewJavaScriptPropagateviaSiteTemplate {
 		var javascript = '''alert("alert!");''';

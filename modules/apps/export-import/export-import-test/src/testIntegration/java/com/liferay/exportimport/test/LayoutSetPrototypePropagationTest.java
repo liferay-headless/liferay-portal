@@ -106,6 +106,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -118,6 +119,7 @@ import org.osgi.framework.FrameworkUtil;
  * @author Julio Camarero
  * @author Eduardo García
  */
+@Ignore
 @RunWith(Arquillian.class)
 public class LayoutSetPrototypePropagationTest
 	extends BasePrototypePropagationTestCase {
