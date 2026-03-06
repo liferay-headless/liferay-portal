@@ -29,4 +29,5 @@ public interface LayoutSetPrototypeConfiguration {
 		name = "cancel-propagation-import-task", required = false
 	)
 	public boolean cancelPropagationImportTask();
+
 }

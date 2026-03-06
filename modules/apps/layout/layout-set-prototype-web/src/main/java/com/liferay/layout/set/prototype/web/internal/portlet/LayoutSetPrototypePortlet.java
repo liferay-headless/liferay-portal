@@ -14,8 +14,6 @@ import com.liferay.layout.set.prototype.helper.LayoutSetPrototypeHelper;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.kernel.exception.RequiredLayoutSetPrototypeException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -315,9 +313,6 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			}
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutSetPrototypePortlet.class);
 
 	private volatile LayoutSetPrototypeConfiguration
 		_layoutSetPrototypeConfiguration;

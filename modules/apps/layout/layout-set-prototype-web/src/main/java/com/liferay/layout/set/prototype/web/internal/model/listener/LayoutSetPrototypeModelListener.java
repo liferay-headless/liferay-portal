@@ -6,17 +6,12 @@
 package com.liferay.layout.set.prototype.web.internal.model.listener;
 
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
-import com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration;
-import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -75,12 +70,6 @@ public class LayoutSetPrototypeModelListener
 	protected boolean isTriggerPropagation() {
 		return false;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutSetPrototypeModelListener.class);
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

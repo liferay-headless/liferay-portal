@@ -5,11 +5,7 @@
 
 package com.liferay.layout.set.prototype.web.internal.display.context;
 
-import com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration;
 import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
-import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
@@ -91,9 +87,6 @@ public class PropagationMessageDisplayContext {
 	protected boolean isTriggerPropagation(long companyId) {
 		return false;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PropagationMessageDisplayContext.class);
 
 	private final HttpServletRequest _httpServletRequest;
 
