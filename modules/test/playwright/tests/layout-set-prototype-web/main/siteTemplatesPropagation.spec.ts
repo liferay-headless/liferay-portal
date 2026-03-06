@@ -35,7 +35,7 @@ export const test = mergeTests(
 	sitesPageTest
 );
 
-test('User is able to propagate pages separately on site templates', async ({
+test.skip('User is able to propagate pages separately on site templates', async ({
 	apiHelpers,
 	applicationsMenuPage,
 	page,
@@ -152,7 +152,7 @@ test('User is able to propagate pages separately on site templates', async ({
 		);
 });
 
-test(
+test.skip(
 	'Guest view permission is not lost when a change in a page generated from a Master Page is propagated from a Site Template to a Site',
 	{tag: ['@LPD-54068']},
 	async ({

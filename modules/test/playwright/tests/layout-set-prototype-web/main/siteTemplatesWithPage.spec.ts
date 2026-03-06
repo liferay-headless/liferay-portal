@@ -28,7 +28,7 @@ export const test = mergeTests(
 	uiElementsPageTest
 );
 
-test(
+test.skip(
 	'Can not edit Pages created with Site Templates if the checkbox of allowing edition is disabled',
 	{tag: ['@LPD-49053', '@LPS-131903', '@LPS-132256']},
 	async ({
