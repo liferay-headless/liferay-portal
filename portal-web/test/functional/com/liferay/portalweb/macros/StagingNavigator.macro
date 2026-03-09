@@ -12,10 +12,6 @@ definition {
 			var portletId = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration";
 		}
 
-		if (${portlet} == "Site Templates") {
-			var portletId = "com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration";
-		}
-
 		if (${portlet} == "Staging") {
 			var portletId = "com.liferay.staging.configuration.StagingConfiguration";
 		}
@@ -37,10 +33,6 @@ definition {
 
 		if (${portlet} == "Export/Import, Staging") {
 			var portletId = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration";
-		}
-
-		if (${portlet} == "Site Templates") {
-			var portletId = "com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration";
 		}
 
 		if (${portlet} == "Staging") {

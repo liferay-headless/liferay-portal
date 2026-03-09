@@ -2368,32 +2368,6 @@
 			"title": "SEO"
 		},
 		{
-			"description": "Configure when automatic propagation is triggered for site templates.",
-			"properties": {
-				"cancelPropagationImportTask": {
-					"default": true,
-					"description": "If checked, old site template propagation import tasks will be cancelled when new ones are already scheduled for the same site. This can help to optimize the site template propagation process, when the template itself is frequently changed, and the propagation is also frequently triggered. This way, the sites will only be updated with the latest version of the template.",
-					"title": "Cancel old site template propagation import tasks.",
-					"type": "boolean"
-				},
-				"pid": {
-					"const": "com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration",
-					"description": "Configure when automatic propagation is triggered for site templates.",
-					"title": "Site Templates"
-				},
-				"triggerPropagation": {
-					"default": false,
-					"description": "If unchecked, changes are propagated to sites individually when they are first visited by a user. If checked, enabling propagation in a template also triggers propagation for all connected sites simultaneously.",
-					"title": "Trigger Propagation",
-					"type": "boolean"
-				}
-			},
-			"required": [
-				"pid"
-			],
-			"title": "Site Templates"
-		},
-		{
 			"properties": {
 				"clientId": {
 					"description": "Set the OAuth 2 client ID for the Outlook API.",
@@ -4925,7 +4899,6 @@
 				"com.liferay.layout.locked.layouts.web.internal.configuration.LockedLayoutsCompanyConfiguration",
 				"com.liferay.layout.reports.web.internal.configuration.LayoutReportsGooglePageSpeedCompanyConfiguration",
 				"com.liferay.layout.seo.internal.configuration.LayoutSEOCompanyConfiguration",
-				"com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration",
 				"com.liferay.mail.outlook.auth.connector.provider.internal.configuration.MailOutlookAuthConnectorCompanyConfiguration",
 				"com.liferay.mail.settings.configuration.MailSettingCompanyConfiguration",
 				"com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration",
