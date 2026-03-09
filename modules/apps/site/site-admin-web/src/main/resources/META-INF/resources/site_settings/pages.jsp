@@ -35,9 +35,7 @@ if (publicLayoutSet != null) {
 <%
 boolean disableLayoutSetPrototypeInput = false;
 
-SiteAdminConfiguration siteAdminConfiguration = ConfigurationProviderUtil.getSystemConfiguration(SiteAdminConfiguration.class);
-
-if (!LanguageUtil.isInheritLocales(siteGroup.getGroupId()) && !siteAdminConfiguration.enableCustomLanguagesWithTemplatePropagation()) {
+if (!LanguageUtil.isInheritLocales(siteGroup.getGroupId())) {
 	disableLayoutSetPrototypeInput = true;
 }
 

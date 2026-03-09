@@ -8,10 +8,8 @@ package com.liferay.layout.set.prototype.web.internal.portlet;
 import com.liferay.application.list.PanelAppRegistry;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
-import com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration;
 import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
 import com.liferay.layout.set.prototype.helper.LayoutSetPrototypeHelper;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.kernel.exception.RequiredLayoutSetPrototypeException;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
@@ -41,16 +39,13 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
-	configurationPid = "com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration",
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-layout-set-prototype",
@@ -240,13 +235,6 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			readyForPropagation, serviceContext);
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_layoutSetPrototypeConfiguration = ConfigurableUtil.createConfigurable(
-			LayoutSetPrototypeConfiguration.class, properties);
-	}
-
 	@Override
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -313,8 +301,5 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			}
 		}
 	}
-
-	private volatile LayoutSetPrototypeConfiguration
-		_layoutSetPrototypeConfiguration;
 
 }
