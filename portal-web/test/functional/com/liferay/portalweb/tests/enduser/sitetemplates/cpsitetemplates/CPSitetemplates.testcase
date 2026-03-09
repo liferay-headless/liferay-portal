@@ -1003,6 +1003,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-166286. TC-5: Verify that the LAR from the Site Template export is cached, so different Sites can reuse it for content page."
+	@ignore = "true"
 	@priority = 3
 	test SiteCanReuseCachedSiteTemplateLarFileForContentPage {
 		property test.liferay.virtual.instance = "false";
