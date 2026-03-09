@@ -60,11 +60,6 @@
 	<td>//input[contains(@id,'LAYOUT_SET_SETTINGS')]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>PAGES_SITE_TEMPLATE_SETTINGS_CHECKBOX</td>
-	<td>//input[contains(@id,'LAYOUT_SET_PROTOTYPE_SETTINGS')]//following-sibling::span</td>
-	<td></td>
-</tr>
 </tbody>
 </table>
 </body>

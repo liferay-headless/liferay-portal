@@ -29,11 +29,6 @@
 <!--CONFIGURATION-->
 
 <tr>
-	<td>CONFIGURATION_SITE_TEMPLATE_SETTINGS</td>
-	<td>//li[contains(.,'Site Template Settings')]/a[contains(@id,'SiteTemplateSettingsPortlet')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>

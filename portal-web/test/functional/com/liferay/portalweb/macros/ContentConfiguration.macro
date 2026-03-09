@@ -222,11 +222,6 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro uncheckSiteTemplateSettings() {
-		Click(locator1 = "PagesConfiguration#PAGES_SITE_TEMPLATE_SETTINGS_CHECKBOX");
-	}
-
-	@summary = "Default summary"
 	macro uncheckSubContent(uncheckSubContent = null, mainContent = null) {
 		var key_contentName = ${mainContent};
 		var key_subContent = ${uncheckSubContent};

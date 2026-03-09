@@ -1,7 +1,7 @@
 definition {
 
 	@summary = "Default summary"
-	macro _configureExportSiteOptions(contentDateRange = null, checkContentNameList = null, uncheckContentNameList = null, checkPageName = null, uncheckLogo = null, larFileName = null, uncheckSiteTemplateSettings = null, contentName = null, uncheckSubSubContent = null, uncheckSubContent = null, exportPermissions = null, uncheckSitePagesSettings = null, contentDeletion = null, mainContent = null, subContent = null) {
+	macro _configureExportSiteOptions(contentDateRange = null, checkContentNameList = null, uncheckContentNameList = null, checkPageName = null, uncheckLogo = null, larFileName = null, contentName = null, uncheckSubSubContent = null, uncheckSubContent = null, exportPermissions = null, uncheckSitePagesSettings = null, contentDeletion = null, mainContent = null, subContent = null) {
 		if (isSet(larFileName)) {
 			Type(
 				inputFieldId = "ExportPortlet_name",
@@ -23,10 +23,6 @@ definition {
 
 		if (${uncheckSitePagesSettings} == "true") {
 			ContentConfiguration.uncheckSitePagesSettings();
-		}
-
-		if (${uncheckSiteTemplateSettings} == "true") {
-			ContentConfiguration.uncheckSiteTemplateSettings();
 		}
 
 		if (isSet(checkPageName)) {
@@ -521,7 +517,7 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro configureExportSiteCP(checkContentNameList = null, uncheckContentNameList = null, siteScopeName = null, checkPageName = null, uncheckLogo = null, deleteMissingPages = null, larFileName = null, lastDateRange = null, contentName = null, uncheckSiteTemplateSettings = null, uncheckSubSubContent = null, uncheckSubContent = null, exportPermissions = null, uncheckSitesPageSettings = null, contentDeletion = null, mainContent = null, subContent = null) {
+	macro configureExportSiteCP(checkContentNameList = null, uncheckContentNameList = null, siteScopeName = null, checkPageName = null, uncheckLogo = null, deleteMissingPages = null, larFileName = null, lastDateRange = null, contentName = null, uncheckSubSubContent = null, uncheckSubContent = null, exportPermissions = null, uncheckSitesPageSettings = null, contentDeletion = null, mainContent = null, subContent = null) {
 		LAR.openExportAdmin(siteScopeName = ${siteScopeName});
 
 		LexiconEntry.gotoAdd();
@@ -540,7 +536,6 @@ definition {
 			uncheckContentNameList = ${uncheckContentNameList},
 			uncheckLogo = ${uncheckLogo},
 			uncheckSitesPageSettings = ${uncheckSitesPageSettings},
-			uncheckSiteTemplateSettings = ${uncheckSiteTemplateSettings},
 			uncheckSubContent = ${uncheckSubContent},
 			uncheckSubSubContent = ${uncheckSubSubContent});
 	}

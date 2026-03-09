@@ -14,8 +14,4 @@ public class LayoutSetPrototypePortletKeys {
 		"com_liferay_layout_set_prototype_web_portlet_" +
 			"LayoutSetPrototypePortlet";
 
-	public static final String SITE_TEMPLATE_SETTINGS =
-		"com_liferay_layout_set_prototype_web_portlet_" +
-			"SiteTemplateSettingsPortlet";
-
 }

@@ -480,13 +480,6 @@ definition {
 			locator1 = "SiteTemplates#SITE_TEMPLATE_NAME",
 			value1 = ${siteTemplateName});
 
-		ProductMenuHelper.expandCategory(category = "Configuration");
-
-		AssertClick(
-			locator1 = "SiteTemplates#CONFIGURATION_SITE_TEMPLATE_SETTINGS",
-			value1 = "Site Template Settings");
-
-		SiteAdmin.viewPortletTitle(portletTitle = "Site Template Settings");
 	}
 
 	@summary = "Default summary"

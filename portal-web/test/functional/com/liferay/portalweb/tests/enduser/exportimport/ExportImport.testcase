@@ -1310,8 +1310,7 @@ definition {
 			LAR.configureExportSiteCP(
 				siteScopeName = "Site Name",
 				uncheckLogo = "true",
-				uncheckSitePagesSettings = "true",
-				uncheckSiteTemplateSettings = "true");
+				uncheckSitePagesSettings = "true");
 
 			AssertClick(
 				key_text = "Export",
