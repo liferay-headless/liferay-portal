@@ -118,7 +118,7 @@ export class WebContentDisplayPage {
 	}
 
 	async goToConfiguration() {
-		await this.webContentDisplay.waitFor({state: 'visible'});
+		await this.webContentDisplay.waitFor();
 		await this.webContentDisplayContent.hover();
 		await this.webContentDisplayContent.click();
 
@@ -135,7 +135,7 @@ export class WebContentDisplayPage {
 			webContentName: '',
 		}
 	) {
-		await this.webContentDisplay.waitFor({state: 'visible'});
+		await this.webContentDisplay.waitFor();
 		await this.webContentDisplayContent.hover();
 		await this.webContentDisplayContent.click();
 
@@ -163,13 +163,13 @@ export class WebContentDisplayPage {
 			.getByText('Success:The application was added to the page.')
 			.waitFor({state: 'hidden'});
 
-		await this.configurationFrameSelectButton.waitFor({state: 'visible'});
+		await this.configurationFrameSelectButton.waitFor();
 		await this.configurationFrameSelectButton.click();
 
 		if (webContentName) {
 			await this.selectWebContentInConfigurationFrame
 				.getByText(webContentName)
-				.waitFor({state: 'visible'});
+				.waitFor();
 			await this.selectWebContentInConfigurationFrame
 				.getByText(webContentName)
 				.hover();
@@ -191,9 +191,9 @@ export class WebContentDisplayPage {
 				.getByText('Success:The application was added to the page.')
 				.waitFor({state: 'hidden'});
 
-			await this.selectWebContentButton.waitFor({state: 'visible'});
+			await this.selectWebContentButton.waitFor();
 			await this.selectWebContentButton.click();
-			await this.webContentToSelect.waitFor({state: 'visible'});
+			await this.webContentToSelect.waitFor();
 			await this.webContentToSelect.hover();
 			await this.webContentToSelect.click();
 
@@ -211,7 +211,7 @@ export class WebContentDisplayPage {
 			await this.page
 				.locator('header')
 				.filter({hasText: 'Web Content Display'})
-				.waitFor({state: 'visible'});
+				.waitFor();
 		}
 
 		await this.saveConfigurationFrameOptions();
@@ -226,14 +226,14 @@ export class WebContentDisplayPage {
 		await this.webContentDisplayAddButton.click();
 		await this.page
 			.getByText('Success:The application was added to the page.')
-			.waitFor({state: 'visible'});
+			.waitFor();
 		await this.page
 			.getByText('Success:The application was added to the page.')
 			.waitFor({state: 'hidden'});
 		await this.page
 			.getByRole('heading', {name: 'Web Content Display'})
 			.hover();
-		await this.selectButton.waitFor({state: 'visible'});
+		await this.selectButton.waitFor();
 		await clickAndExpectToBeVisible({
 			target: this.selectWebContentButton,
 			trigger: this.selectButton,
@@ -264,6 +264,6 @@ export class WebContentDisplayPage {
 				'[id^="portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_"] header'
 			)
 			.filter({hasText: 'Web Content Display'})
-			.waitFor({state: 'visible'});
+			.waitFor();
 	}
 }
