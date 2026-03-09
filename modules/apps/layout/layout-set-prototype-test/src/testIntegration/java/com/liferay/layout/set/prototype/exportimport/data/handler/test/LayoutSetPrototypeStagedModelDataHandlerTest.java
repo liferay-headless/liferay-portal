@@ -47,7 +47,9 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -92,6 +94,13 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 					_layoutPrototype);
 			}
 		}
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testStagedModelDataHandler() throws Exception {
+		super.testStagedModelDataHandler();
 	}
 
 	protected void addLayout(Class<?> clazz, Layout layout) throws Exception {

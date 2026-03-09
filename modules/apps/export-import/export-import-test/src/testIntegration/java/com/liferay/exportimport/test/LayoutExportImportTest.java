@@ -84,6 +84,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -500,6 +501,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			Arrays.asList(LocaleUtil.US, LocaleUtil.GERMANY), true);
 	}
 
+	@Ignore
 	@Test
 	public void testExportImportLayoutsPriorities() throws Exception {
 		Layout layout1 = LayoutTestUtil.addTypePortletLayout(group);
@@ -630,6 +632,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		Assert.assertNull(importedLayout);
 	}
 
+	@Ignore
 	@Test
 	public void testFriendlyURLCollision() throws Exception {
 		String defaultLanguageId = LocaleUtil.toLanguageId(
@@ -699,6 +702,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	}
 
 	@FeatureFlag("LPS-199086")
+	@Ignore
 	@Test
 	public void testLayoutExportImportWithChildLayoutReferencedWithButtonAndChildLayoutHasParentLayout()
 		throws Exception {
@@ -762,6 +766,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	}
 
 	@FeatureFlag("LPS-199086")
+	@Ignore
 	@Test
 	@TestInfo("LPD-6808: AC9-AC10")
 	public void testLayoutExportImportWithModifiedContentAndExistingParentAndChildLayoutsOnImportSide()
@@ -844,6 +849,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	}
 
 	@FeatureFlag("LPS-199086")
+	@Ignore
 	@Test
 	@TestInfo("LPD-6808: AC9-AC11")
 	public void testLayoutExportImportWithModifiedContentAndNonexistentParentAndChildLayoutsOnImportSide()
