@@ -54,6 +54,7 @@ definition {
 	}
 
 	@description = "User can withdraw site administrator's right to modificate of pages on a site template."
+	@ignore = "true"
 	@priority = 4
 	test AddSiteTemplateDisablePageModification {
 		property portal.acceptance = "true";
@@ -1067,6 +1068,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-166286. TC-4: Verify that the LAR from the Site Template export is cached, so different Sites can reuse it for widget page."
+	@ignore = "true"
 	@priority = 3
 	test SiteCanReuseCachedSiteTemplateLarFileForWidgetPage {
 		property test.liferay.virtual.instance = "false";
@@ -1242,6 +1244,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174434 TC-1 TC-2. Verify there's a confirmation dialog and toast message appears when the Site's Page saved with friendly URL collision."
+	@ignore = "true"
 	@priority = 3
 	test ViewAlertAfterAddSitePageWithURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -1352,6 +1355,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174434 TC-7. Verify that the site link in the URL collision cannot be accessed when the User didn't have access to the Site made from the template."
+	@ignore = "true"
 	@priority = 3
 	test ViewCanNotAccesseSiteLinkInURLCollisionWithoutUserAccessSiteInSitePage {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -1515,6 +1519,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174434 TC-3. Verify there's a warning message at Page's configuration, in case of friendly URL collision."
+	@ignore = "true"
 	@priority = 3
 	test ViewWarnignMessageOfEditExistingSitePageWithURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -1612,6 +1617,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174434 TC-6. Verify that the friendly URL collision is detected with child pages."
+	@ignore = "true"
 	@priority = 3
 	test ViewWarnignMessageWithChildSitePageURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";

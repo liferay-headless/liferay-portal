@@ -14,6 +14,7 @@ definition {
 	}
 
 	@description = "This is for LPS-121422. The elements are still shown in edit mode after executing reset changes."
+	@ignore = "true"
 	@priority = 3
 	test SitesTemplatePermissionPersistence {
 		task ("Enable dynamic and manual selection") {

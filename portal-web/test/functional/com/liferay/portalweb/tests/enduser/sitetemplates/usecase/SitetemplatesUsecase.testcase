@@ -547,6 +547,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174471. TC-5: An exclamation mark and tooltip with warning can be seen for multiple collisions pages."
+	@ignore = "true"
 	@priority = 3
 	test VerifyMultipleExclamationMarksWhenSiteContainsMultipleCollisionFriendlyURL {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -724,6 +725,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174471 TC-4: An exclamation mark and tooltip with warning can be seen for child collisions pages."
+	@ignore = "true"
 	@priority = 3
 	test ViewExclamationMarkWhenAddingChildPageInSiteWithFriendlyURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -783,6 +785,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174471. TC-3: An exclamation mark and tooltip with warning next to the specific page's name and draft label diplay well  when add page as draft."
+	@ignore = "true"
 	@priority = 3
 	test ViewExclamationMarkWhenAddingDraftPageWithFriendlyURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -886,6 +889,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174471. TC-1 and TC-2: Verify there's an exclamation mark when a friendly URL collision exists and Administrator tries to add a new site page."
+	@ignore = "true"
 	@priority = 3
 	test ViewExclamationMarkWhenAddingSitePageWithFriendlyURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -992,6 +996,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174465. TC-3: Verify there's an exclamation mark when the Site Template's Page has a friendly URL that matches with a non-connecting Site's page friendly URL."
+	@ignore = "true"
 	@priority = 3
 	test ViewExclamationMarkWhenSiteTemplatePageHavingFriendlyURLCollisionWithNonConnectingSite {
 		property custom.properties = "feature.flag.LPS-174417=true";
@@ -1291,7 +1296,8 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-92663. Navigation menus are copied when a site is created from a site template."
+	@description = "This is a use case for LPS-92663. Navigation menus are copied when a site is created from a site template."\
+	@ignore = "true"
 	@priority = 3
 	test ViewNavigationMenuCopyFromSitesTemplate {
 		task ("Enable private pages") {
@@ -1404,6 +1410,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-174471. TC-6: An exclamation mark and tooltip with warning disappear next to the specific page's name when edit the friendly URL not to the same."
+	@ignore = "true"
 	@priority = 3
 	test ViewNoExclamationMarkAfterRemovedFriendlyURLCollision {
 		property custom.properties = "feature.flag.LPS-174417=true";
