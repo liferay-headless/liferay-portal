@@ -162,23 +162,22 @@ export class WebContentDisplayPage {
 			.getByText('Success:The application was added to the page.')
 			.waitFor({state: 'hidden'});
 
-		await this.configurationFrameSelectButton.waitFor();
 		await this.configurationFrameSelectButton.click();
 
 		if (webContentName) {
 			await this.selectWebContentInConfigurationFrame
 				.getByText(webContentName)
-				.waitFor();
-			await this.selectWebContentInConfigurationFrame
-				.getByText(webContentName)
 				.hover();
-			await this.selectWebContentInConfigurationFrame
-				.getByText(webContentName)
-				.click();
 
 			// Wait for the Item Selector's nested iframe to resolve the selection
 
-			await this.configurationFrameChangeButton.waitFor();
+			await clickAndExpectToBeVisible({
+				target: this.configurationFrameChangeButton,
+				trigger:
+					this.selectWebContentInConfigurationFrame.getByText(
+						webContentName
+					),
+			});
 		}
 		else {
 			await this.webContentDisplayOptionsContent.click();
@@ -190,21 +189,14 @@ export class WebContentDisplayPage {
 				.getByText('Success:The application was added to the page.')
 				.waitFor({state: 'hidden'});
 
-			await this.selectWebContentButton.waitFor();
 			await this.selectWebContentButton.click();
-			await this.webContentToSelect.waitFor();
-			await this.webContentToSelect.hover();
-			await this.webContentToSelect.click();
 
-			if (!this.saveButton.isVisible) {
-				await this.webContentToSelect.click();
-			}
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: this.saveButton,
+				trigger: this.webContentToSelect,
+			});
 
-			if (!this.saveButton.isVisible) {
-				await this.webContentToSelect.click();
-			}
-
-			await this.saveButton.click();
 			await this.uiElementsPage.closeClickable.click();
 
 			await this.page
@@ -232,7 +224,7 @@ export class WebContentDisplayPage {
 		await this.page
 			.getByRole('heading', {name: 'Web Content Display'})
 			.hover();
-		await this.selectButton.waitFor();
+
 		await clickAndExpectToBeVisible({
 			target: this.selectWebContentButton,
 			trigger: this.selectButton,
@@ -241,11 +233,11 @@ export class WebContentDisplayPage {
 			target: this.webContentToSelect.getByText(webContentName),
 			trigger: this.selectWebContentButton,
 		});
-		await this.webContentToSelect.getByText(webContentName).hover();
-		await this.webContentToSelect.getByText(webContentName).click();
-		if (!this.saveButton.isVisible) {
-			await this.webContentToSelect.getByLabel(webContentName).click();
-		}
+		await clickAndExpectToBeVisible({
+			target: this.saveButton,
+			trigger: this.webContentToSelect.getByLabel(webContentName),
+		});
+
 		await this.saveButton.click();
 	}
 
