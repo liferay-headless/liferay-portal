@@ -266,7 +266,7 @@ testWithBatchStagingFF(
 
 		await uiElementsPage.newButton.click();
 
-		await stagingPage.page
+		await page
 			.getByTestId('headerTitle')
 			.filter({hasText: 'New Publish Process'})
 			.waitFor();
@@ -274,9 +274,7 @@ testWithBatchStagingFF(
 		await expect(page.getByRole('button', {name: 'Select'})).toHaveCount(0);
 
 		await expect(
-			stagingPage.page.getByText(
-				/(?=.*Categories \(1\))(?=.*Vocabularies \(1\))/
-			)
+			page.getByText(/(?=.*Categories \(1\))(?=.*Vocabularies \(1\))/)
 		).toBeVisible();
 	}
 );
