@@ -52,6 +52,7 @@ export class PageEditorPage {
 
 	readonly editModeButton: Locator;
 	readonly experienceSelector: Locator;
+	readonly dropZone: Locator;
 	readonly languageSelector: Locator;
 	readonly newRuleButton: Locator;
 	readonly publishButton: Locator;
@@ -70,6 +71,7 @@ export class PageEditorPage {
 		this.experienceSelector = page.locator(
 			'.page-editor__experience-selector'
 		);
+		this.dropZone = page.locator('.page-editor__no-fragments-state');
 		this.languageSelector = page
 			.locator('.page-editor__toolbar')
 			.getByLabel('Select a language');
