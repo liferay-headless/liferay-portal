@@ -6,20 +6,34 @@
 package com.liferay.portlet.preferences.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import jakarta.portlet.Portlet;
 import jakarta.portlet.PortletPreferences;
+
+import java.util.Dictionary;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Jorge Ferrer
@@ -75,11 +89,55 @@ public class PortletPreferencesFactoryImplTest
 			portletPreferences.getValues(name, null), values);
 	}
 
+	@Test
+	public void testGetStrictPortletSetupWithGroupEmbeddedPortlet()
+		throws Exception {
+
+		Bundle bundle = FrameworkUtil.getBundle(
+			PortletPreferencesFactoryImplTest.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		Dictionary<String, String> portletProperties =
+			MapUtil.singletonDictionary("jakarta.portlet.name", _PORTLET_ID);
+
+		ServiceRegistration<Portlet> portletServiceRegistration =
+			bundleContext.registerService(
+				Portlet.class, new MVCPortlet(), portletProperties);
+
+		ServiceRegistration<PortletDataHandler>
+			portletDataHandlerServiceRegistration =
+				bundleContext.registerService(
+					PortletDataHandler.class,
+					new BasePortletDataHandler() {
+					},
+					portletProperties);
+
+		try {
+			portletPreferencesFactory.getStrictPortletSetup(
+				TestPropsValues.getCompanyId(), 0L, _PORTLET_ID);
+
+			Assert.fail();
+		}
+		catch (IllegalArgumentException illegalArgumentException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(illegalArgumentException);
+			}
+		}
+		finally {
+			portletServiceRegistration.unregister();
+			portletDataHandlerServiceRegistration.unregister();
+		}
+	}
+
 	@Override
 	protected String getPortletId() {
 		return _PORTLET_ID;
 	}
 
 	private static final String _PORTLET_ID = RandomTestUtil.randomString(10);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletPreferencesFactoryImplTest.class);
 
 }
