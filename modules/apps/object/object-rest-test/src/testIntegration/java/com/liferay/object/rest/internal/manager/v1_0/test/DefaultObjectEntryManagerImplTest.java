@@ -229,6 +229,7 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -1552,10 +1553,7 @@ public class DefaultObjectEntryManagerImplTest
 									TestPropsValues.getUserId(),
 									objectDefinition.getPortletId(),
 									TempFileEntryUtil.getTempFileName(fileName),
-									FileUtil.createTempFile(
-										RandomTestUtil.randomString(
-										).getBytes()),
-									ContentTypes.TEXT_PLAIN);
+									_createTempFile(), ContentTypes.TEXT_PLAIN);
 
 							return fileEntry.getFileEntryId();
 						}
@@ -10026,8 +10024,7 @@ public class DefaultObjectEntryManagerImplTest
 			TempFileEntryUtil.addTempFileEntry(
 				TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
 				folderName, TempFileEntryUtil.getTempFileName(title + ".txt"),
-				FileUtil.createTempFile(RandomTestUtil.randomBytes()),
-				ContentTypes.TEXT_PLAIN);
+				_createTempFile(), ContentTypes.TEXT_PLAIN);
 
 		return fileEntry.getFileEntryId();
 	}
@@ -10511,6 +10508,12 @@ public class DefaultObjectEntryManagerImplTest
 		objectFieldSetting.setValue(value);
 
 		return objectFieldSetting;
+	}
+
+	private File _createTempFile() throws Exception {
+		String content = "test\n" + RandomTestUtil.randomString();
+
+		return FileUtil.createTempFile(content.getBytes());
 	}
 
 	private void _deleteAccountEntryOrganizationRel(
