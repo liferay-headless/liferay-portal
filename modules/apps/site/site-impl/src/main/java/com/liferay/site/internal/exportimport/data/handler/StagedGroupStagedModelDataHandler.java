@@ -356,21 +356,18 @@ public class StagedGroupStagedModelDataHandler
 			portletIds.add(portletId);
 		}
 
-		List<PortletPreferences> portletPreferences =
+		List<PortletPreferences> portletPreferencesList =
 			_portletPreferencesLocalService.getPortletPreferences(
 				portletDataContext.getScopeGroupId(),
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
 				PortletKeys.PREFS_PLID_SHARED);
 
-		for (PortletPreferences portletPreference : portletPreferences) {
-			portletIds.add(portletPreference.getPortletId());
+		for (PortletPreferences portletPreferences : portletPreferencesList) {
+			portletIds.add(portletPreferences.getPortletId());
 		}
 
 		return portletIds;
 	}
-
-	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 	private void _exportPortlet(
 			PortletDataContext portletDataContext, String portletId, long plid,
@@ -807,6 +804,9 @@ public class StagedGroupStagedModelDataHandler
 
 	@Reference
 	private PortletLocalService _portletLocalService;
+
+	@Reference
+	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 	@Reference
 	private Sites _sites;
