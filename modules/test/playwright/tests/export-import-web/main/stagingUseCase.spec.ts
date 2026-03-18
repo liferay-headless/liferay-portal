@@ -17,6 +17,7 @@ import {collectionsPagesTest} from '../../../fixtures/collectionsPagesTest';
 import {dataApiHelpersTest} from '../../../fixtures/dataApiHelpersTest';
 import {displayPageTemplatesPagesTest} from '../../../fixtures/displayPageTemplatesPagesTest';
 import {featureFlagsTest} from '../../../fixtures/featureFlagsTest';
+import {isolatedSiteTest} from '../../../fixtures/isolatedSiteTest';
 import {loginTest} from '../../../fixtures/loginTest';
 import {pageEditorPagesTest} from '../../../fixtures/pageEditorPagesTest';
 import {pageViewModePagesTest} from '../../../fixtures/pageViewModePagesTest';
@@ -68,6 +69,78 @@ const testWithBatchStagingFF = mergeTests(
 	stagingConfigurationPageTest,
 	stagingPageTest,
 	uiElementsPageTest
+);
+
+const testNoFfEnabled = mergeTests(
+	dataApiHelpersTest,
+	featureFlagsTest({
+		'LPD-35443': {enabled: false},
+		'LPD-35914': {enabled: false},
+	}),
+	isolatedSiteTest,
+	loginTest(),
+	exportPageTest,
+	stagingPageTest,
+	webContentDisplayPageTest,
+	uiElementsPageTest
+);
+
+testNoFfEnabled(
+	'Export content then publish',
+	async ({
+		apiHelpers,
+		exportPage,
+		page,
+		site,
+		stagingPage,
+		webContentDisplayPage,
+	}) => {
+		const webContentTitle = 'WC WebContent Title';
+
+		await test.step('Given: User add a new site and enable local staging', async () => {
+			await stagingPage.goto(site.name);
+			await stagingPage.enableLocalStaging();
+		});
+
+		await test.step('And: Add a new web content on staging then publish it', async () => {
+			const stagingSite =
+				await apiHelpers.headlessAdminUser.getSiteByFriendlyUrlPath(
+					`${site.friendlyUrlPath}-staging`
+				);
+
+			const basicWebcontentStructureId =
+				await getBasicWebContentStructureId(apiHelpers);
+
+			await apiHelpers.jsonWebServicesJournal.addWebContent({
+				content: 'WC WebContent Content',
+				ddmStructureId: basicWebcontentStructureId,
+				groupId: stagingSite.id,
+				titleMap: {en_US: webContentTitle},
+			});
+
+			await webContentDisplayPage.gotoWebContentAdmin(site.name);
+			await expect(
+				page.getByText(webContentTitle, {exact: true})
+			).not.toBeVisible();
+
+			await stagingPage.goto(`${site.name}-staging`);
+			await stagingPage.publish();
+		});
+
+		await test.step('Then: Site can be exported then published', async () => {
+			await exportPage.goto(site.friendlyUrlPath);
+			await exportPage.exportPages();
+
+			await stagingPage.goto(`${site.name}-staging`);
+			await stagingPage.publish();
+
+			await webContentDisplayPage.gotoWebContentAdmin(site.name);
+
+			await expect(
+				page.getByText(webContentTitle, {exact: true})
+			).toBeVisible();
+		});
+	}
 );
 
 testWithBatchStagingFF(
