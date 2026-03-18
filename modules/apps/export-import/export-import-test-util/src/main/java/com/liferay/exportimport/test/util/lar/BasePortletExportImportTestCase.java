@@ -181,6 +181,27 @@ public abstract class BasePortletExportImportTestCase
 	}
 
 	@Test
+	public void testExportImportFromGlobal() throws Exception {
+		Group globalGroup = GroupLocalServiceUtil.getCompanyGroup(
+			group.getCompanyId());
+
+		StagedModel stagedModel = addStagedModel(globalGroup.getGroupId());
+
+		Layout globalLayout = LayoutTestUtil.addTypePortletLayout(globalGroup);
+
+		exportPortlet(getPortletId(), globalLayout);
+
+		importedLayout = LayoutTestUtil.addTypePortletLayout(importedGroup);
+
+		importPortlet(getPortletId(), importedLayout);
+
+		StagedModel importedStagedModel = getStagedModel(
+			stagedModel.getUuid(), importedGroup.getGroupId());
+
+		Assert.assertNotNull(importedStagedModel);
+	}
+
+	@Test
 	public void testExportImportInvalidAvailableLocales() throws Exception {
 		testExportImportAvailableLocales(
 			Arrays.asList(LocaleUtil.US, LocaleUtil.SPAIN),
