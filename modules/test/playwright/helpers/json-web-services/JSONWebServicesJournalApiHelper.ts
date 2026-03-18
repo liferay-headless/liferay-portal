@@ -16,6 +16,17 @@ type TFolder = {
 	parentFolderId?: number;
 };
 
+type TStructuredWebContent = {
+	contentXML: string;
+	ddmStructureId: number;
+	descriptionMap?: LocalizedValue<string>;
+	externalReferenceCode?: string;
+	folderId?: number;
+	groupId: string;
+	serviceContext?: any;
+	titleMap: LocalizedValue<string>;
+};
+
 type TWebContent = {
 	articleId?: string;
 	content?: string;
@@ -103,6 +114,50 @@ export class JSONWebServicesJournalApiHelper {
 
 		return this.apiHelpers.post(
 			`${liferayConfig.environment.baseUrl}${this.baseFolderPath}/add-folder`,
+			{
+				data: urlSearchParams.toString(),
+				failOnStatusCode: true,
+				headers: await this.apiHelpers.getJSONWebServicesHeaders(),
+			}
+		);
+	}
+
+	async addStructuredWebContent(
+		webContent: TStructuredWebContent
+	): Promise<TWebContent> {
+		const urlSearchParams = new URLSearchParams();
+
+		urlSearchParams.append('content', webContent.contentXML);
+
+		urlSearchParams.append(
+			'descriptionMap',
+			JSON.stringify(webContent.descriptionMap || {en_US: ''})
+		);
+
+		urlSearchParams.append(
+			'ddmStructureId',
+			String(webContent.ddmStructureId)
+		);
+
+		urlSearchParams.append('ddmTemplateKey', '');
+
+		urlSearchParams.append(
+			'externalReferenceCode',
+			webContent.externalReferenceCode || getRandomString()
+		);
+
+		urlSearchParams.append('folderId', String(webContent.folderId || 0));
+		urlSearchParams.append('groupId', String(webContent.groupId));
+
+		urlSearchParams.append('titleMap', JSON.stringify(webContent.titleMap));
+
+		urlSearchParams.append(
+			'serviceContext',
+			JSON.stringify(webContent.serviceContext || {})
+		);
+
+		return this.apiHelpers.post(
+			`${liferayConfig.environment.baseUrl}${this.basePath}/add-article`,
 			{
 				data: urlSearchParams.toString(),
 				failOnStatusCode: true,

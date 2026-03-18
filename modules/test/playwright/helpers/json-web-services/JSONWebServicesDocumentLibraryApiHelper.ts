@@ -20,6 +20,8 @@ export enum DLFILE_STATUS {
 
 type TDLFileEntry = {
 	fileEntryId?: string;
+	groupId?: string;
+	uuid?: string;
 };
 
 type TDLFileVersion = {
@@ -35,6 +37,21 @@ export class JSONWebServicesDocumentLibraryApiHelper {
 		this.apiHelpers = apiHelpers;
 		this.baseFileEntryPath = '/api/jsonws/dlfileentry';
 		this.baseFileVersionPath = '/api/jsonws/dlfileversion';
+	}
+
+	async getFileEntry(fileEntryId: string): Promise<TDLFileEntry> {
+		const urlSearchParams = new URLSearchParams();
+
+		urlSearchParams.append('fileEntryId', fileEntryId);
+
+		return this.apiHelpers.post(
+			`${liferayConfig.environment.baseUrl}${this.baseFileEntryPath}/get-file-entry`,
+			{
+				data: urlSearchParams.toString(),
+				failOnStatusCode: true,
+				headers: await this.apiHelpers.getJSONWebServicesHeaders(),
+			}
+		);
 	}
 
 	async getLastestFileVersion(fileEntryId: string): Promise<TDLFileVersion> {

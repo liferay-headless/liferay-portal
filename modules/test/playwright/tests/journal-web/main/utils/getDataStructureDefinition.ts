@@ -10,10 +10,12 @@ interface Props {
 }
 
 interface Field {
+	dataType?: 'image' | 'link-to-page' | 'string';
 	fieldType?:
 		| 'document_library'
 		| 'image'
 		| 'journal_article'
+		| 'link_to_layout'
 		| 'select'
 		| 'text';
 	localizable?: boolean;
@@ -32,6 +34,7 @@ export default function getDataStructureDefinition({
 		availableLanguageIds: [defaultLanguageId],
 		dataDefinitionFields: fields.map(
 			({
+				dataType,
 				fieldType = 'text',
 				localizable = true,
 				name: fieldName,
@@ -39,9 +42,11 @@ export default function getDataStructureDefinition({
 				repeatable = false,
 				required = false,
 			}) => {
+				const resolvedDataType = dataType ?? 'string';
+
 				return {
 					customProperties: {
-						dataType: 'string',
+						dataType: resolvedDataType,
 						displayStyle: 'singleline',
 						fieldReference: fieldName,
 						options,

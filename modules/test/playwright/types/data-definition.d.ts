@@ -16,7 +16,7 @@ type DataDefinition = {
 
 type DefinitionField = {
 	customProperties: {
-		dataType: 'string';
+		dataType: 'image' | 'link-to-page' | 'string';
 		displayStyle: 'singleline' | 'multiline';
 		fieldReference: string;
 		options?: Options;
@@ -26,6 +26,7 @@ type DefinitionField = {
 		| 'document_library'
 		| 'image'
 		| 'journal_article'
+		| 'link_to_layout'
 		| 'select'
 		| 'text';
 	indexType: 'keyword' | 'text' | 'none';

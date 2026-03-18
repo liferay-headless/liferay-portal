@@ -4,6 +4,7 @@
  */
 
 import {FrameLocator, Locator, Page, expect} from '@playwright/test';
+import path from 'path';
 
 import {clickAndExpectToBeHidden} from '../../../../utils/clickAndExpectToBeHidden';
 import {clickAndExpectToBeVisible} from '../../../../utils/clickAndExpectToBeVisible';
@@ -11,6 +12,7 @@ import fillAndClickOutside from '../../../../utils/fillAndClickOutside';
 import {getRandomInt} from '../../../../utils/getRandomInt';
 import getRandomString from '../../../../utils/getRandomString';
 import {openFieldset} from '../../../../utils/openFieldset';
+import {getTempDir} from '../../../../utils/temp';
 import {waitForAlert} from '../../../../utils/waitForAlert';
 import {JournalPage} from './JournalPage';
 
@@ -37,6 +39,9 @@ export class JournalEditArticlePage {
 	readonly titleInput: Locator;
 	readonly undoButton: Locator;
 	readonly alertErrorMessage: Locator;
+	readonly exportImportFrame: FrameLocator;
+	readonly exportImportOption: Locator;
+	readonly options: Locator;
 
 	constructor(page: Page) {
 		this.page = page;
@@ -51,6 +56,9 @@ export class JournalEditArticlePage {
 		this.content = page.getByText('Content', {exact: true});
 		this.contentFrame = page.frameLocator(
 			'internal:role=application[name="Content,"i] >> iframe[title="editor"]'
+		);
+		this.exportImportFrame = page.frameLocator(
+			'iframe[title="Export \\/ Import"]'
 		);
 		this.defaultTemplateButton = page.getByRole('button', {
 			name: 'Default Template',
@@ -84,6 +92,105 @@ export class JournalEditArticlePage {
 			'#_com_liferay_journal_web_portlet_JournalPortlet_titleMapAsXML'
 		);
 		this.undoButton = page.getByTitle('Undo', {exact: true});
+		this.options = page.getByLabel('Options', {exact: true});
+		this.exportImportOption = page.getByRole('menuitem', {
+			name: 'Export / Import',
+		});
+	}
+
+	async selectImportFile({
+		expectedUploadErrorMessage,
+		filePath,
+	}: {
+		expectedUploadErrorMessage?: string;
+		filePath: string;
+	}): Promise<void> {
+		const fileChooserPromise = this.page.waitForEvent('filechooser');
+
+		const selectFileBtn = this.exportImportFrame.getByRole('button', {
+			name: 'Select File',
+		});
+
+		await selectFileBtn.click();
+
+		const fileChooser = await fileChooserPromise;
+		await fileChooser.setFiles(filePath);
+
+		if (expectedUploadErrorMessage) {
+			await expect(
+				this.exportImportFrame.getByText(expectedUploadErrorMessage)
+			).toBeVisible();
+
+			return;
+		}
+
+		await expect(
+			this.exportImportFrame.getByRole('button', {name: 'Continue'})
+		).toBeEnabled();
+	}
+
+	async import({
+		expectedUploadErrorMessage,
+		filePath,
+	}: {
+		expectedUploadErrorMessage?: string;
+		filePath: string;
+	}) {
+		await this.exportImportFrame
+			.getByRole('link', {name: 'Import'})
+			.click();
+
+		await this.selectImportFile({
+			expectedUploadErrorMessage,
+			filePath,
+		});
+
+		if (expectedUploadErrorMessage) {
+			return;
+		}
+
+		await this.exportImportFrame
+			.getByRole('button', {name: 'Continue'})
+			.click();
+
+		await this.exportImportFrame
+			.getByRole('button', {name: 'Import'})
+			.click();
+
+		await this.exportImportFrame.getByText('Successful').waitFor();
+	}
+
+	async export({
+		taskName = `Web_Content-${getRandomString()}.portlet.lar`,
+	}: {
+		taskName?: string;
+	} = {}): Promise<string> {
+		await this.exportImportFrame
+			.getByLabel('Export the selected data to')
+			.fill(taskName);
+
+		await this.exportImportFrame
+			.getByRole('button', {name: 'Export'})
+			.click();
+
+		await this.exportImportFrame
+			.getByRole('cell', {name: 'Successful'})
+			.waitFor();
+
+		return await this.downloadExportProcess(taskName);
+	}
+
+	async downloadExportProcess(name: string): Promise<string> {
+		const downloadPromise = this.page.waitForEvent('download');
+
+		await this.exportImportFrame.getByRole('cell', {name}).click();
+
+		const download = await downloadPromise;
+
+		const filePath = path.join(getTempDir(), download.suggestedFilename());
+		await download.saveAs(filePath);
+
+		return filePath;
 	}
 
 	async assertPrivateContentIconInRelatedAssetPopUp(assetType: string) {
@@ -590,5 +697,13 @@ export class JournalEditArticlePage {
 			.filter({hasText: title});
 
 		await row.locator('span.label').filter({hasText: 'Pending'}).waitFor();
+	}
+
+	async selectExportImportOption() {
+		await clickAndExpectToBeVisible({
+			autoClick: true,
+			target: this.exportImportOption,
+			trigger: this.options,
+		});
 	}
 }
