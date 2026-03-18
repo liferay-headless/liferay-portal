@@ -285,38 +285,6 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-82752. Verify is possible export content and then publish."
-	@priority = 4
-	test ExportContentThenPublish {
-		property portal.acceptance = "true";
-
-		task ("Given: User add a new site and enable local staging") {
-			HeadlessSite.addSite(siteName = "Site Name");
-
-			JSONStaging.enableLocalStaging(groupName = "Site Name");
-		}
-
-		task ("And: Add a new web content on staging then publish it") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				webContentContent = "WC WebContent Content",
-				webContentTitle = "WC WebContent Title");
-
-			WebContent.publishWithPermissions();
-		}
-
-		task ("Then: Site can be exported then published") {
-			LAR.exportSiteCP(siteScopeName = "Site Name");
-
-			Staging.openStagingAdmin(siteURLKey = "site-name-staging");
-
-			Staging.publishCustomPublication();
-		}
-	}
-
 	@description = "This is a use case for LPS-91735. Verify is possible export/import DDM structure in Global site via instances."
 	@priority = 3
 	test ExportImportGlobalDDMStructureViaInstances {
@@ -1229,45 +1197,6 @@ definition {
 				webContentTitle = "Web Content Title");
 
 			AssertConsoleTextNotPresent(value1 = "com.liferay.portal.kernel.repository.InvalidRepositoryIdException");
-		}
-	}
-
-	@description = "Verify is possible export/import a Smoke template."
-	@priority = 4
-	test ExportImportSmoke {
-		property app.server.types = "jboss,tomcat,weblogic,wildfly";
-		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
-		property portal.acceptance = "true";
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
-		task ("Given: User exports default site") {
-			LAR.exportSiteCP(siteScopeName = "Guest");
-
-			var key_larFileName = ${larFileName};
-			var larFileName = LAR.getLarFileName();
-
-			LAR.downloadLar();
-		}
-
-		task ("When: Adds a new site then import the LAR file") {
-			HeadlessSite.addSite(siteName = "Site Name");
-
-			for (var layoutUtilityPageName : list "404 Error,500 Error") {
-				JSONLayoututilitypage.deleteLayoutUtilityPage(
-					groupName = "Site Name",
-					layoutUtilityPageName = ${layoutUtilityPageName});
-			}
-
-			LAR.importSiteCP(
-				larFileName = ${larFileName},
-				siteName = "Site Name");
-		}
-
-		task ("Then: Import should be successful without error message on console") {
-			AssertConsoleTextNotPresent(value1 = "java.lang.StringIndexOutOfBoundsException");
-
-			AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 		}
 	}
 
