@@ -40,14 +40,13 @@ for (int i = 0; i < portletDataHandlerControls.length; i++) {
 				String label = LanguageUtil.get(request, resourceBundle, portletDataHandlerBoolean.getLabel());
 
 				if (Validator.isNotNull(className) && (manifestSummary != null)) {
-					StagedModelType stagedModelType = new StagedModelType(className, portletDataHandlerBoolean.getReferrerClassName());
-
-					long modelAdditionCount = manifestSummary.getModelAdditionCount(stagedModelType);
+					long modelAdditionCount = manifestSummary.getModelAdditionCount(new StagedModelType(className, portletDataHandlerBoolean.getReferrerClassName()));
+					long modelDeletionCount = manifestSummary.getModelDeletionCount(new StagedModelType(className, StagedModelType.REFERRER_CLASS_NAME_ALL));
 
 					if (modelAdditionCount != 0) {
 						label += (modelAdditionCount > 0) ? " (" + modelAdditionCount + ")" : StringPool.BLANK;
 					}
-					else if (!showAllPortlets) {
+					else if ((modelDeletionCount <= 0) && !showAllPortlets) {
 						continue control;
 					}
 				}
