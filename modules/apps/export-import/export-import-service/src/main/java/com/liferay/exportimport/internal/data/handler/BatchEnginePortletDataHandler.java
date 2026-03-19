@@ -667,18 +667,20 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 				manifestSummary.addModelAdditionCount(
 					exportImportDescriptor.getKey(),
 					batchEngineExportTask.getTotalItemsCount());
-			}
 
-			for (String modelClassName : getClassNames()) {
 				long modelDeletionCount =
 					_exportImportHelper.getModelDeletionCount(
 						portletDataContext,
 						new StagedModelType(
-							modelClassName,
+							exportImportDescriptor.getModelClassName(),
 							StagedModelType.REFERRER_CLASS_NAME_ALL));
 
 				manifestSummary.addModelDeletionCount(
-					modelClassName, modelDeletionCount);
+					exportImportDescriptor.getKey(), modelDeletionCount);
+
+				manifestSummary.addModelDeletionCount(
+					exportImportDescriptor.getModelClassName(),
+					modelDeletionCount);
 			}
 		}
 	}
