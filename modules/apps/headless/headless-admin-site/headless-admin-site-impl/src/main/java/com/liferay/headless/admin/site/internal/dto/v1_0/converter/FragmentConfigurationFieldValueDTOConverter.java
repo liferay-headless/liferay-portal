@@ -885,6 +885,14 @@ public class FragmentConfigurationFieldValueDTOConverter
 		return sitePagesNavigationMenuValue;
 	}
 
+	private String _getString(Object object) {
+		if (object == null) {
+			return null;
+		}
+
+		return String.valueOf(object);
+	}
+
 	private FragmentConfigurationFieldValue
 		_getTextFragmentConfigurationFieldValue(
 			FragmentConfigurationField fragmentConfigurationField,
@@ -907,8 +915,7 @@ public class FragmentConfigurationFieldValueDTOConverter
 		}
 		else {
 			textFragmentConfigurationFieldValue.setValue(
-				() -> GetterUtil.getString(
-					fragmentFragmentConfigurationFieldValue));
+				() -> _getString(fragmentFragmentConfigurationFieldValue));
 		}
 
 		return textFragmentConfigurationFieldValue;
