@@ -38,10 +38,6 @@ h4 span {
 	margin-left: 0 !important;
 }
 
-.graphiql-container .doc-explorer-title-bar {
-	height: 100% !important;
-}
-
 .tag {
 	font-weight: bold;
 	margin-right: 1em;
