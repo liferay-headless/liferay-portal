@@ -28,6 +28,7 @@ import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.resource.v1_0.DocumentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.DocumentSerDes;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -272,6 +273,43 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 		_testPutSiteDocumentByExternalReferenceCodeWithSameFolderId();
 		_testPutSiteDocumentWithFriendlyUrlPath();
 		_testPutSiteDocumentWithNoMultipartFiles();
+	}
+
+	@Test
+	public void testPutDocumentWithEmptyDocumentPartAndFileOnlyUpdate()
+		throws Exception {
+
+		Document postDocument = testPutDocument_addDocument();
+
+		String boundary = "----LiferayBoundary" + RandomTestUtil.randomString();
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(
+			_toMultipartBody(boundary, "test.txt", "updated-content", StringPool.BLANK),
+			"multipart/form-data; boundary=" + boundary
+		);
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/documents/" +
+			postDocument.getId());
+		httpInvoker.userNameAndPassword(
+			"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD);
+
+		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+
+		Assert.assertEquals(200, httpResponse.getStatusCode());
+
+		Document putDocument = DocumentSerDes.toDTO(httpResponse.getContent());
+
+		Assert.assertEquals(postDocument.getId(), putDocument.getId());
+		Assert.assertEquals(postDocument.getTitle(), putDocument.getTitle());
+		Assert.assertEquals(
+			postDocument.getDescription(), putDocument.getDescription());
+		Assert.assertEquals(
+			postDocument.getDatePublished(), putDocument.getDatePublished());
+		Assert.assertEquals(
+			postDocument.getDateExpired(), putDocument.getDateExpired());
 	}
 
 	@Override
@@ -890,6 +928,36 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 
 		Assert.assertEquals(
 			postDocument.getSizeInBytes(), putDocument.getSizeInBytes());
+	}
+
+	private String _toMultipartBody(
+		String boundary, String fileName, String fileContent,
+		String documentValue) {
+
+		StringBundler sb = new StringBundler(24);
+
+		sb.append("--");
+		sb.append(boundary);
+		sb.append("\r\n");
+		sb.append("Content-Disposition: form-data; name=\"document\"\r\n\r\n");
+		sb.append(documentValue);
+		sb.append("\r\n");
+
+		sb.append("--");
+		sb.append(boundary);
+		sb.append("\r\n");
+		sb.append("Content-Disposition: form-data; name=\"file\"; filename=\"");
+		sb.append(fileName);
+		sb.append("\"\r\n");
+		sb.append("Content-Type: text/plain\r\n\r\n");
+		sb.append(fileContent);
+		sb.append("\r\n");
+
+		sb.append("--");
+		sb.append(boundary);
+		sb.append("--\r\n");
+
+		return sb.toString();
 	}
 
 	@Inject
