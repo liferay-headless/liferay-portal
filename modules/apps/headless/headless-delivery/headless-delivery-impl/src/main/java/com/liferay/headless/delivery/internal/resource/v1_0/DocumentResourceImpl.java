@@ -1075,15 +1075,11 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	private Document _updateDocument(
-			FileEntry fileEntry, MultipartBody multipartBody)
+		FileEntry fileEntry, MultipartBody multipartBody)
 		throws Exception {
 
 		Document document = multipartBody.getValueAsNullableInstance(
 			"document", Document.class);
-
-		if (document == null) {
-			throw new BadRequestException("Document not found in body");
-		}
 
 		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -1096,6 +1092,12 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 		fileEntry = _moveDocument(
 			fileEntry.getFileEntryId(), document, fileEntry);
 
+		String contentType = binaryFile.getContentType();
+
+		if (contentType == null) {
+			contentType = fileEntry.getMimeType();
+		}
+
 		String fileName = null;
 		String title = null;
 		String urlTitle = null;
@@ -1103,35 +1105,45 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 		Date displayDate = null;
 		Date expirationDate = null;
 
-		if (document != null) {
+		if (document == null) {
+			fileName = binaryFile.getFileName();
+
+			if (fileName == null) {
+				fileName = fileEntry.getFileName();
+			}
+
+			title = fileEntry.getTitle();
+			description = fileEntry.getDescription();
+			displayDate = fileEntry.getDisplayDate();
+			expirationDate = fileEntry.getExpirationDate();
+		}
+		else {
 			fileName = document.getFileName();
 			title = document.getTitle();
 			urlTitle = document.getFriendlyUrlPath();
 			description = document.getDescription();
 			displayDate = document.getDatePublished();
 			expirationDate = document.getDateExpired();
-		}
 
-		if (fileName == null) {
-			fileName = binaryFile.getFileName();
-		}
+			if (fileName == null) {
+				fileName = binaryFile.getFileName();
+			}
 
-		if (title == null) {
-			title = fileEntry.getTitle();
+			if (fileName == null) {
+				fileName = fileEntry.getFileName();
+			}
 		}
 
 		return _toDocument(
 			_dlAppService.updateFileEntry(
-				fileEntry.getFileEntryId(), fileName,
-				binaryFile.getContentType(), title, urlTitle, description, null,
-				DLVersionNumberIncrease.AUTOMATIC, binaryFile.getInputStream(),
-				binaryFile.getSize(), displayDate, expirationDate,
-				fileEntry.getReviewDate(),
+				fileEntry.getFileEntryId(), fileName, contentType, title, urlTitle,
+				description, null, DLVersionNumberIncrease.AUTOMATIC,
+				binaryFile.getInputStream(), binaryFile.getSize(), displayDate,
+				expirationDate, fileEntry.getReviewDate(),
 				_createServiceContext(
 					Constants.UPDATE, () -> new Long[0], () -> new String[0],
 					_getDLFileEntryType(
-						fileEntry.getFolderId(), document,
-						fileEntry.getGroupId()),
+						fileEntry.getFolderId(), document, fileEntry.getGroupId()),
 					document, fileEntry.getGroupId())));
 	}
 
