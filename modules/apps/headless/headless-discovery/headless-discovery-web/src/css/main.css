@@ -38,6 +38,22 @@ h4 span {
 	margin-left: 0 !important;
 }
 
+.graphiql-container {
+	--color-base: 0, 0%, 100%;
+	--color-error: 0, 83%, 47%;
+	--color-info: 219, 58%, 43%;
+	--color-neutral: 235, 13%, 18%;
+	--color-primary: 219, 100%, 52%;
+	--color-secondary: 219, 58%, 43%;
+	--color-success: 134, 52%, 32%;
+	--color-warning: 26, 100%, 36%;
+	--font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Arial,
+		sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	--font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas,
+		"Liberation Mono", "Courier New", monospace;
+}
+
 .tag {
 	font-weight: bold;
 	margin-right: 1em;
