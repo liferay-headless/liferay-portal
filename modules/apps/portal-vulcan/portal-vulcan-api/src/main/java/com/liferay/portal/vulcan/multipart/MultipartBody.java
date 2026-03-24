@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.petra.io.StreamUtil;
 
+import com.liferay.portal.kernel.util.Validator;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 
@@ -62,7 +63,7 @@ public class MultipartBody {
 
 		String valueAsString = getValueAsString(key);
 
-		if (valueAsString == null) {
+		if (Validator.isBlank(valueAsString)) {
 			return null;
 		}
 
