@@ -25,8 +25,9 @@ module.exports = {
 					'esm/vs/editor/editor.worker.js'
 				),
 				'graphql.worker': path.resolve(
-					monacoGraphqlPath,
-					'esm/graphql.worker.js'
+					'src',
+					'js',
+					'graphql.worker.js'
 				),
 				'headless-discovery-web-min': path.resolve('src', 'index.js'),
 				'json.worker': path.resolve(
