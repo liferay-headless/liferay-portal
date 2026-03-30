@@ -103,7 +103,6 @@ import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.io.Serializable;
@@ -1075,7 +1074,7 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 	}
 
 	private Document _updateDocument(
-		FileEntry fileEntry, MultipartBody multipartBody)
+			FileEntry fileEntry, MultipartBody multipartBody)
 		throws Exception {
 
 		Document document = multipartBody.getValueAsNullableInstance(
@@ -1136,14 +1135,15 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 
 		return _toDocument(
 			_dlAppService.updateFileEntry(
-				fileEntry.getFileEntryId(), fileName, contentType, title, urlTitle,
-				description, null, DLVersionNumberIncrease.AUTOMATIC,
+				fileEntry.getFileEntryId(), fileName, contentType, title,
+				urlTitle, description, null, DLVersionNumberIncrease.AUTOMATIC,
 				binaryFile.getInputStream(), binaryFile.getSize(), displayDate,
 				expirationDate, fileEntry.getReviewDate(),
 				_createServiceContext(
 					Constants.UPDATE, () -> new Long[0], () -> new String[0],
 					_getDLFileEntryType(
-						fileEntry.getFolderId(), document, fileEntry.getGroupId()),
+						fileEntry.getFolderId(), document,
+						fileEntry.getGroupId()),
 					document, fileEntry.getGroupId())));
 	}
 
