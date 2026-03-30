@@ -286,13 +286,13 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.body(
-			_toMultipartBody(boundary, "test.txt", "updated-content", StringPool.BLANK),
-			"multipart/form-data; boundary=" + boundary
-		);
+			_toMultipartBody(
+				boundary, "test.txt", "updated-content", StringPool.BLANK),
+			"multipart/form-data; boundary=" + boundary);
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-delivery/v1.0/documents/" +
-			postDocument.getId());
+				postDocument.getId());
 		httpInvoker.userNameAndPassword(
 			"test@liferay.com:" + PropsValues.DEFAULT_ADMIN_PASSWORD);
 
@@ -934,7 +934,7 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 		String boundary, String fileName, String fileContent,
 		String documentValue) {
 
-		StringBundler sb = new StringBundler(24);
+		StringBundler sb = new StringBundler(18);
 
 		sb.append("--");
 		sb.append(boundary);
