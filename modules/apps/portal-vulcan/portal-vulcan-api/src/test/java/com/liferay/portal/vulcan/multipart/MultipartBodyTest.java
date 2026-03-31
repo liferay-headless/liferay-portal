@@ -8,6 +8,7 @@ package com.liferay.portal.vulcan.multipart;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -154,6 +155,17 @@ public class MultipartBodyTest {
 
 		testClass = multipartBody.getValueAsNullableInstance(
 			"null", TestClass.class);
+
+		MatcherAssert.assertThat(testClass != null, Is.is(false));
+
+		// Blank optional
+
+		multipartBody = MultipartBody.of(
+			Collections.emptyMap(), __ -> _objectMapper,
+			Collections.singletonMap("key", StringPool.BLANK));
+
+		testClass = multipartBody.getValueAsNullableInstance(
+			"key", TestClass.class);
 
 		MatcherAssert.assertThat(testClass != null, Is.is(false));
 
