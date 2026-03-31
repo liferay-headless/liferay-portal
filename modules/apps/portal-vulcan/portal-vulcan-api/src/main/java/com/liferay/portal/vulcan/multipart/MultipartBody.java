@@ -48,14 +48,14 @@ public class MultipartBody {
 	public <T> T getValueAsInstance(String key, Class<T> clazz)
 		throws IOException {
 
-		String valueAsString = getValueAsString(key);
+		T value = getValueAsNullableInstance(key, clazz);
 
-		if (valueAsString == null) {
+		if (value == null) {
 			throw new BadRequestException(
 				"Missing JSON property with the key: " + key);
 		}
 
-		return _parseValue(valueAsString, clazz);
+		return value;
 	}
 
 	public <T> T getValueAsNullableInstance(String key, Class<T> clazz)
