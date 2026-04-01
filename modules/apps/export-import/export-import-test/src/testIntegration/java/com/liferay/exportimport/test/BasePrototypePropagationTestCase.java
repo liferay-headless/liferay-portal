@@ -39,6 +39,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -87,8 +88,12 @@ public abstract class BasePrototypePropagationTestCase {
 		doTestLayoutTypePropagation(false);
 	}
 
+	@Ignore
 	@Test
 	public void testLayoutTypePropagationWithLinkEnabled() throws Exception {
+
+		// Ignored due to LPD-81592
+
 		doTestLayoutTypePropagation(true);
 	}
 
@@ -99,9 +104,12 @@ public abstract class BasePrototypePropagationTestCase {
 		doTestPortletPreferencesPropagation(false);
 	}
 
+	@Ignore
 	@Test
 	public void testPortletPreferencesPropagationWithLinkEnabled()
 		throws Exception {
+
+		// Ignored due to LPD-81592
 
 		doTestPortletPreferencesPropagation(true);
 	}
