@@ -126,45 +126,13 @@ public class MultipartBodyTest {
 	@Test
 	public void testGetValueAsNullableInstance() throws IOException {
 
-		// Present optional
+		// Blank optional
 
 		MultipartBody multipartBody = MultipartBody.of(
 			Collections.emptyMap(), __ -> _objectMapper,
-			Collections.singletonMap(
-				"key",
-				JSONUtil.put(
-					"list", Arrays.asList(1, 2, 3)
-				).put(
-					"number", 42
-				).put(
-					"string", "Hello"
-				).toString()));
-
-		TestClass testClass = multipartBody.getValueAsNullableInstance(
-			"key", TestClass.class);
-
-		MatcherAssert.assertThat(testClass != null, Is.is(true));
-
-		MatcherAssert.assertThat(testClass.list, Matchers.contains(1, 2, 3));
-		MatcherAssert.assertThat(testClass.number, Is.is(42L));
-		MatcherAssert.assertThat(testClass.string, Is.is("Hello"));
-		MatcherAssert.assertThat(
-			testClass.testClass, Is.is(CoreMatchers.nullValue()));
-
-		// Null optional
-
-		testClass = multipartBody.getValueAsNullableInstance(
-			"null", TestClass.class);
-
-		MatcherAssert.assertThat(testClass != null, Is.is(false));
-
-		// Blank optional
-
-		multipartBody = MultipartBody.of(
-			Collections.emptyMap(), __ -> _objectMapper,
 			Collections.singletonMap("key", StringPool.BLANK));
 
-		testClass = multipartBody.getValueAsNullableInstance(
+		TestClass testClass = multipartBody.getValueAsNullableInstance(
 			"key", TestClass.class);
 
 		MatcherAssert.assertThat(testClass != null, Is.is(false));
@@ -195,6 +163,38 @@ public class MultipartBodyTest {
 					CoreMatchers.instanceOf(
 						UnrecognizedPropertyException.class)));
 		}
+
+		// Null optional
+
+		testClass = multipartBody.getValueAsNullableInstance(
+			"null", TestClass.class);
+
+		MatcherAssert.assertThat(testClass != null, Is.is(false));
+
+		// Present optional
+
+		multipartBody = MultipartBody.of(
+			Collections.emptyMap(), __ -> _objectMapper,
+			Collections.singletonMap(
+				"key",
+				JSONUtil.put(
+					"list", Arrays.asList(1, 2, 3)
+				).put(
+					"number", 42
+				).put(
+					"string", "Hello"
+				).toString()));
+
+		testClass = multipartBody.getValueAsNullableInstance(
+			"key", TestClass.class);
+
+		MatcherAssert.assertThat(testClass != null, Is.is(true));
+
+		MatcherAssert.assertThat(testClass.list, Matchers.contains(1, 2, 3));
+		MatcherAssert.assertThat(testClass.number, Is.is(42L));
+		MatcherAssert.assertThat(testClass.string, Is.is("Hello"));
+		MatcherAssert.assertThat(
+			testClass.testClass, Is.is(CoreMatchers.nullValue()));
 	}
 
 	@Test
