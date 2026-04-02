@@ -1104,31 +1104,37 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 		Date displayDate = null;
 		Date expirationDate = null;
 
-		if (document != null) {
+		if (document == null) {
+			fileName = binaryFile.getFileName();
+
+			if (fileName == null) {
+				fileName = fileEntry.getFileName();
+			}
+
+			title = fileEntry.getTitle();
+			description = fileEntry.getDescription();
+			displayDate = fileEntry.getDisplayDate();
+			expirationDate = fileEntry.getExpirationDate();
+		}
+		else {
 			fileName = document.getFileName();
 			title = document.getTitle();
 			urlTitle = document.getFriendlyUrlPath();
 			description = document.getDescription();
 			displayDate = document.getDatePublished();
 			expirationDate = document.getDateExpired();
-		}
 
-		if (fileName == null) {
-			fileName = binaryFile.getFileName();
-		}
+			if (fileName == null) {
+				fileName = binaryFile.getFileName();
+			}
 
-		if (fileName == null) {
-			fileName = fileEntry.getFileName();
-		}
+			if (fileName == null) {
+				fileName = fileEntry.getFileName();
+			}
 
-		if (title == null) {
-			title = fileEntry.getTitle();
-		}
-
-		if (document == null) {
-			description = fileEntry.getDescription();
-			displayDate = fileEntry.getDisplayDate();
-			expirationDate = fileEntry.getExpirationDate();
+			if (title == null) {
+				title = fileEntry.getTitle();
+			}
 		}
 
 		return _toDocument(
