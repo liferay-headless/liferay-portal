@@ -828,22 +828,22 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 
 		FileUtil.write(file, "updated-content");
 
-		Document updatedDocument = documentResource.putDocument(
+		Document putDocument = documentResource.putDocument(
 			postDocument.getId(), null,
 			HashMapBuilder.<String, File>put(
 				"file", () -> file
 			).build());
 
-		Assert.assertEquals(postDocument.getId(), updatedDocument.getId());
+		Assert.assertEquals(postDocument.getId(), putDocument.getId());
 		Assert.assertEquals(
-			postDocument.getTitle(), updatedDocument.getTitle());
+			postDocument.getTitle(), putDocument.getTitle());
 		Assert.assertEquals(
-			postDocument.getDescription(), updatedDocument.getDescription());
+			postDocument.getDescription(), putDocument.getDescription());
 		Assert.assertEquals(
 			postDocument.getDatePublished(),
-			updatedDocument.getDatePublished());
+			putDocument.getDatePublished());
 		Assert.assertEquals(
-			postDocument.getDateExpired(), updatedDocument.getDateExpired());
+			postDocument.getDateExpired(), putDocument.getDateExpired());
 	}
 
 	private void _testPutSiteDocumentByExternalReferenceCodeWithSameFolderId()
