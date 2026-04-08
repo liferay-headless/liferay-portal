@@ -824,14 +824,11 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 
 		Document postDocument = testPutDocument_addDocument();
 
-		File file = FileUtil.createTempFile();
-
-		FileUtil.write(file, "updated-content");
-
 		Document putDocument = documentResource.putDocument(
 			postDocument.getId(), null,
 			HashMapBuilder.<String, File>put(
-				"file", () -> file
+				"file",
+				() -> FileUtil.createTempFile("updated-content".getBytes())
 			).build());
 
 		Assert.assertEquals(
