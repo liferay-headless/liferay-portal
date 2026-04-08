@@ -834,16 +834,14 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 				"file", () -> file
 			).build());
 
-		Assert.assertEquals(postDocument.getId(), putDocument.getId());
-		Assert.assertEquals(
-			postDocument.getTitle(), putDocument.getTitle());
-		Assert.assertEquals(
-			postDocument.getDescription(), putDocument.getDescription());
-		Assert.assertEquals(
-			postDocument.getDatePublished(),
-			putDocument.getDatePublished());
 		Assert.assertEquals(
 			postDocument.getDateExpired(), putDocument.getDateExpired());
+		Assert.assertEquals(
+			postDocument.getDatePublished(), putDocument.getDatePublished());
+		Assert.assertEquals(
+			postDocument.getDescription(), putDocument.getDescription());
+		Assert.assertEquals(postDocument.getId(), putDocument.getId());
+		Assert.assertEquals(postDocument.getTitle(), putDocument.getTitle());
 	}
 
 	private void _testPutSiteDocumentByExternalReferenceCodeWithSameFolderId()
