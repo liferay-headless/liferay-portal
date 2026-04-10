@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
@@ -1925,6 +1926,83 @@ public class BatchEnginePortletDataHandlerTest {
 	}
 
 	@Test
+	@TestInfo("LPD-76858")
+	public void testGetSectionKey() throws Exception {
+		String portletId = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).build());
+			SafeCloseable safeCloseable2 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).build())) {
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId);
+
+			Assert.assertEquals(
+				ExportImportConstants.SECTION_KEY_OTHERS,
+				portletDataHandler.getSectionKey());
+		}
+
+		String sectionKey1 = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionKey(
+					sectionKey1
+				).build());
+			SafeCloseable safeCloseable2 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionKey(
+					sectionKey1
+				).build())) {
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId);
+
+			Assert.assertEquals(
+				sectionKey1, portletDataHandler.getSectionKey());
+		}
+
+		String sectionKey2 = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionKey(
+					sectionKey1
+				).build());
+			SafeCloseable safeCloseable2 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId
+				).withSectionKey(
+					sectionKey2
+				).build())) {
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId);
+
+			Assert.assertEquals(
+				ExportImportConstants.SECTION_KEY_MULTIPLE,
+				portletDataHandler.getSectionKey());
+		}
+	}
+
+	@Test
 	@TestInfo("LPD-75687")
 	public void testImportOrderByRank() throws Exception {
 
@@ -3758,11 +3836,12 @@ public class BatchEnginePortletDataHandlerTest {
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegate(
 			Function<Filter, Page<TestItem>> function, String portletId,
-			Integer rank, boolean stagingSupported) {
+			Integer rank, String sectionKey, boolean stagingSupported) {
 
 			_function = function;
 			_portletId = portletId;
 			_rank = rank;
+			_sectionKey = sectionKey;
 			_stagingSupported = stagingSupported;
 		}
 
@@ -3831,6 +3910,11 @@ public class BatchEnginePortletDataHandlerTest {
 				@Override
 				public Scope getScope() {
 					return Scope.COMPANY;
+				}
+
+				@Override
+				public String getSectionKey() {
+					return _sectionKey;
 				}
 
 				@Override
@@ -3923,6 +4007,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private final String _portletId;
 		private final Integer _rank;
 		private final String _resourceClassName = RandomTestUtil.randomString();
+		private final String _sectionKey;
 		private final boolean _stagingSupported;
 
 	}
@@ -3936,7 +4021,7 @@ public class BatchEnginePortletDataHandlerTest {
 			}
 
 			return new TestExportImportVulcanBatchEngineTaskItemDelegate(
-				_function, _portletId, _rank, _stagingSupported);
+				_function, _portletId, _rank, _sectionKey, _stagingSupported);
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
@@ -3964,6 +4049,14 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
+			withSectionKey(String sectionKey) {
+
+			_sectionKey = sectionKey;
+
+			return this;
+		}
+
+		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
 			withStagingSupported(boolean stagingSupported) {
 
 			_stagingSupported = stagingSupported;
@@ -3974,6 +4067,7 @@ public class BatchEnginePortletDataHandlerTest {
 		private Function<Filter, Page<TestItem>> _function;
 		private String _portletId;
 		private Integer _rank;
+		private String _sectionKey;
 		private boolean _stagingSupported;
 
 	}
