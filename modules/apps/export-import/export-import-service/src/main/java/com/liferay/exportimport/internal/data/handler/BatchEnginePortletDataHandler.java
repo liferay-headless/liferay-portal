@@ -15,6 +15,7 @@ import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskService;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.internal.lar.ExportImportDescriptorThreadLocal;
 import com.liferay.exportimport.internal.lar.PortletDataContextImpl;
 import com.liferay.exportimport.internal.lar.PortletDataContextThreadLocal;
@@ -63,6 +64,7 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.staging.StagingGroupHelper;
@@ -253,6 +255,32 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
+	}
+
+	@Override
+	public String getSectionKey() {
+		Set<String> sectionKeys = SetUtil.fromList(
+			TransformUtil.transform(
+				_registrations,
+				registration -> {
+					ExportImportVulcanBatchEngineTaskItemDelegate.
+						ExportImportDescriptor exportImportDescriptor =
+							registration.getExportImportDescriptor();
+
+					return exportImportDescriptor.getSectionKey();
+				}));
+
+		if (sectionKeys.isEmpty()) {
+			return ExportImportConstants.SECTION_KEY_OTHERS;
+		}
+
+		if (sectionKeys.size() > 1) {
+			return ExportImportConstants.SECTION_KEY_MULTIPLE;
+		}
+
+		Iterator<String> iterator = sectionKeys.iterator();
+
+		return iterator.next();
 	}
 
 	@Override
