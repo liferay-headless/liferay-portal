@@ -19,6 +19,7 @@ import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.service.JournalFeedLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
@@ -184,6 +186,30 @@ public class JournalFeedStagedModelDataHandlerTest
 				stagedModel.getUuid(), liveGroup);
 
 			Assert.assertNotNull(importedStagedModel);
+		}
+	}
+
+	@Test
+	public void testExportStagedModelLayoutReference() throws Exception {
+		StagedModel stagedModel = addStagedModel(
+			stagingGroup, addDependentStagedModelsMap(stagingGroup));
+
+		exportStagedModel(stagedModel);
+
+		try (SafeCloseable safeCloseable = initImportWithSafeCloseable()) {
+			List<Element> referenceElements =
+				portletDataContext.getReferenceElements(
+					stagedModel, Layout.class);
+
+			Assert.assertEquals(
+				referenceElements.toString(), 1, referenceElements.size());
+			Assert.assertEquals(
+				"false",
+				referenceElements.get(
+					0
+				).attributeValue(
+					"missing"
+				));
 		}
 	}
 
