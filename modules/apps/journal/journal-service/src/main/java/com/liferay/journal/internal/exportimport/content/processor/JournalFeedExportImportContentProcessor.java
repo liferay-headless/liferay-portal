@@ -7,6 +7,7 @@ package com.liferay.journal.internal.exportimport.content.processor;
 
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -22,7 +23,6 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.xml.Element;
 
 import java.util.Arrays;
 
@@ -131,11 +131,27 @@ public class JournalFeedExportImportContentProcessor
 			throw new NoSuchLayoutException();
 		}
 
-		Element feedElement = portletDataContext.getExportDataElement(feed);
-
-		portletDataContext.addReferenceElement(
-			feed, feedElement, targetLayout,
-			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+		if (exportReferencedContent) {
+			try {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, feed, targetLayout,
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Unable to export target layout " +
+							targetLayout.getLayoutId(),
+						portalException);
+				}
+			}
+		}
+		else {
+			portletDataContext.addReferenceElement(
+				feed, portletDataContext.getExportDataElement(feed),
+				targetLayout, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+				true);
+		}
 
 		return content;
 	}
