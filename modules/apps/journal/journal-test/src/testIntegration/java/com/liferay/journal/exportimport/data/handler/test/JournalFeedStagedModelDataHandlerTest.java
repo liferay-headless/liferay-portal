@@ -13,6 +13,8 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.test.util.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFeed;
@@ -20,6 +22,7 @@ import com.liferay.journal.service.JournalFeedLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -29,6 +32,7 @@ import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -76,11 +80,11 @@ public class JournalFeedStagedModelDataHandlerTest
 		serviceContext.setUuid(_layout.getUuid());
 
 		LayoutLocalServiceUtil.addLayout(
-			null, TestPropsValues.getUserId(), liveGroup.getGroupId(),
-			_layout.isPrivateLayout(), _layout.getParentLayoutId(),
-			_layout.getName(), _layout.getTitle(), _layout.getDescription(),
-			_layout.getType(), _layout.isHidden(), _layout.getFriendlyURL(),
-			serviceContext);
+			_layout.getExternalReferenceCode(), TestPropsValues.getUserId(),
+			liveGroup.getGroupId(), _layout.isPrivateLayout(),
+			_layout.getParentLayoutId(), _layout.getName(), _layout.getTitle(),
+			_layout.getDescription(), _layout.getType(), _layout.isHidden(),
+			_layout.getFriendlyURL(), serviceContext);
 
 		serviceContext.setCompanyId(TestPropsValues.getCompanyId());
 
@@ -190,26 +194,83 @@ public class JournalFeedStagedModelDataHandlerTest
 	}
 
 	@Test
-	public void testExportStagedModelLayoutReference() throws Exception {
+	public void testExportImport() throws Exception {
 		StagedModel stagedModel = addStagedModel(
 			stagingGroup, addDependentStagedModelsMap(stagingGroup));
 
 		exportStagedModel(stagedModel);
 
+		Layout liveGroupLayout =
+			LayoutLocalServiceUtil.getLayoutByExternalReferenceCode(
+				_layout.getExternalReferenceCode(), liveGroup.getGroupId());
+
+		LayoutLocalServiceUtil.deleteLayout(liveGroupLayout);
+
 		try (SafeCloseable safeCloseable = initImportWithSafeCloseable()) {
-			List<Element> referenceElements =
-				portletDataContext.getReferenceElements(
-					stagedModel, Layout.class);
+			Element feedElement =
+				portletDataContext.getImportDataStagedModelElement(stagedModel);
 
 			Assert.assertEquals(
-				referenceElements.toString(), 1, referenceElements.size());
-			Assert.assertEquals(
-				"false",
-				referenceElements.get(
-					0
-				).attributeValue(
-					"missing"
-				));
+				_layout.getExternalReferenceCode(),
+				feedElement.attributeValue("targetLayoutERC"));
+
+			StagedModel exportedStagedModel = readExportedStagedModel(
+				stagedModel);
+
+			Assert.assertNotNull(exportedStagedModel);
+
+			ExportImportThreadLocal.setPortletImportInProcess(true);
+
+			try {
+				AssertUtils.assertFailure(
+					PortletDataException.class,
+					StringBundler.concat(
+						"No Layout exists with the key ",
+						"{externalReferenceCode=",
+						_layout.getExternalReferenceCode(), ", groupId=",
+						liveGroup.getGroupId(), "}"),
+					() -> StagedModelDataHandlerUtil.importStagedModel(
+						portletDataContext, exportedStagedModel));
+			}
+			finally {
+				ExportImportThreadLocal.setPortletImportInProcess(false);
+			}
+		}
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setUuid(_layout.getUuid());
+
+		LayoutLocalServiceUtil.addLayout(
+			_layout.getExternalReferenceCode(), TestPropsValues.getUserId(),
+			liveGroup.getGroupId(), _layout.isPrivateLayout(),
+			_layout.getParentLayoutId(), _layout.getName(), _layout.getTitle(),
+			_layout.getDescription(), _layout.getType(), _layout.isHidden(),
+			_layout.getFriendlyURL(), serviceContext);
+
+		try (SafeCloseable safeCloseable = initImportWithSafeCloseable()) {
+			StagedModel exportedStagedModel = readExportedStagedModel(
+				stagedModel);
+
+			Assert.assertNotNull(exportedStagedModel);
+
+			ExportImportThreadLocal.setPortletImportInProcess(true);
+
+			try {
+				StagedModelDataHandlerUtil.importStagedModel(
+					portletDataContext, exportedStagedModel);
+			}
+			finally {
+				ExportImportThreadLocal.setPortletImportInProcess(false);
+			}
+
+			JournalFeed importedFeed =
+				JournalFeedLocalServiceUtil.fetchJournalFeedByUuidAndGroupId(
+					stagedModel.getUuid(), liveGroup.getGroupId());
+
+			Assert.assertNotNull(importedFeed);
+
+			validateImportedStagedModel(stagedModel, importedFeed);
 		}
 	}
 

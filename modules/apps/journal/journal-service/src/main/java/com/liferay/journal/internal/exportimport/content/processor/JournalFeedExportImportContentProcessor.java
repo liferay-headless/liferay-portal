@@ -7,7 +7,6 @@ package com.liferay.journal.internal.exportimport.content.processor;
 
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -23,6 +22,8 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Element;
 
 import java.util.Arrays;
 
@@ -131,27 +132,10 @@ public class JournalFeedExportImportContentProcessor
 			throw new NoSuchLayoutException();
 		}
 
-		if (exportReferencedContent) {
-			try {
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, feed, targetLayout,
-					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Unable to export target layout " +
-							targetLayout.getLayoutId(),
-						portalException);
-				}
-			}
-		}
-		else {
-			portletDataContext.addReferenceElement(
-				feed, portletDataContext.getExportDataElement(feed),
-				targetLayout, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-				true);
-		}
+		Element feedElement = portletDataContext.getExportDataElement(feed);
+
+		feedElement.addAttribute(
+			"targetLayoutERC", targetLayout.getExternalReferenceCode());
 
 		return content;
 	}
@@ -163,6 +147,31 @@ public class JournalFeedExportImportContentProcessor
 		throws Exception {
 
 		JournalFeed feed = (JournalFeed)stagedModel;
+
+		Element feedElement =
+			portletDataContext.getImportDataStagedModelElement(feed);
+
+		String targetLayoutERC = feedElement.attributeValue("targetLayoutERC");
+
+		if (Validator.isNotNull(targetLayoutERC)) {
+			Layout targetLayout =
+				_layoutLocalService.getLayoutByExternalReferenceCode(
+					targetLayoutERC, portletDataContext.getGroupId());
+
+			Group targetLayoutGroup = _groupLocalService.getGroup(
+				targetLayout.getGroupId());
+
+			String friendlyURLPath =
+				targetLayout.isPrivateLayout() ?
+					_portal.getPathFriendlyURLPrivateGroup() :
+						_portal.getPathFriendlyURLPublic();
+
+			feed.setTargetLayoutFriendlyUrl(
+				friendlyURLPath + targetLayoutGroup.getFriendlyURL() +
+					targetLayout.getFriendlyURL());
+
+			return content;
+		}
 
 		Group group = _groupLocalService.getGroup(
 			portletDataContext.getScopeGroupId());
