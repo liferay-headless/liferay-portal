@@ -366,7 +366,7 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 	}
 
 	@Test
-	public void testPostSitePageSpecificationPageExperiencePageElementWithUndeployedWidget()
+	public void testPostSitePageSpecificationPageExperiencePageElementWithUndeployedPortlet()
 		throws Exception {
 
 		String draftWidgetInstanceExternalReferenceCode =
@@ -376,8 +376,8 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		_addFragmentEntryLink(
 			draftWidgetInstanceExternalReferenceCode, namespace);
 
-		String undeployedWidgetName =
-			"com_liferay_test_undeployed_NonexistentPortlet_" +
+		String undeployedPortletName =
+			"com_liferay_test_UndeployedPortlet_" +
 				RandomTestUtil.randomString();
 
 		PageElement pageElement = _getWidgetPageElement(
@@ -385,7 +385,7 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 			draftWidgetInstanceExternalReferenceCode, false,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			_getWidgetConfig(), RandomTestUtil.randomString(), namespace,
-			undeployedWidgetName, _getWidgetPermissions());
+			undeployedPortletName, _getWidgetPermissions());
 
 		SegmentsExperience segmentsExperience =
 			_segmentsExperienceLocalService.fetchSegmentsExperience(
