@@ -169,42 +169,7 @@ public class JournalFeedExportImportContentProcessor
 			feed.setTargetLayoutFriendlyUrl(
 				friendlyURLPath + targetLayoutGroup.getFriendlyURL() +
 					targetLayout.getFriendlyURL());
-
-			return content;
 		}
-
-		Group group = _groupLocalService.getGroup(
-			portletDataContext.getScopeGroupId());
-
-		String newGroupFriendlyURL = group.getFriendlyURL();
-
-		newGroupFriendlyURL = newGroupFriendlyURL.substring(1);
-
-		String newTargetLayoutFriendlyURL = StringUtil.replace(
-			feed.getTargetLayoutFriendlyUrl(), _DATA_HANDLER_GROUP_FRIENDLY_URL,
-			newGroupFriendlyURL);
-
-		long plid = _portal.getPlidFromFriendlyURL(
-			portletDataContext.getCompanyId(), newTargetLayoutFriendlyURL);
-
-		if (plid <= 0) {
-			Group oldGroup = _groupLocalService.fetchGroup(
-				portletDataContext.getSourceGroupId());
-
-			if (oldGroup == null) {
-				return content;
-			}
-
-			String oldGroupFriendlyURL = oldGroup.getFriendlyURL();
-
-			oldGroupFriendlyURL = oldGroupFriendlyURL.substring(1);
-
-			newTargetLayoutFriendlyURL = StringUtil.replace(
-				feed.getTargetLayoutFriendlyUrl(),
-				_DATA_HANDLER_GROUP_FRIENDLY_URL, oldGroupFriendlyURL);
-		}
-
-		feed.setTargetLayoutFriendlyUrl(newTargetLayoutFriendlyURL);
 
 		return content;
 	}
