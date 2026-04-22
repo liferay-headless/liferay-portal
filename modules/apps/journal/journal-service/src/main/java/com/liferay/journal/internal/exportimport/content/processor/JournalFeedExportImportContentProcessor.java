@@ -83,10 +83,6 @@ public class JournalFeedExportImportContentProcessor
 			feed.setTargetLayoutFriendlyUrl(targetLayoutFriendlyURL);
 		}
 
-		Group targetLayoutGroup = _groupLocalService.fetchFriendlyURLGroup(
-			portletDataContext.getCompanyId(),
-			StringPool.SLASH + oldGroupFriendlyURL);
-
 		boolean privateLayout = false;
 
 		if (!PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING.equals(
@@ -99,6 +95,10 @@ public class JournalFeedExportImportContentProcessor
 		String targetLayoutFriendlyURL = null;
 
 		if (friendlyURLParts.length > 3) {
+			Group targetLayoutGroup = _groupLocalService.fetchFriendlyURLGroup(
+				portletDataContext.getCompanyId(),
+				StringPool.SLASH + oldGroupFriendlyURL);
+
 			targetLayoutFriendlyURL = StringUtil.merge(
 				Arrays.copyOfRange(
 					friendlyURLParts, 3, friendlyURLParts.length),
@@ -161,10 +161,9 @@ public class JournalFeedExportImportContentProcessor
 			Group targetLayoutGroup = _groupLocalService.getGroup(
 				targetLayout.getGroupId());
 
-			String friendlyURLPath =
-				targetLayout.isPrivateLayout() ?
-					_portal.getPathFriendlyURLPrivateGroup() :
-						_portal.getPathFriendlyURLPublic();
+			String friendlyURLPath = targetLayout.isPrivateLayout() ?
+				_portal.getPathFriendlyURLPrivateGroup() :
+					_portal.getPathFriendlyURLPublic();
 
 			feed.setTargetLayoutFriendlyUrl(
 				friendlyURLPath + targetLayoutGroup.getFriendlyURL() +
