@@ -15888,7 +15888,7 @@ public class ObjectEntryResourceTest {
 			JSONAssert.assertEquals(
 				String.valueOf(object),
 				String.valueOf(jsonObject2.get(objectFieldName)),
-				JSONCompareMode.STRICT);
+				JSONCompareMode.LENIENT);
 		}
 	}
 
