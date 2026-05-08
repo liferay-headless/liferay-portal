@@ -16775,12 +16775,7 @@ public class ObjectEntryResourceTest {
 	}
 
 	private JSONObject _getOwnerPermissionsJSONObject() {
-		return _getPermissionsJSONObject(
-			new String[] {
-				ActionKeys.DELETE, ActionKeys.PERMISSIONS, ActionKeys.UPDATE,
-				ActionKeys.VIEW
-			},
-			RoleConstants.OWNER);
+		return JSONUtil.put("roleName", RoleConstants.OWNER);
 	}
 
 	private JSONArray _getPermissionsJSONArray(String[] actionIds, Role role) {
