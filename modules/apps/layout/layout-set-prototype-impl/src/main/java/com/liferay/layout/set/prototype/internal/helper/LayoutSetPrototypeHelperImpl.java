@@ -17,6 +17,8 @@ import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalSer
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.layout.set.prototype.helper.LayoutSetPrototypeHelper;
+import com.liferay.layout.set.prototype.sync.LayoutSetPrototypeSyncContextThreadLocal;
+import com.liferay.layout.set.prototype.sync.LayoutSetPrototypeSyncSessionManager;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.background.task.util.comparator.BackgroundTaskCreateDateComparator;
@@ -53,14 +55,17 @@ import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.sites.kernel.util.Sites;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -87,11 +92,32 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 			return;
 		}
 
+		List<LayoutSet> mergeableLayoutSets = new ArrayList<>();
+
 		for (LayoutSet layoutSet :
 				_layoutSetLocalService.getLayoutSetsByLayoutSetPrototypeUuid(
 					layoutSetPrototype.getUuid())) {
 
+			if (_isLayoutSetMergeable(layoutSet.getGroup(), layoutSet)) {
+				mergeableLayoutSets.add(layoutSet);
+			}
+		}
+
+		String syncSessionId = PortalUUIDUtil.generate();
+
+		_layoutSetPrototypeSyncSessionManager.openSession(
+			mergeableLayoutSets.size(),
+			layoutSetPrototype.getName(LocaleUtil.US), syncSessionId, userId);
+
+		if (mergeableLayoutSets.isEmpty()) {
+			return;
+		}
+
+		for (LayoutSet layoutSet : mergeableLayoutSets) {
 			try {
+				LayoutSetPrototypeSyncContextThreadLocal.setSyncSessionId(
+					syncSessionId);
+
 				executeLayoutSetSync(layoutSet);
 			}
 			catch (Exception exception) {
@@ -99,6 +125,13 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 					"Unable to start site template sync for layout set " +
 						layoutSet.getLayoutSetId(),
 					exception);
+
+				_layoutSetPrototypeSyncSessionManager.
+					recordBackgroundTaskStatus(
+						BackgroundTaskConstants.STATUS_FAILED, syncSessionId);
+			}
+			finally {
+				LayoutSetPrototypeSyncContextThreadLocal.setSyncSessionId(null);
 			}
 		}
 	}
@@ -108,6 +141,8 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
 
 		if (MergeLayoutPrototypesThreadLocal.isSkipMerge()) {
+			_recordSyncResultIfTracked(BackgroundTaskConstants.STATUS_FAILED);
+
 			return;
 		}
 
@@ -119,6 +154,8 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 			layoutSet.getLayoutSetId());
 
 		if (!_isLayoutSetMergeable(group, layoutSet)) {
+			_recordSyncResultIfTracked(BackgroundTaskConstants.STATUS_FAILED);
+
 			return;
 		}
 
@@ -759,6 +796,8 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 			ExportImportThreadLocal.isImportInProcess() ||
 			ExportImportThreadLocal.isStagingInProcess()) {
 
+			_recordSyncResultIfTracked(BackgroundTaskConstants.STATUS_FAILED);
+
 			return;
 		}
 
@@ -770,6 +809,8 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 					"Layout set prototype merge is in progress for layout " +
 						"set " + layoutSet.getLayoutSetId());
 			}
+
+			_recordSyncResultIfTracked(BackgroundTaskConstants.STATUS_FAILED);
 
 			return;
 		}
@@ -808,6 +849,13 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 				String.valueOf(layoutSetPrototype.getLayoutSetPrototypeId())
 			});
 
+		String syncSessionId =
+			LayoutSetPrototypeSyncContextThreadLocal.getSyncSessionId();
+
+		if (Validator.isNotNull(syncSessionId)) {
+			parameterMap.put("syncSessionId", new String[] {syncSessionId});
+		}
+
 		User user = _userLocalService.getDefaultUser(layoutSet.getCompanyId());
 
 		List<Layout> layoutSetPrototypeLayouts = _layoutLocalService.getLayouts(
@@ -835,12 +883,26 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 				"Unable to add draft export-import configuration",
 				portalException);
 
+			_recordSyncResultIfTracked(BackgroundTaskConstants.STATUS_FAILED);
+
 			return;
 		}
 
 		_exportImportLocalService.mergeLayoutSetPrototypeInBackground(
 			user.getUserId(), layoutSet.getGroupId(),
 			exportImportConfiguration);
+	}
+
+	private void _recordSyncResultIfTracked(int backgroundTaskStatus) {
+		String syncSessionId =
+			LayoutSetPrototypeSyncContextThreadLocal.getSyncSessionId();
+
+		if (Validator.isNull(syncSessionId)) {
+			return;
+		}
+
+		_layoutSetPrototypeSyncSessionManager.recordBackgroundTaskStatus(
+			backgroundTaskStatus, syncSessionId);
 	}
 
 	/**
@@ -891,6 +953,10 @@ public class LayoutSetPrototypeHelperImpl implements LayoutSetPrototypeHelper {
 
 	@Reference
 	private LayoutSetPrototypeLocalService _layoutSetPrototypeLocalService;
+
+	@Reference
+	private LayoutSetPrototypeSyncSessionManager
+		_layoutSetPrototypeSyncSessionManager;
 
 	@Reference
 	private UserLocalService _userLocalService;
