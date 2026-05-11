@@ -131,6 +131,7 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -151,6 +152,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -5601,14 +5603,16 @@ public class ObjectEntryResourceTest {
 			new JSONArray[] {
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1),
+					_objectDefinition1, role1),
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2),
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition2, role2),
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1),
+					_objectDefinition1, role1),
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2)
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition2, role2)
 			},
 			Type.MANY_TO_MANY);
 
@@ -5693,10 +5697,11 @@ public class ObjectEntryResourceTest {
 			},
 			new JSONArray[] {
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2),
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition2, role2),
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1)
+					_objectDefinition1, role1)
 			},
 			Type.MANY_TO_ONE);
 
@@ -5764,14 +5769,16 @@ public class ObjectEntryResourceTest {
 			new JSONArray[] {
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1),
+					_objectDefinition1, role1),
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2),
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition2, role2),
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1),
+					_objectDefinition1, role1),
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2)
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition2, role2)
 			},
 			Type.ONE_TO_MANY);
 
@@ -6064,10 +6071,12 @@ public class ObjectEntryResourceTest {
 			},
 			new JSONArray[] {
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2),
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition3, role2),
 				(JSONArray)_userAccountJSONObject.get("permissions"),
 				_getPermissionsJSONArray(
-					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW}, role2),
+					new String[] {ActionKeys.UPDATE, ActionKeys.VIEW},
+					_objectDefinition3, role2),
 				(JSONArray)_userAccountJSONObject.get("permissions")
 			},
 			Type.MANY_TO_MANY);
@@ -6095,7 +6104,7 @@ public class ObjectEntryResourceTest {
 			new JSONArray[] {
 				_getPermissionsJSONArray(
 					new String[] {ActionKeys.DELETE, ActionKeys.PERMISSIONS},
-					role1),
+					_objectDefinition1, role1),
 				(JSONArray)_userAccountJSONObject.get("permissions")
 			},
 			Type.MANY_TO_MANY);
@@ -9205,22 +9214,22 @@ public class ObjectEntryResourceTest {
 			_postCustomObjectEntryWithPermissions(true, null);
 
 		_assertCustomObjectEntryWithPermissions(
-			JSONUtil.putAll(_getOwnerPermissionsJSONObject()),
+			JSONUtil.putAll(_getOwnerPermissionsJSONObject(_objectDefinition1)),
 			objectEntryJSONObject);
 		_assertCustomObjectEntryWithPermissions(
-			JSONUtil.putAll(_getOwnerPermissionsJSONObject()),
+			JSONUtil.putAll(_getOwnerPermissionsJSONObject(_objectDefinition1)),
 			_patchPutByExternalReferenceCodeCustomObjectEntryWithPermissions(
 				Http.Method.PATCH, true, objectEntryJSONObject, null));
 		_assertCustomObjectEntryWithPermissions(
-			JSONUtil.putAll(_getOwnerPermissionsJSONObject()),
+			JSONUtil.putAll(_getOwnerPermissionsJSONObject(_objectDefinition1)),
 			_patchPutByExternalReferenceCodeCustomObjectEntryWithPermissions(
 				Http.Method.PUT, true, objectEntryJSONObject, null));
 		_assertCustomObjectEntryWithPermissions(
-			JSONUtil.putAll(_getOwnerPermissionsJSONObject()),
+			JSONUtil.putAll(_getOwnerPermissionsJSONObject(_objectDefinition1)),
 			_patchPutCustomObjectEntryWithPermissions(
 				Http.Method.PATCH, true, objectEntryJSONObject, null));
 		_assertCustomObjectEntryWithPermissions(
-			JSONUtil.putAll(_getOwnerPermissionsJSONObject()),
+			JSONUtil.putAll(_getOwnerPermissionsJSONObject(_objectDefinition1)),
 			_patchPutCustomObjectEntryWithPermissions(
 				Http.Method.PUT, true, objectEntryJSONObject, null));
 
@@ -16774,13 +16783,22 @@ public class ObjectEntryResourceTest {
 		return objectRelationshipNames;
 	}
 
-	private JSONObject _getOwnerPermissionsJSONObject() {
-		return JSONUtil.put("roleName", RoleConstants.OWNER);
+	private JSONObject _getOwnerPermissionsJSONObject(
+		ObjectDefinition objectDefinition) {
+
+		return _getPermissionsJSONObject(
+			TransformUtil.transformToArray(
+				_resourceActionLocalService.getResourceActions(
+					objectDefinition.getClassName()),
+				ResourceAction::getActionId, String.class),
+			RoleConstants.OWNER);
 	}
 
-	private JSONArray _getPermissionsJSONArray(String[] actionIds, Role role) {
+	private JSONArray _getPermissionsJSONArray(
+		String[] actionIds, ObjectDefinition objectDefinition, Role role) {
+
 		return JSONUtil.putAll(
-			_getOwnerPermissionsJSONObject(),
+			_getOwnerPermissionsJSONObject(objectDefinition),
 			_getPermissionsJSONObject(actionIds, role.getName()));
 	}
 
@@ -21832,6 +21850,9 @@ public class ObjectEntryResourceTest {
 
 	@Inject
 	private PortletFileRepository _portletFileRepository;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
 
 	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
