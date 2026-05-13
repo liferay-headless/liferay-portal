@@ -425,3 +425,25 @@ Update the call sites at the same time.
 -_removeStaleFoos(deletedIdsMap);
 +_deleteStaleFoos(deletedIdsMap);
 ```
+
+### Rule 20: Phrase Messages as a Single Thought
+
+**Why:** Rewriting a two-clause log or exception message as "<action> because <reason>" reads as one continuous thought, surfaces the action up front instead of burying it after a semicolon, and avoids splitting the message at a punctuation seam.
+
+**Examples:**
+
+```diff
+ _log.warn(
+ 	StringBundler.concat(
+-		"Attribute \"", name,
+-		"\" has no value for scope ", primaryScope,
+-		"; using value from scope ", fallbackScope));
++		"Using value from scope ", fallbackScope,
++		" for attribute \"", name,
++		"\" because scope ", primaryScope, " has no value"));
+```
+
+```diff
+-_log.info("SQL server version is too stale; upgraded to " + version);
++_log.info("Upgraded SQL server version to " + version + " because it is too stale");
+```
