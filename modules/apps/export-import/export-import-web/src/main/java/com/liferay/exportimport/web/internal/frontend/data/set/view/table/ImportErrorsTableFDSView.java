@@ -41,7 +41,12 @@ public class ImportErrorsTableFDSView extends BaseTableFDSView {
 			"classExternalReferenceCode", "external-reference-code",
 			fdsTableSchemaField -> fdsTableSchemaField.setSortable(true)
 		).add(
-			"type.label", "type"
+			"type.label", "type",
+			fdsTableSchemaField -> fdsTableSchemaField.setSortable(
+				true
+			).setSortFieldName(
+				"type/label"
+			)
 		).add(
 			"errorMessage", "description"
 		).add(
