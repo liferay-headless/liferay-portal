@@ -110,7 +110,7 @@ async function setupImportReportScenario(apiHelpers: DataApiHelpers) {
 
 test(
 	'Can filter, search and sort errors report entries',
-	{tag: '@LPD-68461'},
+	{tag: ['@LPD-68461', '@LPD-68626']},
 	async ({apiHelpers, exportImportPage}) => {
 		const {
 			objectDefinition1,
@@ -188,6 +188,16 @@ test(
 		values = await exportImportPage.getReportColumnValues(
 			'External Reference Code'
 		);
+		expect(values).toEqual([...values].sort((a, b) => b.localeCompare(a)));
+
+		// Sort by Type
+
+		await exportImportPage.sortReportBy('Type');
+		values = await exportImportPage.getReportColumnValues('Type');
+		expect(values).toEqual([...values].sort((a, b) => a.localeCompare(b)));
+
+		await exportImportPage.sortReportBy('Type');
+		values = await exportImportPage.getReportColumnValues('Type');
 		expect(values).toEqual([...values].sort((a, b) => b.localeCompare(a)));
 
 		// Search by Entity Type name
