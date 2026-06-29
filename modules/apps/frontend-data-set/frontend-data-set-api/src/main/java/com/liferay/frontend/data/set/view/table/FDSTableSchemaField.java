@@ -35,6 +35,10 @@ public class FDSTableSchemaField {
 		return _label;
 	}
 
+	public String getSortFieldName() {
+		return _sortFieldName;
+	}
+
 	public SortingOrder getSortingOrder() {
 		return _sortingOrder;
 	}
@@ -103,6 +107,12 @@ public class FDSTableSchemaField {
 		return this;
 	}
 
+	public FDSTableSchemaField setSortFieldName(String sortFieldName) {
+		_sortFieldName = sortFieldName;
+
+		return this;
+	}
+
 	public FDSTableSchemaField setSortingOrder(SortingOrder sortingOrder) {
 		_sortingOrder = sortingOrder;
 
@@ -134,6 +144,15 @@ public class FDSTableSchemaField {
 		).put(
 			"sortable", isSortable()
 		).put(
+			"sortFieldName",
+			() -> {
+				if (isSortable() && (_sortFieldName != null)) {
+					return _sortFieldName;
+				}
+
+				return null;
+			}
+		).put(
 			"sortingOrder",
 			() -> {
 				FDSTableSchemaField.SortingOrder sortingOrder =
@@ -162,6 +181,7 @@ public class FDSTableSchemaField {
 	private String _label;
 	private boolean _localizeLabel = true;
 	private boolean _sortable;
+	private String _sortFieldName;
 	private SortingOrder _sortingOrder;
 
 }

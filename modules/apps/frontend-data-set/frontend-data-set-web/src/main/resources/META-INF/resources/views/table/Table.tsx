@@ -801,6 +801,12 @@ const Table = ({
 		'item-actions'
 	);
 
+	const getFieldSortKey = (field: any): string =>
+		field.sortFieldName ?? String(field.fieldName);
+
+	const getFieldByColumnId = (columnId: string | undefined) =>
+		visibleFields.find((f) => String(f.fieldName) === columnId);
+
 	const getSorting = (): Sorting | null => {
 		const activeSort = sorts.find((sort: any) => sort.active);
 
@@ -808,18 +814,29 @@ const Table = ({
 			return null;
 		}
 
+		const matchedField = visibleFields.find(
+			(f) => getFieldSortKey(f) === activeSort.key
+		);
+
 		return {
-			column: activeSort.key,
+			column: matchedField
+				? String(matchedField.fieldName)
+				: activeSort.key,
 			direction:
 				activeSort.direction === 'desc' ? 'descending' : 'ascending',
 		};
 	};
 
 	const onSortChange = (sorting: Sorting | null) => {
+		const matchedField = getFieldByColumnId(sorting?.column?.toString());
+		const sortKey = matchedField
+			? getFieldSortKey(matchedField)
+			: String(sorting?.column);
+
 		let updatedSorts: TSort[] = [];
 
 		updatedSorts = sorts.map((sort: any) =>
-			sort.key === sorting?.column
+			sort.key === sortKey
 				? {
 						...sort,
 						active: true,
@@ -833,14 +850,14 @@ const Table = ({
 		);
 
 		const newSort: boolean = Boolean(
-			!sorts.find((sort: any) => sort.key === sorting?.column)
+			!sorts.find((sort: any) => sort.key === sortKey)
 		);
 
 		if (newSort) {
 			updatedSorts.push({
 				active: true,
 				direction: 'asc',
-				key: String(sorting?.column),
+				key: sortKey,
 			});
 		}
 
