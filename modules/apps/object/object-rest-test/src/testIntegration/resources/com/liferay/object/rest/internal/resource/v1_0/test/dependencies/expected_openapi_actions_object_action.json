@@ -32,6 +32,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "AuditEvent"
 				}
@@ -55,6 +57,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "AuditFieldChange"
@@ -133,6 +137,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Collaborator"
 				}
@@ -167,6 +173,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "CollaboratorBrief"
@@ -250,6 +258,17 @@
 						"type": "date_time"
 					}
 				},
+				"x-sortable": {
+					"creatorId": {
+						"type": "integer"
+					},
+					"dateCreated": {
+						"type": "date_time"
+					},
+					"dateModified": {
+						"type": "date_time"
+					}
+				},
 				"xml": {
 					"name": "Comment"
 				}
@@ -319,6 +338,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Creator"
 				}
@@ -337,6 +358,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"FacetValue": {
@@ -351,6 +374,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"FileEntry": {
@@ -426,6 +451,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "FileEntry"
 				}
@@ -448,6 +475,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Folder"
 				}
@@ -469,6 +498,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Link"
 				}
@@ -484,6 +515,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"Object1": {
@@ -771,6 +804,44 @@
 						"type": "integer"
 					}
 				},
+				"x-sortable": {
+					"creator": {
+						"type": "string"
+					},
+					"creatorId": {
+						"type": "integer"
+					},
+					"dateCreated": {
+						"type": "date_time"
+					},
+					"dateModified": {
+						"type": "date_time"
+					},
+					"externalReferenceCode": {
+						"type": "string"
+					},
+					"field2": {
+						"type": "string"
+					},
+					"folderId": {
+						"type": "integer"
+					},
+					"id": {
+						"type": "id"
+					},
+					"status": {
+						"type": "integer"
+					},
+					"title": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "integer"
+					},
+					"version": {
+						"type": "integer"
+					}
+				},
 				"xml": {
 					"name": "ObjectEntry"
 				}
@@ -806,6 +877,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "ObjectDefinitionBrief"
@@ -853,6 +926,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"PageComment": {
@@ -897,6 +972,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"PageObject1": {
@@ -990,6 +1067,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"PagePermission": {
@@ -1102,6 +1181,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"ParentTaxonomyCategory": {
@@ -1119,6 +1200,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "ParentTaxonomyCategory"
@@ -1139,6 +1222,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "ParentTaxonomyVocabulary"
@@ -1165,6 +1250,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Permission"
 				}
@@ -1179,6 +1266,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"PostScopeScopeKeyByExternalReferenceCodeTranslationRequestBody": {
@@ -1191,6 +1280,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				}
 			},
 			"Scope": {
@@ -1225,6 +1316,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "Scope"
 				}
@@ -1252,6 +1345,8 @@
 				],
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "Status"
@@ -1307,6 +1402,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "TaxonomyCategoryBrief"
 				}
@@ -1336,6 +1433,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "TranslationResponse"
 				}
@@ -1363,6 +1462,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "UserGroupBrief"
 				}
@@ -1386,6 +1487,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "ValidationError"
@@ -1411,6 +1514,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "ValidationRequest"
 				}
@@ -1432,6 +1537,8 @@
 				"type": "object",
 				"x-filterable": {
 				},
+				"x-sortable": {
+				},
 				"xml": {
 					"name": "ValidationResponse"
 				}
@@ -1451,6 +1558,8 @@
 				},
 				"type": "object",
 				"x-filterable": {
+				},
+				"x-sortable": {
 				},
 				"xml": {
 					"name": "Version"
