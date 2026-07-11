@@ -36,7 +36,8 @@ public class BulkActionEntityModel implements EntityModel {
 			new BooleanEntityField(
 				"rootDescendantNode", locale -> "rootDescendantNode"),
 			new CollectionEntityField(
-				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID)),
+				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID),
+				true),
 			new CollectionEntityField(
 				new IntegerEntityField(
 					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
@@ -46,7 +47,8 @@ public class BulkActionEntityModel implements EntityModel {
 			new CollectionEntityField(
 				new StringEntityField(
 					"objectFolderExternalReferenceCode",
-					locale -> "objectFolderExternalReferenceCode")),
+					locale -> "objectFolderExternalReferenceCode"),
+				true),
 			new DateTimeEntityField(
 				"dateCreated",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),

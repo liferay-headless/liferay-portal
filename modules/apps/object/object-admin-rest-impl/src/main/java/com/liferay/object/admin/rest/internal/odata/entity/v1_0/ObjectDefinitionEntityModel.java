@@ -30,7 +30,7 @@ public class ObjectDefinitionEntityModel implements EntityModel {
 				new IntegerEntityField(
 					"acceptedGroupIds", locale -> "acceptedGroupIds")),
 			new CollectionEntityField(
-				new IntegerEntityField("status", locale -> Field.STATUS)),
+				new IntegerEntityField("status", locale -> Field.STATUS), true),
 			new DateTimeEntityField(
 				"dateCreated",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),

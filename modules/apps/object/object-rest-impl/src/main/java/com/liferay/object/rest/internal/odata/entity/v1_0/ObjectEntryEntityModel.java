@@ -108,7 +108,8 @@ public class ObjectEntryEntityModel implements EntityModel {
 
 			return new CollectionEntityField(
 				new StringEntityField(
-					objectField.getName(), locale -> objectField.getName()));
+					objectField.getName(), locale -> objectField.getName()),
+				true);
 		}
 
 		if (Objects.equals(
@@ -239,7 +240,8 @@ public class ObjectEntryEntityModel implements EntityModel {
 							"status", locale -> Field.STATUS);
 
 					if (_useLegacyStatus) {
-						return new CollectionEntityField(statusEntityField);
+						return new CollectionEntityField(
+							statusEntityField, true);
 					}
 
 					return statusEntityField;

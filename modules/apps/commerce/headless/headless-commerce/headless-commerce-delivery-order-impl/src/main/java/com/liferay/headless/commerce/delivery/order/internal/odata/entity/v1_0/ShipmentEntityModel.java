@@ -23,7 +23,7 @@ public class ShipmentEntityModel implements EntityModel {
 	public ShipmentEntityModel() {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
-				new IntegerEntityField("status", locale -> Field.STATUS)),
+				new IntegerEntityField("status", locale -> Field.STATUS), true),
 			new DateTimeEntityField(
 				"createDate",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),

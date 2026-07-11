@@ -36,7 +36,8 @@ public class ProductEntityModel implements EntityModel {
 					locale -> CPField.COMMERCE_CHANNEL_GROUP_IDS,
 					object -> _getCommerceChannelGroupId(object))),
 			new CollectionEntityField(
-				new IntegerEntityField("statusCode", locale -> Field.STATUS)),
+				new IntegerEntityField("statusCode", locale -> Field.STATUS),
+				true),
 			new CollectionEntityField(
 				new StringEntityField(
 					"categoryIds", locale -> "assetCategoryIds")),

@@ -24,11 +24,13 @@ public class PaymentEntityModel implements EntityModel {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
 				new IntegerEntityField(
-					"paymentStatus", locale -> "paymentStatus")),
+					"paymentStatus", locale -> "paymentStatus"),
+				true),
 			new CollectionEntityField(
-				new IntegerEntityField("type", locale -> "type")),
+				new IntegerEntityField("type", locale -> "type"), true),
 			new CollectionEntityField(
-				new StringEntityField("reasonKey", locale -> "reasonKey")),
+				new StringEntityField("reasonKey", locale -> "reasonKey"),
+				true),
 			new DateTimeEntityField(
 				"createDate",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),

@@ -27,9 +27,11 @@ public class PlacedOrderEntityModel implements EntityModel {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
 				new IntegerEntityField(
-					"accountId", locale -> "commerceAccountId")),
+					"accountId", locale -> "commerceAccountId"),
+				true),
 			new CollectionEntityField(
-				new IntegerEntityField("orderStatus", locale -> "orderStatus")),
+				new IntegerEntityField("orderStatus", locale -> "orderStatus"),
+				true),
 			new ComplexEntityField("customFields", entityFields),
 			new ComplexEntityField(
 				"orderStatusInfo",

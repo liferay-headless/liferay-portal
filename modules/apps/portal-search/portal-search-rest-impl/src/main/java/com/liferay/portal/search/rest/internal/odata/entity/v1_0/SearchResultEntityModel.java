@@ -31,7 +31,8 @@ public class SearchResultEntityModel implements EntityModel {
 			new BooleanEntityField(
 				"rootDescendantNode", locale -> "rootDescendantNode"),
 			new CollectionEntityField(
-				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID)),
+				new IntegerEntityField("groupIds", locale -> Field.GROUP_ID),
+				true),
 			new CollectionEntityField(
 				new IntegerEntityField(
 					"internalTaxonomyCategoryIds",
@@ -45,7 +46,8 @@ public class SearchResultEntityModel implements EntityModel {
 			new CollectionEntityField(
 				new StringEntityField(
 					"objectFolderExternalReferenceCode",
-					locale -> "objectFolderExternalReferenceCode")),
+					locale -> "objectFolderExternalReferenceCode"),
+				true),
 			new DateTimeEntityField(
 				"cmpDueDate", locale -> "cmpDueDate", locale -> "cmpDueDate"),
 			new DateTimeEntityField(

@@ -20,7 +20,7 @@ public class OrderRuleEntityModel implements EntityModel {
 	public OrderRuleEntityModel() {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
-				new IntegerEntityField("name", locale -> "name")));
+				new IntegerEntityField("name", locale -> "name"), true));
 	}
 
 	@Override

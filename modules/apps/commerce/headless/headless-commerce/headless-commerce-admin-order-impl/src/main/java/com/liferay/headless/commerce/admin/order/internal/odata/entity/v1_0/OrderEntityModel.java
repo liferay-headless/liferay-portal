@@ -25,9 +25,11 @@ public class OrderEntityModel implements EntityModel {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
 				new IntegerEntityField(
-					"accountId", locale -> "commerceAccountId")),
+					"accountId", locale -> "commerceAccountId"),
+				true),
 			new CollectionEntityField(
-				new IntegerEntityField("orderStatus", locale -> "orderStatus")),
+				new IntegerEntityField("orderStatus", locale -> "orderStatus"),
+				true),
 			new DateTimeEntityField(
 				"createDate",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),

@@ -32,7 +32,8 @@ public class PriceListEntityModel implements EntityModel {
 				new IntegerEntityField(
 					"accountId", locale -> "commerceAccountId")),
 			new CollectionEntityField(
-				new IntegerEntityField("catalogId", locale -> "catalogId")),
+				new IntegerEntityField("catalogId", locale -> "catalogId"),
+				true),
 			new CollectionEntityField(
 				new IntegerEntityField(
 					"channelId", locale -> "commerceChannelId")),

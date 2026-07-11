@@ -273,13 +273,32 @@ public class SortableFieldsOpenAPIContributor implements OpenAPIContributor {
 
 			EntityField entityField = entry1.getValue();
 
-			if (entityField instanceof CollectionEntityField) {
+			if (entityField instanceof
+					CollectionEntityField collectionEntityField) {
 
-				// A collection field's sortable name resolves to the same
-				// indexed field used for filtering, but sorting on a
-				// multi-valued field relies on the search engine's implicit
-				// min/max reduction rather than a well-defined ordering, so
-				// it is left out of x-sortable.
+				if (!collectionEntityField.isSortable()) {
+
+					// A collection field's sortable name resolves to the
+					// same indexed field used for filtering, but sorting on
+					// a multi-valued field relies on the search engine's
+					// implicit min/max reduction rather than a well-defined
+					// ordering, so it is left out of x-sortable unless the
+					// entity model has verified the underlying field is
+					// actually single-valued.
+
+					continue;
+				}
+
+				EntityField wrappedEntityField =
+					collectionEntityField.getEntityField();
+
+				sortableFields.put(
+					fieldName,
+					HashMapBuilder.put(
+						"type",
+						StringUtil.toLowerCase(
+							String.valueOf(wrappedEntityField.getType()))
+					).build());
 
 				continue;
 			}

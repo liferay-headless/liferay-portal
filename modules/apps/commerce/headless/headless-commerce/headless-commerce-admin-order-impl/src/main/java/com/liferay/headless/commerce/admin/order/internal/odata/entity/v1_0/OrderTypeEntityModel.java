@@ -22,7 +22,7 @@ public class OrderTypeEntityModel implements EntityModel {
 	public OrderTypeEntityModel() {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
-				new IntegerEntityField("name", locale -> "name")),
+				new IntegerEntityField("name", locale -> "name"), true),
 			new DateTimeEntityField(
 				"displayDate",
 				locale -> Field.getSortableFieldName("displayDate"),

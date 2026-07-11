@@ -26,7 +26,7 @@ public class AccountEntityModel implements EntityModel {
 	public AccountEntityModel(List<EntityField> entityFields) {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new CollectionEntityField(
-				new IntegerEntityField("status", locale -> Field.STATUS)),
+				new IntegerEntityField("status", locale -> Field.STATUS), true),
 			new ComplexEntityField("customFields", entityFields),
 			new DateTimeEntityField(
 				"dateCreated",
