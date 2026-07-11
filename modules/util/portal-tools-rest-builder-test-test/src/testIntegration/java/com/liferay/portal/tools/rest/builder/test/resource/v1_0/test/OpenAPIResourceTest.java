@@ -107,6 +107,8 @@ public class OpenAPIResourceTest {
 								"id", JSONUtil.put("type", "id")
 							).put(
 								"published", JSONUtil.put("type", "boolean")
+							).put(
+								"statusCode", JSONUtil.put("type", "integer")
 							)
 						).put(
 							"x-test", true

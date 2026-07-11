@@ -28,7 +28,8 @@ public class TestEntityEntityModel implements EntityModel {
 		_entityFieldsMap = EntityModel.toEntityFieldsMap(
 			new BooleanEntityField("published", locale -> Field.STATUS),
 			new CollectionEntityField(
-				new IntegerEntityField("statusCode", locale -> Field.STATUS)),
+				new IntegerEntityField("statusCode", locale -> Field.STATUS),
+				true),
 			new CollectionEntityField(
 				new StringEntityField(
 					"keywords", locale -> "assetTagNames.lowercase")),

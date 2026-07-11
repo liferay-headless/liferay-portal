@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 <#assign
 	generateDepotEntry = false
 	generatePermissionsJavaMethodSignatures = []
+	generateSortTests = false
 	javaDataType = freeMarkerTool.getJavaDataType(configYAML, openAPIYAML, schemaName)!""
 	javaMethodSignatures = freeMarkerTool.getResourceTestCaseJavaMethodSignatures(configYAML, openAPIYAML, schemaName)
 	properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema, allSchemas)
@@ -54,6 +55,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 	<#assign
 		generateDepotEntry = generateDepotEntry || javaMethodSignature.methodName?contains("AssetLibrary")
 		generatePermissionsJavaMethodSignatures = generatePermissionsJavaMethodSignatures + (isPermissionsCompatibleMethod(configYAML, javaMethodSignature, javaMethodSignatures, schema, schemaName)?then([javaMethodSignature], []))
+		generateSortTests = generateSortTests || (freeMarkerTool.hasHTTPMethod(javaMethodSignature, "get") && javaMethodSignature.returnType?contains("Page<") && freeMarkerTool.getResourceTestCaseParameters(configYAML, javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, allSchemas, false)?contains("com.liferay.portal.kernel.search.Sort[] sorts"))
 		useDeleteByExternalReferenceCode = useDeleteByExternalReferenceCode || (freeMarkerTool.isExternalReferenceCodeMethod("delete", javaMethodSignature) && hasExternalReferenceCodeProperty && !javaMethodSignature.parentSchemaName?has_content)
 		useDeleteById = useDeleteById || (stringUtil.equals(javaMethodSignature.methodName, "delete" + schemaName) && (freeMarkerTool.hasPathParameter(javaMethodSignature, "id") || freeMarkerTool.hasPathParameter(javaMethodSignature, schemaVarName + "Id")) && hasIdProperty)
 	/>
@@ -113,6 +115,11 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+
+<#if generateSortTests>
+	import com.liferay.portal.kernel.test.util.HTTPTestUtil;
+</#if>
+
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -122,6 +129,11 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+
+<#if generateSortTests>
+	import com.liferay.portal.kernel.util.Http;
+</#if>
+
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -133,6 +145,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 
@@ -1143,6 +1156,157 @@ public abstract class Base${schemaName}ResourceTestCase {
 						for (EntityField entityField : entityFields) {
 							unsafeTriConsumer.accept(entityField, ${schemaVarName}1, ${schemaVarName}2);
 						}
+
+						${schemaVarName}1 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
+							<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
+								${javaMethodParameter.parameterName},
+							</#list>
+
+							${schemaVarName}1);
+
+						${schemaVarName}2 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
+							<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
+								${javaMethodParameter.parameterName},
+							</#list>
+
+							${schemaVarName}2);
+
+						Page<${schemaName}> page = ${schemaVarName}Resource.${javaMethodSignature.methodName}(
+							<#list javaMethodSignature.javaMethodParameters as javaMethodParameter>
+								<#if stringUtil.equals(javaMethodParameter.parameterName, "pagination")>
+									null
+								<#elseif stringUtil.equals(javaMethodParameter.parameterName, "sorts")>
+									null
+								<#elseif freeMarkerTool.isPathParameter(javaMethodParameter, javaMethodSignature.operation)>
+									${javaMethodParameter.parameterName}
+								<#else>
+									null
+								</#if>
+
+								<#sep>, </#sep>
+							</#list>
+						);
+
+						for (EntityField entityField : entityFields) {
+							Page<${schemaName}> ascPage = ${schemaVarName}Resource.${javaMethodSignature.methodName}(
+								<#list javaMethodSignature.javaMethodParameters as javaMethodParameter>
+									<#if stringUtil.equals(javaMethodParameter.parameterName, "pagination")>
+										Pagination.of(1, (int) page.getTotalCount() + 1)
+									<#elseif stringUtil.equals(javaMethodParameter.parameterName, "sorts")>
+										entityField.getName() + ":asc"
+									<#elseif freeMarkerTool.isPathParameter(javaMethodParameter, javaMethodSignature.operation)>
+										${javaMethodParameter.parameterName}
+									<#else>
+										null
+									</#if>
+
+									<#sep>, </#sep>
+								</#list>
+							);
+
+							assertContains(${schemaVarName}1, (List<${schemaName}>)ascPage.getItems());
+							assertContains(${schemaVarName}2, (List<${schemaName}>)ascPage.getItems());
+
+							Page<${schemaName}> descPage = ${schemaVarName}Resource.${javaMethodSignature.methodName}(
+								<#list javaMethodSignature.javaMethodParameters as javaMethodParameter>
+									<#if stringUtil.equals(javaMethodParameter.parameterName, "pagination")>
+										Pagination.of(1, (int) page.getTotalCount() + 1)
+									<#elseif stringUtil.equals(javaMethodParameter.parameterName, "sorts")>
+										entityField.getName() + ":desc"
+									<#elseif freeMarkerTool.isPathParameter(javaMethodParameter, javaMethodSignature.operation)>
+										${javaMethodParameter.parameterName}
+									<#else>
+										null
+									</#if>
+
+									<#sep>, </#sep>
+								</#list>
+							);
+
+							assertContains(${schemaVarName}2, (List<${schemaName}>)descPage.getItems());
+							assertContains(${schemaVarName}1, (List<${schemaName}>)descPage.getItems());
+						}
+					}
+
+					@Test
+					public void test${javaMethodSignature.methodName?cap_first}WithSortCollection() throws Exception {
+						JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+							null,
+							"${configYAML.application.baseURI?remove_beginning("/")}/${openAPIYAML.info.version}/openapi.json",
+							Http.Method.GET
+						).getJSONObject(
+							"components"
+						).getJSONObject(
+							"schemas"
+						).getJSONObject(
+							"${schemaName}"
+						).getJSONObject(
+							"x-sortable"
+						);
+
+						${schemaName} ${schemaVarName}1 = random${schemaName}();
+						${schemaName} ${schemaVarName}2 = random${schemaName}();
+
+						List<EntityField> entityFields = new ArrayList<>();
+
+						for (EntityField entityField : getEntityFields(EntityField.Type.COLLECTION)) {
+							if (!(entityField instanceof CollectionEntityField)) {
+								continue;
+							}
+
+							CollectionEntityField collectionEntityField = (CollectionEntityField)entityField;
+
+							Assert.assertEquals(
+								collectionEntityField.isSortable(),
+								xSortableJSONObject.has(entityField.getName()));
+
+							if (!collectionEntityField.isSortable()) {
+								continue;
+							}
+
+							EntityField wrappedEntityField = collectionEntityField.getEntityField();
+
+							if (Objects.equals(wrappedEntityField.getSortableName(LocaleUtil.getDefault()), com.liferay.portal.kernel.search.Field.STATUS)) {
+								continue;
+							}
+
+							String entityFieldName = entityField.getName();
+
+							try {
+								Method method = ${schemaVarName}1.getClass().getMethod("get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+								Class<?> returnType = method.getReturnType();
+
+								if (returnType.equals(Long.class)) {
+									BeanTestUtil.setProperty(${schemaVarName}1, entityFieldName, 0L);
+									BeanTestUtil.setProperty(${schemaVarName}2, entityFieldName, 1L);
+								}
+								else if (returnType.equals(Integer.class)) {
+									BeanTestUtil.setProperty(${schemaVarName}1, entityFieldName, 0);
+									BeanTestUtil.setProperty(${schemaVarName}2, entityFieldName, 1);
+								}
+								else if (returnType.equals(String.class)) {
+									BeanTestUtil.setProperty(${schemaVarName}1, entityFieldName, "aaa" + StringUtil.toLowerCase(RandomTestUtil.randomString()));
+									BeanTestUtil.setProperty(${schemaVarName}2, entityFieldName, "bbb" + StringUtil.toLowerCase(RandomTestUtil.randomString()));
+								}
+								else {
+									continue;
+								}
+							}
+							catch (Exception exception) {
+								continue;
+							}
+
+							entityFields.add(entityField);
+						}
+
+						if (entityFields.isEmpty()) {
+							return;
+						}
+
+						<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
+							${javaMethodParameter.parameterType} ${javaMethodParameter.parameterName} = test${javaMethodSignature.methodName?cap_first}_get${javaMethodParameter.parameterName?cap_first}();
+						</#list>
 
 						${schemaVarName}1 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
 							<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
