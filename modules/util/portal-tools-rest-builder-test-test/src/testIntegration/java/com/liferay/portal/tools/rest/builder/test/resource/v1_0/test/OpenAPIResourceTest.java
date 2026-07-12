@@ -32,12 +32,20 @@ public class OpenAPIResourceTest {
 					"schemas",
 					JSONUtil.put(
 						"EntityModelResourceTestEntity1",
-						JSONUtil.put("x-filterable", Collections.emptyMap())
+						JSONUtil.put(
+							"x-filterable", Collections.emptyMap()
+						).put(
+							"x-sortable", Collections.emptyMap()
+						)
 					).put(
 						"EntityModelResourceTestEntity2",
 						JSONUtil.put(
 							"x-filterable",
-							JSONUtil.put("id", JSONUtil.put("type", "id")))
+							JSONUtil.put("id", JSONUtil.put("type", "id"))
+						).put(
+							"x-sortable",
+							JSONUtil.put("id", JSONUtil.put("type", "id"))
+						)
 					).put(
 						"TestEntity",
 						JSONUtil.put(
@@ -76,6 +84,29 @@ public class OpenAPIResourceTest {
 								).put(
 									"type", "array"
 								)
+							)
+						).put(
+							"x-sortable",
+							JSONUtil.put(
+								"companyId", JSONUtil.put("type", "id")
+							).put(
+								"customFields/booleanField",
+								JSONUtil.put("type", "boolean")
+							).put(
+								"customFields/integerField",
+								JSONUtil.put("type", "integer")
+							).put(
+								"customFields/stringField",
+								JSONUtil.put("type", "string")
+							).put(
+								"dateModified",
+								JSONUtil.put("type", "date_time")
+							).put(
+								"description", JSONUtil.put("type", "string")
+							).put(
+								"id", JSONUtil.put("type", "id")
+							).put(
+								"published", JSONUtil.put("type", "boolean")
 							)
 						).put(
 							"x-test", true
