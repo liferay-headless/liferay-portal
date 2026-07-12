@@ -8,8 +8,10 @@ package com.liferay.headless.builder.internal.odata.entity;
 import com.liferay.headless.builder.application.APIApplication;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
@@ -89,6 +91,44 @@ public class APISchemaEntityModelTest {
 				).build()));
 
 		Assert.assertNull(apiSchemaEntityModel.getEntityFieldsMap());
+	}
+
+	@Test
+	public void testGetEntityFieldsMapPreservesCollectionEntityFieldSortable() {
+		Map<String, String> fieldMapping = HashMapBuilder.put(
+			"propertyField1", "field1"
+		).put(
+			"propertyField2", "field2"
+		).build();
+
+		EntityModelImpl entityModelImpl = new EntityModelImpl();
+
+		entityModelImpl.setEntityFieldsMap(
+			HashMapBuilder.<String, EntityField>put(
+				"field1",
+				new CollectionEntityField(
+					new StringEntityField("field1", locale -> null), true)
+			).put(
+				"field2",
+				new CollectionEntityField(
+					new StringEntityField("field2", locale -> null), false)
+			).build());
+
+		APISchemaEntityModel apiSchemaEntityModel = new APISchemaEntityModel(
+			entityModelImpl, _getSchema(fieldMapping));
+
+		Map<String, EntityField> entityFieldsMap =
+			apiSchemaEntityModel.getEntityFieldsMap();
+
+		CollectionEntityField collectionEntityField1 =
+			(CollectionEntityField)entityFieldsMap.get("propertyField1");
+
+		Assert.assertTrue(collectionEntityField1.isSortable());
+
+		CollectionEntityField collectionEntityField2 =
+			(CollectionEntityField)entityFieldsMap.get("propertyField2");
+
+		Assert.assertFalse(collectionEntityField2.isSortable());
 	}
 
 	private void _assertEntityField(
