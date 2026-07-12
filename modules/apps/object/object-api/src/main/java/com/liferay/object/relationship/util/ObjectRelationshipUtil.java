@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -184,6 +185,25 @@ public class ObjectRelationshipUtil {
 			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		return jaxRsApplicationDescriptor.getRESTContextPath();
+	}
+
+	public static boolean isManyToOneObjectRelationship(
+		ObjectDefinition objectDefinition,
+		ObjectRelationship objectRelationship,
+		ObjectDefinition relatedObjectDefinition) {
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
+			(objectRelationship.getObjectDefinitionId1() ==
+				relatedObjectDefinition.getObjectDefinitionId()) &&
+			(objectRelationship.getObjectDefinitionId2() ==
+				objectDefinition.getObjectDefinitionId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public static boolean isParameterRequired(

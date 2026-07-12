@@ -317,6 +317,17 @@ public class SortableFieldsOpenAPIContributor implements OpenAPIContributor {
 			ComplexEntityField complexEntityField =
 				(ComplexEntityField)entityField;
 
+			if (!complexEntityField.isSortable()) {
+
+				// A field reached through a to-many relationship has no
+				// well-defined per-parent value to sort by -- the parent
+				// may have any number of related entities, so sorting by
+				// one of their fields relies on the same implicit min/max
+				// reduction that excludes genuine array fields above.
+
+				continue;
+			}
+
 			if (!visitedEntityFields.add(complexEntityField)) {
 				continue;
 			}

@@ -83,10 +83,16 @@ public class ObjectEntryEntityModel implements EntityModel {
 			ObjectRelationshipUtil.getRelatedObjectDefinition(
 				objectDefinition, objectRelationship);
 
+		// Navigating from the "many" side of a one-to-many relationship
+		// toward its one related entity is safe to sort by: each entity
+		// here has exactly one related entity, not an unbounded number.
+
 		return new ComplexEntityField(
 			objectRelationship.getName(),
 			_getObjectDefinitionEntityFieldsMap(relatedObjectDefinition),
-			relatedObjectDefinition.getName());
+			relatedObjectDefinition.getName(),
+			ObjectRelationshipUtil.isManyToOneObjectRelationship(
+				objectDefinition, objectRelationship, relatedObjectDefinition));
 	}
 
 	private EntityField _getEntityField(ObjectField objectField) {

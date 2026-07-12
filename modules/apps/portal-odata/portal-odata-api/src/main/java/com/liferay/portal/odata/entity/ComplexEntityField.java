@@ -36,6 +36,28 @@ public class ComplexEntityField extends EntityField {
 	public ComplexEntityField(
 		String name, List<EntityField> entityFields, String typeKey) {
 
+		this(name, entityFields, typeKey, true);
+	}
+
+	/**
+	 * Creates a new {@code EntityField} with its name, type and the list of
+	 * entity fields contained inside it.
+	 *
+	 * @param  name the entity field's name
+	 * @param  entityFields the list of entity fields
+	 * @param  typeKey the type key
+	 * @param  sortable whether this field is safe to sort by. A field
+	 *         reached through a relationship that can have more than one
+	 *         related entity has no well-defined per-parent value (the
+	 *         parent may have any number of related entities), so it is
+	 *         excluded from x-sortable regardless of what its own leaf
+	 *         fields look like.
+	 * @review
+	 */
+	public ComplexEntityField(
+		String name, List<EntityField> entityFields, String typeKey,
+		boolean sortable) {
+
 		super(
 			name, EntityField.Type.COMPLEX, locale -> name, locale -> name,
 			fieldValue -> String.valueOf(fieldValue));
@@ -52,10 +74,18 @@ public class ComplexEntityField extends EntityField {
 		}
 
 		_typeKey = typeKey;
+		_sortable = sortable;
 	}
 
 	public ComplexEntityField(
 		String name, Map<String, EntityField> entityFieldsMap, String typeKey) {
+
+		this(name, entityFieldsMap, typeKey, true);
+	}
+
+	public ComplexEntityField(
+		String name, Map<String, EntityField> entityFieldsMap, String typeKey,
+		boolean sortable) {
 
 		super(
 			name, EntityField.Type.COMPLEX, locale -> name, locale -> name,
@@ -63,6 +93,7 @@ public class ComplexEntityField extends EntityField {
 
 		_entityFieldsMap = entityFieldsMap;
 		_typeKey = typeKey;
+		_sortable = sortable;
 	}
 
 	/**
@@ -79,6 +110,16 @@ public class ComplexEntityField extends EntityField {
 		return _typeKey;
 	}
 
+	/**
+	 * Returns whether this field is safe to sort by.
+	 *
+	 * @return whether this field is safe to sort by
+	 * @review
+	 */
+	public boolean isSortable() {
+		return _sortable;
+	}
+
 	@Override
 	public String toString() {
 		Type type = getType();
@@ -91,6 +132,7 @@ public class ComplexEntityField extends EntityField {
 	}
 
 	private final Map<String, EntityField> _entityFieldsMap;
+	private final boolean _sortable;
 	private final String _typeKey;
 
 }

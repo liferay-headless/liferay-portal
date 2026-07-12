@@ -97,7 +97,7 @@ public class ObjectRelationshipExtensionProvider
 
 				long primaryKey = getPrimaryKey(entity, objectDefinition);
 
-				if (_isManyToOneObjectRelationship(
+				if (ObjectRelationshipUtil.isManyToOneObjectRelationship(
 						objectDefinition, objectRelationship,
 						relatedObjectDefinition)) {
 
@@ -318,25 +318,6 @@ public class ObjectRelationshipExtensionProvider
 		}
 
 		return PropertyDefinition.PropertyType.MULTIPLE_ELEMENT;
-	}
-
-	private boolean _isManyToOneObjectRelationship(
-		ObjectDefinition objectDefinition,
-		ObjectRelationship objectRelationship,
-		ObjectDefinition relatedObjectDefinition) {
-
-		if (Objects.equals(
-				objectRelationship.getType(),
-				ObjectRelationshipConstants.TYPE_ONE_TO_MANY) &&
-			(objectRelationship.getObjectDefinitionId1() ==
-				relatedObjectDefinition.getObjectDefinitionId()) &&
-			(objectRelationship.getObjectDefinitionId2() ==
-				objectDefinition.getObjectDefinitionId())) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private void _relateNestedObjectEntry(
