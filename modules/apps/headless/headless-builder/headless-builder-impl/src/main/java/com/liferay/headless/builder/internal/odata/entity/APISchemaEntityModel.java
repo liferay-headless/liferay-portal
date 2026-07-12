@@ -105,7 +105,8 @@ public class APISchemaEntityModel implements EntityModel {
 
 			return new CollectionEntityField(
 				_toAPIPropertyEntityField(
-					collectionEntityField.getEntityField(), property));
+					collectionEntityField.getEntityField(), property),
+				collectionEntityField.isSortable());
 		}
 
 		return new APIPropertyEntityField(
