@@ -41,17 +41,20 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -761,6 +764,140 @@ public abstract class BaseDataListViewResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, dataListView1, dataListView2);
 		}
+
+		dataListView1 = testGetDataDefinitionDataListViewsPage_addDataListView(
+			dataDefinitionId, dataListView1);
+
+		dataListView2 = testGetDataDefinitionDataListViewsPage_addDataListView(
+			dataDefinitionId, dataListView2);
+
+		Page<DataListView> page =
+			dataListViewResource.getDataDefinitionDataListViewsPage(
+				dataDefinitionId, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<DataListView> ascPage =
+				dataListViewResource.getDataDefinitionDataListViewsPage(
+					dataDefinitionId, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				dataListView1, (List<DataListView>)ascPage.getItems());
+			assertContains(
+				dataListView2, (List<DataListView>)ascPage.getItems());
+
+			Page<DataListView> descPage =
+				dataListViewResource.getDataDefinitionDataListViewsPage(
+					dataDefinitionId, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				dataListView2, (List<DataListView>)descPage.getItems());
+			assertContains(
+				dataListView1, (List<DataListView>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetDataDefinitionDataListViewsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "data-engine/v2.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"DataListView"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		DataListView dataListView1 = randomDataListView();
+		DataListView dataListView2 = randomDataListView();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = dataListView1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						dataListView1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						dataListView2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(dataListView1, entityFieldName, 0);
+					BeanTestUtil.setProperty(dataListView2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						dataListView1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						dataListView2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long dataDefinitionId =
+			testGetDataDefinitionDataListViewsPage_getDataDefinitionId();
 
 		dataListView1 = testGetDataDefinitionDataListViewsPage_addDataListView(
 			dataDefinitionId, dataListView1);
@@ -2426,4 +2563,4 @@ public abstract class BaseDataListViewResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:429709338
+// LIFERAY-REST-BUILDER-HASH:195913303

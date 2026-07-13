@@ -40,16 +40,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1169,6 +1172,152 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetChannelByExternalReferenceCodeCategoryDisplayPagesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-channel/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"CategoryDisplayPage"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		CategoryDisplayPage categoryDisplayPage1 = randomCategoryDisplayPage();
+		CategoryDisplayPage categoryDisplayPage2 = randomCategoryDisplayPage();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = categoryDisplayPage1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetChannelByExternalReferenceCodeCategoryDisplayPagesPage_getExternalReferenceCode();
+
+		categoryDisplayPage1 =
+			testGetChannelByExternalReferenceCodeCategoryDisplayPagesPage_addCategoryDisplayPage(
+				externalReferenceCode, categoryDisplayPage1);
+
+		categoryDisplayPage2 =
+			testGetChannelByExternalReferenceCodeCategoryDisplayPagesPage_addCategoryDisplayPage(
+				externalReferenceCode, categoryDisplayPage2);
+
+		Page<CategoryDisplayPage> page =
+			categoryDisplayPageResource.
+				getChannelByExternalReferenceCodeCategoryDisplayPagesPage(
+					externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<CategoryDisplayPage> ascPage =
+				categoryDisplayPageResource.
+					getChannelByExternalReferenceCodeCategoryDisplayPagesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				categoryDisplayPage1,
+				(List<CategoryDisplayPage>)ascPage.getItems());
+			assertContains(
+				categoryDisplayPage2,
+				(List<CategoryDisplayPage>)ascPage.getItems());
+
+			Page<CategoryDisplayPage> descPage =
+				categoryDisplayPageResource.
+					getChannelByExternalReferenceCodeCategoryDisplayPagesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				categoryDisplayPage2,
+				(List<CategoryDisplayPage>)descPage.getItems());
+			assertContains(
+				categoryDisplayPage1,
+				(List<CategoryDisplayPage>)descPage.getItems());
+		}
+	}
+
 	protected CategoryDisplayPage
 			testGetChannelByExternalReferenceCodeCategoryDisplayPagesPage_addCategoryDisplayPage(
 				String externalReferenceCode,
@@ -1599,6 +1748,150 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, categoryDisplayPage1, categoryDisplayPage2);
 		}
+
+		categoryDisplayPage1 =
+			testGetChannelIdCategoryDisplayPagesPage_addCategoryDisplayPage(
+				id, categoryDisplayPage1);
+
+		categoryDisplayPage2 =
+			testGetChannelIdCategoryDisplayPagesPage_addCategoryDisplayPage(
+				id, categoryDisplayPage2);
+
+		Page<CategoryDisplayPage> page =
+			categoryDisplayPageResource.getChannelIdCategoryDisplayPagesPage(
+				id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<CategoryDisplayPage> ascPage =
+				categoryDisplayPageResource.
+					getChannelIdCategoryDisplayPagesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				categoryDisplayPage1,
+				(List<CategoryDisplayPage>)ascPage.getItems());
+			assertContains(
+				categoryDisplayPage2,
+				(List<CategoryDisplayPage>)ascPage.getItems());
+
+			Page<CategoryDisplayPage> descPage =
+				categoryDisplayPageResource.
+					getChannelIdCategoryDisplayPagesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				categoryDisplayPage2,
+				(List<CategoryDisplayPage>)descPage.getItems());
+			assertContains(
+				categoryDisplayPage1,
+				(List<CategoryDisplayPage>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetChannelIdCategoryDisplayPagesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-channel/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"CategoryDisplayPage"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		CategoryDisplayPage categoryDisplayPage1 = randomCategoryDisplayPage();
+		CategoryDisplayPage categoryDisplayPage2 = randomCategoryDisplayPage();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = categoryDisplayPage1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						categoryDisplayPage1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						categoryDisplayPage2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetChannelIdCategoryDisplayPagesPage_getId();
 
 		categoryDisplayPage1 =
 			testGetChannelIdCategoryDisplayPagesPage_addCategoryDisplayPage(
@@ -2742,4 +3035,4 @@ public abstract class BaseCategoryDisplayPageResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1091294052
+// LIFERAY-REST-BUILDER-HASH:-12431452

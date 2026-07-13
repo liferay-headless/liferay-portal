@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -953,6 +956,152 @@ public abstract class BaseDiscountProductGroupResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, discountProductGroup1, discountProductGroup2);
 		}
+
+		discountProductGroup1 =
+			testGetDiscountIdDiscountProductGroupsPage_addDiscountProductGroup(
+				id, discountProductGroup1);
+
+		discountProductGroup2 =
+			testGetDiscountIdDiscountProductGroupsPage_addDiscountProductGroup(
+				id, discountProductGroup2);
+
+		Page<DiscountProductGroup> page =
+			discountProductGroupResource.getDiscountIdDiscountProductGroupsPage(
+				id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<DiscountProductGroup> ascPage =
+				discountProductGroupResource.
+					getDiscountIdDiscountProductGroupsPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				discountProductGroup1,
+				(List<DiscountProductGroup>)ascPage.getItems());
+			assertContains(
+				discountProductGroup2,
+				(List<DiscountProductGroup>)ascPage.getItems());
+
+			Page<DiscountProductGroup> descPage =
+				discountProductGroupResource.
+					getDiscountIdDiscountProductGroupsPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				discountProductGroup2,
+				(List<DiscountProductGroup>)descPage.getItems());
+			assertContains(
+				discountProductGroup1,
+				(List<DiscountProductGroup>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetDiscountIdDiscountProductGroupsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-pricing/v2.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"DiscountProductGroup"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		DiscountProductGroup discountProductGroup1 =
+			randomDiscountProductGroup();
+		DiscountProductGroup discountProductGroup2 =
+			randomDiscountProductGroup();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = discountProductGroup1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						discountProductGroup1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						discountProductGroup2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						discountProductGroup1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						discountProductGroup2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						discountProductGroup1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						discountProductGroup2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetDiscountIdDiscountProductGroupsPage_getId();
 
 		discountProductGroup1 =
 			testGetDiscountIdDiscountProductGroupsPage_addDiscountProductGroup(
@@ -2037,4 +2186,4 @@ public abstract class BaseDiscountProductGroupResourceTestCase {
 		DiscountProductGroupResource _discountProductGroupResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-930894358
+// LIFERAY-REST-BUILDER-HASH:-274005472

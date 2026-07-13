@@ -34,17 +34,20 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -653,6 +656,144 @@ public abstract class BaseContentTemplateResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryContentTemplatesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ContentTemplate"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ContentTemplate contentTemplate1 = randomContentTemplate();
+		ContentTemplate contentTemplate2 = randomContentTemplate();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = contentTemplate1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentTemplatesPage_getAssetLibraryId();
+
+		contentTemplate1 =
+			testGetAssetLibraryContentTemplatesPage_addContentTemplate(
+				assetLibraryId, contentTemplate1);
+
+		contentTemplate2 =
+			testGetAssetLibraryContentTemplatesPage_addContentTemplate(
+				assetLibraryId, contentTemplate2);
+
+		Page<ContentTemplate> page =
+			contentTemplateResource.getAssetLibraryContentTemplatesPage(
+				assetLibraryId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ContentTemplate> ascPage =
+				contentTemplateResource.getAssetLibraryContentTemplatesPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				contentTemplate1, (List<ContentTemplate>)ascPage.getItems());
+			assertContains(
+				contentTemplate2, (List<ContentTemplate>)ascPage.getItems());
+
+			Page<ContentTemplate> descPage =
+				contentTemplateResource.getAssetLibraryContentTemplatesPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				contentTemplate2, (List<ContentTemplate>)descPage.getItems());
+			assertContains(
+				contentTemplate1, (List<ContentTemplate>)descPage.getItems());
+		}
+	}
+
 	protected ContentTemplate
 			testGetAssetLibraryContentTemplatesPage_addContentTemplate(
 				Long assetLibraryId, ContentTemplate contentTemplate)
@@ -1195,6 +1336,141 @@ public abstract class BaseContentTemplateResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, contentTemplate1, contentTemplate2);
 		}
+
+		contentTemplate1 = testGetSiteContentTemplatesPage_addContentTemplate(
+			siteId, contentTemplate1);
+
+		contentTemplate2 = testGetSiteContentTemplatesPage_addContentTemplate(
+			siteId, contentTemplate2);
+
+		Page<ContentTemplate> page =
+			contentTemplateResource.getSiteContentTemplatesPage(
+				siteId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ContentTemplate> ascPage =
+				contentTemplateResource.getSiteContentTemplatesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				contentTemplate1, (List<ContentTemplate>)ascPage.getItems());
+			assertContains(
+				contentTemplate2, (List<ContentTemplate>)ascPage.getItems());
+
+			Page<ContentTemplate> descPage =
+				contentTemplateResource.getSiteContentTemplatesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				contentTemplate2, (List<ContentTemplate>)descPage.getItems());
+			assertContains(
+				contentTemplate1, (List<ContentTemplate>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteContentTemplatesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ContentTemplate"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ContentTemplate contentTemplate1 = randomContentTemplate();
+		ContentTemplate contentTemplate2 = randomContentTemplate();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = contentTemplate1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						contentTemplate1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						contentTemplate2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteContentTemplatesPage_getSiteId();
 
 		contentTemplate1 = testGetSiteContentTemplatesPage_addContentTemplate(
 			siteId, contentTemplate1);
@@ -2509,4 +2785,4 @@ public abstract class BaseContentTemplateResourceTestCase {
 		_contentTemplateResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:114614749
+// LIFERAY-REST-BUILDER-HASH:126443399

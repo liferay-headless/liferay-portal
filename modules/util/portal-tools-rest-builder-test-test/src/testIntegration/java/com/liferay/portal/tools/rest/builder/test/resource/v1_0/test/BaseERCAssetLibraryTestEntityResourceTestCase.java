@@ -2305,4 +2305,4 @@ public abstract class BaseERCAssetLibraryTestEntityResourceTestCase {
 		ERCAssetLibraryTestEntityResource _ercAssetLibraryTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:85682754
+// LIFERAY-REST-BUILDER-HASH:-768741098

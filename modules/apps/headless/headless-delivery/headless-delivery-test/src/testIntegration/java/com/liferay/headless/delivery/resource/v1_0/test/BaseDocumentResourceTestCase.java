@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -57,11 +58,13 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1466,6 +1469,133 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryDocumentsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Document"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Document document1 = randomDocument();
+		Document document2 = randomDocument();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = document1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						document1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						document2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long assetLibraryId =
+			testGetAssetLibraryDocumentsPage_getAssetLibraryId();
+
+		document1 = testGetAssetLibraryDocumentsPage_addDocument(
+			assetLibraryId, document1);
+
+		document2 = testGetAssetLibraryDocumentsPage_addDocument(
+			assetLibraryId, document2);
+
+		Page<Document> page = documentResource.getAssetLibraryDocumentsPage(
+			assetLibraryId, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Document> ascPage =
+				documentResource.getAssetLibraryDocumentsPage(
+					assetLibraryId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(document1, (List<Document>)ascPage.getItems());
+			assertContains(document2, (List<Document>)ascPage.getItems());
+
+			Page<Document> descPage =
+				documentResource.getAssetLibraryDocumentsPage(
+					assetLibraryId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(document2, (List<Document>)descPage.getItems());
+			assertContains(document1, (List<Document>)descPage.getItems());
+		}
+	}
+
 	protected Document testGetAssetLibraryDocumentsPage_addDocument(
 			Long assetLibraryId, Document document)
 		throws Exception {
@@ -2550,6 +2680,133 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetDocumentFolderDocumentsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Document"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Document document1 = randomDocument();
+		Document document2 = randomDocument();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = document1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						document1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						document2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long documentFolderId =
+			testGetDocumentFolderDocumentsPage_getDocumentFolderId();
+
+		document1 = testGetDocumentFolderDocumentsPage_addDocument(
+			documentFolderId, document1);
+
+		document2 = testGetDocumentFolderDocumentsPage_addDocument(
+			documentFolderId, document2);
+
+		Page<Document> page = documentResource.getDocumentFolderDocumentsPage(
+			documentFolderId, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Document> ascPage =
+				documentResource.getDocumentFolderDocumentsPage(
+					documentFolderId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(document1, (List<Document>)ascPage.getItems());
+			assertContains(document2, (List<Document>)ascPage.getItems());
+
+			Page<Document> descPage =
+				documentResource.getDocumentFolderDocumentsPage(
+					documentFolderId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(document2, (List<Document>)descPage.getItems());
+			assertContains(document1, (List<Document>)descPage.getItems());
+		}
+	}
+
 	protected Document testGetDocumentFolderDocumentsPage_addDocument(
 			Long documentFolderId, Document document)
 		throws Exception {
@@ -3247,6 +3504,126 @@ public abstract class BaseDocumentResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, document1, document2);
 		}
+
+		document1 = testGetSiteDocumentsPage_addDocument(siteId, document1);
+
+		document2 = testGetSiteDocumentsPage_addDocument(siteId, document2);
+
+		Page<Document> page = documentResource.getSiteDocumentsPage(
+			siteId, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Document> ascPage = documentResource.getSiteDocumentsPage(
+				siteId, null, null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(document1, (List<Document>)ascPage.getItems());
+			assertContains(document2, (List<Document>)ascPage.getItems());
+
+			Page<Document> descPage = documentResource.getSiteDocumentsPage(
+				siteId, null, null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(document2, (List<Document>)descPage.getItems());
+			assertContains(document1, (List<Document>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteDocumentsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Document"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Document document1 = randomDocument();
+		Document document2 = randomDocument();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = document1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(document1, entityFieldName, 0);
+					BeanTestUtil.setProperty(document2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						document1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						document2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteDocumentsPage_getSiteId();
 
 		document1 = testGetSiteDocumentsPage_addDocument(siteId, document1);
 
@@ -6632,4 +7009,4 @@ public abstract class BaseDocumentResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:993960568
+// LIFERAY-REST-BUILDER-HASH:328390633

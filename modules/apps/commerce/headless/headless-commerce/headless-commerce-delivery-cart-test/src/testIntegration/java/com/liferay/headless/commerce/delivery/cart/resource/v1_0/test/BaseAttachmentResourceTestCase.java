@@ -29,16 +29,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -762,6 +765,133 @@ public abstract class BaseAttachmentResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetCartAttachmentsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-cart/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Attachment"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Attachment attachment1 = randomAttachment();
+		Attachment attachment2 = randomAttachment();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = attachment1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(attachment1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(attachment2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(attachment1, entityFieldName, 0);
+					BeanTestUtil.setProperty(attachment2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						attachment1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						attachment2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long cartId = testGetCartAttachmentsPage_getCartId();
+
+		attachment1 = testGetCartAttachmentsPage_addAttachment(
+			cartId, attachment1);
+
+		attachment2 = testGetCartAttachmentsPage_addAttachment(
+			cartId, attachment2);
+
+		Page<Attachment> page = attachmentResource.getCartAttachmentsPage(
+			cartId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Attachment> ascPage =
+				attachmentResource.getCartAttachmentsPage(
+					cartId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(attachment1, (List<Attachment>)ascPage.getItems());
+			assertContains(attachment2, (List<Attachment>)ascPage.getItems());
+
+			Page<Attachment> descPage =
+				attachmentResource.getCartAttachmentsPage(
+					cartId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(attachment2, (List<Attachment>)descPage.getItems());
+			assertContains(attachment1, (List<Attachment>)descPage.getItems());
+		}
+	}
+
 	protected Attachment testGetCartAttachmentsPage_addAttachment(
 			Long cartId, Attachment attachment)
 		throws Exception {
@@ -1166,6 +1296,139 @@ public abstract class BaseAttachmentResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, attachment1, attachment2);
 		}
+
+		attachment1 =
+			testGetCartByExternalReferenceCodeAttachmentsPage_addAttachment(
+				externalReferenceCode, attachment1);
+
+		attachment2 =
+			testGetCartByExternalReferenceCodeAttachmentsPage_addAttachment(
+				externalReferenceCode, attachment2);
+
+		Page<Attachment> page =
+			attachmentResource.getCartByExternalReferenceCodeAttachmentsPage(
+				externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Attachment> ascPage =
+				attachmentResource.
+					getCartByExternalReferenceCodeAttachmentsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(attachment1, (List<Attachment>)ascPage.getItems());
+			assertContains(attachment2, (List<Attachment>)ascPage.getItems());
+
+			Page<Attachment> descPage =
+				attachmentResource.
+					getCartByExternalReferenceCodeAttachmentsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(attachment2, (List<Attachment>)descPage.getItems());
+			assertContains(attachment1, (List<Attachment>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetCartByExternalReferenceCodeAttachmentsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-cart/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Attachment"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Attachment attachment1 = randomAttachment();
+		Attachment attachment2 = randomAttachment();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = attachment1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(attachment1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(attachment2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(attachment1, entityFieldName, 0);
+					BeanTestUtil.setProperty(attachment2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						attachment1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						attachment2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetCartByExternalReferenceCodeAttachmentsPage_getExternalReferenceCode();
 
 		attachment1 =
 			testGetCartByExternalReferenceCodeAttachmentsPage_addAttachment(
@@ -2395,4 +2658,4 @@ public abstract class BaseAttachmentResourceTestCase {
 			AttachmentResource _attachmentResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:309401417
+// LIFERAY-REST-BUILDER-HASH:1623627832

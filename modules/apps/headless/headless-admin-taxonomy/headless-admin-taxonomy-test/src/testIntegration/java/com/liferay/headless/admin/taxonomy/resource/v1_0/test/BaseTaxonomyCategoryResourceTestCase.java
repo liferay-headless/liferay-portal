@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -48,11 +49,13 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1373,6 +1376,144 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryTaxonomyCategoriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyCategory"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
+		TaxonomyCategory taxonomyCategory2 = randomTaxonomyCategory();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyCategory1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long assetLibraryId =
+			testGetAssetLibraryTaxonomyCategoriesPage_getAssetLibraryId();
+
+		taxonomyCategory1 =
+			testGetAssetLibraryTaxonomyCategoriesPage_addTaxonomyCategory(
+				assetLibraryId, taxonomyCategory1);
+
+		taxonomyCategory2 =
+			testGetAssetLibraryTaxonomyCategoriesPage_addTaxonomyCategory(
+				assetLibraryId, taxonomyCategory2);
+
+		Page<TaxonomyCategory> page =
+			taxonomyCategoryResource.getAssetLibraryTaxonomyCategoriesPage(
+				assetLibraryId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyCategory> ascPage =
+				taxonomyCategoryResource.getAssetLibraryTaxonomyCategoriesPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)ascPage.getItems());
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)ascPage.getItems());
+
+			Page<TaxonomyCategory> descPage =
+				taxonomyCategoryResource.getAssetLibraryTaxonomyCategoriesPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)descPage.getItems());
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)descPage.getItems());
+		}
+	}
+
 	protected TaxonomyCategory
 			testGetAssetLibraryTaxonomyCategoriesPage_addTaxonomyCategory(
 				Long assetLibraryId, TaxonomyCategory taxonomyCategory)
@@ -2085,6 +2226,143 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, taxonomyCategory1, taxonomyCategory2);
 		}
+
+		taxonomyCategory1 =
+			testGetSiteTaxonomyCategoriesPage_addTaxonomyCategory(
+				siteId, taxonomyCategory1);
+
+		taxonomyCategory2 =
+			testGetSiteTaxonomyCategoriesPage_addTaxonomyCategory(
+				siteId, taxonomyCategory2);
+
+		Page<TaxonomyCategory> page =
+			taxonomyCategoryResource.getSiteTaxonomyCategoriesPage(
+				siteId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyCategory> ascPage =
+				taxonomyCategoryResource.getSiteTaxonomyCategoriesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)ascPage.getItems());
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)ascPage.getItems());
+
+			Page<TaxonomyCategory> descPage =
+				taxonomyCategoryResource.getSiteTaxonomyCategoriesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)descPage.getItems());
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteTaxonomyCategoriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyCategory"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
+		TaxonomyCategory taxonomyCategory2 = randomTaxonomyCategory();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyCategory1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteTaxonomyCategoriesPage_getSiteId();
 
 		taxonomyCategory1 =
 			testGetSiteTaxonomyCategoriesPage_addTaxonomyCategory(
@@ -3277,6 +3555,146 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetTaxonomyCategoryTaxonomyCategoriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyCategory"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
+		TaxonomyCategory taxonomyCategory2 = randomTaxonomyCategory();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyCategory1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String parentTaxonomyCategoryId =
+			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
+
+		taxonomyCategory1 =
+			testGetTaxonomyCategoryTaxonomyCategoriesPage_addTaxonomyCategory(
+				parentTaxonomyCategoryId, taxonomyCategory1);
+
+		taxonomyCategory2 =
+			testGetTaxonomyCategoryTaxonomyCategoriesPage_addTaxonomyCategory(
+				parentTaxonomyCategoryId, taxonomyCategory2);
+
+		Page<TaxonomyCategory> page =
+			taxonomyCategoryResource.getTaxonomyCategoryTaxonomyCategoriesPage(
+				parentTaxonomyCategoryId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyCategory> ascPage =
+				taxonomyCategoryResource.
+					getTaxonomyCategoryTaxonomyCategoriesPage(
+						parentTaxonomyCategoryId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)ascPage.getItems());
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)ascPage.getItems());
+
+			Page<TaxonomyCategory> descPage =
+				taxonomyCategoryResource.
+					getTaxonomyCategoryTaxonomyCategoriesPage(
+						parentTaxonomyCategoryId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)descPage.getItems());
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)descPage.getItems());
+		}
+	}
+
 	protected TaxonomyCategory
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_addTaxonomyCategory(
 				String parentTaxonomyCategoryId,
@@ -3854,6 +4272,147 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, taxonomyCategory1, taxonomyCategory2);
 		}
+
+		taxonomyCategory1 =
+			testGetTaxonomyVocabularyTaxonomyCategoriesPage_addTaxonomyCategory(
+				taxonomyVocabularyId, taxonomyCategory1);
+
+		taxonomyCategory2 =
+			testGetTaxonomyVocabularyTaxonomyCategoriesPage_addTaxonomyCategory(
+				taxonomyVocabularyId, taxonomyCategory2);
+
+		Page<TaxonomyCategory> page =
+			taxonomyCategoryResource.
+				getTaxonomyVocabularyTaxonomyCategoriesPage(
+					taxonomyVocabularyId, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyCategory> ascPage =
+				taxonomyCategoryResource.
+					getTaxonomyVocabularyTaxonomyCategoriesPage(
+						taxonomyVocabularyId, null, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)ascPage.getItems());
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)ascPage.getItems());
+
+			Page<TaxonomyCategory> descPage =
+				taxonomyCategoryResource.
+					getTaxonomyVocabularyTaxonomyCategoriesPage(
+						taxonomyVocabularyId, null, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyCategory2, (List<TaxonomyCategory>)descPage.getItems());
+			assertContains(
+				taxonomyCategory1, (List<TaxonomyCategory>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetTaxonomyVocabularyTaxonomyCategoriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyCategory"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
+		TaxonomyCategory taxonomyCategory2 = randomTaxonomyCategory();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyCategory1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyCategory1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyCategory2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long taxonomyVocabularyId =
+			testGetTaxonomyVocabularyTaxonomyCategoriesPage_getTaxonomyVocabularyId();
 
 		taxonomyCategory1 =
 			testGetTaxonomyVocabularyTaxonomyCategoriesPage_addTaxonomyCategory(
@@ -6981,4 +7540,4 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			TaxonomyCategoryResource _taxonomyCategoryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1919811996
+// LIFERAY-REST-BUILDER-HASH:1961776985

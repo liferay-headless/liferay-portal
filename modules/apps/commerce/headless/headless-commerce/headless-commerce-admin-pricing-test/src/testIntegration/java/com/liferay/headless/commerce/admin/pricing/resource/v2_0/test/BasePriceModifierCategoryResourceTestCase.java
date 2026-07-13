@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -967,6 +970,153 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, priceModifierCategory1, priceModifierCategory2);
 		}
+
+		priceModifierCategory1 =
+			testGetPriceModifierIdPriceModifierCategoriesPage_addPriceModifierCategory(
+				id, priceModifierCategory1);
+
+		priceModifierCategory2 =
+			testGetPriceModifierIdPriceModifierCategoriesPage_addPriceModifierCategory(
+				id, priceModifierCategory2);
+
+		Page<PriceModifierCategory> page =
+			priceModifierCategoryResource.
+				getPriceModifierIdPriceModifierCategoriesPage(
+					id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PriceModifierCategory> ascPage =
+				priceModifierCategoryResource.
+					getPriceModifierIdPriceModifierCategoriesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				priceModifierCategory1,
+				(List<PriceModifierCategory>)ascPage.getItems());
+			assertContains(
+				priceModifierCategory2,
+				(List<PriceModifierCategory>)ascPage.getItems());
+
+			Page<PriceModifierCategory> descPage =
+				priceModifierCategoryResource.
+					getPriceModifierIdPriceModifierCategoriesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				priceModifierCategory2,
+				(List<PriceModifierCategory>)descPage.getItems());
+			assertContains(
+				priceModifierCategory1,
+				(List<PriceModifierCategory>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetPriceModifierIdPriceModifierCategoriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-pricing/v2.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PriceModifierCategory"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PriceModifierCategory priceModifierCategory1 =
+			randomPriceModifierCategory();
+		PriceModifierCategory priceModifierCategory2 =
+			randomPriceModifierCategory();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = priceModifierCategory1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						priceModifierCategory1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						priceModifierCategory2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						priceModifierCategory1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						priceModifierCategory2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						priceModifierCategory1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						priceModifierCategory2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetPriceModifierIdPriceModifierCategoriesPage_getId();
 
 		priceModifierCategory1 =
 			testGetPriceModifierIdPriceModifierCategoriesPage_addPriceModifierCategory(
@@ -2059,4 +2209,4 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 		PriceModifierCategoryResource _priceModifierCategoryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-656344433
+// LIFERAY-REST-BUILDER-HASH:1203803476

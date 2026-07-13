@@ -2007,4 +2007,4 @@ public abstract class BaseWorkflowDefinitionLinkResourceTestCase {
 		WorkflowDefinitionLinkResource _workflowDefinitionLinkResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-890742207
+// LIFERAY-REST-BUILDER-HASH:-1655645227

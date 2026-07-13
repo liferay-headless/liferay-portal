@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -770,6 +773,154 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 				entityField, shippingFixedOptionOrderType1,
 				shippingFixedOptionOrderType2);
 		}
+
+		shippingFixedOptionOrderType1 =
+			testGetShippingFixedOptionIdShippingFixedOptionOrderTypesPage_addShippingFixedOptionOrderType(
+				id, shippingFixedOptionOrderType1);
+
+		shippingFixedOptionOrderType2 =
+			testGetShippingFixedOptionIdShippingFixedOptionOrderTypesPage_addShippingFixedOptionOrderType(
+				id, shippingFixedOptionOrderType2);
+
+		Page<ShippingFixedOptionOrderType> page =
+			shippingFixedOptionOrderTypeResource.
+				getShippingFixedOptionIdShippingFixedOptionOrderTypesPage(
+					id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ShippingFixedOptionOrderType> ascPage =
+				shippingFixedOptionOrderTypeResource.
+					getShippingFixedOptionIdShippingFixedOptionOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				shippingFixedOptionOrderType1,
+				(List<ShippingFixedOptionOrderType>)ascPage.getItems());
+			assertContains(
+				shippingFixedOptionOrderType2,
+				(List<ShippingFixedOptionOrderType>)ascPage.getItems());
+
+			Page<ShippingFixedOptionOrderType> descPage =
+				shippingFixedOptionOrderTypeResource.
+					getShippingFixedOptionIdShippingFixedOptionOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				shippingFixedOptionOrderType2,
+				(List<ShippingFixedOptionOrderType>)descPage.getItems());
+			assertContains(
+				shippingFixedOptionOrderType1,
+				(List<ShippingFixedOptionOrderType>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetShippingFixedOptionIdShippingFixedOptionOrderTypesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-channel/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ShippingFixedOptionOrderType"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ShippingFixedOptionOrderType shippingFixedOptionOrderType1 =
+			randomShippingFixedOptionOrderType();
+		ShippingFixedOptionOrderType shippingFixedOptionOrderType2 =
+			randomShippingFixedOptionOrderType();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = shippingFixedOptionOrderType1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						shippingFixedOptionOrderType2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id =
+			testGetShippingFixedOptionIdShippingFixedOptionOrderTypesPage_getId();
 
 		shippingFixedOptionOrderType1 =
 			testGetShippingFixedOptionIdShippingFixedOptionOrderTypesPage_addShippingFixedOptionOrderType(
@@ -1826,4 +1977,4 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 			_shippingFixedOptionOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1356888904
+// LIFERAY-REST-BUILDER-HASH:1093421486

@@ -34,17 +34,20 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -733,6 +736,142 @@ public abstract class BasePageTemplateSetResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, pageTemplateSet1, pageTemplateSet2);
 		}
+
+		pageTemplateSet1 = testGetSitePageTemplateSetsPage_addPageTemplateSet(
+			siteExternalReferenceCode, pageTemplateSet1);
+
+		pageTemplateSet2 = testGetSitePageTemplateSetsPage_addPageTemplateSet(
+			siteExternalReferenceCode, pageTemplateSet2);
+
+		Page<PageTemplateSet> page =
+			pageTemplateSetResource.getSitePageTemplateSetsPage(
+				siteExternalReferenceCode, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PageTemplateSet> ascPage =
+				pageTemplateSetResource.getSitePageTemplateSetsPage(
+					siteExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				pageTemplateSet1, (List<PageTemplateSet>)ascPage.getItems());
+			assertContains(
+				pageTemplateSet2, (List<PageTemplateSet>)ascPage.getItems());
+
+			Page<PageTemplateSet> descPage =
+				pageTemplateSetResource.getSitePageTemplateSetsPage(
+					siteExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				pageTemplateSet2, (List<PageTemplateSet>)descPage.getItems());
+			assertContains(
+				pageTemplateSet1, (List<PageTemplateSet>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSitePageTemplateSetsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-site/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PageTemplateSet"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PageTemplateSet pageTemplateSet1 = randomPageTemplateSet();
+		PageTemplateSet pageTemplateSet2 = randomPageTemplateSet();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = pageTemplateSet1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						pageTemplateSet1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						pageTemplateSet2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						pageTemplateSet1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						pageTemplateSet2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						pageTemplateSet1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						pageTemplateSet2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String siteExternalReferenceCode =
+			testGetSitePageTemplateSetsPage_getSiteExternalReferenceCode();
 
 		pageTemplateSet1 = testGetSitePageTemplateSetsPage_addPageTemplateSet(
 			siteExternalReferenceCode, pageTemplateSet1);
@@ -2155,4 +2294,4 @@ public abstract class BasePageTemplateSetResourceTestCase {
 			_pageTemplateSetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:613447948
+// LIFERAY-REST-BUILDER-HASH:1300083513

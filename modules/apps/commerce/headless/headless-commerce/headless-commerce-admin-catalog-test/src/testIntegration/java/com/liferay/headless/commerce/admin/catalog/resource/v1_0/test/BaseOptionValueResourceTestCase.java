@@ -40,16 +40,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -869,6 +872,142 @@ public abstract class BaseOptionValueResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetOptionByExternalReferenceCodeOptionValuesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"OptionValue"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		OptionValue optionValue1 = randomOptionValue();
+		OptionValue optionValue2 = randomOptionValue();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = optionValue1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(optionValue1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(optionValue2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(optionValue1, entityFieldName, 0);
+					BeanTestUtil.setProperty(optionValue2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						optionValue1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						optionValue2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetOptionByExternalReferenceCodeOptionValuesPage_getExternalReferenceCode();
+
+		optionValue1 =
+			testGetOptionByExternalReferenceCodeOptionValuesPage_addOptionValue(
+				externalReferenceCode, optionValue1);
+
+		optionValue2 =
+			testGetOptionByExternalReferenceCodeOptionValuesPage_addOptionValue(
+				externalReferenceCode, optionValue2);
+
+		Page<OptionValue> page =
+			optionValueResource.
+				getOptionByExternalReferenceCodeOptionValuesPage(
+					externalReferenceCode, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<OptionValue> ascPage =
+				optionValueResource.
+					getOptionByExternalReferenceCodeOptionValuesPage(
+						externalReferenceCode, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(optionValue1, (List<OptionValue>)ascPage.getItems());
+			assertContains(optionValue2, (List<OptionValue>)ascPage.getItems());
+
+			Page<OptionValue> descPage =
+				optionValueResource.
+					getOptionByExternalReferenceCodeOptionValuesPage(
+						externalReferenceCode, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				optionValue2, (List<OptionValue>)descPage.getItems());
+			assertContains(
+				optionValue1, (List<OptionValue>)descPage.getItems());
+		}
+	}
+
 	protected OptionValue
 			testGetOptionByExternalReferenceCodeOptionValuesPage_addOptionValue(
 				String externalReferenceCode, OptionValue optionValue)
@@ -1164,6 +1303,134 @@ public abstract class BaseOptionValueResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, optionValue1, optionValue2);
 		}
+
+		optionValue1 = testGetOptionIdOptionValuesPage_addOptionValue(
+			id, optionValue1);
+
+		optionValue2 = testGetOptionIdOptionValuesPage_addOptionValue(
+			id, optionValue2);
+
+		Page<OptionValue> page =
+			optionValueResource.getOptionIdOptionValuesPage(
+				id, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<OptionValue> ascPage =
+				optionValueResource.getOptionIdOptionValuesPage(
+					id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(optionValue1, (List<OptionValue>)ascPage.getItems());
+			assertContains(optionValue2, (List<OptionValue>)ascPage.getItems());
+
+			Page<OptionValue> descPage =
+				optionValueResource.getOptionIdOptionValuesPage(
+					id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				optionValue2, (List<OptionValue>)descPage.getItems());
+			assertContains(
+				optionValue1, (List<OptionValue>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOptionIdOptionValuesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"OptionValue"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		OptionValue optionValue1 = randomOptionValue();
+		OptionValue optionValue2 = randomOptionValue();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = optionValue1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(optionValue1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(optionValue2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(optionValue1, entityFieldName, 0);
+					BeanTestUtil.setProperty(optionValue2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						optionValue1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						optionValue2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetOptionIdOptionValuesPage_getId();
 
 		optionValue1 = testGetOptionIdOptionValuesPage_addOptionValue(
 			id, optionValue1);
@@ -2675,4 +2942,4 @@ public abstract class BaseOptionValueResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:937767632
+// LIFERAY-REST-BUILDER-HASH:1136966992

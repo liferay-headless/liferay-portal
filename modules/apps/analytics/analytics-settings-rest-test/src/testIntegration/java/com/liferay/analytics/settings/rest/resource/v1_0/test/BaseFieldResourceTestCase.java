@@ -29,16 +29,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -417,6 +420,122 @@ public abstract class BaseFieldResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetFieldsAccountsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "analytics-settings-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Field"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Field field1 = randomField();
+		Field field2 = randomField();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = field1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						field1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						field2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		field1 = testGetFieldsAccountsPage_addField(field1);
+
+		field2 = testGetFieldsAccountsPage_addField(field2);
+
+		Page<Field> page = fieldResource.getFieldsAccountsPage(
+			null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Field> ascPage = fieldResource.getFieldsAccountsPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(field1, (List<Field>)ascPage.getItems());
+			assertContains(field2, (List<Field>)ascPage.getItems());
+
+			Page<Field> descPage = fieldResource.getFieldsAccountsPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(field2, (List<Field>)descPage.getItems());
+			assertContains(field1, (List<Field>)descPage.getItems());
+		}
+	}
+
 	protected Field testGetFieldsAccountsPage_addField(Field field)
 		throws Exception {
 
@@ -627,6 +746,121 @@ public abstract class BaseFieldResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, field1, field2);
+		}
+
+		field1 = testGetFieldsOrdersPage_addField(field1);
+
+		field2 = testGetFieldsOrdersPage_addField(field2);
+
+		Page<Field> page = fieldResource.getFieldsOrdersPage(null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Field> ascPage = fieldResource.getFieldsOrdersPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(field1, (List<Field>)ascPage.getItems());
+			assertContains(field2, (List<Field>)ascPage.getItems());
+
+			Page<Field> descPage = fieldResource.getFieldsOrdersPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(field2, (List<Field>)descPage.getItems());
+			assertContains(field1, (List<Field>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetFieldsOrdersPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "analytics-settings-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Field"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Field field1 = randomField();
+		Field field2 = randomField();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = field1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						field1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						field2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		field1 = testGetFieldsOrdersPage_addField(field1);
@@ -887,6 +1121,121 @@ public abstract class BaseFieldResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetFieldsPeoplePageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "analytics-settings-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Field"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Field field1 = randomField();
+		Field field2 = randomField();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = field1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						field1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						field2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		field1 = testGetFieldsPeoplePage_addField(field1);
+
+		field2 = testGetFieldsPeoplePage_addField(field2);
+
+		Page<Field> page = fieldResource.getFieldsPeoplePage(null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Field> ascPage = fieldResource.getFieldsPeoplePage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(field1, (List<Field>)ascPage.getItems());
+			assertContains(field2, (List<Field>)ascPage.getItems());
+
+			Page<Field> descPage = fieldResource.getFieldsPeoplePage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(field2, (List<Field>)descPage.getItems());
+			assertContains(field1, (List<Field>)descPage.getItems());
+		}
+	}
+
 	protected Field testGetFieldsPeoplePage_addField(Field field)
 		throws Exception {
 
@@ -1097,6 +1446,122 @@ public abstract class BaseFieldResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, field1, field2);
+		}
+
+		field1 = testGetFieldsProductsPage_addField(field1);
+
+		field2 = testGetFieldsProductsPage_addField(field2);
+
+		Page<Field> page = fieldResource.getFieldsProductsPage(
+			null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Field> ascPage = fieldResource.getFieldsProductsPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(field1, (List<Field>)ascPage.getItems());
+			assertContains(field2, (List<Field>)ascPage.getItems());
+
+			Page<Field> descPage = fieldResource.getFieldsProductsPage(
+				null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(field2, (List<Field>)descPage.getItems());
+			assertContains(field1, (List<Field>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetFieldsProductsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "analytics-settings-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Field"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Field field1 = randomField();
+		Field field2 = randomField();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = field1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(field1, entityFieldName, 0);
+					BeanTestUtil.setProperty(field2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						field1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						field2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		field1 = testGetFieldsProductsPage_addField(field1);
@@ -2012,4 +2477,4 @@ public abstract class BaseFieldResourceTestCase {
 		_fieldResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1690384034
+// LIFERAY-REST-BUILDER-HASH:-1831946192

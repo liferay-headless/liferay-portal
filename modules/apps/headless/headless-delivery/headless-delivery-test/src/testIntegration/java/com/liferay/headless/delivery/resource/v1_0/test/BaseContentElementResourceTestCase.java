@@ -34,17 +34,20 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -642,6 +645,144 @@ public abstract class BaseContentElementResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryContentElementsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ContentElement"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ContentElement contentElement1 = randomContentElement();
+		ContentElement contentElement2 = randomContentElement();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = contentElement1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long assetLibraryId =
+			testGetAssetLibraryContentElementsPage_getAssetLibraryId();
+
+		contentElement1 =
+			testGetAssetLibraryContentElementsPage_addContentElement(
+				assetLibraryId, contentElement1);
+
+		contentElement2 =
+			testGetAssetLibraryContentElementsPage_addContentElement(
+				assetLibraryId, contentElement2);
+
+		Page<ContentElement> page =
+			contentElementResource.getAssetLibraryContentElementsPage(
+				assetLibraryId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ContentElement> ascPage =
+				contentElementResource.getAssetLibraryContentElementsPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				contentElement1, (List<ContentElement>)ascPage.getItems());
+			assertContains(
+				contentElement2, (List<ContentElement>)ascPage.getItems());
+
+			Page<ContentElement> descPage =
+				contentElementResource.getAssetLibraryContentElementsPage(
+					assetLibraryId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				contentElement2, (List<ContentElement>)descPage.getItems());
+			assertContains(
+				contentElement1, (List<ContentElement>)descPage.getItems());
+		}
+	}
+
 	protected ContentElement
 			testGetAssetLibraryContentElementsPage_addContentElement(
 				Long assetLibraryId, ContentElement contentElement)
@@ -1040,6 +1181,141 @@ public abstract class BaseContentElementResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, contentElement1, contentElement2);
 		}
+
+		contentElement1 = testGetSiteContentElementsPage_addContentElement(
+			siteId, contentElement1);
+
+		contentElement2 = testGetSiteContentElementsPage_addContentElement(
+			siteId, contentElement2);
+
+		Page<ContentElement> page =
+			contentElementResource.getSiteContentElementsPage(
+				siteId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ContentElement> ascPage =
+				contentElementResource.getSiteContentElementsPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				contentElement1, (List<ContentElement>)ascPage.getItems());
+			assertContains(
+				contentElement2, (List<ContentElement>)ascPage.getItems());
+
+			Page<ContentElement> descPage =
+				contentElementResource.getSiteContentElementsPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				contentElement2, (List<ContentElement>)descPage.getItems());
+			assertContains(
+				contentElement1, (List<ContentElement>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteContentElementsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ContentElement"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ContentElement contentElement1 = randomContentElement();
+		ContentElement contentElement2 = randomContentElement();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = contentElement1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						contentElement1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						contentElement2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteContentElementsPage_getSiteId();
 
 		contentElement1 = testGetSiteContentElementsPage_addContentElement(
 			siteId, contentElement1);
@@ -1883,4 +2159,4 @@ public abstract class BaseContentElementResourceTestCase {
 		_contentElementResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1525041821
+// LIFERAY-REST-BUILDER-HASH:-193566505

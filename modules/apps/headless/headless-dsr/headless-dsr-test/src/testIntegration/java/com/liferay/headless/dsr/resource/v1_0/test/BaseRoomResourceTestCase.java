@@ -947,4 +947,4 @@ public abstract class BaseRoomResourceTestCase {
 	private com.liferay.headless.dsr.resource.v1_0.RoomResource _roomResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:381240240
+// LIFERAY-REST-BUILDER-HASH:1666728156

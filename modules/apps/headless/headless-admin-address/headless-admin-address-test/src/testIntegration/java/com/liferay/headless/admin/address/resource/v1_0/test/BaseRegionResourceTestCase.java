@@ -41,17 +41,20 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -927,6 +930,126 @@ public abstract class BaseRegionResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetCountryRegionsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-address/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Region"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Region region1 = randomRegion();
+		Region region2 = randomRegion();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = region1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(region1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(region2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(region1, entityFieldName, 0);
+					BeanTestUtil.setProperty(region2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						region1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						region2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long countryId = testGetCountryRegionsPage_getCountryId();
+
+		region1 = testGetCountryRegionsPage_addRegion(countryId, region1);
+
+		region2 = testGetCountryRegionsPage_addRegion(countryId, region2);
+
+		Page<Region> page = regionResource.getCountryRegionsPage(
+			countryId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Region> ascPage = regionResource.getCountryRegionsPage(
+				countryId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(region1, (List<Region>)ascPage.getItems());
+			assertContains(region2, (List<Region>)ascPage.getItems());
+
+			Page<Region> descPage = regionResource.getCountryRegionsPage(
+				countryId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(region2, (List<Region>)descPage.getItems());
+			assertContains(region1, (List<Region>)descPage.getItems());
+		}
+	}
+
 	protected Region testGetCountryRegionsPage_addRegion(
 			Long countryId, Region region)
 		throws Exception {
@@ -1733,6 +1856,124 @@ public abstract class BaseRegionResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, region1, region2);
+		}
+
+		region1 = testGetRegionsPage_addRegion(region1);
+
+		region2 = testGetRegionsPage_addRegion(region2);
+
+		Page<Region> page = regionResource.getRegionsPage(
+			null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Region> ascPage = regionResource.getRegionsPage(
+				null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(region1, (List<Region>)ascPage.getItems());
+			assertContains(region2, (List<Region>)ascPage.getItems());
+
+			Page<Region> descPage = regionResource.getRegionsPage(
+				null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(region2, (List<Region>)descPage.getItems());
+			assertContains(region1, (List<Region>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetRegionsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-address/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Region"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Region region1 = randomRegion();
+		Region region2 = randomRegion();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = region1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(region1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(region2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(region1, entityFieldName, 0);
+					BeanTestUtil.setProperty(region2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						region1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						region2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		region1 = testGetRegionsPage_addRegion(region1);
@@ -3173,4 +3414,4 @@ public abstract class BaseRegionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-497217834
+// LIFERAY-REST-BUILDER-HASH:-860520463

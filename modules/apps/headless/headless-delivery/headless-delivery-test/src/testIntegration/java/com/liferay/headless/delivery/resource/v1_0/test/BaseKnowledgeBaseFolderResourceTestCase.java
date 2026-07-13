@@ -3563,4 +3563,4 @@ public abstract class BaseKnowledgeBaseFolderResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:708956350
+// LIFERAY-REST-BUILDER-HASH:-1395559406

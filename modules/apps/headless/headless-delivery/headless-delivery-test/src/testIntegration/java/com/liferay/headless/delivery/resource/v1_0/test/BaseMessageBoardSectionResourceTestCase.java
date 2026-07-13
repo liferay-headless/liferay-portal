@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -51,11 +52,13 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1184,6 +1187,151 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetMessageBoardSectionMessageBoardSectionsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"MessageBoardSection"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		MessageBoardSection messageBoardSection1 = randomMessageBoardSection();
+		MessageBoardSection messageBoardSection2 = randomMessageBoardSection();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = messageBoardSection1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long parentMessageBoardSectionId =
+			testGetMessageBoardSectionMessageBoardSectionsPage_getParentMessageBoardSectionId();
+
+		messageBoardSection1 =
+			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
+				parentMessageBoardSectionId, messageBoardSection1);
+
+		messageBoardSection2 =
+			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
+				parentMessageBoardSectionId, messageBoardSection2);
+
+		Page<MessageBoardSection> page =
+			messageBoardSectionResource.
+				getMessageBoardSectionMessageBoardSectionsPage(
+					parentMessageBoardSectionId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<MessageBoardSection> ascPage =
+				messageBoardSectionResource.
+					getMessageBoardSectionMessageBoardSectionsPage(
+						parentMessageBoardSectionId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				messageBoardSection1,
+				(List<MessageBoardSection>)ascPage.getItems());
+			assertContains(
+				messageBoardSection2,
+				(List<MessageBoardSection>)ascPage.getItems());
+
+			Page<MessageBoardSection> descPage =
+				messageBoardSectionResource.
+					getMessageBoardSectionMessageBoardSectionsPage(
+						parentMessageBoardSectionId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				messageBoardSection2,
+				(List<MessageBoardSection>)descPage.getItems());
+			assertContains(
+				messageBoardSection1,
+				(List<MessageBoardSection>)descPage.getItems());
+		}
+	}
+
 	protected MessageBoardSection
 			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
 				Long parentMessageBoardSectionId,
@@ -1997,6 +2145,147 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, messageBoardSection1, messageBoardSection2);
 		}
+
+		messageBoardSection1 =
+			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
+				siteId, messageBoardSection1);
+
+		messageBoardSection2 =
+			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
+				siteId, messageBoardSection2);
+
+		Page<MessageBoardSection> page =
+			messageBoardSectionResource.getSiteMessageBoardSectionsPage(
+				siteId, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<MessageBoardSection> ascPage =
+				messageBoardSectionResource.getSiteMessageBoardSectionsPage(
+					siteId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				messageBoardSection1,
+				(List<MessageBoardSection>)ascPage.getItems());
+			assertContains(
+				messageBoardSection2,
+				(List<MessageBoardSection>)ascPage.getItems());
+
+			Page<MessageBoardSection> descPage =
+				messageBoardSectionResource.getSiteMessageBoardSectionsPage(
+					siteId, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				messageBoardSection2,
+				(List<MessageBoardSection>)descPage.getItems());
+			assertContains(
+				messageBoardSection1,
+				(List<MessageBoardSection>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteMessageBoardSectionsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-delivery/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"MessageBoardSection"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		MessageBoardSection messageBoardSection1 = randomMessageBoardSection();
+		MessageBoardSection messageBoardSection2 = randomMessageBoardSection();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = messageBoardSection1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						messageBoardSection1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						messageBoardSection2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteMessageBoardSectionsPage_getSiteId();
 
 		messageBoardSection1 =
 			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
@@ -3880,4 +4169,4 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:460151248
+// LIFERAY-REST-BUILDER-HASH:-566035480

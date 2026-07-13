@@ -1233,4 +1233,4 @@ public abstract class BaseChatbotResourceTestCase {
 		_chatbotResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:705595240
+// LIFERAY-REST-BUILDER-HASH:-430285740

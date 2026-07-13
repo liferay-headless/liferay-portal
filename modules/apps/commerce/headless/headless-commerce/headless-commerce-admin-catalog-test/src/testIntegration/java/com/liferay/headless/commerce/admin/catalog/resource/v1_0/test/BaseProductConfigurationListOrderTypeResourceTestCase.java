@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1033,6 +1036,156 @@ public abstract class BaseProductConfigurationListOrderTypeResourceTestCase {
 				entityField, productConfigurationListOrderType1,
 				productConfigurationListOrderType2);
 		}
+
+		productConfigurationListOrderType1 =
+			testGetProductConfigurationListIdProductConfigurationListOrderTypesPage_addProductConfigurationListOrderType(
+				id, productConfigurationListOrderType1);
+
+		productConfigurationListOrderType2 =
+			testGetProductConfigurationListIdProductConfigurationListOrderTypesPage_addProductConfigurationListOrderType(
+				id, productConfigurationListOrderType2);
+
+		Page<ProductConfigurationListOrderType> page =
+			productConfigurationListOrderTypeResource.
+				getProductConfigurationListIdProductConfigurationListOrderTypesPage(
+					id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ProductConfigurationListOrderType> ascPage =
+				productConfigurationListOrderTypeResource.
+					getProductConfigurationListIdProductConfigurationListOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				productConfigurationListOrderType1,
+				(List<ProductConfigurationListOrderType>)ascPage.getItems());
+			assertContains(
+				productConfigurationListOrderType2,
+				(List<ProductConfigurationListOrderType>)ascPage.getItems());
+
+			Page<ProductConfigurationListOrderType> descPage =
+				productConfigurationListOrderTypeResource.
+					getProductConfigurationListIdProductConfigurationListOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				productConfigurationListOrderType2,
+				(List<ProductConfigurationListOrderType>)descPage.getItems());
+			assertContains(
+				productConfigurationListOrderType1,
+				(List<ProductConfigurationListOrderType>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetProductConfigurationListIdProductConfigurationListOrderTypesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ProductConfigurationListOrderType"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ProductConfigurationListOrderType productConfigurationListOrderType1 =
+			randomProductConfigurationListOrderType();
+		ProductConfigurationListOrderType productConfigurationListOrderType2 =
+			randomProductConfigurationListOrderType();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = productConfigurationListOrderType1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType1, entityFieldName,
+						0L);
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType2, entityFieldName,
+						1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						productConfigurationListOrderType2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id =
+			testGetProductConfigurationListIdProductConfigurationListOrderTypesPage_getId();
 
 		productConfigurationListOrderType1 =
 			testGetProductConfigurationListIdProductConfigurationListOrderTypesPage_addProductConfigurationListOrderType(
@@ -2224,4 +2377,4 @@ public abstract class BaseProductConfigurationListOrderTypeResourceTestCase {
 			_productConfigurationListOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:2137280219
+// LIFERAY-REST-BUILDER-HASH:70835069

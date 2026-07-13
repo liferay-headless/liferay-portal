@@ -41,17 +41,20 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -647,6 +650,134 @@ public abstract class BaseDataRecordResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, dataRecord1, dataRecord2);
 		}
+
+		dataRecord1 = testGetDataDefinitionDataRecordsPage_addDataRecord(
+			dataDefinitionId, dataRecord1);
+
+		dataRecord2 = testGetDataDefinitionDataRecordsPage_addDataRecord(
+			dataDefinitionId, dataRecord2);
+
+		Page<DataRecord> page =
+			dataRecordResource.getDataDefinitionDataRecordsPage(
+				dataDefinitionId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<DataRecord> ascPage =
+				dataRecordResource.getDataDefinitionDataRecordsPage(
+					dataDefinitionId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(dataRecord1, (List<DataRecord>)ascPage.getItems());
+			assertContains(dataRecord2, (List<DataRecord>)ascPage.getItems());
+
+			Page<DataRecord> descPage =
+				dataRecordResource.getDataDefinitionDataRecordsPage(
+					dataDefinitionId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(dataRecord2, (List<DataRecord>)descPage.getItems());
+			assertContains(dataRecord1, (List<DataRecord>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetDataDefinitionDataRecordsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "data-engine/v2.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"DataRecord"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		DataRecord dataRecord1 = randomDataRecord();
+		DataRecord dataRecord2 = randomDataRecord();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = dataRecord1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(dataRecord1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(dataRecord2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(dataRecord1, entityFieldName, 0);
+					BeanTestUtil.setProperty(dataRecord2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						dataRecord1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						dataRecord2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long dataDefinitionId =
+			testGetDataDefinitionDataRecordsPage_getDataDefinitionId();
 
 		dataRecord1 = testGetDataDefinitionDataRecordsPage_addDataRecord(
 			dataDefinitionId, dataRecord1);
@@ -1387,6 +1518,134 @@ public abstract class BaseDataRecordResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, dataRecord1, dataRecord2);
 		}
+
+		dataRecord1 = testGetDataRecordCollectionDataRecordsPage_addDataRecord(
+			dataRecordCollectionId, dataRecord1);
+
+		dataRecord2 = testGetDataRecordCollectionDataRecordsPage_addDataRecord(
+			dataRecordCollectionId, dataRecord2);
+
+		Page<DataRecord> page =
+			dataRecordResource.getDataRecordCollectionDataRecordsPage(
+				dataRecordCollectionId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<DataRecord> ascPage =
+				dataRecordResource.getDataRecordCollectionDataRecordsPage(
+					dataRecordCollectionId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(dataRecord1, (List<DataRecord>)ascPage.getItems());
+			assertContains(dataRecord2, (List<DataRecord>)ascPage.getItems());
+
+			Page<DataRecord> descPage =
+				dataRecordResource.getDataRecordCollectionDataRecordsPage(
+					dataRecordCollectionId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(dataRecord2, (List<DataRecord>)descPage.getItems());
+			assertContains(dataRecord1, (List<DataRecord>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetDataRecordCollectionDataRecordsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "data-engine/v2.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"DataRecord"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		DataRecord dataRecord1 = randomDataRecord();
+		DataRecord dataRecord2 = randomDataRecord();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = dataRecord1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(dataRecord1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(dataRecord2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(dataRecord1, entityFieldName, 0);
+					BeanTestUtil.setProperty(dataRecord2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						dataRecord1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						dataRecord2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long dataRecordCollectionId =
+			testGetDataRecordCollectionDataRecordsPage_getDataRecordCollectionId();
 
 		dataRecord1 = testGetDataRecordCollectionDataRecordsPage_addDataRecord(
 			dataRecordCollectionId, dataRecord1);
@@ -2646,4 +2905,4 @@ public abstract class BaseDataRecordResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:341876255
+// LIFERAY-REST-BUILDER-HASH:-1470843135

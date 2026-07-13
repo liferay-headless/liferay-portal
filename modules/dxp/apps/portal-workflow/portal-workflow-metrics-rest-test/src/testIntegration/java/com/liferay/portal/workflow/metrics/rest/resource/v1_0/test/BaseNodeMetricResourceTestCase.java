@@ -23,16 +23,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -435,6 +438,132 @@ public abstract class BaseNodeMetricResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, nodeMetric1, nodeMetric2);
 		}
+
+		nodeMetric1 = testGetProcessNodeMetricsPage_addNodeMetric(
+			processId, nodeMetric1);
+
+		nodeMetric2 = testGetProcessNodeMetricsPage_addNodeMetric(
+			processId, nodeMetric2);
+
+		Page<NodeMetric> page = nodeMetricResource.getProcessNodeMetricsPage(
+			processId, null, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<NodeMetric> ascPage =
+				nodeMetricResource.getProcessNodeMetricsPage(
+					processId, null, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(nodeMetric1, (List<NodeMetric>)ascPage.getItems());
+			assertContains(nodeMetric2, (List<NodeMetric>)ascPage.getItems());
+
+			Page<NodeMetric> descPage =
+				nodeMetricResource.getProcessNodeMetricsPage(
+					processId, null, null, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(nodeMetric2, (List<NodeMetric>)descPage.getItems());
+			assertContains(nodeMetric1, (List<NodeMetric>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetProcessNodeMetricsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "portal-workflow-metrics/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"NodeMetric"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		NodeMetric nodeMetric1 = randomNodeMetric();
+		NodeMetric nodeMetric2 = randomNodeMetric();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = nodeMetric1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(nodeMetric1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(nodeMetric2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(nodeMetric1, entityFieldName, 0);
+					BeanTestUtil.setProperty(nodeMetric2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						nodeMetric1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						nodeMetric2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long processId = testGetProcessNodeMetricsPage_getProcessId();
 
 		nodeMetric1 = testGetProcessNodeMetricsPage_addNodeMetric(
 			processId, nodeMetric1);
@@ -1252,4 +1381,4 @@ public abstract class BaseNodeMetricResourceTestCase {
 			NodeMetricResource _nodeMetricResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1170257693
+// LIFERAY-REST-BUILDER-HASH:1690269103

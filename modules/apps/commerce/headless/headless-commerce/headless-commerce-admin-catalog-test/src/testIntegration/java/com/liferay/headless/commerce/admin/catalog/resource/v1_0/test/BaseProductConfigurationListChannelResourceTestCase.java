@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1022,6 +1025,154 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 				entityField, productConfigurationListChannel1,
 				productConfigurationListChannel2);
 		}
+
+		productConfigurationListChannel1 =
+			testGetProductConfigurationListIdProductConfigurationListChannelsPage_addProductConfigurationListChannel(
+				id, productConfigurationListChannel1);
+
+		productConfigurationListChannel2 =
+			testGetProductConfigurationListIdProductConfigurationListChannelsPage_addProductConfigurationListChannel(
+				id, productConfigurationListChannel2);
+
+		Page<ProductConfigurationListChannel> page =
+			productConfigurationListChannelResource.
+				getProductConfigurationListIdProductConfigurationListChannelsPage(
+					id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ProductConfigurationListChannel> ascPage =
+				productConfigurationListChannelResource.
+					getProductConfigurationListIdProductConfigurationListChannelsPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				productConfigurationListChannel1,
+				(List<ProductConfigurationListChannel>)ascPage.getItems());
+			assertContains(
+				productConfigurationListChannel2,
+				(List<ProductConfigurationListChannel>)ascPage.getItems());
+
+			Page<ProductConfigurationListChannel> descPage =
+				productConfigurationListChannelResource.
+					getProductConfigurationListIdProductConfigurationListChannelsPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				productConfigurationListChannel2,
+				(List<ProductConfigurationListChannel>)descPage.getItems());
+			assertContains(
+				productConfigurationListChannel1,
+				(List<ProductConfigurationListChannel>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetProductConfigurationListIdProductConfigurationListChannelsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ProductConfigurationListChannel"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ProductConfigurationListChannel productConfigurationListChannel1 =
+			randomProductConfigurationListChannel();
+		ProductConfigurationListChannel productConfigurationListChannel2 =
+			randomProductConfigurationListChannel();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = productConfigurationListChannel1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						productConfigurationListChannel2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id =
+			testGetProductConfigurationListIdProductConfigurationListChannelsPage_getId();
 
 		productConfigurationListChannel1 =
 			testGetProductConfigurationListIdProductConfigurationListChannelsPage_addProductConfigurationListChannel(
@@ -2197,4 +2348,4 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 			_productConfigurationListChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1168445379
+// LIFERAY-REST-BUILDER-HASH:97171944

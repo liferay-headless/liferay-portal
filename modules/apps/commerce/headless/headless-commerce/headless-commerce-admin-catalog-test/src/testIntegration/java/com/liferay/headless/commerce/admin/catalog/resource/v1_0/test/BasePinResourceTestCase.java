@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -586,6 +589,134 @@ public abstract class BasePinResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetProductByExternalReferenceCodePinsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Pin"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Pin pin1 = randomPin();
+		Pin pin2 = randomPin();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = pin1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(pin1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(pin2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(pin1, entityFieldName, 0);
+					BeanTestUtil.setProperty(pin2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						pin1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						pin2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetProductByExternalReferenceCodePinsPage_getExternalReferenceCode();
+
+		pin1 = testGetProductByExternalReferenceCodePinsPage_addPin(
+			externalReferenceCode, pin1);
+
+		pin2 = testGetProductByExternalReferenceCodePinsPage_addPin(
+			externalReferenceCode, pin2);
+
+		Page<Pin> page = pinResource.getProductByExternalReferenceCodePinsPage(
+			externalReferenceCode, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Pin> ascPage =
+				pinResource.getProductByExternalReferenceCodePinsPage(
+					externalReferenceCode, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(pin1, (List<Pin>)ascPage.getItems());
+			assertContains(pin2, (List<Pin>)ascPage.getItems());
+
+			Page<Pin> descPage =
+				pinResource.getProductByExternalReferenceCodePinsPage(
+					externalReferenceCode, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(pin2, (List<Pin>)descPage.getItems());
+			assertContains(pin1, (List<Pin>)descPage.getItems());
+		}
+	}
+
 	protected Pin testGetProductByExternalReferenceCodePinsPage_addPin(
 			String externalReferenceCode, Pin pin)
 		throws Exception {
@@ -839,6 +970,124 @@ public abstract class BasePinResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, pin1, pin2);
 		}
+
+		pin1 = testGetProductIdPinsPage_addPin(id, pin1);
+
+		pin2 = testGetProductIdPinsPage_addPin(id, pin2);
+
+		Page<Pin> page = pinResource.getProductIdPinsPage(id, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Pin> ascPage = pinResource.getProductIdPinsPage(
+				id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(pin1, (List<Pin>)ascPage.getItems());
+			assertContains(pin2, (List<Pin>)ascPage.getItems());
+
+			Page<Pin> descPage = pinResource.getProductIdPinsPage(
+				id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(pin2, (List<Pin>)descPage.getItems());
+			assertContains(pin1, (List<Pin>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetProductIdPinsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Pin"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Pin pin1 = randomPin();
+		Pin pin2 = randomPin();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = pin1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(pin1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(pin2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(pin1, entityFieldName, 0);
+					BeanTestUtil.setProperty(pin2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						pin1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						pin2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetProductIdPinsPage_getId();
 
 		pin1 = testGetProductIdPinsPage_addPin(id, pin1);
 
@@ -1707,4 +1956,4 @@ public abstract class BasePinResourceTestCase {
 			_pinResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:147484587
+// LIFERAY-REST-BUILDER-HASH:1748675795

@@ -885,4 +885,4 @@ public abstract class BaseCredentialResourceTestCase {
 		_credentialResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1886696877
+// LIFERAY-REST-BUILDER-HASH:-1459247463

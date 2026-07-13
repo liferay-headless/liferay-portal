@@ -1752,4 +1752,4 @@ public abstract class BaseSharedInternalModelBatchTestEntityResourceTestCase {
 			_sharedInternalModelBatchTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:355778140
+// LIFERAY-REST-BUILDER-HASH:-1764984760

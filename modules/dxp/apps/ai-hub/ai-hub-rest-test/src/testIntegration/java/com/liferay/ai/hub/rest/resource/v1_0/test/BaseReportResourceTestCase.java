@@ -1336,4 +1336,4 @@ public abstract class BaseReportResourceTestCase {
 		_reportResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-477900950
+// LIFERAY-REST-BUILDER-HASH:348285054

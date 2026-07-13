@@ -40,16 +40,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1424,6 +1427,140 @@ public abstract class BasePriceEntryResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetPriceListByExternalReferenceCodePriceEntriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-pricing/v2.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PriceEntry"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PriceEntry priceEntry1 = randomPriceEntry();
+		PriceEntry priceEntry2 = randomPriceEntry();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = priceEntry1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(priceEntry1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(priceEntry2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(priceEntry1, entityFieldName, 0);
+					BeanTestUtil.setProperty(priceEntry2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						priceEntry1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						priceEntry2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetPriceListByExternalReferenceCodePriceEntriesPage_getExternalReferenceCode();
+
+		priceEntry1 =
+			testGetPriceListByExternalReferenceCodePriceEntriesPage_addPriceEntry(
+				externalReferenceCode, priceEntry1);
+
+		priceEntry2 =
+			testGetPriceListByExternalReferenceCodePriceEntriesPage_addPriceEntry(
+				externalReferenceCode, priceEntry2);
+
+		Page<PriceEntry> page =
+			priceEntryResource.
+				getPriceListByExternalReferenceCodePriceEntriesPage(
+					externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PriceEntry> ascPage =
+				priceEntryResource.
+					getPriceListByExternalReferenceCodePriceEntriesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(priceEntry1, (List<PriceEntry>)ascPage.getItems());
+			assertContains(priceEntry2, (List<PriceEntry>)ascPage.getItems());
+
+			Page<PriceEntry> descPage =
+				priceEntryResource.
+					getPriceListByExternalReferenceCodePriceEntriesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(priceEntry2, (List<PriceEntry>)descPage.getItems());
+			assertContains(priceEntry1, (List<PriceEntry>)descPage.getItems());
+		}
+	}
+
 	protected PriceEntry
 			testGetPriceListByExternalReferenceCodePriceEntriesPage_addPriceEntry(
 				String externalReferenceCode, PriceEntry priceEntry)
@@ -1814,6 +1951,134 @@ public abstract class BasePriceEntryResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, priceEntry1, priceEntry2);
 		}
+
+		priceEntry1 = testGetPriceListIdPriceEntriesPage_addPriceEntry(
+			id, priceEntry1);
+
+		priceEntry2 = testGetPriceListIdPriceEntriesPage_addPriceEntry(
+			id, priceEntry2);
+
+		Page<PriceEntry> page =
+			priceEntryResource.getPriceListIdPriceEntriesPage(
+				id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PriceEntry> ascPage =
+				priceEntryResource.getPriceListIdPriceEntriesPage(
+					id, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(priceEntry1, (List<PriceEntry>)ascPage.getItems());
+			assertContains(priceEntry2, (List<PriceEntry>)ascPage.getItems());
+
+			Page<PriceEntry> descPage =
+				priceEntryResource.getPriceListIdPriceEntriesPage(
+					id, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(priceEntry2, (List<PriceEntry>)descPage.getItems());
+			assertContains(priceEntry1, (List<PriceEntry>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetPriceListIdPriceEntriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-pricing/v2.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PriceEntry"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PriceEntry priceEntry1 = randomPriceEntry();
+		PriceEntry priceEntry2 = randomPriceEntry();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = priceEntry1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(priceEntry1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(priceEntry2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(priceEntry1, entityFieldName, 0);
+					BeanTestUtil.setProperty(priceEntry2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						priceEntry1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						priceEntry2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetPriceListIdPriceEntriesPage_getId();
 
 		priceEntry1 = testGetPriceListIdPriceEntriesPage_addPriceEntry(
 			id, priceEntry1);
@@ -3703,4 +3968,4 @@ public abstract class BasePriceEntryResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1627566968
+// LIFERAY-REST-BUILDER-HASH:-408655150

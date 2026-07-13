@@ -41,17 +41,20 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1717,6 +1720,132 @@ public abstract class BaseAccountResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAccountGroupAccountsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long accountGroupId =
+			testGetAccountGroupAccountsPage_getAccountGroupId();
+
+		account1 = testGetAccountGroupAccountsPage_addAccount(
+			accountGroupId, account1);
+
+		account2 = testGetAccountGroupAccountsPage_addAccount(
+			accountGroupId, account2);
+
+		Page<Account> page = accountResource.getAccountGroupAccountsPage(
+			accountGroupId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage = accountResource.getAccountGroupAccountsPage(
+				accountGroupId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage =
+				accountResource.getAccountGroupAccountsPage(
+					accountGroupId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
 	protected Account testGetAccountGroupAccountsPage_addAccount(
 			Long accountGroupId, Account account)
 		throws Exception {
@@ -2164,6 +2293,138 @@ public abstract class BaseAccountResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAccountGroupByExternalReferenceCodeAccountsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String accountGroupExternalReferenceCode =
+			testGetAccountGroupByExternalReferenceCodeAccountsPage_getAccountGroupExternalReferenceCode();
+
+		account1 =
+			testGetAccountGroupByExternalReferenceCodeAccountsPage_addAccount(
+				accountGroupExternalReferenceCode, account1);
+
+		account2 =
+			testGetAccountGroupByExternalReferenceCodeAccountsPage_addAccount(
+				accountGroupExternalReferenceCode, account2);
+
+		Page<Account> page =
+			accountResource.getAccountGroupByExternalReferenceCodeAccountsPage(
+				accountGroupExternalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage =
+				accountResource.
+					getAccountGroupByExternalReferenceCodeAccountsPage(
+						accountGroupExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage =
+				accountResource.
+					getAccountGroupByExternalReferenceCodeAccountsPage(
+						accountGroupExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
 	protected Account
 			testGetAccountGroupByExternalReferenceCodeAccountsPage_addAccount(
 				String accountGroupExternalReferenceCode, Account account)
@@ -2467,6 +2728,122 @@ public abstract class BaseAccountResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, account1, account2);
+		}
+
+		account1 = testGetAccountsPage_addAccount(account1);
+
+		account2 = testGetAccountsPage_addAccount(account2);
+
+		Page<Account> page = accountResource.getAccountsPage(
+			null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage = accountResource.getAccountsPage(
+				null, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage = accountResource.getAccountsPage(
+				null, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetAccountsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		account1 = testGetAccountsPage_addAccount(account1);
@@ -2954,6 +3331,132 @@ public abstract class BaseAccountResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetOrganizationAccountsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationId =
+			testGetOrganizationAccountsPage_getOrganizationId();
+
+		account1 = testGetOrganizationAccountsPage_addAccount(
+			organizationId, account1);
+
+		account2 = testGetOrganizationAccountsPage_addAccount(
+			organizationId, account2);
+
+		Page<Account> page = accountResource.getOrganizationAccountsPage(
+			organizationId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage = accountResource.getOrganizationAccountsPage(
+				organizationId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage =
+				accountResource.getOrganizationAccountsPage(
+					organizationId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
 	protected Account testGetOrganizationAccountsPage_addAccount(
 			String organizationId, Account account)
 		throws Exception {
@@ -3363,6 +3866,138 @@ public abstract class BaseAccountResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, account1, account2);
 		}
+
+		account1 =
+			testGetOrganizationByExternalReferenceCodeAccountsPage_addAccount(
+				externalReferenceCode, account1);
+
+		account2 =
+			testGetOrganizationByExternalReferenceCodeAccountsPage_addAccount(
+				externalReferenceCode, account2);
+
+		Page<Account> page =
+			accountResource.getOrganizationByExternalReferenceCodeAccountsPage(
+				externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage =
+				accountResource.
+					getOrganizationByExternalReferenceCodeAccountsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage =
+				accountResource.
+					getOrganizationByExternalReferenceCodeAccountsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationByExternalReferenceCodeAccountsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetOrganizationByExternalReferenceCodeAccountsPage_getExternalReferenceCode();
 
 		account1 =
 			testGetOrganizationByExternalReferenceCodeAccountsPage_addAccount(
@@ -3816,6 +4451,139 @@ public abstract class BaseAccountResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, account1, account2);
 		}
+
+		account1 =
+			testGetOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage_addAccount(
+				organizationExternalReferenceCode, account1);
+
+		account2 =
+			testGetOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage_addAccount(
+				organizationExternalReferenceCode, account2);
+
+		Page<Account> page =
+			accountResource.
+				getOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage(
+					organizationExternalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Account> ascPage =
+				accountResource.
+					getOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage(
+						organizationExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(account1, (List<Account>)ascPage.getItems());
+			assertContains(account2, (List<Account>)ascPage.getItems());
+
+			Page<Account> descPage =
+				accountResource.
+					getOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage(
+						organizationExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(account2, (List<Account>)descPage.getItems());
+			assertContains(account1, (List<Account>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Account"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Account account1 = randomAccount();
+		Account account2 = randomAccount();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = account1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(account1, entityFieldName, 0);
+					BeanTestUtil.setProperty(account2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						account1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						account2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationExternalReferenceCode =
+			testGetOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage_getOrganizationExternalReferenceCode();
 
 		account1 =
 			testGetOrganizationByExternalReferenceCodeOrganizationExternalReferenceCodeAccountsByExternalReferenceCodePage_addAccount(
@@ -6544,4 +7312,4 @@ public abstract class BaseAccountResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-618723767
+// LIFERAY-REST-BUILDER-HASH:-2092997524

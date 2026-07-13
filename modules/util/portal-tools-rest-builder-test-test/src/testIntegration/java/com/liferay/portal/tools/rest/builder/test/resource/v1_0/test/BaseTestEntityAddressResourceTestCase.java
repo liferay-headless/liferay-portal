@@ -1254,4 +1254,4 @@ public abstract class BaseTestEntityAddressResourceTestCase {
 		TestEntityAddressResource _testEntityAddressResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:185615214
+// LIFERAY-REST-BUILDER-HASH:1142717466

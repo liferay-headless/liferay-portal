@@ -23,16 +23,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -424,6 +427,134 @@ public abstract class BaseProcessMetricResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(
 				entityField, processMetric1, processMetric2);
+		}
+
+		processMetric1 = testGetProcessMetricsPage_addProcessMetric(
+			processMetric1);
+
+		processMetric2 = testGetProcessMetricsPage_addProcessMetric(
+			processMetric2);
+
+		Page<ProcessMetric> page = processMetricResource.getProcessMetricsPage(
+			null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ProcessMetric> ascPage =
+				processMetricResource.getProcessMetricsPage(
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				processMetric1, (List<ProcessMetric>)ascPage.getItems());
+			assertContains(
+				processMetric2, (List<ProcessMetric>)ascPage.getItems());
+
+			Page<ProcessMetric> descPage =
+				processMetricResource.getProcessMetricsPage(
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				processMetric2, (List<ProcessMetric>)descPage.getItems());
+			assertContains(
+				processMetric1, (List<ProcessMetric>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetProcessMetricsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "portal-workflow-metrics/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ProcessMetric"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ProcessMetric processMetric1 = randomProcessMetric();
+		ProcessMetric processMetric2 = randomProcessMetric();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = processMetric1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						processMetric1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						processMetric2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						processMetric1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						processMetric2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						processMetric1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						processMetric2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		processMetric1 = testGetProcessMetricsPage_addProcessMetric(
@@ -1181,4 +1312,4 @@ public abstract class BaseProcessMetricResourceTestCase {
 			ProcessMetricResource _processMetricResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:2136916551
+// LIFERAY-REST-BUILDER-HASH:1170455626

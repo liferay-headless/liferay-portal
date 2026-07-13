@@ -907,4 +907,4 @@ public abstract class BasePerformanceTopAssetResourceTestCase {
 			_performanceTopAssetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1344748680
+// LIFERAY-REST-BUILDER-HASH:-760140060

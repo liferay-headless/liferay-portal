@@ -45,17 +45,20 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -668,6 +671,145 @@ public abstract class BaseImportProcessResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryImportProcessesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "export-import/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ImportProcess"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ImportProcess importProcess1 = randomImportProcess();
+		ImportProcess importProcess2 = randomImportProcess();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = importProcess1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String assetLibraryExternalReferenceCode =
+			testGetAssetLibraryImportProcessesPage_getAssetLibraryExternalReferenceCode();
+
+		importProcess1 =
+			testGetAssetLibraryImportProcessesPage_addImportProcess(
+				assetLibraryExternalReferenceCode, importProcess1);
+
+		importProcess2 =
+			testGetAssetLibraryImportProcessesPage_addImportProcess(
+				assetLibraryExternalReferenceCode, importProcess2);
+
+		Page<ImportProcess> page =
+			importProcessResource.getAssetLibraryImportProcessesPage(
+				assetLibraryExternalReferenceCode, null, null, null, null,
+				null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ImportProcess> ascPage =
+				importProcessResource.getAssetLibraryImportProcessesPage(
+					assetLibraryExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				importProcess1, (List<ImportProcess>)ascPage.getItems());
+			assertContains(
+				importProcess2, (List<ImportProcess>)ascPage.getItems());
+
+			Page<ImportProcess> descPage =
+				importProcessResource.getAssetLibraryImportProcessesPage(
+					assetLibraryExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				importProcess2, (List<ImportProcess>)descPage.getItems());
+			assertContains(
+				importProcess1, (List<ImportProcess>)descPage.getItems());
+		}
+	}
+
 	protected ImportProcess
 			testGetAssetLibraryImportProcessesPage_addImportProcess(
 				String assetLibraryExternalReferenceCode,
@@ -1009,6 +1151,147 @@ public abstract class BaseImportProcessResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, importProcess1, importProcess2);
 		}
+
+		importProcess1 =
+			testGetAssetLibraryPortletImportProcessesPage_addImportProcess(
+				assetLibraryExternalReferenceCode, portletId, importProcess1);
+
+		importProcess2 =
+			testGetAssetLibraryPortletImportProcessesPage_addImportProcess(
+				assetLibraryExternalReferenceCode, portletId, importProcess2);
+
+		Page<ImportProcess> page =
+			importProcessResource.getAssetLibraryPortletImportProcessesPage(
+				assetLibraryExternalReferenceCode, portletId, null, null, null,
+				null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ImportProcess> ascPage =
+				importProcessResource.getAssetLibraryPortletImportProcessesPage(
+					assetLibraryExternalReferenceCode, portletId, null, null,
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				importProcess1, (List<ImportProcess>)ascPage.getItems());
+			assertContains(
+				importProcess2, (List<ImportProcess>)ascPage.getItems());
+
+			Page<ImportProcess> descPage =
+				importProcessResource.getAssetLibraryPortletImportProcessesPage(
+					assetLibraryExternalReferenceCode, portletId, null, null,
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				importProcess2, (List<ImportProcess>)descPage.getItems());
+			assertContains(
+				importProcess1, (List<ImportProcess>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetAssetLibraryPortletImportProcessesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "export-import/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ImportProcess"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ImportProcess importProcess1 = randomImportProcess();
+		ImportProcess importProcess2 = randomImportProcess();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = importProcess1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String assetLibraryExternalReferenceCode =
+			testGetAssetLibraryPortletImportProcessesPage_getAssetLibraryExternalReferenceCode();
+		String portletId =
+			testGetAssetLibraryPortletImportProcessesPage_getPortletId();
 
 		importProcess1 =
 			testGetAssetLibraryPortletImportProcessesPage_addImportProcess(
@@ -1576,6 +1859,138 @@ public abstract class BaseImportProcessResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetImportProcessesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "export-import/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ImportProcess"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ImportProcess importProcess1 = randomImportProcess();
+		ImportProcess importProcess2 = randomImportProcess();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = importProcess1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		importProcess1 = testGetImportProcessesPage_addImportProcess(
+			importProcess1);
+
+		importProcess2 = testGetImportProcessesPage_addImportProcess(
+			importProcess2);
+
+		Page<ImportProcess> page = importProcessResource.getImportProcessesPage(
+			null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ImportProcess> ascPage =
+				importProcessResource.getImportProcessesPage(
+					null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				importProcess1, (List<ImportProcess>)ascPage.getItems());
+			assertContains(
+				importProcess2, (List<ImportProcess>)ascPage.getItems());
+
+			Page<ImportProcess> descPage =
+				importProcessResource.getImportProcessesPage(
+					null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				importProcess2, (List<ImportProcess>)descPage.getItems());
+			assertContains(
+				importProcess1, (List<ImportProcess>)descPage.getItems());
+		}
+	}
+
 	protected ImportProcess testGetImportProcessesPage_addImportProcess(
 			ImportProcess importProcess)
 		throws Exception {
@@ -1889,6 +2304,142 @@ public abstract class BaseImportProcessResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, importProcess1, importProcess2);
 		}
+
+		importProcess1 = testGetSiteImportProcessesPage_addImportProcess(
+			siteExternalReferenceCode, importProcess1);
+
+		importProcess2 = testGetSiteImportProcessesPage_addImportProcess(
+			siteExternalReferenceCode, importProcess2);
+
+		Page<ImportProcess> page =
+			importProcessResource.getSiteImportProcessesPage(
+				siteExternalReferenceCode, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ImportProcess> ascPage =
+				importProcessResource.getSiteImportProcessesPage(
+					siteExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				importProcess1, (List<ImportProcess>)ascPage.getItems());
+			assertContains(
+				importProcess2, (List<ImportProcess>)ascPage.getItems());
+
+			Page<ImportProcess> descPage =
+				importProcessResource.getSiteImportProcessesPage(
+					siteExternalReferenceCode, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				importProcess2, (List<ImportProcess>)descPage.getItems());
+			assertContains(
+				importProcess1, (List<ImportProcess>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteImportProcessesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "export-import/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ImportProcess"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ImportProcess importProcess1 = randomImportProcess();
+		ImportProcess importProcess2 = randomImportProcess();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = importProcess1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String siteExternalReferenceCode =
+			testGetSiteImportProcessesPage_getSiteExternalReferenceCode();
 
 		importProcess1 = testGetSiteImportProcessesPage_addImportProcess(
 			siteExternalReferenceCode, importProcess1);
@@ -2248,6 +2799,144 @@ public abstract class BaseImportProcessResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, importProcess1, importProcess2);
 		}
+
+		importProcess1 = testGetSitePortletImportProcessesPage_addImportProcess(
+			siteExternalReferenceCode, portletId, importProcess1);
+
+		importProcess2 = testGetSitePortletImportProcessesPage_addImportProcess(
+			siteExternalReferenceCode, portletId, importProcess2);
+
+		Page<ImportProcess> page =
+			importProcessResource.getSitePortletImportProcessesPage(
+				siteExternalReferenceCode, portletId, null, null, null, null,
+				null);
+
+		for (EntityField entityField : entityFields) {
+			Page<ImportProcess> ascPage =
+				importProcessResource.getSitePortletImportProcessesPage(
+					siteExternalReferenceCode, portletId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				importProcess1, (List<ImportProcess>)ascPage.getItems());
+			assertContains(
+				importProcess2, (List<ImportProcess>)ascPage.getItems());
+
+			Page<ImportProcess> descPage =
+				importProcessResource.getSitePortletImportProcessesPage(
+					siteExternalReferenceCode, portletId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				importProcess2, (List<ImportProcess>)descPage.getItems());
+			assertContains(
+				importProcess1, (List<ImportProcess>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSitePortletImportProcessesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "export-import/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"ImportProcess"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		ImportProcess importProcess1 = randomImportProcess();
+		ImportProcess importProcess2 = randomImportProcess();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = importProcess1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						importProcess1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						importProcess2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String siteExternalReferenceCode =
+			testGetSitePortletImportProcessesPage_getSiteExternalReferenceCode();
+		String portletId = testGetSitePortletImportProcessesPage_getPortletId();
 
 		importProcess1 = testGetSitePortletImportProcessesPage_addImportProcess(
 			siteExternalReferenceCode, portletId, importProcess1);
@@ -3537,4 +4226,4 @@ public abstract class BaseImportProcessResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1167690064
+// LIFERAY-REST-BUILDER-HASH:-1512667387

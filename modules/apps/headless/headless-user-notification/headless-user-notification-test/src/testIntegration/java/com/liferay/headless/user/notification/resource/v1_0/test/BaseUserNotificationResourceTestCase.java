@@ -36,16 +36,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -584,6 +587,138 @@ public abstract class BaseUserNotificationResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetMyUserNotificationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-user-notification/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"UserNotification"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		UserNotification userNotification1 = randomUserNotification();
+		UserNotification userNotification2 = randomUserNotification();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = userNotification1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		userNotification1 = testGetMyUserNotificationsPage_addUserNotification(
+			userNotification1);
+
+		userNotification2 = testGetMyUserNotificationsPage_addUserNotification(
+			userNotification2);
+
+		Page<UserNotification> page =
+			userNotificationResource.getMyUserNotificationsPage(
+				null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<UserNotification> ascPage =
+				userNotificationResource.getMyUserNotificationsPage(
+					null, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				userNotification1, (List<UserNotification>)ascPage.getItems());
+			assertContains(
+				userNotification2, (List<UserNotification>)ascPage.getItems());
+
+			Page<UserNotification> descPage =
+				userNotificationResource.getMyUserNotificationsPage(
+					null, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				userNotification2, (List<UserNotification>)descPage.getItems());
+			assertContains(
+				userNotification1, (List<UserNotification>)descPage.getItems());
+		}
+	}
+
 	protected UserNotification
 			testGetMyUserNotificationsPage_addUserNotification(
 				UserNotification userNotification)
@@ -983,6 +1118,145 @@ public abstract class BaseUserNotificationResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, userNotification1, userNotification2);
 		}
+
+		userNotification1 =
+			testGetUserAccountUserNotificationsPage_addUserNotification(
+				userAccountId, userNotification1);
+
+		userNotification2 =
+			testGetUserAccountUserNotificationsPage_addUserNotification(
+				userAccountId, userNotification2);
+
+		Page<UserNotification> page =
+			userNotificationResource.getUserAccountUserNotificationsPage(
+				userAccountId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<UserNotification> ascPage =
+				userNotificationResource.getUserAccountUserNotificationsPage(
+					userAccountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				userNotification1, (List<UserNotification>)ascPage.getItems());
+			assertContains(
+				userNotification2, (List<UserNotification>)ascPage.getItems());
+
+			Page<UserNotification> descPage =
+				userNotificationResource.getUserAccountUserNotificationsPage(
+					userAccountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				userNotification2, (List<UserNotification>)descPage.getItems());
+			assertContains(
+				userNotification1, (List<UserNotification>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetUserAccountUserNotificationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-user-notification/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"UserNotification"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		UserNotification userNotification1 = randomUserNotification();
+		UserNotification userNotification2 = randomUserNotification();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = userNotification1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						userNotification1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						userNotification2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long userAccountId =
+			testGetUserAccountUserNotificationsPage_getUserAccountId();
 
 		userNotification1 =
 			testGetUserAccountUserNotificationsPage_addUserNotification(
@@ -2243,4 +2517,4 @@ public abstract class BaseUserNotificationResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:572609404
+// LIFERAY-REST-BUILDER-HASH:-1549180971

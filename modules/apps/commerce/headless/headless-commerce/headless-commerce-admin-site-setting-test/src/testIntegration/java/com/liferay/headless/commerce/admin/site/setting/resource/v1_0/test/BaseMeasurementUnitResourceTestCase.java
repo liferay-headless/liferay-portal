@@ -41,17 +41,20 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1559,6 +1562,143 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetMeasurementUnitsByTypeWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-site-setting/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"MeasurementUnit"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		MeasurementUnit measurementUnit1 = randomMeasurementUnit();
+		MeasurementUnit measurementUnit2 = randomMeasurementUnit();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = measurementUnit1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String measurementUnitType =
+			testGetMeasurementUnitsByType_getMeasurementUnitType();
+
+		measurementUnit1 = testGetMeasurementUnitsByType_addMeasurementUnit(
+			measurementUnitType, measurementUnit1);
+
+		measurementUnit2 = testGetMeasurementUnitsByType_addMeasurementUnit(
+			measurementUnitType, measurementUnit2);
+
+		Page<MeasurementUnit> page =
+			measurementUnitResource.getMeasurementUnitsByType(
+				measurementUnitType, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<MeasurementUnit> ascPage =
+				measurementUnitResource.getMeasurementUnitsByType(
+					measurementUnitType,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				measurementUnit1, (List<MeasurementUnit>)ascPage.getItems());
+			assertContains(
+				measurementUnit2, (List<MeasurementUnit>)ascPage.getItems());
+
+			Page<MeasurementUnit> descPage =
+				measurementUnitResource.getMeasurementUnitsByType(
+					measurementUnitType,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				measurementUnit2, (List<MeasurementUnit>)descPage.getItems());
+			assertContains(
+				measurementUnit1, (List<MeasurementUnit>)descPage.getItems());
+		}
+	}
+
 	protected MeasurementUnit testGetMeasurementUnitsByType_addMeasurementUnit(
 			String measurementUnitType, MeasurementUnit measurementUnit)
 		throws Exception {
@@ -2014,6 +2154,137 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(
 				entityField, measurementUnit1, measurementUnit2);
+		}
+
+		measurementUnit1 = testGetMeasurementUnitsPage_addMeasurementUnit(
+			measurementUnit1);
+
+		measurementUnit2 = testGetMeasurementUnitsPage_addMeasurementUnit(
+			measurementUnit2);
+
+		Page<MeasurementUnit> page =
+			measurementUnitResource.getMeasurementUnitsPage(null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<MeasurementUnit> ascPage =
+				measurementUnitResource.getMeasurementUnitsPage(
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				measurementUnit1, (List<MeasurementUnit>)ascPage.getItems());
+			assertContains(
+				measurementUnit2, (List<MeasurementUnit>)ascPage.getItems());
+
+			Page<MeasurementUnit> descPage =
+				measurementUnitResource.getMeasurementUnitsPage(
+					null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				measurementUnit2, (List<MeasurementUnit>)descPage.getItems());
+			assertContains(
+				measurementUnit1, (List<MeasurementUnit>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetMeasurementUnitsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-site-setting/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"MeasurementUnit"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		MeasurementUnit measurementUnit1 = randomMeasurementUnit();
+		MeasurementUnit measurementUnit2 = randomMeasurementUnit();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = measurementUnit1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						measurementUnit1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						measurementUnit2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		measurementUnit1 = testGetMeasurementUnitsPage_addMeasurementUnit(
@@ -3443,4 +3714,4 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-878412798
+// LIFERAY-REST-BUILDER-HASH:-706062055

@@ -1533,4 +1533,4 @@ public abstract class BaseGuardrailResourceTestCase {
 		_guardrailResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:754939531
+// LIFERAY-REST-BUILDER-HASH:-411382665

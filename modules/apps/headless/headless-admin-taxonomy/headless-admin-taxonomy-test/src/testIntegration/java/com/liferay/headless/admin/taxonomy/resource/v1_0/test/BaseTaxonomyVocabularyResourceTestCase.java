@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -55,11 +56,13 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1251,6 +1254,150 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAssetLibraryTaxonomyVocabulariesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyVocabulary"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyVocabulary taxonomyVocabulary1 = randomTaxonomyVocabulary();
+		TaxonomyVocabulary taxonomyVocabulary2 = randomTaxonomyVocabulary();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyVocabulary1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long assetLibraryId =
+			testGetAssetLibraryTaxonomyVocabulariesPage_getAssetLibraryId();
+
+		taxonomyVocabulary1 =
+			testGetAssetLibraryTaxonomyVocabulariesPage_addTaxonomyVocabulary(
+				assetLibraryId, taxonomyVocabulary1);
+
+		taxonomyVocabulary2 =
+			testGetAssetLibraryTaxonomyVocabulariesPage_addTaxonomyVocabulary(
+				assetLibraryId, taxonomyVocabulary2);
+
+		Page<TaxonomyVocabulary> page =
+			taxonomyVocabularyResource.getAssetLibraryTaxonomyVocabulariesPage(
+				assetLibraryId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyVocabulary> ascPage =
+				taxonomyVocabularyResource.
+					getAssetLibraryTaxonomyVocabulariesPage(
+						assetLibraryId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyVocabulary1,
+				(List<TaxonomyVocabulary>)ascPage.getItems());
+			assertContains(
+				taxonomyVocabulary2,
+				(List<TaxonomyVocabulary>)ascPage.getItems());
+
+			Page<TaxonomyVocabulary> descPage =
+				taxonomyVocabularyResource.
+					getAssetLibraryTaxonomyVocabulariesPage(
+						assetLibraryId, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyVocabulary2,
+				(List<TaxonomyVocabulary>)descPage.getItems());
+			assertContains(
+				taxonomyVocabulary1,
+				(List<TaxonomyVocabulary>)descPage.getItems());
+		}
+	}
+
 	protected TaxonomyVocabulary
 			testGetAssetLibraryTaxonomyVocabulariesPage_addTaxonomyVocabulary(
 				Long assetLibraryId, TaxonomyVocabulary taxonomyVocabulary)
@@ -2042,6 +2189,147 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, taxonomyVocabulary1, taxonomyVocabulary2);
 		}
+
+		taxonomyVocabulary1 =
+			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
+				siteId, taxonomyVocabulary1);
+
+		taxonomyVocabulary2 =
+			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
+				siteId, taxonomyVocabulary2);
+
+		Page<TaxonomyVocabulary> page =
+			taxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+				siteId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<TaxonomyVocabulary> ascPage =
+				taxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				taxonomyVocabulary1,
+				(List<TaxonomyVocabulary>)ascPage.getItems());
+			assertContains(
+				taxonomyVocabulary2,
+				(List<TaxonomyVocabulary>)ascPage.getItems());
+
+			Page<TaxonomyVocabulary> descPage =
+				taxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+					siteId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				taxonomyVocabulary2,
+				(List<TaxonomyVocabulary>)descPage.getItems());
+			assertContains(
+				taxonomyVocabulary1,
+				(List<TaxonomyVocabulary>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetSiteTaxonomyVocabulariesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-taxonomy/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"TaxonomyVocabulary"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		TaxonomyVocabulary taxonomyVocabulary1 = randomTaxonomyVocabulary();
+		TaxonomyVocabulary taxonomyVocabulary2 = randomTaxonomyVocabulary();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = taxonomyVocabulary1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						taxonomyVocabulary2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long siteId = testGetSiteTaxonomyVocabulariesPage_getSiteId();
 
 		taxonomyVocabulary1 =
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
@@ -5314,4 +5602,4 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:918371193
+// LIFERAY-REST-BUILDER-HASH:600042183

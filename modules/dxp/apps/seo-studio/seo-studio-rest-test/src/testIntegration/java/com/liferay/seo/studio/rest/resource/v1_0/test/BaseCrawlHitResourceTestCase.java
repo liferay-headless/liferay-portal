@@ -1049,4 +1049,4 @@ public abstract class BaseCrawlHitResourceTestCase {
 		_crawlHitResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1124727245
+// LIFERAY-REST-BUILDER-HASH:618238433

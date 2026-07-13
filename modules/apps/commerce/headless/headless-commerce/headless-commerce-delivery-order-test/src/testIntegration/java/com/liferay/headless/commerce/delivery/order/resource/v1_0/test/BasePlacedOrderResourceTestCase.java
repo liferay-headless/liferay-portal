@@ -36,16 +36,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -656,6 +659,137 @@ public abstract class BasePlacedOrderResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetChannelAccountPlacedOrdersPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-order/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PlacedOrder"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PlacedOrder placedOrder1 = randomPlacedOrder();
+		PlacedOrder placedOrder2 = randomPlacedOrder();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = placedOrder1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						placedOrder1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						placedOrder2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long accountId = testGetChannelAccountPlacedOrdersPage_getAccountId();
+		Long channelId = testGetChannelAccountPlacedOrdersPage_getChannelId();
+
+		placedOrder1 = testGetChannelAccountPlacedOrdersPage_addPlacedOrder(
+			accountId, channelId, placedOrder1);
+
+		placedOrder2 = testGetChannelAccountPlacedOrdersPage_addPlacedOrder(
+			accountId, channelId, placedOrder2);
+
+		Page<PlacedOrder> page =
+			placedOrderResource.getChannelAccountPlacedOrdersPage(
+				accountId, channelId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PlacedOrder> ascPage =
+				placedOrderResource.getChannelAccountPlacedOrdersPage(
+					accountId, channelId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(placedOrder1, (List<PlacedOrder>)ascPage.getItems());
+			assertContains(placedOrder2, (List<PlacedOrder>)ascPage.getItems());
+
+			Page<PlacedOrder> descPage =
+				placedOrderResource.getChannelAccountPlacedOrdersPage(
+					accountId, channelId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				placedOrder2, (List<PlacedOrder>)descPage.getItems());
+			assertContains(
+				placedOrder1, (List<PlacedOrder>)descPage.getItems());
+		}
+	}
+
 	protected PlacedOrder testGetChannelAccountPlacedOrdersPage_addPlacedOrder(
 			Long accountId, Long channelId, PlacedOrder placedOrder)
 		throws Exception {
@@ -1126,6 +1260,149 @@ public abstract class BasePlacedOrderResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, placedOrder1, placedOrder2);
 		}
+
+		placedOrder1 =
+			testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
+				accountExternalReferenceCode, channelExternalReferenceCode,
+				placedOrder1);
+
+		placedOrder2 =
+			testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
+				accountExternalReferenceCode, channelExternalReferenceCode,
+				placedOrder2);
+
+		Page<PlacedOrder> page =
+			placedOrderResource.
+				getChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage(
+					accountExternalReferenceCode, channelExternalReferenceCode,
+					null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PlacedOrder> ascPage =
+				placedOrderResource.
+					getChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage(
+						accountExternalReferenceCode,
+						channelExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(placedOrder1, (List<PlacedOrder>)ascPage.getItems());
+			assertContains(placedOrder2, (List<PlacedOrder>)ascPage.getItems());
+
+			Page<PlacedOrder> descPage =
+				placedOrderResource.
+					getChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage(
+						accountExternalReferenceCode,
+						channelExternalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				placedOrder2, (List<PlacedOrder>)descPage.getItems());
+			assertContains(
+				placedOrder1, (List<PlacedOrder>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-order/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PlacedOrder"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PlacedOrder placedOrder1 = randomPlacedOrder();
+		PlacedOrder placedOrder2 = randomPlacedOrder();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = placedOrder1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						placedOrder1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						placedOrder2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String accountExternalReferenceCode =
+			testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage_getAccountExternalReferenceCode();
+		String channelExternalReferenceCode =
+			testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage_getChannelExternalReferenceCode();
 
 		placedOrder1 =
 			testGetChannelByExternalReferenceCodeChannelExternalReferenceCodeAccountByExternalReferenceCodeAccountExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
@@ -1648,6 +1925,142 @@ public abstract class BasePlacedOrderResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetChannelByExternalReferenceCodePlacedOrdersPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-order/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PlacedOrder"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PlacedOrder placedOrder1 = randomPlacedOrder();
+		PlacedOrder placedOrder2 = randomPlacedOrder();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = placedOrder1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						placedOrder1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						placedOrder2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetChannelByExternalReferenceCodePlacedOrdersPage_getExternalReferenceCode();
+
+		placedOrder1 =
+			testGetChannelByExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
+				externalReferenceCode, placedOrder1);
+
+		placedOrder2 =
+			testGetChannelByExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
+				externalReferenceCode, placedOrder2);
+
+		Page<PlacedOrder> page =
+			placedOrderResource.
+				getChannelByExternalReferenceCodePlacedOrdersPage(
+					externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PlacedOrder> ascPage =
+				placedOrderResource.
+					getChannelByExternalReferenceCodePlacedOrdersPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(placedOrder1, (List<PlacedOrder>)ascPage.getItems());
+			assertContains(placedOrder2, (List<PlacedOrder>)ascPage.getItems());
+
+			Page<PlacedOrder> descPage =
+				placedOrderResource.
+					getChannelByExternalReferenceCodePlacedOrdersPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				placedOrder2, (List<PlacedOrder>)descPage.getItems());
+			assertContains(
+				placedOrder1, (List<PlacedOrder>)descPage.getItems());
+		}
+	}
+
 	protected PlacedOrder
 			testGetChannelByExternalReferenceCodePlacedOrdersPage_addPlacedOrder(
 				String externalReferenceCode, PlacedOrder placedOrder)
@@ -2037,6 +2450,135 @@ public abstract class BasePlacedOrderResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, placedOrder1, placedOrder2);
 		}
+
+		placedOrder1 = testGetChannelPlacedOrdersPage_addPlacedOrder(
+			channelId, placedOrder1);
+
+		placedOrder2 = testGetChannelPlacedOrdersPage_addPlacedOrder(
+			channelId, placedOrder2);
+
+		Page<PlacedOrder> page = placedOrderResource.getChannelPlacedOrdersPage(
+			channelId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PlacedOrder> ascPage =
+				placedOrderResource.getChannelPlacedOrdersPage(
+					channelId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(placedOrder1, (List<PlacedOrder>)ascPage.getItems());
+			assertContains(placedOrder2, (List<PlacedOrder>)ascPage.getItems());
+
+			Page<PlacedOrder> descPage =
+				placedOrderResource.getChannelPlacedOrdersPage(
+					channelId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				placedOrder2, (List<PlacedOrder>)descPage.getItems());
+			assertContains(
+				placedOrder1, (List<PlacedOrder>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetChannelPlacedOrdersPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-order/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PlacedOrder"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PlacedOrder placedOrder1 = randomPlacedOrder();
+		PlacedOrder placedOrder2 = randomPlacedOrder();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = placedOrder1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(placedOrder1, entityFieldName, 0);
+					BeanTestUtil.setProperty(placedOrder2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						placedOrder1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						placedOrder2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long channelId = testGetChannelPlacedOrdersPage_getChannelId();
 
 		placedOrder1 = testGetChannelPlacedOrdersPage_addPlacedOrder(
 			channelId, placedOrder1);
@@ -5235,4 +5777,4 @@ public abstract class BasePlacedOrderResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-24951333
+// LIFERAY-REST-BUILDER-HASH:336365703

@@ -29,16 +29,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -605,6 +608,139 @@ public abstract class BaseCurrencyResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetChannelByExternalReferenceCodeCurrenciesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Currency"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Currency currency1 = randomCurrency();
+		Currency currency2 = randomCurrency();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = currency1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(currency1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(currency2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(currency1, entityFieldName, 0);
+					BeanTestUtil.setProperty(currency2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						currency1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						currency2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetChannelByExternalReferenceCodeCurrenciesPage_getExternalReferenceCode();
+
+		currency1 =
+			testGetChannelByExternalReferenceCodeCurrenciesPage_addCurrency(
+				externalReferenceCode, currency1);
+
+		currency2 =
+			testGetChannelByExternalReferenceCodeCurrenciesPage_addCurrency(
+				externalReferenceCode, currency2);
+
+		Page<Currency> page =
+			currencyResource.getChannelByExternalReferenceCodeCurrenciesPage(
+				externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Currency> ascPage =
+				currencyResource.
+					getChannelByExternalReferenceCodeCurrenciesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(currency1, (List<Currency>)ascPage.getItems());
+			assertContains(currency2, (List<Currency>)ascPage.getItems());
+
+			Page<Currency> descPage =
+				currencyResource.
+					getChannelByExternalReferenceCodeCurrenciesPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(currency2, (List<Currency>)descPage.getItems());
+			assertContains(currency1, (List<Currency>)descPage.getItems());
+		}
+	}
+
 	protected Currency
 			testGetChannelByExternalReferenceCodeCurrenciesPage_addCurrency(
 				String externalReferenceCode, Currency currency)
@@ -960,6 +1096,131 @@ public abstract class BaseCurrencyResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, currency1, currency2);
 		}
+
+		currency1 = testGetChannelCurrenciesPage_addCurrency(
+			channelId, currency1);
+
+		currency2 = testGetChannelCurrenciesPage_addCurrency(
+			channelId, currency2);
+
+		Page<Currency> page = currencyResource.getChannelCurrenciesPage(
+			channelId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Currency> ascPage = currencyResource.getChannelCurrenciesPage(
+				channelId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(currency1, (List<Currency>)ascPage.getItems());
+			assertContains(currency2, (List<Currency>)ascPage.getItems());
+
+			Page<Currency> descPage = currencyResource.getChannelCurrenciesPage(
+				channelId, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(currency2, (List<Currency>)descPage.getItems());
+			assertContains(currency1, (List<Currency>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetChannelCurrenciesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Currency"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Currency currency1 = randomCurrency();
+		Currency currency2 = randomCurrency();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = currency1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(currency1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(currency2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(currency1, entityFieldName, 0);
+					BeanTestUtil.setProperty(currency2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						currency1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						currency2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long channelId = testGetChannelCurrenciesPage_getChannelId();
 
 		currency1 = testGetChannelCurrenciesPage_addCurrency(
 			channelId, currency1);
@@ -2033,4 +2294,4 @@ public abstract class BaseCurrencyResourceTestCase {
 		CurrencyResource _currencyResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1518084914
+// LIFERAY-REST-BUILDER-HASH:-221482510

@@ -29,16 +29,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -483,6 +486,145 @@ public abstract class BaseMappedProductResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, mappedProduct1, mappedProduct2);
 		}
+
+		mappedProduct1 =
+			testGetChannelProductMappedProductsPage_addMappedProduct(
+				channelId, productId, mappedProduct1);
+
+		mappedProduct2 =
+			testGetChannelProductMappedProductsPage_addMappedProduct(
+				channelId, productId, mappedProduct2);
+
+		Page<MappedProduct> page =
+			mappedProductResource.getChannelProductMappedProductsPage(
+				channelId, productId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<MappedProduct> ascPage =
+				mappedProductResource.getChannelProductMappedProductsPage(
+					channelId, productId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				mappedProduct1, (List<MappedProduct>)ascPage.getItems());
+			assertContains(
+				mappedProduct2, (List<MappedProduct>)ascPage.getItems());
+
+			Page<MappedProduct> descPage =
+				mappedProductResource.getChannelProductMappedProductsPage(
+					channelId, productId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				mappedProduct2, (List<MappedProduct>)descPage.getItems());
+			assertContains(
+				mappedProduct1, (List<MappedProduct>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetChannelProductMappedProductsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-delivery-catalog/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"MappedProduct"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		MappedProduct mappedProduct1 = randomMappedProduct();
+		MappedProduct mappedProduct2 = randomMappedProduct();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = mappedProduct1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						mappedProduct1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						mappedProduct2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						mappedProduct1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						mappedProduct2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						mappedProduct1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						mappedProduct2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long channelId = testGetChannelProductMappedProductsPage_getChannelId();
+		Long productId = testGetChannelProductMappedProductsPage_getProductId();
 
 		mappedProduct1 =
 			testGetChannelProductMappedProductsPage_addMappedProduct(
@@ -1980,4 +2122,4 @@ public abstract class BaseMappedProductResourceTestCase {
 		MappedProductResource _mappedProductResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:11245515
+// LIFERAY-REST-BUILDER-HASH:2006577716

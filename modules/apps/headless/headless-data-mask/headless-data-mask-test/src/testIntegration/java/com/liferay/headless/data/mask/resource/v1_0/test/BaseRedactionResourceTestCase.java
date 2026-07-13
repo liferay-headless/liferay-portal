@@ -880,4 +880,4 @@ public abstract class BaseRedactionResourceTestCase {
 		_redactionResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1109746333
+// LIFERAY-REST-BUILDER-HASH:686936969

@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -812,6 +815,142 @@ public abstract class BaseOrderTypeChannelResourceTestCase {
 			unsafeTriConsumer.accept(
 				entityField, orderTypeChannel1, orderTypeChannel2);
 		}
+
+		orderTypeChannel1 =
+			testGetOrderTypeIdOrderTypeChannelsPage_addOrderTypeChannel(
+				id, orderTypeChannel1);
+
+		orderTypeChannel2 =
+			testGetOrderTypeIdOrderTypeChannelsPage_addOrderTypeChannel(
+				id, orderTypeChannel2);
+
+		Page<OrderTypeChannel> page =
+			orderTypeChannelResource.getOrderTypeIdOrderTypeChannelsPage(
+				id, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<OrderTypeChannel> ascPage =
+				orderTypeChannelResource.getOrderTypeIdOrderTypeChannelsPage(
+					id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				orderTypeChannel1, (List<OrderTypeChannel>)ascPage.getItems());
+			assertContains(
+				orderTypeChannel2, (List<OrderTypeChannel>)ascPage.getItems());
+
+			Page<OrderTypeChannel> descPage =
+				orderTypeChannelResource.getOrderTypeIdOrderTypeChannelsPage(
+					id, null, Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				orderTypeChannel2, (List<OrderTypeChannel>)descPage.getItems());
+			assertContains(
+				orderTypeChannel1, (List<OrderTypeChannel>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrderTypeIdOrderTypeChannelsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-order/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"OrderTypeChannel"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		OrderTypeChannel orderTypeChannel1 = randomOrderTypeChannel();
+		OrderTypeChannel orderTypeChannel2 = randomOrderTypeChannel();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = orderTypeChannel1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						orderTypeChannel1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						orderTypeChannel2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						orderTypeChannel1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						orderTypeChannel2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						orderTypeChannel1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						orderTypeChannel2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id = testGetOrderTypeIdOrderTypeChannelsPage_getId();
 
 		orderTypeChannel1 =
 			testGetOrderTypeIdOrderTypeChannelsPage_addOrderTypeChannel(
@@ -1867,4 +2006,4 @@ public abstract class BaseOrderTypeChannelResourceTestCase {
 		OrderTypeChannelResource _orderTypeChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1624035962
+// LIFERAY-REST-BUILDER-HASH:593736246

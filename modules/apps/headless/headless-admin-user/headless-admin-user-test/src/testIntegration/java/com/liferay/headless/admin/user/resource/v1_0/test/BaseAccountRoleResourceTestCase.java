@@ -30,17 +30,20 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1271,6 +1274,141 @@ public abstract class BaseAccountRoleResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAccountAccountRolesByExternalReferenceCodePageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"AccountRole"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		AccountRole accountRole1 = randomAccountRole();
+		AccountRole accountRole2 = randomAccountRole();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = accountRole1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(accountRole1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(accountRole2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(accountRole1, entityFieldName, 0);
+					BeanTestUtil.setProperty(accountRole2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						accountRole1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						accountRole2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetAccountAccountRolesByExternalReferenceCodePage_getExternalReferenceCode();
+
+		accountRole1 =
+			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
+				externalReferenceCode, accountRole1);
+
+		accountRole2 =
+			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
+				externalReferenceCode, accountRole2);
+
+		Page<AccountRole> page =
+			accountRoleResource.
+				getAccountAccountRolesByExternalReferenceCodePage(
+					externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<AccountRole> ascPage =
+				accountRoleResource.
+					getAccountAccountRolesByExternalReferenceCodePage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(accountRole1, (List<AccountRole>)ascPage.getItems());
+			assertContains(accountRole2, (List<AccountRole>)ascPage.getItems());
+
+			Page<AccountRole> descPage =
+				accountRoleResource.
+					getAccountAccountRolesByExternalReferenceCodePage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				accountRole2, (List<AccountRole>)descPage.getItems());
+			assertContains(
+				accountRole1, (List<AccountRole>)descPage.getItems());
+		}
+	}
+
 	protected AccountRole
 			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
 				String externalReferenceCode, AccountRole accountRole)
@@ -1781,6 +1919,134 @@ public abstract class BaseAccountRoleResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, accountRole1, accountRole2);
 		}
+
+		accountRole1 = testGetAccountAccountRolesPage_addAccountRole(
+			accountId, accountRole1);
+
+		accountRole2 = testGetAccountAccountRolesPage_addAccountRole(
+			accountId, accountRole2);
+
+		Page<AccountRole> page = accountRoleResource.getAccountAccountRolesPage(
+			accountId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<AccountRole> ascPage =
+				accountRoleResource.getAccountAccountRolesPage(
+					accountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(accountRole1, (List<AccountRole>)ascPage.getItems());
+			assertContains(accountRole2, (List<AccountRole>)ascPage.getItems());
+
+			Page<AccountRole> descPage =
+				accountRoleResource.getAccountAccountRolesPage(
+					accountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				accountRole2, (List<AccountRole>)descPage.getItems());
+			assertContains(
+				accountRole1, (List<AccountRole>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetAccountAccountRolesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"AccountRole"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		AccountRole accountRole1 = randomAccountRole();
+		AccountRole accountRole2 = randomAccountRole();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = accountRole1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(accountRole1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(accountRole2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(accountRole1, entityFieldName, 0);
+					BeanTestUtil.setProperty(accountRole2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						accountRole1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						accountRole2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long accountId = testGetAccountAccountRolesPage_getAccountId();
 
 		accountRole1 = testGetAccountAccountRolesPage_addAccountRole(
 			accountId, accountRole1);
@@ -3564,4 +3830,4 @@ public abstract class BaseAccountRoleResourceTestCase {
 		_accountRoleResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1860062267
+// LIFERAY-REST-BUILDER-HASH:1901491001

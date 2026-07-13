@@ -35,17 +35,20 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -1834,6 +1837,145 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetAccountByExternalReferenceCodeOrganizationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetAccountByExternalReferenceCodeOrganizationsPage_getExternalReferenceCode();
+
+		organization1 =
+			testGetAccountByExternalReferenceCodeOrganizationsPage_addOrganization(
+				externalReferenceCode, organization1);
+
+		organization2 =
+			testGetAccountByExternalReferenceCodeOrganizationsPage_addOrganization(
+				externalReferenceCode, organization2);
+
+		Page<Organization> page =
+			organizationResource.
+				getAccountByExternalReferenceCodeOrganizationsPage(
+					externalReferenceCode, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.
+					getAccountByExternalReferenceCodeOrganizationsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.
+					getAccountByExternalReferenceCodeOrganizationsPage(
+						externalReferenceCode, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
 	protected Organization
 			testGetAccountByExternalReferenceCodeOrganizationsPage_addOrganization(
 				String externalReferenceCode, Organization organization)
@@ -2486,6 +2628,139 @@ public abstract class BaseOrganizationResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, organization1, organization2);
 		}
+
+		organization1 = testGetAccountOrganizationsPage_addOrganization(
+			accountId, organization1);
+
+		organization2 = testGetAccountOrganizationsPage_addOrganization(
+			accountId, organization2);
+
+		Page<Organization> page =
+			organizationResource.getAccountOrganizationsPage(
+				accountId, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.getAccountOrganizationsPage(
+					accountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.getAccountOrganizationsPage(
+					accountId, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetAccountOrganizationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long accountId = testGetAccountOrganizationsPage_getAccountId();
 
 		organization1 = testGetAccountOrganizationsPage_addOrganization(
 			accountId, organization1);
@@ -3336,6 +3611,145 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetOrganizationByExternalReferenceCodeChildOrganizationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String externalReferenceCode =
+			testGetOrganizationByExternalReferenceCodeChildOrganizationsPage_getExternalReferenceCode();
+
+		organization1 =
+			testGetOrganizationByExternalReferenceCodeChildOrganizationsPage_addOrganization(
+				externalReferenceCode, organization1);
+
+		organization2 =
+			testGetOrganizationByExternalReferenceCodeChildOrganizationsPage_addOrganization(
+				externalReferenceCode, organization2);
+
+		Page<Organization> page =
+			organizationResource.
+				getOrganizationByExternalReferenceCodeChildOrganizationsPage(
+					externalReferenceCode, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.
+					getOrganizationByExternalReferenceCodeChildOrganizationsPage(
+						externalReferenceCode, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.
+					getOrganizationByExternalReferenceCodeChildOrganizationsPage(
+						externalReferenceCode, null, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
 	protected Organization
 			testGetOrganizationByExternalReferenceCodeChildOrganizationsPage_addOrganization(
 				String externalReferenceCode, Organization organization)
@@ -3855,6 +4269,142 @@ public abstract class BaseOrganizationResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, organization1, organization2);
 		}
+
+		organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, organization1);
+
+		organization2 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, organization2);
+
+		Page<Organization> page =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organizationId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
 
 		organization1 =
 			testGetOrganizationChildOrganizationsPage_addOrganization(
@@ -4443,6 +4993,140 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 	}
 
+	@Test
+	public void testGetOrganizationOrganizationsPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String parentOrganizationId =
+			testGetOrganizationOrganizationsPage_getParentOrganizationId();
+
+		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
+			parentOrganizationId, organization1);
+
+		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
+			parentOrganizationId, organization2);
+
+		Page<Organization> page =
+			organizationResource.getOrganizationOrganizationsPage(
+				parentOrganizationId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.getOrganizationOrganizationsPage(
+					parentOrganizationId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.getOrganizationOrganizationsPage(
+					parentOrganizationId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
 	protected Organization testGetOrganizationOrganizationsPage_addOrganization(
 			String parentOrganizationId, Organization organization)
 		throws Exception {
@@ -4881,6 +5565,132 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, organization1, organization2);
+		}
+
+		organization1 = testGetOrganizationsPage_addOrganization(organization1);
+
+		organization2 = testGetOrganizationsPage_addOrganization(organization2);
+
+		Page<Organization> page = organizationResource.getOrganizationsPage(
+			null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.getOrganizationsPage(
+					null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(
+				organization1, (List<Organization>)ascPage.getItems());
+			assertContains(
+				organization2, (List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.getOrganizationsPage(
+					null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(
+				organization2, (List<Organization>)descPage.getItems());
+			assertContains(
+				organization1, (List<Organization>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithSortCollection() throws Exception {
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-admin-user/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"Organization"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = organization1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(organization1, entityFieldName, 0);
+					BeanTestUtil.setProperty(organization2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		organization1 = testGetOrganizationsPage_addOrganization(organization1);
@@ -8107,4 +8917,4 @@ public abstract class BaseOrganizationResourceTestCase {
 		_organizationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1392319792
+// LIFERAY-REST-BUILDER-HASH:-804942308

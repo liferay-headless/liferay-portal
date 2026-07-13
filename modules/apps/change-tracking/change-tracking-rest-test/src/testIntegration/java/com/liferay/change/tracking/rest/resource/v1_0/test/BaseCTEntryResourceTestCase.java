@@ -36,16 +36,19 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -521,6 +524,126 @@ public abstract class BaseCTEntryResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, ctEntry1, ctEntry2);
+		}
+
+		ctEntry1 = testGetCTEntriesHistoryPage_addCTEntry(ctEntry1);
+
+		ctEntry2 = testGetCTEntriesHistoryPage_addCTEntry(ctEntry2);
+
+		Page<CTEntry> page = ctEntryResource.getCTEntriesHistoryPage(
+			null, null, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<CTEntry> ascPage = ctEntryResource.getCTEntriesHistoryPage(
+				null, null, null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":asc");
+
+			assertContains(ctEntry1, (List<CTEntry>)ascPage.getItems());
+			assertContains(ctEntry2, (List<CTEntry>)ascPage.getItems());
+
+			Page<CTEntry> descPage = ctEntryResource.getCTEntriesHistoryPage(
+				null, null, null, null, null,
+				Pagination.of(1, (int)page.getTotalCount() + 1),
+				entityField.getName() + ":desc");
+
+			assertContains(ctEntry2, (List<CTEntry>)descPage.getItems());
+			assertContains(ctEntry1, (List<CTEntry>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetCTEntriesHistoryPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "change-tracking-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"CTEntry"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		CTEntry ctEntry1 = randomCTEntry();
+		CTEntry ctEntry2 = randomCTEntry();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = ctEntry1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(ctEntry1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(ctEntry2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(ctEntry1, entityFieldName, 0);
+					BeanTestUtil.setProperty(ctEntry2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						ctEntry1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						ctEntry2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
 		}
 
 		ctEntry1 = testGetCTEntriesHistoryPage_addCTEntry(ctEntry1);
@@ -1204,6 +1327,133 @@ public abstract class BaseCTEntryResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			unsafeTriConsumer.accept(entityField, ctEntry1, ctEntry2);
 		}
+
+		ctEntry1 = testGetCtCollectionCTEntriesPage_addCTEntry(
+			ctCollectionId, ctEntry1);
+
+		ctEntry2 = testGetCtCollectionCTEntriesPage_addCTEntry(
+			ctCollectionId, ctEntry2);
+
+		Page<CTEntry> page = ctEntryResource.getCtCollectionCTEntriesPage(
+			ctCollectionId, null, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<CTEntry> ascPage =
+				ctEntryResource.getCtCollectionCTEntriesPage(
+					ctCollectionId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":asc");
+
+			assertContains(ctEntry1, (List<CTEntry>)ascPage.getItems());
+			assertContains(ctEntry2, (List<CTEntry>)ascPage.getItems());
+
+			Page<CTEntry> descPage =
+				ctEntryResource.getCtCollectionCTEntriesPage(
+					ctCollectionId, null, null, null,
+					Pagination.of(1, (int)page.getTotalCount() + 1),
+					entityField.getName() + ":desc");
+
+			assertContains(ctEntry2, (List<CTEntry>)descPage.getItems());
+			assertContains(ctEntry1, (List<CTEntry>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetCtCollectionCTEntriesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "change-tracking-rest/v1.0/openapi.json", Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"CTEntry"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		CTEntry ctEntry1 = randomCTEntry();
+		CTEntry ctEntry2 = randomCTEntry();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = ctEntry1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(ctEntry1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(ctEntry2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(ctEntry1, entityFieldName, 0);
+					BeanTestUtil.setProperty(ctEntry2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						ctEntry1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						ctEntry2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long ctCollectionId =
+			testGetCtCollectionCTEntriesPage_getCtCollectionId();
 
 		ctEntry1 = testGetCtCollectionCTEntriesPage_addCTEntry(
 			ctCollectionId, ctEntry1);
@@ -3003,4 +3253,4 @@ public abstract class BaseCTEntryResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1452172856
+// LIFERAY-REST-BUILDER-HASH:-1005002677

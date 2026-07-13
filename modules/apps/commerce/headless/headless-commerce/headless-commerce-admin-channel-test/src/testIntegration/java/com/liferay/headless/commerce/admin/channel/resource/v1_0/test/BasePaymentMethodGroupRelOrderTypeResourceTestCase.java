@@ -32,16 +32,19 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.test.rule.SearchTestRule;
@@ -784,6 +787,154 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceTestCase {
 				entityField, paymentMethodGroupRelOrderType1,
 				paymentMethodGroupRelOrderType2);
 		}
+
+		paymentMethodGroupRelOrderType1 =
+			testGetPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage_addPaymentMethodGroupRelOrderType(
+				id, paymentMethodGroupRelOrderType1);
+
+		paymentMethodGroupRelOrderType2 =
+			testGetPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage_addPaymentMethodGroupRelOrderType(
+				id, paymentMethodGroupRelOrderType2);
+
+		Page<PaymentMethodGroupRelOrderType> page =
+			paymentMethodGroupRelOrderTypeResource.
+				getPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage(
+					id, null, null, null, null);
+
+		for (EntityField entityField : entityFields) {
+			Page<PaymentMethodGroupRelOrderType> ascPage =
+				paymentMethodGroupRelOrderTypeResource.
+					getPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":asc");
+
+			assertContains(
+				paymentMethodGroupRelOrderType1,
+				(List<PaymentMethodGroupRelOrderType>)ascPage.getItems());
+			assertContains(
+				paymentMethodGroupRelOrderType2,
+				(List<PaymentMethodGroupRelOrderType>)ascPage.getItems());
+
+			Page<PaymentMethodGroupRelOrderType> descPage =
+				paymentMethodGroupRelOrderTypeResource.
+					getPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage(
+						id, null, null,
+						Pagination.of(1, (int)page.getTotalCount() + 1),
+						entityField.getName() + ":desc");
+
+			assertContains(
+				paymentMethodGroupRelOrderType2,
+				(List<PaymentMethodGroupRelOrderType>)descPage.getItems());
+			assertContains(
+				paymentMethodGroupRelOrderType1,
+				(List<PaymentMethodGroupRelOrderType>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPageWithSortCollection()
+		throws Exception {
+
+		JSONObject xSortableJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, "headless-commerce-admin-channel/v1.0/openapi.json",
+			Http.Method.GET
+		).getJSONObject(
+			"components"
+		).getJSONObject(
+			"schemas"
+		).getJSONObject(
+			"PaymentMethodGroupRelOrderType"
+		).getJSONObject(
+			"x-sortable"
+		);
+
+		PaymentMethodGroupRelOrderType paymentMethodGroupRelOrderType1 =
+			randomPaymentMethodGroupRelOrderType();
+		PaymentMethodGroupRelOrderType paymentMethodGroupRelOrderType2 =
+			randomPaymentMethodGroupRelOrderType();
+
+		List<EntityField> entityFields = new ArrayList<>();
+
+		for (EntityField entityField :
+				getEntityFields(EntityField.Type.COLLECTION)) {
+
+			if (!(entityField instanceof CollectionEntityField)) {
+				continue;
+			}
+
+			CollectionEntityField collectionEntityField =
+				(CollectionEntityField)entityField;
+
+			Assert.assertEquals(
+				collectionEntityField.isSortable(),
+				xSortableJSONObject.has(entityField.getName()));
+
+			if (!collectionEntityField.isSortable()) {
+				continue;
+			}
+
+			EntityField wrappedEntityField =
+				collectionEntityField.getEntityField();
+
+			if (Objects.equals(
+					wrappedEntityField.getSortableName(LocaleUtil.getDefault()),
+					com.liferay.portal.kernel.search.Field.STATUS)) {
+
+				continue;
+			}
+
+			String entityFieldName = entityField.getName();
+
+			try {
+				Method method = paymentMethodGroupRelOrderType1.getClass(
+				).getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName)
+				);
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.equals(Long.class)) {
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType1, entityFieldName, 0L);
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType2, entityFieldName, 1L);
+				}
+				else if (returnType.equals(Integer.class)) {
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType1, entityFieldName, 0);
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType2, entityFieldName, 1);
+				}
+				else if (returnType.equals(String.class)) {
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanTestUtil.setProperty(
+						paymentMethodGroupRelOrderType2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+				else {
+					continue;
+				}
+			}
+			catch (Exception exception) {
+				continue;
+			}
+
+			entityFields.add(entityField);
+		}
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long id =
+			testGetPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage_getId();
 
 		paymentMethodGroupRelOrderType1 =
 			testGetPaymentMethodGroupRelIdPaymentMethodGroupRelOrderTypesPage_addPaymentMethodGroupRelOrderType(
@@ -1847,4 +1998,4 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceTestCase {
 			_paymentMethodGroupRelOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1044126004
+// LIFERAY-REST-BUILDER-HASH:1546896666
