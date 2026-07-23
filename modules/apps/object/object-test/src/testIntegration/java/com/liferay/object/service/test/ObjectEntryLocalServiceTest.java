@@ -3169,8 +3169,9 @@ public class ObjectEntryLocalServiceTest {
 	}
 
 	@Test
-	public void testAddObjectEntryWithObjectRelationshipInScopeDepot()
-		throws Exception {
+	public void testAddObjectEntryWithObjectRelationship() throws Exception {
+
+		// Depot scope
 
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
@@ -3206,7 +3207,7 @@ public class ObjectEntryLocalServiceTest {
 			ObjectDefinitionSettingConstants.NAME_ACCEPT_ALL_GROUPS,
 			StringPool.TRUE);
 
-		ObjectRelationship objectRelationship =
+		ObjectRelationship objectRelationship1 =
 			ObjectRelationshipTestUtil.addObjectRelationship(
 				_objectRelationshipLocalService, objectDefinition1,
 				objectDefinition2,
@@ -3225,7 +3226,7 @@ public class ObjectEntryLocalServiceTest {
 
 		ObjectField relationshipObjectField =
 			_objectFieldLocalService.fetchObjectField(
-				objectRelationship.getObjectFieldId2());
+				objectRelationship1.getObjectFieldId2());
 
 		Map<String, Serializable> values = Collections.singletonMap(
 			relationshipObjectField.getName(), objectEntry1.getObjectEntryId());
@@ -3252,6 +3253,32 @@ public class ObjectEntryLocalServiceTest {
 			() -> _addObjectEntry(
 				depotEntry2.getGroupId(),
 				objectDefinition2.getObjectDefinitionId(), values));
+
+		// Required relationship
+
+		ObjectDefinition objectDefinition3 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+		ObjectDefinition objectDefinition4 =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		ObjectRelationship objectRelationship2 =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition3,
+				objectDefinition4);
+
+		ObjectField objectField = _objectFieldLocalService.updateRequired(
+			objectRelationship2.getObjectFieldId2(), true);
+
+		AssertUtils.assertFailure(
+			ObjectEntryValuesException.Required.class,
+			"No value was provided for required object field \"" +
+				objectField.getName() + "\"",
+			() -> _addObjectEntry(
+				objectDefinition4,
+				HashMapBuilder.<String, Serializable>put(
+					objectField.getName(), 0
+				).build(),
+				ServiceContextTestUtil.getServiceContext()));
 	}
 
 	@Test
