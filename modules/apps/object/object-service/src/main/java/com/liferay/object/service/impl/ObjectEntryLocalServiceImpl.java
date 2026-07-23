@@ -7945,6 +7945,14 @@ public class ObjectEntryLocalServiceImpl
 					objectField.getName());
 			}
 		}
+		else if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+			if (GetterUtil.getLong(value) == 0) {
+				throw new ObjectEntryValuesException.Required(
+					objectField.getName());
+			}
+		}
 	}
 
 	private void _validateTextMaxLength(
