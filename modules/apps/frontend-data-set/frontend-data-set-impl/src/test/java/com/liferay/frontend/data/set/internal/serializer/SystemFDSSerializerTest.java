@@ -56,6 +56,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -1257,6 +1258,7 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 	}
 
 	@Test
+	@TestInfo("LPD-98414")
 	public void testSerializeSortItems() throws Exception {
 
 		// Different sorts
@@ -1351,6 +1353,30 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 
 		_unregisterServices();
 
+		// No sort field name
+
+		mockLanguage();
+
+		_registerServices(
+			_registerFDSSorts(
+				FDS_NAMES[0], _createFDSSortItemList(FIELD_NAMES[0])),
+			_registerFDSView(
+				FDS_NAMES[0], _createTableFDSView(FIELD_NAMES[0], null)),
+			_registerSystemFDSEntry(FDS_NAMES[0]));
+
+		List<FDSSortItem> fdsSortItems = systemFDSSerializer.serializeSorts(
+			FDS_NAMES[0], httpServletRequest);
+
+		Assert.assertEquals(
+			FIELD_NAMES[0],
+			fdsSortItems.get(
+				0
+			).get(
+				"key"
+			));
+
+		_unregisterServices();
+
 		// No sorts
 
 		_registerServices(_registerSystemFDSEntry(FDS_NAMES[0]));
@@ -1359,6 +1385,39 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 			systemFDSSerializer.serializeSorts(
 				FDS_NAMES[0], httpServletRequest
 			).isEmpty());
+
+		_unregisterServices();
+
+		// No table schema
+
+		_registerServices(
+			_registerFDSSorts(
+				FDS_NAMES[0], _createFDSSortItemList(FIELD_NAMES[0])),
+			_registerFDSView(
+				FDS_NAMES[0],
+				new BaseTableFDSView() {
+
+					@Override
+					public FDSTableSchema getFDSTableSchema(Locale locale) {
+						return null;
+					}
+
+				}),
+			_registerFDSView(
+				FDS_NAMES[0],
+				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
+			_registerSystemFDSEntry(FDS_NAMES[0]));
+
+		fdsSortItems = systemFDSSerializer.serializeSorts(
+			FDS_NAMES[0], httpServletRequest);
+
+		Assert.assertEquals(
+			FIELD_NAMES[1],
+			fdsSortItems.get(
+				0
+			).get(
+				"key"
+			));
 
 		_unregisterServices();
 
@@ -1375,6 +1434,51 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 				FDS_NAMES[0], httpServletRequest),
 			systemFDSSerializer.serializeSorts(
 				FDS_NAMES[1], httpServletRequest));
+
+		_unregisterServices();
+
+		// Sort field name
+
+		_registerServices(
+			_registerFDSSorts(
+				FDS_NAMES[0], _createFDSSortItemList(FIELD_NAMES[0])),
+			_registerFDSView(
+				FDS_NAMES[0],
+				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
+			_registerSystemFDSEntry(FDS_NAMES[0]));
+
+		fdsSortItems = systemFDSSerializer.serializeSorts(
+			FDS_NAMES[0], httpServletRequest);
+
+		Assert.assertEquals(
+			FIELD_NAMES[1],
+			fdsSortItems.get(
+				0
+			).get(
+				"key"
+			));
+
+		_unregisterServices();
+
+		// Unmatched key
+
+		_registerServices(
+			_registerFDSSorts(FDS_NAMES[0], _createFDSSortItemList(IDS[0])),
+			_registerFDSView(
+				FDS_NAMES[0],
+				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
+			_registerSystemFDSEntry(FDS_NAMES[0]));
+
+		fdsSortItems = systemFDSSerializer.serializeSorts(
+			FDS_NAMES[0], httpServletRequest);
+
+		Assert.assertEquals(
+			IDS[0],
+			fdsSortItems.get(
+				0
+			).get(
+				"key"
+			));
 
 		_unregisterServices();
 	}
@@ -1789,6 +1893,43 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 			@Override
 			public Map<String, Object> getPreloadedData() {
 				return preloadedData;
+			}
+
+		};
+	}
+
+	private FDSSortItemList _createFDSSortItemList(String key) {
+		return FDSSortItemListBuilder.add(
+			FDSSortItemBuilder.setActive(
+				true
+			).setDirection(
+				"asc"
+			).setKey(
+				key
+			).setLabel(
+				LABELS[0]
+			).build()
+		).build();
+	}
+
+	private FDSView _createTableFDSView(
+		String fieldName, String sortFieldName) {
+
+		return new BaseTableFDSView() {
+
+			@Override
+			public FDSTableSchema getFDSTableSchema(Locale locale) {
+				FDSTableSchemaBuilder fdsTableSchemaBuilder =
+					new FDSTableSchemaBuilderImpl();
+
+				return fdsTableSchemaBuilder.add(
+					fieldName, LABELS[0],
+					fdsTableSchemaField -> fdsTableSchemaField.setSortable(
+						true
+					).setSortFieldName(
+						sortFieldName
+					)
+				).build();
 			}
 
 		};
