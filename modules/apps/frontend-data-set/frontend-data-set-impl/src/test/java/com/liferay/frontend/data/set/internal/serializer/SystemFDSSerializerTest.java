@@ -1364,12 +1364,11 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 				FDS_NAMES[0], _createTableFDSView(FIELD_NAMES[0], null)),
 			_registerSystemFDSEntry(FDS_NAMES[0]));
 
-		List<FDSSortItem> fdsSortItems = systemFDSSerializer.serializeSorts(
-			FDS_NAMES[0], httpServletRequest);
-
 		Assert.assertEquals(
 			FIELD_NAMES[0],
-			fdsSortItems.get(
+			systemFDSSerializer.serializeSorts(
+				FDS_NAMES[0], httpServletRequest
+			).get(
 				0
 			).get(
 				"key"
@@ -1408,12 +1407,11 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
 			_registerSystemFDSEntry(FDS_NAMES[0]));
 
-		fdsSortItems = systemFDSSerializer.serializeSorts(
-			FDS_NAMES[0], httpServletRequest);
-
 		Assert.assertEquals(
 			FIELD_NAMES[1],
-			fdsSortItems.get(
+			systemFDSSerializer.serializeSorts(
+				FDS_NAMES[0], httpServletRequest
+			).get(
 				0
 			).get(
 				"key"
@@ -1447,12 +1445,11 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
 			_registerSystemFDSEntry(FDS_NAMES[0]));
 
-		fdsSortItems = systemFDSSerializer.serializeSorts(
-			FDS_NAMES[0], httpServletRequest);
-
 		Assert.assertEquals(
 			FIELD_NAMES[1],
-			fdsSortItems.get(
+			systemFDSSerializer.serializeSorts(
+				FDS_NAMES[0], httpServletRequest
+			).get(
 				0
 			).get(
 				"key"
@@ -1469,12 +1466,11 @@ public class SystemFDSSerializerTest extends BaseFDSSerializerTestCase {
 				_createTableFDSView(FIELD_NAMES[0], FIELD_NAMES[1])),
 			_registerSystemFDSEntry(FDS_NAMES[0]));
 
-		fdsSortItems = systemFDSSerializer.serializeSorts(
-			FDS_NAMES[0], httpServletRequest);
-
 		Assert.assertEquals(
 			IDS[0],
-			fdsSortItems.get(
+			systemFDSSerializer.serializeSorts(
+				FDS_NAMES[0], httpServletRequest
+			).get(
 				0
 			).get(
 				"key"
