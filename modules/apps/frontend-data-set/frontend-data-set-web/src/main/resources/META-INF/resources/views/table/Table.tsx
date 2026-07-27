@@ -37,7 +37,6 @@ import {
 	ITableSchema,
 	IView,
 	TRenderer,
-	TSort,
 	VisibleFieldNames,
 } from '../../utils/types';
 import ViewsContext, {
@@ -51,6 +50,7 @@ import getCellColumnClassName from '../utils/getCellColumnClassName';
 import {EViewsActionTypes} from '../viewsReducer';
 import TableContext from './TableContext';
 import TableContextProvider from './TableContextProvider';
+import {Sorting, getTableSorting, getUpdatedSorts} from './sorting';
 
 type Column = {
 	fieldName: string;
@@ -64,11 +64,6 @@ type Field = {
 	localizeLabel?: boolean;
 	mapData?: Function;
 	sortable?: boolean;
-};
-
-type Sorting = {
-	column: React.Key;
-	direction: 'ascending' | 'descending';
 };
 
 const defaultAddItem = {
@@ -801,67 +796,10 @@ const Table = ({
 		'item-actions'
 	);
 
-	const getFieldSortKey = (field: any): string =>
-		field.sortFieldName ?? String(field.fieldName);
-
-	const getFieldByColumnId = (columnId: string | undefined) =>
-		visibleFields.find((f) => String(f.fieldName) === columnId);
-
-	const getSorting = (): Sorting | null => {
-		const activeSort = sorts.find((sort: any) => sort.active);
-
-		if (!activeSort) {
-			return null;
-		}
-
-		const matchedField = visibleFields.find(
-			(f) => getFieldSortKey(f) === activeSort.key
-		);
-
-		return {
-			column: matchedField
-				? String(matchedField.fieldName)
-				: activeSort.key,
-			direction:
-				activeSort.direction === 'desc' ? 'descending' : 'ascending',
-		};
-	};
-
 	const onSortChange = (sorting: Sorting | null) => {
-		const matchedField = getFieldByColumnId(sorting?.column?.toString());
-		const sortKey = matchedField
-			? getFieldSortKey(matchedField)
-			: String(sorting?.column);
-
-		let updatedSorts: TSort[] = [];
-
-		updatedSorts = sorts.map((sort: any) =>
-			sort.key === sortKey
-				? {
-						...sort,
-						active: true,
-						direction:
-							sorting?.direction === 'ascending' ? 'asc' : 'desc',
-					}
-				: {
-						...sort,
-						active: false,
-					}
+		viewsDispatch(
+			updateActiveSorts(getUpdatedSorts(sorts, visibleFields, sorting))
 		);
-
-		const newSort: boolean = Boolean(
-			!sorts.find((sort: any) => sort.key === sortKey)
-		);
-
-		if (newSort) {
-			updatedSorts.push({
-				active: true,
-				direction: 'asc',
-				key: sortKey,
-			});
-		}
-
-		viewsDispatch(updateActiveSorts(updatedSorts));
 	};
 
 	return (
@@ -914,7 +852,7 @@ const Table = ({
 
 					viewsDispatch(updateVisibleFields(visibleFieldNames));
 				}}
-				sort={getSorting()}
+				sort={getTableSorting(sorts, visibleFields)}
 				visibleColumns={getVisibleFieldsMap(
 					schema.fields as Array<Field>,
 					visibleFields,

@@ -28,6 +28,8 @@ import com.liferay.frontend.data.set.view.FDSView;
 import com.liferay.frontend.data.set.view.FDSViewContextContributor;
 import com.liferay.frontend.data.set.view.FDSViewContextContributorRegistry;
 import com.liferay.frontend.data.set.view.FDSViewRegistry;
+import com.liferay.frontend.data.set.view.table.FDSTableSchema;
+import com.liferay.frontend.data.set.view.table.FDSTableSchemaField;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -46,6 +48,7 @@ import com.liferay.portal.kernel.util.Validator;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -351,7 +354,30 @@ public class SystemFDSSerializer
 			return Collections.emptyList();
 		}
 
-		return fdsSorts.getFDSSortItems(httpServletRequest);
+		List<FDSSortItem> fdsSortItems = fdsSorts.getFDSSortItems(
+			httpServletRequest);
+
+		if (fdsSortItems.isEmpty()) {
+			return fdsSortItems;
+		}
+
+		Map<String, String> sortFieldNamesMap = _getSortFieldNamesMap(
+			fdsName, httpServletRequest);
+
+		if (sortFieldNamesMap.isEmpty()) {
+			return fdsSortItems;
+		}
+
+		for (FDSSortItem fdsSortItem : fdsSortItems) {
+			String sortFieldName = sortFieldNamesMap.get(
+				fdsSortItem.get("key"));
+
+			if (sortFieldName != null) {
+				fdsSortItem.setKey(sortFieldName);
+			}
+		}
+
+		return fdsSortItems;
 	}
 
 	@Override
@@ -440,6 +466,42 @@ public class SystemFDSSerializer
 
 	@Reference
 	protected SystemFDSEntryRegistry systemFDSEntryRegistry;
+
+	private Map<String, String> _getSortFieldNamesMap(
+		String fdsName, HttpServletRequest httpServletRequest) {
+
+		List<FDSView> fdsViews = fdsViewRegistry.getFDSViews(fdsName);
+
+		if (ListUtil.isEmpty(fdsViews)) {
+			return Collections.emptyMap();
+		}
+
+		Locale locale = PortalUtil.getLocale(httpServletRequest);
+
+		Map<String, String> sortFieldNamesMap = new HashMap<>();
+
+		for (FDSView fdsView : fdsViews) {
+			FDSTableSchema fdsTableSchema = fdsView.getFDSTableSchema(locale);
+
+			if (fdsTableSchema == null) {
+				continue;
+			}
+
+			for (FDSTableSchemaField fdsTableSchemaField :
+					fdsTableSchema.getFDSTableSchemaFieldsMap(
+					).values()) {
+
+				String sortFieldName = fdsTableSchemaField.getSortFieldName();
+
+				if (sortFieldName != null) {
+					sortFieldNamesMap.put(
+						fdsTableSchemaField.getFieldName(), sortFieldName);
+				}
+			}
+		}
+
+		return sortFieldNamesMap;
+	}
 
 	private void _serializeFilters(
 		List<FDSFilter> fdsFilters, JSONArray jsonArray, Locale locale) {
