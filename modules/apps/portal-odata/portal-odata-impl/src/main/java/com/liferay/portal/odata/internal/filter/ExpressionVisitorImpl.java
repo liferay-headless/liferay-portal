@@ -548,12 +548,9 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 	}
 
 	private Object _normalizeStringLiteral(String literal) {
-		literal = StringUtil.toLowerCase(literal);
-
-		literal = StringUtil.unquote(literal);
-
 		return StringUtil.replace(
-			literal, StringPool.DOUBLE_APOSTROPHE, StringPool.APOSTROPHE);
+			StringUtil.unquote(literal), StringPool.DOUBLE_APOSTROPHE,
+			StringPool.APOSTROPHE);
 	}
 
 	private Filter _startsWith(

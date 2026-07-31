@@ -370,6 +370,7 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 	@TestInfo("LPD-57341")
 	public void testPostSearchPage() throws Exception {
 		_testPostSearchPageAggregationNameAsFacetName();
+		_testPostSearchPageWithCaseSensitiveExternalReferenceCodeFilter();
 		_testPostSearchPageWithCategoryTreeFacetConfiguration();
 		_testPostSearchPageWithCustomFacetConfiguration();
 		_testPostSearchPageWithDateRangeFacetConfiguration();
@@ -907,6 +908,114 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 			(Map<String, Object>)searchPage2.getSearchFacets();
 
 		Assert.assertTrue(map2.containsKey("tag"));
+	}
+
+	private void _testPostSearchPageWithCaseSensitiveExternalReferenceCodeFilter()
+		throws Exception {
+
+		ObjectDefinition objectDefinition1 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"name"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE);
+		ObjectDefinition objectDefinition2 =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"name"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+		try {
+			String externalReferenceCode =
+				"CaseSensitive" + RandomTestUtil.randomString();
+
+			objectDefinition1.setExternalReferenceCode(externalReferenceCode);
+
+			objectDefinition1 =
+				_objectDefinitionLocalService.updateObjectDefinition(
+					objectDefinition1);
+
+			objectDefinition2.setExternalReferenceCode(
+				StringUtil.toLowerCase(externalReferenceCode));
+
+			objectDefinition2 =
+				_objectDefinitionLocalService.updateObjectDefinition(
+					objectDefinition2);
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					testGroup.getGroupId());
+
+			_objectEntryLocalService.addObjectEntry(
+				testGroup.getGroupId(), _user.getUserId(),
+				objectDefinition1.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null,
+				HashMapBuilder.<String, Serializable>put(
+					"name", StringUtil.randomString()
+				).build(),
+				serviceContext);
+			_objectEntryLocalService.addObjectEntry(
+				testGroup.getGroupId(), _user.getUserId(),
+				objectDefinition2.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null,
+				HashMapBuilder.<String, Serializable>put(
+					"name", StringUtil.randomString()
+				).build(),
+				serviceContext);
+
+			SearchRequestBody searchRequestBody = new SearchRequestBody();
+
+			searchRequestBody.setAttributes(
+				() -> HashMapBuilder.<String, Object>put(
+					"search.empty.search", "true"
+				).build());
+
+			SearchPage<SearchResult> searchPage = _postSearchPage(
+				HashMapBuilder.put(
+					"entryClassNames",
+					StringBundler.concat(
+						objectDefinition1.getClassName(), StringPool.COMMA,
+						objectDefinition2.getClassName())
+				).put(
+					"filter",
+					"objectDefinitionExternalReferenceCode eq '" +
+						externalReferenceCode + "'"
+				).build(),
+				searchRequestBody);
+
+			List<SearchResult> searchResults = ListUtil.fromCollection(
+				searchPage.getItems());
+
+			Assert.assertEquals(
+				searchResults.toString(), 1, searchResults.size());
+
+			SearchResult searchResult = searchResults.get(0);
+
+			Assert.assertEquals(
+				objectDefinition1.getClassName(),
+				searchResult.getEntryClassName());
+		}
+		finally {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition1);
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition2);
+		}
 	}
 
 	private void _testPostSearchPageWithCategoryTreeFacetConfiguration()

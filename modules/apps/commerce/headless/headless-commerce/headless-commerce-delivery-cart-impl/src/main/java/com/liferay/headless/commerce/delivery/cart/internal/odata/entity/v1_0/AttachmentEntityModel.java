@@ -37,7 +37,8 @@ public class AttachmentEntityModel implements EntityModel {
 				"commerceOrderId", locale -> "commerceOrderId",
 				String::valueOf),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"),
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf),
 			new StringEntityField("title", locale -> "title"),
 			new StringEntityField("type", locale -> "type"));
 	}

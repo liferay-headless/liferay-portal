@@ -30,7 +30,8 @@ public class UtilityPageEntityModel implements EntityModel {
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"));
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf));
 	}
 
 	@Override

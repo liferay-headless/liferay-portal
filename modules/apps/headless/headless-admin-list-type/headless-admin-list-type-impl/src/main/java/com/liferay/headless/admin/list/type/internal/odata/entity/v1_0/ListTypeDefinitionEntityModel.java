@@ -31,7 +31,8 @@ public class ListTypeDefinitionEntityModel implements EntityModel {
 				locale -> Field.MODIFIED_DATE),
 			new IntegerEntityField("userId", locale -> Field.USER_ID),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"),
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf),
 			new StringEntityField(
 				"name", locale -> Field.getSortableFieldName(Field.NAME)));
 	}

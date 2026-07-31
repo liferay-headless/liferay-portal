@@ -38,7 +38,8 @@ public class KeywordEntityModel implements EntityModel {
 				Field.NAME,
 				locale -> Field.getSortableFieldName(Field.NAME + "_String")),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"));
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf));
 	}
 
 	@Override

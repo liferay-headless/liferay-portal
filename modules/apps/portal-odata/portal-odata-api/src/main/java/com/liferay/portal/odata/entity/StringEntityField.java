@@ -5,6 +5,8 @@
 
 package com.liferay.portal.odata.entity;
 
+import com.liferay.portal.kernel.util.StringUtil;
+
 import java.util.Locale;
 import java.util.function.Function;
 
@@ -30,9 +32,9 @@ public class StringEntityField extends EntityField {
 		String name,
 		Function<Locale, String> filterableAndSortableFieldNameFunction) {
 
-		super(
-			name, Type.STRING, filterableAndSortableFieldNameFunction,
-			filterableAndSortableFieldNameFunction, String::valueOf);
+		this(
+			name, filterableAndSortableFieldNameFunction,
+			filterableAndSortableFieldNameFunction);
 	}
 
 	/**
@@ -51,9 +53,34 @@ public class StringEntityField extends EntityField {
 		String name, Function<Locale, String> sortableFieldNameFunction,
 		Function<Locale, String> filterableFieldNameFunction) {
 
+		this(
+			name, sortableFieldNameFunction, filterableFieldNameFunction,
+			fieldValue -> StringUtil.toLowerCase(String.valueOf(fieldValue)));
+	}
+
+	/**
+	 * Creates a new {@code StringEntityField} with a {@code Function} to
+	 * convert the entity field's name to a sortable and filterable field name
+	 * for a locale, and a {@code Function} to convert the field's value to a
+	 * filterable field value.
+	 *
+	 * @param  name the entity field's name
+	 * @param  sortableFieldNameFunction the sortable field name {@code
+	 *         Function}
+	 * @param  filterableFieldNameFunction the filterable field name {@code
+	 *         Function}
+	 * @param  filterableFieldValueFunction the filterable field value {@code
+	 *         Function}
+	 * @review
+	 */
+	public StringEntityField(
+		String name, Function<Locale, String> sortableFieldNameFunction,
+		Function<Locale, String> filterableFieldNameFunction,
+		Function<Object, String> filterableFieldValueFunction) {
+
 		super(
 			name, Type.STRING, sortableFieldNameFunction,
-			filterableFieldNameFunction, String::valueOf);
+			filterableFieldNameFunction, filterableFieldValueFunction);
 	}
 
 }

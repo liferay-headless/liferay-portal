@@ -44,7 +44,8 @@ public class VocabularyEntityModel implements EntityModel {
 			new IntegerEntityField(
 				"visibilityType", locale -> Field.VISIBILITY_TYPE),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"),
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf),
 			new StringEntityField(
 				"name",
 				locale -> Field.getSortableFieldName(

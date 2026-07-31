@@ -61,7 +61,8 @@ public class SearchResultEntityModel implements EntityModel {
 			new CollectionEntityField(
 				new StringEntityField(
 					"objectFolderExternalReferenceCode",
-					locale -> "objectFolderExternalReferenceCode")),
+					locale -> "objectFolderExternalReferenceCode",
+					String::valueOf)),
 			new DateTimeEntityField(
 				"cmpDueDate", locale -> "cmpDueDate", locale -> "cmpDueDate"),
 			new DateTimeEntityField(
@@ -114,7 +115,9 @@ public class SearchResultEntityModel implements EntityModel {
 			new StringEntityField("extension", locale -> "extension"),
 			new StringEntityField(
 				"objectDefinitionExternalReferenceCode",
-				locale -> "objectDefinitionExternalReferenceCode"),
+				locale -> "objectDefinitionExternalReferenceCode",
+				locale -> "objectDefinitionExternalReferenceCode",
+				String::valueOf),
 			new StringEntityField(
 				"title",
 				locale -> Field.getSortableFieldName(

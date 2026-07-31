@@ -1476,6 +1476,75 @@ public class ObjectEntryResourceTest {
 	}
 
 	@Test
+	public void testFilterByCaseSensitiveExternalReferenceCode()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"name"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		try {
+			String externalReferenceCode =
+				"CaseSensitive" + RandomTestUtil.randomString();
+
+			String lowerCaseExternalReferenceCode = StringUtil.toLowerCase(
+				externalReferenceCode);
+
+			_objectEntryLocalService.addOrUpdateObjectEntry(
+				externalReferenceCode, 0, TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				HashMapBuilder.<String, Serializable>put(
+					"name", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+			_objectEntryLocalService.addOrUpdateObjectEntry(
+				lowerCaseExternalReferenceCode, 0, TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				HashMapBuilder.<String, Serializable>put(
+					"name", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+			String filterString =
+				"externalReferenceCode eq '" + externalReferenceCode + "'";
+
+			JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+				null,
+				objectDefinition.getRESTContextPath() + "?filter=" +
+					_escape(filterString),
+				Http.Method.GET);
+
+			JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+			Assert.assertEquals(
+				itemsJSONArray.toString(), 1, itemsJSONArray.length());
+
+			JSONObject itemJSONObject = itemsJSONArray.getJSONObject(0);
+
+			Assert.assertEquals(
+				externalReferenceCode,
+				itemJSONObject.getString("externalReferenceCode"));
+		}
+		finally {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition);
+		}
+	}
+
+	@Test
 	public void testFilterByComparisonOperatorsObjectEntriesByRelatedObjectEntriesFields()
 		throws Exception {
 

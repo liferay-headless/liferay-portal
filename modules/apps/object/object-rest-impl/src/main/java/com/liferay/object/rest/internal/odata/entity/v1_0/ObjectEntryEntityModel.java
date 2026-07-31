@@ -219,7 +219,8 @@ public class ObjectEntryEntityModel implements EntityModel {
 				"externalReferenceCode",
 				() -> new StringEntityField(
 					"externalReferenceCode",
-					_getExternalReferenceCodeFunction())
+					_getExternalReferenceCodeFunction(),
+					_getExternalReferenceCodeFunction(), String::valueOf)
 			).put(
 				"folderId",
 				new IntegerEntityField(

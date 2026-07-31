@@ -39,7 +39,8 @@ public class CategoryEntityModel implements EntityModel {
 				"projects", locale -> "projectDepotEntryGroupIds",
 				String::valueOf),
 			new StringEntityField(
-				"externalReferenceCode", locale -> "externalReferenceCode"),
+				"externalReferenceCode", locale -> "externalReferenceCode",
+				locale -> "externalReferenceCode", String::valueOf),
 			new StringEntityField(
 				"name",
 				locale -> Field.getSortableFieldName(
