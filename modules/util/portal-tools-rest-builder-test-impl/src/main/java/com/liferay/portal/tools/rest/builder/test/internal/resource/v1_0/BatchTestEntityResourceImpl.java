@@ -10,6 +10,7 @@ import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngin
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.LongWrapper;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity;
@@ -364,39 +365,49 @@ public class BatchTestEntityResourceImpl
 							return customField;
 						},
 						CustomField.class));
-				setEmbeddedNestedField(
-					NestedFieldsSupplier.supplyScopedUnsafeSupplier(
-						"embeddedNestedField",
-						() -> {
-							VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-								_vulcanCRUDItemDelegateBuilderRegistry.builder(
-									contextCompany,
-									BatchTestEntity.class.getName()
-								).acceptLanguage(
-									contextAcceptLanguage
-								).groupLocalService(
-									groupLocalService
-								).httpServletRequest(
-									contextHttpServletRequest
-								).httpServletResponse(
-									contextHttpServletResponse
-								).resourceActionLocalService(
-									resourceActionLocalService
-								).resourcePermissionLocalService(
-									resourcePermissionLocalService
-								).roleLocalService(
-									roleLocalService
-								).scopeChecker(
-									contextScopeChecker
-								).uriInfo(
-									contextUriInfo
-								).user(
-									contextUser
-								).build();
 
-							return vulcanCRUDItemDelegate.fetchItem(
-								originalBatchTestEntity.getId());
-						}));
+				if ((contextHttpServletRequest != null) &&
+					StringUtil.contains(
+						ParamUtil.getString(
+							contextHttpServletRequest, "nestedFields"),
+						"embeddedNestedField")) {
+
+					setEmbeddedNestedField(
+						NestedFieldsSupplier.supplyScopedUnsafeSupplier(
+							"embeddedNestedField",
+							() -> {
+								VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+									_vulcanCRUDItemDelegateBuilderRegistry.
+										builder(
+											contextCompany,
+											BatchTestEntity.class.getName()
+										).acceptLanguage(
+											contextAcceptLanguage
+										).groupLocalService(
+											groupLocalService
+										).httpServletRequest(
+											contextHttpServletRequest
+										).httpServletResponse(
+											contextHttpServletResponse
+										).resourceActionLocalService(
+											resourceActionLocalService
+										).resourcePermissionLocalService(
+											resourcePermissionLocalService
+										).roleLocalService(
+											roleLocalService
+										).scopeChecker(
+											contextScopeChecker
+										).uriInfo(
+											contextUriInfo
+										).user(
+											contextUser
+										).build();
+
+								return vulcanCRUDItemDelegate.fetchItem(
+									originalBatchTestEntity.getId());
+							}));
+				}
+
 				setExternalReferenceCode(
 					originalBatchTestEntity.getExternalReferenceCode());
 				setId(originalBatchTestEntity.getId());

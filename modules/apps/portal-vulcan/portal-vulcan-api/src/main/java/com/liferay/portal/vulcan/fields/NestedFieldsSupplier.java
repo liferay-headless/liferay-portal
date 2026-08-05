@@ -92,11 +92,17 @@ public class NestedFieldsSupplier<T> {
 			NestedFieldsContextThreadLocal.getNestedFieldsContext();
 
 		if (oldNestedFieldsContext == null) {
-			return () -> null;
+			return unsafeSupplier;
 		}
 
 		NestedFieldsContext nestedFieldsContext = _createNestedFieldsContext(
 			nestedField, oldNestedFieldsContext);
+
+		List<String> nestedFields = nestedFieldsContext.getNestedFields();
+
+		if (!nestedFields.contains(nestedField)) {
+			nestedFieldsContext.addNestedField(nestedField);
+		}
 
 		return () -> {
 			try (SafeCloseable safeCloseable =
