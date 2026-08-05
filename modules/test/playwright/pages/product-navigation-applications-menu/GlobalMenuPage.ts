@@ -217,8 +217,13 @@ export class GlobalMenuPage {
 		}
 	}
 
-	async goToObjectDefinition(menuItem: string) {
-		await this.goToHome();
+	async goToObjectDefinition(menuItem: string, siteURL?: string) {
+		if (siteURL) {
+			await this.page.goto(siteURL);
+		}
+		else {
+			await this.goToHome();
+		}
 
 		await this.goTo('Control Panel');
 

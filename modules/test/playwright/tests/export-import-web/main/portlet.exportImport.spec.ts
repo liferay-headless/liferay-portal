@@ -138,11 +138,10 @@ test('Can import object with different classname via portlet', async ({
 	});
 
 	await test.step('Import Object Entry into Virtual Instance & Verify', async () => {
-		await page.goto(
+		await globalMenuPage.goToObjectDefinition(
+			objectDefinition.name,
 			`http://www.able.com:${liferayConfig.environment.port}`
 		);
-
-		await globalMenuPage.goToObjectDefinition(objectDefinition.name);
 
 		await clickAndExpectToBeVisible({
 			autoClick: true,
