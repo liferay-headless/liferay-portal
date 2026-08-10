@@ -5,12 +5,25 @@
 
 import {DateFilterValues, LastRange, Range} from '../components/date_filter';
 
-const LAST_RANGES_BY_HOURS: Record<number, LastRange> = {
-	12: LastRange.H12,
-	24: LastRange.H24,
-	48: LastRange.H48,
-	168: LastRange.D7,
-};
+const LAST_RANGES: Array<{hours: number; lastRange: LastRange}> = [
+	{hours: 12, lastRange: LastRange.H12},
+	{hours: 24, lastRange: LastRange.H24},
+	{hours: 48, lastRange: LastRange.H48},
+	{hours: 168, lastRange: LastRange.D7},
+];
+
+function toLastRange(hours: number): LastRange | null {
+	if (!(hours > 0)) {
+		return null;
+	}
+
+	const [closestLastRange] = [...LAST_RANGES].sort(
+		(first, second) =>
+			Math.abs(first.hours - hours) - Math.abs(second.hours - hours)
+	);
+
+	return closestLastRange.lastRange;
+}
 
 function toDateTime(
 	publishParameters: Record<string, string[]>,
@@ -48,8 +61,7 @@ export function toDateFilterValues(
 	}
 
 	if (range === 'last') {
-		const lastRange =
-			LAST_RANGES_BY_HOURS[Number(publishParameters.last?.[0])];
+		const lastRange = toLastRange(Number(publishParameters.last?.[0]));
 
 		if (lastRange) {
 			return {last: lastRange, range: Range.Last};

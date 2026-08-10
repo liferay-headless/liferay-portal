@@ -36,8 +36,29 @@ describe('toDateFilterValues', () => {
 		});
 	});
 
-	it('falls back to the all range for unmapped last hours', () => {
+	it('maps unmapped last hours to the closest option', () => {
+		expect(toDateFilterValues({last: ['11'], range: ['last']})).toEqual({
+			last: LastRange.H12,
+			range: Range.Last,
+		});
+
 		expect(toDateFilterValues({last: ['31'], range: ['last']})).toEqual({
+			last: LastRange.H24,
+			range: Range.Last,
+		});
+
+		expect(toDateFilterValues({last: ['300'], range: ['last']})).toEqual({
+			last: LastRange.D7,
+			range: Range.Last,
+		});
+	});
+
+	it('falls back to the all range for unusable last hours', () => {
+		expect(toDateFilterValues({range: ['last']})).toEqual({
+			range: Range.All,
+		});
+
+		expect(toDateFilterValues({last: ['0'], range: ['last']})).toEqual({
 			range: Range.All,
 		});
 	});
