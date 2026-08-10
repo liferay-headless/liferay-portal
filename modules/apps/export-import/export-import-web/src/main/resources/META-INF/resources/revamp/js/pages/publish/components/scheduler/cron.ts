@@ -145,10 +145,10 @@ export function fromCronExpression(
 			};
 		}
 
-		const [dayOfWeekList, interval = '1'] = dayOfWeek.split('/');
+		const [dayOfWeekList] = dayOfWeek.split('/');
 
 		return {
-			interval: Number(interval) || 1,
+			interval: 1,
 			unit: IntervalUnit.Week,
 			weekDays: dayOfWeekList.split(',').map(toWeekday),
 		};
@@ -203,7 +203,7 @@ export function toCronExpression(scheduleValues: ScheduleValues): string {
 			.map((weekDay) => DAY_OF_WEEK_ABBREVIATIONS[weekDay])
 			.join(',');
 
-		return `0 ${minute} ${hour} ? * ${dayOfWeek}/${interval} *`;
+		return `0 ${minute} ${hour} ? * ${dayOfWeek} *`;
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Month) {

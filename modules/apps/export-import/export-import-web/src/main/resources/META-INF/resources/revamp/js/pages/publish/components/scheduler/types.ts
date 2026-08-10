@@ -60,7 +60,7 @@ export const MAX_INTERVALS: Record<IntervalUnit, number> = {
 	[IntervalUnit.Day]: 31,
 	[IntervalUnit.Month]: 12,
 	[IntervalUnit.Never]: 0,
-	[IntervalUnit.Week]: 52,
+	[IntervalUnit.Week]: 1,
 	[IntervalUnit.Year]: 10,
 };
 

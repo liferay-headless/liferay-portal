@@ -51,7 +51,7 @@ describe('toCronExpression', () => {
 					weekDays: [2, 4],
 				})
 			)
-		).toBe('0 30 15 ? * MON,WED/1 *');
+		).toBe('0 30 15 ? * MON,WED *');
 	});
 
 	it('produces a monthly cron with the selected day of the month', () => {
@@ -148,7 +148,15 @@ describe('fromCronExpression', () => {
 	});
 
 	it('parses a weekly cron with the selected days', () => {
-		expect(fromCronExpression('0 30 15 ? * MON,WED/1 *')).toEqual({
+		expect(fromCronExpression('0 30 15 ? * MON,WED *')).toEqual({
+			interval: 1,
+			unit: IntervalUnit.Week,
+			weekDays: [2, 4],
+		});
+	});
+
+	it('ignores the day step suffix of a legacy weekly cron', () => {
+		expect(fromCronExpression('0 30 15 ? * MON,WED/2 *')).toEqual({
 			interval: 1,
 			unit: IntervalUnit.Week,
 			weekDays: [2, 4],
