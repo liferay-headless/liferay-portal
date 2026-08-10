@@ -11,13 +11,14 @@ import React from 'react';
 import '@testing-library/jest-dom';
 
 import {NewPublish} from '../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/NewPublish';
+import {ScheduledPublishProcess} from '../../../../../src/main/resources/META-INF/resources/revamp/js/types/exportImportProcess';
 import {mockExportPreview} from '../../mocks/mockExportPreview';
 
 jest.mock('staging-taglib', () => ({
 	PagesTree: require('../../mocks/MockPagesTree').MockPagesTree,
 }));
 
-const SCHEDULED_PUBLISH_PROCESS = {
+const SCHEDULED_PUBLISH_PROCESS: ScheduledPublishProcess = {
 	cronExpression: '0 30 9 ? * MON/1 *',
 	id: 1234,
 	name: 'Weekly Content Sync',
@@ -58,7 +59,10 @@ const getPublishProcessCall = () =>
 const getUnscheduleCall = () =>
 	fetch.mock.calls.find(([, init]) => init?.method === 'DELETE');
 
-const mockAPIRoutes = ({deleteStatus = 204} = {}) => {
+const mockAPIRoutes = ({
+	deleteStatus = 204,
+	scheduledPublishProcess = SCHEDULED_PUBLISH_PROCESS,
+} = {}) => {
 	fetch.mockResponse(async (request) => {
 		if (request.method === 'DELETE') {
 			return {
@@ -68,7 +72,7 @@ const mockAPIRoutes = ({deleteStatus = 204} = {}) => {
 		}
 
 		if (request.url.includes('scheduled-publish-processes')) {
-			return {body: JSON.stringify(SCHEDULED_PUBLISH_PROCESS)};
+			return {body: JSON.stringify(scheduledPublishProcess)};
 		}
 
 		if (request.url.includes('publish-preview')) {
@@ -239,6 +243,90 @@ describe('NewPublish', () => {
 		);
 		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
 			DEFAULT_PROPS.scheduledBackURL
+		);
+	});
+
+	it('seeds the start date from the next fire date when the stored one is past', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				nextFireDate: '2027-01-04T09:30:00Z',
+				scheduleStartDate: '2026-07-01T09:30:00Z',
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		expect(
+			await screen.findByRole('textbox', {name: 'start-date'})
+		).toHaveValue('2027-01-04 09:30');
+	});
+
+	it('re-derives a one-time cron from the moved start date', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 30 9 1 7 ? 2026',
+				scheduleStartDate: '2026-07-01T09:30:00Z',
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+		await screen.findByText('loaded');
+
+		await user.click(
+			screen.getByRole('button', {name: /schedule-publish-to-live/i})
+		);
+
+		await waitFor(() => {
+			expect(getPublishProcessCall()).toBeDefined();
+		});
+
+		const body = JSON.parse(getPublishProcessCall()![1]!.body as string);
+
+		const startDate = new Date(body.scheduleStartDate);
+
+		expect(startDate.getTime()).toBeGreaterThan(Date.now());
+		expect(body.cronExpression).toBe(
+			`0 ${startDate.getUTCMinutes()} ${startDate.getUTCHours()} ` +
+				`${startDate.getUTCDate()} ${startDate.getUTCMonth() + 1} ? ` +
+				`${startDate.getUTCFullYear()}`
+		);
+	});
+
+	it('moves a stale start date forward when editing', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				scheduleStartDate: '2026-07-01T09:30:00Z',
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+		await screen.findByText('loaded');
+
+		await user.click(
+			screen.getByRole('button', {name: /schedule-publish-to-live/i})
+		);
+
+		await waitFor(() => {
+			expect(getPublishProcessCall()).toBeDefined();
+		});
+
+		const body = JSON.parse(getPublishProcessCall()![1]!.body as string);
+
+		expect(new Date(body.scheduleStartDate).getTime()).toBeGreaterThan(
+			Date.now()
 		);
 	});
 

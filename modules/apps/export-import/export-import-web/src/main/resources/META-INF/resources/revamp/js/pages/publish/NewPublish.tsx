@@ -169,6 +169,16 @@ export function NewPublish({
 			const scheduledTimeZoneId =
 				publishParameters.timeZoneId?.[0] ?? timeZoneId;
 
+			let scheduleStartDate = scheduledPublishProcess.scheduleStartDate;
+
+			if (
+				scheduleStartDate &&
+				scheduledPublishProcess.nextFireDate &&
+				new Date(scheduleStartDate).getTime() < Date.now()
+			) {
+				scheduleStartDate = scheduledPublishProcess.nextFireDate;
+			}
+
 			setInitialFormValues((currentInitialFormValues) => ({
 				contentSelection: toContentSelection(
 					preview.previewPortletDataHandlerSections ?? [],
@@ -189,9 +199,9 @@ export function NewPublish({
 							)
 						: '',
 					neverEnd: !scheduledPublishProcess.scheduleEndDate,
-					startDateTime: scheduledPublishProcess.scheduleStartDate
+					startDateTime: scheduleStartDate
 						? toWallClockDateTime(
-								scheduledPublishProcess.scheduleStartDate,
+								scheduleStartDate,
 								scheduledTimeZoneId
 							)
 						: '',
@@ -256,9 +266,26 @@ export function NewPublish({
 			onSubmit={async (values) => {
 				const contentSelection = values.contentSelection;
 
-				const scheduleValues = values.scheduleValues;
+				let scheduleValues = values.scheduleValues;
 
 				const scheduled = scheduleValues.enabled;
+
+				if (
+					scheduled &&
+					editedScheduledPublishProcessId &&
+					toZonedDate(
+						scheduleValues.startDateTime,
+						scheduleValues.timeZoneId
+					).getTime() < Date.now()
+				) {
+					scheduleValues = {
+						...scheduleValues,
+						startDateTime: toWallClockDateTime(
+							new Date(Date.now() + 120000).toISOString(),
+							scheduleValues.timeZoneId
+						),
+					};
+				}
 
 				const scheduleFields = scheduled
 					? {
