@@ -20,13 +20,11 @@ String publishBackURL = ParamUtil.getString(request, "backURL", themeDisplay.get
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(publishBackURL);
 
-PublishSchedulerDisplayContext publishSchedulerDisplayContext = new PublishSchedulerDisplayContext(locale);
+PublishSchedulerDisplayContext publishSchedulerDisplayContext = new PublishSchedulerDisplayContext(liveGroup, locale);
 
 long scheduledPublishProcessId = ParamUtil.getLong(request, "scheduledPublishProcessId");
 
-renderResponse.setTitle(publishSchedulerDisplayContext.getTitle(scheduledPublishProcessId, liveGroup.getGroupId()));
-
-String publishScopePath = "/o/export-import/v1.0/sites/" + liveGroup.getExternalReferenceCode();
+renderResponse.setTitle(publishSchedulerDisplayContext.getTitle(scheduledPublishProcessId));
 
 String scheduledPublishBackURL = HttpComponentsUtil.setParameter(publishBackURL, liferayPortletResponse.getNamespace() + "tabs1", "scheduled");
 
@@ -71,13 +69,13 @@ if (layoutSet != null) {
 					"privateLayoutsAvailable", publishSourceGroup.isPrivateLayoutsEnabled() && publishSourceGroup.hasPrivateLayouts()
 				).build()
 			).put(
-				"publishPreviewAPIURL", publishScopePath + "/publish-preview"
+				"publishPreviewAPIURL", publishSchedulerDisplayContext.getPublishPreviewAPIURL()
 			).put(
-				"publishProcessAPIURL", publishScopePath + "/publish-processes"
+				"publishProcessAPIURL", publishSchedulerDisplayContext.getPublishProcessesAPIURL()
 			).put(
 				"scheduledBackURL", scheduledPublishBackURL
 			).put(
-				"scheduledPublishProcessesAPIURL", publishScopePath + "/scheduled-publish-processes"
+				"scheduledPublishProcessesAPIURL", publishSchedulerDisplayContext.getScheduledPublishProcessesAPIURL()
 			).put(
 				"scheduledPublishProcessId", (scheduledPublishProcessId > 0) ? scheduledPublishProcessId : null
 			).put(

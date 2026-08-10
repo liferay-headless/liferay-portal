@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
@@ -37,8 +38,21 @@ import java.util.TreeSet;
  */
 public class PublishSchedulerDisplayContext {
 
-	public PublishSchedulerDisplayContext(Locale locale) {
+	public PublishSchedulerDisplayContext(Group liveGroup, Locale locale) {
+		_liveGroup = liveGroup;
 		_locale = locale;
+	}
+
+	public String getPublishPreviewAPIURL() {
+		return _getScopePath() + "/publish-preview";
+	}
+
+	public String getPublishProcessesAPIURL() {
+		return _getScopePath() + "/publish-processes";
+	}
+
+	public String getScheduledPublishProcessesAPIURL() {
+		return _getScopePath() + "/scheduled-publish-processes";
 	}
 
 	public JSONArray getTimeZonesJSONArray() {
@@ -62,7 +76,7 @@ public class PublishSchedulerDisplayContext {
 		return timeZonesJSONArray;
 	}
 
-	public String getTitle(long scheduledPublishProcessId, long liveGroupId) {
+	public String getTitle(long scheduledPublishProcessId) {
 		if (scheduledPublishProcessId <= 0) {
 			return LanguageUtil.get(_locale, "new-publishing-process");
 		}
@@ -72,7 +86,7 @@ public class PublishSchedulerDisplayContext {
 					SchedulerEngineHelperUtil.getScheduledJobs(
 						StagingUtil.getSchedulerGroupName(
 							DestinationNames.LAYOUTS_LOCAL_PUBLISHER,
-							liveGroupId),
+							_liveGroup.getGroupId()),
 						StorageType.PERSISTED)) {
 
 				Message message = schedulerResponse.getMessage();
@@ -92,6 +106,11 @@ public class PublishSchedulerDisplayContext {
 		}
 
 		return LanguageUtil.get(_locale, "new-publishing-process");
+	}
+
+	private String _getScopePath() {
+		return StringBundler.concat(
+			_BASE_PATH, "/sites/", _liveGroup.getExternalReferenceCode());
 	}
 
 	private String _getTimeZoneLabel(Date date, TimeZone timeZone) {
@@ -124,9 +143,12 @@ public class PublishSchedulerDisplayContext {
 		return sb.toString();
 	}
 
+	private static final String _BASE_PATH = "/o/export-import/v1.0";
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PublishSchedulerDisplayContext.class);
 
+	private final Group _liveGroup;
 	private final Locale _locale;
 
 }
