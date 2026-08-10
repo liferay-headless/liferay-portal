@@ -11,6 +11,7 @@ import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationPa
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.staging.Staging;
@@ -201,6 +202,10 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 		parameterMap =
 			_exportImportConfigurationParameterMapFactory.buildParameterMap(
 				parameterMap);
+
+		parameterMap.put(
+			PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
+			new String[] {Boolean.TRUE.toString()});
 
 		boolean privateLayout = parameterMap.containsKey(
 			PreviewPortletDataHandlerUtil.PRIVATE_PAGES_CONTROL_NAME);

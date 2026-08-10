@@ -167,6 +167,7 @@ public class PublishProcessResourceTest
 		_testPostSitePublishProcessWithoutStaging();
 		_testPostSitePublishProcessWithLayoutSet();
 		_testPostSitePublishProcessWithDateRangeType();
+		_testPostSitePublishProcessPerformsDirectBinaryImport();
 	}
 
 	@Override
@@ -351,6 +352,35 @@ public class PublishProcessResourceTest
 		return _stagingGroupHelper.fetchLocalStagingGroup(
 			_groupLocalService.fetchGroupByExternalReferenceCode(
 				siteExternalReferenceCode, testCompany.getCompanyId()));
+	}
+
+	private void _testPostSitePublishProcessPerformsDirectBinaryImport()
+		throws Exception {
+
+		PublishProcess publishProcess = _addPublishProcess(
+			testGroup.getExternalReferenceCode(),
+			RandomTestUtil.randomString());
+
+		BackgroundTask backgroundTask =
+			_backgroundTaskLocalService.getBackgroundTask(
+				publishProcess.getId());
+
+		ExportImportConfiguration exportImportConfiguration =
+			_exportImportConfigurationLocalService.getExportImportConfiguration(
+				MapUtil.getLong(
+					backgroundTask.getTaskContextMap(),
+					"exportImportConfigurationId"));
+
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		Assert.assertTrue(
+			MapUtil.getBoolean(
+				parameterMap,
+				PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT));
 	}
 
 	private void _testPostSitePublishProcessWithDateRangeType()
