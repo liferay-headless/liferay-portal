@@ -109,6 +109,40 @@ function fromDayOfWeekExpression(
 	};
 }
 
+function fromMonthField(month: string): number | null {
+	if (month === '*') {
+		return 1;
+	}
+
+	if (month.includes(',')) {
+		return 12 / month.split(',').length;
+	}
+
+	if (month.includes('/')) {
+		return Number(month.split('/')[1]) || 1;
+	}
+
+	return null;
+}
+
+function toMonthField(startMonth: number, interval: number): string {
+	if (interval === 1) {
+		return '*';
+	}
+
+	const months = [];
+
+	for (
+		let month = startMonth;
+		months.length < 12 / interval;
+		month = ((month + interval - 1) % 12) + 1
+	) {
+		months.push(month);
+	}
+
+	return months.sort((first, second) => first - second).join(',');
+}
+
 function toWeekday(dayOfWeekAbbreviation: string): number {
 	const entry = Object.entries(DAY_OF_WEEK_ABBREVIATIONS).find(
 		([, abbreviation]) => abbreviation === dayOfWeekAbbreviation
@@ -130,10 +164,12 @@ export function fromCronExpression(
 
 	if (dayOfWeek !== '?' && dayOfWeek !== '*') {
 		if (dayOfWeek.includes('#') || dayOfWeek.endsWith('L')) {
-			if (month.includes('/')) {
+			const monthInterval = fromMonthField(month);
+
+			if (monthInterval !== null) {
 				return {
 					...fromDayOfWeekExpression(dayOfWeek),
-					interval: Number(month.split('/')[1]) || 1,
+					interval: monthInterval,
 					unit: IntervalUnit.Month,
 				};
 			}
@@ -161,9 +197,11 @@ export function fromCronExpression(
 		};
 	}
 
-	if (month.includes('/')) {
+	const monthInterval = fromMonthField(month);
+
+	if (monthInterval !== null && dayOfMonth !== '*') {
 		return {
-			interval: Number(month.split('/')[1]) || 1,
+			interval: monthInterval,
 			monthDay: Number(dayOfMonth) || 1,
 			repeatType: RepeatType.DayOfMonth,
 			unit: IntervalUnit.Month,
@@ -207,13 +245,15 @@ export function toCronExpression(scheduleValues: ScheduleValues): string {
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Month) {
+		const monthField = toMonthField(month, interval);
+
 		if (scheduleValues.repeatType === RepeatType.DayOfWeek) {
-			return `0 ${minute} ${hour} ? 1/${interval} ${toDayOfWeekExpression(
+			return `0 ${minute} ${hour} ? ${monthField} ${toDayOfWeekExpression(
 				scheduleValues
 			)} *`;
 		}
 
-		return `0 ${minute} ${hour} ${scheduleValues.monthDay} 1/${interval} ? *`;
+		return `0 ${minute} ${hour} ${scheduleValues.monthDay} ${monthField} ? *`;
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Year) {

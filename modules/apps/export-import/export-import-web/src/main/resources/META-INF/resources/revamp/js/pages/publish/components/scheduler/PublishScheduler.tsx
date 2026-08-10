@@ -16,8 +16,8 @@ import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithO
 import {getScheduleSummary} from './summary';
 import {
 	DATE_TIME_FORMAT,
+	INTERVAL_VALUES,
 	IntervalUnit,
-	MAX_INTERVALS,
 	MONTHS,
 	REPEAT_OPTIONS,
 	REPEAT_TYPE_OPTIONS,
@@ -68,13 +68,10 @@ export default function PublishScheduler({
 
 	const scheduleSummary = getScheduleSummary(value);
 
-	const intervalOptions = Array.from(
-		{length: MAX_INTERVALS[value.unit]},
-		(_, index) => ({
-			label: getIntervalText(index + 1, value.unit, locale),
-			value: index + 1,
-		})
-	);
+	const intervalOptions = INTERVAL_VALUES[value.unit].map((interval) => ({
+		label: getIntervalText(interval, value.unit, locale),
+		value: interval,
+	}));
 
 	const toMonthDay = (month: number, unit: IntervalUnit) => {
 		if (unit !== IntervalUnit.Year) {

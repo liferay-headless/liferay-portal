@@ -56,12 +56,12 @@ export const WEEKDAY_ORDINAL_OPTIONS = [
 	{label: Liferay.Language.get('last'), value: LAST_WEEKDAY_ORDINAL},
 ];
 
-export const MAX_INTERVALS: Record<IntervalUnit, number> = {
-	[IntervalUnit.Day]: 31,
-	[IntervalUnit.Month]: 12,
-	[IntervalUnit.Never]: 0,
-	[IntervalUnit.Week]: 1,
-	[IntervalUnit.Year]: 10,
+export const INTERVAL_VALUES: Record<IntervalUnit, number[]> = {
+	[IntervalUnit.Day]: Array.from({length: 31}, (_, index) => index + 1),
+	[IntervalUnit.Month]: [1, 2, 3, 4, 6],
+	[IntervalUnit.Never]: [],
+	[IntervalUnit.Week]: [1],
+	[IntervalUnit.Year]: Array.from({length: 10}, (_, index) => index + 1),
 };
 
 export const DATE_TIME_FORMAT = 'yyyy-MM-dd';

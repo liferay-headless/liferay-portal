@@ -63,7 +63,20 @@ describe('toCronExpression', () => {
 					unit: IntervalUnit.Month,
 				})
 			)
-		).toBe('0 30 15 15 1/3 ? *');
+		).toBe('0 30 15 15 1,4,7,10 ? *');
+	});
+
+	it('anchors the month list on the start date month', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					interval: 2,
+					monthDay: 15,
+					startDateTime: '2026-06-20 15:30',
+					unit: IntervalUnit.Month,
+				})
+			)
+		).toBe('0 30 15 15 2,4,6,8,10,12 ? *');
 	});
 
 	it('produces a monthly cron with the selected ordinal weekday', () => {
@@ -76,7 +89,7 @@ describe('toCronExpression', () => {
 					weekdayOrdinal: '4',
 				})
 			)
-		).toBe('0 30 15 ? 1/1 THU#4 *');
+		).toBe('0 30 15 ? * THU#4 *');
 	});
 
 	it('produces a monthly cron with the last weekday of the month', () => {
@@ -89,7 +102,7 @@ describe('toCronExpression', () => {
 					weekdayOrdinal: LAST_WEEKDAY_ORDINAL,
 				})
 			)
-		).toBe('0 30 15 ? 1/1 FRIL *');
+		).toBe('0 30 15 ? * FRIL *');
 	});
 
 	it('produces a yearly cron with the selected month and day', () => {
@@ -164,7 +177,14 @@ describe('fromCronExpression', () => {
 	});
 
 	it('parses a monthly cron with the selected day of the month', () => {
-		expect(fromCronExpression('0 30 15 15 1/3 ? *')).toEqual({
+		expect(fromCronExpression('0 30 15 15 * ? *')).toEqual({
+			interval: 1,
+			monthDay: 15,
+			repeatType: RepeatType.DayOfMonth,
+			unit: IntervalUnit.Month,
+		});
+
+		expect(fromCronExpression('0 30 15 15 1,4,7,10 ? *')).toEqual({
 			interval: 3,
 			monthDay: 15,
 			repeatType: RepeatType.DayOfMonth,
@@ -172,7 +192,14 @@ describe('fromCronExpression', () => {
 		});
 	});
 
-	it('parses a monthly cron with the selected ordinal weekday', () => {
+	it('parses a legacy monthly cron with a month step', () => {
+		expect(fromCronExpression('0 30 15 15 1/3 ? *')).toEqual({
+			interval: 3,
+			monthDay: 15,
+			repeatType: RepeatType.DayOfMonth,
+			unit: IntervalUnit.Month,
+		});
+
 		expect(fromCronExpression('0 30 15 ? 1/1 THU#4 *')).toEqual({
 			interval: 1,
 			repeatType: RepeatType.DayOfWeek,
@@ -180,9 +207,19 @@ describe('fromCronExpression', () => {
 			weekday: 5,
 			weekdayOrdinal: '4',
 		});
+	});
 
-		expect(fromCronExpression('0 30 15 ? 1/1 FRIL *')).toEqual({
+	it('parses a monthly cron with the selected ordinal weekday', () => {
+		expect(fromCronExpression('0 30 15 ? * THU#4 *')).toEqual({
 			interval: 1,
+			repeatType: RepeatType.DayOfWeek,
+			unit: IntervalUnit.Month,
+			weekday: 5,
+			weekdayOrdinal: '4',
+		});
+
+		expect(fromCronExpression('0 30 15 ? 2,5,8,11 FRIL *')).toEqual({
+			interval: 3,
 			repeatType: RepeatType.DayOfWeek,
 			unit: IntervalUnit.Month,
 			weekday: 6,
