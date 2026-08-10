@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -376,7 +377,14 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 		String groupName = _staging.getSchedulerGroupName(
 			DestinationNames.LAYOUTS_LOCAL_PUBLISHER, liveGroup.getGroupId());
 		String name = publishProcessRequest.getName();
+
 		String timeZoneId = publishProcessRequest.getTimeZoneId();
+
+		if (Validator.isBlank(timeZoneId)) {
+			TimeZone timeZone = TimeZoneUtil.getDefault();
+
+			timeZoneId = timeZone.getID();
+		}
 
 		_validateCronExpression(
 			cronExpression, groupName, name,
@@ -385,10 +393,7 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 
 		parameterMap.put(
 			ParameterMapUtil.CRON_EXPRESSION, new String[] {cronExpression});
-
-		if (!Validator.isBlank(timeZoneId)) {
-			parameterMap.put("timeZoneId", new String[] {timeZoneId});
-		}
+		parameterMap.put("timeZoneId", new String[] {timeZoneId});
 
 		_layoutService.schedulePublishToLive(
 			stagingGroup.getGroupId(), liveGroup.getGroupId(), privateLayout,
@@ -475,8 +480,7 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 		try {
 			trigger = _triggerFactory.createTrigger(
 				name, groupName, scheduleStartDate, scheduleEndDate,
-				cronExpression,
-				TimeZone.getTimeZone(GetterUtil.getString(timeZoneId)));
+				cronExpression, TimeZone.getTimeZone(timeZoneId));
 		}
 		catch (Exception exception) {
 			throw new BadRequestException(

@@ -61,6 +61,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -165,6 +166,7 @@ public class PublishProcessResourceTest
 		_testPostSitePublishProcessWithInvalidCronExpression();
 		_testPostSitePublishProcessWithOneTimeCronExpression();
 		_testPostSitePublishProcessWithoutStaging();
+		_testPostSitePublishProcessWithoutTimeZoneId();
 		_testPostSitePublishProcessWithLayoutSet();
 		_testPostSitePublishProcessWithDateRangeType();
 		_testPostSitePublishProcessPerformsDirectBinaryImport();
@@ -558,6 +560,44 @@ public class PublishProcessResourceTest
 				GroupTestUtil.deleteGroup(group);
 			}
 		}
+	}
+
+	private void _testPostSitePublishProcessWithoutTimeZoneId()
+		throws Exception {
+
+		String publishProcessName = RandomTestUtil.randomString();
+
+		publishProcessResource.postSitePublishProcess(
+			testGroup.getExternalReferenceCode(),
+			new PublishProcessRequest() {
+				{
+					cronExpression = _CRON_EXPRESSION;
+					name = publishProcessName;
+				}
+			});
+
+		Page<ScheduledPublishProcess> page =
+			_scheduledPublishProcessResource.
+				getSiteScheduledPublishProcessesPage(
+					testGroup.getExternalReferenceCode(), publishProcessName,
+					Pagination.of(1, 1), null);
+
+		ScheduledPublishProcess scheduledPublishProcess = page.fetchFirstItem();
+
+		ExportImportConfiguration exportImportConfiguration =
+			_exportImportConfigurationLocalService.getExportImportConfiguration(
+				scheduledPublishProcess.getId());
+
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		TimeZone timeZone = TimeZoneUtil.getDefault();
+
+		Assert.assertEquals(
+			timeZone.getID(), MapUtil.getString(parameterMap, "timeZoneId"));
 	}
 
 	private static final String _CRON_EXPRESSION = "0 0 3 * * ?";
