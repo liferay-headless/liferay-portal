@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.mcp.server.rest.dto.v1_0.Tool;
 import com.liferay.mcp.server.rest.dto.v1_0.ToolSummary;
+import com.liferay.mcp.server.rest.internal.exception.RestrictedFieldException;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -26,10 +27,14 @@ import java.io.InputStream;
 
 import java.nio.charset.StandardCharsets;
 
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
@@ -64,6 +69,9 @@ public class OpenAPIUtilTest {
 
 	@Test
 	public void testGetRequest() throws Exception {
+
+		// Path and query parameters
+
 		_testGetRequest(
 			null, null, "GET",
 			"/v1.0/items/123?fields=name&restrictFields=actions",
@@ -105,6 +113,210 @@ public class OpenAPIUtilTest {
 		_testGetRequest(
 			null, null, "GET", "/v1.0/items?restrictFields=actions",
 			JSONUtil.put("restrictFields", "name"), "getItems");
+
+		// Restricted fields
+
+		_testGetRequest(
+			null, null, "GET", "/v1.0/items?restrictFields=actions",
+			JSONFactoryUtil.createJSONObject(), Collections.emptySet(),
+			"getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?restrictFields=actions%2Cname%2Cparent.name",
+			JSONFactoryUtil.createJSONObject(),
+			new LinkedHashSet<>(Arrays.asList("name", "parent.name")),
+			"getItems");
+		_testGetRequest(
+			"{}", "application/json", "PATCH",
+			"/v1.0/items/123?restrictFields=name",
+			JSONUtil.put(
+				"body", JSONUtil.put("name", "Test")
+			).put(
+				"itemId", "123"
+			),
+			Collections.singleton("name"), "patchItem");
+		_testGetRequest(
+			"{}", "application/json", "POST", "/v1.0/items?restrictFields=name",
+			JSONUtil.put("body", JSONFactoryUtil.createJSONObject()),
+			Collections.singleton("name"), "postItem");
+		_testGetRequest(
+			"{}", "application/json", "PUT",
+			"/v1.0/items/123?restrictFields=name",
+			JSONUtil.put(
+				"body", JSONUtil.put("name", "Test")
+			).put(
+				"itemId", "123"
+			),
+			Collections.singleton("name"), "putItem");
+		_testGetRequest(
+			JSONUtil.put(
+				"string", "Test"
+			).toString(),
+			"application/json", "POST", "/v1.0/items?restrictFields=boolean",
+			JSONUtil.put(
+				"body",
+				JSONUtil.put(
+					"boolean", true
+				).put(
+					"string", "Test"
+				)),
+			Collections.singleton("boolean"), "postItem");
+		_testGetRequest(
+			JSONUtil.put(
+				"object1", JSONUtil.put("boolean", true)
+			).toString(),
+			"application/json", "POST",
+			"/v1.0/items?restrictFields=object1.string",
+			JSONUtil.put(
+				"body",
+				JSONUtil.put(
+					"object1",
+					JSONUtil.put(
+						"boolean", true
+					).put(
+						"string", "Test"
+					))),
+			Collections.singleton("object1.string"), "postItem");
+		_testGetRequest(
+			JSONUtil.put(
+				"string", "Keep"
+			).toString(),
+			"application/json", "POST", "/v1.0/items?restrictFields=object1",
+			JSONUtil.put(
+				"body",
+				JSONUtil.put(
+					"object1", JSONUtil.put("string", "Test")
+				).put(
+					"string", "Keep"
+				)),
+			Collections.singleton("object1"), "postItem");
+		_testGetRequest(
+			JSONUtil.putAll(
+				JSONUtil.put("string", "Keep")
+			).toString(),
+			"application/json", "POST", "/v1.0/batches?restrictFields=boolean",
+			JSONUtil.put(
+				"body",
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"boolean", true
+					).put(
+						"string", "Keep"
+					))),
+			Collections.singleton("boolean"), "postBatch");
+
+		// Restricted field queries
+
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"filter\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [string]. Remove them and invoke the ",
+				"tool again."),
+			JSONUtil.put("filter", "string eq 'Test'"),
+			Collections.singleton("string"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"filter\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [object1/string]. Remove them and ",
+				"invoke the tool again."),
+			JSONUtil.put("filter", "object1/string eq 'Test'"),
+			Collections.singleton("object1.string"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"filter\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [object1.string]. Remove them and ",
+				"invoke the tool again."),
+			JSONUtil.put("filter", "object1.string eq 'Test'"),
+			Collections.singleton("object1.string"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"filter\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [object1/object2/boolean]. Remove them ",
+				"and invoke the tool again."),
+			JSONUtil.put("filter", "object1/object2/boolean eq true"),
+			Collections.singleton("object1"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"filter\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [boolean, string]. Remove them and ",
+				"invoke the tool again."),
+			JSONUtil.put("filter", "string eq 'Test' and boolean eq true"),
+			new LinkedHashSet<>(Arrays.asList("string", "boolean")),
+			"getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"sort\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [string]. Remove them and invoke the ",
+				"tool again."),
+			JSONUtil.put("sort", "boolean:asc,string:desc"),
+			Collections.singleton("string"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"sort\" parameter of the \"getItems\" tool references ",
+				"the restricted fields [object1/string]. Remove them and ",
+				"invoke the tool again."),
+			JSONUtil.put("sort", "object1/string"),
+			Collections.singleton("object1"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"aggregationTerms\" parameter of the \"getItems\" tool ",
+				"references the restricted fields [string]. Remove them and ",
+				"invoke the tool again."),
+			JSONUtil.put(
+				"aggregationTerms", JSONUtil.putAll("boolean", "string")),
+			Collections.singleton("string"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"aggregationTerms\" parameter of the \"getItems\" tool ",
+				"references the restricted fields [object1/string]. Remove ",
+				"them and invoke the tool again."),
+			JSONUtil.put("aggregationTerms", "boolean,object1/string"),
+			Collections.singleton("object1"), "getItems");
+		_testGetRequestFailure(
+			StringBundler.concat(
+				"The \"search\" parameter cannot be used on the \"getItems\" ",
+				"tool because a keyword match confirms the value of a ",
+				"restricted field even when the field is absent from the ",
+				"response. Narrow the invocation with \"filter\" instead."),
+			JSONUtil.put("search", "Test"), Collections.singleton("boolean"),
+			"getItems");
+
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?filter=string+eq+%27phoneNumber%27&restrictFields=" +
+				"actions%2CphoneNumber",
+			JSONUtil.put("filter", "string eq 'phoneNumber'"),
+			Collections.singleton("phoneNumber"), "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?filter=string+eq+%27boolean%27%27s%27&" +
+				"restrictFields=actions%2Cboolean",
+			JSONUtil.put("filter", "string eq 'boolean''s'"),
+			Collections.singleton("boolean"), "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?filter=object1%2Fboolean+eq+true&restrictFields=" +
+				"actions%2Cobject1.string",
+			JSONUtil.put("filter", "object1/boolean eq true"),
+			Collections.singleton("object1.string"), "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?sort=boolean%3Aasc&restrictFields=actions%2Cstring",
+			JSONUtil.put("sort", "boolean:asc"),
+			Collections.singleton("string"), "getItems");
+		_testGetRequest(
+			null, null, "GET", "/v1.0/items?search=Test&restrictFields=actions",
+			JSONUtil.put("search", "Test"), Collections.emptySet(), "getItems");
+		_testGetRequest(
+			null, null, "GET", "/v1.0/items?search=Test&restrictFields=actions",
+			JSONUtil.put("search", "Test"), "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?sort=string%3Aasc&restrictFields=actions",
+			JSONUtil.put("sort", "string:asc"), "getItems");
+
+		// Request bodies
+
 		_testGetRequest(
 			JSONUtil.put(
 				"name", "Test"
@@ -120,6 +332,8 @@ public class OpenAPIUtilTest {
 			"{}", "application/json", "POST", "/v1.0/items",
 			JSONUtil.put("body", JSONFactoryUtil.createJSONObject()),
 			"postItem");
+
+		// Multipart requests
 
 		String fileContent = RandomTestUtil.randomString();
 		String fileName = RandomTestUtil.randomString();
@@ -144,7 +358,7 @@ public class OpenAPIUtilTest {
 			).put(
 				"name", name
 			),
-			_openAPIJSONObject, "postBinary", null);
+			_openAPIJSONObject, null, "postBinary", null);
 
 		Assert.assertEquals("POST", request.getMethod());
 		Assert.assertEquals("/v1.0/binaries", request.getPath());
@@ -169,13 +383,43 @@ public class OpenAPIUtilTest {
 		request = OpenAPIUtil.getRequest(
 			StringPool.BLANK, null,
 			JSONUtil.put(
+				"data",
+				JSONUtil.put(
+					"contentType", "text/plain"
+				).put(
+					"data",
+					() -> {
+						Base64.Encoder encoder = Base64.getEncoder();
+
+						return encoder.encodeToString(fileContent.getBytes());
+					}
+				).put(
+					"filename", fileName
+				)
+			).put(
+				"name", name
+			),
+			_openAPIJSONObject, Collections.singleton("name"), "postBinary",
+			null);
+
+		fileItems = _getFileItems(request);
+
+		Assert.assertEquals(fileItems.toString(), 1, fileItems.size());
+
+		fileItem = _getFileItem(fileItems, "data");
+
+		Assert.assertFalse(fileItem.isFormField());
+
+		request = OpenAPIUtil.getRequest(
+			StringPool.BLANK, null,
+			JSONUtil.put(
 				"boolean", true
 			).put(
 				"integer", 1
 			).put(
 				"string", fileContent
 			),
-			_openAPIJSONObject, "postUpload", null);
+			_openAPIJSONObject, null, "postUpload", null);
 
 		Assert.assertEquals("POST", request.getMethod());
 		Assert.assertEquals("/v1.0/uploads", request.getPath());
@@ -190,13 +434,15 @@ public class OpenAPIUtilTest {
 		Assert.assertEquals(
 			fileContent, _getFileItemValue(fileItems, "string"));
 
+		// Headers
+
 		Map<String, String> headers = HashMapBuilder.put(
 			RandomTestUtil.randomString(), RandomTestUtil.randomString()
 		).build();
 
 		request = OpenAPIUtil.getRequest(
 			StringPool.BLANK, headers, JSONUtil.put("itemId", "123"),
-			_openAPIJSONObject, "getItem", null);
+			_openAPIJSONObject, null, "getItem", null);
 
 		Assert.assertEquals(headers, request.getHeaders());
 
@@ -212,7 +458,7 @@ public class OpenAPIUtilTest {
 				JSONUtil.put(
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString()),
-				_openAPIJSONObject, "postItem", null));
+				_openAPIJSONObject, null, "postItem", null));
 	}
 
 	@Test
@@ -220,12 +466,13 @@ public class OpenAPIUtilTest {
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class,
 			"OpenAPI document has no tool with name \"missing\"",
-			() -> OpenAPIUtil.getTool(true, _openAPIJSONObject, "missing"));
+			() -> OpenAPIUtil.getTool(
+				true, _openAPIJSONObject, null, "missing"));
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class,
 			"OpenAPI document has no \"paths\" object",
 			() -> OpenAPIUtil.getTool(
-				true, JSONFactoryUtil.createJSONObject(),
+				true, JSONFactoryUtil.createJSONObject(), null,
 				RandomTestUtil.randomString()));
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class, "Request body has no content",
@@ -249,6 +496,8 @@ public class OpenAPIUtilTest {
 			"PATCH /v1.0/items/{itemId}", "patch_test_v1.0_items_itemId.json",
 			"patchItem");
 		_testGetTool(
+			"POST /v1.0/batches", "post_test_v1.0_batches.json", "postBatch");
+		_testGetTool(
 			"POST /v1.0/binaries", "post_test_v1.0_binaries.json",
 			"postBinary");
 		_testGetTool(
@@ -271,6 +520,121 @@ public class OpenAPIUtilTest {
 		_testGetTool(
 			"PUT /v1.0/items/{itemId}", "put_test_v1.0_items_itemId.json",
 			"putItem");
+
+		// Restricted fields
+
+		Tool tool = OpenAPIUtil.getTool(
+			true, _openAPIJSONObject,
+			new LinkedHashSet<>(Arrays.asList("boolean", "object1.name")),
+			"getItems");
+
+		Map<String, ?> inputSchemaMap = tool.getInputSchema();
+
+		Map<String, ?> propertiesMap = (Map<String, ?>)inputSchemaMap.get(
+			"properties");
+
+		Map<String, ?> fieldsMap = (Map<String, ?>)propertiesMap.get("fields");
+
+		Map<String, ?> itemsMap = (Map<String, ?>)fieldsMap.get("items");
+
+		List<String> enumValues = (List<String>)itemsMap.get("enum");
+
+		Assert.assertFalse(enumValues.contains("boolean"));
+		Assert.assertTrue(enumValues.contains("object1"));
+
+		Map<String, ?> bodyMap = _getBodyMap(
+			Collections.singleton("string"), "postItem");
+
+		Map<String, ?> bodyPropertiesMap = (Map<String, ?>)bodyMap.get(
+			"properties");
+
+		Assert.assertFalse(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("string"));
+		Assert.assertTrue(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("boolean"));
+
+		Assert.assertEquals(Collections.emptyList(), bodyMap.get("required"));
+
+		bodyMap = _getBodyMap(Collections.singleton("next.name"), "postLevel");
+
+		bodyPropertiesMap = (Map<String, ?>)bodyMap.get("properties");
+
+		Assert.assertTrue(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("name"));
+
+		Map<String, ?> nextMap = (Map<String, ?>)bodyPropertiesMap.get("next");
+
+		Map<String, ?> nextPropertiesMap = (Map<String, ?>)nextMap.get(
+			"properties");
+
+		Assert.assertFalse(
+			nextPropertiesMap.toString(),
+			nextPropertiesMap.containsKey("name"));
+		Assert.assertTrue(
+			nextPropertiesMap.toString(),
+			nextPropertiesMap.containsKey("next"));
+
+		bodyMap = _getBodyMap(Collections.singleton("next"), "postLevel");
+
+		bodyPropertiesMap = (Map<String, ?>)bodyMap.get("properties");
+
+		Assert.assertFalse(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("next"));
+		Assert.assertTrue(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("name"));
+
+		bodyMap = _getBodyMap(Collections.singleton("string"), "postBatch");
+
+		Map<String, ?> bodyItemsMap = (Map<String, ?>)bodyMap.get("items");
+
+		bodyPropertiesMap = (Map<String, ?>)bodyItemsMap.get("properties");
+
+		Assert.assertFalse(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("string"));
+		Assert.assertTrue(
+			bodyPropertiesMap.toString(),
+			bodyPropertiesMap.containsKey("boolean"));
+
+		// Keyword search
+
+		Map<String, ?> itemsPropertiesMap = _getPropertiesMap(
+			Collections.singleton("boolean"), "getItems");
+
+		Assert.assertFalse(
+			itemsPropertiesMap.toString(),
+			itemsPropertiesMap.containsKey("search"));
+		Assert.assertTrue(
+			itemsPropertiesMap.toString(),
+			itemsPropertiesMap.containsKey("aggregationTerms"));
+		Assert.assertTrue(
+			itemsPropertiesMap.toString(),
+			itemsPropertiesMap.containsKey("filter"));
+		Assert.assertTrue(
+			itemsPropertiesMap.toString(),
+			itemsPropertiesMap.containsKey("sort"));
+
+		itemsPropertiesMap = _getPropertiesMap(
+			Collections.emptySet(), "getItems");
+
+		Assert.assertTrue(
+			itemsPropertiesMap.toString(),
+			itemsPropertiesMap.containsKey("search"));
+
+		Map<String, ?> uploadPropertiesMap = _getPropertiesMap(
+			Collections.singleton("string"), "postUpload");
+
+		Assert.assertFalse(
+			uploadPropertiesMap.toString(),
+			uploadPropertiesMap.containsKey("string"));
+		Assert.assertTrue(
+			uploadPropertiesMap.toString(),
+			uploadPropertiesMap.containsKey("boolean"));
 	}
 
 	@Test
@@ -278,39 +642,41 @@ public class OpenAPIUtilTest {
 		List<ToolSummary> toolSummaries = OpenAPIUtil.getToolSummaries(
 			_openAPIJSONObject);
 
-		Assert.assertEquals(toolSummaries.toString(), 15, toolSummaries.size());
+		Assert.assertEquals(toolSummaries.toString(), 16, toolSummaries.size());
 		_assertToolSummary(
-			"POST /v1.0/described", "postDescribed", toolSummaries.get(0));
+			"POST /v1.0/levels", "postLevel", toolSummaries.get(0));
 		_assertToolSummary(
-			"POST /v1.0/levels", "postLevel", toolSummaries.get(1));
+			"This is the description", "getItem", toolSummaries.get(1));
 		_assertToolSummary(
-			"POST /v1.0/undescribed", "postUndescribed", toolSummaries.get(2));
+			"PATCH /v1.0/items/{itemId}", "patchItem", toolSummaries.get(2));
 		_assertToolSummary(
-			"This is the description", "getItem", toolSummaries.get(3));
+			"PUT /v1.0/items/{itemId}", "putItem", toolSummaries.get(3));
 		_assertToolSummary(
-			"PATCH /v1.0/items/{itemId}", "patchItem", toolSummaries.get(4));
+			"POST /v1.0/batches", "postBatch", toolSummaries.get(4));
 		_assertToolSummary(
-			"PUT /v1.0/items/{itemId}", "putItem", toolSummaries.get(5));
+			"POST /v1.0/binaries", "postBinary", toolSummaries.get(5));
 		_assertToolSummary(
-			"POST /v1.0/binaries", "postBinary", toolSummaries.get(6));
+			"POST /v1.0/no-content", "postNoContent", toolSummaries.get(6));
+		_assertToolSummary(
+			"POST /v1.0/parents", "postParent", toolSummaries.get(7));
+		_assertToolSummary(
+			"POST /v1.0/no-schema", "postNoSchema", toolSummaries.get(8));
+		_assertToolSummary(
+			"This is the summary", "getItemsPage", toolSummaries.get(9));
+		_assertToolSummary(
+			"POST /v1.0/described", "postDescribed", toolSummaries.get(10));
+		_assertToolSummary(
+			"POST /v1.0/undescribed", "postUndescribed", toolSummaries.get(11));
 		_assertToolSummary(
 			"POST /v1.0/empty-content", "postEmptyContent",
-			toolSummaries.get(7));
+			toolSummaries.get(12));
 		_assertToolSummary(
-			"POST /v1.0/no-content", "postNoContent", toolSummaries.get(8));
-		_assertToolSummary(
-			"POST /v1.0/parents", "postParent", toolSummaries.get(9));
-		_assertToolSummary(
-			"POST /v1.0/uploads", "postUpload", toolSummaries.get(10));
+			"POST /v1.0/uploads", "postUpload", toolSummaries.get(13));
 		_assertToolSummary(
 			"This is the summary. This is the description", "getItems",
-			toolSummaries.get(11));
+			toolSummaries.get(14));
 		_assertToolSummary(
-			"POST /v1.0/items", "postItem", toolSummaries.get(12));
-		_assertToolSummary(
-			"POST /v1.0/no-schema", "postNoSchema", toolSummaries.get(13));
-		_assertToolSummary(
-			"This is the summary", "getItemsPage", toolSummaries.get(14));
+			"POST /v1.0/items", "postItem", toolSummaries.get(15));
 
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class,
@@ -338,6 +704,15 @@ public class OpenAPIUtilTest {
 		Assert.assertEquals(expectedName, toolSummary.getName());
 	}
 
+	private Map<String, ?> _getBodyMap(
+		Set<String> restrictFieldNames, String toolName) {
+
+		Map<String, ?> propertiesMap = _getPropertiesMap(
+			restrictFieldNames, toolName);
+
+		return (Map<String, ?>)propertiesMap.get("body");
+	}
+
 	private FileItem _getFileItem(List<FileItem> fileItems, String fieldName) {
 		for (FileItem fileItem : fileItems) {
 			if (Objects.equals(fileItem.getFieldName(), fieldName)) {
@@ -347,7 +722,7 @@ public class OpenAPIUtilTest {
 
 		throw new IllegalArgumentException(
 			StringBundler.concat(
-				"No part named \"", fieldName, "\" in ", fileItems));
+				"No part named \"", fieldName, "\" was found in ", fileItems));
 	}
 
 	private List<FileItem> _getFileItems(VulcanRequestForwarder.Request request)
@@ -397,9 +772,21 @@ public class OpenAPIUtilTest {
 	private Map<String, ?> _getInputSchema(
 		JSONObject openAPIJSONObject, String toolName) {
 
-		Tool tool = OpenAPIUtil.getTool(true, openAPIJSONObject, toolName);
+		Tool tool = OpenAPIUtil.getTool(
+			true, openAPIJSONObject, null, toolName);
 
 		return tool.getInputSchema();
+	}
+
+	private Map<String, ?> _getPropertiesMap(
+		Set<String> restrictFieldNames, String toolName) {
+
+		Tool tool = OpenAPIUtil.getTool(
+			true, _openAPIJSONObject, restrictFieldNames, toolName);
+
+		Map<String, ?> inputSchemaMap = tool.getInputSchema();
+
+		return (Map<String, ?>)inputSchemaMap.get("properties");
 	}
 
 	private String _read(String fileName) throws Exception {
@@ -410,12 +797,13 @@ public class OpenAPIUtilTest {
 	private void _testGetRequest(
 			String expectedBody, String expectedContentType,
 			String expectedMethod, String expectedPathWithQuery,
-			JSONObject inputJSONObject, String toolName)
+			JSONObject inputJSONObject, Set<String> restrictFieldNames,
+			String toolName)
 		throws Exception {
 
 		VulcanRequestForwarder.Request request = OpenAPIUtil.getRequest(
 			StringPool.BLANK, null, inputJSONObject, _openAPIJSONObject,
-			toolName, null);
+			restrictFieldNames, toolName, null);
 
 		if (expectedBody == null) {
 			Assert.assertNull(request.getBody());
@@ -432,13 +820,35 @@ public class OpenAPIUtilTest {
 		Assert.assertEquals(expectedPathWithQuery, request.getPath());
 	}
 
+	private void _testGetRequest(
+			String expectedBody, String expectedContentType,
+			String expectedMethod, String expectedPathWithQuery,
+			JSONObject inputJSONObject, String toolName)
+		throws Exception {
+
+		_testGetRequest(
+			expectedBody, expectedContentType, expectedMethod,
+			expectedPathWithQuery, inputJSONObject, null, toolName);
+	}
+
+	private void _testGetRequestFailure(
+		String expectedMessage, JSONObject inputJSONObject,
+		Set<String> restrictFieldNames, String toolName) {
+
+		AssertUtils.assertFailure(
+			RestrictedFieldException.class, expectedMessage,
+			() -> OpenAPIUtil.getRequest(
+				StringPool.BLANK, null, inputJSONObject, _openAPIJSONObject,
+				restrictFieldNames, toolName, null));
+	}
+
 	private void _testGetTool(
 			String expectedDescription, String expectedSchemaFileName,
 			boolean injectVulcanParameters, String toolName)
 		throws Exception {
 
 		Tool tool = OpenAPIUtil.getTool(
-			injectVulcanParameters, _openAPIJSONObject, toolName);
+			injectVulcanParameters, _openAPIJSONObject, null, toolName);
 
 		Assert.assertEquals(expectedDescription, tool.getDescription());
 		Assert.assertEquals(toolName, tool.getName());

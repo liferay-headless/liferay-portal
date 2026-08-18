@@ -46,6 +46,9 @@ public class MCPServerProtectedResourceMetadataServletTest {
 
 	@Test
 	public void testService() throws Exception {
+
+		// GET
+
 		HttpResponse<String> httpResponse = _send("GET");
 
 		_assertHeader(
@@ -80,6 +83,8 @@ public class MCPServerProtectedResourceMetadataServletTest {
 		Assert.assertEquals(
 			portalURL, authorizationServersJSONArray.getString(0));
 
+		// HEAD
+
 		httpResponse = _send("HEAD");
 
 		_assertHeader(
@@ -88,6 +93,8 @@ public class MCPServerProtectedResourceMetadataServletTest {
 		Assert.assertEquals(
 			HttpServletResponse.SC_OK, httpResponse.statusCode());
 		Assert.assertEquals(StringPool.BLANK, httpResponse.body());
+
+		// OPTIONS
 
 		httpResponse = _send("OPTIONS");
 
@@ -103,6 +110,8 @@ public class MCPServerProtectedResourceMetadataServletTest {
 		_assertHeader("300", "Access-Control-Max-Age", httpResponse.headers());
 		Assert.assertEquals(
 			HttpServletResponse.SC_NO_CONTENT, httpResponse.statusCode());
+
+		// POST
 
 		httpResponse = _send("POST");
 

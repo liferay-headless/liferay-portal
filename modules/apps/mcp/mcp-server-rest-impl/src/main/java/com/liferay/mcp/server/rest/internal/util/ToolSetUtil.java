@@ -70,14 +70,21 @@ public class ToolSetUtil {
 	}
 
 	public static Tool getTool(
-		HttpServletRequest httpServletRequest, String toolName,
+		HttpServletRequest httpServletRequest,
+		Map<String, Set<String>> restrictFieldNamesMap, String toolName,
 		String toolSetName) {
 
 		return OpenAPIUtil.getTool(
 			!Objects.equals(toolSetName, _TOOL_SET_NAME),
 			_getOpenAPIJSONObject(
 				httpServletRequest, _getOpenAPIBrief(toolSetName)),
+			_getRestrictFieldNames(
+				restrictFieldNamesMap, toolName, toolSetName),
 			toolName);
+	}
+
+	public static String getToolKey(String toolSetName, String toolName) {
+		return toolSetName + StringPool.SPACE + toolName;
 	}
 
 	public static Page<ToolSet> getToolSetsPage() {
@@ -112,7 +119,8 @@ public class ToolSetUtil {
 	public static Response invokeTool(
 			List<String> dataMaskExternalReferenceCodes,
 			HttpServletRequest httpServletRequest, Object inputObject,
-			String toolName, String toolSetName)
+			Map<String, Set<String>> restrictFieldNamesMap, String toolName,
+			String toolSetName)
 		throws Exception {
 
 		JSONObject inputJSONObject = null;
@@ -132,7 +140,7 @@ public class ToolSetUtil {
 			if (Objects.equals(toolName, "getToolSetToolSetNameTool")) {
 				return _getResponse(
 					getTool(
-						httpServletRequest,
+						httpServletRequest, restrictFieldNamesMap,
 						inputJSONObject.getString("toolName"),
 						inputJSONObject.getString("toolSetName")));
 			}
@@ -153,7 +161,7 @@ public class ToolSetUtil {
 			if (Objects.equals(toolName, "postToolSetToolSetNameToolInvoke")) {
 				return invokeTool(
 					dataMaskExternalReferenceCodes, httpServletRequest,
-					inputJSONObject.opt("body"),
+					inputJSONObject.opt("body"), restrictFieldNamesMap,
 					inputJSONObject.getString("toolName"),
 					inputJSONObject.getString("toolSetName"));
 			}
@@ -176,6 +184,8 @@ public class ToolSetUtil {
 					).build(),
 					inputJSONObject,
 					_getOpenAPIJSONObject(httpServletRequest, openAPIBrief),
+					_getRestrictFieldNames(
+						restrictFieldNamesMap, toolName, toolSetName),
 					toolName, _getUser(httpServletRequest)));
 
 		String content = response.getContent();
@@ -384,6 +394,17 @@ public class ToolSetUtil {
 		return Response.ok(
 			objectMapper.writeValueAsString(value), ContentTypes.TEXT_PLAIN_UTF8
 		).build();
+	}
+
+	private static Set<String> _getRestrictFieldNames(
+		Map<String, Set<String>> restrictFieldNamesMap, String toolName,
+		String toolSetName) {
+
+		if (restrictFieldNamesMap == null) {
+			return null;
+		}
+
+		return restrictFieldNamesMap.get(getToolKey(toolSetName, toolName));
 	}
 
 	private static Map<String, String> _getToolSetDescriptions() {

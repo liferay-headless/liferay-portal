@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -27,6 +28,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,19 +63,39 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 			MCPServerTestUtil.fetchMCPServerProfileObjectEntry("default");
 
 		Assert.assertEquals(
-			_SYSTEM_MASK_COUNT,
+			_SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES.length,
 			_getMCPServerProfileDataMasksCount(
 				mcpServerProfileObjectEntry.getExternalReferenceCode()));
+
+		MCPServerTestUtil.addDataMaskObjectEntry(
+			"\\d{4}", RandomTestUtil.randomString(), "[REDACTED]");
 
 		mcpServerProfileObjectEntry =
 			MCPServerTestUtil.addMCPServerProfileObjectEntry(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				"mcp-server-profiles getMCPServerProfilesPage");
 
+		List<ObjectEntry> mcpServerProfileDataMaskObjectEntries =
+			_getMCPServerProfileDataMaskObjectEntries(
+				mcpServerProfileObjectEntry.getExternalReferenceCode());
+
 		Assert.assertEquals(
-			_SYSTEM_MASK_COUNT,
-			_getMCPServerProfileDataMasksCount(
-				mcpServerProfileObjectEntry.getExternalReferenceCode()));
+			mcpServerProfileDataMaskObjectEntries.toString(),
+			_SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES.length,
+			mcpServerProfileDataMaskObjectEntries.size());
+
+		for (ObjectEntry mcpServerProfileDataMaskObjectEntry :
+				mcpServerProfileDataMaskObjectEntries) {
+
+			Map<String, Serializable> values =
+				mcpServerProfileDataMaskObjectEntry.getValues();
+
+			int executionOrder = MapUtil.getInteger(values, "executionOrder");
+
+			Assert.assertEquals(
+				_SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES[executionOrder - 1],
+				values.get("dataMaskExternalReferenceCode"));
+		}
 	}
 
 	@Test
@@ -86,7 +109,7 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 			mcpServerProfileObjectEntry.getExternalReferenceCode();
 
 		Assert.assertEquals(
-			_SYSTEM_MASK_COUNT,
+			_SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES.length,
 			_getMCPServerProfileDataMasksCount(
 				mcpServerProfileObjectEntryExternalReferenceCode));
 
@@ -98,6 +121,20 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 			MCPServerTestUtil.addMCPServerProfileDataMaskObjectEntry(
 				dataMaskObjectEntry.getObjectEntryId(), 1,
 				mcpServerProfileObjectEntryExternalReferenceCode);
+
+		ObjectEntry mcpServerProfileToolObjectEntry =
+			MCPServerTestUtil.addMCPServerProfileToolObjectEntry(
+				mcpServerProfileObjectEntryExternalReferenceCode,
+				"getMCPServerProfilesPage", "mcp-server-profiles");
+
+		ObjectEntry mcpServerRestrictedFieldObjectEntry =
+			MCPServerTestUtil.addMCPServerRestrictedFieldObjectEntry(
+				"description", mcpServerProfileToolObjectEntry);
+
+		Assert.assertEquals(
+			1,
+			_getMCPServerRestrictedFieldsCount(
+				mcpServerProfileToolObjectEntry));
 
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
 				new ConfigurationTemporarySwapper(
@@ -134,32 +171,85 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 				"MCP server profile was deleted.",
 				MCPServerTestUtil.getAuditedDeleteReason(
 					mcpServerProfileDataMaskObjectEntry));
+
+			Assert.assertEquals(
+				0,
+				_getMCPServerRestrictedFieldsCount(
+					mcpServerProfileToolObjectEntry));
+
+			Assert.assertEquals(
+				"MCP server profile was deleted.",
+				MCPServerTestUtil.getAuditedDeleteReason(
+					mcpServerRestrictedFieldObjectEntry));
 		}
+	}
+
+	private List<ObjectEntry> _getMCPServerProfileDataMaskObjectEntries(
+			String mcpServerProfileExternalReferenceCode)
+		throws Exception {
+
+		List<ObjectEntry> mcpServerProfileDataMaskObjectEntries =
+			new ArrayList<>();
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_MCP_SERVER_PROFILE_DATA_MASK",
+					TestPropsValues.getCompanyId());
+
+		for (ObjectEntry objectEntry :
+				_objectEntryLocalService.getObjectEntries(
+					0, objectDefinition.getObjectDefinitionId(),
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
+
+			Map<String, Serializable> values = objectEntry.getValues();
+
+			if (Objects.equals(
+					mcpServerProfileExternalReferenceCode,
+					values.get("mcpServerProfileExternalReferenceCode"))) {
+
+				mcpServerProfileDataMaskObjectEntries.add(objectEntry);
+			}
+		}
+
+		return mcpServerProfileDataMaskObjectEntries;
 	}
 
 	private int _getMCPServerProfileDataMasksCount(
 			String mcpServerProfileExternalReferenceCode)
 		throws Exception {
 
+		List<ObjectEntry> mcpServerProfileDataMaskObjectEntries =
+			_getMCPServerProfileDataMaskObjectEntries(
+				mcpServerProfileExternalReferenceCode);
+
+		return mcpServerProfileDataMaskObjectEntries.size();
+	}
+
+	private int _getMCPServerRestrictedFieldsCount(
+			ObjectEntry mcpServerProfileToolObjectEntry)
+		throws Exception {
+
 		int count = 0;
 
-		ObjectDefinition profileDataMaskObjectDefinition =
+		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
 				fetchObjectDefinitionByExternalReferenceCode(
-					"L_MCP_SERVER_PROFILE_DATA_MASK",
+					"L_MCP_SERVER_RESTRICTED_FIELD",
 					TestPropsValues.getCompanyId());
 
-		for (ObjectEntry profileDataMaskObjectEntry :
+		for (ObjectEntry objectEntry :
 				_objectEntryLocalService.getObjectEntries(
-					0, profileDataMaskObjectDefinition.getObjectDefinitionId(),
+					0, objectDefinition.getObjectDefinitionId(),
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
 
-			Map<String, Serializable> values =
-				profileDataMaskObjectEntry.getValues();
+			Map<String, Serializable> values = objectEntry.getValues();
 
 			if (Objects.equals(
-					mcpServerProfileExternalReferenceCode,
-					values.get("mcpServerProfileExternalReferenceCode"))) {
+					mcpServerProfileToolObjectEntry.getExternalReferenceCode(),
+					values.get(
+						"r_mcpServerToolToRestrictedFields_" +
+							"l_mcpServerProfileToolERC"))) {
 
 				count++;
 			}
@@ -168,7 +258,12 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 		return count;
 	}
 
-	private static final int _SYSTEM_MASK_COUNT = 9;
+	private static final String[] _SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES = {
+		"L_DATA_MASK_IBAN", "L_DATA_MASK_CREDIT_CARD_NUMBER",
+		"L_DATA_MASK_EMAIL_ADDRESS", "L_DATA_MASK_IPV4", "L_DATA_MASK_IPV6",
+		"L_DATA_MASK_NATIONAL_ID_BSN", "L_DATA_MASK_NATIONAL_ID_DNI_NIF",
+		"L_DATA_MASK_NATIONAL_ID_SSN", "L_DATA_MASK_PHONE_NUMBER"
+	};
 
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
