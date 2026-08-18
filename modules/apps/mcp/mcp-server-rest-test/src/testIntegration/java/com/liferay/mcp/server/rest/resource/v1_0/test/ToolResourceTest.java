@@ -53,11 +53,16 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 	@Override
 	@Test
 	public void testGetToolSetToolSetNameTool() throws Exception {
+
+		// System tools
+
 		Tool tool = toolResource.getToolSetToolSetNameTool(
 			"mcp-server-v1.0", "getToolSetsPage");
 
 		Assert.assertEquals("getToolSetsPage", tool.getName());
 		Assert.assertNotNull(tool.getInputSchema());
+
+		// Object definition tools
 
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition();
@@ -84,6 +89,8 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 				"JSONObject/inputSchema", "JSONObject/properties",
 				"JSONObject/body", "JSONObject/properties"),
 			false);
+
+		// Different companies
 
 		String objectDefinitionName = ObjectDefinitionTestUtil.getRandomName();
 		String objectFieldName = "a" + RandomTestUtil.randomString(8);
@@ -141,6 +148,9 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 	@Override
 	@Test
 	public void testPostToolSetToolSetNameToolInvoke() throws Exception {
+
+		// Multipart requests
+
 		byte[] bytes = RandomTestUtil.randomBytes();
 		Base64.Encoder encoder = Base64.getEncoder();
 		String fileName =
@@ -173,6 +183,8 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 			bytes.length, documentJSONObject.getInt("sizeInBytes"));
 		Assert.assertEquals(fileName, documentJSONObject.getString("title"));
 
+		// Internal fields
+
 		httpResponse =
 			toolResource.postToolSetToolSetNameToolInvokeHttpResponse(
 				"mcp-server-v1.0", "getToolSetToolSetNameToolSummariesPage",
@@ -191,6 +203,8 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 			).has(
 				"xClassName"
 			));
+
+		// Requested fields
 
 		httpResponse =
 			toolResource.postToolSetToolSetNameToolInvokeHttpResponse(

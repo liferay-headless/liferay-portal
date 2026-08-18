@@ -190,6 +190,23 @@
 				"summary": "This is the summary"
 			}
 		},
+		"/v1.0/batches": {
+			"post": {
+				"operationId": "postBatch",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/Item"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v1.0/binaries": {
 			"post": {
 				"operationId": "postBinary",
