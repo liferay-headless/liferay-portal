@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.batch.engine.csv.ColumnDescriptor;
 import com.liferay.batch.engine.csv.ColumnDescriptorProvider;
+import com.liferay.batch.engine.internal.BatchEngineFormulaInjectionUtil;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -90,6 +91,13 @@ public class ColumnValuesExtractor {
 
 			blankValues[childFieldColumnDescriptor.getIndex()] =
 				childFieldColumnDescriptor.getValue(item);
+		}
+
+		for (Object[] rowValues : values) {
+			for (int i = 0; i < rowValues.length; i++) {
+				rowValues[i] = BatchEngineFormulaInjectionUtil.neutralize(
+					rowValues[i]);
+			}
 		}
 
 		return values;

@@ -250,6 +250,38 @@ public class XLSBatchEngineImportTaskItemReaderImplTest
 	}
 
 	@Test
+	public void testReadNeutralizedFormulaValue() throws Exception {
+		try (XLSBatchEngineImportTaskItemReaderImpl
+				xlsBatchEngineImportTaskItemReaderImpl =
+					_getXLSBatchEngineImportTaskItemReader(
+						FIELD_NAMES,
+						new Object[][] {
+							{createDate, "'=1+1", 1L, "sample name", "naziv"}
+						})) {
+
+			validate(
+				createDateString, "=1+1", 1L,
+				HashMapBuilder.put(
+					"createDate", "createDate"
+				).put(
+					"description", "description"
+				).put(
+					"id", "id"
+				).put(
+					"name_i18n_en", "name"
+				).put(
+					"name_i18n_hr", "name"
+				).build(),
+				xlsBatchEngineImportTaskItemReaderImpl.read(),
+				HashMapBuilder.put(
+					"en", "sample name"
+				).put(
+					"hr", "naziv"
+				).build());
+		}
+	}
+
+	@Test
 	public void testReadRowsWithCommaInsideQuotes() throws Exception {
 		try (XLSBatchEngineImportTaskItemReaderImpl
 				xlsBatchEngineImportTaskItemReaderImpl =

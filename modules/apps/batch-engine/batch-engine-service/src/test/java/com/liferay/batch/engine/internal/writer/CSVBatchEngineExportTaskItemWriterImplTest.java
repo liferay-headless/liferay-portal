@@ -45,6 +45,35 @@ public class CSVBatchEngineExportTaskItemWriterImplTest
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
+	public void testWriteRowsNeutralizesFormulaValues() throws Exception {
+		List<String> fieldNames = Arrays.asList("description", "id");
+
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		try (CSVBatchEngineExportTaskItemWriterImpl
+				csvBatchEngineExportTaskItemWriterImpl =
+					new CSVBatchEngineExportTaskItemWriterImpl(
+						null, 0, StringPool.COMMA, fieldNameObjectValuePairs,
+						fieldNames, unsyncByteArrayOutputStream,
+						HashMapBuilder.<String, Serializable>put(
+							"containsHeaders", "false"
+						).build(),
+						null)) {
+
+			csvBatchEngineExportTaskItemWriterImpl.write(
+				Arrays.asList(
+					_createItem("=1+1", 1L), _createItem("@SUM(1)", 2L),
+					_createItem("+1", 3L), _createItem("-1", 4L),
+					_createItem("safe", 5L)));
+		}
+
+		Assert.assertEquals(
+			"'=1+1,1\r\n'@SUM(1),2\r\n'+1,3\r\n'-1,4\r\nsafe,5\r\n",
+			unsyncByteArrayOutputStream.toString());
+	}
+
+	@Test
 	public void testWriteRowsWithDefinedFieldNames1() throws Exception {
 		_testWriteRows(Arrays.asList("createDate", "description", "id"));
 	}
@@ -85,6 +114,15 @@ public class CSVBatchEngineExportTaskItemWriterImplTest
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
 		}
+	}
+
+	private Item _createItem(String description, long id) {
+		Item item = new Item();
+
+		item.setDescription(description);
+		item.setId(id);
+
+		return item;
 	}
 
 	private String _formatValue(Object value, int fieldIndex) {

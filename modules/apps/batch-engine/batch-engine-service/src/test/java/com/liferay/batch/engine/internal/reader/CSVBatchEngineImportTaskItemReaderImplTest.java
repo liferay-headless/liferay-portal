@@ -276,6 +276,41 @@ public class CSVBatchEngineImportTaskItemReaderImplTest
 	}
 
 	@Test
+	public void testReadNeutralizedFormulaValue() throws Exception {
+		try (CSVBatchEngineImportTaskItemReaderImpl
+				csvBatchEngineImportTaskItemReaderImpl =
+					_getCSVBatchEngineImportTaskItemReader(
+						FIELD_NAMES, true, null, null,
+						new Object[][] {
+							{
+								createDateString, "'=1+1", 1, "sample name",
+								"naziv"
+							}
+						})) {
+
+			validate(
+				createDateString, "=1+1", 1L,
+				HashMapBuilder.put(
+					"createDate", "createDate"
+				).put(
+					"description", "description"
+				).put(
+					"id", "id"
+				).put(
+					"name_i18n_en", "name"
+				).put(
+					"name_i18n_hr", "name"
+				).build(),
+				csvBatchEngineImportTaskItemReaderImpl.read(),
+				HashMapBuilder.put(
+					"en", "sample name"
+				).put(
+					"hr", "naziv"
+				).build());
+		}
+	}
+
+	@Test
 	public void testReadRowsWithEnclosingCharacter() throws Exception {
 		for (String delimiter : _CSV_DELIMITERS) {
 			for (String enclosingCharacter : _CSV_ENCLOSING_CHARACTERS) {

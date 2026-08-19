@@ -66,4 +66,25 @@ public class CSVUtil {
 		return StringPool.QUOTE.concat(s.concat(StringPool.QUOTE));
 	}
 
+	public static String escapeValue(String s) {
+		if ((s == null) || s.isEmpty() ||
+			!isFormulaInjectionPrefix(s.charAt(0))) {
+
+			return s;
+		}
+
+		return StringPool.APOSTROPHE.concat(s);
+	}
+
+	public static boolean isFormulaInjectionPrefix(char c) {
+		if ((c == CharPool.AT) || (c == CharPool.EQUAL) ||
+			(c == CharPool.MINUS) || (c == CharPool.PLUS) ||
+			(c == CharPool.RETURN) || (c == CharPool.TAB)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 }

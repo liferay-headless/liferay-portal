@@ -5,6 +5,7 @@
 
 package com.liferay.batch.engine.internal.reader;
 
+import com.liferay.batch.engine.internal.BatchEngineFormulaInjectionUtil;
 import com.liferay.petra.io.unsync.UnsyncBufferedReader;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.CSVUtil;
@@ -108,7 +109,9 @@ public class CSVBatchEngineImportTaskItemReaderImpl
 
 			fieldNameValueMapHandler.handle(
 				fieldName, fieldNameValueMap,
-				CSVUtil.decode(_enclosingCharacter, _delimiter, values.get(i)));
+				BatchEngineFormulaInjectionUtil.restore(
+					CSVUtil.decode(
+						_enclosingCharacter, _delimiter, values.get(i))));
 		}
 
 		return fieldNameValueMap;

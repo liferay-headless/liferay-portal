@@ -52,6 +52,45 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
+	public void testWriteRowsNeutralizesFormulaValues() throws Exception {
+		List<String> fieldNames = Arrays.asList("description", "id");
+
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		try (XLSBatchEngineExportTaskItemWriterImpl
+				xlsBatchEngineExportTaskItemWriterImpl =
+					new XLSBatchEngineExportTaskItemWriterImpl(
+						null, 0, fieldNameObjectValuePairs, fieldNames,
+						unsyncByteArrayOutputStream, null)) {
+
+			xlsBatchEngineExportTaskItemWriterImpl.write(
+				Arrays.asList(
+					_createItem("=1+1", 1L), _createItem("@SUM(1)", 2L),
+					_createItem("+1", 3L), _createItem("-1", 4L),
+					_createItem("safe", 5L)));
+		}
+
+		Workbook workbook = new XSSFWorkbook(
+			new ByteArrayInputStream(
+				unsyncByteArrayOutputStream.toByteArray()));
+
+		Sheet sheet = workbook.getSheetAt(0);
+
+		String[] expectedValues = {"'=1+1", "'@SUM(1)", "'+1", "'-1", "safe"};
+
+		for (int i = 0; i < expectedValues.length; i++) {
+			Cell cell = sheet.getRow(
+				i + 1
+			).getCell(
+				0
+			);
+
+			Assert.assertEquals(expectedValues[i], cell.getStringCellValue());
+		}
+	}
+
+	@Test
 	public void testWriteRowsWithDefinedFieldNames1() throws Exception {
 		_testWriteRows(Arrays.asList("createDate", "description", "id"));
 	}
@@ -82,6 +121,15 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
 		}
+	}
+
+	private Item _createItem(String description, long id) {
+		Item item = new Item();
+
+		item.setDescription(description);
+		item.setId(id);
+
+		return item;
 	}
 
 	private byte[] _getExpectedContent(

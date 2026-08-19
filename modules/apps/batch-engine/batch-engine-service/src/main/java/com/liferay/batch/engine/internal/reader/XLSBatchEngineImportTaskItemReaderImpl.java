@@ -5,6 +5,8 @@
 
 package com.liferay.batch.engine.internal.reader;
 
+import com.liferay.batch.engine.internal.BatchEngineFormulaInjectionUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -100,7 +102,9 @@ public class XLSBatchEngineImportTaskItemReaderImpl
 							getFieldNameValueMapHandler(fieldName);
 
 				fieldNameValueMapHandler.handle(
-					fieldName, fieldNameValueMap, cell.getStringCellValue());
+					fieldName, fieldNameValueMap,
+					BatchEngineFormulaInjectionUtil.restore(
+						cell.getStringCellValue()));
 			}
 		}
 
