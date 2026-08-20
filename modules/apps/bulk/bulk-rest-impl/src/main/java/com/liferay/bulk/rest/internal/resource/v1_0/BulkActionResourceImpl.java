@@ -88,7 +88,6 @@ import com.liferay.portal.search.rest.dto.v1_0.SearchResult;
 import com.liferay.portal.search.rest.resource.v1_0.SearchResultResource;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.Searcher;
-import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.permission.Permission;
@@ -348,8 +347,6 @@ public class BulkActionResourceImpl extends BaseBulkActionResourceImpl {
 			contextHttpServletRequest);
 
 		dynamicServletRequest.setParameter("nestedFields", "embedded");
-
-		NestedFieldsSupplier.addNestedField("embedded");
 
 		SearchResultResource searchResultResource =
 			_searchResultResourceFactory.create(
