@@ -66,7 +66,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Javier de Arcos
  */
 @Component(
-	property = "dto.class.name=com.liferay.layout.util.structure.LayoutStructureItem",
+	property = {
+		"default=true",
+		"dto.class.name=com.liferay.layout.util.structure.LayoutStructureItem"
+	},
 	service = DTOConverter.class
 )
 public class PageElementDTOConverter
