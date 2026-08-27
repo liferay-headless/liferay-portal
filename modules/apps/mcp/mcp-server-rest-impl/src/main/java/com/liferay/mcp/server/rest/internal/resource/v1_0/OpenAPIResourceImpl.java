@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Generated("")
 @OpenAPIDefinition(
-	info = @Info(description = "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSetsPage` to find a tool-set matching their intent, then `getToolSetToolSetNameToolSummariesPage` to find the right tool in it, then `getToolSetToolSetNameTool` to fetch the tool's input schema, then `postToolSetToolSetNameToolInvoke` with an input map matching that schema to execute it. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.0.4'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "MCP", version = "v1.0")
+	info = @Info(description = "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSearchPage`: pass what the user wants to do as `search` and it returns the most relevant tools across every tool-set, ranked. Set `includeRequiredInputSchema` and the top match comes back with the arguments it cannot run without, so you can go straight to `postToolSetToolSetNameToolInvoke`; call `getToolSetToolSetNameTool` first only when you need the optional arguments too. Search one action at a time, since it matches a single operation: a request spanning several steps needs one search per step. Do not begin by browsing the catalogue. `getToolSetsPage` and `getToolSetToolSetNameToolSummariesPage` list every tool-set and every operation in one, which costs more than ten times the context of a search and is rarely what you need; reach for them only when search has returned nothing relevant. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.0.4'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "MCP", version = "v1.0")
 )
 @Path("/v1.0")
 public class OpenAPIResourceImpl {
@@ -87,6 +87,8 @@ public class OpenAPIResourceImpl {
 		{
 			add(ToolResourceImpl.class);
 
+			add(ToolSearchResultResourceImpl.class);
+
 			add(ToolSetResourceImpl.class);
 
 			add(ToolSummaryResourceImpl.class);
@@ -96,4 +98,4 @@ public class OpenAPIResourceImpl {
 	};
 
 }
-// LIFERAY-REST-BUILDER-HASH:2076215429
+// LIFERAY-REST-BUILDER-HASH:-892959189

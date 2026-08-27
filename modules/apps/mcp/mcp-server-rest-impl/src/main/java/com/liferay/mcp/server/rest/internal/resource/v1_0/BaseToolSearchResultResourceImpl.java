@@ -5,8 +5,8 @@
 
 package com.liferay.mcp.server.rest.internal.resource.v1_0;
 
-import com.liferay.mcp.server.rest.dto.v1_0.ToolSummary;
-import com.liferay.mcp.server.rest.resource.v1_0.ToolSummaryResource;
+import com.liferay.mcp.server.rest.dto.v1_0.ToolSearchResult;
+import com.liferay.mcp.server.rest.resource.v1_0.ToolSearchResultResource;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,38 +41,56 @@ import java.util.Map;
  */
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
-public abstract class BaseToolSummaryResourceImpl
-	implements ToolSummaryResource {
+public abstract class BaseToolSearchResultResourceImpl
+	implements ToolSearchResultResource {
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/mcp-server/v1.0/tool-sets/{toolSetName}/tool-summaries'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/mcp-server/v1.0/tool-search'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Operation(
-		description = "Use this only as part of the browse fallback, once `getToolSearchPage` has come up empty and you have identified a tool-set with `getToolSetsPage`. Returns every tool in the tool-set, each with a `name` and a description, which for a large tool-set is a great deal of context. Pick the tool whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameTool` to see its input schema."
+		description = "Use this first whenever the user asks for something you do not already know how to do in Liferay. Returns the most relevant tools across every tool-set, ranked by relevance. Pass its `toolSetName` and `name` to `getTool` for the full input schema, or set `includeRequiredInputSchema` to invoke the top match directly. A result may also carry `prerequisites`: each entry names the operation that resolves one of the tool's parameters, so invoke that operation rather than searching for it again. This is far cheaper than browsing with `getToolSets` and `getToolSummaries`; reach for those only when search returns nothing relevant. Search one action at a time. It matches a single operation, so a request spanning several steps must be broken into one search per step: for 'create a book store using objects', search 'create a custom object definition', then 'add a field to a custom object', then 'publish an object definition'. Searching the whole request at once matches on incidental words and returns unrelated tools. Phrase each search as verb plus object plus scope, keeping the user's own terms but writing them in English: 'upload a document to a site', 'create a blog entry'. The catalogue is indexed in English alone, so a search in any other language matches nothing at all, whatever language the conversation is being held in -- translate the request and search in English. If nothing relevant comes back, re-phrase and search again rather than raising `limit`."
 	)
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
-				description = "The tool-set name returned by `getToolSetsPage`.",
-				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
-				name = "toolSetName"
+				description = "When true, each result carries `requiredInputSchema`, the tool's required arguments only. Use it to skip the `getTool` round trip when you expect to invoke the top match.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "includeRequiredInputSchema"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				description = "Maximum number of tools to return. Defaults to 10, which is enough for almost every search. When a result set holds nothing plausible, the cause is usually the wording rather than the depth — search again in plainer words, as in `list cart items` rather than `what is in the shopper's cart`, instead of asking for more results.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "limit"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				description = "A natural-language description, in English, of what the user wants to do, for example \"upload a document to a site\" or \"create a blog entry\". Matched against every tool's name and description, which are indexed in English only.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "search"
 			)
 		}
 	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
-		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "ToolSummary")}
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "ToolSearchResult")
+		}
 	)
 	@jakarta.ws.rs.GET
-	@jakarta.ws.rs.Path("/tool-sets/{toolSetName}/tool-summaries")
+	@jakarta.ws.rs.Path("/tool-search")
 	@jakarta.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Page<ToolSummary> getToolSetToolSetNameToolSummariesPage(
+	public Page<ToolSearchResult> getToolSearchPage(
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@jakarta.ws.rs.QueryParam("includeRequiredInputSchema")
+			Boolean includeRequiredInputSchema,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@jakarta.ws.rs.QueryParam("limit")
+			Integer limit,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.validation.constraints.NotNull
-			@jakarta.ws.rs.PathParam("toolSetName")
-			String toolSetName)
+			@jakarta.ws.rs.QueryParam("search")
+			String search)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -520,7 +538,7 @@ public abstract class BaseToolSummaryResourceImpl
 	protected SortParserProvider sortParserProvider;
 
 	private static final com.liferay.portal.kernel.log.Log _log =
-		LogFactoryUtil.getLog(BaseToolSummaryResourceImpl.class);
+		LogFactoryUtil.getLog(BaseToolSearchResultResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1056098956
+// LIFERAY-REST-BUILDER-HASH:2031522916
