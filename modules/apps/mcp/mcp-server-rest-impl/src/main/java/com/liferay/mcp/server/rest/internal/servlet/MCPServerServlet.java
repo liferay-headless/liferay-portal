@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.mcp.server.rest.dto.v1_0.Tool;
 import com.liferay.mcp.server.rest.internal.constants.MCPServerConstants;
+import com.liferay.mcp.server.rest.internal.search.exception.ToolSearchUnavailableException;
 import com.liferay.mcp.server.rest.internal.util.ToolSetUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
@@ -144,6 +145,9 @@ public class MCPServerServlet extends HttpServlet {
 
 		String mcpServerProfileName = (String)values.get("name");
 
+		_checkProfileTools(
+			mcpServerProfileName, GetterUtil.getString(values.get("tools")));
+
 		String mcpServerProfileExternalReferenceCode =
 			mcpServerProfileObjectEntry.getExternalReferenceCode();
 
@@ -206,6 +210,8 @@ public class MCPServerServlet extends HttpServlet {
 			).build()
 		).immediateExecution(
 			true
+		).instructions(
+			(String)values.get("instructions")
 		).prompts(
 			_getSyncPromptSpecifications(companyId)
 		).tools(
@@ -286,8 +292,12 @@ public class MCPServerServlet extends HttpServlet {
 				true
 			).build();
 		}
-		catch (Exception exception) {
-			_log.error(exception);
+		catch (IllegalArgumentException | ToolSearchUnavailableException
+					exception) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
 
 			return McpSchema.CallToolResult.builder(
 			).addTextContent(
@@ -296,6 +306,55 @@ public class MCPServerServlet extends HttpServlet {
 				true
 			).build();
 		}
+		catch (Exception exception) {
+			_log.error(exception);
+
+			return McpSchema.CallToolResult.builder(
+			).addTextContent(
+				StringBundler.concat(
+					"Unable to run the \"", toolName, "\" tool. The failure ",
+					"is on the server rather than in the request, so retrying ",
+					"will not help. Tell the user that this step failed and ",
+					"that the details are in the server log.")
+			).isError(
+				true
+			).build();
+		}
+	}
+
+	private void _checkProfileTools(String mcpServerProfileName, String tools) {
+		boolean invoke = false;
+		boolean search = false;
+
+		for (String tool : StringUtil.splitLines(tools)) {
+			String[] tokens = StringUtil.split(tool, CharPool.SPACE);
+
+			if (tokens.length != 2) {
+				continue;
+			}
+
+			if (Objects.equals(tokens[1], "getToolSearchPage")) {
+				search = true;
+			}
+			else if (Objects.equals(
+						tokens[1], "postToolSetToolSetNameToolInvoke")) {
+
+				invoke = true;
+			}
+		}
+
+		if (!search || invoke) {
+			return;
+		}
+
+		_log.error(
+			StringBundler.concat(
+				"Profile \"", mcpServerProfileName, "\" grants ",
+				"\"getToolSearchPage\" without ",
+				"\"postToolSetToolSetNameToolInvoke\", so a search can return ",
+				"a tool the client is unable to call. Add ",
+				"\"postToolSetToolSetNameToolInvoke\" to the profile or ",
+				"remove \"getToolSearchPage\"."));
 	}
 
 	private void _destroy(String servletKey) {
@@ -480,7 +539,7 @@ public class MCPServerServlet extends HttpServlet {
 
 		try {
 			Tool tool = ToolSetUtil.getTool(
-				httpServletRequest, toolName, toolSetName);
+				httpServletRequest, false, toolName, toolSetName);
 
 			return McpSchema.Tool.builder(
 			).description(
