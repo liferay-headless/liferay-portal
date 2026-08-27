@@ -7,6 +7,7 @@ package com.liferay.mcp.server.rest.internal.util;
 
 import com.liferay.mcp.server.rest.dto.v1_0.Tool;
 import com.liferay.mcp.server.rest.dto.v1_0.ToolSummary;
+import com.liferay.mcp.server.rest.internal.constants.MCPToolConstants;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -82,7 +83,8 @@ public class OpenAPIUtil {
 						"\" tool requires the request payload nested under a ",
 						"\"body\" property. Pass any path or query parameters ",
 						"as siblings of \"body\" rather than flattening the ",
-						"payload into the input map."));
+						"payload into the input map. This tool accepts: ",
+						_getInputPropertyNames(operation), "."));
 			}
 
 			String bodyString = StringPool.BLANK;
@@ -187,7 +189,7 @@ public class OpenAPIUtil {
 		for (String path : pathsJSONObject.keySet()) {
 			JSONObject pathItemJSONObject = pathsJSONObject.getJSONObject(path);
 
-			for (String method : _METHODS) {
+			for (String method : MCPToolConstants.METHODS) {
 				JSONObject operationJSONObject =
 					pathItemJSONObject.getJSONObject(method);
 
@@ -568,6 +570,34 @@ public class OpenAPIUtil {
 			Arrays.asList(StringUtil.split((String)value)));
 	}
 
+	private static String _getInputPropertyNames(Operation operation) {
+		Set<String> names = new TreeSet<>();
+
+		names.add("body");
+
+		JSONArray parametersJSONArray =
+			operation._operationJSONObject.getJSONArray("parameters");
+
+		if (parametersJSONArray != null) {
+			for (int i = 0; i < parametersJSONArray.length(); i++) {
+				JSONObject parameterJSONObject =
+					parametersJSONArray.getJSONObject(i);
+
+				if (parameterJSONObject == null) {
+					continue;
+				}
+
+				String name = parameterJSONObject.getString("name");
+
+				if (Validator.isNotNull(name)) {
+					names.add(name);
+				}
+			}
+		}
+
+		return StringUtil.merge(names, ", ");
+	}
+
 	private static Map<String, Object> _getInputSchema(
 		boolean injectVulcanParameters, String method,
 		JSONObject openAPIJSONObject, JSONObject operationJSONObject,
@@ -841,7 +871,7 @@ public class OpenAPIUtil {
 		for (String path : pathsJSONObject.keySet()) {
 			JSONObject pathJSONObject = pathsJSONObject.getJSONObject(path);
 
-			for (String method : _METHODS) {
+			for (String method : MCPToolConstants.METHODS) {
 				JSONObject operationJSONObject = pathJSONObject.getJSONObject(
 					method);
 
@@ -1211,10 +1241,6 @@ public class OpenAPIUtil {
 	private static final String _DESCRIPTION_FIELDS =
 		"Fields to include in the response. Pass only the fields the user " +
 			"actually needs.";
-
-	private static final String[] _METHODS = {
-		"delete", "get", "head", "options", "patch", "post", "put"
-	};
 
 	private static final Set<String> _excludedSchemaKeys = Set.of(
 		"actions", "example", "exclusiveMaximum", "exclusiveMinimum", "xml");
