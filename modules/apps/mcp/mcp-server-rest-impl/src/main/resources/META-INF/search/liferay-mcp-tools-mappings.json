@@ -1,0 +1,86 @@
+{
+	"properties": {
+		"deprecated": {
+			"type": "boolean"
+		},
+		"description": {
+			"analyzer": "mcp_tool_index",
+			"search_analyzer": "mcp_tool_search",
+			"type": "text"
+		},
+		"entityName": {
+			"analyzer": "mcp_tool_joined",
+			"fields": {
+				"split": {
+					"analyzer": "mcp_tool_split_index",
+					"search_analyzer": "mcp_tool_search",
+					"type": "text"
+				}
+			},
+			"search_analyzer": "mcp_tool_joined",
+			"type": "text"
+		},
+		"expansion": {
+			"analyzer": "mcp_tool_index",
+			"fields": {
+				"phrase": {
+					"analyzer": "mcp_tool_phrase_index",
+					"search_analyzer": "mcp_tool_phrase",
+					"type": "text"
+				}
+			},
+			"search_analyzer": "mcp_tool_search",
+			"type": "text"
+		},
+		"identifier": {
+			"type": "keyword"
+		},
+		"intent": {
+			"type": "keyword"
+		},
+		"method": {
+			"type": "keyword"
+		},
+		"modifier": {
+			"type": "keyword"
+		},
+		"parameters": {
+			"analyzer": "mcp_tool_index",
+			"search_analyzer": "mcp_tool_search",
+			"type": "text"
+		},
+		"path": {
+			"analyzer": "mcp_tool_index",
+			"search_analyzer": "mcp_tool_search",
+			"type": "text"
+		},
+		"pathSegmentsCount": {
+			"type": "integer"
+		},
+		"requiredReferences": {
+			"index": false,
+			"type": "keyword"
+		},
+		"schemaProperties": {
+			"analyzer": "mcp_tool_index",
+			"search_analyzer": "mcp_tool_search",
+			"type": "text"
+		},
+		"toolName": {
+			"fields": {
+				"split": {
+					"analyzer": "mcp_tool_name_split",
+					"search_analyzer": "mcp_tool_search",
+					"type": "text"
+				}
+			},
+			"type": "keyword"
+		},
+		"toolSetName": {
+			"type": "keyword"
+		},
+		"uid": {
+			"type": "keyword"
+		}
+	}
+}
