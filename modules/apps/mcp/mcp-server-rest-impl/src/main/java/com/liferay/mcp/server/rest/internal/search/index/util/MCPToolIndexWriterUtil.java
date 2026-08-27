@@ -130,6 +130,13 @@ public class MCPToolIndexWriterUtil {
 				String marker = _getActionMarker(method, path, toolName);
 				String modifier = _getModifier(entityName, path);
 
+				if (Objects.equals(
+						modifier, MCPToolModifiers.MODIFIER_TRAVERSAL)) {
+
+					entityName = _getTargetEntityName(
+						entityName, path, toolName);
+				}
+
 				mcpTools.add(
 					new MCPTool(
 						operationJSONObject.getBoolean("deprecated"),
@@ -369,6 +376,55 @@ public class MCPToolIndexWriterUtil {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Answers the entity a traversal path actually targets. The operation's
+	 * first tag names the resource the operation is grouped under, which for a
+	 * nested path is the parent: "POST
+	 * /sites/{id}/site-pages/{id}/page-specifications" is tagged "SitePage"
+	 * while the GET on the same path is tagged "PageSpecification". The last
+	 * plural segment names the target, so it harmonizes the two.
+	 */
+	private static String _getTargetEntityName(
+		String entityName, String path, String toolName) {
+
+		// Only when the tool name already carries the parent. Where it does
+		// not, the parent is matched by the path alone, so handing the entity
+		// field to the target would drop the only strong signal for it:
+		// "CMSBlog" would become the generic "Version".
+
+		String comparableToolName = MCPToolWordUtil.toComparable(toolName);
+
+		if (!comparableToolName.contains(
+				MCPToolWordUtil.toComparable(entityName))) {
+
+			return entityName;
+		}
+
+		String[] segments = StringUtil.split(path, CharPool.SLASH);
+
+		for (int i = segments.length - 1; i >= 0; i--) {
+			String segment = segments[i];
+
+			if (segment.startsWith("{") ||
+				StringUtil.startsWith(segment, "by-") ||
+				MCPToolModifiers.pathSegmentModifiers.containsKey(segment) ||
+				!_isPlural(segment)) {
+
+				continue;
+			}
+
+			StringBundler sb = new StringBundler();
+
+			for (String word : StringUtil.split(segment, CharPool.DASH)) {
+				sb.append(StringUtil.upperCaseFirstLetter(word));
+			}
+
+			return MCPToolWordUtil.toSingular(sb.toString());
+		}
+
+		return entityName;
 	}
 
 	private static Set<String> _getToolSetNames(Collection<MCPTool> mcpTools) {
