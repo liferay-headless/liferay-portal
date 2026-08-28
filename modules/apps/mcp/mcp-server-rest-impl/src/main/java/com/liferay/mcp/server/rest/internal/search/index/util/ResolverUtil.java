@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Petteri Karttunen
  */
-public class MCPToolResolverUtil {
+public class ResolverUtil {
 
 	public static String getPathParameter(String segment) {
 		if ((segment.length() > 2) &&

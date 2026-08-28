@@ -14,4 +14,6 @@ public class MCPToolConstants {
 		"delete", "get", "head", "options", "patch", "post", "put"
 	};
 
+	public static final String OPENAPI_TOOL_SET_NAME = "openapi";
+
 }

@@ -5,8 +5,6 @@
 
 package com.liferay.mcp.server.rest.internal.search.index;
 
-import com.liferay.mcp.server.rest.internal.search.index.util.MCPToolIndexCreatorUtil;
-import com.liferay.mcp.server.rest.internal.search.index.util.MCPToolIndexWriterUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.spi.reindexer.IndexReindexer;

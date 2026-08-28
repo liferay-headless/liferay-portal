@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  *
  * @author Petteri Karttunen
  */
-public class MCPToolExpansionUtil {
+public class ExpansionUtil {
 
 	public static String[] getExpansion(
 		boolean batch, String marker, String method, String path, String tags,
@@ -49,43 +49,21 @@ public class MCPToolExpansionUtil {
 			return _getActionExpansion(entity, marker, path, toolName);
 		}
 
-		String[] verbs = _VERBS_DELETE;
-
-		if (Objects.equals(method, "get")) {
-			verbs = collection ? _VERBS_COLLECTION : _VERBS_SINGLE;
-		}
-		else if (Objects.equals(method, "patch")) {
-			verbs = _VERBS_UPDATE;
-		}
-		else if (Objects.equals(method, "post")) {
-			verbs = _VERBS_CREATE;
-		}
-		else if (Objects.equals(method, "put")) {
-			verbs = _VERBS_REPLACE;
-		}
+		String[] verbs = _getVerbs(collection, method);
 
 		String remainder = toolName.replaceFirst(
 			"^(delete|get|head|options|patch|post|put)", StringPool.BLANK);
 
 		String scopePhrase = StringPool.BLANK;
 
-		for (Map.Entry<String, String> entry : _entityScopePhrases.entrySet()) {
-			String prefix = entry.getKey();
+		Map.Entry<String, String> entry = _getEntityScopeEntry(remainder);
 
-			if (!remainder.startsWith(prefix)) {
-				continue;
-			}
+		if (entry != null) {
+			String entityScopePrefix = entry.getKey();
 
-			String rest = remainder.substring(prefix.length());
+			remainder = remainder.substring(entityScopePrefix.length());
 
-			if (rest.isEmpty() || !Character.isUpperCase(rest.charAt(0))) {
-				continue;
-			}
-
-			remainder = rest;
 			scopePhrase = entry.getValue();
-
-			break;
 		}
 
 		if (batch) {
@@ -99,7 +77,7 @@ public class MCPToolExpansionUtil {
 		String suffix = nounPhrase._suffix;
 
 		if (batch || collection) {
-			head = MCPToolWordUtil.toPlural(head);
+			head = WordUtil.toPlural(head);
 		}
 
 		String parameterSuffix = _getParameterSuffix(
@@ -111,38 +89,10 @@ public class MCPToolExpansionUtil {
 		List<String> expansions = new ArrayList<>(verbs.length);
 
 		for (String verb : verbs) {
-			StringBundler sb = new StringBundler(12);
-
-			if (batch) {
-				sb.append("batch ");
-			}
-
-			sb.append(verb);
-			sb.append(StringPool.SPACE);
-
-			if (Validator.isNotNull(prefix)) {
-				sb.append(prefix);
-				sb.append(StringPool.SPACE);
-			}
-
-			sb.append(head);
-
-			if (Validator.isNotNull(scopePhrase)) {
-				sb.append(StringPool.SPACE);
-				sb.append(scopePhrase);
-			}
-
-			if (Validator.isNotNull(suffix)) {
-				sb.append(StringPool.SPACE);
-				sb.append(suffix);
-			}
-
-			if (Validator.isNotNull(parameterSuffix)) {
-				sb.append(StringPool.SPACE);
-				sb.append(parameterSuffix);
-			}
-
-			expansions.add(sb.toString());
+			expansions.add(
+				_toExpansion(
+					batch, head, parameterSuffix, prefix, scopePhrase, suffix,
+					verb));
 		}
 
 		return expansions.toArray(new String[0]);
@@ -221,14 +171,36 @@ public class MCPToolExpansionUtil {
 		return applicableVerbs.toArray(new String[0]);
 	}
 
+	private static Map.Entry<String, String> _getEntityScopeEntry(
+		String remainder) {
+
+		for (Map.Entry<String, String> entry : _entityScopePhrases.entrySet()) {
+			String prefix = entry.getKey();
+
+			if (!remainder.startsWith(prefix)) {
+				continue;
+			}
+
+			String rest = remainder.substring(prefix.length());
+
+			if (rest.isEmpty() || !Character.isUpperCase(rest.charAt(0))) {
+				continue;
+			}
+
+			return entry;
+		}
+
+		return null;
+	}
+
 	private static NounPhrase _getNounPhrase(String entity, String remainder) {
 		String humanizedRemainder = StringUtil.toLowerCase(
-			MCPToolWordUtil.humanize(StringUtil.removeLast(remainder, "Page")));
+			WordUtil.humanize(StringUtil.removeLast(remainder, "Page")));
 
 		Set<String> entityWords = new HashSet<>();
 
 		for (String word : StringUtil.split(entity, CharPool.SPACE)) {
-			entityWords.add(MCPToolWordUtil.toSingular(word));
+			entityWords.add(WordUtil.toSingular(word));
 		}
 
 		StringBundler afterSB = new StringBundler();
@@ -238,7 +210,7 @@ public class MCPToolExpansionUtil {
 		for (String word :
 				StringUtil.split(humanizedRemainder, CharPool.SPACE)) {
 
-			if (entityWords.contains(MCPToolWordUtil.toSingular(word))) {
+			if (entityWords.contains(WordUtil.toSingular(word))) {
 				seen = true;
 
 				continue;
@@ -290,8 +262,7 @@ public class MCPToolExpansionUtil {
 			return StringPool.BLANK;
 		}
 
-		String words = StringUtil.toLowerCase(
-			MCPToolWordUtil.humanize(parameter));
+		String words = StringUtil.toLowerCase(WordUtil.humanize(parameter));
 
 		if (qualifier.contains(words)) {
 			return StringPool.BLANK;
@@ -304,6 +275,68 @@ public class MCPToolExpansionUtil {
 		}
 
 		return "by " + words;
+	}
+
+	private static String[] _getVerbs(boolean collection, String method) {
+		if (Objects.equals(method, "get")) {
+			if (collection) {
+				return _VERBS_COLLECTION;
+			}
+
+			return _VERBS_SINGLE;
+		}
+
+		if (Objects.equals(method, "patch")) {
+			return _VERBS_UPDATE;
+		}
+
+		if (Objects.equals(method, "post")) {
+			return _VERBS_CREATE;
+		}
+
+		if (Objects.equals(method, "put")) {
+			return _VERBS_REPLACE;
+		}
+
+		return _VERBS_DELETE;
+	}
+
+	private static String _toExpansion(
+		boolean batch, String head, String parameterSuffix, String prefix,
+		String scopePhrase, String suffix, String verb) {
+
+		StringBundler sb = new StringBundler(12);
+
+		if (batch) {
+			sb.append("batch ");
+		}
+
+		sb.append(verb);
+		sb.append(StringPool.SPACE);
+
+		if (Validator.isNotNull(prefix)) {
+			sb.append(prefix);
+			sb.append(StringPool.SPACE);
+		}
+
+		sb.append(head);
+
+		if (Validator.isNotNull(scopePhrase)) {
+			sb.append(StringPool.SPACE);
+			sb.append(scopePhrase);
+		}
+
+		if (Validator.isNotNull(suffix)) {
+			sb.append(StringPool.SPACE);
+			sb.append(suffix);
+		}
+
+		if (Validator.isNotNull(parameterSuffix)) {
+			sb.append(StringPool.SPACE);
+			sb.append(parameterSuffix);
+		}
+
+		return sb.toString();
 	}
 
 	private static final String[] _VERBS_COLLECTION = {

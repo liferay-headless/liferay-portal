@@ -3,21 +3,22 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.mcp.server.rest.internal.search.index.util;
+package com.liferay.mcp.server.rest.internal.search.index;
 
 import com.liferay.mcp.server.rest.dto.v1_0.Prerequisite;
 import com.liferay.mcp.server.rest.dto.v1_0.ToolSearchResult;
 import com.liferay.mcp.server.rest.internal.constants.MCPToolClientAdvices;
 import com.liferay.mcp.server.rest.internal.search.constants.MCPToolFields;
 import com.liferay.mcp.server.rest.internal.search.constants.MCPToolModifiers;
+import com.liferay.mcp.server.rest.internal.search.index.util.IntentExtractorUtil;
+import com.liferay.mcp.server.rest.internal.search.index.util.MCPTool;
+import com.liferay.mcp.server.rest.internal.search.index.util.ResolverUtil;
+import com.liferay.mcp.server.rest.internal.search.index.util.SearchPhraseUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.module.service.Snapshot;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
@@ -38,13 +39,8 @@ import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Petteri Karttunen
@@ -92,46 +88,6 @@ public class MCPToolIndexReaderUtil {
 		return searchSearchRequest;
 	}
 
-	private static String _getHeadNoun(String search) {
-		if (_isAssociating(search)) {
-			return null;
-		}
-
-		String boundary = null;
-		String headNoun = null;
-		String trailingNoun = null;
-
-		for (String word :
-				StringUtil.split(
-					StringUtil.toLowerCase(search), CharPool.SPACE)) {
-
-			if (_headNounBoundaries.contains(word)) {
-				if (boundary == null) {
-					boundary = word;
-				}
-
-				continue;
-			}
-
-			if (_genericNouns.contains(word)) {
-				continue;
-			}
-
-			if (boundary == null) {
-				headNoun = word;
-			}
-			else if (Objects.equals(boundary, "of")) {
-				trailingNoun = word;
-			}
-		}
-
-		if (Objects.equals(boundary, "of") && (trailingNoun != null)) {
-			return trailingNoun;
-		}
-
-		return headNoun;
-	}
-
 	private static Query _getIntentQuery(List<String> intents) {
 		if (intents == null) {
 			return null;
@@ -139,9 +95,7 @@ public class MCPToolIndexReaderUtil {
 
 		BooleanQuery booleanQuery = new BooleanQuery();
 
-		for (String intent :
-				MCPToolIntentExtractorUtil.getOtherIntents(intents)) {
-
+		for (String intent : IntentExtractorUtil.getOtherIntents(intents)) {
 			booleanQuery.addShouldQueryClauses(
 				new TermQuery(MCPToolFields.INTENT, intent));
 		}
@@ -210,8 +164,7 @@ public class MCPToolIndexReaderUtil {
 		String[] segments = StringUtil.split(path, CharPool.SLASH);
 
 		for (int i = 1; i < (segments.length - 1); i++) {
-			String parameter = MCPToolResolverUtil.getPathParameter(
-				segments[i]);
+			String parameter = ResolverUtil.getPathParameter(segments[i]);
 
 			if (parameter == null) {
 				continue;
@@ -227,7 +180,7 @@ public class MCPToolIndexReaderUtil {
 				prerequisite.setNote(() -> note);
 			}
 
-			MCPTool mcpTool = MCPToolResolverUtil.getResolverMCPTool(
+			MCPTool mcpTool = ResolverUtil.getResolverMCPTool(
 				companyId, segments[i - 1]);
 
 			if (mcpTool != null) {
@@ -248,7 +201,7 @@ public class MCPToolIndexReaderUtil {
 				continue;
 			}
 
-			MCPTool mcpTool = MCPToolResolverUtil.getResolverMCPTool(
+			MCPTool mcpTool = ResolverUtil.getResolverMCPTool(
 				companyId, parts[1]);
 
 			if (mcpTool == null) {
@@ -268,10 +221,11 @@ public class MCPToolIndexReaderUtil {
 	}
 
 	private static Query _getQuery(String search) {
-		List<String> intents = MCPToolIntentExtractorUtil.getIntents(search);
+		List<String> intents = IntentExtractorUtil.getIntents(search);
 
 		BoostingQuery boostingQuery = new BoostingQuery(
-			_getScoringQuery(_replaceEntityWords(intents, search)),
+			_getScoringQuery(
+				SearchPhraseUtil.replaceEntityWords(intents, search)),
 			_getModifierQuery(MCPToolModifiers.RARELY_WANTED_MODIFIERS));
 
 		boostingQuery.setNegativeBoost(_NEGATIVE_BOOST_RARELY_WANTED);
@@ -290,7 +244,7 @@ public class MCPToolIndexReaderUtil {
 
 		Query query = deprecatedBoostingQuery;
 
-		if (!_isBatch(search)) {
+		if (!SearchPhraseUtil.isBatch(search)) {
 			BoostingQuery batchBoostingQuery = new BoostingQuery(
 				query,
 				new TermQuery(
@@ -301,7 +255,7 @@ public class MCPToolIndexReaderUtil {
 			query = batchBoostingQuery;
 		}
 
-		if (!_isAssociating(search)) {
+		if (!SearchPhraseUtil.isAssociating(search)) {
 			BoostingQuery traversalBoostingQuery = new BoostingQuery(
 				query,
 				new TermQuery(
@@ -334,7 +288,7 @@ public class MCPToolIndexReaderUtil {
 			_getMultiMatchQuery(search),
 			new MatchPhraseQuery(MCPToolFields.EXPANSION + ".phrase", search));
 
-		String headNoun = _getHeadNoun(search);
+		String headNoun = SearchPhraseUtil.getHeadNoun(search);
 
 		if (headNoun == null) {
 			return booleanQuery;
@@ -346,53 +300,6 @@ public class MCPToolIndexReaderUtil {
 		matchQuery.setBoost(_BOOST_HEAD_NOUN);
 
 		return booleanQuery.addShouldQueryClauses(matchQuery);
-	}
-
-	private static boolean _isAssociating(String search) {
-		String[] words = StringUtil.split(
-			StringUtil.toLowerCase(search), CharPool.SPACE);
-
-		Set<String> directionWords = new HashSet<>();
-
-		for (String word : words) {
-			if (_associationWords.contains(word)) {
-				return true;
-			}
-
-			String directionWord = _ambiguousAssociationWords.get(word);
-
-			if (directionWord != null) {
-				directionWords.add(directionWord);
-			}
-		}
-
-		if (directionWords.isEmpty()) {
-			return false;
-		}
-
-		for (String word : words) {
-			if (directionWords.contains(word)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static boolean _isBatch(String search) {
-		for (String word :
-				StringUtil.split(
-					StringUtil.toLowerCase(search), CharPool.SPACE)) {
-
-			if (_bulkWords.contains(word) ||
-				(Validator.isNumber(word) &&
-				 (GetterUtil.getInteger(word) >= _BULK_THRESHOLD))) {
-
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private static boolean _isConfident(
@@ -419,41 +326,6 @@ public class MCPToolIndexReaderUtil {
 		}
 
 		return false;
-	}
-
-	private static String _replaceEntityWords(
-		List<String> intents, String search) {
-
-		Matcher matcher = _entityWordPattern.matcher(search);
-
-		if (!matcher.find()) {
-			return search;
-		}
-
-		String entityReplacement =
-			_ENTITY_DEFINITION + StringPool.SPACE + _ENTITY_ENTRY;
-
-		if (intents != null) {
-			boolean definitionIntent = intents.contains(
-				MCPToolIntentExtractorUtil.INTENT_CREATE);
-
-			boolean entryIntent = false;
-
-			if (intents.contains(MCPToolIntentExtractorUtil.INTENT_LIST) ||
-				intents.contains(MCPToolIntentExtractorUtil.INTENT_READ)) {
-
-				entryIntent = true;
-			}
-
-			if (definitionIntent && !entryIntent) {
-				entityReplacement = _ENTITY_DEFINITION;
-			}
-			else if (entryIntent && !definitionIntent) {
-				entityReplacement = _ENTITY_ENTRY;
-			}
-		}
-
-		return matcher.replaceAll(Matcher.quoteReplacement(entityReplacement));
 	}
 
 	private static void _setSorts(SearchSearchRequest searchSearchRequest) {
@@ -552,12 +424,6 @@ public class MCPToolIndexReaderUtil {
 
 	private static final float _BOOST_HEAD_NOUN = 2.0F;
 
-	private static final int _BULK_THRESHOLD = 10;
-
-	private static final String _ENTITY_DEFINITION = "object definition";
-
-	private static final String _ENTITY_ENTRY = "object entry";
-
 	private static final float _NEGATIVE_BOOST_BATCH = 0.3F;
 
 	private static final float _NEGATIVE_BOOST_DEPRECATED = 0.8F;
@@ -570,39 +436,6 @@ public class MCPToolIndexReaderUtil {
 
 	private static final float _NEGATIVE_BOOST_TRAVERSAL = 0.7F;
 
-	private static final Map<String, String> _ambiguousAssociationWords =
-		HashMapBuilder.put(
-			"add", "to"
-		).put(
-			"added", "to"
-		).put(
-			"adds", "to"
-		).put(
-			"put", "to"
-		).put(
-			"remove", "from"
-		).put(
-			"removed", "from"
-		).put(
-			"removes", "from"
-		).build();
-	private static final Set<String> _associationWords = SetUtil.fromArray(
-		"assign", "assigned", "assigning", "associate", "associated",
-		"association", "attach", "attached", "detach", "disassociate", "link",
-		"linked", "relate", "related", "unassign", "unlink");
-	private static final Set<String> _bulkWords = SetUtil.fromArray(
-		"batch", "batches", "bulk", "dozen", "hundred", "many", "ten",
-		"thousand", "twelve", "twenty");
-	private static final Pattern _entityWordPattern = Pattern.compile(
-		"\\b(entity|entities)\\b", Pattern.CASE_INSENSITIVE);
-	private static final Set<String> _genericNouns = SetUtil.fromArray(
-		"data", "detail", "details", "entries", "entry", "info", "information",
-		"item", "items", "object", "objects", "record", "records", "row",
-		"rows", "value", "values");
-	private static final Set<String> _headNounBoundaries = SetUtil.fromArray(
-		"and", "as", "at", "belonging", "by", "for", "from", "in", "inside",
-		"into", "of", "on", "onto", "that", "to", "under", "using", "via",
-		"whose", "with", "within");
 	private static final Snapshot<SearchEngineAdapter>
 		_searchEngineAdapterSnapshot = new Snapshot<>(
 			MCPToolIndexReaderUtil.class, SearchEngineAdapter.class);

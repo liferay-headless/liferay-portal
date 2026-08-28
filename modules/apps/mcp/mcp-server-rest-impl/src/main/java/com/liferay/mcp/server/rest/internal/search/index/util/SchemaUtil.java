@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * @author Petteri Karttunen
  */
-public class MCPToolSchemaUtil {
+public class SchemaUtil {
 
 	public static Set<String> getEnvelopePropertyNames(
 		Map<String, Integer> counts, int size) {
@@ -357,10 +357,10 @@ public class MCPToolSchemaUtil {
 			return null;
 		}
 
-		String words = StringUtil.toLowerCase(MCPToolWordUtil.humanize(entity));
+		String words = StringUtil.toLowerCase(WordUtil.humanize(entity));
 
 		return StringUtil.replace(
-			MCPToolWordUtil.toPlural(StringUtil.trim(words)), CharPool.SPACE,
+			WordUtil.toPlural(StringUtil.trim(words)), CharPool.SPACE,
 			CharPool.DASH);
 	}
 

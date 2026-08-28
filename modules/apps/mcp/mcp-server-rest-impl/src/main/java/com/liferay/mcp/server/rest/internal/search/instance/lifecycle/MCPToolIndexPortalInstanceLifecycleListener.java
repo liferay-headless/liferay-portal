@@ -5,8 +5,8 @@
 
 package com.liferay.mcp.server.rest.internal.search.instance.lifecycle;
 
-import com.liferay.mcp.server.rest.internal.search.index.util.MCPToolIndexCreatorUtil;
-import com.liferay.mcp.server.rest.internal.search.index.util.MCPToolIndexWriterUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexCreatorUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexWriterUtil;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;

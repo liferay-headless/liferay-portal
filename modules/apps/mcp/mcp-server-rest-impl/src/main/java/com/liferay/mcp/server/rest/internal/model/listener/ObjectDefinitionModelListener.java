@@ -5,7 +5,7 @@
 
 package com.liferay.mcp.server.rest.internal.model.listener;
 
-import com.liferay.mcp.server.rest.internal.search.index.util.MCPToolIndexWriterUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexWriterUtil;
 import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
 import com.liferay.mcp.server.rest.internal.util.OpenAPIBriefUtil;
 import com.liferay.object.model.ObjectDefinition;

@@ -22,7 +22,7 @@ import java.util.Objects;
  *
  * @author Petteri Karttunen
  */
-public class MCPToolIntentExtractorUtil {
+public class IntentExtractorUtil {
 
 	public static final String INTENT_CREATE = "create";
 

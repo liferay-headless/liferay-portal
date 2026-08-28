@@ -5,17 +5,18 @@
 
 package com.liferay.mcp.server.rest.internal.search.index.util;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 /**
- * Turns the words of REST Builder's generated operation into the words a
+ * Turns the words of REST Builder generated words into the words a
  * caller would use.
  *
  * @author Petteri Karttunen
  */
-public class MCPToolWordUtil {
+public class WordUtil {
 
 	public static String humanize(String value) {
 		if (Validator.isNull(value)) {
@@ -25,6 +26,10 @@ public class MCPToolWordUtil {
 		value = value.replaceAll("([a-z0-9])([A-Z])", "$1 $2");
 
 		return value.replaceAll("([A-Z]+)([A-Z][a-z])", "$1 $2");
+	}
+
+	public static boolean isPlural(String word) {
+		return StringUtil.endsWith(toComparable(word), CharPool.LOWER_CASE_S);
 	}
 
 	public static String toComparable(String value) {
