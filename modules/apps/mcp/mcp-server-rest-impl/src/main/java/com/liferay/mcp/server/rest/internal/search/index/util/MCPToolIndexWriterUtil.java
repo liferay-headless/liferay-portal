@@ -679,58 +679,13 @@ public class MCPToolIndexWriterUtil {
 
 		Set<String> failedToolSetNames = new HashSet<>();
 
-		Set<String> indexedToolSetNames = _indexedToolSetNames.get(companyId);
+		if (!_replaceChangedToolSets(
+				companyId, failedToolSetNames, httpServletRequest)) {
 
-		if (indexedToolSetNames != null) {
-			Set<String> toolSetNames = new HashSet<>(
-				OpenAPIBriefUtil.getOpenAPIBriefs(
-				).keySet());
-
-			toolSetNames.remove(_OPENAPI_TOOL_SET_NAME);
-
-			Set<String> addedToolSetNames = new HashSet<>(toolSetNames);
-
-			addedToolSetNames.removeAll(indexedToolSetNames);
-
-			Set<String> removedToolSetNames = new HashSet<>(
-				indexedToolSetNames);
-
-			removedToolSetNames.removeAll(toolSetNames);
-
-			if (removedToolSetNames.isEmpty()) {
-				Set<String> replacedToolSetNames = _getStaleToolSetNames(
-					companyId);
-
-				replacedToolSetNames.retainAll(toolSetNames);
-
-				replacedToolSetNames.removeAll(addedToolSetNames);
-
-				Set<String> changedToolSetNames = new HashSet<>(
-					addedToolSetNames);
-
-				changedToolSetNames.addAll(replacedToolSetNames);
-
-				List<MCPTool> mcpTools = _getMCPTools(
-					httpServletRequest, failedToolSetNames,
-					changedToolSetNames);
-
-				replacedToolSetNames.removeAll(failedToolSetNames);
-
-				if (_replaceToolSets(
-						companyId, mcpTools, replacedToolSetNames,
-						toolSetNames)) {
-
-					_updateStaleness(
-						companyId, changeCount, failedToolSetNames);
-
-					return;
-				}
-			}
+			_replaceAll(
+				companyId, failedToolSetNames,
+				_getMCPTools(httpServletRequest, failedToolSetNames, null));
 		}
-
-		_replaceAll(
-			companyId, failedToolSetNames,
-			_getMCPTools(httpServletRequest, failedToolSetNames, null));
 
 		_updateStaleness(companyId, changeCount, failedToolSetNames);
 	}
@@ -767,6 +722,55 @@ public class MCPToolIndexWriterUtil {
 		_prune(failedToolSetNames, indexName, mcpTools);
 
 		_staleToolSetNames.remove(companyId);
+	}
+
+	/**
+	 * Replaces only the tool sets that changed since the last rebuild. Answers
+	 * false when the index has to be rebuilt whole instead: nothing is indexed
+	 * yet, a tool set is gone and its tools have to be pruned, or the counts
+	 * the incremental path needs are missing.
+	 */
+	private static boolean _replaceChangedToolSets(
+		long companyId, Set<String> failedToolSetNames,
+		HttpServletRequest httpServletRequest) {
+
+		Set<String> indexedToolSetNames = _indexedToolSetNames.get(companyId);
+
+		if (indexedToolSetNames == null) {
+			return false;
+		}
+
+		Set<String> toolSetNames = new HashSet<>(
+			OpenAPIBriefUtil.getOpenAPIBriefs(
+			).keySet());
+
+		toolSetNames.remove(_OPENAPI_TOOL_SET_NAME);
+
+		if (!toolSetNames.containsAll(indexedToolSetNames)) {
+			return false;
+		}
+
+		Set<String> addedToolSetNames = new HashSet<>(toolSetNames);
+
+		addedToolSetNames.removeAll(indexedToolSetNames);
+
+		Set<String> replacedToolSetNames = new HashSet<>(
+			_getStaleToolSetNames(companyId));
+
+		replacedToolSetNames.retainAll(toolSetNames);
+		replacedToolSetNames.removeAll(addedToolSetNames);
+
+		Set<String> changedToolSetNames = new HashSet<>(addedToolSetNames);
+
+		changedToolSetNames.addAll(replacedToolSetNames);
+
+		List<MCPTool> mcpTools = _getMCPTools(
+			httpServletRequest, failedToolSetNames, changedToolSetNames);
+
+		replacedToolSetNames.removeAll(failedToolSetNames);
+
+		return _replaceToolSets(
+			companyId, mcpTools, replacedToolSetNames, toolSetNames);
 	}
 
 	private static boolean _replaceToolSets(
