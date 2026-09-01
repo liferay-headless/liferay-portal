@@ -179,6 +179,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -331,7 +332,50 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		_testGetSitePageSitePagesPage(false);
 		_testGetSitePageSitePagesPage(true);
+		_testGetSiteSitePagesPageWithAncestorSitePageExternalReferenceCode();
 		_testGetSiteSitePagesPageWithPageSpecificationVersionsNestedField();
+		_testGetSiteSitePagesPageWithParentSitePageExternalReferenceCode();
+	}
+
+	@FeatureFlag(enable = false, value = "LPD-35443")
+	@Test
+	public void testGetSiteSitePagesPageWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		Layout layout = LayoutTestUtil.addTypePortletLayout(testGroup);
+
+		Page<SitePage> page = sitePageResource.getSiteSitePagesPage(
+			testGroup.getExternalReferenceCode(), false, null, null, null,
+			Pagination.of(1, 10), null);
+
+		Assert.assertEquals(1, page.getTotalCount());
+
+		SitePage sitePage = page.fetchFirstItem();
+
+		Assert.assertEquals(
+			layout.getExternalReferenceCode(),
+			sitePage.getExternalReferenceCode());
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		SitePageResource userSitePageResource = SitePageResource.builder(
+		).authentication(
+			user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		_assertProblemException(
+			"Feature flag LPD-35443 is disabled for company " +
+				testCompany.getCompanyId(),
+			() -> userSitePageResource.getSiteSitePagesPage(
+				testGroup.getExternalReferenceCode(), false, null, null, null,
+				Pagination.of(1, 10), null));
 	}
 
 	@Override
@@ -538,6 +582,14 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		return new String[] {
 			"externalReferenceCode", "friendlyUrlPath_i18n", "keywords",
 			"name_i18n", "taxonomyCategoryBriefs", "type", "uuid"
+		};
+	}
+
+	@Override
+	protected String[] getIgnoredEntityFieldNames() {
+		return new String[] {
+			"ancestorSitePageExternalReferenceCode",
+			"parentSitePageExternalReferenceCode"
 		};
 	}
 
@@ -2320,6 +2372,50 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_testGetSiteSitePageWithNestedFields(sitePage);
 	}
 
+	private void _testGetSiteSitePagesPageWithAncestorSitePageExternalReferenceCode()
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				testGroup, TestPropsValues.getUserId());
+
+		SitePage ancestorSitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(serviceContext, SitePage.Type.CONTENT_PAGE));
+
+		SitePage childSitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(
+				StringUtil.toLowerCase(RandomTestUtil.randomString()),
+				ancestorSitePage.getExternalReferenceCode(), serviceContext,
+				SitePage.Type.CONTENT_PAGE,
+				StringUtil.toLowerCase(RandomTestUtil.randomString())));
+
+		SitePage grandchildSitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(
+				StringUtil.toLowerCase(RandomTestUtil.randomString()),
+				childSitePage.getExternalReferenceCode(), serviceContext,
+				SitePage.Type.CONTENT_PAGE,
+				StringUtil.toLowerCase(RandomTestUtil.randomString())));
+
+		Page<SitePage> page = sitePageResource.getSiteSitePagesPage(
+			testGroup.getExternalReferenceCode(), null, null, null,
+			StringBundler.concat(
+				"ancestorSitePageExternalReferenceCode eq '",
+				ancestorSitePage.getExternalReferenceCode(), "'"),
+			Pagination.of(1, 10), null);
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		Collection<SitePage> sitePages = page.getItems();
+
+		Assert.assertFalse(sitePages.contains(ancestorSitePage));
+
+		Assert.assertTrue(sitePages.contains(childSitePage));
+		Assert.assertTrue(sitePages.contains(grandchildSitePage));
+	}
+
 	private void _testGetSiteSitePagesPageWithPageSpecificationVersionsNestedField()
 		throws Exception {
 
@@ -2350,6 +2446,48 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 					testGroup.getGroupId()),
 				sitePage.getPageSpecificationVersions());
 		}
+	}
+
+	private void _testGetSiteSitePagesPageWithParentSitePageExternalReferenceCode()
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				testGroup, TestPropsValues.getUserId());
+
+		SitePage parentSitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(serviceContext, SitePage.Type.CONTENT_PAGE));
+
+		SitePage childSitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(
+				StringUtil.toLowerCase(RandomTestUtil.randomString()),
+				parentSitePage.getExternalReferenceCode(), serviceContext,
+				SitePage.Type.CONTENT_PAGE,
+				StringUtil.toLowerCase(RandomTestUtil.randomString())));
+
+		Page<SitePage> page = sitePageResource.getSiteSitePagesPage(
+			testGroup.getExternalReferenceCode(), null, null, null,
+			StringBundler.concat(
+				"parentSitePageExternalReferenceCode eq '",
+				parentSitePage.getExternalReferenceCode(), "'"),
+			Pagination.of(1, 10), null);
+
+		Assert.assertEquals(1, page.getTotalCount());
+
+		Assert.assertEquals(childSitePage, page.fetchFirstItem());
+
+		page = sitePageResource.getSiteSitePagesPage(
+			testGroup.getExternalReferenceCode(), null, null, null,
+			"parentSitePageExternalReferenceCode eq null",
+			Pagination.of(1, 100), null);
+
+		Collection<SitePage> sitePages = page.getItems();
+
+		Assert.assertFalse(sitePages.contains(childSitePage));
+
+		Assert.assertTrue(sitePages.contains(parentSitePage));
 	}
 
 	private void _testGetSiteSitePageWithNestedFields(SitePage sitePage)
