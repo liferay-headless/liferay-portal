@@ -37,11 +37,11 @@ import java.util.function.Supplier;
  */
 @Generated("")
 @GraphQLName(
-	description = "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getTool` first. Call `getTool` when you need the optional arguments too.",
+	description = "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getToolSetToolSetNameTool` first. Call `getToolSetToolSetNameTool` when you need the optional arguments too.",
 	value = "ToolSearchResult"
 )
 @io.swagger.v3.oas.annotations.media.Schema(
-	description = "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getTool` first. Call `getTool` when you need the optional arguments too.",
+	description = "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getToolSetToolSetNameTool` first. Call `getToolSetToolSetNameTool` when you need the optional arguments too.",
 	requiredProperties = {"name", "toolSetName"}
 )
 @JsonFilter("Liferay.Vulcan")
@@ -102,7 +102,7 @@ public class ToolSearchResult implements Serializable {
 	private Supplier<String> _descriptionSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema(
-		description = "Stable identifier of the operation within its tool-set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
+		description = "Stable identifier of the operation within its tool set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
 	)
 	public String getName() {
 		if (_nameSupplier != null) {
@@ -136,7 +136,7 @@ public class ToolSearchResult implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "Stable identifier of the operation within its tool-set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
+		description = "Stable identifier of the operation within its tool set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
@@ -192,7 +192,7 @@ public class ToolSearchResult implements Serializable {
 	private Supplier<Prerequisite[]> _prerequisitesSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema(
-		description = "JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getTool` for the full schema including optional arguments."
+		description = "JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getToolSetToolSetNameTool` for the full schema including optional arguments."
 	)
 	@Valid
 	public Map<String, ?> getRequiredInputSchema() {
@@ -230,7 +230,7 @@ public class ToolSearchResult implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getTool` for the full schema including optional arguments."
+		description = "JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getToolSetToolSetNameTool` for the full schema including optional arguments."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> requiredInputSchema;
@@ -239,7 +239,7 @@ public class ToolSearchResult implements Serializable {
 	private Supplier<Map<String, ?>> _requiredInputSchemaSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema(
-		description = "Stable identifier of the tool-set that exposes this tool. Pass this verbatim as `toolSetName` to `getTool` and `invokeTool`."
+		description = "Stable identifier of the tool set that exposes this tool. Pass this verbatim as `toolSetName` to `getToolSetToolSetNameTool` and `postToolSetToolSetNameToolInvoke`."
 	)
 	public String getToolSetName() {
 		if (_toolSetNameSupplier != null) {
@@ -275,7 +275,7 @@ public class ToolSearchResult implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "Stable identifier of the tool-set that exposes this tool. Pass this verbatim as `toolSetName` to `getTool` and `invokeTool`."
+		description = "Stable identifier of the tool set that exposes this tool. Pass this verbatim as `toolSetName` to `getToolSetToolSetNameTool` and `postToolSetToolSetNameToolInvoke`."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
@@ -494,4 +494,4 @@ public class ToolSearchResult implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1860198009
+// LIFERAY-REST-BUILDER-HASH:-42792783
