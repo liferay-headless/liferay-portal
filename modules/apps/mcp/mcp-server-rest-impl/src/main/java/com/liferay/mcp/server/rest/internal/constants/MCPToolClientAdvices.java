@@ -17,7 +17,7 @@ public class MCPToolClientAdvices {
 
 	public static final String BATCH_HINT = StringBundler.concat(
 		"Takes many entities in one call, so use it rather than calling the ",
-		"single-entity operation repeatedly. It answers 202 with an import ",
+		"single entity operation repeatedly. It answers 202 with an import ",
 		"task, not a result: nothing is written yet and 202 is not success. ",
 		"Before reporting the work done, read executeStatus and failedItems ",
 		"by invoking getImportTask in headless-batch-engine-v1.0, passing the ",
@@ -45,12 +45,12 @@ public class MCPToolClientAdvices {
 		"assetLibraryId",
 		StringBundler.concat(
 			"The asset library's key, its numeric id or its external ",
-			"reference code. The key is case-sensitive.")
+			"reference code. The key is case sensitive.")
 	).put(
 		"siteId",
 		StringBundler.concat(
 			"The site's key, its numeric id or its external reference code. ",
-			"The key is usually the site's name and is case-sensitive, so try ",
+			"The key is usually the site's name and is case sensitive, so try ",
 			"it before listing sites.")
 	).build();
 	public static final Map<String, String> toolHints = HashMapBuilder.put(

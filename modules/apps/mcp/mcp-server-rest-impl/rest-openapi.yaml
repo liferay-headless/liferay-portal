@@ -25,7 +25,7 @@ components:
             type: object
         Tool:
             description:
-                A tool exposed by a tool-set, including its input schema.
+                A tool exposed by a tool set, including its input schema.
             properties:
                 description:
                     description:
@@ -38,14 +38,14 @@ components:
                     type: object
                 name:
                     description:
-                        Stable identifier of the tool within its tool-set.
+                        Stable identifier of the tool within its tool set.
                     type: string
             required:
                 -   name
             type: object
         ToolSearchResult:
             description:
-                "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getTool` first. Call `getTool` when you need the optional arguments too."
+                "A tool matching a search query, ranked by relevance. It describes an operation reachable through this server; it is not itself one of this server's tools. Run it by calling `postToolSetToolSetNameToolInvoke` with its `toolSetName` and `name`. Calling `name` as though it were a tool of its own fails, because the only tools this server exposes are the handful listed in its tool list. When `requiredInputSchema` is present it lists the arguments the tool cannot run without, so a tool taking only required arguments can be invoked straight from a search result without calling `getToolSetToolSetNameTool` first. Call `getToolSetToolSetNameTool` when you need the optional arguments too."
             properties:
                 description:
                     description:
@@ -53,7 +53,7 @@ components:
                     type: string
                 name:
                     description:
-                        "Stable identifier of the operation within its tool-set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
+                        "Stable identifier of the operation within its tool set, such as `postSiteStructuredContent`. Not a callable tool: pass it verbatim as the `toolName` argument of `getToolSetToolSetNameTool` or `postToolSetToolSetNameToolInvoke`, alongside `toolSetName`."
                     type: string
                 prerequisites:
                     description:
@@ -64,11 +64,11 @@ components:
                 requiredInputSchema:
                     additionalProperties: true
                     description:
-                        JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getTool` for the full schema including optional arguments.
+                        JSON Schema covering only the tool's required arguments, returned when `includeRequiredInputSchema` is true. Enough to invoke the tool in the common case; call `getToolSetToolSetNameTool` for the full schema including optional arguments.
                     type: object
                 toolSetName:
                     description:
-                        Stable identifier of the tool-set that exposes this tool. Pass this verbatim as `toolSetName` to `getTool` and `invokeTool`.
+                        Stable identifier of the tool set that exposes this tool. Pass this verbatim as `toolSetName` to `getToolSetToolSetNameTool` and `postToolSetToolSetNameToolInvoke`.
                     type: string
             required:
                 -   name
@@ -80,18 +80,18 @@ components:
             properties:
                 description:
                     description:
-                        Curated, one-sentence description of what this tool-set can do, suitable for routing a natural-language request.
+                        Curated, one sentence description of what this tool set can do, suitable for routing a natural language request.
                     type: string
                 name:
                     description:
-                        Stable identifier of the tool-set. Pass this verbatim as `toolSetName` in subsequent calls.
+                        Stable identifier of the tool set. Pass this verbatim as `toolSetName` in subsequent calls.
                     type: string
             required:
                 -   name
             type: object
         ToolSummary:
             description:
-                A summary of a tool exposed by a tool-set.
+                A summary of a tool exposed by a tool set.
             properties:
                 description:
                     description:
@@ -99,14 +99,14 @@ components:
                     type: string
                 name:
                     description:
-                        Stable identifier of the tool within its tool-set. Pass this verbatim as `toolName` in subsequent calls.
+                        Stable identifier of the tool within its tool set. Pass this verbatim as `toolName` in subsequent calls.
                     type: string
             required:
                 -   name
             type: object
 info:
     description:
-        "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSearchPage`: pass what the user wants to do as `search` and it returns the most relevant tools across every tool-set, ranked. Set `includeRequiredInputSchema` and the top match comes back with the arguments it cannot run without, so you can go straight to `postToolSetToolSetNameToolInvoke`; call `getToolSetToolSetNameTool` first only when you need the optional arguments too. Search one action at a time, since it matches a single operation: a request spanning several steps needs one search per step. Do not begin by browsing the catalogue. `getToolSetsPage` and `getToolSetToolSetNameToolSummariesPage` list every tool-set and every operation in one, which costs more than ten times the context of a search and is rarely what you need; reach for them only when search has returned nothing relevant. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.0.4'."
+        "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSearchPage`: pass what the user wants to do as `search` and it returns the most relevant tools across every tool set, ranked. Set `includeRequiredInputSchema` and the top match comes back with the arguments it cannot run without, so you can go straight to `postToolSetToolSetNameToolInvoke`; call `getToolSetToolSetNameTool` first only when you need the optional arguments too. Search one action at a time, since it matches a single operation: a request spanning several steps needs one search per step. Do not begin by browsing the catalogue. `getToolSetsPage` and `getToolSetToolSetNameToolSummariesPage` list every tool set and every operation in one, which costs more than ten times the context of a search and is rarely what you need; reach for them only when search has returned nothing relevant. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.1.0'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -117,12 +117,12 @@ paths:
     "/tool-search":
         get:
             description:
-                "Use this first whenever the user asks for something you do not already know how to do in Liferay. Returns the most relevant tools across every tool-set, ranked by relevance. Pass its `toolSetName` and `name` to `getTool` for the full input schema, or set `includeRequiredInputSchema` to invoke the top match directly. A result may also carry `prerequisites`: each entry names the operation that resolves one of the tool's parameters, so invoke that operation rather than searching for it again. This is far cheaper than browsing with `getToolSets` and `getToolSummaries`; reach for those only when search returns nothing relevant. Search one action at a time. It matches a single operation, so a request spanning several steps must be broken into one search per step: for 'create a book store using objects', search 'create a custom object definition', then 'add a field to a custom object', then 'publish an object definition'. Searching the whole request at once matches on incidental words and returns unrelated tools. Phrase each search as verb plus object plus scope, keeping the user's own terms but writing them in English: 'upload a document to a site', 'create a blog entry'. The catalogue is indexed in English alone, so a search in any other language matches nothing at all, whatever language the conversation is being held in -- translate the request and search in English. If nothing relevant comes back, re-phrase and search again rather than raising `limit`."
+                "Use this first whenever the user asks for something you do not already know how to do in Liferay. Returns the most relevant tools across every tool set, ranked by relevance. Pass its `toolSetName` and `name` to `getToolSetToolSetNameTool` for the full input schema, or set `includeRequiredInputSchema` to invoke the top match directly. A result may also carry `prerequisites`: each entry names the operation that resolves one of the tool's parameters, so invoke that operation rather than searching for it again. This is far cheaper than browsing with `getToolSetsPage` and `getToolSetToolSetNameToolSummariesPage`; reach for those only when search returns nothing relevant. Search one action at a time. It matches a single operation, so a request spanning several steps must be broken into one search per step: for 'create a book store using objects', search 'create a custom object definition', then 'add a field to a custom object', then 'publish an object definition'. Searching the whole request at once matches on incidental words and returns unrelated tools. Phrase each search as verb plus object plus scope, keeping the user's own terms but writing them in English: 'upload a document to a site', 'create a blog entry'. The catalogue is indexed in English alone, so a search in any other language matches nothing at all, whatever language the conversation is being held in -- translate the request and search in English. If nothing relevant comes back, rephrase and search again rather than raising `limit`."
             operationId: getToolSearchPage
             parameters:
                 -   in: query
                     description:
-                        When true, each result carries `requiredInputSchema`, the tool's required arguments only. Use it to skip the `getTool` round trip when you expect to invoke the top match.
+                        When true, each result carries `requiredInputSchema`, the tool's required arguments only. Use it to skip the `getToolSetToolSetNameTool` round trip when you expect to invoke the top match.
                     name: includeRequiredInputSchema
                     required: false
                     schema:
@@ -136,7 +136,7 @@ paths:
                         type: integer
                 -   in: query
                     description:
-                        A natural-language description, in English, of what the user wants to do, for example "upload a document to a site" or "create a blog entry". Matched against every tool's name and description, which are indexed in English only.
+                        A natural language description, in English, of what the user wants to do, for example "upload a document to a site" or "create a blog entry". Matched against every tool's name and description, which are indexed in English only.
                     name: search
                     required: true
                     schema:
@@ -160,7 +160,7 @@ paths:
     "/tool-sets":
         get:
             description:
-                Use this only when `getToolSearchPage` has returned nothing relevant for the user's request. Searching is the first thing to try; this is the fallback for when it comes up empty. Returns every tool-set exposed by Liferay, each with a curated description. Pick the tool-set whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameToolSummariesPage` to see what tools it offers.
+                Use this only when `getToolSearchPage` has returned nothing relevant for the user's request. Searching is the first thing to try; this is the fallback for when it comes up empty. Returns every tool set exposed by Liferay, each with a curated description. Pick the tool set whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameToolSummariesPage` to see what tools it offers.
             operationId: getToolSetsPage
             responses:
                 200:
@@ -176,17 +176,17 @@ paths:
                                     $ref: "#/components/schemas/ToolSet"
                                 type: array
                     description:
-                        The available tool-sets.
+                        The available tool sets.
             tags: ["ToolSet"]
     "/tool-sets/{toolSetName}/tool-summaries":
         get:
             description:
-                Use this only as part of the browse fallback, once `getToolSearchPage` has come up empty and you have identified a tool-set with `getToolSetsPage`. Returns every tool in the tool-set, each with a `name` and a description, which for a large tool-set is a great deal of context. Pick the tool whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameTool` to see its input schema.
+                Use this only as part of the browse fallback, once `getToolSearchPage` has come up empty and you have identified a tool set with `getToolSetsPage`. Returns every tool in the tool set, each with a `name` and a description, which for a large tool set is a great deal of context. Pick the tool whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameTool` to see its input schema.
             operationId: getToolSetToolSetNameToolSummariesPage
             parameters:
                 -   in: path
                     description:
-                        The tool-set name returned by `getToolSetsPage`.
+                        The tool set name returned by `getToolSetsPage`.
                     name: toolSetName
                     required: true
                     schema:
@@ -205,7 +205,7 @@ paths:
                                     $ref: "#/components/schemas/ToolSummary"
                                 type: array
                     description:
-                        The tools exposed by the tool-set.
+                        The tools exposed by the tool set.
             tags: ["ToolSummary"]
     "/tool-sets/{toolSetName}/tools/{toolName}":
         get:
@@ -229,7 +229,7 @@ paths:
                         type: string
                 -   in: query
                     description:
-                        "When true, `inputSchema` is projected to what the tool declares it cannot run without, at every level: the arguments themselves and, within each one, its own required properties -- which is where nearly all of the saving is. Worth asking for when you intend to invoke rather than survey, but the saving varies with how well the operation is documented: across a sample of sixty create operations it trimmed 15% of them substantially, left 35% unchanged because they declare nothing as required, and averaged 1.5× overall. Where an operation under-declares, the trimmed schema can be missing an argument the API will still insist on, so treat a rejection as a reason to fetch the full schema rather than to retry."
+                        "When true, `inputSchema` is projected to what the tool declares it cannot run without, at every level: the arguments themselves and, within each one, its own required properties -- which is where nearly all of the saving is. Worth asking for when you intend to invoke rather than survey, but the saving varies with how well the operation is documented: across a sample of sixty create operations it trimmed 15% of them substantially, left 35% unchanged because they declare nothing as required, and averaged 1.5× overall. Where an operation underdeclares, the trimmed schema can be missing an argument the API will still insist on, so treat a rejection as a reason to fetch the full schema rather than to retry."
                     name: requiredInputSchemaOnly
                     required: false
                     schema:
@@ -249,7 +249,7 @@ paths:
     "/tool-sets/{toolSetName}/tools/{toolName}/invoke":
         post:
             description:
-                "Invokes a tool. Never build the request `body` from guesswork — it must match a schema you have actually seen, or the call fails on malformed input. Either schema will do. The `requiredInputSchema` on a `getToolSearchPage` result is enough whenever the required arguments cover what you need; fetch the full `inputSchema` with `getToolSetToolSetNameTool` when you also need optional arguments. A scope parameter accepts a name as well as an identifier — `siteId` takes the site's key, such as `Guest` — so resolving a site to its numeric ID beforehand is usually a wasted round trip. Keys are case-sensitive. Returns the tool's response body unchanged, which for a listing is large: Liferay entities carry their available languages, their permitted actions and every unset field. When you need only some of it, pass a `fields` query parameter naming what you want, as in `fields=id,name` — that turns a ten-row site listing from 6,400 bytes into 700, and a blog posting listing from 20,900 into 1,600."
+                "Invokes a tool. Never build the request `body` from guesswork — it must match a schema you have actually seen, or the call fails on malformed input. Either schema will do. The `requiredInputSchema` on a `getToolSearchPage` result is enough whenever the required arguments cover what you need; fetch the full `inputSchema` with `getToolSetToolSetNameTool` when you also need optional arguments. A scope parameter accepts a name as well as an identifier — `siteId` takes the site's key, such as `Guest` — so resolving a site to its numeric ID beforehand is usually a wasted round trip. Keys are case sensitive. Returns the tool's response body unchanged, which for a listing is large: Liferay entities carry their available languages, their permitted actions and every unset field. When you need only some of it, pass a `fields` query parameter naming what you want, as in `fields=id,name` — that turns a ten row site listing from 6,400 bytes into 700, and a blog posting listing from 20,900 into 1,600. Two answers are final and mean the operation is switched off on this instance: one naming a disabled feature flag, and one reporting an UnsupportedOperationException. Stop that step. Retrying it, invoking a similarly named operation in another tool set, invoking its batch form, and searching for a way around it all reach the same switch. Tell the user which step could not be done, naming the flag if the answer named one, and carry on with the rest."
             operationId: postToolSetToolSetNameToolInvoke
             parameters:
                 -   in: path
