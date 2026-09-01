@@ -39,15 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
-import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 
 /**
  * @author Alejandro Tardín
@@ -206,44 +197,6 @@ public class ToolSetUtil {
 
 			return content;
 		}
-	}
-
-	private static Set<String> _getOpenAPIPaths(ApplicationDTO applicationDTO) {
-		Set<String> openAPIPaths = new TreeSet<>();
-
-		for (ResourceDTO resourceDTO : applicationDTO.resourceDTOs) {
-			openAPIPaths.addAll(_getOpenAPIPaths(resourceDTO.resourceMethods));
-		}
-
-		if (openAPIPaths.isEmpty()) {
-			openAPIPaths.addAll(
-				_getOpenAPIPaths(applicationDTO.resourceMethods));
-		}
-
-		return openAPIPaths;
-	}
-
-	private static Set<String> _getOpenAPIPaths(
-		ResourceMethodInfoDTO[] resourceMethodInfoDTOs) {
-
-		Set<String> openAPIPaths = new TreeSet<>();
-
-		if (resourceMethodInfoDTOs == null) {
-			return openAPIPaths;
-		}
-
-		for (ResourceMethodInfoDTO resourceMethodInfoDTO :
-				resourceMethodInfoDTOs) {
-
-			String path = resourceMethodInfoDTO.path;
-
-			if ((path != null) && path.contains("/openapi")) {
-				openAPIPaths.add(
-					StringUtil.replace(path, "{type:json|yaml}", "json"));
-			}
-		}
-
-		return openAPIPaths;
 	}
 
 	private static Response _getResponse(Object value) throws Exception {
@@ -489,132 +442,6 @@ public class ToolSetUtil {
 		).type(
 			ContentTypes.TEXT_PLAIN_UTF8
 		).build();
-	}
-
-	private String _getDescription(Object service) {
-		if (service == null) {
-			return null;
-		}
-
-		Class<?> serviceClass = service.getClass();
-
-		OpenAPIDefinition openAPIDefinition = serviceClass.getAnnotation(
-			OpenAPIDefinition.class);
-
-		if (openAPIDefinition == null) {
-			return null;
-		}
-
-		Info info = openAPIDefinition.info();
-
-		String description = info.description();
-
-		if (description == null) {
-			return null;
-		}
-
-		return description;
-	}
-
-	private OpenAPIBrief _getOpenAPIBrief(String toolSetName) {
-		Map<String, OpenAPIBrief> openAPIBriefs = _getOpenAPIBriefs();
-
-		OpenAPIBrief openAPIBrief = openAPIBriefs.get(toolSetName);
-
-		if (openAPIBrief == null) {
-			throw new IllegalArgumentException(
-				"No tool-set was found with name \"" + toolSetName + "\"");
-		}
-
-		return openAPIBrief;
-	}
-
-	private Map<String, OpenAPIBrief> _getOpenAPIBriefs() {
-		Map<String, OpenAPIBrief> openAPIBriefs = new TreeMap<>();
-
-		JaxrsServiceRuntime jaxrsServiceRuntime =
-			_jaxrsServiceRuntimeSnapshot.get();
-
-		RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
-
-		Map<String, String> toolSetDescriptions = _getToolSetDescriptions();
-
-		for (ApplicationDTO applicationDTO : runtimeDTO.applicationDTOs) {
-			String base = applicationDTO.base;
-
-			if (Validator.isNull(base)) {
-				continue;
-			}
-
-			if (!base.startsWith(StringPool.SLASH)) {
-				base = StringPool.SLASH + base;
-			}
-
-			for (String openAPIPath : _getOpenAPIPaths(applicationDTO)) {
-				String basePath = base + _getVersionPath(openAPIPath);
-
-				openAPIBriefs.put(
-					StringUtil.replace(
-						basePath.substring(1), CharPool.SLASH, CharPool.DASH),
-					new OpenAPIBrief(
-						base, toolSetDescriptions.get(basePath), openAPIPath));
-			}
-		}
-
-		return openAPIBriefs;
-	}
-
-	private JSONObject _getOpenAPIJSONObject(
-		HttpServletRequest httpServletRequest, OpenAPIBrief openAPIBrief) {
-
-		return _openAPIJSONObjects.computeIfAbsent(
-			StringBundler.concat(
-				PortalUtil.getCompanyId(httpServletRequest), StringPool.POUND,
-				openAPIBrief._basePath, openAPIBrief._openAPIPath),
-			key -> {
-				String path =
-					openAPIBrief._basePath + openAPIBrief._openAPIPath;
-
-				try {
-					VulcanRequestForwarder vulcanRequestForwarder =
-						_vulcanRequestForwarderSnapshot.get();
-
-					VulcanRequestForwarder.Response response =
-						vulcanRequestForwarder.forward(
-							httpServletRequest,
-							new VulcanRequestForwarder.Request() {
-
-								@Override
-								public String getMethod() {
-									return "GET";
-								}
-
-								@Override
-								public String getPath() {
-									return path;
-								}
-
-								@Override
-								public User getUser() {
-									return _getUser(httpServletRequest);
-								}
-
-							});
-
-					if (response.getStatusCode() >= 300) {
-						throw new RuntimeException(
-							StringBundler.concat(
-								"HTTP ", response.getStatusCode(), " for ",
-								path, ": ", response.getContent()));
-					}
-
-					return JSONFactoryUtil.createJSONObject(
-						response.getContent());
-				}
-				catch (Exception exception) {
-					throw new RuntimeException(exception);
-				}
-			});
 	}
 
 	private static final int _MAX_SCHEMA_DEPTH = 4;
