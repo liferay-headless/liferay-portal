@@ -5,11 +5,13 @@
 
 package com.liferay.exportimport.web.internal.display.context;
 
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
 import com.liferay.exportimport.util.ScopeUtil;
 import com.liferay.exportimport.web.internal.constants.ExportImportFDSNames;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -56,9 +58,16 @@ public class ExportImportProcessesDisplayContext {
 	}
 
 	public CreationMenu getExportCreationMenu() {
-		return _getCreationMenu(
-			Constants.EXPORT, "mvcRenderCommandName",
-			"/export_import/view_new_export");
+		return CreationMenuBuilder.addPrimaryDropdownItem(
+			dropdownItem -> _setNewExportDropdownItem(
+				dropdownItem, LanguageUtil.get(_httpServletRequest, "new"),
+				StaticSiteExportConstants.OUTPUT_FORMAT_LAR)
+		).addPrimaryDropdownItem(
+			dropdownItem -> _setNewExportDropdownItem(
+				dropdownItem,
+				LanguageUtil.get(_httpServletRequest, "static-site"),
+				StaticSiteExportConstants.OUTPUT_FORMAT_STATIC_HTML)
+		).build();
 	}
 
 	public List<FDSActionDropdownItem> getExportFDSActionDropdownItems() {
@@ -257,6 +266,20 @@ public class ExportImportProcessesDisplayContext {
 		return StringBundler.concat(
 			LanguageUtil.get(_httpServletRequest, key), " ",
 			PortalUtil.getPortletTitle(portletId, _themeDisplay.getLocale()));
+	}
+
+	private void _setNewExportDropdownItem(
+		DropdownItem dropdownItem, String label, String outputFormat) {
+
+		dropdownItem.setHref(
+			_liferayPortletResponse.createRenderURL(), "mvcRenderCommandName",
+			"/export_import/view_new_export", Constants.CMD, Constants.EXPORT,
+			"groupId", String.valueOf(_groupId), "liveGroupId",
+			String.valueOf(_groupId), "outputFormat", outputFormat,
+			"privateLayout", String.valueOf(_privateLayout), "plid",
+			String.valueOf(_themeDisplay.getPlid()), "portletId",
+			_getPortletId(), "backURL", _themeDisplay.getURLCurrent());
+		dropdownItem.setLabel(label);
 	}
 
 	private String _exportProcessesAPIURL;

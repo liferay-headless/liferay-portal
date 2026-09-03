@@ -5,8 +5,10 @@
 
 package com.liferay.exportimport.rest.internal.resource.v1_0;
 
+import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.lar.DeletionSystemEventExporter;
 import com.liferay.exportimport.portlet.data.handler.provider.PortletDataHandlerProvider;
 import com.liferay.exportimport.rest.dto.v1_0.ExportPreview;
@@ -16,18 +18,23 @@ import com.liferay.exportimport.rest.internal.util.ParameterMapUtil;
 import com.liferay.exportimport.rest.internal.util.PermissionUtil;
 import com.liferay.exportimport.rest.internal.util.PreviewPortletDataHandlerUtil;
 import com.liferay.exportimport.rest.resource.v1_0.ExportPreviewResource;
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
+import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +52,8 @@ public class ExportPreviewResourceImpl extends BaseExportPreviewResourceImpl {
 	@Override
 	public ExportPreview getAssetLibraryExportPreview(
 			String assetLibraryExternalReferenceCode, String dateRangeType,
-			Date endDate, Long plid, String portletId, Date startDate)
+			Date endDate, String outputFormat, Long plid, String portletId,
+			Date startDate)
 		throws Exception {
 
 		return _getExportPreview(
@@ -53,37 +61,82 @@ public class ExportPreviewResourceImpl extends BaseExportPreviewResourceImpl {
 			GroupUtil.getAssetLibraryGroup(
 				contextCompany.getCompanyId(),
 				assetLibraryExternalReferenceCode),
-			GetterUtil.getLong(plid), portletId, startDate);
+			outputFormat, GetterUtil.getLong(plid), portletId, startDate);
 	}
 
 	@Override
 	public ExportPreview getExportPreview(
-			String dateRangeType, Date endDate, Long plid, String portletId,
-			Date startDate)
+			String dateRangeType, Date endDate, String outputFormat, Long plid,
+			String portletId, Date startDate)
 		throws Exception {
 
 		return _getExportPreview(
 			dateRangeType, endDate,
 			GroupUtil.getCompanyGroup(contextCompany.getCompanyId()),
-			GetterUtil.getLong(plid), portletId, startDate);
+			outputFormat, GetterUtil.getLong(plid), portletId, startDate);
 	}
 
 	@Override
 	public ExportPreview getSiteExportPreview(
 			String siteExternalReferenceCode, String dateRangeType,
-			Date endDate, Long plid, String portletId, Date startDate)
+			Date endDate, String outputFormat, Long plid, String portletId,
+			Date startDate)
 		throws Exception {
 
 		return _getExportPreview(
 			dateRangeType, endDate,
 			GroupUtil.getSiteGroup(
 				contextCompany.getCompanyId(), siteExternalReferenceCode),
-			GetterUtil.getLong(plid), portletId, startDate);
+			outputFormat, GetterUtil.getLong(plid), portletId, startDate);
+	}
+
+	/**
+	 * Narrows the preview to the one selection a static site export can act
+	 * on, which is which pages to render. Everything else the preview offers
+	 * describes models to serialize, and a static site export serializes
+	 * rendered pages instead.
+	 */
+	private Map<String, List<PreviewPortletDataHandler>>
+		_filterStaticSitePreviewPortletDataHandlersMap(
+			Map<String, List<PreviewPortletDataHandler>>
+				previewPortletDataHandlersMap) {
+
+		List<PreviewPortletDataHandler> previewPortletDataHandlers =
+			previewPortletDataHandlersMap.get(
+				ExportImportConstants.SECTION_KEY_SITE_BUILDER);
+
+		if (previewPortletDataHandlers == null) {
+			return new LinkedHashMap<>();
+		}
+
+		List<PreviewPortletDataHandler> filteredPreviewPortletDataHandlers =
+			new ArrayList<>();
+
+		for (PreviewPortletDataHandler previewPortletDataHandler :
+				previewPortletDataHandlers) {
+
+			if (Objects.equals(
+					previewPortletDataHandler.getName(),
+					_LAYOUT_SET_LAYOUTS_PORTLET_DATA_NAME)) {
+
+				filteredPreviewPortletDataHandlers.add(
+					previewPortletDataHandler);
+			}
+		}
+
+		if (filteredPreviewPortletDataHandlers.isEmpty()) {
+			return new LinkedHashMap<>();
+		}
+
+		return HashMapBuilder.<String, List<PreviewPortletDataHandler>>put(
+			ExportImportConstants.SECTION_KEY_SITE_BUILDER,
+			filteredPreviewPortletDataHandlers
+		).build();
 	}
 
 	private ExportPreview _getExportPreview(
-			String dateRangeType, Date endDate, Group group, long plid,
-			String portletId, Date startDate)
+			String dateRangeType, Date endDate, Group group,
+			String outputFormat, long plid, String portletId, Date startDate)
 		throws Exception {
 
 		long groupId = group.getGroupId();
@@ -113,29 +166,48 @@ public class ExportPreviewResourceImpl extends BaseExportPreviewResourceImpl {
 				contextUser);
 
 		Map<String, List<PreviewPortletDataHandler>>
-			previewPortletDataHandlersMap =
+			allPreviewPortletDataHandlersMap =
 				PreviewPortletDataHandlerUtil.getPreviewPortletDataHandlersMap(
 					_deletionSystemEventExporter, group, locale, parameterMap,
 					plid, _portletDataContextFactory,
 					_portletDataHandlerProvider, portlets, portletScoped,
 					contextUser.getTimeZone());
 
+		Map<String, List<PreviewPortletDataHandler>>
+			previewPortletDataHandlersMap = allPreviewPortletDataHandlersMap;
+
+		if (Objects.equals(
+				outputFormat,
+				StaticSiteExportConstants.OUTPUT_FORMAT_STATIC_HTML)) {
+
+			previewPortletDataHandlersMap =
+				_filterStaticSitePreviewPortletDataHandlersMap(
+					allPreviewPortletDataHandlersMap);
+		}
+
+		Map<String, List<PreviewPortletDataHandler>>
+			finalPreviewPortletDataHandlersMap = previewPortletDataHandlersMap;
+
 		return new ExportPreview() {
 			{
 				setAdditionCount(
 					() -> PreviewPortletDataHandlerUtil.getAdditionCount(
-						previewPortletDataHandlersMap));
+						finalPreviewPortletDataHandlersMap));
 				setDeletionCount(
 					() -> PreviewPortletDataHandlerUtil.getDeletionCount(
-						previewPortletDataHandlersMap));
+						finalPreviewPortletDataHandlersMap));
 				setPreviewPortletDataHandlerSections(
 					() ->
 						PreviewPortletDataHandlerUtil.
 							toPreviewPortletDataHandlerSections(
-								locale, previewPortletDataHandlersMap));
+								locale, finalPreviewPortletDataHandlersMap));
 			}
 		};
 	}
+
+	private static final String _LAYOUT_SET_LAYOUTS_PORTLET_DATA_NAME =
+		PortletDataHandlerKeys.PORTLET_DATA + "_" +
+			LayoutAdminPortletKeys.LAYOUT_SET_LAYOUTS;
 
 	@Reference
 	private DeletionSystemEventExporter _deletionSystemEventExporter;

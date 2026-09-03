@@ -22,8 +22,10 @@ const LABEL_ID = 'dataSelection-label';
 
 export default function DataSelection({
 	commentsAndRatingsEnabled = false,
+	dateFilterEnabled = true,
 	deletionCount = 0,
 	deletionsDescription,
+	deletionsEnabled = true,
 	deletionsLabel,
 	itemsCount,
 	lastPublishDate,
@@ -32,14 +34,17 @@ export default function DataSelection({
 	onApplyFilter,
 	pageTreeModalConfiguration,
 	permissionsDescription,
+	permissionsEnabled = true,
 	permissionsLabel,
 	previewPortletDataHandlerSections,
 	process = 'export',
 	subtitle,
 }: {
 	commentsAndRatingsEnabled?: boolean;
+	dateFilterEnabled?: boolean;
 	deletionCount?: number;
 	deletionsDescription: string;
+	deletionsEnabled?: boolean;
 	deletionsLabel: string;
 	itemsCount?: number;
 	lastPublishDate?: string;
@@ -48,6 +53,7 @@ export default function DataSelection({
 	onApplyFilter: (dateFilterValues: DateFilterValues) => void;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
 	permissionsDescription: string;
+	permissionsEnabled?: boolean;
 	permissionsLabel: string;
 	previewPortletDataHandlerSections: PreviewPortletDataHandlerSection[];
 	process?: ExportImportProcess;
@@ -62,30 +68,37 @@ export default function DataSelection({
 				title={Liferay.Language.get('data-selection')}
 			/>
 
-			<ClayLayout.Sheet className="option-group">
-				<FormikFieldCheckbox
-					description={permissionsDescription}
-					label={permissionsLabel}
-					name="permissions"
-				/>
+			{(permissionsEnabled ||
+				(deletionsEnabled && deletionCount > 0)) && (
+				<ClayLayout.Sheet className="option-group">
+					{permissionsEnabled && (
+						<FormikFieldCheckbox
+							description={permissionsDescription}
+							label={permissionsLabel}
+							name="permissions"
+						/>
+					)}
 
-				{deletionCount > 0 && (
-					<FormikFieldCheckbox
-						description={deletionsDescription}
-						label={deletionsLabel}
-						name="deletions"
+					{deletionsEnabled && deletionCount > 0 && (
+						<FormikFieldCheckbox
+							description={deletionsDescription}
+							label={deletionsLabel}
+							name="deletions"
+						/>
+					)}
+				</ClayLayout.Sheet>
+			)}
+
+			{dateFilterEnabled && (
+				<ClayLayout.Sheet className="mt-4">
+					<FormikFieldDateFilter
+						itemsCount={itemsCount}
+						lastPublishDate={lastPublishDate}
+						name="dateFilter"
+						onApplyFilter={onApplyFilter}
 					/>
-				)}
-			</ClayLayout.Sheet>
-
-			<ClayLayout.Sheet className="mt-4">
-				<FormikFieldDateFilter
-					itemsCount={itemsCount}
-					lastPublishDate={lastPublishDate}
-					name="dateFilter"
-					onApplyFilter={onApplyFilter}
-				/>
-			</ClayLayout.Sheet>
+				</ClayLayout.Sheet>
+			)}
 
 			<div className="sr-only" role="status">
 				{loading

@@ -7,6 +7,13 @@ import {RequestPortletDataHandler} from './portletDataHandler';
 
 export type ExportImportProcess = 'export' | 'import' | 'publish';
 
+export const OUTPUT_FORMATS = {
+	LAR: 'LAR',
+	STATIC_HTML: 'STATIC_HTML',
+} as const;
+
+export type OutputFormat = (typeof OUTPUT_FORMATS)[keyof typeof OUTPUT_FORMATS];
+
 export type DateRangeType =
 	| 'ALL'
 	| 'DATE_RANGE'
@@ -28,6 +35,7 @@ export interface ExportProcessRequest {
 	endDate?: string;
 	logo?: boolean;
 	name: string;
+	outputFormat?: OutputFormat;
 	permissions?: boolean;
 	ratings?: boolean;
 	requestPortletDataHandlers?: RequestPortletDataHandler[];

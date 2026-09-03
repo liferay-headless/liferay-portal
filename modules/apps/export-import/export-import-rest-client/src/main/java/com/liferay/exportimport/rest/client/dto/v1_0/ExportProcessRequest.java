@@ -156,6 +156,35 @@ public class ExportProcessRequest implements Cloneable, Serializable {
 
 	protected String name;
 
+	public OutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+
+	public String getOutputFormatAsString() {
+		if (outputFormat == null) {
+			return null;
+		}
+
+		return outputFormat.toString();
+	}
+
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
+	}
+
+	public void setOutputFormat(
+		UnsafeSupplier<OutputFormat, Exception> outputFormatUnsafeSupplier) {
+
+		try {
+			outputFormat = outputFormatUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected OutputFormat outputFormat;
+
 	public Boolean getPermissions() {
 		return permissions;
 	}
@@ -372,5 +401,38 @@ public class ExportProcessRequest implements Cloneable, Serializable {
 
 	}
 
+	public static enum OutputFormat {
+
+		LAR("LAR"), STATIC_HTML("STATIC_HTML");
+
+		public static OutputFormat create(String value) {
+			for (OutputFormat outputFormat : values()) {
+				if (Objects.equals(outputFormat.getValue(), value) ||
+					Objects.equals(outputFormat.name(), value)) {
+
+					return outputFormat;
+				}
+			}
+
+			return null;
+		}
+
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private OutputFormat(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
+
 }
-// LIFERAY-REST-BUILDER-HASH:-773468954
+// LIFERAY-REST-BUILDER-HASH:1229753600

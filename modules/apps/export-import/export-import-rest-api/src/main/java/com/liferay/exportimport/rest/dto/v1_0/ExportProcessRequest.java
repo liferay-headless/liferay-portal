@@ -318,6 +318,64 @@ public class ExportProcessRequest implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _nameSupplier;
 
+	@io.swagger.v3.oas.annotations.media.Schema(
+		description = "The shape of the exported file. LAR writes the portal's own archive, which only another Liferay instance can read. STATIC_HTML writes the selected pages as a tree of static HTML files and the assets they reference, ready to be unzipped into a web server's document root."
+	)
+	@JsonGetter("outputFormat")
+	@Valid
+	public OutputFormat getOutputFormat() {
+		if (_outputFormatSupplier != null) {
+			outputFormat = _outputFormatSupplier.get();
+
+			_outputFormatSupplier = null;
+		}
+
+		return outputFormat;
+	}
+
+	@JsonIgnore
+	public String getOutputFormatAsString() {
+		OutputFormat outputFormat = getOutputFormat();
+
+		if (outputFormat == null) {
+			return null;
+		}
+
+		return outputFormat.toString();
+	}
+
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
+
+		_outputFormatSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setOutputFormat(
+		UnsafeSupplier<OutputFormat, Exception> outputFormatUnsafeSupplier) {
+
+		_outputFormatSupplier = () -> {
+			try {
+				return outputFormatUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField(
+		description = "The shape of the exported file. LAR writes the portal's own archive, which only another Liferay instance can read. STATIC_HTML writes the selected pages as a tree of static HTML files and the assets they reference, ready to be unzipped into a web server's document root."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected OutputFormat outputFormat;
+
+	@JsonIgnore
+	private Supplier<OutputFormat> _outputFormatSupplier;
+
 	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getPermissions() {
 		if (_permissionsSupplier != null) {
@@ -724,6 +782,20 @@ public class ExportProcessRequest implements Serializable {
 			sb.append("\"");
 		}
 
+		OutputFormat outputFormat = getOutputFormat();
+
+		if (outputFormat != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"outputFormat\": ");
+
+			sb.append("\"");
+			sb.append(outputFormat);
+			sb.append("\"");
+		}
+
 		Boolean permissions = getPermissions();
 
 		if (permissions != null) {
@@ -873,6 +945,44 @@ public class ExportProcessRequest implements Serializable {
 
 	}
 
+	@GraphQLName("OutputFormat")
+	public static enum OutputFormat {
+
+		LAR("LAR"), STATIC_HTML("STATIC_HTML");
+
+		@JsonCreator
+		public static OutputFormat create(String value) {
+			if ((value == null) || value.equals("")) {
+				return null;
+			}
+
+			for (OutputFormat outputFormat : values()) {
+				if (Objects.equals(outputFormat.getValue(), value)) {
+					return outputFormat;
+				}
+			}
+
+			throw new IllegalArgumentException("Invalid enum value: " + value);
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private OutputFormat(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
+
 	private static String _escape(Object object) {
 		return StringUtil.replace(
 			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
@@ -962,4 +1072,4 @@ public class ExportProcessRequest implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1417832215
+// LIFERAY-REST-BUILDER-HASH:-1000861432

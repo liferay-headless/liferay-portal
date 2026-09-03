@@ -7,6 +7,7 @@ package com.liferay.exportimport.web.internal.display.context;
 
 import com.liferay.exportimport.rest.dto.v1_0.ExportPreview;
 import com.liferay.exportimport.rest.resource.v1_0.ExportPreviewResource;
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
 import com.liferay.exportimport.util.ScopeUtil;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate.Scope;
 import com.liferay.petra.string.StringBundler;
@@ -31,6 +32,8 @@ import java.net.URLEncoder;
 
 import java.nio.charset.StandardCharsets;
 
+import java.util.Objects;
+
 /**
  * @author Daniel Raposo
  * @author Jorge González
@@ -42,7 +45,7 @@ public class ExportImportProcessDisplayContext {
 		ExportPreviewResource.Factory exportPreviewResourceFactory, Group group,
 		long groupId, HttpServletRequest httpServletRequest,
 		LiferayPortletResponse liferayPortletResponse, long liveGroupId,
-		boolean privateLayout) {
+		String outputFormat, boolean privateLayout) {
 
 		_backMVCRenderCommandName = backMVCRenderCommandName;
 		_exportPreviewResourceFactory = exportPreviewResourceFactory;
@@ -52,6 +55,13 @@ public class ExportImportProcessDisplayContext {
 		_liferayPortletResponse = liferayPortletResponse;
 		_liveGroupId = liveGroupId;
 		_privateLayout = privateLayout;
+
+		if (Validator.isBlank(outputFormat)) {
+			_outputFormat = StaticSiteExportConstants.OUTPUT_FORMAT_LAR;
+		}
+		else {
+			_outputFormat = outputFormat;
+		}
 	}
 
 	public ExportImportProcessDisplayContext(
@@ -62,7 +72,8 @@ public class ExportImportProcessDisplayContext {
 
 		this(
 			backMVCRenderCommandName, null, group, groupId, httpServletRequest,
-			liferayPortletResponse, liveGroupId, privateLayout);
+			liferayPortletResponse, liveGroupId,
+			StaticSiteExportConstants.OUTPUT_FORMAT_LAR, privateLayout);
 	}
 
 	public String getBackURL() {
@@ -99,7 +110,8 @@ public class ExportImportProcessDisplayContext {
 			return _exportPreviewAPIURL;
 		}
 
-		_exportPreviewAPIURL = _getResourceAPIURL("/export-preview");
+		_exportPreviewAPIURL = _getResourceAPIURL(
+			"/export-preview", "outputFormat", _outputFormat);
 
 		return _exportPreviewAPIURL;
 	}
@@ -164,6 +176,10 @@ public class ExportImportProcessDisplayContext {
 		return _getTitle("new-import-process");
 	}
 
+	public String getOutputFormat() {
+		return _outputFormat;
+	}
+
 	public Scope getScope() {
 		if (!Validator.isBlank(_getPortletId())) {
 			return Scope.PORTLET;
@@ -185,6 +201,17 @@ public class ExportImportProcessDisplayContext {
 	}
 
 	public boolean isLookAndFeelEnabled() {
+
+		// A static site export writes rendered pages, so the theme is already
+		// baked into them and there is nothing left to choose
+
+		if (Objects.equals(
+				_outputFormat,
+				StaticSiteExportConstants.OUTPUT_FORMAT_STATIC_HTML)) {
+
+			return false;
+		}
+
 		if ((getScope() != Scope.PORTLET) &&
 			ScopeUtil.isLookAndFeelEnabled(_group)) {
 
@@ -227,20 +254,22 @@ public class ExportImportProcessDisplayContext {
 			long plid = ParamUtil.getLong(_httpServletRequest, "plid");
 			String portletId = _getPortletId();
 
+			String outputFormat = _outputFormat;
+
 			if (ScopeUtil.isInstanceScoped(_group)) {
 				return exportPreviewResource.getExportPreview(
-					null, null, plid, portletId, null);
+					null, null, outputFormat, plid, portletId, null);
 			}
 
 			if (_group.isDepot()) {
 				return exportPreviewResource.getAssetLibraryExportPreview(
-					_group.getExternalReferenceCode(), null, null, plid,
-					portletId, null);
+					_group.getExternalReferenceCode(), null, null, outputFormat,
+					plid, portletId, null);
 			}
 
 			return exportPreviewResource.getSiteExportPreview(
-				_group.getExternalReferenceCode(), null, null, plid, portletId,
-				null);
+				_group.getExternalReferenceCode(), null, null, outputFormat,
+				plid, portletId, null);
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get export preview", exception);
@@ -253,17 +282,42 @@ public class ExportImportProcessDisplayContext {
 		return ParamUtil.getString(_httpServletRequest, "portletId");
 	}
 
-	private String _getResourceAPIURL(String endpoint) {
+	private String _getResourceAPIURL(
+		String endpoint, String... parameterNamesAndValues) {
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(ScopeUtil.getAPIURL(_group, endpoint));
+
 		String portletId = _getPortletId();
 
-		if (Validator.isBlank(portletId)) {
-			return ScopeUtil.getAPIURL(_group, endpoint);
+		if (!Validator.isBlank(portletId)) {
+			sb.append("?plid=");
+			sb.append(ParamUtil.getLong(_httpServletRequest, "plid"));
+			sb.append("&portletId=");
+			sb.append(_encode(portletId));
 		}
 
-		return StringBundler.concat(
-			ScopeUtil.getAPIURL(_group, endpoint), "?plid=",
-			ParamUtil.getLong(_httpServletRequest, "plid"), "&portletId=",
-			_encode(portletId));
+		for (int i = 0; i < parameterNamesAndValues.length; i += 2) {
+			String value = parameterNamesAndValues[i + 1];
+
+			if (Validator.isBlank(value)) {
+				continue;
+			}
+
+			if (sb.index() == 1) {
+				sb.append("?");
+			}
+			else {
+				sb.append("&");
+			}
+
+			sb.append(parameterNamesAndValues[i]);
+			sb.append("=");
+			sb.append(_encode(value));
+		}
+
+		return sb.toString();
 	}
 
 	private String _getTitle(String key) {
@@ -297,6 +351,7 @@ public class ExportImportProcessDisplayContext {
 	private String _importProcessAPIURL;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final long _liveGroupId;
+	private final String _outputFormat;
 	private final boolean _privateLayout;
 
 }

@@ -46,6 +46,8 @@ renderResponse.setTitle(exportImportProcessDisplayContext.getExportTitle());
 			).put(
 				"lookAndFeelEnabled", exportImportProcessDisplayContext.isLookAndFeelEnabled()
 			).put(
+				"outputFormat", exportImportProcessDisplayContext.getOutputFormat()
+			).put(
 				"pageTreeModalConfiguration",
 				HashMapBuilder.<String, Object>put(
 					"groupId", liveGroupId

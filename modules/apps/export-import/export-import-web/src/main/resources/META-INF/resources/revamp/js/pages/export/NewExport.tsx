@@ -19,6 +19,7 @@ import {ContentSelection} from '../../components/forms/content_selector/ContentS
 import {usePreview} from '../../hooks/usePreview';
 import {postExportProcess} from '../../services/postExportProcess';
 import {Preview} from '../../types/exportImportPreview';
+import {OUTPUT_FORMATS, OutputFormat} from '../../types/exportImportProcess';
 import {
 	getSelectedDeletionCount,
 	getSelectedItemsCount,
@@ -43,6 +44,7 @@ export function NewExport({
 	exportPreviewAPIURL,
 	exportProcessAPIURL,
 	lookAndFeelEnabled = false,
+	outputFormat = OUTPUT_FORMATS.LAR,
 	pageTreeModalConfiguration,
 }: {
 	backURL: string;
@@ -51,8 +53,10 @@ export function NewExport({
 	exportPreviewAPIURL: string;
 	exportProcessAPIURL: string;
 	lookAndFeelEnabled?: boolean;
+	outputFormat?: OutputFormat;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
 }) {
+	const staticSite = outputFormat === OUTPUT_FORMATS.STATIC_HTML;
 	const {appliedDateFilterRef, error, handleApplyFilter, loading, preview} =
 		usePreview(exportPreviewAPIURL, exportPreview);
 
@@ -81,6 +85,7 @@ export function NewExport({
 						...toProcessRequestFlags(values.contentSelection),
 						deletions: values.deletions,
 						name: values.name,
+						outputFormat,
 						permissions: values.permissions,
 						requestPortletDataHandlers:
 							toRequestPortletDataHandlers(
@@ -114,12 +119,20 @@ export function NewExport({
 							placeholder={Liferay.Language.get(
 								'add-an-export-name'
 							)}
-							subtitle={Liferay.Language.get(
-								'provide-a-descriptive-name-for-your-file'
-							)}
+							subtitle={
+								staticSite
+									? Liferay.Language.get(
+											'the-selected-pages-will-be-exported-as-a-zip-of-static-html-files-ready-to-be-unzipped-into-a-web-server'
+										)
+									: Liferay.Language.get(
+											'provide-a-descriptive-name-for-your-file'
+										)
+							}
 							title={sub(
 								Liferay.Language.get('x-details'),
-								Liferay.Language.get('export')
+								staticSite
+									? Liferay.Language.get('static-site')
+									: Liferay.Language.get('export')
 							)}
 						/>
 
@@ -127,6 +140,7 @@ export function NewExport({
 							commentsAndRatingsEnabled={
 								commentsAndRatingsEnabled
 							}
+							dateFilterEnabled={!staticSite}
 							deletionCount={getSelectedDeletionCount(
 								preview?.deletionCount,
 								previewPortletDataHandlerSections,
@@ -135,6 +149,7 @@ export function NewExport({
 							deletionsDescription={Liferay.Language.get(
 								'deletions-help-export'
 							)}
+							deletionsEnabled={!staticSite}
 							deletionsLabel={Liferay.Language.get(
 								'export-individual-deletions'
 							)}
@@ -152,6 +167,7 @@ export function NewExport({
 							permissionsDescription={Liferay.Language.get(
 								'export-import-permissions-help'
 							)}
+							permissionsEnabled={!staticSite}
 							permissionsLabel={Liferay.Language.get(
 								'export-permissions'
 							)}

@@ -7,6 +7,7 @@ package com.liferay.exportimport.internal.background.task;
 
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -20,6 +21,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 
 import java.io.File;
+
+import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -60,13 +64,36 @@ public class LayoutExportBackgroundTaskExecutor
 		File larFile = _exportImportLocalService.exportLayoutsAsFile(
 			exportImportConfiguration);
 
+		String extension = _getExtension(exportImportConfiguration);
+
 		_backgroundTaskManager.addBackgroundTaskAttachment(
 			userId, backgroundTask.getBackgroundTaskId(),
 			StringBundler.concat(
-				name, StringPool.DASH, Time.getTimestamp(), ".lar"),
-			name + ".lar", larFile);
+				name, StringPool.DASH, Time.getTimestamp(), extension),
+			name + extension, larFile);
 
 		return BackgroundTaskResult.SUCCESS;
+	}
+
+	private String _getExtension(
+		ExportImportConfiguration exportImportConfiguration) {
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)exportImportConfiguration.getSettingsMap(
+			).get(
+				"parameterMap"
+			);
+
+		if ((parameterMap != null) &&
+			Objects.equals(
+				MapUtil.getString(
+					parameterMap, StaticSiteExportConstants.OUTPUT_FORMAT),
+				StaticSiteExportConstants.OUTPUT_FORMAT_STATIC_HTML)) {
+
+			return ".zip";
+		}
+
+		return ".lar";
 	}
 
 	@Reference

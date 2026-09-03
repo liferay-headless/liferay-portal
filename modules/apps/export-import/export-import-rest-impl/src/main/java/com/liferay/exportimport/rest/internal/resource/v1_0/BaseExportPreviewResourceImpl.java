@@ -63,6 +63,11 @@ public abstract class BaseExportPreviewResourceImpl
 				name = "endDate"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
+				description = "The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "outputFormat"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "plid"
 			),
@@ -99,6 +104,9 @@ public abstract class BaseExportPreviewResourceImpl
 			@jakarta.ws.rs.QueryParam("endDate")
 			Date endDate,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@jakarta.ws.rs.QueryParam("outputFormat")
+			String outputFormat,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.ws.rs.QueryParam("plid")
 			Long plid,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
@@ -126,6 +134,11 @@ public abstract class BaseExportPreviewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "endDate"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				description = "The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "outputFormat"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -158,6 +171,9 @@ public abstract class BaseExportPreviewResourceImpl
 			@jakarta.ws.rs.QueryParam("endDate")
 			Date endDate,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@jakarta.ws.rs.QueryParam("outputFormat")
+			String outputFormat,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.ws.rs.QueryParam("plid")
 			Long plid,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
@@ -189,6 +205,11 @@ public abstract class BaseExportPreviewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "endDate"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				description = "The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.",
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "outputFormat"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
@@ -224,6 +245,9 @@ public abstract class BaseExportPreviewResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.ws.rs.QueryParam("endDate")
 			Date endDate,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@jakarta.ws.rs.QueryParam("outputFormat")
+			String outputFormat,
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@jakarta.ws.rs.QueryParam("plid")
 			Long plid,
@@ -683,4 +707,4 @@ public abstract class BaseExportPreviewResourceImpl
 		LogFactoryUtil.getLog(BaseExportPreviewResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-443313810
+// LIFERAY-REST-BUILDER-HASH:906792321

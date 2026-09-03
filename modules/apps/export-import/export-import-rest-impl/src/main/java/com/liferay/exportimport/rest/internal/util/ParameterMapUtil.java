@@ -13,6 +13,7 @@ import com.liferay.exportimport.rest.dto.v1_0.ImportProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.RequestPortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.RequestPortletDataHandlerControl;
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
@@ -191,6 +192,13 @@ public class ParameterMapUtil {
 				String.valueOf(
 					GetterUtil.getBoolean(
 						exportProcessRequest.getThemeSettings()))
+			});
+		parameterMap.put(
+			StaticSiteExportConstants.OUTPUT_FORMAT,
+			new String[] {
+				GetterUtil.getString(
+					exportProcessRequest.getOutputFormatAsString(),
+					StaticSiteExportConstants.OUTPUT_FORMAT_LAR)
 			});
 
 		return parameterMap;

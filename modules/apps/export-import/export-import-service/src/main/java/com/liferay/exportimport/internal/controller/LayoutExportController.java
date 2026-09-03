@@ -23,6 +23,8 @@ import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.exportimport.kernel.lifecycle.constants.ExportImportLifecycleConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.lar.DeletionSystemEventExporter;
+import com.liferay.exportimport.staticsite.StaticSiteExporter;
+import com.liferay.exportimport.staticsite.constants.StaticSiteExportConstants;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
@@ -34,6 +36,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
@@ -140,6 +143,10 @@ public class LayoutExportController implements ExportController {
 
 	protected File doExport(PortletDataContext portletDataContext)
 		throws Exception {
+
+		if (_isStaticSiteExport(portletDataContext)) {
+			return _staticSiteExport(portletDataContext);
+		}
 
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
@@ -406,8 +413,48 @@ public class LayoutExportController implements ExportController {
 			PROCESS_FLAG_LAYOUT_EXPORT_IN_PROCESS;
 	}
 
+	private boolean _isStaticSiteExport(PortletDataContext portletDataContext) {
+		return Objects.equals(
+			MapUtil.getString(
+				portletDataContext.getParameterMap(),
+				StaticSiteExportConstants.OUTPUT_FORMAT),
+			StaticSiteExportConstants.OUTPUT_FORMAT_STATIC_HTML);
+	}
+
+	private File _staticSiteExport(PortletDataContext portletDataContext)
+		throws Exception {
+
+		StaticSiteExporter staticSiteExporter =
+			_staticSiteExporterSnapshot.get();
+
+		if (staticSiteExporter == null) {
+			throw new IllegalStateException(
+				"No \"StaticSiteExporter\" is registered");
+		}
+
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
+
+		staticSiteExporter.export(portletDataContext);
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"Exporting the static site takes " + stopWatch.getTime() +
+					" ms");
+		}
+
+		ZipWriter zipWriter = portletDataContext.getZipWriter();
+
+		return zipWriter.getFile();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutExportController.class);
+
+	private static final Snapshot<StaticSiteExporter>
+		_staticSiteExporterSnapshot = new Snapshot<>(
+			LayoutExportController.class, StaticSiteExporter.class, null, true);
 
 	@Reference
 	private BackgroundTaskLocalService _backgroundTaskLocalService;

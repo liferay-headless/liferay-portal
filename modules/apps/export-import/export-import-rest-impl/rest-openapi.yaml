@@ -80,6 +80,12 @@ components:
                     type: boolean
                 name:
                     type: string
+                outputFormat:
+                    default: LAR
+                    description:
+                        The shape of the exported file. LAR writes the portal's own archive, which only another Liferay instance can read. STATIC_HTML writes the selected pages as a tree of static HTML files and the assets they reference, ready to be unzipped into a web server's document root.
+                    enum: [LAR, STATIC_HTML]
+                    type: string
                 permissions:
                     default: false
                     type: boolean
@@ -710,6 +716,13 @@ paths:
                         format: date-time
                         type: string
                 -   in: query
+                    description:
+                        The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.
+                    name: outputFormat
+                    schema:
+                        enum: [LAR, STATIC_HTML]
+                        type: string
+                -   in: query
                     name: plid
                     schema:
                         format: int64
@@ -985,6 +998,13 @@ paths:
                     name: endDate
                     schema:
                         format: date-time
+                        type: string
+                -   in: query
+                    description:
+                        The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.
+                    name: outputFormat
+                    schema:
+                        enum: [LAR, STATIC_HTML]
                         type: string
                 -   in: query
                     name: plid
@@ -1675,6 +1695,13 @@ paths:
                     name: endDate
                     schema:
                         format: date-time
+                        type: string
+                -   in: query
+                    description:
+                        The output format the preview is for. STATIC_HTML narrows the preview to the selections a static site export can honor.
+                    name: outputFormat
+                    schema:
+                        enum: [LAR, STATIC_HTML]
                         type: string
                 -   in: query
                     name: plid

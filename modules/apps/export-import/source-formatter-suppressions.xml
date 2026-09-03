@@ -4,4 +4,10 @@
 	<checkstyle>
 		<suppress checks="StaticVariableNameCheck" files="export-import-web/src/main/java/com/liferay/exportimport/web/internal/configuration/ExportImportWebConfigurationValues\.java" />
 	</checkstyle>
+	<source-check>
+		<suppress checks="IllegalImportsCheck" files="export-import-static-site-impl/src/main/java/com/liferay/exportimport/staticsite/internal/StaticSiteExporterImpl\.java" />
+		<suppress checks="IllegalImportsCheck" files="export-import-static-site-impl/src/main/java/com/liferay/exportimport/staticsite/internal/asset/StaticSiteAssetHarvester\.java" />
+		<suppress checks="IllegalImportsCheck" files="export-import-static-site-impl/src/main/java/com/liferay/exportimport/staticsite/internal/render/LayoutHTMLRenderer\.java" />
+		<suppress checks="IllegalImportsCheck" files="export-import-static-site-impl/src/test/java/com/liferay/exportimport/staticsite/internal/asset/StaticSiteAssetHarvesterTest\.java" />
+	</source-check>
 </suppressions>

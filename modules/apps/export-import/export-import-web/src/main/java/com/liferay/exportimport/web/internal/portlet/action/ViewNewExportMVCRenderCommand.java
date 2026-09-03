@@ -50,6 +50,7 @@ public class ViewNewExportMVCRenderCommand implements MVCRenderCommand {
 				_portal.getHttpServletRequest(renderRequest),
 				_portal.getLiferayPortletResponse(renderResponse),
 				ParamUtil.getLong(renderRequest, "liveGroupId", groupId),
+				ParamUtil.getString(renderRequest, "outputFormat"),
 				ParamUtil.getBoolean(renderRequest, "privateLayout")));
 
 		return "/revamp/export/new_export.jsp";
