@@ -20,6 +20,7 @@ import {
 	buildToolChildren,
 	buildToolWaves,
 	getAssignedToolIds,
+	getAvailableToolSets,
 	getEligibleToolIds,
 	getSelectedTools,
 	openErrorToast,
@@ -131,13 +132,18 @@ export default function AddToolsModal({
 		};
 	}, [onClose, profileERC]);
 
+	const availableToolSets = useMemo(
+		() => getAvailableToolSets(toolSets, profileTools),
+		[profileTools, toolSets]
+	);
+
 	const initialItems = useMemo(
 		() =>
-			toolSets.map((toolSet) => ({
+			availableToolSets.map((toolSet) => ({
 				id: toolSet.name,
 				name: toolSet.name,
 			})),
-		[toolSets]
+		[availableToolSets]
 	);
 
 	const selectedTools = getSelectedTools(
@@ -394,40 +400,28 @@ export default function AddToolsModal({
 								item.children ? (
 									<TreeView.Item>
 										<TreeView.ItemStack
-											disabled={item.children.every(
-												(child) => child.assigned
-											)}
 											expandOnClick={false}
 											expanderDisabled={false}
 											onClick={(event) =>
 												event.preventDefault()
 											}
 										>
-											{item.children.some(
-												(child) => child.assigned
-											) ? (
-												<span>
-													<ClayCheckbox
-														aria-label={item.name}
-														onChange={() =>
-															toggleAssignedToolSet(
-																item
-															)
-														}
-														onClick={(event) =>
-															event.stopPropagation()
-														}
-														{...getAssignedToolSetState(
-															item
-														)}
-													/>
-												</span>
-											) : (
+											<span>
 												<ClayCheckbox
 													aria-label={item.name}
-													checked
+													onChange={() =>
+														toggleAssignedToolSet(
+															item
+														)
+													}
+													onClick={(event) =>
+														event.stopPropagation()
+													}
+													{...getAssignedToolSetState(
+														item
+													)}
 												/>
-											)}
+											</span>
 
 											<span className="font-weight-normal pl-1 text-3">
 												{item.name}

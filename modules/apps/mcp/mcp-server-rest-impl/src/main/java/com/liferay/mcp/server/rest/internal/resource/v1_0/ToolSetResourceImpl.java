@@ -31,7 +31,7 @@ public class ToolSetResourceImpl extends BaseToolSetResourceImpl {
 			throw new UnsupportedOperationException();
 		}
 
-		return ToolSetUtil.getToolSetsPage();
+		return ToolSetUtil.getToolSetsPage(contextHttpServletRequest);
 	}
 
 }

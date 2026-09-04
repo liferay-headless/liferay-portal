@@ -21,9 +21,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -39,6 +41,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.ws.rs.core.Response;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +67,19 @@ import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
  */
 public class ToolSetUtil {
 
+	public static void clearNumberOfTools(long companyId, String toolSetName) {
+		Map<String, Integer> numberOfToolsMap = _numberOfToolsMaps.get(
+			companyId);
+
+		if (numberOfToolsMap != null) {
+			numberOfToolsMap.remove(toolSetName);
+		}
+	}
+
+	public static void clearNumberOfToolsMapCache(long companyId) {
+		_numberOfToolsMaps.remove(companyId);
+	}
+
 	public static void clearOpenAPIJSONObjectCache(long companyId) {
 		Set<String> keys = _openAPIJSONObjects.keySet();
 
@@ -81,8 +97,44 @@ public class ToolSetUtil {
 			toolName);
 	}
 
-	public static Page<ToolSet> getToolSetsPage() {
+	public static String getToolSetName(String restContextPath) {
+		if (Validator.isNull(restContextPath)) {
+			return null;
+		}
+
+		String path = restContextPath;
+
+		if (path.startsWith(Portal.PATH_MODULE)) {
+			path = path.substring(Portal.PATH_MODULE.length());
+		}
+
+		if (path.startsWith(StringPool.SLASH)) {
+			path = path.substring(1);
+		}
+
 		Map<String, OpenAPIBrief> openAPIBriefs = _getOpenAPIBriefs();
+
+		String[] parts = StringUtil.split(path, CharPool.SLASH);
+
+		for (int i = parts.length; i > 0; i--) {
+			String toolSetName = StringUtil.merge(
+				ArrayUtil.subset(parts, 0, i), StringPool.DASH);
+
+			if (openAPIBriefs.containsKey(toolSetName)) {
+				return toolSetName;
+			}
+		}
+
+		return null;
+	}
+
+	public static Page<ToolSet> getToolSetsPage(
+		HttpServletRequest httpServletRequest) {
+
+		Map<String, OpenAPIBrief> openAPIBriefs = _getOpenAPIBriefs();
+
+		Map<String, Integer> numberOfToolsMap = _getNumberOfToolsMap(
+			httpServletRequest, openAPIBriefs);
 
 		return Page.of(
 			TransformUtil.transform(
@@ -97,6 +149,11 @@ public class ToolSetUtil {
 							});
 
 						setName(entry::getKey);
+
+						setNumberOfTools(
+							() -> _getNumberOfTools(
+								httpServletRequest, numberOfToolsMap,
+								entry.getValue(), entry.getKey()));
 					}
 				}));
 	}
@@ -148,7 +205,7 @@ public class ToolSetUtil {
 			}
 
 			if (Objects.equals(toolName, "getToolSetsPage")) {
-				return _getResponse(getToolSetsPage());
+				return _getResponse(getToolSetsPage(httpServletRequest));
 			}
 
 			if (Objects.equals(toolName, "postToolSetToolSetNameToolInvoke")) {
@@ -188,6 +245,46 @@ public class ToolSetUtil {
 		).type(
 			ContentTypes.TEXT_PLAIN_UTF8
 		).build();
+	}
+
+	private static Map<String, Integer> _createNumberOfToolsMap(
+		HttpServletRequest httpServletRequest,
+		Map<String, OpenAPIBrief> openAPIBriefs) {
+
+		OpenAPIBrief openAPIBrief = openAPIBriefs.get(_AGGREGATE_TOOL_SET_NAME);
+
+		if (openAPIBrief == null) {
+			return Collections.emptyMap();
+		}
+
+		try {
+			return OpenAPIUtil.getNumberOfToolsMap(
+				_getOpenAPIJSONObject(httpServletRequest, openAPIBrief),
+				openAPIBriefs.keySet());
+		}
+		catch (RuntimeException runtimeException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(runtimeException);
+			}
+
+			return Collections.emptyMap();
+		}
+	}
+
+	private static long _getChangeCount() {
+		Bundle bundle = FrameworkUtil.getBundle(ToolSetUtil.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		ServiceReference<JaxrsServiceRuntime> serviceReference =
+			bundleContext.getServiceReference(JaxrsServiceRuntime.class);
+
+		if (serviceReference == null) {
+			return -1;
+		}
+
+		return GetterUtil.getLong(
+			serviceReference.getProperty("service.changecount"), -1);
 	}
 
 	private static String _getContent(String content) {
@@ -242,6 +339,53 @@ public class ToolSetUtil {
 		return description;
 	}
 
+	private static Integer _getNumberOfTools(
+		HttpServletRequest httpServletRequest,
+		Map<String, Integer> numberOfToolsMap, OpenAPIBrief openAPIBrief,
+		String toolSetName) {
+
+		if (Objects.equals(toolSetName, _AGGREGATE_TOOL_SET_NAME)) {
+			return null;
+		}
+
+		Integer numberOfTools = numberOfToolsMap.get(toolSetName);
+
+		if (numberOfTools != null) {
+			return numberOfTools;
+		}
+
+		// The entry was invalidated on its own, so refill it from this tool
+		// set's document instead of regenerating the aggregate
+
+		try {
+			List<ToolSummary> toolSummaries = OpenAPIUtil.getToolSummaries(
+				_getOpenAPIJSONObject(httpServletRequest, openAPIBrief));
+
+			numberOfTools = toolSummaries.size();
+
+			numberOfToolsMap.put(toolSetName, numberOfTools);
+
+			return numberOfTools;
+		}
+		catch (RuntimeException runtimeException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(runtimeException);
+			}
+
+			return null;
+		}
+	}
+
+	private static Map<String, Integer> _getNumberOfToolsMap(
+		HttpServletRequest httpServletRequest,
+		Map<String, OpenAPIBrief> openAPIBriefs) {
+
+		return _numberOfToolsMaps.computeIfAbsent(
+			PortalUtil.getCompanyId(httpServletRequest),
+			companyId -> new ConcurrentHashMap<>(
+				_createNumberOfToolsMap(httpServletRequest, openAPIBriefs)));
+	}
+
 	private static OpenAPIBrief _getOpenAPIBrief(String toolSetName) {
 		Map<String, OpenAPIBrief> openAPIBriefs = _getOpenAPIBriefs();
 
@@ -256,10 +400,27 @@ public class ToolSetUtil {
 	}
 
 	private static Map<String, OpenAPIBrief> _getOpenAPIBriefs() {
-		Map<String, OpenAPIBrief> openAPIBriefs = new TreeMap<>();
+		long changeCount = _getChangeCount();
+
+		Map<String, OpenAPIBrief> openAPIBriefs = _openAPIBriefs.get(
+			changeCount);
+
+		if (openAPIBriefs != null) {
+			return openAPIBriefs;
+		}
+
+		openAPIBriefs = new TreeMap<>();
 
 		JaxrsServiceRuntime jaxrsServiceRuntime =
 			_jaxrsServiceRuntimeSnapshot.get();
+
+		// The JAX-RS runtime is unavailable while the batch engine seeds the
+		// system object definitions at startup, so report no tool sets rather
+		// than failing the caller
+
+		if (jaxrsServiceRuntime == null) {
+			return openAPIBriefs;
+		}
 
 		RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
 
@@ -285,6 +446,12 @@ public class ToolSetUtil {
 					new OpenAPIBrief(
 						base, toolSetDescriptions.get(basePath), openAPIPath));
 			}
+		}
+
+		if (changeCount != -1) {
+			_openAPIBriefs.clear();
+
+			_openAPIBriefs.put(changeCount, openAPIBriefs);
 		}
 
 		return openAPIBriefs;
@@ -458,6 +625,8 @@ public class ToolSetUtil {
 		return openAPIPath.substring(0, index);
 	}
 
+	private static final String _AGGREGATE_TOOL_SET_NAME = "openapi";
+
 	private static final String _TOOL_SET_NAME = "mcp-server-v1.0";
 
 	private static final Log _log = LogFactoryUtil.getLog(ToolSetUtil.class);
@@ -465,6 +634,10 @@ public class ToolSetUtil {
 	private static final Snapshot<JaxrsServiceRuntime>
 		_jaxrsServiceRuntimeSnapshot = new Snapshot<>(
 			ToolSetUtil.class, JaxrsServiceRuntime.class);
+	private static final Map<Long, Map<String, Integer>> _numberOfToolsMaps =
+		new ConcurrentHashMap<>();
+	private static final Map<Long, Map<String, OpenAPIBrief>> _openAPIBriefs =
+		new ConcurrentHashMap<>();
 	private static final Map<String, JSONObject> _openAPIJSONObjects =
 		new ConcurrentHashMap<>();
 	private static final Snapshot<VulcanRequestForwarder>

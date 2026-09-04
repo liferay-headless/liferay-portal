@@ -72,6 +72,16 @@ public class ToolSetSerDes {
 			sb.append("\"");
 		}
 
+		if (toolSet.getNumberOfTools() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"numberOfTools\": ");
+
+			sb.append(toolSet.getNumberOfTools());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -104,6 +114,14 @@ public class ToolSetSerDes {
 			map.put("name", String.valueOf(toolSet.getName()));
 		}
 
+		if (toolSet.getNumberOfTools() == null) {
+			map.put("numberOfTools", null);
+		}
+		else {
+			map.put(
+				"numberOfTools", String.valueOf(toolSet.getNumberOfTools()));
+		}
+
 		return map;
 	}
 
@@ -127,6 +145,9 @@ public class ToolSetSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				return false;
 			}
+			else if (Objects.equals(jsonParserFieldName, "numberOfTools")) {
+				return false;
+			}
 
 			return false;
 		}
@@ -144,6 +165,12 @@ public class ToolSetSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					toolSet.setName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "numberOfTools")) {
+				if (jsonParserFieldValue != null) {
+					toolSet.setNumberOfTools(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 		}
@@ -227,4 +254,4 @@ public class ToolSetSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1647045452
+// LIFERAY-REST-BUILDER-HASH:1968601621

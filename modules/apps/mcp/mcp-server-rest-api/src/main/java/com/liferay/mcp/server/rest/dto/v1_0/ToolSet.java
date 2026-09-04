@@ -140,6 +140,51 @@ public class ToolSet implements Serializable {
 	@JsonIgnore
 	private Supplier<String> _nameSupplier;
 
+	@io.swagger.v3.oas.annotations.media.Schema(
+		description = "Number of tools this tool-set exposes. Use it to gauge the cost of listing the tool-set's tools. Absent when the number is not known."
+	)
+	public Integer getNumberOfTools() {
+		if (_numberOfToolsSupplier != null) {
+			numberOfTools = _numberOfToolsSupplier.get();
+
+			_numberOfToolsSupplier = null;
+		}
+
+		return numberOfTools;
+	}
+
+	public void setNumberOfTools(Integer numberOfTools) {
+		this.numberOfTools = numberOfTools;
+
+		_numberOfToolsSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setNumberOfTools(
+		UnsafeSupplier<Integer, Exception> numberOfToolsUnsafeSupplier) {
+
+		_numberOfToolsSupplier = () -> {
+			try {
+				return numberOfToolsUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField(
+		description = "Number of tools this tool-set exposes. Use it to gauge the cost of listing the tool-set's tools. Absent when the number is not known."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Integer numberOfTools;
+
+	@JsonIgnore
+	private Supplier<Integer> _numberOfToolsSupplier;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -197,6 +242,18 @@ public class ToolSet implements Serializable {
 			sb.append(_escape(name));
 
 			sb.append("\"");
+		}
+
+		Integer numberOfTools = getNumberOfTools();
+
+		if (numberOfTools != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"numberOfTools\": ");
+
+			sb.append(numberOfTools);
 		}
 
 		sb.append("}");
@@ -300,4 +357,4 @@ public class ToolSet implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:708170744
+// LIFERAY-REST-BUILDER-HASH:-1632554458
