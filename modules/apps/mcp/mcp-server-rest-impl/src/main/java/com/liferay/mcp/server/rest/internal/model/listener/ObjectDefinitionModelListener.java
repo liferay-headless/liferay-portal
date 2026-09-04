@@ -7,6 +7,8 @@ package com.liferay.mcp.server.rest.internal.model.listener;
 
 import com.liferay.mcp.server.rest.internal.util.ToolSetUtil;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 
@@ -21,14 +23,12 @@ public class ObjectDefinitionModelListener
 
 	@Override
 	public void onAfterCreate(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		_clearCaches(objectDefinition);
 	}
 
 	@Override
 	public void onAfterRemove(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		_clearCaches(objectDefinition);
 	}
 
 	@Override
@@ -36,8 +36,30 @@ public class ObjectDefinitionModelListener
 		ObjectDefinition originalObjectDefinition,
 		ObjectDefinition objectDefinition) {
 
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		_clearCaches(objectDefinition);
 	}
+
+	private void _clearCaches(ObjectDefinition objectDefinition) {
+		try {
+			String toolSetName = ToolSetUtil.getToolSetName(
+				objectDefinition.getRESTContextPath());
+
+			if (toolSetName != null) {
+				ToolSetUtil.clearNumberOfTools(
+					objectDefinition.getCompanyId(), toolSetName);
+			}
+
+			ToolSetUtil.clearOpenAPIJSONObjectCache(
+				objectDefinition.getCompanyId());
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception);
+			}
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ObjectDefinitionModelListener.class);
 
 }
