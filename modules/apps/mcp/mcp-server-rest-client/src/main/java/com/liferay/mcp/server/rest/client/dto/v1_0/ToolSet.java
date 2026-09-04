@@ -65,6 +65,27 @@ public class ToolSet implements Cloneable, Serializable {
 
 	protected String name;
 
+	public Integer getNumberOfTools() {
+		return numberOfTools;
+	}
+
+	public void setNumberOfTools(Integer numberOfTools) {
+		this.numberOfTools = numberOfTools;
+	}
+
+	public void setNumberOfTools(
+		UnsafeSupplier<Integer, Exception> numberOfToolsUnsafeSupplier) {
+
+		try {
+			numberOfTools = numberOfToolsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Integer numberOfTools;
+
 	@Override
 	public ToolSet clone() throws CloneNotSupportedException {
 		return (ToolSet)super.clone();
@@ -97,4 +118,4 @@ public class ToolSet implements Cloneable, Serializable {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:1606074518
+// LIFERAY-REST-BUILDER-HASH:263220988
