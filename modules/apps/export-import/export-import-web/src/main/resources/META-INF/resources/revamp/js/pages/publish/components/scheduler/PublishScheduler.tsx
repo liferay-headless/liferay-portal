@@ -17,6 +17,7 @@ import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
 import {FieldRadio} from '../../../../components/forms/FieldRadio';
 import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
 import FieldText from '../../../../components/forms/FieldText';
+import {isCompleteDateTime} from './cron';
 import {getScheduleSummary} from './summary';
 import {
 	IntervalUnit,
@@ -41,6 +42,20 @@ const MONTH_MAX_DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const MONTH_VALUES = MONTHS.map((month) => month.value);
 
 const DATE_TIME_PLACEHOLDER = `${DATE_FORMAT} HH:MM`.toUpperCase();
+
+const withDefaultTime = (value: string, defaultTime: string) => {
+	if (isCompleteDateTime(value)) {
+		return value;
+	}
+
+	const [datePart, timePart = ''] = value.split(' ');
+
+	if (!isCompleteDateTime(`${datePart} 00:00`) || !timePart.includes('-')) {
+		return value;
+	}
+
+	return `${datePart} ${defaultTime}`;
+};
 
 export default function PublishScheduler({
 	cronExpressionErrorMessage,
@@ -187,7 +202,10 @@ export default function PublishScheduler({
 								onBlur={onStartDateTimeBlur}
 								onChange={(startDateTime) =>
 									set({
-										startDateTime: startDateTime as string,
+										startDateTime: withDefaultTime(
+											startDateTime as string,
+											'00:00'
+										),
 									})
 								}
 								placeholder={DATE_TIME_PLACEHOLDER}
@@ -482,7 +500,10 @@ export default function PublishScheduler({
 								onBlur={onEndDateTimeBlur}
 								onChange={(endDateTime) =>
 									set({
-										endDateTime: endDateTime as string,
+										endDateTime: withDefaultTime(
+											endDateTime as string,
+											'23:59'
+										),
 									})
 								}
 								placeholder={DATE_TIME_PLACEHOLDER}
