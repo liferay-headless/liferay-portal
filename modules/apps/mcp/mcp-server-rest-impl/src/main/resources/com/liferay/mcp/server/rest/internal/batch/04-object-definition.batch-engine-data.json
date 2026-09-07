@@ -55,6 +55,31 @@
 					"type": "String"
 				}
 			],
+			"objectRelationships": [
+				{
+					"deletionType": "cascade",
+					"externalReferenceCode": "L_MCP_SERVER_PROFILE_TOOL_TO_L_MCP_SERVER_RESTRICTED_FIELD",
+					"label": {
+						"en_US": "MCP Server Profile Tool to MCP Server Restricted Fields"
+					},
+					"name": "mcpServerToolToRestrictedFields",
+					"objectDefinitionExternalReferenceCode1": "L_MCP_SERVER_PROFILE_TOOL",
+					"objectDefinitionExternalReferenceCode2": "L_MCP_SERVER_RESTRICTED_FIELD",
+					"objectDefinitionName2": "MCPServerRestrictedField",
+					"objectDefinitionSystem2": true,
+					"objectField": {
+						"label": {
+							"en_US": "MCP Server Profile Tool to MCP Server Restricted Fields"
+						},
+						"required": true
+					},
+					"parameterObjectFieldId": 0,
+					"parameterObjectFieldName": "",
+					"reverse": false,
+					"system": true,
+					"type": "oneToMany"
+				}
+			],
 			"panelCategoryKey": "control_panel.object",
 			"pluralLabel": {
 				"en_US": "MCP Server Profile Tools"

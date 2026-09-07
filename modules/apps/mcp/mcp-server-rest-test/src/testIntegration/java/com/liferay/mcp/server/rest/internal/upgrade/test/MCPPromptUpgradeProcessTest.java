@@ -99,8 +99,8 @@ public class MCPPromptUpgradeProcessTest {
 
 		UserTestUtil.setUser(_user);
 
-		_deleteObjectDefinition("L_MCP_SERVER_PROFILE_TOOL");
 		_deleteObjectDefinition("L_MCP_SERVER_PROFILE");
+		_deleteObjectDefinition("L_MCP_SERVER_PROFILE_TOOL");
 		_deleteObjectDefinition("L_MCP_SERVER_PROMPT");
 
 		ListTypeDefinition listTypeDefinition =

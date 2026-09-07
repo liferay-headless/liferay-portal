@@ -7,9 +7,12 @@ package com.liferay.mcp.server.rest.internal.model.listener.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.mcp.server.rest.test.util.MCPServerTestUtil;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -27,6 +30,7 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -117,6 +121,20 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 				dataMaskObjectEntry.getObjectEntryId(), 1,
 				mcpServerProfileObjectEntryExternalReferenceCode);
 
+		ObjectEntry mcpServerProfileToolObjectEntry =
+			MCPServerTestUtil.addMCPServerProfileToolObjectEntry(
+				mcpServerProfileObjectEntryExternalReferenceCode,
+				"getMCPServerProfilesPage", "mcp-server-profiles");
+
+		ObjectEntry mcpServerRestrictedFieldObjectEntry =
+			MCPServerTestUtil.addMCPServerRestrictedFieldObjectEntry(
+				"description", mcpServerProfileToolObjectEntry);
+
+		Assert.assertEquals(
+			1,
+			_getMCPServerRestrictedFieldsCount(
+				mcpServerProfileToolObjectEntry));
+
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
 				new ConfigurationTemporarySwapper(
 					"com.liferay.portal.security.audit.router.configuration." +
@@ -152,6 +170,16 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 				"MCP server profile was deleted.",
 				MCPServerTestUtil.getAuditedDeleteReason(
 					mcpServerProfileDataMaskObjectEntry));
+
+			Assert.assertEquals(
+				0,
+				_getMCPServerRestrictedFieldsCount(
+					mcpServerProfileToolObjectEntry));
+
+			Assert.assertEquals(
+				"MCP server profile was deleted.",
+				MCPServerTestUtil.getAuditedDeleteReason(
+					mcpServerRestrictedFieldObjectEntry));
 		}
 	}
 
@@ -166,12 +194,47 @@ public class MCPServerProfileObjectEntryModelListenerTest {
 		return mcpServerProfileDataMaskObjectEntries.size();
 	}
 
+	private int _getMCPServerRestrictedFieldsCount(
+			ObjectEntry mcpServerProfileToolObjectEntry)
+		throws Exception {
+
+		int count = 0;
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.
+				fetchObjectDefinitionByExternalReferenceCode(
+					"L_MCP_SERVER_RESTRICTED_FIELD",
+					TestPropsValues.getCompanyId());
+
+		for (ObjectEntry objectEntry :
+				_objectEntryLocalService.getObjectEntries(
+					0, objectDefinition.getObjectDefinitionId(),
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
+
+			Map<String, Serializable> values = objectEntry.getValues();
+
+			if (Objects.equals(
+					mcpServerProfileToolObjectEntry.getExternalReferenceCode(),
+					values.get(
+						"r_mcpServerToolToRestrictedFields_" +
+							"l_mcpServerProfileToolERC"))) {
+
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	private static final String[] _SYSTEM_DATA_MASK_EXTERNAL_REFERENCE_CODES = {
 		"L_DATA_MASK_IBAN", "L_DATA_MASK_CREDIT_CARD_NUMBER",
 		"L_DATA_MASK_EMAIL_ADDRESS", "L_DATA_MASK_IPV4", "L_DATA_MASK_IPV6",
 		"L_DATA_MASK_NATIONAL_ID_BSN", "L_DATA_MASK_NATIONAL_ID_DNI_NIF",
 		"L_DATA_MASK_NATIONAL_ID_SSN", "L_DATA_MASK_PHONE_NUMBER"
 	};
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
