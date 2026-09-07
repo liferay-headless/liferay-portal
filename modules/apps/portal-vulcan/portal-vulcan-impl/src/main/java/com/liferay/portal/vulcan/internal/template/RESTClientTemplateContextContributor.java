@@ -14,7 +14,9 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.vulcan.http.VulcanRequestForwarder;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -48,55 +50,99 @@ public class RESTClientTemplateContextContributor
 
 			_contextObjects = contextObjects;
 			_httpServletRequest = httpServletRequest;
+
+			_results = _getResults(contextObjects, httpServletRequest);
 		}
 
 		public Object get(String path) throws Exception {
+			Object result = _results.get(path);
+
+			if (result != null) {
+				return result;
+			}
+
+			VulcanRequestForwarder.Response response;
+
 			try {
-				return _get(path);
+				response = _forward(path);
 			}
 			catch (Throwable throwable) {
 				_log.error(throwable, throwable);
 
 				throw throwable;
 			}
-		}
 
-		private Object _get(String path) throws Exception {
-			VulcanRequestForwarder.Response response =
-				_vulcanRequestForwarder.forward(
-					_httpServletRequest,
-					new VulcanRequestForwarder.Request() {
-
-						@Override
-						public String getMethod() {
-							return "GET";
-						}
-
-						@Override
-						public String getPath() {
-							return path;
-						}
-
-						@Override
-						public User getUser() {
-							return (User)_contextObjects.get("user");
-						}
-
-					});
+			result = response.getContent();
 
 			if (Objects.equals(
 					response.getContentType(), ContentTypes.APPLICATION_JSON)) {
 
-				return _jsonFactory.looseDeserialize(response.getContent());
+				result = _jsonFactory.looseDeserialize(response.getContent());
 			}
 
-			return response.getContent();
+			if (response.getStatusCode() < HttpServletResponse.SC_BAD_REQUEST) {
+				_results.put(path, result);
+			}
+
+			return result;
+		}
+
+		private VulcanRequestForwarder.Response _forward(String path)
+			throws Exception {
+
+			return _vulcanRequestForwarder.forward(
+				_httpServletRequest,
+				new VulcanRequestForwarder.Request() {
+
+					@Override
+					public String getMethod() {
+						return "GET";
+					}
+
+					@Override
+					public String getPath() {
+						return path;
+					}
+
+					@Override
+					public User getUser() {
+						return (User)_contextObjects.get("user");
+					}
+
+				});
+		}
+
+		@SuppressWarnings("unchecked")
+		private Map<String, Object> _getResults(
+			Map<String, Object> contextObjects,
+			HttpServletRequest httpServletRequest) {
+
+			if (httpServletRequest == null) {
+				return (Map<String, Object>)contextObjects.computeIfAbsent(
+					_RESULTS_KEY, key -> new HashMap<>());
+			}
+
+			Map<String, Object> results =
+				(Map<String, Object>)httpServletRequest.getAttribute(
+					_RESULTS_KEY);
+
+			if (results == null) {
+				results = new HashMap<>();
+
+				httpServletRequest.setAttribute(_RESULTS_KEY, results);
+			}
+
+			return results;
 		}
 
 		private final Map<String, Object> _contextObjects;
 		private final HttpServletRequest _httpServletRequest;
+		private final Map<String, Object> _results;
 
 	}
+
+	private static final String _RESULTS_KEY =
+		RESTClientTemplateContextContributor.class.getName() + "#results";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RESTClientTemplateContextContributor.class);
