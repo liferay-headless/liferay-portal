@@ -13,9 +13,17 @@
 	},
 	"items": [
 		{
-			"description": "Default MCP profile: the four mcp-server tools an AI orchestrates to use any Liferay tool (list tool-sets, list tools, fetch a tool's input schema, invoke).",
+			"description": "Default MCP profile: the four mcp-server tools an AI orchestrates to use any Liferay tool (list tool sets, list tools, fetch a tool's input schema, invoke).",
 			"externalReferenceCode": "L_MCP_SERVER_DEFAULT_PROFILE",
+			"instructions": "",
 			"name": "default",
+			"profileStatus": "active"
+		},
+		{
+			"description": "Tool search MCP profile: the default tools plus getToolSearchPage, which finds the tools for an action instead of reading the catalogue. Needs Elasticsearch or OpenSearch.",
+			"externalReferenceCode": "L_MCP_SERVER_TOOL_SEARCH_PROFILE",
+			"instructions": "These tools reach every operation Liferay exposes, through a catalogue far too large to read. Start with getToolSearchPage. Set includeRequiredInputSchema and the top result carries the arguments it cannot run without, so postToolSetToolSetNameToolInvoke can follow immediately. A search result names an operation reachable through this server, not a tool you can call: run it with postToolSetToolSetNameToolInvoke, passing the result's toolSetName and name. The tools listed here are the only ones that exist, so calling a name from a result as though it were one of them fails. Count the repetitions before you search: when the same operation would run ten or more times, say so in the search, as in \"add twenty books at once\", and prefer the batch operation that comes back. It answers 202 with an import task rather than a result, so confirm it by invoking getImportTask in headless-batch-engine-v1.0 with the id it returned, rather than searching for a way to check. Search in the words a user would use, not Liferay's: a published object definition exposes its entries under the object's own name, so \"create a pet store\" finds them and \"create an object entry\" does not. The reverse holds for a kind of thing Liferay does not model at all: nothing creates a ticket or a webinar, so when creating one finds nothing plausible, define an object definition for it and use the tool set that publishing it registers. Do not open the catalogue to begin with. getToolSetsPage and getToolSetToolSetNameToolSummariesPage list every tool set and every operation within one, costing many times the context of a search.",
+			"name": "tool-search",
 			"profileStatus": "active"
 		}
 	]
