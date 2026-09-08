@@ -145,6 +145,16 @@ describe('schedule summary wording', () => {
 		'year': 'Year',
 	};
 
+	function getStartsSentence(
+		partialScheduleValues: Partial<ScheduleValues>
+	): string {
+		const summary = getScheduleSummary(
+			buildScheduleValues(partialScheduleValues)
+		) as string;
+
+		return summary.slice(summary.indexOf('The process starts'));
+	}
+
 	function getRepeatSentence(
 		partialScheduleValues: Partial<ScheduleValues>
 	): string {
@@ -242,5 +252,46 @@ describe('schedule summary wording', () => {
 				unit: IntervalUnit.Year,
 			})
 		).toBe('The process repeats every Year in july on Day 4.');
+	});
+
+	it('shows the start date time while the repeat time is synced', () => {
+		const startTimeText = new Date(
+			START_DATE_TIME.replace(' ', 'T')
+		).toLocaleTimeString(Liferay.ThemeDisplay.getBCP47LanguageId(), {
+			hour: 'numeric',
+			minute: '2-digit',
+		});
+
+		expect(getStartsSentence({unit: IntervalUnit.Week})).toBe(
+			`The process starts on ${new Date(
+				START_DATE_TIME.replace(' ', 'T')
+			).toLocaleDateString(
+				Liferay.ThemeDisplay.getBCP47LanguageId()
+			)} at ${startTimeText} and never ends.`
+		);
+	});
+
+	it('shows the independent repeat time once the repeat time is unsynced', () => {
+		const repeatTimeText = new Date(2026, 0, 1, 0, 0).toLocaleTimeString(
+			Liferay.ThemeDisplay.getBCP47LanguageId(),
+			{
+				hour: 'numeric',
+				minute: '2-digit',
+			}
+		);
+
+		expect(
+			getStartsSentence({
+				repeatOnTime: '00:00',
+				repeatOnTimeSynced: false,
+				unit: IntervalUnit.Week,
+			})
+		).toBe(
+			`The process starts on ${new Date(
+				START_DATE_TIME.replace(' ', 'T')
+			).toLocaleDateString(
+				Liferay.ThemeDisplay.getBCP47LanguageId()
+			)} at ${repeatTimeText} and never ends.`
+		);
 	});
 });
