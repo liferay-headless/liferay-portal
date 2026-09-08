@@ -368,6 +368,14 @@
 							}
 						}
 					}
+				},
+				"responses": {
+					"default": {
+						"content": {
+							"application/json": {
+							}
+						}
+					}
 				}
 			},
 			"put": {

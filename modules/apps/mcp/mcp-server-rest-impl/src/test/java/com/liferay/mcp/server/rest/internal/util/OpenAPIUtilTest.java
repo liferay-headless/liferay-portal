@@ -274,6 +274,46 @@ public class OpenAPIUtilTest {
 	}
 
 	@Test
+	public void testGetToolOutputSchema() throws Exception {
+		JSONObject itemJSONObject = JSONUtil.getValueAsJSONObject(
+			JSONFactoryUtil.createJSONObject(
+				_read("post_test_v1.0_items.json")),
+			"JSONObject/properties", "JSONObject/body");
+
+		_testGetToolOutputSchema(itemJSONObject, "getItem");
+		_testGetToolOutputSchema(
+			JSONUtil.put(
+				"items", itemJSONObject
+			).put(
+				"type", "array"
+			),
+			"getItems");
+		_testGetToolOutputSchema(
+			JSONUtil.put(
+				"properties",
+				JSONUtil.put(
+					"items",
+					JSONUtil.put(
+						"items", itemJSONObject
+					).put(
+						"type", "array"
+					)
+				).put(
+					"page", JSONUtil.put("type", "integer")
+				).put(
+					"totalCount", JSONUtil.put("type", "integer")
+				)
+			).put(
+				"type", "object"
+			),
+			"getItemsPage");
+
+		Assert.assertNull(_getOutputSchema("patchItem"));
+		Assert.assertNull(_getOutputSchema("postItem"));
+		Assert.assertNull(_getOutputSchema("postNoContent"));
+	}
+
+	@Test
 	public void testGetToolSummaries() {
 		List<ToolSummary> toolSummaries = OpenAPIUtil.getToolSummaries(
 			_openAPIJSONObject);
@@ -402,6 +442,12 @@ public class OpenAPIUtilTest {
 		return tool.getInputSchema();
 	}
 
+	private Map<String, ?> _getOutputSchema(String toolName) {
+		Tool tool = OpenAPIUtil.getTool(true, _openAPIJSONObject, toolName);
+
+		return tool.getOutputSchema();
+	}
+
 	private String _read(String fileName) throws Exception {
 		return StringUtil.read(
 			getClass().getResourceAsStream("dependencies/" + fileName));
@@ -459,6 +505,19 @@ public class OpenAPIUtilTest {
 
 		_testGetTool(
 			expectedDescription, expectedSchemaFileName, true, toolName);
+	}
+
+	private void _testGetToolOutputSchema(
+			JSONObject expectedJSONObject, String toolName)
+		throws Exception {
+
+		JSONAssert.assertEquals(
+			expectedJSONObject.toString(),
+			new ObjectMapper(
+			).writeValueAsString(
+				_getOutputSchema(toolName)
+			),
+			true);
 	}
 
 	private JSONObject _openAPIJSONObject;
