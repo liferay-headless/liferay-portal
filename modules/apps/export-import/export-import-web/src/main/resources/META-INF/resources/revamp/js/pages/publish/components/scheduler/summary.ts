@@ -126,15 +126,15 @@ function getMonthDayListText(monthDays: number[], locale: string): string {
 
 function getUnitText(scheduleValues: ScheduleValues, locale: string): string {
 	if (scheduleValues.unit === IntervalUnit.Day) {
-		return Liferay.Language.get('day');
+		return Liferay.Language.get('repeat-unit-day');
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Week) {
-		return Liferay.Language.get('week');
+		return Liferay.Language.get('repeat-unit-week');
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Month) {
-		return Liferay.Language.get('month');
+		return Liferay.Language.get('repeat-unit-month');
 	}
 
 	if (scheduleValues.yearInterval > 1) {
@@ -145,7 +145,7 @@ function getUnitText(scheduleValues: ScheduleValues, locale: string): string {
 		);
 	}
 
-	return Liferay.Language.get('year');
+	return Liferay.Language.get('repeat-unit-year');
 }
 
 function getMonthlyRepeatText(
