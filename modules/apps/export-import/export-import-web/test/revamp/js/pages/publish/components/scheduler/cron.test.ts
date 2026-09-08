@@ -223,6 +223,42 @@ describe('toCronExpression', () => {
 			})
 		);
 	});
+
+	it('uses the start date time when the repeat time is synced', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					unit: IntervalUnit.Week,
+					weekdays: [2, 6],
+				})
+			)
+		).toBe('0 30 15 ? * MON,FRI *');
+	});
+
+	it('uses the independent repeat time when unsynced', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '00:00',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Week,
+					weekdays: [2, 6],
+				})
+			)
+		).toBe('0 0 0 ? * MON,FRI *');
+	});
+
+	it('ignores the repeat time for a one time cron', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '00:00',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Never,
+				})
+			)
+		).toBe('0 30 15 20 7 ? 2026');
+	});
 });
 
 describe('fromCronExpression', () => {
@@ -380,13 +416,59 @@ describe('fromCronExpression', () => {
 			'0 30 15 ? * MON#0 *',
 			'0 30 15 ? * MON#5 *',
 			'45 30 15 15 * ? *',
-			'0 45 09 15 * ? *',
 			'0 30 15 15 * ? 2026-2030',
 		].forEach((cronExpression) => {
 			expect(decode(cronExpression)).toEqual({
 				cronExpression,
 				unit: IntervalUnit.Custom,
 			});
+		});
+	});
+
+	it('keeps a cron whose hour or minute is a list or step as a custom one', () => {
+		['0 0,30 9 * * ? *', '0 0 8-17 * * ? *', '0 0/15 9 * * ? *'].forEach(
+			(cronExpression) => {
+				expect(decode(cronExpression)).toEqual({
+					cronExpression,
+					unit: IntervalUnit.Custom,
+				});
+			}
+		);
+	});
+
+	it('classifies a pattern whose time does not match the start date time, unchecking the sync', () => {
+		expect(decode('0 45 09 15 * ? *')).toEqual({
+			monthDays: [15],
+			months: [],
+			repeatOnTime: '09:45',
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfMonth,
+			unit: IntervalUnit.Month,
+		});
+	});
+
+	it('keeps the sync when the pattern time matches the start date time', () => {
+		expect(decode('0 30 15 15 * ? *')).toEqual({
+			monthDays: [15],
+			months: [],
+			repeatType: RepeatType.DayOfMonth,
+			unit: IntervalUnit.Month,
+		});
+	});
+
+	it('round trips a weekly Monday and Friday midnight cron regardless of the start date time', () => {
+		const cronExpression = '0 0 0 ? * MON,FRI *';
+
+		expect(fromCronExpression(cronExpression, '2026-07-20 00:00')).toEqual({
+			unit: IntervalUnit.Week,
+			weekdays: [2, 6],
+		});
+
+		expect(fromCronExpression(cronExpression, '2026-07-20 15:30')).toEqual({
+			repeatOnTime: '00:00',
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Week,
+			weekdays: [2, 6],
 		});
 	});
 });
