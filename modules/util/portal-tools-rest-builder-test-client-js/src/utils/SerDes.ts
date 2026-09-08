@@ -38,6 +38,7 @@
 	import {PageSort} from '../models/PageSort';
 	import {PageTestEntity} from '../models/PageTestEntity';
 	import {Permission} from '../models/Permission';
+	import {ReferencingTestEntity} from '../models/ReferencingTestEntity';
 	import {Schema} from '../models/Schema';
 	import {ScopedTestEntity} from '../models/ScopedTestEntity';
 	import {SharedInternalModelBatchTestEntity} from '../models/SharedInternalModelBatchTestEntity';
@@ -116,6 +117,7 @@ const typeMap: {[index: string]: any} = {
 	PageSort,
 	PageTestEntity,
 	Permission,
+	ReferencingTestEntity,
 	Schema,
 	ScopedTestEntity,
 	SharedInternalModelBatchTestEntity,
