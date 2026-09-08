@@ -17,6 +17,7 @@ import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
 import {FieldRadio} from '../../../../components/forms/FieldRadio';
 import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
 import FieldText from '../../../../components/forms/FieldText';
+import FieldTimePicker from '../../../../components/forms/FieldTimePicker';
 import {isCompleteDateTime} from './cron';
 import {getScheduleSummary} from './summary';
 import {
@@ -35,6 +36,7 @@ import {
 	WEEKDAY_ORDINAL_OPTIONS,
 	getIntervalText,
 	getWeekdayName,
+	isRepeatingUnit,
 } from './utils';
 
 const MONTH_MAX_DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -63,7 +65,9 @@ export default function PublishScheduler({
 	onChange,
 	onCronExpressionBlur,
 	onEndDateTimeBlur,
+	onRepeatOnTimeBlur,
 	onStartDateTimeBlur,
+	repeatOnTimeErrorMessage,
 	startDateTimeErrorMessage,
 	timeZones,
 	value,
@@ -73,7 +77,9 @@ export default function PublishScheduler({
 	onChange: (scheduleValues: ScheduleValues) => void;
 	onCronExpressionBlur?: () => void;
 	onEndDateTimeBlur?: () => void;
+	onRepeatOnTimeBlur?: () => void;
 	onStartDateTimeBlur?: () => void;
+	repeatOnTimeErrorMessage?: string;
 	startDateTimeErrorMessage?: string;
 	timeZones: TimeZoneOption[];
 	value: ScheduleValues;
@@ -98,6 +104,10 @@ export default function PublishScheduler({
 	};
 
 	const repeatsOnDayOfWeek = value.repeatType === RepeatType.DayOfWeek;
+
+	const [, startDateTimeTime = ''] = value.startDateTime.split(' ');
+
+	const repeats = isRepeatingUnit(value.unit);
 
 	const scheduleSummary = getScheduleSummary(value);
 
@@ -484,6 +494,53 @@ export default function PublishScheduler({
 						<ClayLayout.Row>
 							<ClayLayout.Col md={6} size={12}>
 								{repeatEverySelect}
+							</ClayLayout.Col>
+						</ClayLayout.Row>
+					)}
+
+					{repeats && (
+						<ClayLayout.Row>
+							<ClayLayout.Col md={6} size={12}>
+								<FieldTimePicker
+									disabled={value.repeatOnTimeSynced}
+									errorMessage={repeatOnTimeErrorMessage}
+									id="publishScheduleRepeatOnTime"
+									label={Liferay.Language.get('time-of-day')}
+									name="publishScheduleRepeatOnTime"
+									onBlur={onRepeatOnTimeBlur}
+									onChange={(repeatOnTime) =>
+										set({repeatOnTime})
+									}
+									required={!value.repeatOnTimeSynced}
+									value={
+										value.repeatOnTimeSynced
+											? startDateTimeTime
+											: value.repeatOnTime
+									}
+								/>
+							</ClayLayout.Col>
+
+							<ClayLayout.Col md={6} size={12}>
+								<ClayCheckbox
+									checked={value.repeatOnTimeSynced}
+									label={Liferay.Language.get(
+										'sync-with-start-date-time'
+									)}
+									onChange={() => {
+										if (value.repeatOnTimeSynced) {
+											set({
+												repeatOnTime: startDateTimeTime,
+												repeatOnTimeSynced: false,
+											});
+										}
+										else {
+											set({
+												repeatOnTime: '',
+												repeatOnTimeSynced: true,
+											});
+										}
+									}}
+								/>
 							</ClayLayout.Col>
 						</ClayLayout.Row>
 					)}
