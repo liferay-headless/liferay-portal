@@ -5,7 +5,13 @@
 
 import {sub} from 'frontend-js-web';
 
-import {isCompleteDateTime, toDateTimeParts, toZonedDate} from './cron';
+import {
+	isCompleteDateTime,
+	isCompleteTime,
+	toDateTimeParts,
+	toTimeParts,
+	toZonedDate,
+} from './cron';
 import {
 	IntervalUnit,
 	MONTH_DAYS,
@@ -24,6 +30,16 @@ function toLocalDate(dateTime: string): Date {
 	const {day, hour, minute, month, year} = toDateTimeParts(dateTime);
 
 	return new Date(year, month - 1, day, hour, minute);
+}
+
+function toRepeatDate(startDate: Date, repeatOnTime: string): Date {
+	const {hour, minute} = toTimeParts(repeatOnTime);
+
+	const repeatDate = new Date(startDate);
+
+	repeatDate.setHours(hour, minute);
+
+	return repeatDate;
 }
 
 function getListText(labels: string[], locale: string): string {
@@ -279,10 +295,6 @@ export function getScheduleSummary(
 	const locale = Liferay.ThemeDisplay.getBCP47LanguageId();
 
 	const startDateText = startDate.toLocaleDateString(locale);
-	const timeText = startDate.toLocaleTimeString(locale, {
-		hour: 'numeric',
-		minute: '2-digit',
-	});
 
 	if (scheduleValues.unit === IntervalUnit.Never) {
 		return sub(
@@ -290,9 +302,24 @@ export function getScheduleSummary(
 				'the-process-runs-once-on-x-at-x-and-does-not-repeat'
 			),
 			startDateText,
-			timeText
+			startDate.toLocaleTimeString(locale, {
+				hour: 'numeric',
+				minute: '2-digit',
+			})
 		);
 	}
+
+	const repeatDate =
+		scheduleValues.unit !== IntervalUnit.Custom &&
+		!scheduleValues.repeatOnTimeSynced &&
+		isCompleteTime(scheduleValues.repeatOnTime)
+			? toRepeatDate(startDate, scheduleValues.repeatOnTime)
+			: startDate;
+
+	const timeText = repeatDate.toLocaleTimeString(locale, {
+		hour: 'numeric',
+		minute: '2-digit',
+	});
 
 	const endDate =
 		!scheduleValues.neverEnd &&

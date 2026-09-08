@@ -22,6 +22,7 @@ export function FormikFieldPublishScheduler({
 
 	const [cronExpressionTouched, setCronExpressionTouched] = useState(false);
 	const [endDateTimeTouched, setEndDateTimeTouched] = useState(false);
+	const [repeatOnTimeTouched, setRepeatOnTimeTouched] = useState(false);
 	const [startDateTimeTouched, setStartDateTimeTouched] = useState(false);
 
 	const scheduleValuesErrors = getScheduleValuesErrors(field.value);
@@ -42,7 +43,13 @@ export function FormikFieldPublishScheduler({
 			onChange={(scheduleValues) => helpers.setValue(scheduleValues)}
 			onCronExpressionBlur={() => setCronExpressionTouched(true)}
 			onEndDateTimeBlur={() => setEndDateTimeTouched(true)}
+			onRepeatOnTimeBlur={() => setRepeatOnTimeTouched(true)}
 			onStartDateTimeBlur={() => setStartDateTimeTouched(true)}
+			repeatOnTimeErrorMessage={
+				repeatOnTimeTouched
+					? scheduleValuesErrors.repeatOnTime
+					: undefined
+			}
 			startDateTimeErrorMessage={
 				startDateTimeTouched ||
 				isCompleteDateTime(field.value.startDateTime)
