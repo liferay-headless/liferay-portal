@@ -130,9 +130,14 @@ describe('getScheduleSummary', () => {
 
 describe('schedule summary wording', () => {
 	const LANGUAGE_KEYS: Record<string, string> = {
+		'day': 'Day',
 		'day-x': 'Day {0}',
 		'days-x': 'Days {0}',
 		'month': 'Month',
+		'repeat-unit-day': 'day',
+		'repeat-unit-month': 'month',
+		'repeat-unit-week': 'week',
+		'repeat-unit-year': 'year',
 		'the-process-repeats-every-x': 'The process repeats every {0}.',
 		'the-process-repeats-every-x-in-x-on-x':
 			'The process repeats every {0} in {1} on {2}.',
@@ -142,6 +147,7 @@ describe('schedule summary wording', () => {
 			'The process repeats in {0} on the {1}.',
 		'the-process-starts-on-x-at-x-and-never-ends':
 			'The process starts on {0} at {1} and never ends.',
+		'week': 'Week',
 		'year': 'Year',
 	};
 
@@ -201,7 +207,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month.');
+		).toBe('The process repeats every month.');
 	});
 
 	it('lists a two day run as separate days', () => {
@@ -211,7 +217,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 2, and 20.');
+		).toBe('The process repeats every month on Days 1, 2, and 20.');
 	});
 
 	it('collapses consecutive days into ranges', () => {
@@ -221,7 +227,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1-5 and 20.');
+		).toBe('The process repeats every month on Days 1-5 and 20.');
 	});
 
 	it('lists scattered days without repeating the word day', () => {
@@ -231,7 +237,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 3, and 5.');
+		).toBe('The process repeats every month on Days 1, 3, and 5.');
 	});
 
 	it('uses the singular day for a single day of the month', () => {
@@ -241,7 +247,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Day 15.');
+		).toBe('The process repeats every month on Day 15.');
 	});
 
 	it('describes a yearly repetition', () => {
@@ -251,7 +257,26 @@ describe('schedule summary wording', () => {
 				months: [7],
 				unit: IntervalUnit.Year,
 			})
-		).toBe('The process repeats every Year in july on Day 4.');
+		).toBe('The process repeats every year in july on Day 4.');
+	});
+
+	it('lowercases the day unit in a daily repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Day,
+			})
+		).toBe('The process repeats every day.');
+	});
+
+	it('lowercases the week unit in a weekly repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Week,
+				weekdays: [2, 5, 6],
+			})
+		).toBe(
+			'The process repeats every week on Monday, Thursday, and Friday.'
+		);
 	});
 
 	it('shows the start date time while the repeat time is synced', () => {
