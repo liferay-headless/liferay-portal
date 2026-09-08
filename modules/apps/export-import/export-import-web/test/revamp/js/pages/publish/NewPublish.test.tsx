@@ -447,6 +447,80 @@ describe('NewPublish', () => {
 		);
 	});
 
+	it('reclassifies a custom cron whose time matches the start date, keeping the sync', async () => {
+		const midnight = new Date(FUTURE_DATE);
+
+		midnight.setUTCHours(0, 0, 0, 0);
+
+		if (midnight.getTime() <= Date.now()) {
+			midnight.setUTCDate(midnight.getUTCDate() + 1);
+		}
+
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 0 0 ? * MON,FRI *',
+				scheduleStartDate: midnight.toISOString(),
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+
+		expect(screen.getByRole('combobox', {name: 'repeat'})).toHaveValue(
+			'week'
+		);
+		expect(screen.getByRole('button', {name: 'Monday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(screen.getByRole('button', {name: 'Friday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).toBeChecked();
+		expect(screen.getByLabelText(/time-of-day/)).toHaveValue('00');
+		expect(screen.getByLabelText(/time-of-day/)).toBeDisabled();
+	});
+
+	it('reclassifies a custom cron whose time differs from the start date, unchecking the sync', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 0 0 ? * MON,FRI *',
+				scheduleStartDate: FUTURE_DATE.toISOString(),
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+
+		expect(screen.getByRole('combobox', {name: 'repeat'})).toHaveValue(
+			'week'
+		);
+		expect(screen.getByRole('button', {name: 'Monday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(screen.getByRole('button', {name: 'Friday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).not.toBeChecked();
+		expect(screen.getByLabelText(/time-of-day/)).toHaveValue('00');
+		expect(screen.getByLabelText(/time-of-day/)).toBeEnabled();
+	});
+
 	it('replaces the scheduled process on submit when editing', async () => {
 		renderComponent({
 			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
@@ -642,6 +716,46 @@ describe('NewPublish', () => {
 
 		expect(
 			await screen.findByText('this-field-is-required')
+		).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole('button', {
+					name: /schedule-publication-to-live/i,
+				})
+			).toBeDisabled();
+		});
+	});
+
+	it('requires a valid time of day when the sync is unchecked', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		await user.click(screen.getByRole('textbox', {name: /start-date/}));
+
+		await user.paste(FUTURE_DATE_TIME);
+
+		await user.selectOptions(
+			screen.getByRole('combobox', {name: 'repeat'}),
+			'week'
+		);
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		await user.click(screen.getByLabelText(/time-of-day/));
+		await user.keyboard('{Backspace}');
+
+		await user.click(screen.getByRole('textbox', {name: /^name/i}));
+
+		expect(
+			await screen.findByText('please-enter-a-valid-time')
 		).toBeInTheDocument();
 
 		await waitFor(() => {
