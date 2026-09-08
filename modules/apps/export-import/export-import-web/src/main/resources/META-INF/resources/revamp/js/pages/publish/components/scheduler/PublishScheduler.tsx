@@ -499,50 +499,52 @@ export default function PublishScheduler({
 					)}
 
 					{repeats && (
-						<ClayLayout.Row>
-							<ClayLayout.Col md={6} size={12}>
-								<FieldTimePicker
-									disabled={value.repeatOnTimeSynced}
-									errorMessage={repeatOnTimeErrorMessage}
-									id="publishScheduleRepeatOnTime"
-									label={Liferay.Language.get('time-of-day')}
-									name="publishScheduleRepeatOnTime"
-									onBlur={onRepeatOnTimeBlur}
-									onChange={(repeatOnTime) =>
-										set({repeatOnTime})
-									}
-									required={!value.repeatOnTimeSynced}
-									value={
-										value.repeatOnTimeSynced
-											? startDateTimeTime
-											: value.repeatOnTime
-									}
-								/>
-							</ClayLayout.Col>
+						<>
+							<ClayLayout.Row>
+								<ClayLayout.Col md={6} size={12}>
+									<FieldTimePicker
+										disabled={value.repeatOnTimeSynced}
+										errorMessage={repeatOnTimeErrorMessage}
+										id="publishScheduleRepeatOnTime"
+										label={Liferay.Language.get(
+											'time-of-day'
+										)}
+										name="publishScheduleRepeatOnTime"
+										onBlur={onRepeatOnTimeBlur}
+										onChange={(repeatOnTime) =>
+											set({repeatOnTime})
+										}
+										required={!value.repeatOnTimeSynced}
+										value={
+											value.repeatOnTimeSynced
+												? startDateTimeTime
+												: value.repeatOnTime
+										}
+									/>
+								</ClayLayout.Col>
+							</ClayLayout.Row>
 
-							<ClayLayout.Col md={6} size={12}>
-								<ClayCheckbox
-									checked={value.repeatOnTimeSynced}
-									label={Liferay.Language.get(
-										'sync-with-start-date-time'
-									)}
-									onChange={() => {
-										if (value.repeatOnTimeSynced) {
-											set({
-												repeatOnTime: startDateTimeTime,
-												repeatOnTimeSynced: false,
-											});
-										}
-										else {
-											set({
-												repeatOnTime: '',
-												repeatOnTimeSynced: true,
-											});
-										}
-									}}
-								/>
-							</ClayLayout.Col>
-						</ClayLayout.Row>
+							<ClayCheckbox
+								checked={value.repeatOnTimeSynced}
+								label={Liferay.Language.get(
+									'sync-with-start-date-time'
+								)}
+								onChange={() => {
+									if (value.repeatOnTimeSynced) {
+										set({
+											repeatOnTime: startDateTimeTime,
+											repeatOnTimeSynced: false,
+										});
+									}
+									else {
+										set({
+											repeatOnTime: '',
+											repeatOnTimeSynced: true,
+										});
+									}
+								}}
+							/>
+						</>
 					)}
 
 					<ClayLayout.Row>
