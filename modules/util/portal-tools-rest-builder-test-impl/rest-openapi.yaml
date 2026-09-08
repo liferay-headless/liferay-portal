@@ -246,6 +246,11 @@ components:
                 testEntity:
                     $ref: "#/components/schemas/TestEntity"
             type: object
+        ReferencingTestEntity:
+            properties:
+                externalScopedTestEntity:
+                    $ref: ../portal-tools-rest-builder-test-external-impl/rest-openapi.yaml#ExternalScopedTestEntity
+            type: object
         Schema:
             properties:
                 property1:
@@ -1607,6 +1612,21 @@ paths:
                     description:
                         "OK"
             tags: ["MultipartTestEntity"]
+    "/referencing-test-entities":
+        post:
+            operationId: postReferencingTestEntity
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ReferencingTestEntity"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ReferencingTestEntity"
+            tags: ["ReferencingTestEntity"]
     "/reserved-word":
         post:
             operationId: postReservedWord
