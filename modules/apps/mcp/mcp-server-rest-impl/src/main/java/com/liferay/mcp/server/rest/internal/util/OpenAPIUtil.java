@@ -1096,7 +1096,19 @@ public class OpenAPIUtil {
 					visitedRefs);
 			}
 
-			responseFieldNames.addAll(propertiesJSONObject.keySet());
+			for (String propertyName : propertiesJSONObject.keySet()) {
+				JSONObject propertyJSONObject =
+					propertiesJSONObject.getJSONObject(propertyName);
+
+				if ((propertyJSONObject != null) &&
+					GetterUtil.getBoolean(
+						propertyJSONObject.get("writeOnly"))) {
+
+					continue;
+				}
+
+				responseFieldNames.add(propertyName);
+			}
 		}
 
 		JSONArray allOfJSONArray = schemaJSONObject.getJSONArray("allOf");
