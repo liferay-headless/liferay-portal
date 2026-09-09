@@ -485,8 +485,8 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		).toBeChecked();
-		expect(screen.getByLabelText(/time-of-day/)).toHaveValue('00');
-		expect(screen.getByLabelText(/time-of-day/)).toBeDisabled();
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toBeDisabled();
 	});
 
 	it('reclassifies a custom cron whose time differs from the start date, unchecking the sync', async () => {
@@ -518,8 +518,8 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		).not.toBeChecked();
-		expect(screen.getByLabelText(/time-of-day/)).toHaveValue('00');
-		expect(screen.getByLabelText(/time-of-day/)).toBeEnabled();
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
 	});
 
 	it('shows the original cron when a reclassified process is switched back to custom', async () => {
@@ -777,7 +777,7 @@ describe('NewPublish', () => {
 		});
 	});
 
-	it('requires a valid time of day when the sync is unchecked', async () => {
+	it('requires a valid repeat at time when the sync is unchecked', async () => {
 		renderComponent();
 
 		await fillRequiredFields();
@@ -799,7 +799,7 @@ describe('NewPublish', () => {
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		);
 
-		await user.click(screen.getByLabelText(/time-of-day/));
+		await user.click(screen.getByLabelText(/repeat-at/));
 		await user.keyboard('{Backspace}');
 
 		await user.click(screen.getByRole('textbox', {name: /^name/i}));
