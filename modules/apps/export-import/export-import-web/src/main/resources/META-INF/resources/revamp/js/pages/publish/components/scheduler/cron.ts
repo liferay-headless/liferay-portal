@@ -295,7 +295,7 @@ export function fromCronExpression(
 		return {cronExpression, unit: IntervalUnit.Custom};
 	}
 
-	return scheduleValues;
+	return {...scheduleValues, cronExpression};
 }
 
 function toRepeatOnTimeFields(
