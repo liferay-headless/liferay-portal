@@ -507,7 +507,7 @@ export default function PublishScheduler({
 										errorMessage={repeatOnTimeErrorMessage}
 										id="publishScheduleRepeatOnTime"
 										label={Liferay.Language.get(
-											'time-of-day'
+											'repeat-at'
 										)}
 										name="publishScheduleRepeatOnTime"
 										onBlur={onRepeatOnTimeBlur}
