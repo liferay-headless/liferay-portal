@@ -24,6 +24,7 @@ import {
 	WEEKDAY_ORDINAL_OPTIONS,
 	getIntervalText,
 	getWeekdayName,
+	isRepeatingUnit,
 } from './utils';
 
 function toLocalDate(dateTime: string): Date {
@@ -316,21 +317,23 @@ export function getScheduleSummary(
 
 	const startDateText = startDate.toLocaleDateString(locale);
 
+	const startTimeText = startDate.toLocaleTimeString(locale, {
+		hour: 'numeric',
+		minute: '2-digit',
+	});
+
 	if (scheduleValues.unit === IntervalUnit.Never) {
 		return sub(
 			Liferay.Language.get(
 				'the-process-runs-once-on-x-at-x-and-does-not-repeat'
 			),
 			startDateText,
-			startDate.toLocaleTimeString(locale, {
-				hour: 'numeric',
-				minute: '2-digit',
-			})
+			startTimeText
 		);
 	}
 
 	const repeatDate =
-		scheduleValues.unit !== IntervalUnit.Custom &&
+		isRepeatingUnit(scheduleValues.unit) &&
 		!scheduleValues.repeatOnTimeSynced &&
 		isCompleteTime(scheduleValues.repeatOnTime)
 			? toRepeatDate(startDate, scheduleValues.repeatOnTime)
