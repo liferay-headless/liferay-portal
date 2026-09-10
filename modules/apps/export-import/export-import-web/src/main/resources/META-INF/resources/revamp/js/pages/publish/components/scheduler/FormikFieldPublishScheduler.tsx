@@ -4,7 +4,7 @@
  */
 
 import {useField} from 'formik';
-import React, {useState} from 'react';
+import React from 'react';
 
 import PublishScheduler from './PublishScheduler';
 import {isCompleteDateTime} from './cron';
@@ -20,38 +20,46 @@ export function FormikFieldPublishScheduler({
 }) {
 	const [field, , helpers] = useField<ScheduleValues>(name);
 
-	const [cronExpressionTouched, setCronExpressionTouched] = useState(false);
-	const [endDateTimeTouched, setEndDateTimeTouched] = useState(false);
-	const [repeatOnTimeTouched, setRepeatOnTimeTouched] = useState(false);
-	const [startDateTimeTouched, setStartDateTimeTouched] = useState(false);
+	const [, cronExpressionMeta, cronExpressionHelpers] = useField<string>(
+		`${name}.cronExpression`
+	);
+	const [, endDateTimeMeta, endDateTimeHelpers] = useField<string>(
+		`${name}.endDateTime`
+	);
+	const [, repeatOnTimeMeta, repeatOnTimeHelpers] = useField<string>(
+		`${name}.repeatOnTime`
+	);
+	const [, startDateTimeMeta, startDateTimeHelpers] = useField<string>(
+		`${name}.startDateTime`
+	);
 
 	const scheduleValuesErrors = getScheduleValuesErrors(field.value);
 
 	return (
 		<PublishScheduler
 			cronExpressionErrorMessage={
-				cronExpressionTouched
+				cronExpressionMeta.touched
 					? scheduleValuesErrors.cronExpression
 					: undefined
 			}
 			endDateTimeErrorMessage={
-				endDateTimeTouched ||
+				endDateTimeMeta.touched ||
 				isCompleteDateTime(field.value.endDateTime)
 					? scheduleValuesErrors.endDateTime
 					: undefined
 			}
 			onChange={(scheduleValues) => helpers.setValue(scheduleValues)}
-			onCronExpressionBlur={() => setCronExpressionTouched(true)}
-			onEndDateTimeBlur={() => setEndDateTimeTouched(true)}
-			onRepeatOnTimeBlur={() => setRepeatOnTimeTouched(true)}
-			onStartDateTimeBlur={() => setStartDateTimeTouched(true)}
+			onCronExpressionBlur={() => cronExpressionHelpers.setTouched(true)}
+			onEndDateTimeBlur={() => endDateTimeHelpers.setTouched(true)}
+			onRepeatOnTimeBlur={() => repeatOnTimeHelpers.setTouched(true)}
+			onStartDateTimeBlur={() => startDateTimeHelpers.setTouched(true)}
 			repeatOnTimeErrorMessage={
-				repeatOnTimeTouched
+				repeatOnTimeMeta.touched
 					? scheduleValuesErrors.repeatOnTime
 					: undefined
 			}
 			startDateTimeErrorMessage={
-				startDateTimeTouched ||
+				startDateTimeMeta.touched ||
 				isCompleteDateTime(field.value.startDateTime)
 					? scheduleValuesErrors.startDateTime
 					: undefined
