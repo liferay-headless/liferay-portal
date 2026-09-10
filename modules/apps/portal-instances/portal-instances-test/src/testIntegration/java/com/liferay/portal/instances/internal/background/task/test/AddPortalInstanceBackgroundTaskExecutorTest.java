@@ -15,10 +15,13 @@ import com.liferay.portal.kernel.encryptor.EncryptorUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
+import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -41,7 +44,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -61,6 +66,16 @@ public class AddPortalInstanceBackgroundTaskExecutorTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@After
+	public void tearDown() throws Exception {
+		for (UserNotificationEvent userNotificationEvent :
+				_getUserNotificationEvents()) {
+
+			_userNotificationEventLocalService.deleteUserNotificationEvent(
+				userNotificationEvent);
+		}
+	}
+
 	@Test
 	public void testExecute() throws Exception {
 		BackgroundTask backgroundTask = _addBackgroundTask(null, null);
@@ -77,6 +92,17 @@ public class AddPortalInstanceBackgroundTaskExecutorTest {
 		Assert.assertEquals(
 			company.getCompanyId(),
 			statusMessageJSONObject.getLong("companyId"));
+
+		JSONObject payloadJSONObject = _getPayloadJSONObject();
+
+		Assert.assertEquals(
+			BackgroundTaskConstants.STATUS_SUCCESSFUL,
+			payloadJSONObject.getInt("status"));
+		Assert.assertEquals(
+			PortalInstanceBackgroundTaskExecutorNames.
+				ADD_PORTAL_INSTANCE_BACKGROUND_TASK_EXECUTOR,
+			payloadJSONObject.getString("taskExecutorClassName"));
+		Assert.assertEquals(_WEB_ID, payloadJSONObject.getString("webId"));
 
 		_companyLocalService.deleteCompany(company);
 	}
@@ -112,6 +138,19 @@ public class AddPortalInstanceBackgroundTaskExecutorTest {
 			Assert.assertEquals(
 				"please-enter-a-valid-email-address",
 				taskContextMap.get("errorMessageKey"));
+
+			JSONObject payloadJSONObject = _getPayloadJSONObject();
+
+			Assert.assertEquals(
+				"please-enter-a-valid-email-address",
+				payloadJSONObject.getString("errorMessageKey"));
+			Assert.assertEquals(
+				BackgroundTaskConstants.STATUS_FAILED,
+				payloadJSONObject.getInt("status"));
+			Assert.assertEquals(
+				PortalInstanceBackgroundTaskExecutorNames.
+					ADD_PORTAL_INSTANCE_BACKGROUND_TASK_EXECUTOR,
+				payloadJSONObject.getString("taskExecutorClassName"));
 		}
 
 		Company company = _companyLocalService.getCompanyByWebId(_WEB_ID);
@@ -211,6 +250,42 @@ public class AddPortalInstanceBackgroundTaskExecutorTest {
 			"Background task " + backgroundTaskId + " did not complete");
 	}
 
+	private JSONObject _getPayloadJSONObject() throws Exception {
+		List<UserNotificationEvent> userNotificationEvents =
+			_getUserNotificationEvents();
+
+		Assert.assertEquals(
+			userNotificationEvents.toString(), 1,
+			userNotificationEvents.size());
+
+		UserNotificationEvent userNotificationEvent =
+			userNotificationEvents.get(0);
+
+		return _jsonFactory.createJSONObject(
+			userNotificationEvent.getPayload());
+	}
+
+	private List<UserNotificationEvent> _getUserNotificationEvents()
+		throws Exception {
+
+		List<UserNotificationEvent> userNotificationEvents = new ArrayList<>();
+
+		for (UserNotificationEvent userNotificationEvent :
+				_userNotificationEventLocalService.getUserNotificationEvents(
+					TestPropsValues.getUserId(),
+					UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
+
+			JSONObject payloadJSONObject = _jsonFactory.createJSONObject(
+				userNotificationEvent.getPayload());
+
+			if (Objects.equals(_WEB_ID, payloadJSONObject.getString("webId"))) {
+				userNotificationEvents.add(userNotificationEvent);
+			}
+		}
+
+		return userNotificationEvents;
+	}
+
 	private static final String _VIRTUAL_HOSTNAME =
 		StringUtil.toLowerCase(RandomTestUtil.randomString()) + ".com";
 
@@ -231,5 +306,9 @@ public class AddPortalInstanceBackgroundTaskExecutorTest {
 
 	@Inject
 	private UserLocalService _userLocalService;
+
+	@Inject
+	private UserNotificationEventLocalService
+		_userNotificationEventLocalService;
 
 }
