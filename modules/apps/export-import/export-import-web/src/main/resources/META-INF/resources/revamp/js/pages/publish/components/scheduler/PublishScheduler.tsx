@@ -539,10 +539,7 @@ export default function PublishScheduler({
 										});
 									}
 									else {
-										set({
-											repeatOnTime: '',
-											repeatOnTimeSynced: true,
-										});
+										set({repeatOnTimeSynced: true});
 									}
 								}}
 							/>
