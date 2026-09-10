@@ -54,7 +54,7 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 	@Test
 	public void testGetToolSetToolSetNameTool() throws Exception {
 		Tool tool = toolResource.getToolSetToolSetNameTool(
-			"mcp-server-v1.0", "getToolSetsPage");
+			"mcp-server-v1.0", "getToolSetsPage", null);
 
 		Assert.assertEquals("getToolSetsPage", tool.getName());
 		Assert.assertNotNull(tool.getInputSchema());
@@ -215,7 +215,7 @@ public class ToolResourceTest extends BaseToolResourceTestCase {
 	private Tool _getTool(ObjectDefinition objectDefinition) throws Exception {
 		return toolResource.getToolSetToolSetNameTool(
 			_getToolSetName(objectDefinition),
-			"post" + objectDefinition.getShortName());
+			"post" + objectDefinition.getShortName(), null);
 	}
 
 	private String _getToolSetName(ObjectDefinition objectDefinition) {
