@@ -97,6 +97,56 @@ function everyUIState(): ScheduleValues[] {
 		})
 	);
 
+	const UNSYNCED_REPEAT_ON_TIME = '09:15';
+
+	states.push(
+		buildScheduleValues({
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Day,
+		}),
+		buildScheduleValues({
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Week,
+			weekdays: [2, 5],
+		}),
+		buildScheduleValues({
+			monthDays: [1, 15],
+			months: [],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Month,
+		}),
+		buildScheduleValues({
+			months: [3, 6, 9, 12],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfWeek,
+			unit: IntervalUnit.Month,
+			weekday: 2,
+			weekdayOrdinal: '1',
+		}),
+		buildScheduleValues({
+			monthDays: [15],
+			months: [7],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Year,
+			yearInterval: 1,
+		}),
+		buildScheduleValues({
+			months: [7],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfWeek,
+			unit: IntervalUnit.Year,
+			weekday: 5,
+			weekdayOrdinal: '2',
+			yearInterval: 1,
+		})
+	);
+
 	return states;
 }
 
