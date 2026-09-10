@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayTimePicker, {Input} from '@clayui/time-picker';
 import {FieldBase} from 'frontend-js-components-web';
 import React from 'react';
-
-const DEFAULT_SEGMENT = '--';
 
 export type FieldTimePickerProps = {
 	disabled?: boolean;
 	errorMessage?: string;
+	helpMessage?: string;
 	id?: string;
 	label: string;
 	name?: string;
@@ -21,22 +19,10 @@ export type FieldTimePickerProps = {
 	value?: string;
 };
 
-function toInput(value: string): Input {
-	const [hours, minutes] = value.split(':');
-
-	return {
-		hours: hours || DEFAULT_SEGMENT,
-		minutes: minutes || DEFAULT_SEGMENT,
-	};
-}
-
-function toValue(input: Input): string {
-	return `${input.hours}:${input.minutes}`;
-}
-
 const FieldTimePicker = ({
 	disabled,
 	errorMessage,
+	helpMessage,
 	id,
 	label,
 	name,
@@ -51,30 +37,27 @@ const FieldTimePicker = ({
 		<FieldBase
 			disabled={disabled}
 			errorMessage={errorMessage}
+			helpMessage={helpMessage}
 			id={fieldId}
 			label={label}
 			required={required}
 		>
-			<div
-				onBlur={(event) => {
-					if (
-						!event.currentTarget.contains(
-							event.relatedTarget as Node
-						)
-					) {
-						onBlur?.();
-					}
-				}}
-			>
-				<ClayTimePicker
-					disabled={disabled}
-					id={fieldId}
-					name={name}
-					onChange={(input) => onChange?.(toValue(input))}
-					use12Hours={false}
-					value={toInput(value)}
-				/>
-			</div>
+			<input
+				aria-describedby={
+					errorMessage || helpMessage
+						? `${fieldId}fieldFeedback`
+						: undefined
+				}
+				aria-invalid={!!errorMessage}
+				className="form-control"
+				disabled={disabled}
+				id={fieldId}
+				name={name}
+				onBlur={onBlur}
+				onChange={(event) => onChange?.(event.target.value)}
+				type="time"
+				value={value}
+			/>
 		</FieldBase>
 	);
 };
