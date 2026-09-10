@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fetch from 'jest-fetch-mock';
 import React from 'react';
@@ -46,6 +46,7 @@ const DEFAULT_PROPS = {
 		pageSize: 20,
 		privateLayoutsAvailable: false,
 	},
+	processesBackURL: '/some/back/url?tab=processes',
 	publishPreviewAPIURL:
 		'/o/export-import/v1.0/sites/site-erc/publish-preview',
 	publishProcessAPIURL:
@@ -104,6 +105,25 @@ const renderComponent = (
 	props: Partial<React.ComponentProps<typeof NewPublish>> = {}
 ) => render(<NewPublish {...DEFAULT_PROPS} {...props} />);
 
+const clickCalendarDay = async (
+	datePicker: HTMLElement,
+	preferredIndex: number
+) => {
+	let dayCells = screen.queryAllByLabelText(FUTURE_DATE.toDateString());
+
+	if (dayCells.length <= preferredIndex) {
+		await user.click(
+			within(datePicker).getByRole('button', {
+				name: 'Select the next month',
+			})
+		);
+
+		dayCells = screen.getAllByLabelText(FUTURE_DATE.toDateString());
+	}
+
+	await user.click(dayCells[Math.min(preferredIndex, dayCells.length - 1)]);
+};
+
 describe('NewPublish', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -113,7 +133,7 @@ describe('NewPublish', () => {
 		mockAPIRoutes();
 	});
 
-	it('publishes immediately and navigates back', async () => {
+	it('publishes immediately and navigates to processes', async () => {
 		renderComponent();
 
 		await fillRequiredFields();
@@ -135,7 +155,7 @@ describe('NewPublish', () => {
 		expect(body.requestPortletDataHandlers.length).toBeGreaterThan(0);
 
 		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.backURL
+			DEFAULT_PROPS.processesBackURL
 		);
 	});
 
@@ -164,13 +184,208 @@ describe('NewPublish', () => {
 			expect(submitButton).toBeDisabled();
 		});
 
-		await user.click(screen.getByRole('textbox', {name: 'start-date'}));
+		expect(
+			screen.queryByText(
+				'please-set-a-start-date-and-time-to-schedule-the-publication'
+			)
+		).not.toBeInTheDocument();
 
+		const startDateField = screen.getByRole('textbox', {
+			name: /start-date/,
+		});
+
+		await user.click(startDateField);
+		await user.tab();
+
+		expect(
+			await screen.findByText(
+				'please-set-a-start-date-and-time-to-schedule-the-publication'
+			)
+		).toBeInTheDocument();
+
+		await user.click(startDateField);
 		await user.paste(FUTURE_DATE_TIME);
 
 		await waitFor(() => {
 			expect(submitButton).toBeEnabled();
 		});
+
+		expect(
+			screen.queryByText(
+				'please-set-a-start-date-and-time-to-schedule-the-publication'
+			)
+		).not.toBeInTheDocument();
+	});
+
+	it('does not show an error while a valid date is still being typed', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		await user.type(
+			screen.getByRole('textbox', {name: /start-date/}),
+			FUTURE_DATE_TIME.slice(0, 4)
+		);
+
+		expect(
+			screen.queryByText('please-enter-a-valid-date')
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				'please-set-a-start-date-and-time-to-schedule-the-publication'
+			)
+		).not.toBeInTheDocument();
+	});
+
+	it('does not overwrite a time being typed after a complete date', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		const startDateField = screen.getByRole('textbox', {
+			name: /start-date/,
+		});
+
+		await user.click(startDateField);
+		await user.type(startDateField, `${FUTURE_DATE_TIME.split(' ')[0]} 1`);
+
+		expect(startDateField).toHaveValue(
+			`${FUTURE_DATE_TIME.split(' ')[0]} 1`
+		);
+	});
+
+	it('defaults the start date time to midnight when a day is picked from the calendar', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		const startDateField = screen.getByRole('textbox', {
+			name: /start-date/,
+		});
+		const startDatePicker = startDateField.closest(
+			'.date-picker'
+		) as HTMLElement;
+
+		await user.click(
+			within(startDatePicker).getByRole('button', {
+				name: 'Choose date',
+			})
+		);
+
+		await clickCalendarDay(startDatePicker, 0);
+
+		expect(startDateField).toHaveValue(
+			`${FUTURE_DATE_TIME.split(' ')[0]} 00:00`
+		);
+
+		await user.click(document.body);
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole('button', {
+					name: /schedule-publication-to-live/i,
+				})
+			).toBeEnabled();
+		});
+	});
+
+	it('defaults the end date time to 23:59 when a day is picked from the calendar', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		await user.click(screen.getByRole('checkbox', {name: /never-end/}));
+
+		const endDateField = screen.getByRole('textbox', {
+			name: /end-date/,
+		});
+		const endDatePicker = endDateField.closest(
+			'.date-picker'
+		) as HTMLElement;
+
+		await user.click(
+			within(endDatePicker).getByRole('button', {name: 'Choose date'})
+		);
+
+		await clickCalendarDay(endDatePicker, 1);
+
+		expect(endDateField).toHaveValue(
+			`${FUTURE_DATE_TIME.split(' ')[0]} 23:59`
+		);
+	});
+
+	it('shows the end date error only after the field is touched', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		await user.click(screen.getByRole('textbox', {name: /start-date/}));
+
+		await user.paste(FUTURE_DATE_TIME);
+
+		await user.click(screen.getByRole('checkbox', {name: /never-end/}));
+
+		expect(
+			screen.queryByText('please-enter-a-valid-date')
+		).not.toBeInTheDocument();
+
+		const endDateField = screen.getByRole('textbox', {name: /end-date/});
+
+		await user.click(endDateField);
+		await user.tab();
+
+		expect(
+			await screen.findByText('please-enter-a-valid-date')
+		).toBeInTheDocument();
+	});
+
+	it('marks the schedule fields as required as soon as they appear', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		expect(
+			screen.getByRole('textbox', {name: /start-date/})
+		).toHaveAccessibleName(/mandatory/i);
+
+		await user.click(screen.getByRole('checkbox', {name: /never-end/}));
+
+		expect(
+			screen.getByRole('textbox', {name: /end-date/})
+		).toHaveAccessibleName(/mandatory/i);
+
+		await user.selectOptions(
+			screen.getByRole('combobox', {name: 'repeat'}),
+			'custom'
+		);
+
+		expect(
+			screen.getByRole('textbox', {name: /cron-expression/})
+		).toHaveAccessibleName(/mandatory/i);
 	});
 
 	it('schedules the publication with the cron fields', async () => {
@@ -182,7 +397,7 @@ describe('NewPublish', () => {
 			screen.getByRole('radio', {name: /schedule-for-later/})
 		);
 
-		await user.click(screen.getByRole('textbox', {name: 'start-date'}));
+		await user.click(screen.getByRole('textbox', {name: /start-date/}));
 
 		await user.paste(FUTURE_DATE_TIME);
 
@@ -220,7 +435,7 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('radio', {name: /schedule-for-later/})
 		).toBeChecked();
-		expect(screen.getByRole('textbox', {name: 'start-date'})).toHaveValue(
+		expect(screen.getByRole('textbox', {name: /start-date/})).toHaveValue(
 			FUTURE_DATE_TIME
 		);
 		expect(
@@ -231,6 +446,105 @@ describe('NewPublish', () => {
 		expect(screen.getByLabelText('filter-content-by')).toHaveValue(
 			'fromLastPublishDate'
 		);
+	});
+
+	it('reclassifies a custom cron whose time matches the start date, keeping the sync', async () => {
+		const midnight = new Date(FUTURE_DATE);
+
+		midnight.setUTCHours(0, 0, 0, 0);
+
+		if (midnight.getTime() <= Date.now()) {
+			midnight.setUTCDate(midnight.getUTCDate() + 1);
+		}
+
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 0 0 ? * MON,FRI *',
+				scheduleStartDate: midnight.toISOString(),
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+
+		expect(screen.getByRole('combobox', {name: 'repeat'})).toHaveValue(
+			'week'
+		);
+		expect(screen.getByRole('button', {name: 'Monday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(screen.getByRole('button', {name: 'Friday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).toBeChecked();
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toBeDisabled();
+	});
+
+	it('reclassifies a custom cron whose time differs from the start date, unchecking the sync', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 0 0 ? * MON,FRI *',
+				scheduleStartDate: FUTURE_DATE.toISOString(),
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+
+		expect(screen.getByRole('combobox', {name: 'repeat'})).toHaveValue(
+			'week'
+		);
+		expect(screen.getByRole('button', {name: 'Monday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(screen.getByRole('button', {name: 'Friday'})).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).not.toBeChecked();
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
+	});
+
+	it('shows the original cron when a reclassified process is switched back to custom', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				cronExpression: '0 0 0 ? * MON,FRI *',
+				scheduleStartDate: FUTURE_DATE.toISOString(),
+			},
+		});
+
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+
+		await user.selectOptions(
+			screen.getByRole('combobox', {name: 'repeat'}),
+			'custom'
+		);
+
+		expect(
+			screen.getByRole('textbox', {name: /cron-expression/})
+		).toHaveValue('0 0 0 ? * MON,FRI *');
 	});
 
 	it('replaces the scheduled process on submit when editing', async () => {
@@ -257,6 +571,30 @@ describe('NewPublish', () => {
 		);
 	});
 
+	it('navigates to processes when an edited scheduled process is switched to publish now', async () => {
+		renderComponent({
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		await screen.findByRole('textbox', {name: /^name/i});
+		await screen.findByText('loaded');
+
+		await user.click(screen.getByRole('radio', {name: /publish-now/}));
+
+		await user.click(screen.getByRole('button', {name: /-to-live/i}));
+
+		await waitFor(() => {
+			expect(getUnscheduleCall()).toBeDefined();
+		});
+
+		expect(String(getUnscheduleCall()![0])).toContain(
+			String(SCHEDULED_PUBLISH_PROCESS.id)
+		);
+		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
+			DEFAULT_PROPS.processesBackURL
+		);
+	});
+
 	it('requires a future start date when the edited process has started', async () => {
 		mockAPIRoutes({
 			scheduledPublishProcess: {
@@ -270,7 +608,7 @@ describe('NewPublish', () => {
 		});
 
 		expect(
-			await screen.findByRole('textbox', {name: 'start-date'})
+			await screen.findByRole('textbox', {name: /start-date/})
 		).toHaveValue('2026-07-01 09:30');
 
 		await screen.findByText('the-publish-time-must-be-in-the-future');
@@ -295,7 +633,7 @@ describe('NewPublish', () => {
 		await screen.findByRole('textbox', {name: /^name/i});
 		await screen.findByText('loaded');
 
-		await user.clear(screen.getByRole('textbox', {name: 'start-date'}));
+		await user.clear(screen.getByRole('textbox', {name: /start-date/}));
 
 		await user.paste(FUTURE_DATE_TIME);
 
@@ -406,7 +744,7 @@ describe('NewPublish', () => {
 			screen.getByRole('radio', {name: /schedule-for-later/})
 		);
 
-		await user.click(screen.getByRole('textbox', {name: 'start-date'}));
+		await user.click(screen.getByRole('textbox', {name: /start-date/}));
 
 		await user.paste(FUTURE_DATE_TIME);
 
@@ -415,7 +753,60 @@ describe('NewPublish', () => {
 			'custom'
 		);
 
-		await screen.findByText('this-field-is-required');
+		expect(
+			screen.queryByText('this-field-is-required')
+		).not.toBeInTheDocument();
+
+		const cronExpressionField = screen.getByRole('textbox', {
+			name: /cron-expression/,
+		});
+
+		await user.click(cronExpressionField);
+		await user.tab();
+
+		expect(
+			await screen.findByText('this-field-is-required')
+		).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(
+				screen.getByRole('button', {
+					name: /schedule-publication-to-live/i,
+				})
+			).toBeDisabled();
+		});
+	});
+
+	it('requires a valid repeat at time when the sync is unchecked', async () => {
+		renderComponent();
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		await user.click(screen.getByRole('textbox', {name: /start-date/}));
+
+		await user.paste(FUTURE_DATE_TIME);
+
+		await user.selectOptions(
+			screen.getByRole('combobox', {name: 'repeat'}),
+			'week'
+		);
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		await user.click(screen.getByLabelText(/repeat-at/));
+		await user.keyboard('{Backspace}');
+
+		await user.click(screen.getByRole('textbox', {name: /^name/i}));
+
+		expect(
+			await screen.findByText('please-enter-a-valid-time')
+		).toBeInTheDocument();
 
 		await waitFor(() => {
 			expect(

@@ -191,6 +191,106 @@ describe('PublishScheduler', () => {
 		);
 	});
 
+	it('shows the repeat at field only for a repeating unit', () => {
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Never});
+
+		expect(screen.queryByLabelText('repeat-at')).not.toBeInTheDocument();
+
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Custom});
+
+		expect(screen.queryAllByLabelText('repeat-at')).toHaveLength(0);
+
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Week});
+
+		expect(screen.getByLabelText('repeat-at')).toBeInTheDocument();
+	});
+
+	it('mirrors the start date time in the repeat at field while synced', () => {
+		renderPublishScheduler({
+			enabled: true,
+			startDateTime: '2026-09-08 09:15',
+			unit: IntervalUnit.Week,
+		});
+
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).toBeChecked();
+		expect(screen.getByLabelText('repeat-at')).toHaveValue('09');
+		expect(screen.getByLabelText('repeat-at')).toBeDisabled();
+	});
+
+	it('unchecks the sync and seeds the current start date time when unchecked', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({
+				repeatOnTime: '09:15',
+				repeatOnTimeSynced: false,
+			})
+		);
+	});
+
+	it('re-syncs to the start date time when the checkbox is checked again', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				repeatOnTime: '10:00',
+				repeatOnTimeSynced: false,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('10');
+		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({repeatOnTimeSynced: true})
+		);
+	});
+
+	it('edits the repeat at time independently while unsynced', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				repeatOnTime: '',
+				repeatOnTimeSynced: false,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		await user.click(screen.getByLabelText(/repeat-at/));
+		await user.keyboard('5');
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({repeatOnTime: '05:--'})
+		);
+	});
+
 	it('has no accessibility violations', async () => {
 		const {container} = renderPublishScheduler({
 			enabled: true,

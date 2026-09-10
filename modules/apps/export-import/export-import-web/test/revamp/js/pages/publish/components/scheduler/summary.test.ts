@@ -70,7 +70,7 @@ describe('getScheduleSummary', () => {
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Day}))
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-repeats-every-x-at-x the-process-starts-on-x-at-x-and-never-ends'
 		);
 	});
 
@@ -84,7 +84,7 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-ends-on-x-at-x'
+			'the-process-repeats-every-x-at-x the-process-starts-on-x-at-x-and-ends-on-x-at-x'
 		);
 	});
 
@@ -98,7 +98,7 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-repeats-every-x-at-x the-process-starts-on-x-at-x-and-never-ends'
 		);
 	});
 
@@ -106,13 +106,13 @@ describe('getScheduleSummary', () => {
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Week}))
 		).toBe(
-			'the-process-repeats-every-x-on-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-repeats-every-x-on-x-at-x the-process-starts-on-x-at-x-and-never-ends'
 		);
 
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Month}))
 		).toBe(
-			'the-process-repeats-every-x-on-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-repeats-every-x-on-x-at-x the-process-starts-on-x-at-x-and-never-ends'
 		);
 
 		expect(
@@ -123,27 +123,58 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x-on-the-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-repeats-every-x-on-the-x-at-x the-process-starts-on-x-at-x-and-never-ends'
 		);
 	});
 });
 
 describe('schedule summary wording', () => {
 	const LANGUAGE_KEYS: Record<string, string> = {
+		'day': 'Day',
 		'day-x': 'Day {0}',
 		'days-x': 'Days {0}',
 		'month': 'Month',
-		'the-process-repeats-every-x': 'The process repeats every {0}.',
-		'the-process-repeats-every-x-in-x-on-x':
-			'The process repeats every {0} in {1} on {2}.',
-		'the-process-repeats-every-x-on-x':
-			'The process repeats every {0} on {1}.',
-		'the-process-repeats-in-x-on-the-x':
-			'The process repeats in {0} on the {1}.',
+		'repeat-unit-day': 'day',
+		'repeat-unit-month': 'month',
+		'repeat-unit-week': 'week',
+		'repeat-unit-year': 'year',
+		'the-process-repeats-every-x-at-x':
+			'The process repeats every {0} at {1}.',
+		'the-process-repeats-every-x-in-x-on-the-x-at-x':
+			'The process repeats every {0} in {1} on the {2} at {3}.',
+		'the-process-repeats-every-x-in-x-on-x-at-x':
+			'The process repeats every {0} in {1} on {2} at {3}.',
+		'the-process-repeats-every-x-on-the-x-at-x':
+			'The process repeats every {0} on the {1} at {2}.',
+		'the-process-repeats-every-x-on-x-at-x':
+			'The process repeats every {0} on {1} at {2}.',
+		'the-process-repeats-in-x-at-x': 'The process repeats in {0} at {1}.',
+		'the-process-repeats-in-x-on-the-x-at-x':
+			'The process repeats in {0} on the {1} at {2}.',
+		'the-process-repeats-in-x-on-x-at-x':
+			'The process repeats in {0} on {1} at {2}.',
 		'the-process-starts-on-x-at-x-and-never-ends':
 			'The process starts on {0} at {1} and never ends.',
+		'week': 'Week',
 		'year': 'Year',
 	};
+
+	const START_TIME_TEXT = new Date(
+		START_DATE_TIME.replace(' ', 'T')
+	).toLocaleTimeString(Liferay.ThemeDisplay.getBCP47LanguageId(), {
+		hour: 'numeric',
+		minute: '2-digit',
+	});
+
+	function getStartsSentence(
+		partialScheduleValues: Partial<ScheduleValues>
+	): string {
+		const summary = getScheduleSummary(
+			buildScheduleValues(partialScheduleValues)
+		) as string;
+
+		return summary.slice(summary.indexOf('The process starts'));
+	}
 
 	function getRepeatSentence(
 		partialScheduleValues: Partial<ScheduleValues>
@@ -180,7 +211,7 @@ describe('schedule summary wording', () => {
 				weekdayOrdinal: '3',
 			})
 		).toBe(
-			'The process repeats in january, april, august, and december on the third Thursday.'
+			`The process repeats in january, april, august, and december on the third Thursday at ${START_TIME_TEXT}.`
 		);
 	});
 
@@ -191,7 +222,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month.');
+		).toBe(`The process repeats every month at ${START_TIME_TEXT}.`);
 	});
 
 	it('lists a two day run as separate days', () => {
@@ -201,7 +232,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 2, and 20.');
+		).toBe(
+			`The process repeats every month on Days 1, 2, and 20 at ${START_TIME_TEXT}.`
+		);
 	});
 
 	it('collapses consecutive days into ranges', () => {
@@ -211,7 +244,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1-5 and 20.');
+		).toBe(
+			`The process repeats every month on Days 1-5 and 20 at ${START_TIME_TEXT}.`
+		);
 	});
 
 	it('lists scattered days without repeating the word day', () => {
@@ -221,7 +256,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 3, and 5.');
+		).toBe(
+			`The process repeats every month on Days 1, 3, and 5 at ${START_TIME_TEXT}.`
+		);
 	});
 
 	it('uses the singular day for a single day of the month', () => {
@@ -231,7 +268,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Day 15.');
+		).toBe(
+			`The process repeats every month on Day 15 at ${START_TIME_TEXT}.`
+		);
 	});
 
 	it('describes a yearly repetition', () => {
@@ -241,6 +280,69 @@ describe('schedule summary wording', () => {
 				months: [7],
 				unit: IntervalUnit.Year,
 			})
-		).toBe('The process repeats every Year in july on Day 4.');
+		).toBe(
+			`The process repeats every year in july on Day 4 at ${START_TIME_TEXT}.`
+		);
+	});
+
+	it('lowercases the day unit in a daily repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Day,
+			})
+		).toBe(`The process repeats every day at ${START_TIME_TEXT}.`);
+	});
+
+	it('lowercases the week unit in a weekly repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Week,
+				weekdays: [2, 5, 6],
+			})
+		).toBe(
+			`The process repeats every week on Monday, Thursday, and Friday at ${START_TIME_TEXT}.`
+		);
+	});
+
+	it('shows the start date time in both sentences while the repeat time is synced', () => {
+		expect(getRepeatSentence({unit: IntervalUnit.Week})).toBe(
+			`The process repeats every week on Monday at ${START_TIME_TEXT}.`
+		);
+
+		expect(getStartsSentence({unit: IntervalUnit.Week})).toBe(
+			`The process starts on ${new Date(
+				START_DATE_TIME.replace(' ', 'T')
+			).toLocaleDateString(
+				Liferay.ThemeDisplay.getBCP47LanguageId()
+			)} at ${START_TIME_TEXT} and never ends.`
+		);
+	});
+
+	it('shows the independent repeat time in both sentences once the repeat time is unsynced', () => {
+		const repeatTimeText = new Date(2026, 0, 1, 0, 0).toLocaleTimeString(
+			Liferay.ThemeDisplay.getBCP47LanguageId(),
+			{
+				hour: 'numeric',
+				minute: '2-digit',
+			}
+		);
+
+		const unsyncedScheduleValues = {
+			repeatOnTime: '00:00',
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Week,
+		};
+
+		expect(getRepeatSentence(unsyncedScheduleValues)).toBe(
+			`The process repeats every week on Monday at ${repeatTimeText}.`
+		);
+
+		expect(getStartsSentence(unsyncedScheduleValues)).toBe(
+			`The process starts on ${new Date(
+				START_DATE_TIME.replace(' ', 'T')
+			).toLocaleDateString(
+				Liferay.ThemeDisplay.getBCP47LanguageId()
+			)} at ${repeatTimeText} and never ends.`
+		);
 	});
 });
