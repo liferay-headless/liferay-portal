@@ -332,24 +332,12 @@ function toRepeatOnTimeFields(
 	};
 }
 
-function fromSupportedCronExpression(
-	cronExpression: string,
-	startDateTime: string
+function toCronScheduleValueFields(
+	dayOfMonth: string,
+	dayOfWeek: string,
+	month: string,
+	year: string
 ): Partial<ScheduleValues> {
-	const [second, minute, hour, dayOfMonth, month, dayOfWeek, year = '*'] =
-		cronExpression.trim().toUpperCase().split(/\s+/);
-
-	if (year !== '*' && !year.includes('/')) {
-		return {unit: IntervalUnit.Never};
-	}
-
-	const repeatOnTimeFields = toRepeatOnTimeFields(
-		second,
-		minute,
-		hour,
-		startDateTime
-	);
-
 	const months = toFieldNumbers(month, 4) ?? [];
 
 	let yearInterval = Number(year.split('/')[1]) || 1;
@@ -362,7 +350,6 @@ function fromSupportedCronExpression(
 		if (isOrdinalDayOfWeek(dayOfWeek)) {
 			return {
 				...fromDayOfWeekExpression(dayOfWeek),
-				...repeatOnTimeFields,
 				months,
 				unit: year.includes('/')
 					? IntervalUnit.Year
@@ -372,7 +359,6 @@ function fromSupportedCronExpression(
 		}
 
 		return {
-			...repeatOnTimeFields,
 			unit: IntervalUnit.Week,
 			weekdays: toFieldNumbers(dayOfWeek, 5) ?? [2],
 		};
@@ -382,7 +368,6 @@ function fromSupportedCronExpression(
 
 	if (year.includes('/')) {
 		return {
-			...repeatOnTimeFields,
 			monthDays,
 			months,
 			repeatType: RepeatType.DayOfMonth,
@@ -393,7 +378,6 @@ function fromSupportedCronExpression(
 
 	if (!months.length && !monthDays.length) {
 		return {
-			...repeatOnTimeFields,
 			monthDays,
 			months,
 			unit: IntervalUnit.Day,
@@ -401,11 +385,27 @@ function fromSupportedCronExpression(
 	}
 
 	return {
-		...repeatOnTimeFields,
 		monthDays,
 		months,
 		repeatType: RepeatType.DayOfMonth,
 		unit: IntervalUnit.Month,
+	};
+}
+
+function fromSupportedCronExpression(
+	cronExpression: string,
+	startDateTime: string
+): Partial<ScheduleValues> {
+	const [second, minute, hour, dayOfMonth, month, dayOfWeek, year = '*'] =
+		cronExpression.trim().toUpperCase().split(/\s+/);
+
+	if (year !== '*' && !year.includes('/')) {
+		return {unit: IntervalUnit.Never};
+	}
+
+	return {
+		...toRepeatOnTimeFields(second, minute, hour, startDateTime),
+		...toCronScheduleValueFields(dayOfMonth, dayOfWeek, month, year),
 	};
 }
 
