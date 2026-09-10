@@ -122,6 +122,7 @@ export type ProfileToolPayload = {
 export type ToolSet = {
 	description?: string;
 	name: string;
+	numberOfTools?: number;
 };
 
 export type ToolSummary = {

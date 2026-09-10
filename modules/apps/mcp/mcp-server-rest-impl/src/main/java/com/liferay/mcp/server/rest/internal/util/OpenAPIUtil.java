@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -52,6 +54,41 @@ import org.apache.http.util.EntityUtils;
  * @author Alejandro Tardín
  */
 public class OpenAPIUtil {
+
+	public static Map<String, Integer> getNumberOfToolsMap(
+		JSONObject openAPIJSONObject, Set<String> toolSetNames) {
+
+		JSONObject pathsJSONObject = openAPIJSONObject.getJSONObject("paths");
+
+		if (pathsJSONObject == null) {
+			throw new IllegalArgumentException(
+				"OpenAPI document has no \"paths\" object");
+		}
+
+		Map<String, Integer> numberOfToolsMap = new HashMap<>();
+
+		for (String path : pathsJSONObject.keySet()) {
+			String toolSetName = _getToolSetName(path, toolSetNames);
+
+			if (toolSetName == null) {
+				continue;
+			}
+
+			JSONObject pathItemJSONObject = pathsJSONObject.getJSONObject(path);
+
+			int numberOfTools = 0;
+
+			for (String method : _METHODS) {
+				if (pathItemJSONObject.getJSONObject(method) != null) {
+					numberOfTools++;
+				}
+			}
+
+			numberOfToolsMap.merge(toolSetName, numberOfTools, Integer::sum);
+		}
+
+		return numberOfToolsMap;
+	}
 
 	public static VulcanRequestForwarder.Request getRequest(
 			String basePath, Map<String, String> headers,
@@ -1184,6 +1221,27 @@ public class OpenAPIUtil {
 		}
 
 		return value;
+	}
+
+	private static String _getToolSetName(
+		String path, Set<String> toolSetNames) {
+
+		if (path.startsWith(StringPool.SLASH)) {
+			path = path.substring(1);
+		}
+
+		String[] parts = StringUtil.split(path, CharPool.SLASH);
+
+		for (int i = parts.length; i > 0; i--) {
+			String toolSetName = StringUtil.merge(
+				ArrayUtil.subset(parts, 0, i), StringPool.DASH);
+
+			if (toolSetNames.contains(toolSetName)) {
+				return toolSetName;
+			}
+		}
+
+		return null;
 	}
 
 	private static boolean _isBinary(Map<String, Object> schemaMap) {

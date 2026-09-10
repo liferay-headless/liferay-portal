@@ -10,6 +10,7 @@ import {
 	DataMaskTreeItem,
 	DataMaskTypeKey,
 	ProfileTool,
+	ToolSet,
 	ToolSummary,
 	ToolTreeItem,
 } from './types';
@@ -56,14 +57,52 @@ export function buildToolChildren(
 ): ToolTreeItem[] {
 	const assignedToolIds = getAssignedToolIds(profileTools);
 
-	return tools.map((tool) => {
-		const id = toToolId(toolSetName, tool.name);
+	return tools
+		.map((tool) => {
+			const id = toToolId(toolSetName, tool.name);
 
-		return {
-			assigned: assignedToolIds.has(id),
-			id,
-			name: tool.name,
-		};
+			return {
+				assigned: assignedToolIds.has(id),
+				id,
+				name: tool.name,
+			};
+		})
+		.filter((toolTreeItem) => !toolTreeItem.assigned);
+}
+
+export function getAssignedToolCounts(
+	profileTools: ProfileTool[]
+): Map<string, number> {
+	const assignedToolCounts = new Map<string, number>();
+
+	profileTools.forEach((profileTool) => {
+		assignedToolCounts.set(
+			profileTool.toolSetName,
+			(assignedToolCounts.get(profileTool.toolSetName) ?? 0) + 1
+		);
+	});
+
+	return assignedToolCounts;
+}
+
+export function getAvailableToolSets(
+	toolSets: ToolSet[],
+	profileTools: ProfileTool[]
+): ToolSet[] {
+	const assignedToolCounts = getAssignedToolCounts(profileTools);
+
+	return toolSets.filter((toolSet) => {
+
+		// Keep the tool set when its size is unknown, so an absent count never
+		// hides tools that are still available
+
+		if (toolSet.numberOfTools === undefined) {
+			return true;
+		}
+
+		return (
+			(assignedToolCounts.get(toolSet.name) ?? 0) < toolSet.numberOfTools
+		);
 	});
 }
 
