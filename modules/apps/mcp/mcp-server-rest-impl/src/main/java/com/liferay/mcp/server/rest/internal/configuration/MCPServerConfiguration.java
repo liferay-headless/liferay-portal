@@ -26,4 +26,10 @@ public interface MCPServerConfiguration {
 	@Meta.AD(deflt = "false", name = "enabled", required = false)
 	public boolean enabled();
 
+	@Meta.AD(
+		deflt = "10", description = "search-tool-default-limit-description",
+		name = "search-tool-default-limit", required = false
+	)
+	public int searchToolDefaultLimit();
+
 }
