@@ -5,12 +5,16 @@
 
 package com.liferay.mcp.server.rest.internal.model.listener;
 
-import com.liferay.mcp.server.rest.internal.util.ToolSetUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexWriter;
+import com.liferay.mcp.server.rest.internal.util.MCPClusterUtil;
+import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
+import com.liferay.mcp.server.rest.internal.util.OpenAPIBriefUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
@@ -20,15 +24,12 @@ public class ObjectDefinitionModelListener
 	extends BaseModelListener<ObjectDefinition> {
 
 	@Override
-	public void onAfterCreate(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
-	}
-
-	@Override
 	public void onAfterRemove(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		if (!objectDefinition.isApproved()) {
+			return;
+		}
+
+		_invalidate(objectDefinition);
 	}
 
 	@Override
@@ -36,8 +37,32 @@ public class ObjectDefinitionModelListener
 		ObjectDefinition originalObjectDefinition,
 		ObjectDefinition objectDefinition) {
 
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		if (!originalObjectDefinition.isApproved() &&
+			!objectDefinition.isApproved()) {
+
+			return;
+		}
+
+		_invalidate(objectDefinition);
 	}
+
+	private void _invalidate(ObjectDefinition objectDefinition) {
+		String restContextPath = ObjectRESTPathUtil.getRESTContextPath(
+			objectDefinition);
+
+		OpenAPIBriefUtil.clearOpenAPIJSONObjectCache(
+			objectDefinition.getCompanyId(), restContextPath);
+
+		_mcpToolIndexWriter.invalidate(
+			objectDefinition.getCompanyId(),
+			OpenAPIBriefUtil.getToolSetName(
+				objectDefinition.getCompanyId(), restContextPath));
+
+		MCPClusterUtil.notifyCluster(
+			objectDefinition.getCompanyId(), restContextPath);
+	}
+
+	@Reference
+	private MCPToolIndexWriter _mcpToolIndexWriter;
 
 }
