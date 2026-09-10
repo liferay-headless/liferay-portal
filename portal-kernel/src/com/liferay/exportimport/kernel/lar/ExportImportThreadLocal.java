@@ -16,6 +16,14 @@ public class ExportImportThreadLocal {
 		return _exportImportConfigurationId.get();
 	}
 
+	public static String getPublishingUserName() {
+		return _publishingUserName.get();
+	}
+
+	public static String getPublishingUserUuid() {
+		return _publishingUserUuid.get();
+	}
+
 	public static boolean isDataDeletionImportInProcess() {
 		if (isLayoutDataDeletionImportInProcess() ||
 			isPortletDataDeletionImportInProcess()) {
@@ -173,6 +181,14 @@ public class ExportImportThreadLocal {
 		_portletValidationInProcess.set(portletValidationInProcess);
 	}
 
+	public static void setPublishingUserName(String publishingUserName) {
+		_publishingUserName.set(publishingUserName);
+	}
+
+	public static void setPublishingUserUuid(String publishingUserUuid) {
+		_publishingUserUuid.set(publishingUserUuid);
+	}
+
 	public static void setStagingInProcessOnRemoteLive(
 		boolean stagingInProcessOnRemoteLive) {
 
@@ -229,6 +245,12 @@ public class ExportImportThreadLocal {
 		new CentralizedThreadLocal<>(
 			ExportImportThreadLocal.class + "._portletValidationInProcess",
 			() -> Boolean.FALSE);
+	private static final ThreadLocal<String> _publishingUserName =
+		new CentralizedThreadLocal<>(
+			ExportImportThreadLocal.class + "._publishingUserName", () -> null);
+	private static final ThreadLocal<String> _publishingUserUuid =
+		new CentralizedThreadLocal<>(
+			ExportImportThreadLocal.class + "._publishingUserUuid", () -> null);
 	private static final ThreadLocal<Boolean> _stagingInProcessOnRemoteLive =
 		new CentralizedThreadLocal<>(
 			ExportImportThreadLocal.class + "._stagingInProcessOnRemoteLive",
