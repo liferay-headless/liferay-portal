@@ -190,7 +190,7 @@ public class Prerequisite implements Serializable {
 	private Supplier<String> _toolNameSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema(
-		description = "Tool-set that exposes the operation named in `toolName`."
+		description = "Tool set that exposes the operation named in `toolName`."
 	)
 	public String getToolSetName() {
 		if (_toolSetNameSupplier != null) {
@@ -226,7 +226,7 @@ public class Prerequisite implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "Tool-set that exposes the operation named in `toolName`."
+		description = "Tool set that exposes the operation named in `toolName`."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String toolSetName;
@@ -426,4 +426,4 @@ public class Prerequisite implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-917330232
+// LIFERAY-REST-BUILDER-HASH:-96888024
