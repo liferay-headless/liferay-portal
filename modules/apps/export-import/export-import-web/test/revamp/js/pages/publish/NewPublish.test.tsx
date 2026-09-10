@@ -392,6 +392,23 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('textbox', {name: /cron-expression/})
 		).toHaveAccessibleName(/mandatory/i);
+
+		await user.selectOptions(
+			screen.getByRole('combobox', {name: 'repeat'}),
+			'week'
+		);
+
+		expect(screen.getByLabelText(/repeat-at/)).not.toHaveAccessibleName(
+			/mandatory/i
+		);
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		expect(screen.getByLabelText(/repeat-at/)).toHaveAccessibleName(
+			/mandatory/i
+		);
 	});
 
 	it('schedules the publication with the cron fields', async () => {
