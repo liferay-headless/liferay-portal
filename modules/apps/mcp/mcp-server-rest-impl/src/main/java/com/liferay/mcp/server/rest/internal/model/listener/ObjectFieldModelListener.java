@@ -5,10 +5,8 @@
 
 package com.liferay.mcp.server.rest.internal.model.listener;
 
-import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexWriter;
-import com.liferay.mcp.server.rest.internal.util.MCPClusterUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexInvalidator;
 import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
-import com.liferay.mcp.server.rest.internal.util.OpenAPIBriefUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -46,10 +44,12 @@ public class ObjectFieldModelListener extends BaseModelListener<ObjectField> {
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				objectField.getObjectDefinitionId());
 
-		if (objectDefinition == null) {
-			_mcpToolIndexWriter.invalidate(objectField.getCompanyId());
+		// A removed object definition cannot name its own tool set, so
+		// everything for the company is invalidated.
 
-			MCPClusterUtil.notifyCluster(objectField.getCompanyId(), null);
+		if (objectDefinition == null) {
+			_mcpToolIndexInvalidator.invalidate(
+				objectField.getCompanyId(), null);
 
 			return;
 		}
@@ -58,23 +58,13 @@ public class ObjectFieldModelListener extends BaseModelListener<ObjectField> {
 			return;
 		}
 
-		String restContextPath = ObjectRESTPathUtil.getRESTContextPath(
-			objectDefinition);
-
-		OpenAPIBriefUtil.clearOpenAPIJSONObjectCache(
-			objectField.getCompanyId(), restContextPath);
-
-		_mcpToolIndexWriter.invalidate(
+		_mcpToolIndexInvalidator.invalidate(
 			objectField.getCompanyId(),
-			OpenAPIBriefUtil.getToolSetName(
-				objectField.getCompanyId(), restContextPath));
-
-		MCPClusterUtil.notifyCluster(
-			objectField.getCompanyId(), restContextPath);
+			ObjectRESTPathUtil.getRESTContextPath(objectDefinition));
 	}
 
 	@Reference
-	private MCPToolIndexWriter _mcpToolIndexWriter;
+	private MCPToolIndexInvalidator _mcpToolIndexInvalidator;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
