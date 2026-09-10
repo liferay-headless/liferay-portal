@@ -3,7 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {render, screen, waitFor, within} from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import fetch from 'jest-fetch-mock';
 import React from 'react';
@@ -485,7 +491,7 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		).toBeChecked();
-		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00:00');
 		expect(screen.getByLabelText(/repeat-at/)).toBeDisabled();
 	});
 
@@ -518,7 +524,7 @@ describe('NewPublish', () => {
 		expect(
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		).not.toBeChecked();
-		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('00:00');
 		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
 	});
 
@@ -777,7 +783,7 @@ describe('NewPublish', () => {
 		});
 	});
 
-	it('requires a valid repeat at time when the sync is unchecked', async () => {
+	it('requires the repeat at time once the sync is unchecked', async () => {
 		renderComponent();
 
 		await fillRequiredFields();
@@ -799,13 +805,13 @@ describe('NewPublish', () => {
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		);
 
-		await user.click(screen.getByLabelText(/repeat-at/));
-		await user.keyboard('{Backspace}');
-
-		await user.click(screen.getByRole('textbox', {name: /^name/i}));
+		fireEvent.change(screen.getByLabelText(/repeat-at/), {
+			target: {value: ''},
+		});
+		fireEvent.blur(screen.getByLabelText(/repeat-at/));
 
 		expect(
-			await screen.findByText('please-enter-a-valid-time')
+			await screen.findByText('this-field-is-required')
 		).toBeInTheDocument();
 
 		await waitFor(() => {

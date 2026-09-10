@@ -5,7 +5,7 @@
 
 // eslint-disable-next-line @liferay/portal/no-cross-module-deep-import
 import {checkAccessibility} from '@liferay/layout-js-components-web/test/__lib__/index';
-import {render, screen, within} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -215,7 +215,7 @@ describe('PublishScheduler', () => {
 		expect(
 			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
 		).toBeChecked();
-		expect(screen.getByLabelText('repeat-at')).toHaveValue('09');
+		expect(screen.getByLabelText('repeat-at')).toHaveValue('09:15');
 		expect(screen.getByLabelText('repeat-at')).toBeDisabled();
 	});
 
@@ -257,7 +257,7 @@ describe('PublishScheduler', () => {
 			onChange
 		);
 
-		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('10');
+		expect(screen.getByLabelText(/repeat-at/)).toHaveValue('10:00');
 		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
 
 		await user.click(
@@ -283,11 +283,12 @@ describe('PublishScheduler', () => {
 			onChange
 		);
 
-		await user.click(screen.getByLabelText(/repeat-at/));
-		await user.keyboard('5');
+		fireEvent.change(screen.getByLabelText(/repeat-at/), {
+			target: {value: '05:30'},
+		});
 
 		expect(onChange).toHaveBeenCalledWith(
-			expect.objectContaining({repeatOnTime: '05:--'})
+			expect.objectContaining({repeatOnTime: '05:30'})
 		);
 	});
 
