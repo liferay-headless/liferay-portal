@@ -40,6 +40,9 @@ public class PortalInstanceBackgroundTaskConstants {
 
 	public static final String STATUS = "status";
 
+	public static final String TASK_EXECUTOR_CLASS_NAME =
+		"taskExecutorClassName";
+
 	public static final String VIRTUAL_HOSTNAME = "virtualHostname";
 
 	public static final String WEB_ID = "webId";

@@ -6,6 +6,7 @@
 package com.liferay.portal.instances.internal.background.task;
 
 import com.liferay.portal.instances.background.task.constants.PortalInstanceBackgroundTaskConstants;
+import com.liferay.portal.instances.constants.PortalInstancesPortletKeys;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -27,9 +28,11 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalInstances;
@@ -104,6 +107,18 @@ public class AddPortalInstanceBackgroundTaskExecutor
 				defaultAdminEmailAddress, defaultAdminFirstName,
 				defaultAdminMiddleName, defaultAdminLastName));
 
+		try {
+			_sendUserNotificationEvent(
+				backgroundTask,
+				_getPayloadJSONObject(
+					null, BackgroundTaskConstants.STATUS_SUCCESSFUL,
+					backgroundTask.getTaskExecutorClassName(), webId));
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to send the success user notification", exception);
+		}
+
 		JSONObject statusMessageJSONObject = JSONUtil.put(
 			PortalInstanceBackgroundTaskConstants.COMPANY_ID,
 			company.getCompanyId());
@@ -124,6 +139,9 @@ public class AddPortalInstanceBackgroundTaskExecutor
 	public String handleException(
 		BackgroundTask backgroundTask, Exception exception1) {
 
+		Map<String, Serializable> taskContextMap =
+			backgroundTask.getTaskContextMap();
+
 		String errorMessageKey = _getErrorMessageKey(exception1);
 
 		try {
@@ -133,6 +151,21 @@ public class AddPortalInstanceBackgroundTaskExecutor
 			_log.error(
 				"Unable to persist the portal instance operation error",
 				exception2);
+		}
+
+		try {
+			_sendUserNotificationEvent(
+				backgroundTask,
+				_getPayloadJSONObject(
+					errorMessageKey, BackgroundTaskConstants.STATUS_FAILED,
+					backgroundTask.getTaskExecutorClassName(),
+					GetterUtil.getString(
+						taskContextMap.get(
+							PortalInstanceBackgroundTaskConstants.WEB_ID))));
+		}
+		catch (Exception exception2) {
+			_log.error(
+				"Unable to send the failure user notification", exception2);
 		}
 
 		return super.handleException(backgroundTask, exception1);
@@ -203,6 +236,23 @@ public class AddPortalInstanceBackgroundTaskExecutor
 		return "an-unexpected-error-occurred";
 	}
 
+	private JSONObject _getPayloadJSONObject(
+		String errorMessageKey, int status, String taskExecutorClassName,
+		String webId) {
+
+		return JSONUtil.put(
+			PortalInstanceBackgroundTaskConstants.ERROR_MESSAGE_KEY,
+			errorMessageKey
+		).put(
+			PortalInstanceBackgroundTaskConstants.STATUS, status
+		).put(
+			PortalInstanceBackgroundTaskConstants.TASK_EXECUTOR_CLASS_NAME,
+			taskExecutorClassName
+		).put(
+			PortalInstanceBackgroundTaskConstants.WEB_ID, webId
+		);
+	}
+
 	private void _persistErrorMessageKey(
 			BackgroundTask backgroundTask, String errorMessageKey)
 		throws Exception {
@@ -219,6 +269,16 @@ public class AddPortalInstanceBackgroundTaskExecutor
 			backgroundTask.getStatus(), new ServiceContext());
 	}
 
+	private void _sendUserNotificationEvent(
+			BackgroundTask backgroundTask, JSONObject payloadJSONObject)
+		throws Exception {
+
+		_userNotificationEventLocalService.sendUserNotificationEvents(
+			backgroundTask.getUserId(),
+			PortalInstancesPortletKeys.PORTAL_INSTANCES,
+			UserNotificationDeliveryConstants.TYPE_WEBSITE, payloadJSONObject);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		AddPortalInstanceBackgroundTaskExecutor.class);
 
@@ -233,5 +293,9 @@ public class AddPortalInstanceBackgroundTaskExecutor
 
 	@Reference
 	private Encryptor _encryptor;
+
+	@Reference
+	private UserNotificationEventLocalService
+		_userNotificationEventLocalService;
 
 }
