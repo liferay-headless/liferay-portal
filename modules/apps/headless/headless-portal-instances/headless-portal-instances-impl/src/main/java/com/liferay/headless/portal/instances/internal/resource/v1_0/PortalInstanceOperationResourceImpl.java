@@ -8,7 +8,6 @@ package com.liferay.headless.portal.instances.internal.resource.v1_0;
 import com.liferay.headless.portal.instances.dto.v1_0.PortalInstanceOperation;
 import com.liferay.headless.portal.instances.internal.dto.v1_0.util.PortalInstanceOperationUtil;
 import com.liferay.headless.portal.instances.resource.v1_0.PortalInstanceOperationResource;
-import com.liferay.portal.instances.background.task.PortalInstanceOperationType;
 import com.liferay.portal.instances.background.task.constants.PortalInstanceBackgroundTaskExecutorNames;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -55,7 +54,7 @@ public class PortalInstanceOperationResourceImpl
 		return PortalInstanceOperationUtil.toPortalInstanceOperation(
 			backgroundTask, _jsonFactory, _language,
 			contextAcceptLanguage.getPreferredLocale(),
-			_getPortalInstanceOperationType(backgroundTask));
+			_getOperationType(backgroundTask));
 	}
 
 	private void _checkPermission() throws Exception {
@@ -67,7 +66,7 @@ public class PortalInstanceOperationResourceImpl
 		}
 	}
 
-	private PortalInstanceOperationType _getPortalInstanceOperationType(
+	private PortalInstanceOperation.OperationType _getOperationType(
 		BackgroundTask backgroundTask) {
 
 		if (StringUtil.equals(
@@ -75,7 +74,7 @@ public class PortalInstanceOperationResourceImpl
 				PortalInstanceBackgroundTaskExecutorNames.
 					ADD_PORTAL_INSTANCE_BACKGROUND_TASK_EXECUTOR)) {
 
-			return PortalInstanceOperationType.ADD;
+			return PortalInstanceOperation.OperationType.ADD;
 		}
 
 		throw new NotFoundException(

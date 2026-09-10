@@ -10,7 +10,6 @@ import com.liferay.headless.portal.instances.dto.v1_0.PortalInstance;
 import com.liferay.headless.portal.instances.dto.v1_0.PortalInstanceOperation;
 import com.liferay.headless.portal.instances.internal.dto.v1_0.util.PortalInstanceOperationUtil;
 import com.liferay.headless.portal.instances.resource.v1_0.AsyncPortalInstanceResource;
-import com.liferay.portal.instances.background.task.PortalInstanceOperationType;
 import com.liferay.portal.instances.background.task.constants.PortalInstanceBackgroundTaskConstants;
 import com.liferay.portal.instances.background.task.constants.PortalInstanceBackgroundTaskExecutorNames;
 import com.liferay.portal.instances.exception.PortalInstanceAlreadyBeingAddedException;
@@ -75,7 +74,7 @@ public class AsyncPortalInstanceResourceImpl
 		return PortalInstanceOperationUtil.toPortalInstanceOperation(
 			_addPortalInstance(admin, portalInstance), _jsonFactory, _language,
 			contextAcceptLanguage.getPreferredLocale(),
-			PortalInstanceOperationType.ADD);
+			PortalInstanceOperation.OperationType.ADD);
 	}
 
 	private BackgroundTask _addPortalInstance(

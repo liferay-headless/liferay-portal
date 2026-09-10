@@ -36,8 +36,6 @@ public class PortalInstanceBackgroundTaskConstants {
 
 	public static final String MX = "mx";
 
-	public static final String OPERATION_TYPE = "operationType";
-
 	public static final String SITE_INITIALIZER_KEY = "siteInitializerKey";
 
 	public static final String STATUS = "status";
