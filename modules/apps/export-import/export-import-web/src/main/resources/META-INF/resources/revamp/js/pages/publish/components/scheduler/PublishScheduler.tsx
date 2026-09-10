@@ -45,6 +45,8 @@ const MONTH_VALUES = MONTHS.map((month) => month.value);
 
 const DATE_TIME_PLACEHOLDER = `${DATE_FORMAT} HH:MM`.toUpperCase();
 
+const UNSET_TIME = '--:--';
+
 const withDefaultTime = (value: string, defaultTime: string) => {
 	if (isCompleteDateTime(value)) {
 		return value;
@@ -52,7 +54,7 @@ const withDefaultTime = (value: string, defaultTime: string) => {
 
 	const [datePart, timePart = ''] = value.split(' ');
 
-	if (!isCompleteDateTime(`${datePart} 00:00`) || !timePart.includes('-')) {
+	if (!isCompleteDateTime(`${datePart} 00:00`) || timePart !== UNSET_TIME) {
 		return value;
 	}
 
