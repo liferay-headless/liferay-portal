@@ -5,12 +5,14 @@
 
 package com.liferay.mcp.server.rest.internal.model.listener;
 
-import com.liferay.mcp.server.rest.internal.util.ToolSetUtil;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexInvalidator;
+import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
@@ -20,15 +22,12 @@ public class ObjectDefinitionModelListener
 	extends BaseModelListener<ObjectDefinition> {
 
 	@Override
-	public void onAfterCreate(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
-	}
-
-	@Override
 	public void onAfterRemove(ObjectDefinition objectDefinition) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		if (!objectDefinition.isApproved()) {
+			return;
+		}
+
+		_invalidate(objectDefinition);
 	}
 
 	@Override
@@ -36,8 +35,22 @@ public class ObjectDefinitionModelListener
 		ObjectDefinition originalObjectDefinition,
 		ObjectDefinition objectDefinition) {
 
-		ToolSetUtil.clearOpenAPIJSONObjectCache(
-			objectDefinition.getCompanyId());
+		if (!originalObjectDefinition.isApproved() &&
+			!objectDefinition.isApproved()) {
+
+			return;
+		}
+
+		_invalidate(objectDefinition);
 	}
+
+	private void _invalidate(ObjectDefinition objectDefinition) {
+		_mcpToolIndexInvalidator.invalidate(
+			objectDefinition.getCompanyId(),
+			ObjectRESTPathUtil.getRESTContextPath(objectDefinition));
+	}
+
+	@Reference
+	private MCPToolIndexInvalidator _mcpToolIndexInvalidator;
 
 }

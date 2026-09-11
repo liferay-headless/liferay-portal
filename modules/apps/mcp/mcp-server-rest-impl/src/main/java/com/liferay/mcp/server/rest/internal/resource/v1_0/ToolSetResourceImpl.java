@@ -25,13 +25,10 @@ public class ToolSetResourceImpl extends BaseToolSetResourceImpl {
 
 	@Override
 	public Page<ToolSet> getToolSetsPage() {
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-63311")) {
+		FeatureFlagManagerUtil.checkEnabled(
+			contextCompany.getCompanyId(), "LPD-63311");
 
-			throw new UnsupportedOperationException();
-		}
-
-		return ToolSetUtil.getToolSetsPage();
+		return ToolSetUtil.getToolSetsPage(contextCompany.getCompanyId());
 	}
 
 }
