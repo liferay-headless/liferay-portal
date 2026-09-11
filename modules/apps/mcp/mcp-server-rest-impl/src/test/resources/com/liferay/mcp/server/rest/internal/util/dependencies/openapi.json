@@ -190,6 +190,23 @@
 				"summary": "This is the summary"
 			}
 		},
+		"/v1.0/batches": {
+			"post": {
+				"operationId": "postBatch",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/Item"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v1.0/binaries": {
 			"post": {
 				"operationId": "postBinary",
@@ -237,6 +254,17 @@
 					{
 						"description": "This is the description",
 						"in": "query",
+						"name": "aggregationTerms",
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						}
+					},
+					{
+						"description": "This is the description",
+						"in": "query",
 						"name": "filter",
 						"schema": {
 							"type": "string"
@@ -256,6 +284,22 @@
 						"name": "pageSize",
 						"schema": {
 							"type": "integer"
+						}
+					},
+					{
+						"description": "This is the description",
+						"in": "query",
+						"name": "search",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "This is the description",
+						"in": "query",
+						"name": "sort",
+						"schema": {
+							"type": "string"
 						}
 					}
 				],

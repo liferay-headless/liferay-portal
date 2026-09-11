@@ -26,6 +26,10 @@ public class MCPServerConstants {
 	public static final String EXTERNAL_REFERENCE_CODE_MCP_SERVER_PROMPT =
 		"L_MCP_SERVER_PROMPT";
 
+	public static final String
+		EXTERNAL_REFERENCE_CODE_MCP_SERVER_RESTRICTED_FIELD =
+			"L_MCP_SERVER_RESTRICTED_FIELD";
+
 	public static final String PATH_MCP = "/mcp";
 
 	public static final String PATH_WELL_KNOWN_PROTECTED_RESOURCE =
