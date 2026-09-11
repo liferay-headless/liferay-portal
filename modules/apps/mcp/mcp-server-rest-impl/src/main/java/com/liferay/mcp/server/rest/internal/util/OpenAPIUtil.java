@@ -53,6 +53,23 @@ import org.apache.http.util.EntityUtils;
  */
 public class OpenAPIUtil {
 
+	public static Map<String, ?> getOutputSchema(
+		JSONObject openAPIJSONObject, String toolName) {
+
+		Operation operation = _getOperation(openAPIJSONObject, toolName);
+
+		JSONObject responseSchemaJSONObject = _getResponseSchemaJSONObject(
+			operation._operationJSONObject);
+
+		if (responseSchemaJSONObject == null) {
+			return null;
+		}
+
+		return (Map<String, Object>)_getSchemaObject(
+			"writeOnly", openAPIJSONObject, responseSchemaJSONObject,
+			new HashSet<>());
+	}
+
 	public static VulcanRequestForwarder.Request getRequest(
 			String basePath, Map<String, String> headers,
 			JSONObject inputJSONObject, JSONObject openAPIJSONObject,
@@ -218,7 +235,7 @@ public class OpenAPIUtil {
 
 		Map<String, Object> bodySchemaMap =
 			(Map<String, Object>)_getSchemaObject(
-				openAPIJSONObject,
+				"readOnly", openAPIJSONObject,
 				_getBodySchemaJSONObject(operationJSONObject), new HashSet<>());
 
 		Map<String, Object> bodyProperties =
@@ -325,8 +342,8 @@ public class OpenAPIUtil {
 		sb.append(URLCodec.encodeURL(stringValue));
 	}
 
-	private static void _filterReadOnlyProperties(
-		Map<String, Object> schemaMap) {
+	private static void _filterProperties(
+		String excludedPropertyAttributeName, Map<String, Object> schemaMap) {
 
 		Object propertiesObject = schemaMap.get("properties");
 
@@ -336,7 +353,7 @@ public class OpenAPIUtil {
 
 		Map<String, Object> properties = (Map<String, Object>)propertiesObject;
 
-		Set<String> readOnlyPropertyNames = new HashSet<>();
+		Set<String> excludedPropertyNames = new HashSet<>();
 
 		for (Map.Entry<String, Object> entry : properties.entrySet()) {
 			Object value = entry.getValue();
@@ -347,16 +364,18 @@ public class OpenAPIUtil {
 
 			Map<?, ?> propertyMap = (Map<?, ?>)value;
 
-			if (GetterUtil.getBoolean(propertyMap.get("readOnly"))) {
-				readOnlyPropertyNames.add(entry.getKey());
+			if (GetterUtil.getBoolean(
+					propertyMap.get(excludedPropertyAttributeName))) {
+
+				excludedPropertyNames.add(entry.getKey());
 			}
 		}
 
-		if (readOnlyPropertyNames.isEmpty()) {
+		if (excludedPropertyNames.isEmpty()) {
 			return;
 		}
 
-		readOnlyPropertyNames.forEach(properties::remove);
+		excludedPropertyNames.forEach(properties::remove);
 
 		List<Object> required = (List<Object>)schemaMap.get("required");
 
@@ -368,12 +387,12 @@ public class OpenAPIUtil {
 			"required",
 			ListUtil.filter(
 				TransformUtil.transform(required, String::valueOf),
-				Predicate.not(readOnlyPropertyNames::contains)));
+				Predicate.not(excludedPropertyNames::contains)));
 	}
 
 	private static Map<String, Object> _getAllOfSchemaMap(
-		JSONObject jsonObject, JSONObject openAPIJSONObject,
-		Set<String> visitedRefs) {
+		String excludedPropertyAttributeName, JSONObject jsonObject,
+		JSONObject openAPIJSONObject, Set<String> visitedRefs) {
 
 		Map<String, Object> allOfSchemaMap = new LinkedHashMap<>();
 
@@ -390,15 +409,16 @@ public class OpenAPIUtil {
 			allOfSchemaMap.put(
 				key,
 				_getSchemaObject(
-					openAPIJSONObject, jsonObject.get(key), visitedRefs));
+					excludedPropertyAttributeName, openAPIJSONObject,
+					jsonObject.get(key), visitedRefs));
 		}
 
 		JSONArray allOfJSONArray = jsonObject.getJSONArray("allOf");
 
 		for (int i = 0; i < allOfJSONArray.length(); i++) {
 			Object schemaObject = _getSchemaObject(
-				openAPIJSONObject, allOfJSONArray.getJSONObject(i),
-				visitedRefs);
+				excludedPropertyAttributeName, openAPIJSONObject,
+				allOfJSONArray.getJSONObject(i), visitedRefs);
 
 			if (!(schemaObject instanceof Map)) {
 				continue;
@@ -440,7 +460,7 @@ public class OpenAPIUtil {
 
 		allOfSchemaMap.putIfAbsent("type", "object");
 
-		_filterReadOnlyProperties(allOfSchemaMap);
+		_filterProperties(excludedPropertyAttributeName, allOfSchemaMap);
 
 		return allOfSchemaMap;
 	}
@@ -590,7 +610,7 @@ public class OpenAPIUtil {
 
 				if (requestBodyJSONObject.getJSONObject("content") != null) {
 					Object bodySchemaObject = _getSchemaObject(
-						openAPIJSONObject,
+						"readOnly", openAPIJSONObject,
 						_getBodySchemaJSONObject(operationJSONObject),
 						new HashSet<>());
 
@@ -668,7 +688,7 @@ public class OpenAPIUtil {
 
 		Map<String, Object> bodySchemaMap =
 			(Map<String, Object>)_getSchemaObject(
-				openAPIJSONObject,
+				"readOnly", openAPIJSONObject,
 				_getBodySchemaJSONObject(operation._operationJSONObject),
 				new HashSet<>());
 
@@ -746,8 +766,8 @@ public class OpenAPIUtil {
 	}
 
 	private static Map<String, Object> _getOneOfSchemaMap(
-		JSONObject jsonObject, JSONObject openAPIJSONObject, String ref,
-		Set<String> visitedRefs) {
+		String excludedPropertyAttributeName, JSONObject jsonObject,
+		JSONObject openAPIJSONObject, String ref, Set<String> visitedRefs) {
 
 		List<Object> oneOfSchemaObjects = new ArrayList<>();
 
@@ -799,8 +819,8 @@ public class OpenAPIUtil {
 
 				oneOfSchemaObjects.add(
 					_getSchemaObject(
-						openAPIJSONObject, schemaJSONObject,
-						subtypeVisitedRefs));
+						excludedPropertyAttributeName, openAPIJSONObject,
+						schemaJSONObject, subtypeVisitedRefs));
 			}
 		}
 
@@ -815,10 +835,11 @@ public class OpenAPIUtil {
 				schemaMap.put(
 					key,
 					_getSchemaObject(
-						openAPIJSONObject, jsonObject.get(key), visitedRefs));
+						excludedPropertyAttributeName, openAPIJSONObject,
+						jsonObject.get(key), visitedRefs));
 			}
 
-			_filterReadOnlyProperties(schemaMap);
+			_filterProperties(excludedPropertyAttributeName, schemaMap);
 
 			return schemaMap;
 		}
@@ -1017,46 +1038,9 @@ public class OpenAPIUtil {
 	private static Collection<String> _getResponseFieldNames(
 		JSONObject openAPIJSONObject, JSONObject operationJSONObject) {
 
-		JSONObject responsesJSONObject = operationJSONObject.getJSONObject(
-			"responses");
-
-		JSONObject responseJSONObject = null;
-
-		if (responsesJSONObject != null) {
-			for (String code : responsesJSONObject.keySet()) {
-				if (code.startsWith("2")) {
-					responseJSONObject = responsesJSONObject.getJSONObject(
-						code);
-
-					break;
-				}
-			}
-
-			if (responseJSONObject == null) {
-				responseJSONObject = responsesJSONObject.getJSONObject(
-					"default");
-			}
-		}
-
-		JSONObject responseSchemaJSONObject = null;
-
-		if (responseJSONObject != null) {
-			JSONObject contentJSONObject = responseJSONObject.getJSONObject(
-				"content");
-
-			if (contentJSONObject != null) {
-				JSONObject mediaTypeJSONObject =
-					contentJSONObject.getJSONObject("application/json");
-
-				if (mediaTypeJSONObject != null) {
-					responseSchemaJSONObject =
-						mediaTypeJSONObject.getJSONObject("schema");
-				}
-			}
-		}
-
 		return _getResponseFieldNames(
-			openAPIJSONObject, responseSchemaJSONObject, new HashSet<>());
+			openAPIJSONObject,
+			_getResponseSchemaJSONObject(operationJSONObject), new HashSet<>());
 	}
 
 	private static Set<String> _getResponseFieldNames(
@@ -1104,7 +1088,19 @@ public class OpenAPIUtil {
 					visitedRefs);
 			}
 
-			responseFieldNames.addAll(propertiesJSONObject.keySet());
+			for (String propertyName : propertiesJSONObject.keySet()) {
+				JSONObject propertyJSONObject =
+					propertiesJSONObject.getJSONObject(propertyName);
+
+				if ((propertyJSONObject != null) &&
+					GetterUtil.getBoolean(
+						propertyJSONObject.get("writeOnly"))) {
+
+					continue;
+				}
+
+				responseFieldNames.add(propertyName);
+			}
 		}
 
 		JSONArray allOfJSONArray = schemaJSONObject.getJSONArray("allOf");
@@ -1121,8 +1117,54 @@ public class OpenAPIUtil {
 		return responseFieldNames;
 	}
 
+	private static JSONObject _getResponseSchemaJSONObject(
+		JSONObject operationJSONObject) {
+
+		JSONObject responsesJSONObject = operationJSONObject.getJSONObject(
+			"responses");
+
+		if (responsesJSONObject == null) {
+			return null;
+		}
+
+		JSONObject responseJSONObject = null;
+
+		for (String code : responsesJSONObject.keySet()) {
+			if (code.startsWith("2")) {
+				responseJSONObject = responsesJSONObject.getJSONObject(code);
+
+				break;
+			}
+		}
+
+		if (responseJSONObject == null) {
+			responseJSONObject = responsesJSONObject.getJSONObject("default");
+		}
+
+		if (responseJSONObject == null) {
+			return null;
+		}
+
+		JSONObject contentJSONObject = responseJSONObject.getJSONObject(
+			"content");
+
+		if (contentJSONObject == null) {
+			return null;
+		}
+
+		JSONObject mediaTypeJSONObject = contentJSONObject.getJSONObject(
+			"application/json");
+
+		if (mediaTypeJSONObject == null) {
+			return null;
+		}
+
+		return mediaTypeJSONObject.getJSONObject("schema");
+	}
+
 	private static Object _getSchemaObject(
-		JSONObject openAPIJSONObject, Object value, Set<String> visitedRefs) {
+		String excludedPropertyAttributeName, JSONObject openAPIJSONObject,
+		Object value, Set<String> visitedRefs) {
 
 		if (value instanceof JSONObject) {
 			JSONObject jsonObject = (JSONObject)value;
@@ -1145,17 +1187,19 @@ public class OpenAPIUtil {
 
 				if (refJSONObject.has("discriminator")) {
 					return _getOneOfSchemaMap(
-						refJSONObject, openAPIJSONObject, ref,
-						currentVisitedRefs);
+						excludedPropertyAttributeName, refJSONObject,
+						openAPIJSONObject, ref, currentVisitedRefs);
 				}
 
 				return _getSchemaObject(
-					openAPIJSONObject, refJSONObject, currentVisitedRefs);
+					excludedPropertyAttributeName, openAPIJSONObject,
+					refJSONObject, currentVisitedRefs);
 			}
 
 			if (jsonObject.has("allOf")) {
 				return _getAllOfSchemaMap(
-					jsonObject, openAPIJSONObject, visitedRefs);
+					excludedPropertyAttributeName, jsonObject,
+					openAPIJSONObject, visitedRefs);
 			}
 
 			Map<String, Object> schemaMap = new LinkedHashMap<>();
@@ -1168,10 +1212,11 @@ public class OpenAPIUtil {
 				schemaMap.put(
 					key,
 					_getSchemaObject(
-						openAPIJSONObject, jsonObject.get(key), visitedRefs));
+						excludedPropertyAttributeName, openAPIJSONObject,
+						jsonObject.get(key), visitedRefs));
 			}
 
-			_filterReadOnlyProperties(schemaMap);
+			_filterProperties(excludedPropertyAttributeName, schemaMap);
 
 			return schemaMap;
 		}
@@ -1180,7 +1225,8 @@ public class OpenAPIUtil {
 			return TransformUtil.transform(
 				JSONUtil.toObjectList(jsonArray),
 				object -> _getSchemaObject(
-					openAPIJSONObject, object, visitedRefs));
+					excludedPropertyAttributeName, openAPIJSONObject, object,
+					visitedRefs));
 		}
 
 		return value;

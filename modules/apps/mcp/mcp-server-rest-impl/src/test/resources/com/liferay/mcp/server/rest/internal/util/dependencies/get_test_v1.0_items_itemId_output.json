@@ -21,15 +21,16 @@
 		"object2": {
 			"type": "object"
 		},
-		"string": {
+		"readOnly": {
+			"readOnly": true,
 			"type": "string"
 		},
-		"writeOnly": {
-			"type": "string",
-			"writeOnly": true
+		"string": {
+			"type": "string"
 		}
 	},
 	"required": [
+		"readOnly",
 		"string"
 	],
 	"type": "object"

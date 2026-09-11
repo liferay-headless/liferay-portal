@@ -2,7 +2,7 @@ components:
     schemas:
         Tool:
             description:
-                A tool exposed by a tool-set, including its input schema.
+                A tool exposed by a tool-set, including its input and output schemas.
             properties:
                 description:
                     description:
@@ -17,6 +17,11 @@ components:
                     description:
                         Stable identifier of the tool within its tool-set.
                     type: string
+                outputSchema:
+                    additionalProperties: true
+                    description:
+                        JSON Schema describing the body the tool returns. Read it to learn which fields the response carries, for example to narrow `fields` in the input. Absent when the tool returns no JSON body.
+                    type: object
             required:
                 -   name
             type: object
@@ -52,7 +57,7 @@ components:
             type: object
 info:
     description:
-        "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSetsPage` to find a tool-set matching their intent, then `getToolSetToolSetNameToolSummariesPage` to find the right tool in it, then `getToolSetToolSetNameTool` to fetch the tool's input schema, then `postToolSetToolSetNameToolInvoke` with an input map matching that schema to execute it. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.0.4'."
+        "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSetsPage` to find a tool-set matching their intent, then `getToolSetToolSetNameToolSummariesPage` to find the right tool in it, then `getToolSetToolSetNameTool` to fetch the tool's input schema, then `postToolSetToolSetNameToolInvoke` with an input map matching that schema to execute it. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.1.0'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -113,7 +118,7 @@ paths:
     "/tool-sets/{toolSetName}/tools/{toolName}":
         get:
             description:
-                Use this once you have identified a tool (via `getToolSetToolSetNameToolSummariesPage`) and need its input schema before invoking it. Returns the tool's `inputSchema`. Build an input map matching `inputSchema` and POST it to `invoke` under the same URL to execute the tool.
+                Use this once you have identified a tool (via `getToolSetToolSetNameToolSummariesPage`) and need its input schema before invoking it. Returns the tool's `inputSchema`, and its `outputSchema` when the tool returns a JSON body. Build an input map matching `inputSchema` and POST it to `invoke` under the same URL to execute the tool.
             operationId: getToolSetToolSetNameTool
             parameters:
                 -   in: path
@@ -130,6 +135,10 @@ paths:
                     required: true
                     schema:
                         type: string
+                -   in: query
+                    name: nestedFields
+                    schema:
+                        type: string
             responses:
                 200:
                     content:
@@ -140,7 +149,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Tool"
                     description:
-                        The tool with its input schema.
+                        The tool with its input and output schemas.
             tags: ["Tool"]
     "/tool-sets/{toolSetName}/tools/{toolName}/invoke":
         post:
