@@ -61,6 +61,10 @@ public abstract class BaseToolResourceImpl implements ToolResource {
 				description = "The tool name returned by `getToolSetToolSetNameToolSummariesPage`.",
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
 				name = "toolName"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "nestedFields"
 			)
 		}
 	)
@@ -579,4 +583,4 @@ public abstract class BaseToolResourceImpl implements ToolResource {
 		LogFactoryUtil.getLog(BaseToolResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:523466934
+// LIFERAY-REST-BUILDER-HASH:1200714336
