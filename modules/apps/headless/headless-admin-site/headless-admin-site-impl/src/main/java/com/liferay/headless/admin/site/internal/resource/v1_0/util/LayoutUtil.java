@@ -705,6 +705,23 @@ public class LayoutUtil {
 			return Collections.emptyMap();
 		}
 
+		String publishingUserName =
+			ExportImportThreadLocal.getPublishingUserName();
+		String publishingUserUuid =
+			ExportImportThreadLocal.getPublishingUserUuid();
+
+		if (Validator.isNotNull(publishingUserName) &&
+			Validator.isNotNull(publishingUserUuid)) {
+
+			return HashMapBuilder.put(
+				"last-import-date", String.valueOf(System.currentTimeMillis())
+			).put(
+				"last-import-user-name", publishingUserName
+			).put(
+				"last-import-user-uuid", publishingUserUuid
+			).build();
+		}
+
 		User user = UserLocalServiceUtil.fetchUser(userId);
 
 		if (user == null) {

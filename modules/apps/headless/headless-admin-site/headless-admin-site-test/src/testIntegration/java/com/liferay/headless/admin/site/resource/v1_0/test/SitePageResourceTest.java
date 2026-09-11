@@ -141,6 +141,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -2229,6 +2230,29 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		originalCentralizedThreadLocal.set(value);
 
 		Supplier<Boolean> originalSupplier =
+			ReflectionTestUtil.getAndSetFieldValue(
+				originalCentralizedThreadLocal, "_supplier", () -> value);
+
+		return () -> {
+			originalCentralizedThreadLocal.set(originalValue);
+
+			ReflectionTestUtil.setFieldValue(
+				originalCentralizedThreadLocal, "_supplier", originalSupplier);
+		};
+	}
+
+	private SafeCloseable _setExportImportThreadLocalWithSafeCloseable(
+		String fieldName, String value) {
+
+		CentralizedThreadLocal<String> originalCentralizedThreadLocal =
+			ReflectionTestUtil.getFieldValue(
+				ExportImportThreadLocal.class, fieldName);
+
+		String originalValue = originalCentralizedThreadLocal.get();
+
+		originalCentralizedThreadLocal.set(value);
+
+		Supplier<String> originalSupplier =
 			ReflectionTestUtil.getAndSetFieldValue(
 				originalCentralizedThreadLocal, "_supplier", () -> value);
 
@@ -4851,6 +4875,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			serviceContext, SitePage.Type.WIDGET_PAGE);
 
 		_testPutSiteSitePageWithStagingImportByAnotherUser(serviceContext);
+		_testPutSiteSitePageWithStagingPublishByPublishingUser(serviceContext);
 	}
 
 	private void _testPutSiteSitePageWithStagingImport(
@@ -4965,6 +4990,49 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			layout.getTypeSettingsProperty("last-import-user-name"));
 		Assert.assertEquals(
 			user.getUuid(),
+			layout.getTypeSettingsProperty("last-import-user-uuid"));
+	}
+
+	private void _testPutSiteSitePageWithStagingPublishByPublishingUser(
+			ServiceContext serviceContext)
+		throws Exception {
+
+		_publishingUser = UserTestUtil.addCompanyAdminUser(testCompany);
+
+		SitePage sitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(serviceContext, SitePage.Type.CONTENT_PAGE));
+
+		SitePage randomSitePage = _getRandomSitePage(serviceContext, sitePage);
+
+		try (SafeCloseable safeCloseable1 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_layoutImportInProcess", true);
+			SafeCloseable safeCloseable2 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_layoutStagingInProcess", true);
+			SafeCloseable safeCloseable3 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_publishingUserName", _publishingUser.getFullName());
+			SafeCloseable safeCloseable4 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_publishingUserUuid", _publishingUser.getUuid())) {
+
+			sitePageResource.putSiteSitePage(
+				testGroup.getExternalReferenceCode(),
+				randomSitePage.getExternalReferenceCode(), false,
+				randomSitePage);
+		}
+
+		Layout layout = _layoutLocalService.getLayoutByExternalReferenceCode(
+			randomSitePage.getExternalReferenceCode(), testGroup.getGroupId());
+
+		Assert.assertEquals(TestPropsValues.getUserId(), layout.getUserId());
+		Assert.assertEquals(
+			_publishingUser.getFullName(),
+			layout.getTypeSettingsProperty("last-import-user-name"));
+		Assert.assertEquals(
+			_publishingUser.getUuid(),
 			layout.getTypeSettingsProperty("last-import-user-uuid"));
 	}
 
@@ -5300,6 +5368,9 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	private Portal _portal;
 
 	private final Map<String, Integer> _priorities = new HashMap<>();
+
+	@DeleteAfterTestRun
+	private User _publishingUser;
 
 	@Inject
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
