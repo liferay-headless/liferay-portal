@@ -123,16 +123,25 @@ public class DTOConverterRegistryTest {
 	public void testGetDTOConverterWithDefaultProperty() throws Exception {
 		String dtoClassName = RandomTestUtil.randomString();
 
-		DTOConverter<?, ?> defaultDTOConverter = new TestDTOConverter();
-		DTOConverter<?, ?> nondefaultDTOConverter = new TestDTOConverter();
+		DTOConverter<?, ?> dtoConverter = new TestDTOConverter();
 
-		try (AutoCloseable autoCloseable1 = _registerDTOConverter(
-				null, dtoClassName, nondefaultDTOConverter, null);
-			AutoCloseable autoCloseable2 = _registerDefaultDTOConverter(
-				dtoClassName, defaultDTOConverter, null)) {
+		try (AutoCloseable autoCloseable1 = _registerDefaultDTOConverter(
+				dtoClassName, dtoConverter, null);
+			AutoCloseable autoCloseable2 = _registerDTOConverter(
+				null, dtoClassName, new TestDTOConverter(), null)) {
 
 			Assert.assertSame(
-				defaultDTOConverter,
+				dtoConverter,
+				_dtoConverterRegistry.getDTOConverter(dtoClassName));
+		}
+
+		try (AutoCloseable autoCloseable1 = _registerDTOConverter(
+				null, dtoClassName, new TestDTOConverter(), null);
+			AutoCloseable autoCloseable2 = _registerDefaultDTOConverter(
+				dtoClassName, dtoConverter, null)) {
+
+			Assert.assertSame(
+				dtoConverter,
 				_dtoConverterRegistry.getDTOConverter(dtoClassName));
 		}
 	}
@@ -143,17 +152,27 @@ public class DTOConverterRegistryTest {
 
 		String dtoClassName = RandomTestUtil.randomString();
 
-		DTOConverter<?, ?> defaultDTOConverter = new TestDTOConverter();
-		DTOConverter<?, ?> highRankingDTOConverter = new TestDTOConverter();
+		DTOConverter<?, ?> dtoConverter = new TestDTOConverter();
+
+		try (AutoCloseable autoCloseable1 = _registerDefaultDTOConverter(
+				dtoClassName, dtoConverter, null);
+			AutoCloseable autoCloseable2 =
+				_registerDTOConverterWithServiceRanking(
+					dtoClassName, new TestDTOConverter(), Integer.MAX_VALUE)) {
+
+			Assert.assertSame(
+				dtoConverter,
+				_dtoConverterRegistry.getDTOConverter(dtoClassName));
+		}
 
 		try (AutoCloseable autoCloseable1 =
 				_registerDTOConverterWithServiceRanking(
-					dtoClassName, highRankingDTOConverter, Integer.MAX_VALUE);
+					dtoClassName, new TestDTOConverter(), Integer.MAX_VALUE);
 			AutoCloseable autoCloseable2 = _registerDefaultDTOConverter(
-				dtoClassName, defaultDTOConverter, null)) {
+				dtoClassName, dtoConverter, null)) {
 
 			Assert.assertSame(
-				defaultDTOConverter,
+				dtoConverter,
 				_dtoConverterRegistry.getDTOConverter(dtoClassName));
 		}
 	}
