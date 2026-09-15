@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.BatchTestEntity;
+import com.liferay.portal.tools.rest.builder.test.resource.v1_0.BatchTestEntityResource;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
@@ -29,6 +30,7 @@ import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -112,6 +114,63 @@ public class BatchTestEntityResourceTest
 			JSONUtil.getValueAsString(
 				batchTestEntityJSONObject, "JSONObject/embeddedNestedField",
 				"Object/nestedField2"));
+
+		try (SafeCloseable safeCloseable =
+				NestedFieldsContextThreadLocal.
+					setNestedFieldsContextWithSafeCloseable(
+						new NestedFieldsContext(
+							1, Collections.emptyList(), "v1.0"))) {
+
+			BatchTestEntityResource batchTestEntityResource1 =
+				_batchTestEntityResourceFactory.create(
+				).httpServletRequest(
+					new MockHttpServletRequest()
+				).httpServletResponse(
+					new MockHttpServletResponse()
+				).uriInfo(
+					testVulcanCRUDItemDelegate_getUriInfo()
+				).user(
+					testVulcanCRUDItemDelegate_getUser()
+				).build();
+
+			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
+				batchTestEntity1 = batchTestEntityResource1.getBatchTestEntity(
+					postBatchTestEntity.getId());
+
+			Assert.assertNull(batchTestEntity1.getEmbeddedNestedField());
+
+			MockHttpServletRequest mockHttpServletRequest =
+				new MockHttpServletRequest();
+
+			mockHttpServletRequest.setParameter(
+				"nestedFields", "embeddedNestedField");
+
+			BatchTestEntityResource batchTestEntityResource2 =
+				_batchTestEntityResourceFactory.create(
+				).httpServletRequest(
+					mockHttpServletRequest
+				).httpServletResponse(
+					new MockHttpServletResponse()
+				).uriInfo(
+					testVulcanCRUDItemDelegate_getUriInfo()
+				).user(
+					testVulcanCRUDItemDelegate_getUser()
+				).build();
+
+			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
+				batchTestEntity2 = batchTestEntityResource2.getBatchTestEntity(
+					postBatchTestEntity.getId());
+
+			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
+				embeddedBatchTestEntity =
+					(com.liferay.portal.tools.rest.builder.test.dto.v1_0.
+						BatchTestEntity)
+							batchTestEntity2.getEmbeddedNestedField();
+
+			Assert.assertEquals(
+				postBatchTestEntity.getName(),
+				embeddedBatchTestEntity.getName());
+		}
 	}
 
 	@Override
@@ -314,6 +373,9 @@ public class BatchTestEntityResourceTest
 				batchTestEntityId, "?", queryString),
 			Http.Method.GET);
 	}
+
+	@Inject
+	private BatchTestEntityResource.Factory _batchTestEntityResourceFactory;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
