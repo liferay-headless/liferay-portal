@@ -27,7 +27,12 @@ public class StatusContainerResponseFilter implements ContainerResponseFilter {
 			ContainerResponseContext containerResponseContext)
 		throws IOException {
 
-		containerResponseContext.setStatus(_status.getStatusCode());
+		Response.StatusType statusType =
+			containerResponseContext.getStatusInfo();
+
+		if (statusType.getFamily() == Response.Status.Family.SUCCESSFUL) {
+			containerResponseContext.setStatus(_status.getStatusCode());
+		}
 	}
 
 	private final Response.Status _status;

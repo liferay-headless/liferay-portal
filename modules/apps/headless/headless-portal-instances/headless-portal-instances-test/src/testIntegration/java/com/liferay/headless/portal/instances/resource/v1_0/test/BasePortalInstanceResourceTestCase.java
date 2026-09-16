@@ -545,6 +545,14 @@ public abstract class BasePortalInstanceResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("maxUsers", additionalAssertFieldName)) {
+				if (portalInstance.getMaxUsers() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("portalInstanceId", additionalAssertFieldName)) {
 				if (portalInstance.getPortalInstanceId() == null) {
 					valid = false;
@@ -765,6 +773,17 @@ public abstract class BasePortalInstanceResourceTestCase {
 				if (!Objects.deepEquals(
 						portalInstance1.getDomain(),
 						portalInstance2.getDomain())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("maxUsers", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						portalInstance1.getMaxUsers(),
+						portalInstance2.getMaxUsers())) {
 
 					return false;
 				}
@@ -1019,6 +1038,12 @@ public abstract class BasePortalInstanceResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("maxUsers")) {
+			sb.append(String.valueOf(portalInstance.getMaxUsers()));
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("portalInstanceId")) {
 			Object object = portalInstance.getPortalInstanceId();
 
@@ -1207,6 +1232,7 @@ public abstract class BasePortalInstanceResourceTestCase {
 				active = RandomTestUtil.randomBoolean();
 				companyId = RandomTestUtil.randomLong();
 				domain = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				maxUsers = RandomTestUtil.randomInt();
 				portalInstanceId = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				siteInitializerKey = StringUtil.toLowerCase(
@@ -1449,4 +1475,4 @@ public abstract class BasePortalInstanceResourceTestCase {
 			PortalInstanceResource _portalInstanceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:890027372
+// LIFERAY-REST-BUILDER-HASH:-1976177775

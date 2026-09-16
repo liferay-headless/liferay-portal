@@ -85,11 +85,15 @@ public class OpenAPIResourceImpl {
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
+			add(AsyncPortalInstanceResourceImpl.class);
+
 			add(PortalInstanceResourceImpl.class);
+
+			add(PortalInstanceOperationResourceImpl.class);
 
 			add(OpenAPIResourceImpl.class);
 		}
 	};
 
 }
-// LIFERAY-REST-BUILDER-HASH:645045538
+// LIFERAY-REST-BUILDER-HASH:293078923

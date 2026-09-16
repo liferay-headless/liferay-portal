@@ -21,12 +21,27 @@ components:
                     description:
                         The admin's first name.
                     type: string
+                middleName:
+                    description:
+                        The admin's middle name.
+                    type: string
+                    writeOnly: true
+                password:
+                    description:
+                        The admin's initial password.
+                    format: password
+                    type: string
+                    writeOnly: true
+                screenName:
+                    description:
+                        The admin's screen name.
+                    type: string
+                    writeOnly: true
             type: object
         PortalInstance:
             # @review
             properties:
                 active:
-                    readOnly: true
                     type: boolean
                 admin:
                     $ref: "#/components/schemas/Admin"
@@ -43,6 +58,10 @@ components:
                     description:
                         domain used for email authentication.
                     type: string
+                maxUsers:
+                    description:
+                        maximum number of users the portal instance allows.
+                    type: integer
                 portalInstanceId:
                     description:
                         public unique key (corresponds to company's webId field)
@@ -116,6 +135,53 @@ components:
             required:
                 -   schemaName
             type: object
+        PortalInstanceOperation:
+            description:
+                An asynchronous portal instance operation.
+            properties:
+                backgroundTaskId:
+                    description:
+                        internal unique key.
+                    format: int64
+                    type: integer
+                companyId:
+                    description:
+                        internal unique key of the affected portal instance.
+                    format: int64
+                    type: integer
+                completionDate:
+                    description:
+                        date the operation reached a terminal status.
+                    format: date-time
+                    type: string
+                createDate:
+                    description:
+                        date the operation was enqueued.
+                    format: date-time
+                    type: string
+                errorMessage:
+                    description:
+                        message of the error that made the operation fail.
+                    type: string
+                operationType:
+                    description:
+                        operation performed on the portal instance.
+                    enum: [ADD, COPY, DELETE, EXPORT, IMPORT]
+                    type: string
+                portalInstanceId:
+                    description:
+                        public unique key (corresponds to company's webId field)
+                    type: string
+                schemaName:
+                    description:
+                        database schema extracted by an export operation.
+                    type: string
+                status:
+                    description:
+                        execution status of the operation.
+                    enum: [CANCELLED, COMPLETED_WITH_ERRORS, FAILED, IN_PROGRESS, NEW, QUEUED, SUCCESSFUL]
+                    type: string
+            type: object
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.headless.portal.instances.client', and version '1.0.34'."
@@ -126,6 +192,54 @@ info:
     version: v1.0
 openapi: 3.0.1
 paths:
+    /async-portal-instances:
+        post:
+            description:
+                Adds a new portal instance asynchronously
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PortalInstance"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/PortalInstance"
+            responses:
+                202:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PortalInstanceOperation"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/PortalInstanceOperation"
+                    description:
+                        The enqueued portal instance operation.
+            tags: ["AsyncPortalInstance"]
+    /portal-instance-operations/{backgroundTaskId}:
+        get:
+            description:
+                Retrieves the portal instance operation
+            operationId: getPortalInstanceOperation
+            parameters:
+                -   in: path
+                    name: backgroundTaskId
+                    required: true
+                    schema:
+                        format: int64
+                        type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PortalInstanceOperation"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/PortalInstanceOperation"
+                    description:
+                        The portal instance operation.
+            tags: ["PortalInstanceOperation"]
     /portal-instances:
         get:
             description:
