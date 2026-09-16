@@ -34,11 +34,8 @@ public class ToolResourceImpl extends BaseToolResourceImpl {
 		@PathParam("toolName") String toolName,
 		@PathParam("toolSetName") String toolSetName) {
 
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-63311")) {
-
-			throw new UnsupportedOperationException();
-		}
+		FeatureFlagManagerUtil.checkEnabled(
+			contextCompany.getCompanyId(), "LPD-63311");
 
 		return ToolSetUtil.getToolOutputSchema(
 			contextHttpServletRequest, toolName, toolSetName);
