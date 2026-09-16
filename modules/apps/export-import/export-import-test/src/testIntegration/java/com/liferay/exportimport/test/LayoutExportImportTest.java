@@ -485,6 +485,60 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 	}
 
 	@Test
+	@TestInfo("LPD-105349")
+	public void testExportImportContentLayoutWithDuplicateFriendlyURL()
+		throws Exception {
+
+		Map<Locale, String> friendlyURLMap = HashMapBuilder.put(
+			LocaleUtil.getDefault(),
+			StringPool.SLASH +
+				StringUtil.toLowerCase(RandomTestUtil.randomString())
+		).build();
+
+		Layout contentLayout = LayoutTestUtil.updateFriendlyURL(
+			LayoutTestUtil.addTypeContentLayout(
+				group, RandomTestUtil.randomString()),
+			friendlyURLMap);
+
+		Layout draftLayout = contentLayout.fetchDraftLayout();
+
+		ContentLayoutTestUtil.addFragmentEntryLinkToLayout(
+			StringPool.BLANK, draftLayout,
+			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
+				draftLayout.getPlid()));
+
+		ContentLayoutTestUtil.publishLayout(draftLayout, contentLayout);
+
+		Layout existingLayout = LayoutTestUtil.addTypePortletLayout(
+			importedGroup.getGroupId(), false,
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			friendlyURLMap);
+
+		exportImportLayouts(
+			new long[] {contentLayout.getLayoutId()}, getImportParameterMap());
+
+		Layout importedLayout =
+			_layoutLocalService.fetchLayoutByExternalReferenceCode(
+				contentLayout.getExternalReferenceCode(),
+				importedGroup.getGroupId());
+
+		Assert.assertNotNull(importedLayout);
+		Assert.assertTrue(importedLayout.isTypeContent());
+		Assert.assertNotEquals(
+			existingLayout.getFriendlyURL(), importedLayout.getFriendlyURL());
+		Assert.assertNotNull(_getFragmentEntryLink(importedLayout));
+
+		existingLayout = _layoutLocalService.getLayout(
+			existingLayout.getPlid());
+
+		Assert.assertEquals(
+			friendlyURLMap.get(LocaleUtil.getDefault()),
+			existingLayout.getFriendlyURL());
+	}
+
+	@Test
 	@TestInfo("LPS-98501")
 	public void testExportImportContentLayoutWithGlobalFragmentEntry()
 		throws Exception {
