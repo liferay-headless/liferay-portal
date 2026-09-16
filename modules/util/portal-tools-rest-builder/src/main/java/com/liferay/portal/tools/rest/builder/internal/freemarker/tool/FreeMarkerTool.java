@@ -414,6 +414,10 @@ public class FreeMarkerTool {
 		return null;
 	}
 
+	public String getFeatureFlag(OpenAPIYAML openAPIYAML, Operation operation) {
+		return ResourceOpenAPIParser.getFeatureFlag(openAPIYAML, operation);
+	}
+
 	public String getGraphQLArguments(
 		List<JavaMethodParameter> javaMethodParameters, String schemaVarName) {
 
@@ -916,10 +920,11 @@ public class FreeMarkerTool {
 	}
 
 	public String getResourceMethodAnnotations(
-		ConfigYAML configYAML, JavaMethodSignature javaMethodSignature) {
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML,
+		JavaMethodSignature javaMethodSignature) {
 
 		return ResourceOpenAPIParser.getMethodAnnotations(
-			configYAML, javaMethodSignature);
+			configYAML, openAPIYAML, javaMethodSignature);
 	}
 
 	public String getResourceMethodName(
