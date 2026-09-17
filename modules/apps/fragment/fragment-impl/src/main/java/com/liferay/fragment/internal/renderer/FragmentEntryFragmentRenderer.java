@@ -19,8 +19,10 @@ import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
+import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
@@ -50,12 +52,14 @@ import com.liferay.portal.kernel.util.ScopeUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.preview.PreviewableResolverUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -133,6 +137,47 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			FragmentEntryFragmentRenderer.class.getName());
 	}
 
+	private FragmentEntry _fetchPreviewFragmentEntry(
+		FragmentEntryLink fragmentEntryLink) {
+
+		Map<Serializable, Object> previewableMap =
+			PreviewableResolverUtil.getPreviewableMap(FragmentEntry.class);
+
+		if ((previewableMap == null) ||
+			Validator.isNull(fragmentEntryLink.getFragmentEntryERC())) {
+
+			return null;
+		}
+
+		Long groupId = ScopeUtil.getItemGroupId(
+			fragmentEntryLink.getCompanyId(),
+			fragmentEntryLink.getFragmentEntryScopeERC(),
+			fragmentEntryLink.getGroupId());
+
+		if (groupId == null) {
+			return null;
+		}
+
+		FragmentEntry fragmentEntry = null;
+
+		try (SafeCloseable safeCloseable =
+				PreviewableResolverUtil.setPreviewIdWithSafeCloseable(null)) {
+
+			fragmentEntry =
+				_fragmentEntryLocalService.
+					fetchFragmentEntryByExternalReferenceCode(
+						fragmentEntryLink.getFragmentEntryERC(), groupId);
+		}
+
+		if ((fragmentEntry == null) ||
+			!previewableMap.containsKey(fragmentEntry.getFragmentEntryId())) {
+
+			return null;
+		}
+
+		return (FragmentEntry)PreviewableResolverUtil.resolve(fragmentEntry);
+	}
+
 	private FragmentEntryLink _getFragmentEntryLink(
 		FragmentRendererContext fragmentRendererContext) {
 
@@ -159,6 +204,20 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentEntryLink.setType(fragmentEntry.getType());
 		}
 
+		FragmentEntry previewFragmentEntry = _fetchPreviewFragmentEntry(
+			fragmentEntryLink);
+
+		if (previewFragmentEntry != null) {
+			fragmentEntryLink = (FragmentEntryLink)fragmentEntryLink.clone();
+
+			fragmentEntryLink.setCss(previewFragmentEntry.getCss());
+			fragmentEntryLink.setHtml(previewFragmentEntry.getHtml());
+			fragmentEntryLink.setJs(previewFragmentEntry.getJs());
+			fragmentEntryLink.setConfiguration(
+				previewFragmentEntry.getConfiguration());
+			fragmentEntryLink.setType(previewFragmentEntry.getType());
+		}
+
 		return fragmentEntryLink;
 	}
 
@@ -170,7 +229,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentEntryLink.isTypeInput() ||
 			!fragmentRendererContext.isViewMode() ||
 			(fragmentRendererContext.getPreviewClassPK() > 0) ||
-			!fragmentRendererContext.isUseCachedContent()) {
+			!fragmentRendererContext.isUseCachedContent() ||
+			(PreviewableResolverUtil.getPreviewId() != null)) {
 
 			return false;
 		}
@@ -565,6 +625,9 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 	@Reference
 	private FragmentEntryLinkHelper _fragmentEntryLinkHelper;
+
+	@Reference
+	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
