@@ -12,6 +12,7 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
+import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportProcessCallbackRegistry;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
@@ -22,6 +23,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
+import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.lar.ThemeExporter;
 import com.liferay.exportimport.lar.ThemeImporter;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
@@ -30,11 +32,14 @@ import com.liferay.layout.set.model.adapter.StagedLayoutSet;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
@@ -158,6 +163,8 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		_exportFaviconFileEntry(
 			portletDataContext, stagedLayoutSet, stagedLayoutSetElement);
+		_exportLayoutRevisions(
+			portletDataContext, stagedLayoutSet, stagedLayoutSetElement);
 
 		if (ExportImportThreadLocal.isStagingInProcess() &&
 			updateLastPublishDate) {
@@ -244,6 +251,7 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		_importFaviconFileEntry(
 			portletDataContext, stagedLayoutSet, stagedLayoutSetElement);
+		_importLayoutRevisions(portletDataContext, stagedLayoutSetElement);
 
 		// Page priorities
 
@@ -463,6 +471,73 @@ public class StagedLayoutSetStagedModelDataHandler
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
 			portletDataContext, stagedLayoutSet, faviconFileEntry,
 			PortletDataContext.REFERENCE_TYPE_STRONG);
+	}
+
+	private void _exportLayoutRevisions(
+			PortletDataContext portletDataContext,
+			StagedLayoutSet stagedLayoutSet, Element stagedLayoutSetElement)
+		throws Exception {
+
+		if (!ExportImportThreadLocal.isStagingInProcess() ||
+			!FeatureFlagManagerUtil.isEnabled(
+				portletDataContext.getCompanyId(), "LPD-105778")) {
+
+			return;
+		}
+
+		Group group = _groupLocalService.fetchGroup(
+			stagedLayoutSet.getGroupId());
+
+		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
+
+		if ((group == null) ||
+			!LayoutStagingUtil.isBranchingLayoutSet(
+				group, layoutSet.isPrivateLayout())) {
+
+			return;
+		}
+
+		long[] layoutIds = portletDataContext.getLayoutIds();
+
+		if (layoutIds == null) {
+			layoutIds = _exportImportHelper.getAllLayoutIds(
+				stagedLayoutSet.getGroupId(), layoutSet.isPrivateLayout());
+		}
+
+		for (long layoutId : layoutIds) {
+			Layout layout = _layoutLocalService.fetchLayout(
+				stagedLayoutSet.getGroupId(), layoutSet.isPrivateLayout(),
+				layoutId);
+
+			if (layout == null) {
+				continue;
+			}
+
+			LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
+				layout);
+
+			if (layoutRevision == null) {
+				continue;
+			}
+
+			Element layoutRevisionElement = stagedLayoutSetElement.addElement(
+				"layout-revision");
+
+			layoutRevisionElement.addAttribute(
+				"external-reference-code", layout.getExternalReferenceCode());
+			layoutRevisionElement.addAttribute(
+				"layout-branch-id",
+				String.valueOf(layoutRevision.getLayoutBranchId()));
+
+			LayoutBranch layoutBranch = layoutRevision.getLayoutBranch();
+
+			layoutRevisionElement.addAttribute(
+				"layout-branch-name", layoutBranch.getName());
+
+			layoutRevisionElement.addAttribute(
+				"layout-revision-id",
+				String.valueOf(layoutRevision.getLayoutRevisionId()));
+		}
 	}
 
 	private void _exportLayouts(
@@ -687,6 +762,38 @@ public class StagedLayoutSetStagedModelDataHandler
 		existingLayoutSet.setFaviconFileEntryId(faviconFileEntryId);
 
 		_layoutSetLocalService.updateLayoutSet(existingLayoutSet);
+	}
+
+	private void _importLayoutRevisions(
+			PortletDataContext portletDataContext,
+			Element stagedLayoutSetElement)
+		throws Exception {
+
+		if (!ExportImportThreadLocal.isStagingInProcess() ||
+			!FeatureFlagManagerUtil.isEnabled(
+				portletDataContext.getCompanyId(), "LPD-105778")) {
+
+			return;
+		}
+
+		for (Element layoutRevisionElement :
+				stagedLayoutSetElement.elements("layout-revision")) {
+
+			Layout layout =
+				_layoutLocalService.fetchLayoutByExternalReferenceCode(
+					layoutRevisionElement.attributeValue(
+						"external-reference-code"),
+					portletDataContext.getScopeGroupId());
+
+			if (layout == null) {
+				continue;
+			}
+
+			_staging.updateLastImportSettings(
+				layoutRevisionElement, layout, portletDataContext);
+
+			_layoutLocalService.updateLayout(layout);
+		}
 	}
 
 	private void _importLogo(PortletDataContext portletDataContext) {
@@ -1030,6 +1137,9 @@ public class StagedLayoutSetStagedModelDataHandler
 		_dlReferencesExportImportContentProcessor;
 
 	@Reference
+	private ExportImportHelper _exportImportHelper;
+
+	@Reference
 	private ExportImportProcessCallbackRegistry
 		_exportImportProcessCallbackRegistry;
 
@@ -1062,6 +1172,9 @@ public class StagedLayoutSetStagedModelDataHandler
 	)
 	private StagedModelRepository<StagedLayoutSet>
 		_stagedLayoutSetStagedModelRepository;
+
+	@Reference
+	private Staging _staging;
 
 	@Reference
 	private ThemeExporter _themeExporter;
