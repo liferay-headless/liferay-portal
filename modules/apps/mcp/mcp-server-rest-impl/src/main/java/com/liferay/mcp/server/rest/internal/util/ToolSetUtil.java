@@ -84,7 +84,9 @@ public class ToolSetUtil {
 			toolName);
 	}
 
-	public static Page<ToolSet> getToolSetsPage() {
+	public static Page<ToolSet> getToolSetsPage(
+		HttpServletRequest httpServletRequest) {
+
 		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
 			openAPIDocuments = _getOpenAPIDocuments();
 
@@ -102,6 +104,12 @@ public class ToolSetUtil {
 							});
 
 						setName(entry::getKey);
+
+						setNumberOfTools(
+							() -> NumberOfToolsUtil.getNumberOfTools(
+								_getAPIPath(entry.getValue()),
+								PortalUtil.getCompanyId(httpServletRequest),
+								entry.getValue()));
 					}
 				}));
 	}
@@ -155,7 +163,7 @@ public class ToolSetUtil {
 			}
 
 			if (Objects.equals(toolName, "getToolSetsPage")) {
-				return _getResponse(getToolSetsPage());
+				return _getResponse(getToolSetsPage(httpServletRequest));
 			}
 
 			if (Objects.equals(toolName, "postToolSetToolSetNameToolInvoke")) {
@@ -206,6 +214,23 @@ public class ToolSetUtil {
 		).type(
 			ContentTypes.TEXT_PLAIN_UTF8
 		).build();
+	}
+
+	private static String _getAPIPath(
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument) {
+
+		HeadlessApplicationProvider.Application application =
+			openAPIDocument.getApplication();
+
+		String apiPath = application.getBasePath();
+
+		String version = openAPIDocument.getVersion();
+
+		if (version != null) {
+			apiPath += StringPool.SLASH + version;
+		}
+
+		return apiPath;
 	}
 
 	private static String _getContent(String content) {
@@ -271,13 +296,7 @@ public class ToolSetUtil {
 			for (HeadlessApplicationProvider.OpenAPIDocument openAPIDocument :
 					application.getOpenAPIDocuments()) {
 
-				String apiPath = application.getBasePath();
-
-				String version = openAPIDocument.getVersion();
-
-				if (version != null) {
-					apiPath += StringPool.SLASH + version;
-				}
+				String apiPath = _getAPIPath(openAPIDocument);
 
 				openAPIDocuments.putIfAbsent(
 					StringUtil.replace(
@@ -295,10 +314,7 @@ public class ToolSetUtil {
 		String toolSetName) {
 
 		return _openAPIJSONObjects.computeIfAbsent(
-			StringBundler.concat(
-				PortalUtil.getCompanyId(httpServletRequest), StringPool.POUND,
-				openAPIDocument.getPath(
-					HeadlessApplicationProvider.OpenAPIDocument.Type.JSON)),
+			_getOpenAPIJSONObjectCacheKey(httpServletRequest, openAPIDocument),
 			key -> {
 				String content = openAPIDocument.getContentString(
 					PortalUtil.getPortalURL(httpServletRequest) +
@@ -318,6 +334,16 @@ public class ToolSetUtil {
 					throw new RuntimeException(exception);
 				}
 			});
+	}
+
+	private static String _getOpenAPIJSONObjectCacheKey(
+		HttpServletRequest httpServletRequest,
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument) {
+
+		return StringBundler.concat(
+			PortalUtil.getCompanyId(httpServletRequest), StringPool.POUND,
+			openAPIDocument.getPath(
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
 	}
 
 	private static Response _getResponse(Object value) throws Exception {

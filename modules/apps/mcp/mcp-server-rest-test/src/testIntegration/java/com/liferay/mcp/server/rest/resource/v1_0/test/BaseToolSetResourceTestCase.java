@@ -302,6 +302,14 @@ public abstract class BaseToolSetResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("numberOfTools", additionalAssertFieldName)) {
+				if (toolSet.getNumberOfTools() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -430,6 +438,17 @@ public abstract class BaseToolSetResourceTestCase {
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						toolSet1.getName(), toolSet2.getName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("numberOfTools", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						toolSet1.getNumberOfTools(),
+						toolSet2.getNumberOfTools())) {
 
 					return false;
 				}
@@ -636,6 +655,12 @@ public abstract class BaseToolSetResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("numberOfTools")) {
+			sb.append(String.valueOf(toolSet.getNumberOfTools()));
+
+			return sb.toString();
+		}
+
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -686,6 +711,7 @@ public abstract class BaseToolSetResourceTestCase {
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				numberOfTools = RandomTestUtil.randomInt();
 			}
 		};
 	}
@@ -910,4 +936,4 @@ public abstract class BaseToolSetResourceTestCase {
 		_toolSetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1838648977
+// LIFERAY-REST-BUILDER-HASH:1333416804
