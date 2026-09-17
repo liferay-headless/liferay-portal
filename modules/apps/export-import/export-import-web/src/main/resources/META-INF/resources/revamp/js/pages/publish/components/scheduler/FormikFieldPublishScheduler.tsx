@@ -7,6 +7,7 @@ import {useField} from 'formik';
 import React from 'react';
 
 import PublishScheduler from './PublishScheduler';
+import {isCompleteDateTime} from './cron';
 import {ScheduleValues, TimeZoneOption} from './types';
 import {getScheduleValuesErrors} from './utils';
 
@@ -19,14 +20,50 @@ export function FormikFieldPublishScheduler({
 }) {
 	const [field, , helpers] = useField<ScheduleValues>(name);
 
+	const [, cronExpressionMeta, cronExpressionHelpers] = useField<string>(
+		`${name}.cronExpression`
+	);
+	const [, endDateTimeMeta, endDateTimeHelpers] = useField<string>(
+		`${name}.endDateTime`
+	);
+	const [, repeatOnTimeMeta, repeatOnTimeHelpers] = useField<string>(
+		`${name}.repeatOnTime`
+	);
+	const [, startDateTimeMeta, startDateTimeHelpers] = useField<string>(
+		`${name}.startDateTime`
+	);
+
 	const scheduleValuesErrors = getScheduleValuesErrors(field.value);
 
 	return (
 		<PublishScheduler
-			cronExpressionErrorMessage={scheduleValuesErrors.cronExpression}
-			endDateTimeErrorMessage={scheduleValuesErrors.endDateTime}
+			cronExpressionErrorMessage={
+				cronExpressionMeta.touched
+					? scheduleValuesErrors.cronExpression
+					: undefined
+			}
+			endDateTimeErrorMessage={
+				endDateTimeMeta.touched ||
+				isCompleteDateTime(field.value.endDateTime)
+					? scheduleValuesErrors.endDateTime
+					: undefined
+			}
 			onChange={(scheduleValues) => helpers.setValue(scheduleValues)}
-			startDateTimeErrorMessage={scheduleValuesErrors.startDateTime}
+			onCronExpressionBlur={() => cronExpressionHelpers.setTouched(true)}
+			onEndDateTimeBlur={() => endDateTimeHelpers.setTouched(true)}
+			onRepeatOnTimeBlur={() => repeatOnTimeHelpers.setTouched(true)}
+			onStartDateTimeBlur={() => startDateTimeHelpers.setTouched(true)}
+			repeatOnTimeErrorMessage={
+				repeatOnTimeMeta.touched
+					? scheduleValuesErrors.repeatOnTime
+					: undefined
+			}
+			startDateTimeErrorMessage={
+				startDateTimeMeta.touched ||
+				isCompleteDateTime(field.value.startDateTime)
+					? scheduleValuesErrors.startDateTime
+					: undefined
+			}
 			timeZones={timeZones}
 			value={field.value}
 		/>
