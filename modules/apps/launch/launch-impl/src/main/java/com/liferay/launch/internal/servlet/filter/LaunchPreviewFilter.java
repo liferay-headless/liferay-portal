@@ -12,12 +12,14 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.petra.function.UnsafeSupplierValue;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.launch.LaunchPreviewThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -69,9 +71,9 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 		throws Exception {
 
 		long previewLaunchSetId = ParamUtil.getLong(
-			httpServletRequest, "previewLaunchSetId");
+			httpServletRequest, "previewLaunchSetId", -1);
 
-		if ((previewLaunchSetId <= 0) ||
+		if ((previewLaunchSetId == -1) ||
 			(PreviewableResolverUtil.getPreviewId() != null)) {
 
 			processFilter(
@@ -113,30 +115,13 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 			return;
 		}
 
-		Map<Class<?>, Map<Serializable, Serializable>> previewableMap =
-			_getPreviewableMap(companyId, previewLaunchSetId);
-
-		if (previewableMap.isEmpty()) {
-			processFilter(
-				LaunchPreviewFilter.class.getName(), httpServletRequest,
-				httpServletResponse, filterChain);
-
-			return;
-		}
-
-		Long previewId = PreviewableResolverUtil.addPreviewableMap(
-			previewableMap);
-
 		try (SafeCloseable safeCloseable =
-				PreviewableResolverUtil.setPreviewIdWithSafeCloseable(
-					previewId)) {
+				LaunchPreviewThreadLocal.setLaunchSetIdWithSafeCloseable(
+					previewLaunchSetId)) {
 
-			processFilter(
-				LaunchPreviewFilter.class.getName(), httpServletRequest,
-				httpServletResponse, filterChain);
-		}
-		finally {
-			PreviewableResolverUtil.removePreviewableMap(previewId);
+			_processPreviewFilter(
+				companyId, filterChain, httpServletRequest, httpServletResponse,
+				previewLaunchSetId);
 		}
 	}
 
@@ -179,11 +164,11 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 			null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
-	private Map<Class<?>, Map<Serializable, Serializable>> _getPreviewableMap(
+	private Map<Class<?>, Map<Serializable, Object>> _getPreviewableMap(
 			long companyId, long launchSetId)
 		throws Exception {
 
-		Map<Class<?>, Map<Serializable, Serializable>> previewableMap =
+		Map<Class<?>, Map<Serializable, Object>> previewableMap =
 			new HashMap<>();
 
 		List<Map<String, Serializable>> launchEntryValuesList =
@@ -215,21 +200,55 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 
 			if ((version == null) || (publishedVersion == null) ||
 				Objects.equals(
-					publishedVersion.getPrimaryKey(),
-					version.getPrimaryKey())) {
+					publishedVersion.getClassVersion(),
+					version.getClassVersion())) {
 
 				continue;
 			}
 
-			Map<Serializable, Serializable> primaryKeys =
+			Map<Serializable, Object> primaryKeys =
 				previewableMap.computeIfAbsent(
 					launchEntryType.getModelClass(), key -> new HashMap<>());
 
 			primaryKeys.put(
-				publishedVersion.getPrimaryKey(), version.getPrimaryKey());
+				publishedVersion.getPrimaryKey(),
+				new UnsafeSupplierValue<>(version::getPreviewBaseModel));
 		}
 
 		return previewableMap;
+	}
+
+	private void _processPreviewFilter(
+			long companyId, FilterChain filterChain,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, long previewLaunchSetId)
+		throws Exception {
+
+		Map<Class<?>, Map<Serializable, Object>> previewableMap =
+			_getPreviewableMap(companyId, previewLaunchSetId);
+
+		if (previewableMap.isEmpty()) {
+			processFilter(
+				LaunchPreviewFilter.class.getName(), httpServletRequest,
+				httpServletResponse, filterChain);
+
+			return;
+		}
+
+		Long previewId = PreviewableResolverUtil.addPreviewableMap(
+			previewableMap);
+
+		try (SafeCloseable safeCloseable =
+				PreviewableResolverUtil.setPreviewIdWithSafeCloseable(
+					previewId)) {
+
+			processFilter(
+				LaunchPreviewFilter.class.getName(), httpServletRequest,
+				httpServletResponse, filterChain);
+		}
+		finally {
+			PreviewableResolverUtil.removePreviewableMap(previewId);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

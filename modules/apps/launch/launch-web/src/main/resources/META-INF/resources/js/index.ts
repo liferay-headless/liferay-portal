@@ -6,5 +6,6 @@
 export {default as AddToLaunchModal} from './components/AddToLaunchModal';
 export {default as LaunchDetailsForm} from './components/LaunchDetailsForm';
 export {default as LaunchPreviewButton} from './components/LaunchPreviewButton';
+export {default as LaunchPreviewTopbar} from './components/LaunchPreviewTopbar';
 export {default as LaunchEntriesFDSPropsTransformer} from './props_transformer/LaunchEntriesFDSPropsTransformer';
 export {default as LaunchesFDSPropsTransformer} from './props_transformer/LaunchesFDSPropsTransformer';
