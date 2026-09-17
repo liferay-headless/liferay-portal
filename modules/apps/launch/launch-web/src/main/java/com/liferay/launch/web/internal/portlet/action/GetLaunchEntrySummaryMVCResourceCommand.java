@@ -5,19 +5,17 @@
 
 package com.liferay.launch.web.internal.portlet.action;
 
+import com.liferay.launch.entry.type.LaunchEntryType;
+import com.liferay.launch.entry.type.registry.LaunchEntryTypeRegistry;
 import com.liferay.launch.web.internal.constants.LaunchPortletKeys;
-import com.liferay.launch.web.internal.item.LaunchEntryContent;
-import com.liferay.launch.web.internal.item.LaunchEntryContentResolver;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -32,10 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Locale;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -44,24 +39,12 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	property = {
 		"jakarta.portlet.name=" + LaunchPortletKeys.LAUNCH,
-		"mvc.command.name=/launch/get_launch_entry_content"
+		"mvc.command.name=/launch/get_launch_entry_summary"
 	},
 	service = MVCResourceCommand.class
 )
-public class GetLaunchEntryContentMVCResourceCommand
+public class GetLaunchEntrySummaryMVCResourceCommand
 	extends BaseMVCResourceCommand {
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, LaunchEntryContentResolver.class,
-			"launch.entry.content.resolver.class.name");
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
 
 	@Override
 	protected void doServeResource(
@@ -70,10 +53,10 @@ public class GetLaunchEntryContentMVCResourceCommand
 
 		String className = ParamUtil.getString(resourceRequest, "className");
 
-		LaunchEntryContentResolver launchEntryContentResolver =
-			_serviceTrackerMap.getService(className);
+		LaunchEntryType launchEntryType =
+			_launchEntryTypeRegistry.getLaunchEntryType(className);
 
-		if (launchEntryContentResolver == null) {
+		if (launchEntryType == null) {
 			resourceResponse.setProperty(
 				ResourceResponse.HTTP_STATUS_CODE,
 				String.valueOf(HttpServletResponse.SC_NOT_FOUND));
@@ -85,25 +68,62 @@ public class GetLaunchEntryContentMVCResourceCommand
 		String classVersion = ParamUtil.getString(
 			resourceRequest, "classVersion");
 
+		LaunchEntryType.Version version = launchEntryType.fetchVersion(
+			classPK, classVersion);
+
+		if (version == null) {
+			resourceResponse.setProperty(
+				ResourceResponse.HTTP_STATUS_CODE,
+				String.valueOf(HttpServletResponse.SC_NOT_FOUND));
+
+			return;
+		}
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		Locale locale = themeDisplay.getLocale();
+
+		boolean published = ParamUtil.getBoolean(resourceRequest, "published");
+
 		try {
-			LaunchEntryContent launchEntryContent =
-				launchEntryContentResolver.resolve(
-					classPK, classVersion, themeDisplay.getLocale());
+			Group group = _groupLocalService.getGroup(version.getGroupId());
+
+			String editURL = null;
+
+			if (!published) {
+				editURL = version.getEditURL(
+					ParamUtil.getString(resourceRequest, "redirect"),
+					RequestBackedPortletURLFactoryUtil.create(resourceRequest));
+			}
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
-				_toJSONObject(
-					classVersion, launchEntryContent,
-					themeDisplay.getLocale()));
+				JSONUtil.put(
+					"author", version.getUserName()
+				).put(
+					"editURL", editURL
+				).put(
+					"groupId", version.getGroupId()
+				).put(
+					"modified", version.getModifiedDate()
+				).put(
+					"space", group.getDescriptiveName(locale)
+				).put(
+					"status", version.getStatus()
+				).put(
+					"title", version.getTitle(locale)
+				).put(
+					"type", version.getTypeName(locale)
+				).put(
+					"version", version.getLabel(locale)
+				));
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
-						"Unable to resolve launch entry content for class ",
+						"Unable to resolve launch entry summary for class ",
 						className, " ", classPK),
 					portalException);
 			}
@@ -114,38 +134,13 @@ public class GetLaunchEntryContentMVCResourceCommand
 		}
 	}
 
-	private JSONObject _toJSONObject(
-			String classVersion, LaunchEntryContent launchEntryContent,
-			Locale locale)
-		throws PortalException {
-
-		Group group = _groupLocalService.getGroup(
-			launchEntryContent.getGroupId());
-
-		return JSONUtil.put(
-			"author", launchEntryContent.getUserName()
-		).put(
-			"modified", launchEntryContent.getModifiedDate()
-		).put(
-			"space", group.getDescriptiveName(locale)
-		).put(
-			"status", launchEntryContent.getStatus()
-		).put(
-			"title", launchEntryContent.getTitle()
-		).put(
-			"type", launchEntryContent.getTypeName()
-		).put(
-			"version", classVersion
-		);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
-		GetLaunchEntryContentMVCResourceCommand.class);
+		GetLaunchEntrySummaryMVCResourceCommand.class);
 
 	@Reference
 	private GroupLocalService _groupLocalService;
 
-	private ServiceTrackerMap<String, LaunchEntryContentResolver>
-		_serviceTrackerMap;
+	@Reference
+	private LaunchEntryTypeRegistry _launchEntryTypeRegistry;
 
 }

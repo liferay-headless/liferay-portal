@@ -1,0 +1,10 @@
+.launch-screen-navigation {
+	position: relative;
+
+	.launch-screen-navigation__actions {
+		position: absolute;
+		right: 1rem;
+		top: 0.5rem;
+		z-index: 1;
+	}
+}
