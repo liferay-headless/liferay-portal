@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
@@ -122,6 +123,11 @@ public class VulcanBatchEngineTaskItemDelegateAdaptor<T>
 	}
 
 	@Override
+	public Propagation getTransactionPropagation() {
+		return _vulcanBatchEngineTaskItemDelegate.getTransactionPropagation();
+	}
+
+	@Override
 	public String getVersion() {
 		return _vulcanBatchEngineTaskItemDelegate.getVersion();
 	}
@@ -140,6 +146,11 @@ public class VulcanBatchEngineTaskItemDelegateAdaptor<T>
 			_vulcanBatchEngineTaskItemDelegate.getAvailableUpdateStrategies();
 
 		return updateStrategies.contains(updateStrategy);
+	}
+
+	@Override
+	public boolean isBatchModeEnabled() {
+		return _vulcanBatchEngineTaskItemDelegate.isBatchModeEnabled();
 	}
 
 	@Override

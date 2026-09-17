@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -70,8 +71,30 @@ public interface VulcanBatchEngineTaskItemDelegate<T> {
 		return null;
 	}
 
+	/**
+	 * Returns the transaction propagation each item of this delegate runs
+	 * under. The default nested savepoint lets a failing item roll back
+	 * without poisoning the shared connection. Return
+	 * {@link Propagation#NOT_SUPPORTED} when an item issues DDL, because an
+	 * implicit commit discards the savepoint the executor relies on.
+	 */
+	public default Propagation getTransactionPropagation() {
+		return Propagation.NESTED;
+	}
+
 	public default String getVersion() {
 		return "v1.0";
+	}
+
+	/**
+	 * Returns <code>true</code> if the items of this delegate must run in
+	 * batch mode. Batch mode defers search indexing and makes model listeners
+	 * skip work that is redone once the import finishes, which suits importing
+	 * plain records in bulk. Return <code>false</code> when a single item is a
+	 * composite operation that depends on those listeners and on indexing.
+	 */
+	public default boolean isBatchModeEnabled() {
+		return true;
 	}
 
 	public Page<T> read(

@@ -74,6 +74,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -141,8 +142,8 @@ public class BatchEngineImportTaskExecutorImpl
 			return;
 		}
 
-		try (SafeCloseable safeCloseable2 = SearchContext.openBatchMode()) {
-			BatchEngineThreadLocal.setBatchImportInProcess(true);
+		try (SafeCloseable safeCloseable2 = _openBatchMode(
+				batchEngineTaskItemDelegate)) {
 
 			batchEngineImportTask.setExecuteStatus(
 				BatchEngineTaskExecuteStatus.STARTED.toString());
@@ -407,6 +408,22 @@ public class BatchEngineImportTaskExecutorImpl
 		return parameters;
 	}
 
+	private TransactionConfig _getTransactionConfig(
+		BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate) {
+
+		Propagation propagation =
+			batchEngineTaskItemDelegate.getTransactionPropagation();
+
+		if (propagation == Propagation.NESTED) {
+			return _nestedTransactionConfig;
+		}
+
+		return _transactionConfigs.computeIfAbsent(
+			propagation,
+			transactionPropagation -> TransactionConfig.Factory.create(
+				transactionPropagation, new Class<?>[] {Exception.class}));
+	}
+
 	private void _handleException(
 			BatchEngineImportTask batchEngineImportTask,
 			BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate,
@@ -558,16 +575,19 @@ public class BatchEngineImportTaskExecutorImpl
 
 		try {
 
-			// Run every item in a nested savepoint. A failing item rolls back
-			// to the savepoint, which restores the shared connection to a
-			// usable state even on PostgreSQL, where any statement error
-			// otherwise aborts the whole transaction. Because the savepoint
-			// shares the enclosing connection, there is no second connection
-			// that could deadlock against the outer import transaction on
-			// databases that take table level write locks.
+			// Run every item in a nested savepoint by default. A failing item
+			// rolls back to the savepoint, which restores the shared
+			// connection to a usable state even on PostgreSQL, where any
+			// statement error otherwise aborts the whole transaction. Because
+			// the savepoint shares the enclosing connection, there is no
+			// second connection that could deadlock against the outer import
+			// transaction on databases that take table level write locks. A
+			// delegate whose items issue DDL asks for another propagation,
+			// because an implicit commit discards the savepoint.
 
 			TransactionInvokerUtil.invoke(
-				_nestedTransactionConfig, importItemCallable);
+				_getTransactionConfig(batchEngineTaskItemDelegate),
+				importItemCallable);
 
 			LastSessionRecorderHelperUtil.syncLastSessionState();
 		}
@@ -611,6 +631,24 @@ public class BatchEngineImportTaskExecutorImpl
 		}
 
 		return value;
+	}
+
+	private SafeCloseable _openBatchMode(
+		BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate) {
+
+		// A delegate whose items are composite operations opts out of batch
+		// mode, because deferring indexing and making model listeners skip
+		// work leaves the items it creates in a different state than the
+		// synchronous operation produces.
+
+		if (!batchEngineTaskItemDelegate.isBatchModeEnabled()) {
+			return () -> {
+			};
+		}
+
+		BatchEngineThreadLocal.setBatchImportInProcess(true);
+
+		return SearchContext.openBatchMode();
 	}
 
 	private Map<String, Object> _processFieldNameValueMap(
@@ -718,6 +756,8 @@ public class BatchEngineImportTaskExecutorImpl
 	private static final TransactionConfig _nestedTransactionConfig =
 		TransactionConfig.Factory.create(
 			Propagation.NESTED, new Class<?>[] {Exception.class});
+	private static final Map<Propagation, TransactionConfig>
+		_transactionConfigs = new ConcurrentHashMap<>();
 
 	@Reference
 	private BackgroundTaskStatusMessageSender
