@@ -6,6 +6,8 @@
 package com.liferay.mcp.server.rest.internal.model.listener;
 
 import com.liferay.mcp.server.rest.internal.cache.MCPServerCacheManager;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexInvalidator;
+import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -23,22 +25,22 @@ public class ObjectFieldModelListener extends BaseModelListener<ObjectField> {
 
 	@Override
 	public void onAfterCreate(ObjectField objectField) {
-		_clearOpenAPIJSONObjectCache(objectField);
+		_invalidateToolSet(objectField);
 	}
 
 	@Override
 	public void onAfterRemove(ObjectField objectField) {
-		_clearOpenAPIJSONObjectCache(objectField);
+		_invalidateToolSet(objectField);
 	}
 
 	@Override
 	public void onAfterUpdate(
 		ObjectField originalObjectField, ObjectField objectField) {
 
-		_clearOpenAPIJSONObjectCache(objectField);
+		_invalidateToolSet(objectField);
 	}
 
-	private void _clearOpenAPIJSONObjectCache(ObjectField objectField) {
+	private void _invalidateToolSet(ObjectField objectField) {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				objectField.getObjectDefinitionId());
@@ -49,10 +51,17 @@ public class ObjectFieldModelListener extends BaseModelListener<ObjectField> {
 
 		_mcpServerCacheManager.clearOpenAPIJSONObjectCache(
 			objectField.getCompanyId());
+
+		_mcpToolIndexInvalidator.invalidate(
+			objectField.getCompanyId(),
+			ObjectRESTPathUtil.getRESTContextPath(objectDefinition));
 	}
 
 	@Reference
 	private MCPServerCacheManager _mcpServerCacheManager;
+
+	@Reference
+	private MCPToolIndexInvalidator _mcpToolIndexInvalidator;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
