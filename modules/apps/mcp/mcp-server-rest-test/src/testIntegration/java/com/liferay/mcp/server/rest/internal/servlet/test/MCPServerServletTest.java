@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -762,11 +761,30 @@ public class MCPServerServletTest {
 
 		Assert.assertEquals(200, _getResponseCode(authorization, name));
 
-		_updateMCPServerProfileStatus(objectEntry, "inactive");
+		MCPServerTestUtil.updateMCPServerProfileStatus(objectEntry, "inactive");
 
-		Assert.assertEquals(404, _getResponseCode(authorization, name));
+		Http.Options options = new Http.Options();
 
-		_updateMCPServerProfileStatus(objectEntry, "active");
+		options.addHeader("Authorization", authorization);
+		options.setLocation(_getMCPURL() + StringPool.SLASH + name);
+
+		String responseContent = _http.URLtoString(options);
+
+		Http.Response response = options.getResponse();
+
+		Assert.assertEquals(404, response.getResponseCode());
+
+		Assert.assertEquals(
+			JSONUtil.put(
+				"error",
+				StringBundler.concat(
+					"MCP server profile \"", name,
+					"\" is inactive. Activate it in the MCP Server control ",
+					"panel to make its tools available.")
+			).toString(),
+			responseContent);
+
+		MCPServerTestUtil.updateMCPServerProfileStatus(objectEntry, "active");
 
 		Assert.assertEquals(200, _getResponseCode(authorization, name));
 	}
@@ -1229,6 +1247,9 @@ public class MCPServerServletTest {
 				mcpServerProfileExternalReferenceCode, "description",
 				"postMCPServerProfile", "mcp-server-profiles");
 
+		MCPServerTestUtil.updateMCPServerProfileStatus(
+			mcpServerProfileObjectEntry, "active");
+
 		McpSyncClient mcpSyncClient = _getMcpSyncClient(
 			authorization, profileName);
 
@@ -1331,21 +1352,6 @@ public class MCPServerServletTest {
 		Assert.assertTrue(fieldsEnumValues.contains("description"));
 
 		mcpSyncClient.closeGracefully();
-	}
-
-	private void _updateMCPServerProfileStatus(
-			ObjectEntry objectEntry, String profileStatus)
-		throws Exception {
-
-		_objectEntryLocalService.updateObjectEntry(
-			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
-			objectEntry.getObjectEntryFolderId(),
-			HashMapBuilder.<String, Serializable>putAll(
-				objectEntry.getValues()
-			).put(
-				"profileStatus", profileStatus
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private static final String _TEST_EMAIL_ADDRESS = "example@example.com";

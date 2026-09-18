@@ -166,6 +166,10 @@ export class ProfilesPage extends FDSTablePage {
 		return this.page.getByRole('button', {name: 'Save'});
 	}
 
+	get statusToggle(): Locator {
+		return this.page.locator('.toggle-switch-check');
+	}
+
 	get cancelButton(): Locator {
 		return this.page.getByRole('button', {name: 'Cancel'});
 	}
