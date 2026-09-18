@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Generated("")
 @OpenAPIDefinition(
-	info = @Info(description = "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, start with `getToolSetsPage` to find a tool set matching their intent, then `getToolSetToolSetNameToolSummariesPage` to find the right tool in it, then `getToolSetToolSetNameTool` to fetch the tool's input schema, then `postToolSetToolSetNameToolInvoke` with an input map matching that schema to execute it. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.1.0'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "MCP", version = "v1.0")
+	info = @Info(description = "Single entry point for an AI to discover, understand, and invoke any tool exposed by Liferay. When the user asks for something you do not already know how to do in Liferay, find the tool first. If `getToolSearchPage` is among your tools, start there: pass what the user wants to do as `search` and it returns the most relevant tools across every tool set, ranked. Set `includeRequiredInputSchema` and the highest ranked matches come back with the arguments they cannot run without, so you can go straight to `postToolSetToolSetNameToolInvoke`. Search one action at a time, since it matches a single operation: a request spanning several steps needs one search per step. Browse with `getToolSetsPage` and `getToolSetToolSetNameToolSummariesPage` only when search is not available or has returned nothing relevant; together they list every tool set and every operation, which costs many times the context of a search. Either way, fetch the tool's `inputSchema` with `getToolSetToolSetNameTool` before invoking, unless a search result already gave you a `requiredInputSchema` that covers what you need. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.mcp.server.rest.client', and version '1.1.0'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "MCP", version = "v1.0")
 )
 @Path("/v1.0")
 public class OpenAPIResourceImpl {
@@ -87,6 +87,8 @@ public class OpenAPIResourceImpl {
 		{
 			add(ToolResourceImpl.class);
 
+			add(ToolSearchResultResourceImpl.class);
+
 			add(ToolSetResourceImpl.class);
 
 			add(ToolSummaryResourceImpl.class);
@@ -96,4 +98,4 @@ public class OpenAPIResourceImpl {
 	};
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1232720715
+// LIFERAY-REST-BUILDER-HASH:2114442415
