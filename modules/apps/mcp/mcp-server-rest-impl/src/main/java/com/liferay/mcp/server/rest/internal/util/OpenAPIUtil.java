@@ -53,6 +53,24 @@ import org.apache.http.util.EntityUtils;
  */
 public class OpenAPIUtil {
 
+	public static final String[] METHODS = {
+		"delete", "get", "head", "options", "patch", "post", "put"
+	};
+
+	public static String getLastPathParameter(String path) {
+		String[] segments = StringUtil.split(path, CharPool.SLASH);
+
+		for (int i = segments.length - 1; i >= 0; i--) {
+			String pathParameter = getPathParameter(segments[i]);
+
+			if (pathParameter != null) {
+				return pathParameter;
+			}
+		}
+
+		return null;
+	}
+
 	public static Map<String, ?> getOutputSchema(
 		JSONObject openAPIJSONObject, String toolName) {
 
@@ -68,6 +86,18 @@ public class OpenAPIUtil {
 		return (Map<String, Object>)_getSchemaObject(
 			"writeOnly", openAPIJSONObject, responseSchemaJSONObject,
 			new HashSet<>());
+	}
+
+	public static String getPathParameter(String segment) {
+		if ((segment.length() > 2) &&
+			(segment.charAt(0) == CharPool.OPEN_CURLY_BRACE) &&
+			(segment.charAt(segment.length() - 1) ==
+				CharPool.CLOSE_CURLY_BRACE)) {
+
+			return segment.substring(1, segment.length() - 1);
+		}
+
+		return null;
 	}
 
 	public static VulcanRequestForwarder.Request getRequest(
@@ -204,7 +234,7 @@ public class OpenAPIUtil {
 		for (String path : pathsJSONObject.keySet()) {
 			JSONObject pathItemJSONObject = pathsJSONObject.getJSONObject(path);
 
-			for (String method : _METHODS) {
+			for (String method : METHODS) {
 				JSONObject operationJSONObject =
 					pathItemJSONObject.getJSONObject(method);
 
@@ -227,6 +257,14 @@ public class OpenAPIUtil {
 		}
 
 		return toolSummaries;
+	}
+
+	public static boolean isPathParameter(String segment) {
+		if (getPathParameter(segment) != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static void _addMultipartParts(
@@ -869,7 +907,7 @@ public class OpenAPIUtil {
 		for (String path : pathsJSONObject.keySet()) {
 			JSONObject pathJSONObject = pathsJSONObject.getJSONObject(path);
 
-			for (String method : _METHODS) {
+			for (String method : METHODS) {
 				JSONObject operationJSONObject = pathJSONObject.getJSONObject(
 					method);
 
@@ -1274,10 +1312,6 @@ public class OpenAPIUtil {
 	private static final String _DESCRIPTION_FIELDS =
 		"Fields to include in the response. Pass only the fields the user " +
 			"actually needs.";
-
-	private static final String[] _METHODS = {
-		"delete", "get", "head", "options", "patch", "post", "put"
-	};
 
 	private static final Set<String> _excludedSchemaKeys = Set.of(
 		"actions", "example", "exclusiveMaximum", "exclusiveMinimum", "xml");
