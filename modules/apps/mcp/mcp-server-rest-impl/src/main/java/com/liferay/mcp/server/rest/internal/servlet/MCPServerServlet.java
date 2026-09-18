@@ -214,7 +214,7 @@ public class MCPServerServlet extends HttpServlet {
 		).immediateExecution(
 			true
 		).instructions(
-			(String)values.get("instructions")
+			MapUtil.getString(values, "instructions", null)
 		).prompts(
 			_getSyncPromptSpecifications(companyId)
 		).tools(
@@ -519,7 +519,8 @@ public class MCPServerServlet extends HttpServlet {
 
 		try {
 			Tool tool = ToolSetUtil.getTool(
-				httpServletRequest, restrictFieldsMap, toolName, toolSetName);
+				httpServletRequest, false, restrictFieldsMap, toolName,
+				toolSetName);
 
 			return McpSchema.Tool.builder(
 			).description(
