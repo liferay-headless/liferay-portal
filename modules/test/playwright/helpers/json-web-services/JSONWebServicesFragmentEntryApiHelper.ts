@@ -69,4 +69,51 @@ export class JSONWebServicesFragmentEntryApiHelper {
 			}
 		);
 	}
+
+	async updateFragmentEntry({
+		configuration = {fieldSets: []},
+		css = '',
+		fragmentCollectionId,
+		fragmentEntryId,
+		html = '',
+		js = '',
+		name,
+		status = 0,
+		typeOptions = {fieldTypes: []},
+	}: {
+		configuration?: FragmentConfiguration;
+		css?: string;
+		fragmentCollectionId: string;
+		fragmentEntryId: string;
+		html?: string;
+		js?: string;
+		name: string;
+		status?: number;
+		typeOptions?: FragmentTypeOptions;
+	}): Promise<FragmentEntry> {
+		const urlSearchParams = new URLSearchParams();
+
+		urlSearchParams.append('fragmentEntryId', fragmentEntryId);
+		urlSearchParams.append('fragmentCollectionId', fragmentCollectionId);
+		urlSearchParams.append('name', name);
+		urlSearchParams.append('css', css);
+		urlSearchParams.append('html', html);
+		urlSearchParams.append('js', js);
+		urlSearchParams.append('cacheable', 'false');
+		urlSearchParams.append('configuration', JSON.stringify(configuration));
+		urlSearchParams.append('icon', '');
+		urlSearchParams.append('previewFileEntryId', '0');
+		urlSearchParams.append('readOnly', 'false');
+		urlSearchParams.append('typeOptions', JSON.stringify(typeOptions));
+		urlSearchParams.append('status', String(status));
+
+		return await this.apiHelpers.post(
+			`${liferayConfig.environment.baseUrl}${this.basePath}/update-fragment-entry`,
+			{
+				data: urlSearchParams.toString(),
+				failOnStatusCode: true,
+				headers: await this.apiHelpers.getJSONWebServicesHeaders(),
+			}
+		);
+	}
 }
