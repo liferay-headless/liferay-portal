@@ -222,6 +222,9 @@ public class ObjectDefinitionResourceImpl
 						"' or objectFolderExternalReferenceCode eq '",
 						ObjectFolderConstants.
 							EXTERNAL_REFERENCE_CODE_FILE_TYPES,
+						"' or objectFolderExternalReferenceCode eq '",
+						ObjectFolderConstants.
+							EXTERNAL_REFERENCE_CODE_STRUCTURE_REPEATABLE_GROUPS,
 						"')");
 				}
 
@@ -1339,7 +1342,12 @@ public class ObjectDefinitionResourceImpl
 						serviceBuilderObjectDefinition2.getCompanyId(),
 						contextUser.getUserId(),
 						serviceBuilderObjectDefinition2.getObjectFolderId(),
-						true, ObjectDefinitionConstants.SCOPE_COMPANY, false);
+						true,
+						GetterUtil.get(
+							objectField.getObjectDefinitionScope1(),
+							ObjectDefinitionConstants.SCOPE_COMPANY),
+						GetterUtil.get(
+							objectField.getObjectDefinitionSystem1(), false));
 
 			com.liferay.object.model.ObjectRelationship objectRelationship =
 				_objectRelationshipLocalService.
