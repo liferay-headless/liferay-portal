@@ -85,8 +85,6 @@ public class StyleBookResourceImpl
 			String styleBookExternalReferenceCode)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		StyleBookEntry styleBookEntry = _getStyleBookEntry(
 			_getDesignLibraryGroupId(designLibraryExternalReferenceCode),
 			styleBookExternalReferenceCode);
@@ -101,8 +99,6 @@ public class StyleBookResourceImpl
 			String styleBookExternalReferenceCode)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		StyleBookEntry styleBookEntry = _getStyleBookEntry(
 			siteExternalReferenceCode, styleBookExternalReferenceCode);
 
@@ -116,8 +112,6 @@ public class StyleBookResourceImpl
 			String styleBookExternalReferenceCode)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		return _toStyleBook(
 			_getStyleBookEntry(
 				_getDesignLibraryGroupId(designLibraryExternalReferenceCode),
@@ -130,8 +124,6 @@ public class StyleBookResourceImpl
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
-
-		_checkFeatureFlag();
 
 		List<StyleBookEntry> styleBookEntries = null;
 		long totalCount = 0L;
@@ -175,8 +167,6 @@ public class StyleBookResourceImpl
 			String pageSpecificationExternalReferenceCode, String search,
 			Pagination pagination)
 		throws Exception {
-
-		_checkFeatureFlag();
 
 		long groupId = GroupUtil.getGroupId(
 			true, contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -246,8 +236,6 @@ public class StyleBookResourceImpl
 			String styleBookExternalReferenceCode)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		return _toStyleBook(
 			_getStyleBookEntry(
 				siteExternalReferenceCode, styleBookExternalReferenceCode));
@@ -259,8 +247,6 @@ public class StyleBookResourceImpl
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
-
-		_checkFeatureFlag();
 
 		List<StyleBookEntry> styleBookEntries = null;
 		long totalCount = 0L;
@@ -302,8 +288,6 @@ public class StyleBookResourceImpl
 			String designLibraryExternalReferenceCode, StyleBook styleBook)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		long groupId = _getDesignLibraryGroupId(
 			designLibraryExternalReferenceCode);
 
@@ -332,8 +316,6 @@ public class StyleBookResourceImpl
 			String siteExternalReferenceCode, StyleBook styleBook)
 		throws Exception {
 
-		_checkFeatureFlag();
-
 		long groupId = _getGroupId(siteExternalReferenceCode);
 
 		StyleBookEntry styleBookEntry =
@@ -361,8 +343,6 @@ public class StyleBookResourceImpl
 			String designLibraryExternalReferenceCode,
 			String styleBookExternalReferenceCode, StyleBook styleBook)
 		throws Exception {
-
-		_checkFeatureFlag();
 
 		styleBook.setExternalReferenceCode(
 			() -> styleBookExternalReferenceCode);
@@ -397,8 +377,6 @@ public class StyleBookResourceImpl
 			String siteExternalReferenceCode,
 			String styleBookExternalReferenceCode, StyleBook styleBook)
 		throws Exception {
-
-		_checkFeatureFlag();
 
 		styleBook.setExternalReferenceCode(
 			() -> styleBookExternalReferenceCode);
