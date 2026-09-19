@@ -1,0 +1,15 @@
+
+journal article, journal articles, news article, news articles, web content, web contents, web content article, web content articles, page content => structured content
+basic web content, basic web contents => cms basic web content
+blog post, blog posts, blog entry, blog entries => blog posting
+file, files => document
+directory, directories => document folder
+tag, tags => keyword
+custom entity, custom entities, custom object, custom objects, object type, object types, entity type, entity types => object definition
+picklist, picklists, dropdown, dropdowns, option set, option sets, list type, list types => list type definition
+page, pages, layout, layouts => site page
+member, members, person, people => user account
+csv, csvs, spreadsheet, spreadsheets => import task
+product catalog, product catalogs => catalog
+place => create
+stock, stock level, stock levels, inventory level, inventory levels => warehouse item

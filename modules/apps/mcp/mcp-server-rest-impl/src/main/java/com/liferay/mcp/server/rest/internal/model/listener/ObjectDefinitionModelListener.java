@@ -6,6 +6,8 @@
 package com.liferay.mcp.server.rest.internal.model.listener;
 
 import com.liferay.mcp.server.rest.internal.cache.MCPServerCacheManager;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexInvalidator;
+import com.liferay.mcp.server.rest.internal.util.ObjectRESTPathUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -22,12 +24,12 @@ public class ObjectDefinitionModelListener
 
 	@Override
 	public void onAfterCreate(ObjectDefinition objectDefinition) {
-		_clearOpenAPIJSONObjectCache(objectDefinition);
+		_invalidateToolSet(objectDefinition);
 	}
 
 	@Override
 	public void onAfterRemove(ObjectDefinition objectDefinition) {
-		_clearOpenAPIJSONObjectCache(objectDefinition);
+		_invalidateToolSet(objectDefinition);
 	}
 
 	@Override
@@ -35,21 +37,26 @@ public class ObjectDefinitionModelListener
 		ObjectDefinition originalObjectDefinition,
 		ObjectDefinition objectDefinition) {
 
-		_clearOpenAPIJSONObjectCache(objectDefinition);
+		_invalidateToolSet(objectDefinition);
 	}
 
-	private void _clearOpenAPIJSONObjectCache(
-		ObjectDefinition objectDefinition) {
-
+	private void _invalidateToolSet(ObjectDefinition objectDefinition) {
 		if (!objectDefinition.isApproved()) {
 			return;
 		}
 
 		_mcpServerCacheManager.clearOpenAPIJSONObjectCache(
 			objectDefinition.getCompanyId());
+
+		_mcpToolIndexInvalidator.invalidate(
+			objectDefinition.getCompanyId(),
+			ObjectRESTPathUtil.getRESTContextPath(objectDefinition));
 	}
 
 	@Reference
 	private MCPServerCacheManager _mcpServerCacheManager;
+
+	@Reference
+	private MCPToolIndexInvalidator _mcpToolIndexInvalidator;
 
 }

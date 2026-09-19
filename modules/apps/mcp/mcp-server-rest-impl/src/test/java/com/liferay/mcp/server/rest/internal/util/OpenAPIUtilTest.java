@@ -63,6 +63,27 @@ public class OpenAPIUtilTest {
 	}
 
 	@Test
+	public void testGetLastPathParameter() {
+		Assert.assertEquals(
+			"blogPostingId",
+			OpenAPIUtil.getLastPathParameter(
+				"/sites/{siteId}/blog-postings/{blogPostingId}"));
+		Assert.assertEquals(
+			"siteId",
+			OpenAPIUtil.getLastPathParameter("/sites/{siteId}/blog-postings"));
+		Assert.assertNull(OpenAPIUtil.getLastPathParameter("/sites"));
+		Assert.assertNull(OpenAPIUtil.getLastPathParameter(StringPool.BLANK));
+	}
+
+	@Test
+	public void testGetPathParameter() {
+		Assert.assertEquals("siteId", OpenAPIUtil.getPathParameter("{siteId}"));
+		Assert.assertNull(OpenAPIUtil.getPathParameter("sites"));
+		Assert.assertNull(OpenAPIUtil.getPathParameter("{}"));
+		Assert.assertNull(OpenAPIUtil.getPathParameter("{siteId"));
+	}
+
+	@Test
 	public void testGetRequest() throws Exception {
 		_testGetRequest(
 			null, null, "GET",
@@ -403,6 +424,13 @@ public class OpenAPIUtilTest {
 			"OpenAPI document has no \"paths\" object",
 			() -> OpenAPIUtil.getToolSummaries(
 				JSONFactoryUtil.createJSONObject()));
+	}
+
+	@Test
+	public void testIsPathParameter() {
+		Assert.assertTrue(OpenAPIUtil.isPathParameter("{siteId}"));
+		Assert.assertFalse(
+			OpenAPIUtil.isPathParameter("by-external-reference-code"));
 	}
 
 	private void _assertMultipartContentType(

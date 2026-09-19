@@ -50,12 +50,12 @@ public abstract class BaseToolSummaryResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/mcp-server/v1.0/tool-sets/{toolSetName}/tool-summaries'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Operation(
-		description = "Use this once you have identified a tool set (via `getToolSetsPage`) and need to find which of its tools matches the user's request. Returns every tool in the tool set, each with a `name` and a description. Pick the tool whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameTool` to see its input schema."
+		description = "Use this once you have identified a tool set with `getToolSetsPage`, whether because `getToolSearchPage` is not among the tools available to you or because it returned nothing relevant. Returns every tool in the tool set, each with a `name` and a description, which for a large tool set is a great deal of context. Pick the tool whose description matches the user's intent and pass its `name` to `getToolSetToolSetNameTool` to see its input schema."
 	)
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
-				description = "The tool set name returned by `getToolSetsPage`.",
+				description = "The `toolSetName` from a `getToolSearchPage` result, or `name` from `getToolSetsPage`.",
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
 				name = "toolSetName", required = true
 			)
@@ -523,4 +523,4 @@ public abstract class BaseToolSummaryResourceImpl
 		LogFactoryUtil.getLog(BaseToolSummaryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1592209868
+// LIFERAY-REST-BUILDER-HASH:1389490267

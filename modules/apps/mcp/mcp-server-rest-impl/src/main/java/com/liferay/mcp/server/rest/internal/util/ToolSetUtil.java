@@ -8,12 +8,21 @@ package com.liferay.mcp.server.rest.internal.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.mcp.server.rest.dto.v1_0.Tool;
+import com.liferay.mcp.server.rest.dto.v1_0.ToolSearchResult;
 import com.liferay.mcp.server.rest.dto.v1_0.ToolSet;
 import com.liferay.mcp.server.rest.dto.v1_0.ToolSummary;
+import com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration;
+import com.liferay.mcp.server.rest.internal.search.exception.ToolSearchUnavailableException;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexReader;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexWriter;
+import com.liferay.mcp.server.rest.internal.search.index.constants.MCPToolConstants;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -23,11 +32,13 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.vulcan.application.HeadlessApplicationProvider;
 import com.liferay.portal.vulcan.http.VulcanRequestForwarder;
 import com.liferay.portal.vulcan.jackson.databind.ObjectMapperProviderUtil;
@@ -37,6 +48,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,18 +69,75 @@ public class ToolSetUtil {
 		keys.removeIf(key -> key.startsWith(companyId + StringPool.POUND));
 	}
 
+	public static Map<String, HeadlessApplicationProvider.OpenAPIDocument>
+		getOpenAPIDocuments() {
+
+		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
+			openAPIDocuments = new TreeMap<>();
+
+		HeadlessApplicationProvider headlessApplicationProvider =
+			_headlessApplicationProviderSnapshot.get();
+
+		for (HeadlessApplicationProvider.Application application :
+				headlessApplicationProvider.getApplications()) {
+
+			if (Validator.isNull(application.getBasePath())) {
+				continue;
+			}
+
+			for (HeadlessApplicationProvider.OpenAPIDocument openAPIDocument :
+					application.getOpenAPIDocuments()) {
+
+				String apiPath = application.getBasePath();
+
+				String version = openAPIDocument.getVersion();
+
+				if (version != null) {
+					apiPath += StringPool.SLASH + version;
+				}
+
+				openAPIDocuments.putIfAbsent(
+					StringUtil.replace(
+						apiPath.substring(1), CharPool.SLASH, CharPool.DASH),
+					openAPIDocument);
+			}
+		}
+
+		return openAPIDocuments;
+	}
+
+	public static JSONObject getOpenAPIJSONObject(
+		HttpServletRequest httpServletRequest, String toolSetName) {
+
+		return _getOpenAPIJSONObject(
+			httpServletRequest, _getOpenAPIDocument(toolSetName), toolSetName);
+	}
+
 	public static Tool getTool(
-		HttpServletRequest httpServletRequest,
+		HttpServletRequest httpServletRequest, boolean requiredInputSchemaOnly,
 		Map<String, String> restrictFieldsMap, String toolName,
 		String toolSetName) {
 
-		return OpenAPIUtil.getTool(
-			!Objects.equals(toolSetName, _TOOL_SET_NAME),
-			_getOpenAPIJSONObject(
-				httpServletRequest, _getOpenAPIDocument(toolSetName),
-				toolSetName),
+		JSONObject openAPIJSONObject = _getOpenAPIJSONObject(
+			httpServletRequest, _getOpenAPIDocument(toolSetName), toolSetName);
+
+		Tool tool = OpenAPIUtil.getTool(
+			!Objects.equals(toolSetName, _MCP_SERVER_TOOL_SET_NAME),
+			openAPIJSONObject,
 			_getRestrictFields(restrictFieldsMap, toolName, toolSetName),
 			toolName);
+
+		if (!requiredInputSchemaOnly) {
+			return tool;
+		}
+
+		Map<String, Object> requiredInputSchema = _toRequiredInputSchema(
+			tool.getInputSchema(), _isObjectOpenAPI(openAPIJSONObject),
+			toolName);
+
+		tool.setInputSchema(() -> requiredInputSchema);
+
+		return tool;
 	}
 
 	public static String getToolKey(String toolName, String toolSetName) {
@@ -84,9 +155,99 @@ public class ToolSetUtil {
 			toolName);
 	}
 
+	public static Page<ToolSearchResult> getToolSearchPage(
+		HttpServletRequest httpServletRequest,
+		boolean includeRequiredInputSchema,
+		Map<String, String> restrictFieldsMap, String search) {
+
+		long companyId = PortalUtil.getCompanyId(httpServletRequest);
+
+		FeatureFlagManagerUtil.checkEnabled(companyId, "LPD-63311");
+
+		SearchCapabilities searchCapabilities =
+			_searchCapabilitiesSnapshot.get();
+
+		if ((searchCapabilities == null) ||
+			!searchCapabilities.isMCPToolSearchSupported()) {
+
+			throw new ToolSearchUnavailableException(
+				StringBundler.concat(
+					"Tool search is unavailable on this instance because it ",
+					"needs Elasticsearch or OpenSearch. Browse instead: ",
+					"\"getToolSetsPage\" lists every tool set and ",
+					"\"getToolSetToolSetNameToolSummariesPage\" lists the ",
+					"operations of one."));
+		}
+
+		_validateSearch(search);
+
+		try {
+			MCPToolIndexWriter mcpToolIndexWriter =
+				_mcpToolIndexWriterSnapshot.get();
+
+			mcpToolIndexWriter.updateIfStale(companyId, httpServletRequest);
+
+			return Page.of(
+				_getToolSearchResults(
+					companyId, httpServletRequest, includeRequiredInputSchema,
+					restrictFieldsMap, search));
+		}
+		catch (RuntimeException runtimeException) {
+			_log.error("Unable to search the tool index", runtimeException);
+
+			throw new ToolSearchUnavailableException(
+				StringBundler.concat(
+					"Tool search is unavailable on this instance right now. ",
+					"Browse instead: \"getToolSetsPage\" lists every tool set ",
+					"and \"getToolSetToolSetNameToolSummariesPage\" lists the ",
+					"operations of one."));
+		}
+	}
+
+	public static String getToolSetName(String restContextPath) {
+		if (Validator.isBlank(restContextPath)) {
+			return null;
+		}
+
+		String mostSpecificBasePath = null;
+		String toolSetName = null;
+
+		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
+			openAPIDocuments = getOpenAPIDocuments();
+
+		for (Map.Entry<String, HeadlessApplicationProvider.OpenAPIDocument>
+				entry : openAPIDocuments.entrySet()) {
+
+			HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+				entry.getValue();
+
+			HeadlessApplicationProvider.Application application =
+				openAPIDocument.getApplication();
+
+			String applicationBasePath = application.getBasePath();
+
+			if (!restContextPath.equals(applicationBasePath) &&
+				!restContextPath.startsWith(
+					applicationBasePath + StringPool.SLASH)) {
+
+				continue;
+			}
+
+			if ((mostSpecificBasePath == null) ||
+				(applicationBasePath.length() >
+					mostSpecificBasePath.length())) {
+
+				mostSpecificBasePath = applicationBasePath;
+				toolSetName = entry.getKey();
+			}
+		}
+
+		return toolSetName;
+	}
+
 	public static Page<ToolSet> getToolSetsPage() {
 		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
-			openAPIDocuments = _getOpenAPIDocuments();
+			openAPIDocuments = getOpenAPIDocuments();
 
 		return Page.of(
 			TransformUtil.transform(
@@ -136,11 +297,23 @@ public class ToolSetUtil {
 			inputJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
-		if (Objects.equals(toolSetName, _TOOL_SET_NAME)) {
+		if (Objects.equals(toolSetName, _MCP_SERVER_TOOL_SET_NAME)) {
+			if (Objects.equals(toolName, "getToolSearchPage")) {
+				return _getResponse(
+					getToolSearchPage(
+						httpServletRequest,
+						inputJSONObject.getBoolean(
+							"includeRequiredInputSchema"),
+						restrictFieldsMap,
+						inputJSONObject.getString("search")));
+			}
+
 			if (Objects.equals(toolName, "getToolSetToolSetNameTool")) {
 				return _getResponse(
 					getTool(
-						httpServletRequest, restrictFieldsMap,
+						httpServletRequest,
+						inputJSONObject.getBoolean("requiredInputSchemaOnly"),
+						restrictFieldsMap,
 						inputJSONObject.getString("toolName"),
 						inputJSONObject.getString("toolSetName")));
 			}
@@ -239,7 +412,7 @@ public class ToolSetUtil {
 		_getOpenAPIDocument(String toolSetName) {
 
 		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
-			openAPIDocuments = _getOpenAPIDocuments();
+			openAPIDocuments = getOpenAPIDocuments();
 
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
 			openAPIDocuments.get(toolSetName);
@@ -250,43 +423,6 @@ public class ToolSetUtil {
 		}
 
 		return openAPIDocument;
-	}
-
-	private static Map<String, HeadlessApplicationProvider.OpenAPIDocument>
-		_getOpenAPIDocuments() {
-
-		Map<String, HeadlessApplicationProvider.OpenAPIDocument>
-			openAPIDocuments = new TreeMap<>();
-
-		HeadlessApplicationProvider headlessApplicationProvider =
-			_headlessApplicationProviderSnapshot.get();
-
-		for (HeadlessApplicationProvider.Application application :
-				headlessApplicationProvider.getApplications()) {
-
-			if (Validator.isNull(application.getBasePath())) {
-				continue;
-			}
-
-			for (HeadlessApplicationProvider.OpenAPIDocument openAPIDocument :
-					application.getOpenAPIDocuments()) {
-
-				String apiPath = application.getBasePath();
-
-				String version = openAPIDocument.getVersion();
-
-				if (version != null) {
-					apiPath += StringPool.SLASH + version;
-				}
-
-				openAPIDocuments.putIfAbsent(
-					StringUtil.replace(
-						apiPath.substring(1), CharPool.SLASH, CharPool.DASH),
-					openAPIDocument);
-			}
-		}
-
-		return openAPIDocuments;
 	}
 
 	private static JSONObject _getOpenAPIJSONObject(
@@ -314,10 +450,39 @@ public class ToolSetUtil {
 				try {
 					return JSONFactoryUtil.createJSONObject(content);
 				}
-				catch (Exception exception) {
-					throw new RuntimeException(exception);
+				catch (JSONException jsonException) {
+					throw new IllegalStateException(
+						StringBundler.concat(
+							"Unable to parse the OpenAPI document of the \"",
+							toolSetName, "\" tool set"),
+						jsonException);
 				}
 			});
+	}
+
+	private static Map<String, ?> _getRequiredInputSchema(
+		HttpServletRequest httpServletRequest,
+		Map<String, String> restrictFieldsMap, String toolName,
+		String toolSetName) {
+
+		try {
+			Tool tool = getTool(
+				httpServletRequest, true, restrictFieldsMap, toolName,
+				toolSetName);
+
+			return tool.getInputSchema();
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Unable to get the required input schema of tool ",
+						toolName, " of tool set ", toolSetName),
+					exception);
+			}
+
+			return null;
+		}
 	}
 
 	private static Response _getResponse(Object value) throws Exception {
@@ -339,15 +504,276 @@ public class ToolSetUtil {
 		return restrictFieldsMap.get(getToolKey(toolName, toolSetName));
 	}
 
-	private static final String _TOOL_SET_NAME = "mcp-server-v1.0";
+	private static int _getSize(long companyId) {
+		try {
+			ConfigurationProvider configurationProvider =
+				_configurationProviderSnapshot.get();
+
+			MCPServerConfiguration mcpServerConfiguration =
+				configurationProvider.getCompanyConfiguration(
+					MCPServerConfiguration.class, companyId);
+
+			int searchToolMaxResultsCount =
+				mcpServerConfiguration.searchToolMaxResultsCount();
+
+			if (searchToolMaxResultsCount > 0) {
+				return Math.min(searchToolMaxResultsCount, _SIZE_MAX);
+			}
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
+
+		return _SIZE_DEFAULT;
+	}
+
+	private static List<ToolSearchResult> _getToolSearchResults(
+		long companyId, HttpServletRequest httpServletRequest,
+		boolean includeRequiredInputSchema,
+		Map<String, String> restrictFieldsMap, String search) {
+
+		MCPToolIndexReader mcpToolIndexReader =
+			_mcpToolIndexReaderSnapshot.get();
+
+		List<ToolSearchResult> toolSearchResults = mcpToolIndexReader.search(
+			companyId, includeRequiredInputSchema, search, _getSize(companyId));
+
+		if (includeRequiredInputSchema) {
+			for (ToolSearchResult toolSearchResult :
+					ListUtil.subList(
+						toolSearchResults, 0,
+						MCPToolConstants.DETAILED_HITS_MAX)) {
+
+				toolSearchResult.setRequiredInputSchema(
+					() -> _getRequiredInputSchema(
+						httpServletRequest, restrictFieldsMap,
+						toolSearchResult.getToolName(),
+						toolSearchResult.getToolSetName()));
+			}
+		}
+
+		return toolSearchResults;
+	}
+
+	private static boolean _isObjectOpenAPI(JSONObject openAPIJSONObject) {
+		JSONObject infoJSONObject = openAPIJSONObject.getJSONObject("info");
+
+		if (infoJSONObject == null) {
+			return false;
+		}
+
+		return Objects.equals(infoJSONObject.getString("title"), "Object");
+	}
+
+	private static Map<String, Object> _toNestedTypesOnly(
+		Map<String, Object> schema) {
+
+		Map<String, Object> properties = (Map<String, Object>)schema.get(
+			"properties");
+
+		if (properties == null) {
+			return schema;
+		}
+
+		Map<String, Object> namedProperties = new LinkedHashMap<>();
+
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			Object value = entry.getValue();
+
+			if (value instanceof Map) {
+				Map<String, Object> valueMap = (Map<String, Object>)value;
+
+				if (valueMap.containsKey("properties") ||
+					valueMap.containsKey("items")) {
+
+					value = HashMapBuilder.<String, Object>put(
+						"type", valueMap.get("type")
+					).build();
+				}
+			}
+
+			namedProperties.put(entry.getKey(), value);
+		}
+
+		return HashMapBuilder.<String, Object>putAll(
+			schema
+		).put(
+			"properties", namedProperties
+		).build();
+	}
+
+	private static Map<String, Object> _toObjectType(
+		Map<String, Object> schema) {
+
+		Map<String, Object> bareObject = new LinkedHashMap<>();
+
+		Object description = schema.get("description");
+
+		if (description != null) {
+			bareObject.put("description", description);
+		}
+
+		bareObject.put("type", schema.get("type"));
+
+		return bareObject;
+	}
+
+	private static Map<String, Object> _toRequiredInputSchema(
+		Map<String, ?> inputSchema, boolean objectToolSet, String toolName) {
+
+		Map<String, Object> requiredInputSchema = _toRequiredInputSchemaOnly(
+			0, objectToolSet, inputSchema);
+
+		if (requiredInputSchema == null) {
+			requiredInputSchema = HashMapBuilder.<String, Object>put(
+				"properties", new HashMap<String, Object>()
+			).put(
+				"type", "object"
+			).build();
+		}
+
+		if (!toolName.endsWith("Page")) {
+			return requiredInputSchema;
+		}
+
+		Map<String, ?> properties = (Map<String, ?>)inputSchema.get(
+			"properties");
+
+		if (properties.containsKey("fields")) {
+			Map<String, Object> requiredProperties =
+				(Map<String, Object>)requiredInputSchema.get("properties");
+
+			requiredProperties.put("fields", properties.get("fields"));
+		}
+
+		return requiredInputSchema;
+	}
+
+	private static Map<String, Object> _toRequiredInputSchemaOnly(
+		int depth, boolean objectToolSet, Map<String, ?> schema) {
+
+		if ((schema == null) || (depth > _MAX_SCHEMA_DEPTH)) {
+			return null;
+		}
+
+		List<Object> requiredPropertyNames = (List<Object>)schema.get(
+			"required");
+
+		Map<String, Object> properties = (Map<String, Object>)schema.get(
+			"properties");
+
+		if (ListUtil.isEmpty(requiredPropertyNames) || (properties == null)) {
+			return null;
+		}
+
+		Map<String, Object> requiredProperties = new LinkedHashMap<>();
+
+		for (Object object : requiredPropertyNames) {
+			String requiredPropertyName = String.valueOf(object);
+
+			Object property = properties.get(requiredPropertyName);
+
+			if (!(property instanceof Map)) {
+				continue;
+			}
+
+			Map<String, Object> propertyMap = (Map<String, Object>)property;
+
+			Map<String, Object> requiredNestedProperties =
+				_toRequiredInputSchemaOnly(
+					depth + 1, objectToolSet, propertyMap);
+
+			if (requiredNestedProperties != null) {
+				propertyMap = HashMapBuilder.<String, Object>putAll(
+					requiredNestedProperties
+				).put(
+					"description", propertyMap.get("description")
+				).build();
+			}
+			else if (propertyMap.containsKey("properties")) {
+				if (objectToolSet && (depth == 0)) {
+
+					// An object declares its required fields exactly,
+					// so none declared means none required
+
+					propertyMap = _toObjectType(propertyMap);
+				}
+				else {
+
+					// Hand-written specs may not have required fields
+					// declared, so fall back to all properties
+
+					propertyMap = _toNestedTypesOnly(propertyMap);
+				}
+			}
+
+			requiredProperties.put(requiredPropertyName, propertyMap);
+		}
+
+		if (requiredProperties.isEmpty()) {
+			return null;
+		}
+
+		return HashMapBuilder.<String, Object>put(
+			"properties", requiredProperties
+		).put(
+			"required", new ArrayList<>(requiredProperties.keySet())
+		).put(
+			"type", schema.get("type")
+		).build();
+	}
+
+	private static void _validateSearch(String search) {
+		if (Validator.isBlank(search)) {
+			throw new IllegalArgumentException(
+				StringBundler.concat(
+					"The search is empty. Say what the user wants to do, as ",
+					"\"create a blog entry\", and search for one action at a ",
+					"time."));
+		}
+
+		if (search.length() > _SEARCH_MAX_LENGTH) {
+			throw new IllegalArgumentException(
+				StringBundler.concat(
+					"The search is ", search.length(),
+					" characters long and the most this tool answers is ",
+					_SEARCH_MAX_LENGTH,
+					". Search for one action at a time, phrased the way a ",
+					"person would ask for it, as in \"create a blog entry\". ",
+					"A request made of several steps needs one search for ",
+					"each."));
+		}
+	}
+
+	private static final int _MAX_SCHEMA_DEPTH = 4;
+
+	private static final String _MCP_SERVER_TOOL_SET_NAME = "mcp-server-v1.0";
+
+	private static final int _SEARCH_MAX_LENGTH = 500;
+
+	private static final int _SIZE_DEFAULT = 10;
+
+	private static final int _SIZE_MAX = 100;
 
 	private static final Log _log = LogFactoryUtil.getLog(ToolSetUtil.class);
 
+	private static final Snapshot<ConfigurationProvider>
+		_configurationProviderSnapshot = new Snapshot<>(
+			ToolSetUtil.class, ConfigurationProvider.class);
 	private static final Snapshot<HeadlessApplicationProvider>
 		_headlessApplicationProviderSnapshot = new Snapshot<>(
 			ToolSetUtil.class, HeadlessApplicationProvider.class);
+	private static final Snapshot<MCPToolIndexReader>
+		_mcpToolIndexReaderSnapshot = new Snapshot<>(
+			ToolSetUtil.class, MCPToolIndexReader.class);
+	private static final Snapshot<MCPToolIndexWriter>
+		_mcpToolIndexWriterSnapshot = new Snapshot<>(
+			ToolSetUtil.class, MCPToolIndexWriter.class);
 	private static final Map<String, JSONObject> _openAPIJSONObjects =
 		new ConcurrentHashMap<>();
+	private static final Snapshot<SearchCapabilities>
+		_searchCapabilitiesSnapshot = new Snapshot<>(
+			ToolSetUtil.class, SearchCapabilities.class);
 	private static final Snapshot<VulcanRequestForwarder>
 		_vulcanRequestForwarderSnapshot = new Snapshot<>(
 			ToolSetUtil.class, VulcanRequestForwarder.class);

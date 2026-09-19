@@ -6,6 +6,7 @@
 package com.liferay.mcp.server.rest.internal.model.listener;
 
 import com.liferay.mcp.server.rest.internal.cache.MCPServerCacheManager;
+import com.liferay.mcp.server.rest.internal.search.index.MCPToolIndexInvalidator;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -33,6 +34,9 @@ public class ObjectDefinitionModelListenerTest {
 		ReflectionTestUtil.setFieldValue(
 			_objectDefinitionModelListener, "_mcpServerCacheManager",
 			_mcpServerCacheManager);
+		ReflectionTestUtil.setFieldValue(
+			_objectDefinitionModelListener, "_mcpToolIndexInvalidator",
+			_mcpToolIndexInvalidator);
 	}
 
 	@Test
@@ -40,7 +44,7 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterCreate(
 			_mockObjectDefinition(true));
 
-		_assertCacheCleared();
+		_assertToolSetInvalidated();
 	}
 
 	@Test
@@ -48,7 +52,7 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterCreate(
 			_mockObjectDefinition(false));
 
-		_assertCacheNotCleared();
+		_assertToolSetNotInvalidated();
 	}
 
 	@Test
@@ -56,7 +60,7 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterRemove(
 			_mockObjectDefinition(true));
 
-		_assertCacheCleared();
+		_assertToolSetInvalidated();
 	}
 
 	@Test
@@ -64,7 +68,7 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterRemove(
 			_mockObjectDefinition(false));
 
-		_assertCacheNotCleared();
+		_assertToolSetNotInvalidated();
 	}
 
 	@Test
@@ -72,7 +76,7 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterUpdate(
 			_mockObjectDefinition(false), _mockObjectDefinition(true));
 
-		_assertCacheCleared();
+		_assertToolSetInvalidated();
 	}
 
 	@Test
@@ -80,22 +84,34 @@ public class ObjectDefinitionModelListenerTest {
 		_objectDefinitionModelListener.onAfterUpdate(
 			_mockObjectDefinition(false), _mockObjectDefinition(false));
 
-		_assertCacheNotCleared();
+		_assertToolSetNotInvalidated();
 	}
 
-	private void _assertCacheCleared() {
+	private void _assertToolSetInvalidated() {
 		Mockito.verify(
 			_mcpServerCacheManager
 		).clearOpenAPIJSONObjectCache(
 			_COMPANY_ID
 		);
+
+		Mockito.verify(
+			_mcpToolIndexInvalidator
+		).invalidate(
+			_COMPANY_ID, _REST_CONTEXT_PATH
+		);
 	}
 
-	private void _assertCacheNotCleared() {
+	private void _assertToolSetNotInvalidated() {
 		Mockito.verify(
 			_mcpServerCacheManager, Mockito.never()
 		).clearOpenAPIJSONObjectCache(
 			Mockito.anyLong()
+		);
+
+		Mockito.verify(
+			_mcpToolIndexInvalidator, Mockito.never()
+		).invalidate(
+			Mockito.anyLong(), Mockito.anyString()
 		);
 	}
 
@@ -110,6 +126,12 @@ public class ObjectDefinitionModelListenerTest {
 		);
 
 		Mockito.when(
+			objectDefinition.getRESTContextPath()
+		).thenReturn(
+			_REST_CONTEXT_PATH
+		);
+
+		Mockito.when(
 			objectDefinition.isApproved()
 		).thenReturn(
 			approved
@@ -120,8 +142,13 @@ public class ObjectDefinitionModelListenerTest {
 
 	private static final long _COMPANY_ID = RandomTestUtil.randomLong();
 
+	private static final String _REST_CONTEXT_PATH =
+		"/c/" + RandomTestUtil.randomString();
+
 	private final MCPServerCacheManager _mcpServerCacheManager = Mockito.mock(
 		MCPServerCacheManager.class);
+	private final MCPToolIndexInvalidator _mcpToolIndexInvalidator =
+		Mockito.mock(MCPToolIndexInvalidator.class);
 	private final ObjectDefinitionModelListener _objectDefinitionModelListener =
 		new ObjectDefinitionModelListener();
 
