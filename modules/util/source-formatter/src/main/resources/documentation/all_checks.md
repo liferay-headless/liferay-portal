@@ -232,6 +232,7 @@ JavaAggregateTestRuleParameterOrderCheck | [Styling](styling_checks.md#styling-c
 JavaAnnotationDefaultAttributeCheck | [Styling](styling_checks.md#styling-checks) | .java | Finds cases where the default value is passed to annotations in package `*.bnd.annotations` or `*.bind.annotations`. |
 JavaAnnotationsCheck | [Bug Prevention](bug_prevention_checks.md#bug-prevention-checks) | .java | Performs several checks on annotations. |
 [JavaAnonymousInnerClassCheck](check/java_anonymous_inner_class_check.md#javaanonymousinnerclasscheck) | [Bug Prevention](bug_prevention_checks.md#bug-prevention-checks) | .java | Performs several checks on anonymous classes. |
+[JavaArquillianStaticInitializerCheck](check/java_arquillian_static_initializer_check.md#javaarquillianstaticinitializercheck) | [Bug Prevention](bug_prevention_checks.md#bug-prevention-checks) | .java | Checks that static initializers of Arquillian tests do not call portal test utilities and service methods. |
 JavaAssertEqualsCheck | [Styling](styling_checks.md#styling-checks) | .java | Validates `Assert.assertEquals` calls. |
 JavaBooleanStatementCheck | [Bug Prevention](bug_prevention_checks.md#bug-prevention-checks) | .java | Performs several checks on variable declaration of type `Boolean`. |
 JavaBooleanUsageCheck | [Bug Prevention](bug_prevention_checks.md#bug-prevention-checks) | .java | Finds incorrect use of passing boolean values in `setAttribute` calls. |
