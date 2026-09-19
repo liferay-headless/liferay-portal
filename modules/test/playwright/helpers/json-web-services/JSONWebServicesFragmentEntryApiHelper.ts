@@ -16,6 +16,21 @@ export class JSONWebServicesFragmentEntryApiHelper {
 		this.basePath = '/api/jsonws/fragment.fragmententry';
 	}
 
+	async fetchFragmentEntry(fragmentEntryId: string) {
+		const urlSearchParams = new URLSearchParams();
+
+		urlSearchParams.append('fragmentEntryId', fragmentEntryId);
+
+		return await this.apiHelpers.post(
+			`${liferayConfig.environment.baseUrl}${this.basePath}/fetch-fragment-entry`,
+			{
+				data: urlSearchParams.toString(),
+				failOnStatusCode: true,
+				headers: await this.apiHelpers.getJSONWebServicesHeaders(),
+			}
+		);
+	}
+
 	async addFragmentEntry({
 		configuration = {fieldSets: []},
 		css = '',

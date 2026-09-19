@@ -4,43 +4,12 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayLabel from '@clayui/label';
 import ClayModal, {useModal} from '@clayui/modal';
 import ClayTable from '@clayui/table';
 import React, {useState} from 'react';
 
 import {LaunchEntryVersion} from '../api/launches';
-
-const WORKFLOW_STATUS_LABELS: Record<
-	number,
-	{
-		displayType: 'danger' | 'info' | 'secondary' | 'success' | 'warning';
-		key: string;
-	}
-> = {
-	0: {displayType: 'success', key: 'approved'},
-	1: {displayType: 'info', key: 'pending'},
-	2: {displayType: 'secondary', key: 'draft'},
-	3: {displayType: 'warning', key: 'expired'},
-	4: {displayType: 'danger', key: 'denied'},
-	5: {displayType: 'secondary', key: 'inactive'},
-	6: {displayType: 'warning', key: 'incomplete'},
-	7: {displayType: 'info', key: 'scheduled'},
-	8: {displayType: 'secondary', key: 'in-trash'},
-};
-
-function StatusLabel({status}: {status: number}) {
-	const {displayType, key} = WORKFLOW_STATUS_LABELS[status] ?? {
-		displayType: 'secondary',
-		key: 'unknown',
-	};
-
-	return (
-		<ClayLabel displayType={displayType}>
-			{Liferay.Language.get(key)}
-		</ClayLabel>
-	);
-}
+import WorkflowStatusLabel from './WorkflowStatusLabel';
 
 interface Props {
 	launchEntryVersions: LaunchEntryVersion[];
@@ -119,8 +88,10 @@ export default function SelectLaunchEntryVersionModal({
 								</ClayTable.Cell>
 
 								<ClayTable.Cell>
-									<StatusLabel
-										status={launchEntryVersion.status}
+									<WorkflowStatusLabel
+										workflowStatus={
+											launchEntryVersion.status
+										}
 									/>
 								</ClayTable.Cell>
 

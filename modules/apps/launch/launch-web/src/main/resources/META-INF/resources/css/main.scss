@@ -2,6 +2,8 @@
 	position: relative;
 
 	.launch-screen-navigation__actions {
+		display: flex;
+		gap: 0.5rem;
 		position: absolute;
 		right: 1rem;
 		top: 0.5rem;
