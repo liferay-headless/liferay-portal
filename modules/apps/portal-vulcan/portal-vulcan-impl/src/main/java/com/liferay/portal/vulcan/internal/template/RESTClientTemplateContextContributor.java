@@ -14,7 +14,9 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.vulcan.http.VulcanRequestForwarder;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -48,9 +50,17 @@ public class RESTClientTemplateContextContributor
 
 			_contextObjects = contextObjects;
 			_httpServletRequest = httpServletRequest;
+
+			_contents = _getContents(contextObjects, httpServletRequest);
 		}
 
 		public Object get(String path) throws Exception {
+			Object content = _contents.get(path);
+
+			if ((content != null) || _contents.containsKey(path)) {
+				return content;
+			}
+
 			try {
 				return _get(path);
 			}
@@ -84,19 +94,52 @@ public class RESTClientTemplateContextContributor
 
 					});
 
+			Object content = response.getContent();
+
 			if (Objects.equals(
 					response.getContentType(), ContentTypes.APPLICATION_JSON)) {
 
-				return _jsonFactory.looseDeserialize(response.getContent());
+				content = _jsonFactory.looseDeserialize(response.getContent());
 			}
 
-			return response.getContent();
+			if (response.getStatusCode() < HttpServletResponse.SC_BAD_REQUEST) {
+				_contents.put(path, content);
+			}
+
+			return content;
 		}
 
+		@SuppressWarnings("unchecked")
+		private Map<String, Object> _getContents(
+			Map<String, Object> contextObjects,
+			HttpServletRequest httpServletRequest) {
+
+			if (httpServletRequest == null) {
+				return (Map<String, Object>)contextObjects.computeIfAbsent(
+					_CONTENTS_KEY, key -> new HashMap<>());
+			}
+
+			Map<String, Object> contents =
+				(Map<String, Object>)httpServletRequest.getAttribute(
+					_CONTENTS_KEY);
+
+			if (contents == null) {
+				contents = new HashMap<>();
+
+				httpServletRequest.setAttribute(_CONTENTS_KEY, contents);
+			}
+
+			return contents;
+		}
+
+		private final Map<String, Object> _contents;
 		private final Map<String, Object> _contextObjects;
 		private final HttpServletRequest _httpServletRequest;
 
 	}
+
+	private static final String _CONTENTS_KEY =
+		RESTClientTemplateContextContributor.class.getName() + "#contents";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RESTClientTemplateContextContributor.class);
