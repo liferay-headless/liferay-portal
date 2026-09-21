@@ -68,6 +68,19 @@ public class ExpansionUtilTest {
 	}
 
 	@Test
+	public void testGetExpansionsWithAPathParameterInTheToolName() {
+		String[] expansions = ExpansionUtil.getExpansions(
+			null, false, "blog posting", "get",
+			"/sites/{siteId}/blog-postings/by-external-reference-code" +
+				"/{externalReferenceCode}",
+			"getSiteBlogPostingByExternalReferenceCode");
+
+		Assert.assertEquals(
+			"get blog posting in a site by external reference code",
+			expansions[0]);
+	}
+
+	@Test
 	public void testGetExpansionsWithAnActionMarker() {
 		String[] expansions = ExpansionUtil.getExpansions(
 			"Subscribe", false, "blog posting", "put",
@@ -88,16 +101,18 @@ public class ExpansionUtilTest {
 	}
 
 	@Test
-	public void testGetExpansionsWithAPathParameterInTheToolName() {
+	public void testGetExpansionsWithTheEntityAsTheScope() {
 		String[] expansions = ExpansionUtil.getExpansions(
-			null, false, "blog posting", "get",
-			"/sites/{siteId}/blog-postings/by-external-reference-code" +
-				"/{externalReferenceCode}",
-			"getSiteBlogPostingByExternalReferenceCode");
+			null, false, "site", "get",
+			"/sites/by-external-reference-code/{externalReferenceCode}",
+			"getSiteByExternalReferenceCode");
 
 		Assert.assertEquals(
-			"get blog posting in a site by external reference code",
-			expansions[0]);
+			"get site by external reference code", expansions[0]);
+
+		for (String expansion : expansions) {
+			Assert.assertFalse(expansion, expansion.contains("in a site"));
+		}
 	}
 
 	@Test
@@ -111,21 +126,6 @@ public class ExpansionUtilTest {
 			0,
 			ExpansionUtil.getExpansions(
 				null, false, "site", "head", "/sites", "headSite").length);
-	}
-
-	@Test
-	public void testGetExpansionsWithTheEntityAsTheScope() {
-		String[] expansions = ExpansionUtil.getExpansions(
-			null, false, "site", "get",
-			"/sites/by-external-reference-code/{externalReferenceCode}",
-			"getSiteByExternalReferenceCode");
-
-		Assert.assertEquals(
-			"get site by external reference code", expansions[0]);
-
-		for (String expansion : expansions) {
-			Assert.assertFalse(expansion, expansion.contains("in a site"));
-		}
 	}
 
 }

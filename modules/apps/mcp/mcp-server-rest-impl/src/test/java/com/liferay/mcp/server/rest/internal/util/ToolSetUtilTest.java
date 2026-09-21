@@ -84,6 +84,26 @@ public class ToolSetUtilTest {
 	}
 
 	@Test
+	public void testToRequiredInputSchemaWhenARequiredPropertyIsMissing() {
+		Map<String, Object> requiredInputSchema = _toRequiredInputSchema(
+			_getInputSchema(
+				HashMapBuilder.<String, Object>put(
+					"body", _getProperty("object")
+				).build(),
+				ListUtil.fromArray("body", "siteId")));
+
+		Map<String, Object> properties = _getProperties(requiredInputSchema);
+
+		Assert.assertEquals(
+			properties.toString(), Collections.singleton("body"),
+			properties.keySet());
+
+		Assert.assertEquals(
+			Collections.singletonList("body"),
+			requiredInputSchema.get("required"));
+	}
+
+	@Test
 	public void testToRequiredInputSchemaWhenAnObjectBodyHasNoRequiredProperties() {
 		Map<String, Object> requiredInputSchema = _toRequiredInputSchema(
 			_getInputSchema(
@@ -162,26 +182,6 @@ public class ToolSetUtilTest {
 		Assert.assertEquals(
 			statusProperties.toString(), ListUtil.fromArray("key", "name"),
 			ListUtil.sort(ListUtil.fromCollection(statusProperties.keySet())));
-	}
-
-	@Test
-	public void testToRequiredInputSchemaWhenARequiredPropertyIsMissing() {
-		Map<String, Object> requiredInputSchema = _toRequiredInputSchema(
-			_getInputSchema(
-				HashMapBuilder.<String, Object>put(
-					"body", _getProperty("object")
-				).build(),
-				ListUtil.fromArray("body", "siteId")));
-
-		Map<String, Object> properties = _getProperties(requiredInputSchema);
-
-		Assert.assertEquals(
-			properties.toString(), Collections.singleton("body"),
-			properties.keySet());
-
-		Assert.assertEquals(
-			Collections.singletonList("body"),
-			requiredInputSchema.get("required"));
 	}
 
 	@Test

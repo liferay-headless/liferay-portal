@@ -157,6 +157,19 @@ public class ToolSearchResultResourceTest
 		Assert.assertTrue(content, content.contains("one action at a time"));
 	}
 
+	private void _testGetToolSearchPageWithAScope() throws Exception {
+		List<ToolSearchResult> toolSearchResults = _search(
+			false, "create a blog posting in a site");
+
+		ToolSearchResult toolSearchResult = toolSearchResults.get(0);
+
+		Assert.assertEquals(
+			_getToolNames(toolSearchResults), "postSiteBlogPosting",
+			toolSearchResult.getToolName());
+		Assert.assertEquals(
+			"headless-delivery-v1.0", toolSearchResult.getToolSetName());
+	}
+
 	private void _testGetToolSearchPageWithAnAction() throws Exception {
 		List<ToolSearchResult> toolSearchResults = _search(
 			false, "publish a change list");
@@ -228,19 +241,6 @@ public class ToolSearchResultResourceTest
 					objectDefinition);
 			}
 		}
-	}
-
-	private void _testGetToolSearchPageWithAScope() throws Exception {
-		List<ToolSearchResult> toolSearchResults = _search(
-			false, "create a blog posting in a site");
-
-		ToolSearchResult toolSearchResult = toolSearchResults.get(0);
-
-		Assert.assertEquals(
-			_getToolNames(toolSearchResults), "postSiteBlogPosting",
-			toolSearchResult.getToolName());
-		Assert.assertEquals(
-			"headless-delivery-v1.0", toolSearchResult.getToolSetName());
 	}
 
 	private void _testGetToolSearchPageWithNothingRelevant() throws Exception {
