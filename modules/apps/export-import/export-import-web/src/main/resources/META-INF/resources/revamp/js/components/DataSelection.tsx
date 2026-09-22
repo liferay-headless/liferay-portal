@@ -36,6 +36,7 @@ export default function DataSelection({
 	previewPortletDataHandlerSections,
 	process = 'export',
 	subtitle,
+	timeZoneId,
 }: {
 	commentsAndRatingsEnabled?: boolean;
 	deletionCount?: number;
@@ -52,6 +53,7 @@ export default function DataSelection({
 	previewPortletDataHandlerSections: PreviewPortletDataHandlerSection[];
 	process?: ExportImportProcess;
 	subtitle: string;
+	timeZoneId: string;
 }) {
 	return (
 		<>
@@ -84,6 +86,7 @@ export default function DataSelection({
 					lastPublishDate={lastPublishDate}
 					name="dateFilter"
 					onApplyFilter={onApplyFilter}
+					timeZoneId={timeZoneId}
 				/>
 			</ClayLayout.Sheet>
 

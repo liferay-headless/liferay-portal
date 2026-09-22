@@ -54,6 +54,8 @@ renderResponse.setTitle(exportImportProcessDisplayContext.getExportTitle());
 				).put(
 					"privateLayoutsAvailable", liveGroup.isPrivateLayoutsEnabled() && liveGroup.hasPrivateLayouts()
 				).build()
+			).put(
+				"timeZoneId", timeZone.getID()
 			).build()
 		%>'
 	/>

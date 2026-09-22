@@ -44,6 +44,7 @@ export function NewExport({
 	exportProcessAPIURL,
 	lookAndFeelEnabled = false,
 	pageTreeModalConfiguration,
+	timeZoneId,
 }: {
 	backURL: string;
 	commentsAndRatingsEnabled?: boolean;
@@ -52,9 +53,10 @@ export function NewExport({
 	exportProcessAPIURL: string;
 	lookAndFeelEnabled?: boolean;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
+	timeZoneId: string;
 }) {
 	const {appliedDateFilterRef, error, handleApplyFilter, loading, preview} =
-		usePreview(exportPreviewAPIURL, exportPreview);
+		usePreview(exportPreviewAPIURL, timeZoneId, exportPreview);
 
 	if (error) {
 		return <ClayAlert displayType="danger">{error}</ClayAlert>;
@@ -162,6 +164,7 @@ export function NewExport({
 							subtitle={Liferay.Language.get(
 								'select-and-filter-the-data-you-want-to-include-in-your-export'
 							)}
+							timeZoneId={timeZoneId}
 						/>
 
 						<Footer
