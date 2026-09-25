@@ -6,6 +6,7 @@
 package com.liferay.portal.vulcan.internal.jaxrs.exception.mapper;
 
 import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
@@ -26,6 +27,12 @@ public class NoSuchModelExceptionMapper
 
 	@Override
 	public Response toResponse(NoSuchModelException noSuchModelException) {
+		if (Validator.isNotNull(
+				noSuchModelException.getExternalReferenceCode())) {
+
+			return super.toResponse(noSuchModelException);
+		}
+
 		ExceptionMapper<NotFoundException> exceptionMapper =
 			_providers.getExceptionMapper(NotFoundException.class);
 
@@ -35,7 +42,11 @@ public class NoSuchModelExceptionMapper
 
 	@Override
 	protected Problem getProblem(NoSuchModelException noSuchModelException) {
-		throw new UnsupportedOperationException("This should not be called");
+		return new Problem(
+			Response.Status.NOT_FOUND,
+			"No entity with the external reference code " +
+				noSuchModelException.getExternalReferenceCode() +
+					" could be found.");
 	}
 
 	@Context

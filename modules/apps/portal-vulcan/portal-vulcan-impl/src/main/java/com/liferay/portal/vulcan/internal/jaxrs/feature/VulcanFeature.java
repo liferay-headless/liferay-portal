@@ -10,10 +10,13 @@ import com.fasterxml.jackson.jakarta.rs.xml.JacksonXMLProvider;
 
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -87,9 +90,12 @@ import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.core.Feature;
 import jakarta.ws.rs.core.FeatureContext;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -144,7 +150,8 @@ public class VulcanFeature implements Feature {
 		featureContext.register(NotFoundExceptionMapper.class);
 		featureContext.register(ObjectMapperContextResolver.class);
 		featureContext.register(PageEntityExtensionWriterInterceptor.class);
-		featureContext.register(PrincipalExceptionMapper.class);
+		featureContext.register(
+			new PrincipalExceptionMapper(_serviceTrackerMap));
 		featureContext.register(ProblemWriterInterceptor.class);
 		featureContext.register(RestrictFieldsQueryParamContextProvider.class);
 		featureContext.register(
@@ -203,6 +210,18 @@ public class VulcanFeature implements Feature {
 		return false;
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, PersistedModelLocalService.class,
+			"model.class.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
+	}
+
 	private static final Snapshot<ScopeChecker> _scopeCheckerSnapshot =
 		new Snapshot<>(VulcanFeature.class, ScopeChecker.class);
 
@@ -255,6 +274,9 @@ public class VulcanFeature implements Feature {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	private ServiceTrackerMap<String, PersistedModelLocalService>
+		_serviceTrackerMap;
 
 	@Reference
 	private SortParserProvider _sortParserProvider;
