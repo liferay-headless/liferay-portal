@@ -204,7 +204,9 @@ public class PageTemplateResourceTest extends BasePageTemplateResourceTestCase {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
 			() -> pageTemplateResource.getSitePageTemplate(
 				testGroup.getExternalReferenceCode(), externalReferenceCode));
 
@@ -1311,7 +1313,9 @@ public class PageTemplateResourceTest extends BasePageTemplateResourceTestCase {
 					pageTemplateExternalReferenceCode, group.getGroupId()));
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				pageTemplateExternalReferenceCode + " could be found.",
 			() -> pageTemplateResource.deleteSitePageTemplate(
 				group.getExternalReferenceCode(),
 				pageTemplateExternalReferenceCode));

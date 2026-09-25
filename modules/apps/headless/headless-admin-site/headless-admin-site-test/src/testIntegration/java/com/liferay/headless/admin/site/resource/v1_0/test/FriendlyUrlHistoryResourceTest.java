@@ -132,10 +132,15 @@ public class FriendlyUrlHistoryResourceTest
 			"This page type cannot be modified through this endpoint",
 			layout.fetchDraftLayout());
 
+		Layout privateLayout = LayoutTestUtil.addTypePortletLayout(
+			testGroup.getGroupId(), true);
+
 		_assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				privateLayout.getExternalReferenceCode() + " could be found.",
 			_getUserWithoutPermissionsFriendlyUrlHistoryResource(),
-			LayoutTestUtil.addTypePortletLayout(testGroup.getGroupId(), true));
+			privateLayout);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(

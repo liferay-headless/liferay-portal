@@ -226,7 +226,10 @@ public class DisplayPageTemplateResourceTest
 					testGroup.getGroupId()));
 
 		_assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				postDisplayPageTemplate.getExternalReferenceCode() +
+					" could be found.",
 			() -> displayPageTemplateResource.deleteSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
 				postDisplayPageTemplate.getExternalReferenceCode()));
@@ -319,11 +322,16 @@ public class DisplayPageTemplateResourceTest
 
 		_testGetSiteDisplayPageTemplateWithNestedFields(displayPageTemplate);
 
+		String displayPageTemplateExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		_assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				displayPageTemplateExternalReferenceCode + " could be found.",
 			() -> displayPageTemplateResource.getSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString()));
+				displayPageTemplateExternalReferenceCode));
 
 		_enableLocalStaging();
 
@@ -540,11 +548,17 @@ public class DisplayPageTemplateResourceTest
 		_testPatchSiteDisplayPageTemplateWithPageSpecifications();
 		_testPatchSiteDisplayPageTemplateWithThumbnail();
 
+		String displayPageTemplateExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		_assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				displayPageTemplateExternalReferenceCode + " could be found.",
 			() -> displayPageTemplateResource.patchSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString(), randomDisplayPageTemplate()));
+				displayPageTemplateExternalReferenceCode,
+				randomDisplayPageTemplate()));
 
 		_enableLocalStaging();
 

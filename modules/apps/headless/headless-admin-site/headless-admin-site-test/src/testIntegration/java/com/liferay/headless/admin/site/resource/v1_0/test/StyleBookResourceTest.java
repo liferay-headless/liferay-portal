@@ -558,11 +558,15 @@ public class StyleBookResourceTest extends BaseStyleBookResourceTestCase {
 	private void _testDeleteSiteStyleBookForNonexistingStyleBook()
 		throws Exception {
 
+		String styleBookExternalReferenceCode = RandomTestUtil.randomString();
+
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				styleBookExternalReferenceCode + " could be found.",
 			() -> styleBookResource.deleteSiteStyleBook(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString()));
+				styleBookExternalReferenceCode));
 	}
 
 	private void _testDeleteSiteStyleBookWithDesignLibraryExternalReferenceCode()
@@ -920,7 +924,9 @@ public class StyleBookResourceTest extends BaseStyleBookResourceTestCase {
 		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				layout.getExternalReferenceCode() + " could be found.",
 			() -> styleBookResource.getSitePageSpecificationStyleBooksPage(
 				testGroup.getExternalReferenceCode(),
 				layout.getExternalReferenceCode(), null, Pagination.of(1, 10)));

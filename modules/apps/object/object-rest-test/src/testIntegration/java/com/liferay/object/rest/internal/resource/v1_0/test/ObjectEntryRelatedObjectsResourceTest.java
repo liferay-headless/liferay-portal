@@ -379,7 +379,7 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		).apply(
 			() -> {
 				Assert.assertEquals(
-					403,
+					404,
 					HTTPTestUtil.invokeToHttpCode(
 						null,
 						StringBundler.concat(

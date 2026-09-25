@@ -197,7 +197,9 @@ public class MasterPageResourceTest extends BaseMasterPageResourceTestCase {
 					testGroup.getGroupId()));
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				postMasterPage.getExternalReferenceCode() + " could be found.",
 			() -> masterPageResource.deleteSiteMasterPage(
 				testGroup.getExternalReferenceCode(),
 				postMasterPage.getExternalReferenceCode()));
@@ -306,7 +308,9 @@ public class MasterPageResourceTest extends BaseMasterPageResourceTestCase {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
 			() -> masterPageResource.getSiteMasterPage(
 				testGroup.getExternalReferenceCode(), externalReferenceCode));
 
@@ -510,7 +514,9 @@ public class MasterPageResourceTest extends BaseMasterPageResourceTestCase {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
 			() -> masterPageResource.patchSiteMasterPage(
 				testGroup.getExternalReferenceCode(), externalReferenceCode,
 				randomMasterPage()));
@@ -670,7 +676,9 @@ public class MasterPageResourceTest extends BaseMasterPageResourceTestCase {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
 			() -> masterPageResource.postSiteMasterPagePageSpecification(
 				testGroup.getExternalReferenceCode(), externalReferenceCode,
 				new ContentPageSpecification() {

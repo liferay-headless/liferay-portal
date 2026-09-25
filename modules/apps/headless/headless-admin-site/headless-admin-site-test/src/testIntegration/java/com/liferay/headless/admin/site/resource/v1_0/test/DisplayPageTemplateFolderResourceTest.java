@@ -328,13 +328,17 @@ public class DisplayPageTemplateFolderResourceTest
 			displayPageTemplateFolder.getExternalReferenceCode(),
 			StringPool.BLANK);
 
+		String externalReferenceCode = RandomTestUtil.randomString();
+
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
 			() ->
 				displayPageTemplateFolderResource.
 					patchSiteDisplayPageTemplateFolder(
 						testGroup.getExternalReferenceCode(),
-						RandomTestUtil.randomString(),
+						externalReferenceCode,
 						randomDisplayPageTemplateFolder()));
 
 		_enableLocalStaging();

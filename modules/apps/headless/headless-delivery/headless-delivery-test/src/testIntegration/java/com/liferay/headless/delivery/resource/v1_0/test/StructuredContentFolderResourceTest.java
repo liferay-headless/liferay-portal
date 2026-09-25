@@ -58,7 +58,10 @@ public class StructuredContentFolderResourceTest
 			Problem problem = problemException.getProblem();
 
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
-			Assert.assertNull(problem.getTitle());
+			Assert.assertEquals(
+				"No entity with the external reference code " +
+					externalReferenceCode + " could be found.",
+				problem.getTitle());
 		}
 
 		StructuredContentFolder parentStructuredContentFolder1 =
@@ -255,7 +258,10 @@ public class StructuredContentFolderResourceTest
 			Problem problem = problemException.getProblem();
 
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
-			Assert.assertNull(problem.getTitle());
+			Assert.assertEquals(
+				"No entity with the external reference code " +
+					externalReferenceCode + " could be found.",
+				problem.getTitle());
 		}
 
 		long assetLibraryId = RandomTestUtil.randomLong();

@@ -2917,10 +2917,12 @@ public class FragmentResourceTest extends BaseFragmentResourceTestCase {
 
 		fragment.setFragmentSet((FragmentSet)null);
 
+		String fragmentSetExternalReferenceCode = RandomTestUtil.randomString();
+
 		try {
 			fragmentResource.postSiteFragmentSetFragment(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString(), fragment);
+				fragmentSetExternalReferenceCode, fragment);
 
 			Assert.fail();
 		}
@@ -2928,7 +2930,10 @@ public class FragmentResourceTest extends BaseFragmentResourceTestCase {
 			Problem problem = problemException.getProblem();
 
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
-			Assert.assertNull(problem.getTitle());
+			Assert.assertEquals(
+				"No entity with the external reference code " +
+					fragmentSetExternalReferenceCode + " could be found.",
+				problem.getTitle());
 		}
 	}
 

@@ -285,6 +285,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				serviceContext));
 	}
 
+	@FeatureFlag("LPD-38869")
 	@Override
 	@Test
 	@TestInfo({"LPD-78718", "LPD-101791", "LPD-110512"})
@@ -337,7 +338,9 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				).buildString()));
 
 		_testGetSiteSitePageWithDeletedOpenGraphImage(serviceContext);
+		_testGetSiteSitePageWithNonexistentSitePage();
 		_testGetSiteSitePageWithWidgetPageTypeWithWidgetPageWidgetInstances();
+		_testGetSiteSitePageWithoutPermissions();
 	}
 
 	@Override
@@ -515,10 +518,19 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_testPutSiteSitePageWithExportedSitePageWithLayoutIdFriendlyURL();
 		_testPutSiteSitePageWithFormFragmentPageElements();
 		LazyReferencingTestUtil.executeWithLazyReferencingSafeCloseable(
-			this::_testPutSiteSitePageWithMissingTaxonomyCategories);
+			() -> _testPutSiteSitePageWithMissingTaxonomyCategories(
+				RandomTestUtil.randomString()));
+
+		String taxonomyCategoryExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		_assertProblemException(
-			"NOT_FOUND", null,
-			this::_testPutSiteSitePageWithMissingTaxonomyCategories);
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				taxonomyCategoryExternalReferenceCode + " could be found.",
+			() -> _testPutSiteSitePageWithMissingTaxonomyCategories(
+				taxonomyCategoryExternalReferenceCode));
+
 		_testPutSiteSitePageWithPageElements();
 		_testPutSiteSitePageWithPageExperiences();
 		_testPutSiteSitePageWithPageSpecifications();
@@ -2796,6 +2808,20 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				sitePage.getExternalReferenceCode()));
 	}
 
+	private void _testGetSiteSitePageWithNonexistentSitePage()
+		throws Exception {
+
+		String sitePageExternalReferenceCode = RandomTestUtil.randomString();
+
+		_assertProblemException(
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				sitePageExternalReferenceCode + " could be found.",
+			() -> sitePageResource.getSiteSitePage(
+				testGroup.getExternalReferenceCode(),
+				sitePageExternalReferenceCode));
+	}
+
 	private void _testGetSiteSitePageWithWidgetPageTypeWithWidgetPageWidgetInstances()
 		throws Exception {
 
@@ -2834,6 +2860,33 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_assertWidgetPageWidgetInstances(
 			null, 1, customApplicationDecorator, customCSS, customCSSClassName,
 			sitePage);
+	}
+
+	private void _testGetSiteSitePageWithoutPermissions() throws Exception {
+		SitePage sitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), true, randomSitePage());
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		SitePageResource userSitePageResource = SitePageResource.builder(
+		).authentication(
+			user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		_assertProblemException(
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				sitePage.getExternalReferenceCode() + " could be found.",
+			() -> userSitePageResource.getSiteSitePage(
+				testGroup.getExternalReferenceCode(),
+				sitePage.getExternalReferenceCode()));
 	}
 
 	private void _testGetSiteSitePagesPageWithFlatten() throws Exception {
@@ -4901,12 +4954,13 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				layout.getExternalReferenceCode(), testGroup.getGroupId()));
 	}
 
-	private void _testPutSiteSitePageWithMissingTaxonomyCategories()
+	private void _testPutSiteSitePageWithMissingTaxonomyCategories(
+			String taxonomyCategoryExternalReferenceCode)
 		throws Exception {
 
 		TaxonomyCategoryBrief taxonomyCategoryBrief1 =
 			_getTaxonomyCategoryBrief(
-				RandomTestUtil.randomString(),
+				taxonomyCategoryExternalReferenceCode,
 				_groupLocalService.getGroup(testCompany.getGroupId()), null);
 		TaxonomyCategoryBrief taxonomyCategoryBrief2 =
 			_getTaxonomyCategoryBrief(

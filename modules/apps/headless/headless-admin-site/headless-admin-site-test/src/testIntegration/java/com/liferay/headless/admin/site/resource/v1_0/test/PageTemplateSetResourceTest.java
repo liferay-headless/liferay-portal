@@ -140,7 +140,9 @@ public class PageTemplateSetResourceTest
 					testGroup.getGroupId()));
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				pageTemplateSet.getExternalReferenceCode() + " could be found.",
 			() -> pageTemplateSetResource.deleteSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
 				pageTemplateSet.getExternalReferenceCode()));
@@ -214,11 +216,16 @@ public class PageTemplateSetResourceTest
 
 		_testGetSitePageTemplateSet(pageTemplateSet);
 
+		String pageTemplateSetExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				pageTemplateSetExternalReferenceCode + " could be found.",
 			() -> pageTemplateSetResource.getSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString()));
+				pageTemplateSetExternalReferenceCode));
 
 		_enableLocalStaging();
 
@@ -339,11 +346,16 @@ public class PageTemplateSetResourceTest
 		assertEquals(pageTemplateSet, patchPageTemplateSet);
 		assertValid(patchPageTemplateSet);
 
+		String pageTemplateSetExternalReferenceCode =
+			RandomTestUtil.randomString();
+
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				pageTemplateSetExternalReferenceCode + " could be found.",
 			() -> pageTemplateSetResource.patchSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
-				RandomTestUtil.randomString(), randomPageTemplateSet()));
+				pageTemplateSetExternalReferenceCode, randomPageTemplateSet()));
 
 		_enableLocalStaging();
 

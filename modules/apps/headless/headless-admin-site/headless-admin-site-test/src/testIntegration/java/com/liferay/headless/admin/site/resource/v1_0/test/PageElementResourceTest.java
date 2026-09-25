@@ -2399,7 +2399,9 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		_removeGuestViewPermission();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				_draftLayout.getExternalReferenceCode() + " could be found.",
 			() ->
 				pageElementResource.
 					getSitePageSpecificationPageExperiencePageElementPageElementsPage(
@@ -2457,7 +2459,9 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 			RandomTestUtil.randomString();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				pageExperienceExternalReferenceCode + " could be found.",
 			() ->
 				pageElementResource.
 					getSitePageSpecificationPageExperiencePageElement(
@@ -2553,7 +2557,9 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		_removeGuestViewPermission();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				_draftLayout.getExternalReferenceCode() + " could be found.",
 			() ->
 				pageElementResource.
 					getSitePageSpecificationPageExperiencePageElement(
@@ -2588,7 +2594,9 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		_removeGuestViewPermission();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"NOT_FOUND", null,
+			"NOT_FOUND",
+			"No entity with the external reference code " +
+				_draftLayout.getExternalReferenceCode() + " could be found.",
 			() ->
 				pageElementResource.
 					getSitePageSpecificationPageExperiencePageElementsPage(

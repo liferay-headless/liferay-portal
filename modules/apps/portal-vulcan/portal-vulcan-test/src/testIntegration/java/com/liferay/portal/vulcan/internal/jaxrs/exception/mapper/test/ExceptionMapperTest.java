@@ -10,8 +10,12 @@ import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.test.TestInfo;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -62,14 +66,17 @@ public class ExceptionMapperTest {
 		new LiferayIntegrationTestRule();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
 		Bundle bundle = FrameworkUtil.getBundle(ExceptionMapperTest.class);
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
 		_serviceRegistrations = Arrays.asList(
 			bundleContext.registerService(
-				Application.class, new ExceptionMapperTest.TestApplication(),
+				Application.class,
+				new ExceptionMapperTest.TestApplication(_group.getGroupId()),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"liferay.auth.verifier", true
 				).put(
@@ -88,8 +95,10 @@ public class ExceptionMapperTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		_serviceRegistrations.forEach(ServiceRegistration::unregister);
+
+		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	@Test
@@ -118,6 +127,28 @@ public class ExceptionMapperTest {
 			HTTPTestUtil.invokeToJSONObject(
 				null, "/test-vulcan/testNoSuchModelException", Http.Method.GET
 			).toString());
+	}
+
+	@Test
+	@TestInfo("LPD-107137")
+	public void testNoSuchModelExceptionAndPrincipalExceptionWithExternalReferenceCodeReturnNotFound()
+		throws Exception {
+
+		_assertNotFoundWithExternalReferenceCode(
+			_EXTERNAL_REFERENCE_CODE, Http.Method.GET,
+			"/test-vulcan/testNoSuchModelExceptionWithExternalReferenceCode");
+
+		String externalReferenceCode = _group.getExternalReferenceCode();
+
+		_assertNotFoundWithExternalReferenceCode(
+			externalReferenceCode, Http.Method.GET,
+			"/test-vulcan/testPrincipalException3/" + externalReferenceCode);
+		_assertNotFoundWithExternalReferenceCode(
+			externalReferenceCode, Http.Method.POST,
+			"/test-vulcan/testPrincipalException4/" + externalReferenceCode);
+		_assertNotFoundWithExternalReferenceCode(
+			externalReferenceCode, Http.Method.GET,
+			"/test-vulcan/testPrincipalException7/" + externalReferenceCode);
 	}
 
 	@Test
@@ -169,6 +200,39 @@ public class ExceptionMapperTest {
 	}
 
 	@Test
+	@TestInfo("LPD-107137")
+	public void testPrincipalExceptionWithExternalReferenceCodeOutsidePathReturnNotFound()
+		throws Exception {
+
+		Assert.assertEquals(
+			404,
+			HTTPTestUtil.invokeToHttpCode(
+				null, "/test-vulcan/testPrincipalException5", Http.Method.GET));
+
+		JSONObject expectedJSONObject = JSONUtil.put("status", "NOT_FOUND");
+
+		Assert.assertEquals(
+			expectedJSONObject.toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				null, "/test-vulcan/testPrincipalException5", Http.Method.GET
+			).toString());
+	}
+
+	@Test
+	@TestInfo("LPD-107137")
+	public void testPrincipalExceptionWithoutViewActionReturnForbidden()
+		throws Exception {
+
+		Assert.assertEquals(
+			403,
+			HTTPTestUtil.invokeToHttpCode(
+				null,
+				"/test-vulcan/testPrincipalException6/" +
+					_group.getExternalReferenceCode(),
+				Http.Method.POST));
+	}
+
+	@Test
 	public void testProblemMapperReturnBadRequestProblem() throws Exception {
 		Assert.assertEquals(
 			400,
@@ -202,6 +266,10 @@ public class ExceptionMapperTest {
 
 	public static class TestApplication extends Application {
 
+		public TestApplication(long groupId) {
+			_groupId = groupId;
+		}
+
 		@Override
 		public Set<Object> getSingletons() {
 			return Collections.singleton(this);
@@ -222,10 +290,65 @@ public class ExceptionMapperTest {
 		}
 
 		@GET
+		@Path("/testPrincipalException3/{externalReferenceCode}")
+		@Produces("application/json")
+		public String principalException3() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), _groupId, ActionKeys.VIEW);
+		}
+
+		@Path("/testPrincipalException4/{externalReferenceCode}")
+		@POST
+		@Produces("application/json")
+		public void principalException4() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), _groupId, ActionKeys.VIEW);
+		}
+
+		@GET
+		@Path("/testPrincipalException5")
+		@Produces("application/json")
+		public String principalException5() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), _groupId, ActionKeys.VIEW);
+		}
+
+		@Path("/testPrincipalException6/{externalReferenceCode}")
+		@POST
+		@Produces("application/json")
+		public void principalException6() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), _groupId, ActionKeys.UPDATE);
+		}
+
+		@GET
+		@Path("/testPrincipalException7/{externalReferenceCode}")
+		@Produces("application/json")
+		public String principalException7() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), _groupId, ActionKeys.UPDATE);
+		}
+
+		@GET
 		@Path("/testNoSuchModelException")
 		@Produces("application/json")
 		public String testNoSuchModelException() throws NoSuchModelException {
 			throw new NoSuchModelException();
+		}
+
+		@GET
+		@Path("/testNoSuchModelExceptionWithExternalReferenceCode")
+		@Produces("application/json")
+		public String testNoSuchModelExceptionWithExternalReferenceCode()
+			throws NoSuchModelException {
+
+			NoSuchModelException noSuchModelException =
+				new NoSuchModelException();
+
+			noSuchModelException.setExternalReferenceCode(
+				_EXTERNAL_REFERENCE_CODE);
+
+			throw noSuchModelException;
 		}
 
 		@GET
@@ -243,14 +366,37 @@ public class ExceptionMapperTest {
 				new TestException(RandomTestUtil.randomString()));
 		}
 
+		private final long _groupId;
+
+	}
+
+	private void _assertNotFoundWithExternalReferenceCode(
+			String externalReferenceCode, Http.Method method, String path)
+		throws Exception {
+
+		Assert.assertEquals(
+			404, HTTPTestUtil.invokeToHttpCode(null, path, method));
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, path, method);
+
+		Assert.assertEquals("NOT_FOUND", jsonObject.getString("status"));
+		Assert.assertEquals(
+			"No entity with the external reference code " +
+				externalReferenceCode + " could be found.",
+			jsonObject.getString("title"));
 	}
 
 	private static final String _DETAIL = RandomTestUtil.randomString();
+
+	private static final String _EXTERNAL_REFERENCE_CODE =
+		RandomTestUtil.randomString();
 
 	private static final String _TITLE = RandomTestUtil.randomString();
 
 	private static final String _TYPE = RandomTestUtil.randomString();
 
+	private Group _group;
 	private List<ServiceRegistration<?>> _serviceRegistrations;
 
 	private static class TestException extends Exception {
