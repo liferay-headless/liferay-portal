@@ -5127,6 +5127,7 @@ paths:
                                     $ref: "#/components/schemas/DisplayPageTemplate"
                                 type: array
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}":
         delete:
             # @review
@@ -5150,6 +5151,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-57283
         get:
             # @review
             description:
@@ -5188,6 +5190,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/permissions":
         get:
             operationId: getDesignLibraryDisplayPageTemplatePermissionsPage
@@ -5220,6 +5223,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-57283
         put:
             operationId: putDesignLibraryDisplayPageTemplatePermissionsPage
             parameters:
@@ -5243,6 +5247,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets":
         get:
             # @review
@@ -5307,6 +5312,7 @@ paths:
                                     $ref: "#/components/schemas/PageTemplateSet"
                                 type: array
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}":
         delete:
             # @review
@@ -5330,6 +5336,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-57283
         get:
             # @review
             description:
@@ -5368,6 +5375,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplateSet"
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/style-books":
         get:
             # @review
@@ -5432,6 +5440,7 @@ paths:
                                     $ref: "#/components/schemas/StyleBook"
                                 type: array
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         post:
             # @review
             description:
@@ -5462,6 +5471,7 @@ paths:
                                 $ref: "#/components/schemas/StyleBook"
             # @review
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
     "/design-libraries/{designLibraryExternalReferenceCode}/style-books/{styleBookExternalReferenceCode}":
         delete:
             # @review
@@ -5485,6 +5495,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         get:
             # @review
             description:
@@ -5523,6 +5534,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         patch:
             # @review
             description:
@@ -5569,6 +5581,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         put:
             # @review
             description:
@@ -5615,6 +5628,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
     "/sites/{siteExternalReferenceCode}/display-page-template-folders":
         get:
             # @review
@@ -5679,6 +5693,7 @@ paths:
                                     $ref: "#/components/schemas/DisplayPageTemplateFolder"
                                 type: array
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -5709,6 +5724,7 @@ paths:
                                 $ref: "#/components/schemas/DisplayPageTemplateFolder"
             # @review
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-template-folders/{displayPageTemplateFolderExternalReferenceCode}":
         delete:
             # @review
@@ -5732,6 +5748,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -5770,6 +5787,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplateFolder"
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -5816,6 +5834,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplateFolder"
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -5862,6 +5881,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplateFolder"
             tags: ["DisplayPageTemplateFolder"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-template-folders/{displayPageTemplateFolderExternalReferenceCode}/display-page-templates":
         get:
             # @review
@@ -5910,6 +5930,7 @@ paths:
                                 type: array
             # @review
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -5957,6 +5978,7 @@ paths:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             # @review
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-template-folders/{displayPageTemplateFolderExternalReferenceCode}/permissions":
         get:
             operationId: getSiteDisplayPageTemplateFolderPermissionsPage
@@ -6076,6 +6098,7 @@ paths:
                                     $ref: "#/components/schemas/DisplayPageTemplate"
                                 type: array
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -6106,6 +6129,7 @@ paths:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             # @review
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}":
         delete:
             # @review
@@ -6129,6 +6153,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -6167,6 +6192,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -6213,6 +6239,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -6259,6 +6286,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DisplayPageTemplate"
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/friendly-url-history":
         get:
             # @review
@@ -6297,6 +6325,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/FriendlyUrlHistory"
             tags: ["FriendlyUrlHistory"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/page-specifications":
         get:
             # @review
@@ -6340,6 +6369,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -6387,6 +6417,7 @@ paths:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
             tags: ["DisplayPageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/permissions":
         get:
             operationId: getSiteDisplayPageTemplatePermissionsPage
@@ -6506,6 +6537,7 @@ paths:
                                     $ref: "#/components/schemas/MasterPage"
                                 type: array
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -6536,6 +6568,7 @@ paths:
                                 $ref: "#/components/schemas/MasterPage"
             # @review
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/master-pages/{masterPageExternalReferenceCode}":
         delete:
             # @review
@@ -6559,6 +6592,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -6597,6 +6631,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/MasterPage"
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -6643,6 +6678,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/MasterPage"
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -6689,6 +6725,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/MasterPage"
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/master-pages/{masterPageExternalReferenceCode}/page-specifications":
         get:
             # @review
@@ -6732,6 +6769,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -6779,6 +6817,7 @@ paths:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
             tags: ["MasterPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/master-pages/{masterPageExternalReferenceCode}/permissions":
         get:
             operationId: getSiteMasterPagePermissionsPage
@@ -7107,6 +7146,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
         get:
             # @review
             description:
@@ -7145,6 +7185,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageExperience"
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
         patch:
             # @review
             description:
@@ -7191,6 +7232,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageExperience"
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
         put:
             # @review
             description:
@@ -7237,6 +7279,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageExperience"
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}":
         delete:
             # @review
@@ -7272,6 +7315,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-74328
         get:
             # @review
             description:
@@ -7310,6 +7354,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecification"
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -7356,6 +7401,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecification"
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-74328
         put:
             # @review
             description:
@@ -7402,6 +7448,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecification"
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences":
         get:
             # @review
@@ -7446,6 +7493,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
         post:
             # @review
             description:
@@ -7493,6 +7541,7 @@ paths:
                                 $ref: "#/components/schemas/PageExperience"
             # @review
             tags: ["PageExperience"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements":
         get:
             # @review
@@ -7546,6 +7595,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
         post:
             # @review
             description:
@@ -7598,6 +7648,7 @@ paths:
                                 $ref: "#/components/schemas/PageElement"
             # @review
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}":
         delete:
             # @review
@@ -7631,6 +7682,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
         get:
             # @review
             description:
@@ -7679,6 +7731,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageElement"
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
         patch:
             # @review
             description:
@@ -7735,6 +7788,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageElement"
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
         put:
             # @review
             description:
@@ -7791,6 +7845,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageElement"
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}/page-elements":
         get:
             # @review
@@ -7849,6 +7904,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageElement"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/publish":
         post:
             # @review
@@ -7939,6 +7995,7 @@ paths:
                                     $ref: "#/components/schemas/StyleBook"
                                 type: array
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
     "/sites/{siteExternalReferenceCode}/page-template-sets":
         get:
             # @review
@@ -8003,6 +8060,7 @@ paths:
                                     $ref: "#/components/schemas/PageTemplateSet"
                                 type: array
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -8033,6 +8091,7 @@ paths:
                                 $ref: "#/components/schemas/PageTemplateSet"
             # @review
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}":
         delete:
             # @review
@@ -8056,6 +8115,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -8094,6 +8154,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplateSet"
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -8140,6 +8201,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplateSet"
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -8186,6 +8248,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplateSet"
             tags: ["PageTemplateSet"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}/page-templates":
         get:
             # @review
@@ -8234,6 +8297,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -8281,6 +8345,7 @@ paths:
                                 $ref: "#/components/schemas/PageTemplate"
             # @review
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}/permissions":
         get:
             operationId: getSitePageTemplateSetPermissionsPage
@@ -8400,6 +8465,7 @@ paths:
                                     $ref: "#/components/schemas/PageTemplate"
                                 type: array
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -8430,6 +8496,7 @@ paths:
                                 $ref: "#/components/schemas/PageTemplate"
             # @review
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-templates/{pageTemplateExternalReferenceCode}":
         delete:
             # @review
@@ -8453,6 +8520,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -8491,6 +8559,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplate"
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -8537,6 +8606,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplate"
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -8583,6 +8653,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageTemplate"
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-templates/{pageTemplateExternalReferenceCode}/page-specifications":
         get:
             # @review
@@ -8626,6 +8697,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -8673,6 +8745,7 @@ paths:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
             tags: ["PageTemplate"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/page-templates/{pageTemplateExternalReferenceCode}/permissions":
         get:
             operationId: getSitePageTemplatePermissionsPage
@@ -8842,6 +8915,7 @@ paths:
                                     $ref: "#/components/schemas/SitePage"
                                 type: array
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -8877,6 +8951,7 @@ paths:
                                 $ref: "#/components/schemas/SitePage"
             # @review
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}":
         delete:
             # @review
@@ -8900,6 +8975,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -8938,6 +9014,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SitePage"
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -8989,6 +9066,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SitePage"
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -9040,6 +9118,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SitePage"
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/friendly-url-history":
         get:
             # @review
@@ -9078,6 +9157,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/FriendlyUrlHistory"
             tags: ["FriendlyUrlHistory"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions":
         get:
             description:
@@ -9120,6 +9200,7 @@ paths:
                                     $ref: "#/components/schemas/PageSpecificationVersion"
                                 type: array
             tags: ["PageSpecificationVersion"]
+            x-feature-flag: LPD-10622
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}":
         delete:
             description:
@@ -9147,6 +9228,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["PageSpecificationVersion"]
+            x-feature-flag: LPD-10622
         get:
             description:
                 Retrieves a specific page specification version of a site page.
@@ -9189,6 +9271,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecificationVersion"
             tags: ["PageSpecificationVersion"]
+            x-feature-flag: LPD-10622
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}/page-specification":
         get:
             description:
@@ -9232,6 +9315,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecification"
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-10622
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}/page-specification-version-page-experiences":
         get:
             description:
@@ -9279,6 +9363,7 @@ paths:
                                     $ref: "#/components/schemas/PageSpecificationVersionPageExperience"
                                 type: array
             tags: ["PageSpecificationVersionPageExperience"]
+            x-feature-flag: LPD-10622
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}/restore":
         post:
             description:
@@ -9310,6 +9395,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/PageSpecification"
             tags: ["PageSpecificationVersion"]
+            x-feature-flag: LPD-10622
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specifications":
         get:
             # @review
@@ -9353,6 +9439,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -9399,6 +9486,7 @@ paths:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
             tags: ["SitePage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/permissions":
         get:
             operationId: getSiteSitePagePermissionsPage
@@ -9503,6 +9591,7 @@ paths:
                         "The requested site page could not be found."
             # @review
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
         post:
             # @review
             description:
@@ -9556,6 +9645,7 @@ paths:
                         "The requested site page could not be found."
             # @review
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/widget-instances/{widgetInstanceExternalReferenceCode}":
         delete:
             # @review
@@ -9590,6 +9680,7 @@ paths:
                     description:
                         "The requested site page or widget instance could not be found."
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
         get:
             # @review
             description:
@@ -9639,6 +9730,7 @@ paths:
                     description:
                         "The requested site page or widget instance could not be found."
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
         patch:
             # @review
             description:
@@ -9696,6 +9788,7 @@ paths:
                     description:
                         "The requested site page or widget instance could not be found."
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
         put:
             # @review
             description:
@@ -9753,6 +9846,7 @@ paths:
                     description:
                         "The requested site page could not be found."
             tags: ["WidgetPageWidgetInstance"]
+            x-feature-flag: LPD-74328
     "/sites/{siteExternalReferenceCode}/style-books":
         get:
             # @review
@@ -9817,6 +9911,7 @@ paths:
                                     $ref: "#/components/schemas/StyleBook"
                                 type: array
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         post:
             # @review
             description:
@@ -9847,6 +9942,7 @@ paths:
                                 $ref: "#/components/schemas/StyleBook"
             # @review
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
     "/sites/{siteExternalReferenceCode}/style-books/{styleBookExternalReferenceCode}":
         delete:
             # @review
@@ -9870,6 +9966,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         get:
             # @review
             description:
@@ -9908,6 +10005,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         patch:
             # @review
             description:
@@ -9954,6 +10052,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
         put:
             # @review
             description:
@@ -10000,6 +10099,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/StyleBook"
             tags: ["StyleBook"]
+            x-feature-flag: LPD-57283
     "/sites/{siteExternalReferenceCode}/utility-pages":
         get:
             # @review
@@ -10064,6 +10164,7 @@ paths:
                                     $ref: "#/components/schemas/UtilityPage"
                                 type: array
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -10094,6 +10195,7 @@ paths:
                                 $ref: "#/components/schemas/UtilityPage"
             # @review
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/utility-pages/{utilityPageExternalReferenceCode}":
         delete:
             # @review
@@ -10117,6 +10219,7 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
         get:
             # @review
             description:
@@ -10155,6 +10258,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/UtilityPage"
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
         patch:
             # @review
             description:
@@ -10201,6 +10305,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/UtilityPage"
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
         put:
             # @review
             description:
@@ -10247,6 +10352,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/UtilityPage"
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/utility-pages/{utilityPageExternalReferenceCode}/friendly-url-history":
         get:
             # @review
@@ -10285,6 +10391,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/FriendlyUrlHistory"
             tags: ["FriendlyUrlHistory"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/utility-pages/{utilityPageExternalReferenceCode}/page-specifications":
         get:
             # @review
@@ -10328,6 +10435,7 @@ paths:
                                 type: array
             # @review
             tags: ["PageSpecification"]
+            x-feature-flag: LPD-35443
         post:
             # @review
             description:
@@ -10374,6 +10482,7 @@ paths:
                                 $ref: "#/components/schemas/ContentPageSpecification"
             # @review
             tags: ["UtilityPage"]
+            x-feature-flag: LPD-35443
     "/sites/{siteExternalReferenceCode}/utility-pages/{utilityPageExternalReferenceCode}/permissions":
         get:
             operationId: getSiteUtilityPagePermissionsPage
@@ -10706,6 +10815,7 @@ paths:
                                 format: binary
                                 type: string
             tags: ["Site"]
+            x-feature-flag: LPD-19870
         put:
             description:
                 Adds or update a new site

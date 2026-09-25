@@ -14,6 +14,7 @@ import com.liferay.portal.tools.rest.builder.test.dto.v1_0.CompanyTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.ERCAssetLibraryTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.ERCScopedTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.ERCSiteTestEntity;
+import com.liferay.portal.tools.rest.builder.test.dto.v1_0.FeatureFlagMethodTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.Filter;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.MultipartTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.ReferencingTestEntity;
@@ -29,6 +30,7 @@ import com.liferay.portal.tools.rest.builder.test.resource.v1_0.ERCAssetLibraryT
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.ERCScopedTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.ERCSiteTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.EntityModelResourceTestEntity1Resource;
+import com.liferay.portal.tools.rest.builder.test.resource.v1_0.FeatureFlagMethodTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.FilterResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.MultipartTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.ReferencingTestEntityResource;
@@ -123,6 +125,15 @@ public class Mutation {
 
 		_entityModelResourceTestEntity1ResourceComponentServiceObjects =
 			entityModelResourceTestEntity1ResourceComponentServiceObjects;
+	}
+
+	public static void
+		setFeatureFlagMethodTestEntityResourceComponentServiceObjects(
+			ComponentServiceObjects<FeatureFlagMethodTestEntityResource>
+				featureFlagMethodTestEntityResourceComponentServiceObjects) {
+
+		_featureFlagMethodTestEntityResourceComponentServiceObjects =
+			featureFlagMethodTestEntityResourceComponentServiceObjects;
 	}
 
 	public static void setFilterResourceComponentServiceObjects(
@@ -1013,6 +1024,101 @@ public class Mutation {
 				entityModelResourceTestEntity1Resource.
 					postEntityModelResourceTestEntities1PageExportBatch(
 						callbackURL, contentType, fieldNames));
+	}
+
+	@GraphQLField
+	public boolean deleteFeatureFlagMethodTestEntity(
+			@GraphQLName("featureFlagMethodTestEntityId") Long
+				featureFlagMethodTestEntityId)
+		throws Exception {
+
+		if (!com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil.
+				isEnabled(_company.getCompanyId(), "METHOD-123")) {
+
+			throw new jakarta.ws.rs.NotFoundException();
+		}
+
+		_applyVoidComponentServiceObjects(
+			_featureFlagMethodTestEntityResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			featureFlagMethodTestEntityResource ->
+				featureFlagMethodTestEntityResource.
+					deleteFeatureFlagMethodTestEntity(
+						featureFlagMethodTestEntityId));
+
+		return true;
+	}
+
+	@GraphQLField
+	public Response deleteFeatureFlagMethodTestEntityBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		if (!com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil.
+				isEnabled(_company.getCompanyId(), "METHOD-123")) {
+
+			throw new jakarta.ws.rs.NotFoundException();
+		}
+
+		return _applyComponentServiceObjects(
+			_featureFlagMethodTestEntityResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			featureFlagMethodTestEntityResource ->
+				featureFlagMethodTestEntityResource.
+					deleteFeatureFlagMethodTestEntityBatch(
+						callbackURL, object));
+	}
+
+	@GraphQLField
+	public Response createFeatureFlagMethodTestEntitiesPageExportBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("contentType") String contentType,
+			@GraphQLName("fieldNames") String fieldNames)
+		throws Exception {
+
+		if (!com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil.
+				isEnabled(_company.getCompanyId(), "METHOD-123")) {
+
+			throw new jakarta.ws.rs.NotFoundException();
+		}
+
+		return _applyComponentServiceObjects(
+			_featureFlagMethodTestEntityResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			featureFlagMethodTestEntityResource ->
+				featureFlagMethodTestEntityResource.
+					postFeatureFlagMethodTestEntitiesPageExportBatch(
+						callbackURL, contentType, fieldNames));
+	}
+
+	@GraphQLField
+	public FeatureFlagMethodTestEntity createFeatureFlagMethodTestEntity(
+			@GraphQLName("featureFlagMethodTestEntity")
+				FeatureFlagMethodTestEntity featureFlagMethodTestEntity)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_featureFlagMethodTestEntityResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			featureFlagMethodTestEntityResource ->
+				featureFlagMethodTestEntityResource.
+					postFeatureFlagMethodTestEntity(
+						featureFlagMethodTestEntity));
+	}
+
+	@GraphQLField
+	public Response createFeatureFlagMethodTestEntityBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_featureFlagMethodTestEntityResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			featureFlagMethodTestEntityResource ->
+				featureFlagMethodTestEntityResource.
+					postFeatureFlagMethodTestEntityBatch(callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1999,6 +2105,34 @@ public class Mutation {
 				_vulcanBatchEngineImportTaskResource);
 	}
 
+	private void _populateResourceContext(
+			FeatureFlagMethodTestEntityResource
+				featureFlagMethodTestEntityResource)
+		throws Exception {
+
+		featureFlagMethodTestEntityResource.setContextAcceptLanguage(
+			_acceptLanguage);
+		featureFlagMethodTestEntityResource.setContextCompany(_company);
+		featureFlagMethodTestEntityResource.setContextHttpServletRequest(
+			_httpServletRequest);
+		featureFlagMethodTestEntityResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		featureFlagMethodTestEntityResource.setContextUriInfo(_uriInfo);
+		featureFlagMethodTestEntityResource.setContextUser(_user);
+		featureFlagMethodTestEntityResource.setGroupLocalService(
+			_groupLocalService);
+		featureFlagMethodTestEntityResource.setRoleLocalService(
+			_roleLocalService);
+
+		featureFlagMethodTestEntityResource.
+			setVulcanBatchEngineExportTaskResource(
+				_vulcanBatchEngineExportTaskResource);
+
+		featureFlagMethodTestEntityResource.
+			setVulcanBatchEngineImportTaskResource(
+				_vulcanBatchEngineImportTaskResource);
+	}
+
 	private void _populateResourceContext(FilterResource filterResource)
 		throws Exception {
 
@@ -2206,6 +2340,8 @@ public class Mutation {
 	private static ComponentServiceObjects
 		<EntityModelResourceTestEntity1Resource>
 			_entityModelResourceTestEntity1ResourceComponentServiceObjects;
+	private static ComponentServiceObjects<FeatureFlagMethodTestEntityResource>
+		_featureFlagMethodTestEntityResourceComponentServiceObjects;
 	private static ComponentServiceObjects<FilterResource>
 		_filterResourceComponentServiceObjects;
 	private static ComponentServiceObjects<MultipartTestEntityResource>
@@ -2245,4 +2381,4 @@ public class Mutation {
 		_vulcanBatchEngineImportTaskResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-311735118
+// LIFERAY-REST-BUILDER-HASH:1200627579

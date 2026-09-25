@@ -19,14 +19,17 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.EntityExtensionHandler;
 import com.liferay.portal.vulcan.extension.ExtensionProviderRegistry;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 import com.liferay.portal.vulcan.extension.util.ExtensionUtil;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
+import com.liferay.portal.vulcan.internal.feature.flag.FeatureFlagUtil;
 import com.liferay.portal.vulcan.openapi.DTOProperty;
 import com.liferay.portal.vulcan.openapi.OpenAPIContext;
 import com.liferay.portal.vulcan.openapi.OpenAPISchemaFilter;
@@ -77,6 +80,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 
+import java.lang.reflect.Method;
+
 import java.net.URI;
 
 import java.time.LocalDateTime;
@@ -94,6 +99,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -539,6 +546,19 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			_getUpdatedSchemaReference(schema.get$ref(), schemaPrefix));
 	}
 
+	private String _getApplicationPath(UriInfo uriInfo) {
+		if (uriInfo == null) {
+			return null;
+		}
+
+		URI baseURI = uriInfo.getBaseUri();
+
+		String applicationPath = StringUtil.removeFirst(
+			baseURI.getPath(), Portal.PATH_MODULE);
+
+		return StringUtil.replaceLast(applicationPath, '/', "");
+	}
+
 	private String _getBasePath(
 		HttpServletRequest httpServletRequest, UriInfo uriInfo) {
 
@@ -676,6 +696,33 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		return propertyDefinitions;
 	}
 
+	private Set<String> _getFeatureFlagDisabledOperationIds(
+		Set<Class<?>> resourceClasses) {
+
+		Set<String> operationIds = new HashSet<>();
+
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		for (Class<?> resourceClass : resourceClasses) {
+			for (Class<?> currentClass = resourceClass; currentClass != null;
+				 currentClass = currentClass.getSuperclass()) {
+
+				for (Method method : currentClass.getDeclaredMethods()) {
+					if ((AnnotationUtils.getHttpMethodValue(method) == null) ||
+						FeatureFlagUtil.isEnabled(
+							companyId, method, resourceClass)) {
+
+						continue;
+					}
+
+					operationIds.add(_getOperationId(method));
+				}
+			}
+		}
+
+		return operationIds;
+	}
+
 	private Response _getOpenAPI(
 			HttpServletRequest httpServletRequest,
 			OpenAPIContributor openAPIContributor,
@@ -719,21 +766,23 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			_mergeOpenAPISchemaFilters(
 				openAPISchemaFilter,
 				_getOpenAPISchemaFilter(
-					_getBasePath(null, uriInfo), _extensionProviderRegistry,
+					_getApplicationPath(uriInfo), _extensionProviderRegistry,
 					resourceClasses));
 
-		if (mergedOpenAPISchemaFilter != null) {
-			SpecFilter specFilter = new SpecFilter();
+		OpenAPISpecFilter openAPISpecFilter = _toOpenAPISpecFilter(
+			mergedOpenAPISchemaFilter, resourceClasses);
 
+		if (openAPISpecFilter != null) {
 			Map<String, List<String>> queryParameters = null;
 
 			if (uriInfo != null) {
 				queryParameters = uriInfo.getQueryParameters();
 			}
 
+			SpecFilter specFilter = new SpecFilter();
+
 			openAPI = specFilter.filter(
-				openAPI, _toOpenAPISpecFilter(mergedOpenAPISchemaFilter),
-				queryParameters, null, null);
+				openAPI, openAPISpecFilter, queryParameters, null, null);
 		}
 
 		if (openAPI == null) {
@@ -776,23 +825,17 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 	}
 
 	private OpenAPISchemaFilter _getOpenAPISchemaFilter(
-			String basePath,
+			String applicationPath,
 			ExtensionProviderRegistry extensionProviderRegistry,
 			Set<Class<?>> resourceClasses)
 		throws Exception {
 
-		Set<String> classNames = _getDTOClassNames(resourceClasses);
-
-		if (SetUtil.isEmpty(classNames)) {
-			return null;
-		}
-
-		long companyId = CompanyThreadLocal.getCompanyId();
-
 		Map<String, List<PropertyDefinition>> propertyDefinitionsMap =
 			new HashMap<>();
 
-		for (String className : classNames) {
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		for (String className : _getDTOClassNames(resourceClasses)) {
 			List<PropertyDefinition> propertyDefinitions =
 				_getExtendedPropertyDefinitions(
 					className, companyId, extensionProviderRegistry);
@@ -802,11 +845,7 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 			}
 		}
 
-		if (MapUtil.isNotEmpty(propertyDefinitionsMap)) {
-			return _getOpenAPISchemaFilter(basePath, propertyDefinitionsMap);
-		}
-
-		return null;
+		return _getOpenAPISchemaFilter(applicationPath, propertyDefinitionsMap);
 	}
 
 	private OpenAPISchemaFilter _getOpenAPISchemaFilter(
@@ -838,16 +877,25 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 		};
 	}
 
+	private String _getOperationId(Method method) {
+		io.swagger.v3.oas.annotations.Operation operation =
+			method.getAnnotation(io.swagger.v3.oas.annotations.Operation.class);
+
+		if ((operation != null) &&
+			Validator.isNotNull(operation.operationId())) {
+
+			return operation.operationId();
+		}
+
+		return method.getName();
+	}
+
 	private OpenAPISchemaFilter _mergeOpenAPISchemaFilters(
 		OpenAPISchemaFilter openAPISchemaFilter1,
 		OpenAPISchemaFilter openAPISchemaFilter2) {
 
 		if (openAPISchemaFilter1 == null) {
 			return openAPISchemaFilter2;
-		}
-
-		if (openAPISchemaFilter2 == null) {
-			return openAPISchemaFilter1;
 		}
 
 		OpenAPISchemaFilter mergedOpenAPISchemaFilter =
@@ -872,13 +920,27 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 	}
 
 	private OpenAPISpecFilter _toOpenAPISpecFilter(
-		OpenAPISchemaFilter openAPISchemaFilter) {
+		OpenAPISchemaFilter openAPISchemaFilter,
+		Set<Class<?>> resourceClasses) {
 
 		List<DTOProperty> dtoProperties =
 			openAPISchemaFilter.getDTOProperties();
-
+		Set<String> excludedOperationIds =
+			ConfigurationUtil.getExcludedOperationIds(
+				CompanyThreadLocal.getCompanyId(), _configurationAdmin,
+				openAPISchemaFilter.getApplicationPath());
+		Set<String> featureFlagDisabledOperationIds =
+			_getFeatureFlagDisabledOperationIds(resourceClasses);
 		Map<String, String> schemaMappings =
 			openAPISchemaFilter.getSchemaMappings();
+
+		if (ListUtil.isEmpty(dtoProperties) &&
+			SetUtil.isEmpty(excludedOperationIds) &&
+			featureFlagDisabledOperationIds.isEmpty() &&
+			MapUtil.isEmpty(schemaMappings)) {
+
+			return null;
+		}
 
 		return new AbstractSpecFilter() {
 
@@ -890,7 +952,16 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 				Components components = openAPI.getComponents();
 
-				Map<String, Schema> schemas = components.getSchemas();
+				Map<String, Schema> schemas = null;
+
+				if (components != null) {
+					schemas = components.getSchemas();
+				}
+
+				if (MapUtil.isEmpty(schemas)) {
+					return super.filterOpenAPI(
+						openAPI, params, cookies, headers);
+				}
 
 				for (Map.Entry<String, String> entry :
 						schemaMappings.entrySet()) {
@@ -932,12 +1003,9 @@ public class OpenAPIResourceImpl implements OpenAPIResource {
 
 				String operationId = operation.getOperationId();
 
-				Set<String> excludedOperationIds =
-					ConfigurationUtil.getExcludedOperationIds(
-						CompanyThreadLocal.getCompanyId(), _configurationAdmin,
-						openAPISchemaFilter.getApplicationPath());
+				if (excludedOperationIds.contains(operationId) ||
+					featureFlagDisabledOperationIds.contains(operationId)) {
 
-				if (excludedOperationIds.contains(operationId)) {
 					return Optional.empty();
 				}
 

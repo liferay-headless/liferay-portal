@@ -21,6 +21,7 @@ import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTa
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResourceFactory;
 import com.liferay.portal.vulcan.internal.accept.language.AcceptLanguageImpl;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
+import com.liferay.portal.vulcan.internal.feature.flag.FeatureFlagUtil;
 import com.liferay.portal.vulcan.internal.jaxrs.context.provider.ContextProviderUtil;
 import com.liferay.portal.vulcan.jaxrs.context.ContextDataInjector;
 import com.liferay.portal.vulcan.jaxrs.context.ContextDataInjectorBuilderFactory;
@@ -48,7 +49,10 @@ import java.util.Set;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -182,6 +186,15 @@ public class ContextContainerRequestFilter
 		HttpServletRequest httpServletRequest =
 			ContextProviderUtil.getHttpServletRequest(message);
 
+		if (!_isFeatureFlagEnabled(httpServletRequest, message)) {
+			containerRequestContext.abortWith(
+				Response.status(
+					Response.Status.NOT_FOUND
+				).build());
+
+			return;
+		}
+
 		_filterExcludedOperationIds(
 			containerRequestContext, httpServletRequest, message);
 
@@ -224,6 +237,27 @@ public class ContextContainerRequestFilter
 			).build();
 
 		contextDataInjector.inject(instance);
+	}
+
+	private boolean _isFeatureFlagEnabled(
+		HttpServletRequest httpServletRequest, Message message) {
+
+		Exchange exchange = message.getExchange();
+
+		OperationResourceInfo operationResourceInfo = exchange.get(
+			OperationResourceInfo.class);
+
+		if (operationResourceInfo == null) {
+			return true;
+		}
+
+		ClassResourceInfo classResourceInfo =
+			operationResourceInfo.getClassResourceInfo();
+
+		return FeatureFlagUtil.isEnabled(
+			_portal.getCompanyId(httpServletRequest),
+			operationResourceInfo.getAnnotatedMethod(),
+			classResourceInfo.getServiceClass());
 	}
 
 	private final ConfigurationAdmin _configurationAdmin;

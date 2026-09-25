@@ -122,8 +122,6 @@ public class DisplayPageTemplateResourceImpl
 			String displayPageTemplateExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
-
 		_layoutPageTemplateEntryService.deleteLayoutPageTemplateEntry(
 			_getLayoutPageTemplateEntry(
 				displayPageTemplateExternalReferenceCode,
@@ -137,8 +135,6 @@ public class DisplayPageTemplateResourceImpl
 			String displayPageTemplateExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
-
 		_layoutPageTemplateEntryService.deleteLayoutPageTemplateEntry(
 			displayPageTemplateExternalReferenceCode,
 			GroupUtil.getStagingAwareGroupId(
@@ -150,8 +146,6 @@ public class DisplayPageTemplateResourceImpl
 			String designLibraryExternalReferenceCode,
 			String displayPageTemplateExternalReferenceCode)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		return _toDesignLibraryDisplayPageTemplate(
 			designLibraryExternalReferenceCode,
@@ -165,8 +159,6 @@ public class DisplayPageTemplateResourceImpl
 			String designLibraryExternalReferenceCode,
 			String displayPageTemplateExternalReferenceCode, String roleNames)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		long groupId = _getDesignLibraryGroupId(
 			designLibraryExternalReferenceCode);
@@ -189,8 +181,6 @@ public class DisplayPageTemplateResourceImpl
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		long groupId = _getDesignLibraryGroupId(
 			designLibraryExternalReferenceCode);
@@ -306,8 +296,6 @@ public class DisplayPageTemplateResourceImpl
 				Boolean flatten)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
-
 		long groupId = GroupUtil.getGroupId(
 			true, contextCompany.getCompanyId(), siteExternalReferenceCode);
 
@@ -343,8 +331,6 @@ public class DisplayPageTemplateResourceImpl
 				DisplayPageTemplate displayPageTemplate)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
-
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
 
@@ -374,8 +360,6 @@ public class DisplayPageTemplateResourceImpl
 				String pageTemplateExternalReferenceCode,
 				ContentPageSpecification contentPageSpecification)
 		throws Exception {
-
-		EnabledUtil.checkEnabled(contextCompany);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryService.
@@ -416,8 +400,6 @@ public class DisplayPageTemplateResourceImpl
 			Permission[] permissions)
 		throws Exception {
 
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
-
 		super.putSiteDisplayPageTemplatePermissionsPage(
 			designLibraryExternalReferenceCode,
 			displayPageTemplateExternalReferenceCode, permissions);
@@ -440,8 +422,6 @@ public class DisplayPageTemplateResourceImpl
 			String siteExternalReferenceCode,
 			String displayPageTemplateExternalReferenceCode)
 		throws Exception {
-
-		EnabledUtil.checkEnabled(contextCompany);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryService.
@@ -470,8 +450,6 @@ public class DisplayPageTemplateResourceImpl
 			Sort[] sorts)
 		throws Exception {
 
-		EnabledUtil.checkEnabled(contextCompany);
-
 		return _getDisplayPageTemplatesPage(
 			filter,
 			GroupUtil.getGroupId(
@@ -484,8 +462,6 @@ public class DisplayPageTemplateResourceImpl
 			String siteExternalReferenceCode,
 			DisplayPageTemplate displayPageTemplate)
 		throws Exception {
-
-		EnabledUtil.checkEnabled(contextCompany);
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);
@@ -501,8 +477,6 @@ public class DisplayPageTemplateResourceImpl
 			String displayPageTemplateExternalReferenceCode,
 			DisplayPageTemplate displayPageTemplate)
 		throws Exception {
-
-		EnabledUtil.checkEnabled(contextCompany);
 
 		long groupId = GroupUtil.getStagingAwareGroupId(
 			contextCompany.getCompanyId(), siteExternalReferenceCode);

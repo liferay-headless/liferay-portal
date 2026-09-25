@@ -63,6 +63,7 @@ import java.util.Set;
  * @author Feliphe Marinho
  * @generated
  */
+@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-62272")
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseAuthorizationTokenResourceImpl
@@ -822,4 +823,4 @@ public abstract class BaseAuthorizationTokenResourceImpl
 		LogFactoryUtil.getLog(BaseAuthorizationTokenResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:246510993
+// LIFERAY-REST-BUILDER-HASH:94190031

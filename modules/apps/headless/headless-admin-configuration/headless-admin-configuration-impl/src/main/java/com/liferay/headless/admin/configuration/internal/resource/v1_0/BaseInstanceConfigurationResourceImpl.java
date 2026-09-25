@@ -63,6 +63,7 @@ import java.util.Set;
  * @author Thiago Buarque
  * @generated
  */
+@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-65399")
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseInstanceConfigurationResourceImpl
@@ -1082,4 +1083,4 @@ public abstract class BaseInstanceConfigurationResourceImpl
 		LogFactoryUtil.getLog(BaseInstanceConfigurationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-751733153
+// LIFERAY-REST-BUILDER-HASH:-1529365734
