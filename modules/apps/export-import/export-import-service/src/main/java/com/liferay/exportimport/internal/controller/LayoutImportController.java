@@ -173,6 +173,7 @@ public class LayoutImportController implements ImportController {
 			}
 		}
 		finally {
+			ExportImportThreadLocal.setExportImportConfigurationId(0);
 			ExportImportThreadLocal.setLayoutDataDeletionImportInProcess(false);
 		}
 	}
@@ -246,6 +247,7 @@ public class LayoutImportController implements ImportController {
 			throw throwable;
 		}
 		finally {
+			ExportImportThreadLocal.setExportImportConfigurationId(0);
 			ExportImportThreadLocal.setLastImportUserName(null);
 			ExportImportThreadLocal.setLastImportUserUuid(null);
 		}
