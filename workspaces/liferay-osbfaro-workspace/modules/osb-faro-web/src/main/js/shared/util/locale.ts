@@ -28,6 +28,12 @@ export function resolveLocale(languageId?: string | null): string {
 	return SUPPORTED_LOCALES[resolveLanguageId(languageId)];
 }
 
+export function getLanguageLabel(languageId?: string | null): string {
+	const [language, country] = (languageId || DEFAULT_LANGUAGE_ID).split('_');
+
+	return `${language.toUpperCase()} (${country})`;
+}
+
 const LANGUAGE_IDS_BY_LOCALE: Record<string, LanguageIds> = Object.fromEntries(
 	Object.entries(SUPPORTED_LOCALES).map(
 		([languageId, locale]): [string, LanguageIds] => [

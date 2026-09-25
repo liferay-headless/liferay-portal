@@ -1,71 +1,42 @@
 .sidebar-root {
-	background: $mainLighten4;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
+	background: $lightL1;
+	border-right: 1px solid $cadmin-secondary-l2;
+	height: calc(100% - #{$toolbarHeight});
 	left: 0;
 	overflow: hidden;
 	position: fixed;
-	transition: width 0.2s ease-out;
+	top: $toolbarHeight;
 	width: $sidebarOpenWidth;
 	z-index: 1000;
 
+	@media (prefers-reduced-motion: no-preference) {
+		transition:
+			visibility 0.5s ease,
+			width 0.5s ease;
+	}
+
 	&.collapsed {
-		width: $sidebarClosedWidth;
-
-		.item-label,
-		.section-title,
-		.user-name,
-		.channels-menu-label,
-		.channels-menu-caret {
-			opacity: 0;
-			visibility: hidden;
-		}
-
-		.sidebar-body {
-			overflow-x: hidden;
-		}
-
-		.channels-menu-icon {
-			opacity: 1;
-			transition:
-				opacity 0.2s ease,
-				visibility 0.2s ease;
-			transition-delay: 0.2s;
-			visibility: visible;
-		}
+		visibility: hidden;
+		width: 0;
 	}
 
-	.item-label,
-	.section-title,
-	.user-name {
-		opacity: 1;
-		transition:
-			opacity 0.2s ease,
-			visibility 0.2s ease;
-		visibility: visible;
+	.sidebar-menu {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		width: $sidebarOpenWidth;
 	}
 
-	.channels-menu-label,
-	.channels-menu-caret {
-		opacity: 1;
-		transition:
-			opacity 0.2s ease,
-			visibility 0.2s ease;
-		transition-delay: 0.1s;
-		visibility: visible;
-	}
-
-	.link,
-	.trigger {
+	.link {
 		align-items: center;
+		border-radius: 0 !important;
 		border-width: 0;
-		color: $mainLighten52;
+		color: $dark;
 		display: flex;
 		font-size: $fontSizeSmall;
-		font-weight: $fontWeightSemiBold;
+		font-weight: $fontWeightRegular;
 		height: 40px;
-		padding: 0 24px;
+		padding: 0 $sidebarGutter;
 		position: relative;
 		transition:
 			border-color 0.15s ease-out,
@@ -76,39 +47,24 @@
 		&:active,
 		&:focus,
 		&:active:focus {
-			color: $secondaryHover;
+			color: $dark;
 			text-decoration: none;
-
-			.avatar {
-				background: $mainLighten65;
-			}
 		}
 
 		&:active,
 		&:focus {
-			background: $mainLighten8;
+			background: $secondaryHover;
 		}
 
 		&:active:focus {
-			background: $mainLighten4;
+			background: $lightL1;
 		}
 
 		&:hover {
-			background: $mainLighten8;
-			color: $secondaryHover;
+			background: $secondaryHover;
+			color: $dark;
 			text-decoration: none;
-
-			.avatar {
-				background: $mainLighten65;
-				color: $mainLighten8;
-			}
 		}
-	}
-
-	.logo {
-		height: 24px;
-		margin-right: 16px;
-		width: 24px;
 	}
 
 	.nav-list {
@@ -123,17 +79,39 @@
 		overflow-y: auto;
 		padding: 0;
 
-		.section {
+		.panel {
+			background: transparent;
+			border: none;
+			border-radius: 0;
 			margin-bottom: 24px;
 
+			.panel-header {
+				align-items: center;
+				display: flex;
+				height: auto;
+				padding: 8px $sidebarGutter;
+			}
+
+			.panel-body {
+				padding: 0;
+			}
+
 			.section-title {
-				color: $mainLighten28;
+				align-items: center;
+				color: $dark;
+				display: flex;
 				font-size: $fontSizeExtraSmall;
+				font-weight: $fontWeightSemiBold;
+				justify-content: space-between;
 				letter-spacing: 0.5px;
-				margin-bottom: 16px;
-				padding: 0 32px;
 				text-transform: uppercase;
 				white-space: nowrap;
+				width: 100%;
+
+				.icon-root {
+					color: $mainLighten28;
+					font-size: 0.75rem;
+				}
 			}
 		}
 	}
@@ -160,22 +138,19 @@
 	.sidebar-header {
 		align-items: center;
 		margin: 24px 0;
-		padding: 0 16px;
-
-		.sidebar-header-logo {
-			padding: 0 12px;
-		}
+		padding: 0 $sidebarGutter;
 	}
 
 	.sidebar-item-root {
 		&.active .link {
-			background: $mainLighten8;
+			background: $light;
 			border-left: 4px solid $primary;
-			color: $white;
-			padding-left: 20px;
+			color: $dark;
+			font-weight: $fontWeightSemiBold;
+			padding-left: calc(#{$sidebarGutter} - 4px);
 
 			&:hover {
-				color: $white;
+				color: $dark;
 				text-decoration: none;
 			}
 		}
@@ -191,20 +166,6 @@
 		.link-content-wrapper {
 			align-items: center;
 			display: flex;
-		}
-	}
-
-	.user-dropdown-root {
-		.avatar {
-			background-color: $secondary;
-			color: $main;
-			font-size: $fontSizeSmall;
-			font-weight: $fontWeightSemiBold;
-			margin-right: 16px;
-			transition:
-				border-color 0.15s ease-out,
-				background-color 0.15s ease-out,
-				color 0.15s ease-out;
 		}
 	}
 }

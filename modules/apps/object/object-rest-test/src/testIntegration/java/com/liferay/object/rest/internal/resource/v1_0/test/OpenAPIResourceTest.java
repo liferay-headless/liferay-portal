@@ -16,10 +16,13 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.builder.ObjectFieldSettingBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.rest.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
@@ -43,6 +46,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -119,19 +123,7 @@ public class OpenAPIResourceTest {
 
 	@Test
 	public void testGetOpenAPI() throws Exception {
-		ListTypeDefinition listTypeDefinition =
-			_listTypeDefinitionLocalService.addListTypeDefinition(
-				null, TestPropsValues.getUserId(),
-				Collections.singletonMap(
-					LocaleUtil.US, RandomTestUtil.randomString()),
-				false,
-				TransformUtil.transformToList(
-					new String[] {"value1", "value2"},
-					listTypeValue -> ListTypeEntryUtil.createListTypeEntry(
-						listTypeValue,
-						Collections.singletonMap(
-							LocaleUtil.US, listTypeValue))),
-				new ServiceContext());
+		ListTypeDefinition listTypeDefinition = _addListTypeDefinition();
 
 		ObjectDefinition relatedObjectDefinition1 =
 			ObjectDefinitionTestUtil.publishObjectDefinition(
@@ -225,56 +217,56 @@ public class OpenAPIResourceTest {
 			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition1.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship1"), "relationship1",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(),
 			relatedObjectDefinition1.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship2"), "relationship2",
 			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition1.getObjectDefinitionId(),
 			relatedObjectDefinition2.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship3"), "relationship3",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition1.getObjectDefinitionId(),
 			relatedObjectDefinition2.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship4"), "relationship4",
 			false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition2.getObjectDefinitionId(),
 			relatedObjectDefinition3.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship5"), "relationship5",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition3.getObjectDefinitionId(),
 			relatedObjectDefinition4.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship6"), "relationship6",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition4.getObjectDefinitionId(),
 			relatedObjectDefinition5.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship7"), "relationship7",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, TestPropsValues.getUserId(),
 			relatedObjectDefinition5.getObjectDefinitionId(),
 			relatedObjectDefinition6.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap("relationship8"), "relationship8",
 			false, ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
 
@@ -451,6 +443,147 @@ public class OpenAPIResourceTest {
 	}
 
 	@Test
+	public void testGetOpenAPIWithDescriptions() throws Exception {
+		ListTypeDefinition listTypeDefinition = _addListTypeDefinition();
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				HashMapBuilder.put(
+					LocaleUtil.US,
+					"This is the description of an object definition."
+				).build(),
+				"Object5",
+				Arrays.asList(
+					new TextObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US,
+							"This is the description of an object field."
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field5")
+					).name(
+						"field5"
+					).build(),
+					new MultiselectPicklistObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US,
+							"This is the description of a multiselect field."
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field6")
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"field6"
+					).build(),
+					new PicklistObjectFieldBuilder(
+					).descriptionMap(
+						HashMapBuilder.put(
+							LocaleUtil.US,
+							"This is the description of a picklist field."
+						).build()
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap("field7")
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"field7"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		_objectDefinitions.add(objectDefinition);
+
+		ObjectRelationshipTestUtil.addObjectRelationship(
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			HashMapBuilder.put(
+				LocaleUtil.US,
+				"This is the description of an object relationship."
+			).build(),
+			_objectDefinition, objectDefinition, TestPropsValues.getUserId(),
+			"relationship5", ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		JSONObject openAPIJSONObject = HTTPTestUtil.invokeToJSONObject(
+			null, objectDefinition.getRESTContextPath() + "/openapi.json",
+			Http.Method.GET);
+
+		JSONObject componentsJSONObject = openAPIJSONObject.getJSONObject(
+			"components");
+
+		JSONObject schemasJSONObject = componentsJSONObject.getJSONObject(
+			"schemas");
+
+		JSONObject objectDefinitionSchemaJSONObject =
+			schemasJSONObject.getJSONObject(objectDefinition.getShortName());
+
+		Assert.assertEquals(
+			"This is the description of an object definition.",
+			objectDefinitionSchemaJSONObject.getString("description"));
+
+		JSONObject propertiesJSONObject =
+			objectDefinitionSchemaJSONObject.getJSONObject("properties");
+
+		JSONObject textFieldJSONObject = propertiesJSONObject.getJSONObject(
+			"field5");
+
+		Assert.assertEquals(
+			"This is the description of an object field.",
+			textFieldJSONObject.getString("description"));
+
+		JSONObject multiselectPicklistFieldJSONObject =
+			propertiesJSONObject.getJSONObject("field6");
+
+		Assert.assertEquals(
+			"This is the description of a multiselect field.",
+			multiselectPicklistFieldJSONObject.getString("description"));
+
+		JSONObject itemsJSONObject =
+			multiselectPicklistFieldJSONObject.getJSONObject("items");
+
+		Assert.assertEquals(
+			"#/components/schemas/ListEntry",
+			itemsJSONObject.getString("$ref"));
+
+		JSONObject picklistFieldJSONObject = propertiesJSONObject.getJSONObject(
+			"field7");
+
+		Assert.assertEquals(
+			"This is the description of a picklist field.",
+			picklistFieldJSONObject.getString("description"));
+
+		JSONArray picklistAllOfJSONArray = picklistFieldJSONObject.getJSONArray(
+			"allOf");
+
+		JSONObject picklistAllOfJSONObject =
+			picklistAllOfJSONArray.getJSONObject(0);
+
+		Assert.assertEquals(
+			"#/components/schemas/ListEntry",
+			picklistAllOfJSONObject.getString("$ref"));
+
+		Assert.assertEquals(
+			"properties", picklistFieldJSONObject.getString("x-parent-map"));
+
+		JSONObject relationshipJSONObject = propertiesJSONObject.getJSONObject(
+			"relationship5");
+
+		Assert.assertEquals(
+			"This is the description of an object relationship.",
+			relationshipJSONObject.getString("description"));
+
+		JSONArray relationshipAllOfJSONArray =
+			relationshipJSONObject.getJSONArray("allOf");
+
+		JSONObject relationshipAllOfJSONObject =
+			relationshipAllOfJSONArray.getJSONObject(0);
+
+		Assert.assertEquals(
+			"#/components/schemas/" + _objectDefinition.getShortName(),
+			relationshipAllOfJSONObject.getString("$ref"));
+	}
+
+	@Test
 	public void testGetOpenAPIWithSystemObjectRelationship() throws Exception {
 		_user = TestPropsValues.getUser();
 
@@ -470,14 +603,14 @@ public class OpenAPIResourceTest {
 			null, _user.getUserId(),
 			_userSystemObjectDefinition.getObjectDefinitionId(),
 			_objectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			"relation1ToM", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
 			null);
 		ObjectRelationshipLocalServiceUtil.addObjectRelationship(
 			null, _user.getUserId(), _objectDefinition.getObjectDefinitionId(),
 			_userSystemObjectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			"relationMTo1", false, ObjectRelationshipConstants.TYPE_ONE_TO_MANY,
 			null);
@@ -485,7 +618,7 @@ public class OpenAPIResourceTest {
 			null, _user.getUserId(),
 			_userSystemObjectDefinition.getObjectDefinitionId(),
 			_objectDefinition.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false,
+			ObjectRelationshipConstants.DELETION_TYPE_PREVENT, null, false,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			"relationMToM", false,
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY, null);
@@ -505,6 +638,20 @@ public class OpenAPIResourceTest {
 				Http.Method.GET
 			).toString(),
 			JSONCompareMode.LENIENT);
+	}
+
+	private ListTypeDefinition _addListTypeDefinition() throws Exception {
+		return _listTypeDefinitionLocalService.addListTypeDefinition(
+			null, TestPropsValues.getUserId(),
+			Collections.singletonMap(
+				LocaleUtil.US, RandomTestUtil.randomString()),
+			false,
+			TransformUtil.transformToList(
+				new String[] {"value1", "value2"},
+				listTypeValue -> ListTypeEntryUtil.createListTypeEntry(
+					listTypeValue,
+					Collections.singletonMap(LocaleUtil.US, listTypeValue))),
+			new ServiceContext());
 	}
 
 	private void _assertOpenAPI(

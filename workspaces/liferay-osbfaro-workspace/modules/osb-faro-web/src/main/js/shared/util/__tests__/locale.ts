@@ -1,6 +1,7 @@
 import {
 	DEFAULT_LANGUAGE_ID,
 	DEFAULT_LOCALE,
+	getLanguageLabel,
 	getLocale,
 	resolveLanguageId,
 	resolveLocale,
@@ -61,5 +62,20 @@ describe('getLocale/setLocale', () => {
 		setLocale('ja-JP');
 
 		expect(getLocale()).toBe('ja-JP');
+	});
+});
+
+describe('getLanguageLabel', () => {
+	it('compacts a portal languageId', () => {
+		expect(getLanguageLabel('en_US')).toBe('EN (US)');
+		expect(getLanguageLabel('pt_BR')).toBe('PT (BR)');
+	});
+
+	it('labels a language the product does not format for', () => {
+		expect(getLanguageLabel('de_DE')).toBe('DE (DE)');
+	});
+
+	it('falls back to the default language when there is none', () => {
+		expect(getLanguageLabel(null)).toBe('EN (US)');
 	});
 });

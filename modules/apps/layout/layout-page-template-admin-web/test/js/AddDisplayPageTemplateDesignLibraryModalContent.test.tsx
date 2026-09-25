@@ -1,0 +1,155 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+import '@testing-library/jest-dom';
+import {render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+
+import AddDisplayPageTemplateDesignLibraryModalContent from '../../src/main/resources/META-INF/resources/js/AddDisplayPageTemplateDesignLibraryModalContent';
+
+const mockFetch = jest.fn();
+const mockNavigate = jest.fn();
+const mockOpenToast = jest.fn();
+
+jest.mock('frontend-js-components-web', () => ({
+	openToast: (props: any) => mockOpenToast(props),
+}));
+
+jest.mock('frontend-js-web', () => ({
+	fetch: (url: string, options: any) => mockFetch(url, options),
+	navigate: (url: string, options: any) => mockNavigate(url, options),
+}));
+
+const ADD_DISPLAY_PAGE_URL = '/add_display_page';
+
+const NAMESPACE = '_namespace_';
+
+const DEFAULT_PROPS = {
+	addDisplayPageURL: ADD_DISPLAY_PAGE_URL,
+	closeModal: jest.fn(),
+	mappingTypes: [
+		{
+			id: 'type-with-subtype',
+			label: 'Type with subtype',
+			subtypes: [
+				{
+					id: 'subtype',
+					label: 'Subtype',
+				},
+			],
+		},
+		{
+			id: 'type-without-subtype',
+			label: 'Type without subtype',
+			subtypes: [],
+		},
+	],
+	namespace: NAMESPACE,
+};
+
+const renderComponent = (props = {}) =>
+	render(
+		<AddDisplayPageTemplateDesignLibraryModalContent
+			{...DEFAULT_PROPS}
+			{...props}
+		/>
+	);
+
+const submitForm = async () => {
+	await userEvent.click(screen.getByText('save'));
+};
+
+describe('AddDisplayPageTemplateDesignLibraryModalContent', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
+	it('creates a display page template once the form is valid', async () => {
+		mockFetch
+			.mockResolvedValueOnce({
+				json: () =>
+					Promise.resolve({
+						error: {name: 'that-name-is-already-taken'},
+					}),
+			})
+			.mockResolvedValueOnce({
+				json: () =>
+					Promise.resolve({redirectURL: '/editor?p_l_mode=edit'}),
+			});
+
+		const {container} = renderComponent();
+
+		await submitForm();
+
+		expect(screen.getAllByText('this-field-is-required')).toHaveLength(2);
+
+		const nameInput = container.querySelector(`#${NAMESPACE}name`)!;
+
+		await userEvent.type(nameInput, 'Display Page Template');
+
+		const classNameIdSelect = container.querySelector(
+			`#${NAMESPACE}classNameId`
+		)!;
+
+		await userEvent.selectOptions(classNameIdSelect, 'type-with-subtype');
+
+		await submitForm();
+
+		expect(screen.getAllByText('this-field-is-required')).toHaveLength(1);
+		expect(mockFetch).not.toHaveBeenCalled();
+
+		await userEvent.selectOptions(
+			classNameIdSelect,
+			'type-without-subtype'
+		);
+
+		await submitForm();
+
+		expect(
+			await screen.findByText('that-name-is-already-taken')
+		).toBeInTheDocument();
+		expect(mockNavigate).not.toHaveBeenCalled();
+
+		await userEvent.type(nameInput, ' 2');
+
+		await submitForm();
+
+		await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
+
+		expect(mockFetch).toHaveBeenCalledTimes(2);
+		expect(mockFetch).toHaveBeenLastCalledWith(
+			ADD_DISPLAY_PAGE_URL,
+			expect.objectContaining({method: 'POST'})
+		);
+		expect(mockNavigate).toHaveBeenCalledWith('/editor?p_l_mode=edit', {
+			beforeScreenFlip: DEFAULT_PROPS.closeModal,
+		});
+	});
+
+	it('opens an error toast when the request fails', async () => {
+		mockFetch.mockRejectedValue(new Error('Network down'));
+
+		const {container} = renderComponent();
+
+		await userEvent.type(
+			container.querySelector(`#${NAMESPACE}name`)!,
+			'Display Page Template'
+		);
+		await userEvent.selectOptions(
+			container.querySelector(`#${NAMESPACE}classNameId`)!,
+			'type-without-subtype'
+		);
+
+		await submitForm();
+
+		await waitFor(() => expect(mockOpenToast).toHaveBeenCalledTimes(1));
+
+		expect(mockOpenToast).toHaveBeenCalledWith(
+			expect.objectContaining({type: 'danger'})
+		);
+		expect(mockNavigate).not.toHaveBeenCalled();
+	});
+});

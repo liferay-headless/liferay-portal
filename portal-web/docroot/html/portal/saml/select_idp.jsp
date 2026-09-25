@@ -29,10 +29,10 @@ JSONArray relevantIdpConnectionsJSONArray = samlSsoLoginContextJSONObject.getJSO
 			JSONObject relevantIdpConnectionJSONObject = relevantIdpConnectionsJSONArray.getJSONObject(0);
 			%>
 
-			<aui:input name="idpEntityId" type="hidden" value='<%= HtmlUtil.escapeAttribute(relevantIdpConnectionJSONObject.getString("entityId")) %>' />
+			<aui:input name="idpEntityId" type="hidden" value='<%= relevantIdpConnectionJSONObject.getString("entityId") %>' />
 
 			<aui:script sandbox="<%= true %>">
-				window.addEventListener("load", (event) => {
+				window.addEventListener('load', (event) => {
 					window.fm.submit();
 				});
 			</aui:script>
@@ -46,11 +46,10 @@ JSONArray relevantIdpConnectionsJSONArray = samlSsoLoginContextJSONObject.getJSO
 				for (int i = 0; i < relevantIdpConnectionsJSONArray.length(); i++) {
 					JSONObject relevantIdpConnectionJSONObject = relevantIdpConnectionsJSONArray.getJSONObject(i);
 
-					String entityId = relevantIdpConnectionJSONObject.getString("entityId");
 					String name = relevantIdpConnectionJSONObject.getString("name");
 				%>
 
-					<aui:option label="<%= HtmlUtil.escape(name) %>" value="<%= HtmlUtil.escapeAttribute(entityId) %>" />
+					<aui:option label="<%= HtmlUtil.escape(name) %>" localizeLabel="<%= false %>" value='<%= relevantIdpConnectionJSONObject.getString("entityId") %>' />
 
 				<%
 				}

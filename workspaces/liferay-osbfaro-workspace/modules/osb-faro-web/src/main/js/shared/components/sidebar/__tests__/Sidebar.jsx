@@ -1,15 +1,14 @@
 import mockStore, {mockStoreDataLDP} from 'test/mock-store';
 import React from 'react';
 import Sidebar from '../index';
-import {Provider} from 'react-redux';
-import {render} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
+import {Map} from 'immutable';
 import {MemoryRouter} from 'react-router';
-import {User} from 'shared/util/records';
+import {Provider} from 'react-redux';
 
 const defaultProps = {
 	activePathname: '',
 	channelId: '123',
-	currentUser: new User({emailAddress: 'test@test.com', name: 'Test Test'}),
 	groupId: '23'
 };
 
@@ -112,5 +111,55 @@ describe('Sidebar', () => {
 
 		expect(queryByText('Lifecycles')).toBeNull();
 		expect(queryByText('Accounts')).toBeNull();
+	});
+
+	it('should default a section to expanded when nothing is stored for it', () => {
+		render(
+			<Provider store={mockStore(mockStoreDataLDP)}>
+				<MemoryRouter>
+					<Sidebar {...defaultProps} collapsedSections={new Map()} />
+				</MemoryRouter>
+			</Provider>
+		);
+
+		expect(
+			screen.getByRole('button', {name: 'Touchpoints'})
+		).toHaveAttribute('aria-expanded', 'true');
+	});
+
+	it('should collapse a section whose collapsedSections entry is true', () => {
+		render(
+			<Provider store={mockStore(mockStoreDataLDP)}>
+				<MemoryRouter>
+					<Sidebar
+						{...defaultProps}
+						collapsedSections={new Map({touchpoints: true})}
+					/>
+				</MemoryRouter>
+			</Provider>
+		);
+
+		expect(
+			screen.getByRole('button', {name: 'Touchpoints'})
+		).toHaveAttribute('aria-expanded', 'false');
+	});
+
+	it('should call onSectionToggle with the section key when its header is clicked', () => {
+		const onSectionToggle = jest.fn();
+
+		render(
+			<Provider store={mockStore(mockStoreDataLDP)}>
+				<MemoryRouter>
+					<Sidebar
+						{...defaultProps}
+						onSectionToggle={onSectionToggle}
+					/>
+				</MemoryRouter>
+			</Provider>
+		);
+
+		fireEvent.click(screen.getByRole('button', {name: 'Touchpoints'}));
+
+		expect(onSectionToggle).toHaveBeenCalledWith('touchpoints', true);
 	});
 });

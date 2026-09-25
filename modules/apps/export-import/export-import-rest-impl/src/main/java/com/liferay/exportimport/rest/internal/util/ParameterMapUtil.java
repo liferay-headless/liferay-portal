@@ -152,6 +152,17 @@ public class ParameterMapUtil {
 				String.valueOf(
 					GetterUtil.getBoolean(exportProcessRequest.getDeletions()))
 			});
+
+		String[] siteExternalReferenceCodes = ArrayUtil.filter(
+			exportProcessRequest.getSiteExternalReferenceCodes(),
+			Validator::isNotNull);
+
+		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+			parameterMap.put(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
+				ArrayUtil.unique(siteExternalReferenceCodes));
+		}
+
 		parameterMap.put(
 			PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS,
 			new String[] {
@@ -227,6 +238,17 @@ public class ParameterMapUtil {
 				String.valueOf(
 					GetterUtil.getBoolean(importProcessRequest.getDeletions()))
 			});
+
+		String[] siteExternalReferenceCodes = ArrayUtil.filter(
+			importProcessRequest.getSiteExternalReferenceCodes(),
+			Validator::isNotNull);
+
+		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+			parameterMap.put(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
+				ArrayUtil.unique(siteExternalReferenceCodes));
+		}
+
 		parameterMap.put(
 			PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS,
 			new String[] {

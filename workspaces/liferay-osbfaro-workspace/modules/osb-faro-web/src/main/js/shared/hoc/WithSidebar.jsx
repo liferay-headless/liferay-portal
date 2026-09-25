@@ -17,6 +17,7 @@ import {connect} from 'react-redux';
 import {get} from 'lodash';
 import {getDefaultChannel} from 'shared/components/channels-menu';
 import {hasChanges} from 'shared/util/react';
+import {Map} from 'immutable';
 import {updateDefaultChannelId} from 'shared/actions/preferences';
 import {User} from '../util/records';
 import {withError, withLoading} from './util';
@@ -36,7 +37,14 @@ export default compose(
 	withCurrentUser,
 	connect(
 		(store, {currentUser}) => ({
-			collapsed: store.getIn(['sidebar', String(currentUser.id)], false)
+			collapsed: store.getIn(
+				['sidebar', String(currentUser.id), 'collapsed'],
+				false
+			),
+			collapsedSections: store.getIn(
+				['sidebar', String(currentUser.id), 'collapsedSections'],
+				Map()
+			)
 		}),
 		{collapseSidebar, updateDefaultChannelId}
 	),
@@ -66,6 +74,7 @@ export default compose(
 					})
 				),
 				collapsed: PropTypes.bool.isRequired,
+				collapsedSections: PropTypes.instanceOf(Map).isRequired,
 				collapseSidebar: PropTypes.func.isRequired,
 				currentUser: PropTypes.instanceOf(User).isRequired,
 				defaultChannelId: PropTypes.string,
@@ -127,7 +136,7 @@ export default compose(
 				if (hasChanges(prevProps, this.props, 'collapsed')) {
 					setTimeout(
 						() => window.dispatchEvent(this._toggleSidebarEvent),
-						250
+						500
 					);
 				}
 
@@ -145,12 +154,13 @@ export default compose(
 			}
 
 			@autobind
-			handleSidebarToggle() {
-				const {collapseSidebar, collapsed, currentUser} = this.props;
+			handleSectionToggle(sectionKey, collapsed) {
+				const {collapseSidebar, currentUser} = this.props;
 
 				collapseSidebar({
-					collapsed: !collapsed,
-					currentUserId: currentUser.id
+					collapsed,
+					currentUserId: currentUser.id,
+					sectionKey
 				});
 			}
 
@@ -160,6 +170,7 @@ export default compose(
 					props: {
 						className,
 						collapsed,
+						collapsedSections,
 						currentUser,
 						groupId,
 						location,
@@ -180,9 +191,9 @@ export default compose(
 							channelId={selectedChannel && selectedChannel.id}
 							channels={channels}
 							collapsed={collapsed}
-							currentUser={currentUser}
+							collapsedSections={collapsedSections}
 							groupId={groupId}
-							onToggle={this.handleSidebarToggle}
+							onSectionToggle={this.handleSectionToggle}
 						/>
 
 						<WrappedComponent
