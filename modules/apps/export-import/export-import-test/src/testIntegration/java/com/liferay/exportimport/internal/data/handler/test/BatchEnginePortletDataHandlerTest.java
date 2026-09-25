@@ -49,6 +49,8 @@ import com.liferay.exportimport.report.model.ExportImportReportEntry;
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate.Scope;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.journal.constants.JournalContentPortletKeys;
@@ -159,6 +161,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -213,6 +216,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
@@ -254,6 +258,13 @@ public class BatchEnginePortletDataHandlerTest {
 			BatchEnginePortletDataHandlerTest.class);
 
 		_bundleContext = bundle.getBundleContext();
+
+		_objectFieldValueAttachmentDocsAndMedia =
+			DLTestUtil.randomTextFileBytes();
+		_objectFieldValueAttachmentShowFilesInDocsAndMedia =
+			DLTestUtil.randomTextFileBytes();
+		_objectFieldValueAttachmentUserComputer =
+			DLTestUtil.randomTextFileBytes();
 	}
 
 	@Test
@@ -3219,6 +3230,88 @@ public class BatchEnginePortletDataHandlerTest {
 	}
 
 	@Test
+	@TestInfo("LPD-106614")
+	public void testIsDataDepotLevel() throws Exception {
+		String portletId1 = RandomTestUtil.randomString();
+		String portletId2 = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId1
+				).withScope(
+					Scope.SITE
+				).build());
+			SafeCloseable safeCloseable2 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId2
+				).withScope(
+					Scope.SITE
+				).build());
+			SafeCloseable safeCloseable3 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId2
+				).withScopes(
+					Scope.DEPOT, Scope.SITE
+				).build())) {
+
+			Thread.sleep(1000);
+
+			PortletDataHandler portletDataHandler1 =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId1);
+
+			Assert.assertFalse(portletDataHandler1.isDataDepotLevel());
+
+			PortletDataHandler portletDataHandler2 =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId2);
+
+			Assert.assertTrue(portletDataHandler2.isDataDepotLevel());
+			Assert.assertTrue(portletDataHandler2.isDataSiteLevel());
+		}
+	}
+
+	@Test
+	@TestInfo("LPD-106614")
+	public void testIsDataSiteLevel() throws Exception {
+		String portletId1 = RandomTestUtil.randomString();
+		String portletId2 = RandomTestUtil.randomString();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId1
+				).withScope(
+					Scope.COMPANY
+				).build());
+			SafeCloseable safeCloseable2 = _register(
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withPortletId(
+					portletId2
+				).withScope(
+					Scope.SITE
+				).build())) {
+
+			Thread.sleep(1000);
+
+			PortletDataHandler portletDataHandler1 =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId1);
+
+			Assert.assertFalse(portletDataHandler1.isDataSiteLevel());
+
+			PortletDataHandler portletDataHandler2 =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId2);
+
+			Assert.assertTrue(portletDataHandler2.isDataSiteLevel());
+		}
+	}
+
+	@Test
 	public void testIsHiddenWithObjectDefinitionHierarchy() throws Exception {
 
 		// Allow standalone object entry setting is disabled
@@ -3314,6 +3407,86 @@ public class BatchEnginePortletDataHandlerTest {
 					TestPropsValues.getCompanyId(), portletId);
 
 			Assert.assertFalse(portletDataHandler.isStaged());
+		}
+	}
+
+	@Test
+	@TestInfo("LPD-106614")
+	public void testPrepareManifestSummaryWithGroupScope() throws Exception {
+		String portletId = RandomTestUtil.randomString();
+
+		TestExportImportVulcanBatchEngineTaskItemDelegate
+			testExportImportVulcanBatchEngineTaskItemDelegate1 =
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withFunction(
+					filter -> Page.of(Arrays.asList(new TestItem(1)))
+				).withPortletId(
+					portletId
+				).withScope(
+					Scope.SITE
+				).build();
+		TestExportImportVulcanBatchEngineTaskItemDelegate
+			testExportImportVulcanBatchEngineTaskItemDelegate2 =
+				new TestExportImportVulcanBatchEngineTaskItemDelegateBuilder(
+				).withFunction(
+					filter -> Page.of(Arrays.asList(new TestItem(2)))
+				).withPortletId(
+					portletId
+				).withScopes(
+					Scope.DEPOT, Scope.SITE
+				).build();
+
+		try (SafeCloseable safeCloseable1 = _register(
+				testExportImportVulcanBatchEngineTaskItemDelegate1);
+			SafeCloseable safeCloseable2 = _register(
+				testExportImportVulcanBatchEngineTaskItemDelegate2)) {
+
+			Thread.sleep(1000);
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					TestPropsValues.getCompanyId(), portletId);
+
+			ExportImportDescriptor exportImportDescriptor1 =
+				testExportImportVulcanBatchEngineTaskItemDelegate1.
+					getExportImportDescriptor();
+			ExportImportDescriptor exportImportDescriptor2 =
+				testExportImportVulcanBatchEngineTaskItemDelegate2.
+					getExportImportDescriptor();
+
+			DepotEntry depotEntry = _addDepotEntry();
+
+			ManifestSummary manifestSummary = _getManifestSummary(
+				PortletDataContextFactoryUtil.createExportPortletDataContext(
+					TestPropsValues.getCompanyId(), depotEntry.getGroupId(),
+					new HashMap<>(), null, null, null),
+				portletDataHandler);
+
+			Assert.assertEquals(
+				-1,
+				manifestSummary.getModelAdditionCount(
+					exportImportDescriptor1.getKey()));
+			Assert.assertEquals(
+				1,
+				manifestSummary.getModelAdditionCount(
+					exportImportDescriptor2.getKey()));
+
+			Group group = GroupTestUtil.addGroup();
+
+			manifestSummary = _getManifestSummary(
+				PortletDataContextFactoryUtil.createExportPortletDataContext(
+					TestPropsValues.getCompanyId(), group.getGroupId(),
+					new HashMap<>(), null, null, null),
+				portletDataHandler);
+
+			Assert.assertEquals(
+				1,
+				manifestSummary.getModelAdditionCount(
+					exportImportDescriptor1.getKey()));
+			Assert.assertEquals(
+				1,
+				manifestSummary.getModelAdditionCount(
+					exportImportDescriptor2.getKey()));
 		}
 	}
 
@@ -3643,14 +3816,13 @@ public class BatchEnginePortletDataHandlerTest {
 			TestPropsValues.getCompanyId());
 
 		DLFileEntry dlFileEntry = _addDLFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_DOCS_AND_MEDIA,
-			company.getGroupId());
+			_objectFieldValueAttachmentDocsAndMedia, company.getGroupId());
 
 		FileEntry tempFileEntry1 = _addTempFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_SHOW_FILES_IN_DOCS_AND_MEDIA,
+			_objectFieldValueAttachmentShowFilesInDocsAndMedia,
 			objectDefinition);
 		FileEntry tempFileEntry2 = _addTempFileEntry(
-			_OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER, objectDefinition);
+			_objectFieldValueAttachmentUserComputer, objectDefinition);
 
 		return _addObjectEntry(
 			groupId, objectDefinition,
@@ -4041,8 +4213,7 @@ public class BatchEnginePortletDataHandlerTest {
 			String content = StringUtil.read(dlFileEntry.getContentStream());
 
 			Assert.assertArrayEquals(
-				_OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER,
-				content.getBytes());
+				_objectFieldValueAttachmentUserComputer, content.getBytes());
 		}
 	}
 
@@ -5256,16 +5427,6 @@ public class BatchEnginePortletDataHandlerTest {
 	private static final String _OBJECT_FIELD_NAME_TEXT =
 		"xText" + RandomTestUtil.randomString();
 
-	private static final byte[] _OBJECT_FIELD_VALUE_ATTACHMENT_DOCS_AND_MEDIA =
-		DLTestUtil.randomTextFileBytes();
-
-	private static final byte[]
-		_OBJECT_FIELD_VALUE_ATTACHMENT_SHOW_FILES_IN_DOCS_AND_MEDIA =
-			DLTestUtil.randomTextFileBytes();
-
-	private static final byte[] _OBJECT_FIELD_VALUE_ATTACHMENT_USER_COMPUTER =
-		DLTestUtil.randomTextFileBytes();
-
 	private static BundleContext _bundleContext;
 	private static final BiFunction
 		<FileEntry, Group, ObjectValuePair<String, Long>>
@@ -5273,6 +5434,9 @@ public class BatchEnginePortletDataHandlerTest {
 				(fileEntry, targetGroup) -> new ObjectValuePair<>(
 					fileEntry.getExternalReferenceCode(),
 					fileEntry.getGroupId());
+	private static byte[] _objectFieldValueAttachmentDocsAndMedia;
+	private static byte[] _objectFieldValueAttachmentShowFilesInDocsAndMedia;
+	private static byte[] _objectFieldValueAttachmentUserComputer;
 
 	@Inject
 	private AccountEntryLocalService _accountEntryLocalService;
@@ -5397,11 +5561,14 @@ public class BatchEnginePortletDataHandlerTest {
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegate(
 			Function<Filter, Page<TestItem>> function, String portletId,
-			Integer rank, boolean stagingSupported) {
+			Integer rank, Scope scope, Set<Scope> scopes,
+			boolean stagingSupported) {
 
 			_function = function;
 			_portletId = portletId;
 			_rank = rank;
+			_scope = scope;
+			_scopes = scopes;
 			_stagingSupported = stagingSupported;
 		}
 
@@ -5469,7 +5636,20 @@ public class BatchEnginePortletDataHandlerTest {
 
 				@Override
 				public Scope getScope() {
+					if (_scope != null) {
+						return _scope;
+					}
+
 					return Scope.COMPANY;
+				}
+
+				@Override
+				public Set<Scope> getScopes() {
+					if (_scopes != null) {
+						return _scopes;
+					}
+
+					return ExportImportDescriptor.super.getScopes();
 				}
 
 				@Override
@@ -5562,6 +5742,8 @@ public class BatchEnginePortletDataHandlerTest {
 		private final String _portletId;
 		private final Integer _rank;
 		private final String _resourceClassName = RandomTestUtil.randomString();
+		private final Scope _scope;
+		private final Set<Scope> _scopes;
 		private final boolean _stagingSupported;
 
 	}
@@ -5575,7 +5757,8 @@ public class BatchEnginePortletDataHandlerTest {
 			}
 
 			return new TestExportImportVulcanBatchEngineTaskItemDelegate(
-				_function, _portletId, _rank, _stagingSupported);
+				_function, _portletId, _rank, _scope, _scopes,
+				_stagingSupported);
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
@@ -5603,6 +5786,22 @@ public class BatchEnginePortletDataHandlerTest {
 		}
 
 		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
+			withScope(Scope scope) {
+
+			_scope = scope;
+
+			return this;
+		}
+
+		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
+			withScopes(Scope... scopes) {
+
+			_scopes = SetUtil.fromArray(scopes);
+
+			return this;
+		}
+
+		public TestExportImportVulcanBatchEngineTaskItemDelegateBuilder
 			withStagingSupported(boolean stagingSupported) {
 
 			_stagingSupported = stagingSupported;
@@ -5613,6 +5812,8 @@ public class BatchEnginePortletDataHandlerTest {
 		private Function<Filter, Page<TestItem>> _function;
 		private String _portletId;
 		private Integer _rank;
+		private Scope _scope;
+		private Set<Scope> _scopes;
 		private boolean _stagingSupported;
 
 	}

@@ -11,9 +11,11 @@ import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -67,7 +69,16 @@ public interface ExportImportVulcanBatchEngineTaskItemDelegate<T>
 			return null;
 		}
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+		 *             #getScopes()}
+		 */
+		@Deprecated
 		public Scope getScope();
+
+		public default Set<Scope> getScopes() {
+			return Collections.singleton(getScope());
+		}
 
 		public default String getSectionKey() {
 			return null;

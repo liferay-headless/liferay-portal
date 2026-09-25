@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.SystemEvent;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -160,7 +161,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 			if (!StringUtil.equals(
 					className, exportImportDescriptor.getModelClassName()) ||
-				((activeRegistrations.size() > 1) &&
+				(!isEmptyControlsAllowed() &&
 				 !portletDataContext.getBooleanParameter(
 					 getPortletId(), exportImportDescriptor.getKey()))) {
 
@@ -310,6 +311,18 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Override
+	public boolean isDataDepotLevel() {
+		return _hasScope(
+			ExportImportVulcanBatchEngineTaskItemDelegate.Scope.DEPOT);
+	}
+
+	@Override
+	public boolean isDataSiteLevel() {
+		return _hasScope(
+			ExportImportVulcanBatchEngineTaskItemDelegate.Scope.SITE);
+	}
+
+	@Override
 	public boolean isHidden() {
 		return Boolean.TRUE.equals(
 			_getSoleProperty(
@@ -369,21 +382,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 
 			});
 
-		if (ExportImportVulcanBatchEngineTaskItemDelegate.Scope.COMPANY.equals(
-				exportImportDescriptor.getScope())) {
-
-			setDataLevel(DataLevel.PORTAL);
-		}
-		else if (ExportImportVulcanBatchEngineTaskItemDelegate.Scope.DEPOT.
-					equals(exportImportDescriptor.getScope())) {
-
-			setDataLevel(DataLevel.DEPOT);
-		}
-		else if (ExportImportVulcanBatchEngineTaskItemDelegate.Scope.SITE.
-					equals(exportImportDescriptor.getScope())) {
-
-			setDataLevel(DataLevel.SITE);
-		}
+		_updateDataLevel();
 
 		setPublishToLiveByDefault(true);
 		_updateDeletionSystemEventStagedModelTypes();
@@ -408,6 +407,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 			if (StringUtil.equals(key, exportImportDescriptor.getKey())) {
 				iterator.remove();
 
+				_updateDataLevel();
 				_updateDeletionSystemEventStagedModelTypes();
 				_updatePortletDataHandlerControls();
 
@@ -488,7 +488,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 					ExportImportDescriptor exportImportDescriptor =
 						registration.getExportImportDescriptor();
 
-				if ((activeRegistrations.size() > 1) &&
+				if (!isEmptyControlsAllowed() &&
 					!portletDataContext.getBooleanParameter(
 						getPortletId(), exportImportDescriptor.getKey())) {
 
@@ -561,7 +561,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 				exportImportDescriptor =
 					registration.getExportImportDescriptor();
 
-			if ((activeRegistrations.size() > 1) &&
+			if (!isEmptyControlsAllowed() &&
 				!portletDataContext.getBooleanParameter(
 					getPortletId(), exportImportDescriptor.getKey())) {
 
@@ -757,8 +757,19 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 	private List<Registration> _getActiveRegistrations(
 		PortletDataContext portletDataContext) {
 
-		return _getActiveRegistrations(
+		List<Registration> activeRegistrations = _getActiveRegistrations(
 			portletDataContext, ExportImportThreadLocal.isStagingInProcess());
+
+		ExportImportVulcanBatchEngineTaskItemDelegate.Scope scope =
+			_getGroupScope(portletDataContext.getScopeGroupId());
+
+		if (scope == null) {
+			return activeRegistrations;
+		}
+
+		return ListUtil.filter(
+			activeRegistrations,
+			registration -> _isActiveInScope(registration, scope));
 	}
 
 	private List<Registration> _getActiveRegistrations(
@@ -799,6 +810,26 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		}
 
 		return unsyncByteArrayOutputStream.toByteArray();
+	}
+
+	private ExportImportVulcanBatchEngineTaskItemDelegate.Scope _getGroupScope(
+		long groupId) {
+
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		if (group == null) {
+			return null;
+		}
+
+		if (_stagingGroupHelper.isCompanyGroup(group)) {
+			return ExportImportVulcanBatchEngineTaskItemDelegate.Scope.COMPANY;
+		}
+
+		if (group.isDepot()) {
+			return ExportImportVulcanBatchEngineTaskItemDelegate.Scope.DEPOT;
+		}
+
+		return ExportImportVulcanBatchEngineTaskItemDelegate.Scope.SITE;
 	}
 
 	private PortletDataHandlerControl _getPortletDataHandlerControl(
@@ -897,11 +928,65 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		return permissionChecker.getUserId();
 	}
 
+	private boolean _hasScope(
+		ExportImportVulcanBatchEngineTaskItemDelegate.Scope scope) {
+
+		return ListUtil.exists(
+			_registrations, registration -> _hasScope(registration, scope));
+	}
+
+	private boolean _hasScope(
+		Registration registration,
+		ExportImportVulcanBatchEngineTaskItemDelegate.Scope scope) {
+
+		ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor
+			exportImportDescriptor = registration.getExportImportDescriptor();
+
+		Set<ExportImportVulcanBatchEngineTaskItemDelegate.Scope> scopes =
+			exportImportDescriptor.getScopes();
+
+		return scopes.contains(scope);
+	}
+
+	private boolean _isActiveInScope(
+		Registration registration,
+		ExportImportVulcanBatchEngineTaskItemDelegate.Scope scope) {
+
+		if (_hasScope(
+				registration,
+				ExportImportVulcanBatchEngineTaskItemDelegate.Scope.COMPANY)) {
+
+			return true;
+		}
+
+		return _hasScope(registration, scope);
+	}
+
 	private String _normalize(String fileName, long groupId) {
 		return StringBundler.concat(
 			StringPool.FORWARD_SLASH, ExportImportPathUtil.PATH_PREFIX_GROUP,
 			StringPool.FORWARD_SLASH, groupId, StringPool.FORWARD_SLASH,
 			fileName);
+	}
+
+	private void _updateDataLevel() {
+		if (_hasScope(
+				ExportImportVulcanBatchEngineTaskItemDelegate.Scope.SITE)) {
+
+			setDataLevel(DataLevel.SITE);
+		}
+		else if (_hasScope(
+					ExportImportVulcanBatchEngineTaskItemDelegate.Scope.
+						DEPOT)) {
+
+			setDataLevel(DataLevel.DEPOT);
+		}
+		else if (_hasScope(
+					ExportImportVulcanBatchEngineTaskItemDelegate.Scope.
+						COMPANY)) {
+
+			setDataLevel(DataLevel.PORTAL);
+		}
 	}
 
 	private void _updateDeletionSystemEventStagedModelTypes() {
