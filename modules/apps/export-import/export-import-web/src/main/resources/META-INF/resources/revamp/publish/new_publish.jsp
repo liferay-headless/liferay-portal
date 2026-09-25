@@ -67,6 +67,8 @@ renderResponse.setTitle(publishProcessDisplayContext.getTitle(scheduledPublishPr
 					"privateLayoutsAvailable", publishSourceGroup.isPrivateLayoutsEnabled() && publishSourceGroup.hasPrivateLayouts()
 				).build()
 			).put(
+				"processesBackURL", HttpComponentsUtil.setParameter(backURL, liferayPortletResponse.getNamespace() + "tabs1", "processes")
+			).put(
 				"publishPreviewAPIURL", publishProcessDisplayContext.getPublishPreviewAPIURL()
 			).put(
 				"publishProcessAPIURL", publishProcessDisplayContext.getPublishProcessAPIURL()

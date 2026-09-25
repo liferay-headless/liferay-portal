@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {toWallClockDateTime} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/cron';
 import {getScheduleSummary} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/summary';
 import {
 	IntervalUnit,
@@ -12,17 +11,9 @@ import {
 } from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
 import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
 
-const DAY = 24 * 60 * 60 * 1000;
+const END_DATE_TIME = '2099-08-23 18:30';
 
-const START_DATE_TIME = toWallClockDateTime(
-	new Date(Date.now() + DAY).toISOString(),
-	'UTC'
-);
-
-const END_DATE_TIME = toWallClockDateTime(
-	new Date(Date.now() + 2 * DAY).toISOString(),
-	'UTC'
-);
+const START_DATE_TIME = '2099-08-22 15:05';
 
 function buildScheduleValues(
 	partialScheduleValues: Partial<ScheduleValues>
@@ -70,7 +61,7 @@ describe('getScheduleSummary', () => {
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Day}))
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-is-active-from-x-at-x-and-never-ends the-process-repeats-every-x-at-x'
 		);
 	});
 
@@ -84,8 +75,54 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-ends-on-x-at-x'
+			'the-process-is-active-from-x-at-x-and-ends-on-x-at-x the-process-repeats-every-x-at-x'
 		);
+	});
+
+	it('returns null while an end date is required but incomplete', () => {
+		expect(
+			getScheduleSummary(
+				buildScheduleValues({
+					endDateTime: '',
+					neverEnd: false,
+					unit: IntervalUnit.Day,
+				})
+			)
+		).toBeNull();
+
+		expect(
+			getScheduleSummary(
+				buildScheduleValues({
+					cronExpression: '0 0 12 * * ? *',
+					endDateTime: '2099-08',
+					neverEnd: false,
+					unit: IntervalUnit.Custom,
+				})
+			)
+		).toBeNull();
+	});
+
+	it('returns null while a custom cron expression is missing', () => {
+		expect(
+			getScheduleSummary(
+				buildScheduleValues({
+					cronExpression: ' ',
+					unit: IntervalUnit.Custom,
+				})
+			)
+		).toBeNull();
+	});
+
+	it('returns null while an unsynced repeat at time is missing', () => {
+		expect(
+			getScheduleSummary(
+				buildScheduleValues({
+					repeatOnTime: '',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Week,
+				})
+			)
+		).toBeNull();
 	});
 
 	it('ignores the end date while never end is checked', () => {
@@ -98,7 +135,7 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-is-active-from-x-at-x-and-never-ends the-process-repeats-every-x-at-x'
 		);
 	});
 
@@ -106,13 +143,13 @@ describe('getScheduleSummary', () => {
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Week}))
 		).toBe(
-			'the-process-repeats-every-x-on-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-is-active-from-x-at-x-and-never-ends the-process-repeats-every-x-on-x-at-x'
 		);
 
 		expect(
 			getScheduleSummary(buildScheduleValues({unit: IntervalUnit.Month}))
 		).toBe(
-			'the-process-repeats-every-x-on-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-is-active-from-x-at-x-and-never-ends the-process-repeats-every-x-on-x-at-x'
 		);
 
 		expect(
@@ -123,27 +160,54 @@ describe('getScheduleSummary', () => {
 				})
 			)
 		).toBe(
-			'the-process-repeats-every-x-on-the-x the-process-starts-on-x-at-x-and-never-ends'
+			'the-process-is-active-from-x-at-x-and-never-ends the-process-repeats-every-x-on-the-x-at-x'
 		);
 	});
 });
 
 describe('schedule summary wording', () => {
 	const LANGUAGE_KEYS: Record<string, string> = {
-		'day-x': 'Day {0}',
-		'days-x': 'Days {0}',
-		'month': 'Month',
-		'the-process-repeats-every-x': 'The process repeats every {0}.',
-		'the-process-repeats-every-x-in-x-on-x':
-			'The process repeats every {0} in {1} on {2}.',
-		'the-process-repeats-every-x-on-x':
-			'The process repeats every {0} on {1}.',
-		'the-process-repeats-in-x-on-the-x':
-			'The process repeats in {0} on the {1}.',
-		'the-process-starts-on-x-at-x-and-never-ends':
-			'The process starts on {0} at {1} and never ends.',
-		'year': 'Year',
+		'repeat-day-x': 'day {0}',
+		'repeat-days-x': 'days {0}',
+		'repeat-first': 'first',
+		'repeat-fourth': 'fourth',
+		'repeat-last': 'last',
+		'repeat-second': 'second',
+		'repeat-third': 'third',
+		'repeat-unit-day': 'day',
+		'repeat-unit-month': 'month',
+		'repeat-unit-week': 'week',
+		'repeat-unit-year': 'year',
+		'the-process-is-active-from-x-at-x-and-ends-on-x-at-x':
+			'The process is active from {0} at {1} and ends on {2} at {3}.',
+		'the-process-is-active-from-x-at-x-and-never-ends':
+			'The process is active from {0} at {1} and never ends.',
+		'the-process-repeats-every-x-at-x':
+			'The process repeats every {0} at {1}.',
+		'the-process-repeats-every-x-in-x-on-the-x-at-x':
+			'The process repeats every {0} in {1} on the {2} at {3}.',
+		'the-process-repeats-every-x-in-x-on-x-at-x':
+			'The process repeats every {0} in {1} on {2} at {3}.',
+		'the-process-repeats-every-x-on-the-x-at-x':
+			'The process repeats every {0} on the {1} at {2}.',
+		'the-process-repeats-every-x-on-x-at-x':
+			'The process repeats every {0} on {1} at {2}.',
+		'the-process-repeats-in-x-at-x': 'The process repeats in {0} at {1}.',
+		'the-process-repeats-in-x-on-the-x-at-x':
+			'The process repeats in {0} on the {1} at {2}.',
+		'the-process-repeats-in-x-on-x-at-x':
+			'The process repeats in {0} on {1} at {2}.',
 	};
+
+	function getActiveFromSentence(
+		partialScheduleValues: Partial<ScheduleValues>
+	): string {
+		const summary = getScheduleSummary(
+			buildScheduleValues(partialScheduleValues)
+		) as string;
+
+		return summary.slice(0, summary.indexOf(' The process repeats'));
+	}
 
 	function getRepeatSentence(
 		partialScheduleValues: Partial<ScheduleValues>
@@ -152,7 +216,7 @@ describe('schedule summary wording', () => {
 			buildScheduleValues(partialScheduleValues)
 		) as string;
 
-		return summary.slice(0, summary.indexOf(' The process starts'));
+		return summary.slice(summary.indexOf('The process repeats'));
 	}
 
 	const getLanguageKey = Liferay.Language.get as jest.Mock;
@@ -180,7 +244,7 @@ describe('schedule summary wording', () => {
 				weekdayOrdinal: '3',
 			})
 		).toBe(
-			'The process repeats in january, april, august, and december on the third Thursday.'
+			'The process repeats in january, april, august, and december on the third Thursday at 3:05 PM.'
 		);
 	});
 
@@ -191,7 +255,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month.');
+		).toBe('The process repeats every month at 3:05 PM.');
 	});
 
 	it('lists a two day run as separate days', () => {
@@ -201,7 +265,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 2, and 20.');
+		).toBe(
+			'The process repeats every month on days 1, 2, and 20 at 3:05 PM.'
+		);
 	});
 
 	it('collapses consecutive days into ranges', () => {
@@ -211,7 +277,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1-5 and 20.');
+		).toBe(
+			'The process repeats every month on days 1-5 and 20 at 3:05 PM.'
+		);
 	});
 
 	it('lists scattered days without repeating the word day', () => {
@@ -221,7 +289,9 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Days 1, 3, and 5.');
+		).toBe(
+			'The process repeats every month on days 1, 3, and 5 at 3:05 PM.'
+		);
 	});
 
 	it('uses the singular day for a single day of the month', () => {
@@ -231,7 +301,7 @@ describe('schedule summary wording', () => {
 				months: [],
 				unit: IntervalUnit.Month,
 			})
-		).toBe('The process repeats every Month on Day 15.');
+		).toBe('The process repeats every month on day 15 at 3:05 PM.');
 	});
 
 	it('describes a yearly repetition', () => {
@@ -241,6 +311,74 @@ describe('schedule summary wording', () => {
 				months: [7],
 				unit: IntervalUnit.Year,
 			})
-		).toBe('The process repeats every Year in july on Day 4.');
+		).toBe('The process repeats every year in july on day 4 at 3:05 PM.');
+	});
+
+	it('lowercases the day unit in a daily repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Day,
+			})
+		).toBe('The process repeats every day at 3:05 PM.');
+	});
+
+	it('lowercases the week unit in a weekly repetition', () => {
+		expect(
+			getRepeatSentence({
+				unit: IntervalUnit.Week,
+				weekdays: [2, 5, 6],
+			})
+		).toBe(
+			'The process repeats every week on Monday, Thursday, and Friday at 3:05 PM.'
+		);
+	});
+
+	it('shows the start date time in both sentences while the repeat time is synced', () => {
+		expect(getRepeatSentence({unit: IntervalUnit.Week})).toBe(
+			'The process repeats every week on Monday at 3:05 PM.'
+		);
+
+		expect(getActiveFromSentence({unit: IntervalUnit.Week})).toBe(
+			'The process is active from 8/22/2099 at 3:05 PM and never ends.'
+		);
+	});
+
+	it('shows the repeat time in the repeats sentence and the start time in the active from sentence, once unsynced', () => {
+		const unsyncedScheduleValues = {
+			repeatOnTime: '00:00',
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Week,
+		};
+
+		expect(getRepeatSentence(unsyncedScheduleValues)).toBe(
+			'The process repeats every week on Monday at 12:00 AM.'
+		);
+
+		expect(getActiveFromSentence(unsyncedScheduleValues)).toBe(
+			'The process is active from 8/22/2099 at 3:05 PM and never ends.'
+		);
+	});
+
+	it('never implies the start date itself is an occurrence, even when it falls outside the selected days', () => {
+		expect(
+			getActiveFromSentence({
+				monthDays: [1, 10, 20],
+				unit: IntervalUnit.Month,
+			})
+		).toBe(
+			'The process is active from 8/22/2099 at 3:05 PM and never ends.'
+		);
+	});
+
+	it('keeps the end date and its own time in the active from sentence', () => {
+		expect(
+			getActiveFromSentence({
+				endDateTime: END_DATE_TIME,
+				neverEnd: false,
+				unit: IntervalUnit.Week,
+			})
+		).toBe(
+			'The process is active from 8/22/2099 at 3:05 PM and ends on 8/23/2099 at 6:30 PM.'
+		);
 	});
 });

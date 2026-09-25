@@ -5,19 +5,28 @@
 
 // eslint-disable-next-line @liferay/portal/no-cross-module-deep-import
 import {checkAccessibility} from '@liferay/layout-js-components-web/test/__lib__/index';
-import {render, screen, within} from '@testing-library/react';
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import '@testing-library/jest-dom';
 
 import PublishScheduler from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/PublishScheduler';
-import {toWallClockDateTime} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/cron';
 import {
 	IntervalUnit,
 	ScheduleValues,
 } from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
 import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
+import {
+	toWallClockDate,
+	toWallClockDateTime,
+} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
 
 const user = userEvent.setup({delay: null});
 
@@ -58,6 +67,29 @@ describe('PublishScheduler', () => {
 				'the-process-runs-once-on-x-at-x-and-does-not-repeat'
 			)
 		).toBeInTheDocument();
+	});
+
+	it('fills a start date picked for today with a time still ahead', () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler({enabled: true}, onChange);
+
+		const today = new Date().toLocaleDateString('en-US', {
+			day: '2-digit',
+			month: '2-digit',
+			timeZone: 'UTC',
+			year: 'numeric',
+		});
+
+		fireEvent.change(screen.getByLabelText(/start-date/), {
+			target: {value: `${today} --:-- --`},
+		});
+
+		const {startDateTime} = onChange.mock.calls[0][0];
+
+		expect(toWallClockDate(startDateTime).getTime()).toBeGreaterThan(
+			Date.now()
+		);
 	});
 
 	it('hides the summary while there is no start date', () => {
@@ -191,10 +223,141 @@ describe('PublishScheduler', () => {
 		);
 	});
 
+	it('shows the repeat at field only for a repeating unit', () => {
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Never});
+
+		expect(screen.queryByLabelText('repeat-at')).not.toBeInTheDocument();
+
+		cleanup();
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Custom});
+
+		expect(screen.queryByLabelText('repeat-at')).not.toBeInTheDocument();
+
+		cleanup();
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Week});
+
+		expect(screen.getByLabelText('repeat-at')).toBeInTheDocument();
+	});
+
+	it('shows the end date field for every unit except never', () => {
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Never});
+
+		expect(screen.queryByLabelText('end-date')).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole('checkbox', {name: 'never-end'})
+		).not.toBeInTheDocument();
+
+		cleanup();
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Custom});
+
+		expect(screen.getByLabelText('end-date')).toBeInTheDocument();
+
+		cleanup();
+		renderPublishScheduler({enabled: true, unit: IntervalUnit.Week});
+
+		expect(screen.getByLabelText('end-date')).toBeInTheDocument();
+		expect(
+			screen.getByRole('checkbox', {name: 'never-end'})
+		).toBeInTheDocument();
+	});
+
+	it('mirrors the start date time in the repeat at field while synced', () => {
+		renderPublishScheduler({
+			enabled: true,
+			startDateTime: '2026-09-08 09:15',
+			unit: IntervalUnit.Week,
+		});
+
+		expect(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		).toBeChecked();
+		expect(screen.getByLabelText('hours')).toHaveValue('09');
+		expect(screen.getByLabelText('minutes')).toHaveValue('15');
+		expect(screen.getByLabelText('repeat-at')).toBeDisabled();
+	});
+
+	it('unchecks the sync and seeds the current start date time when unchecked', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({
+				repeatOnTime: '09:15',
+				repeatOnTimeSynced: false,
+			})
+		);
+	});
+
+	it('resyncs to the start date time when the checkbox is checked again', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				repeatOnTime: '10:00',
+				repeatOnTimeSynced: false,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		expect(screen.getByLabelText('hours')).toHaveValue('10');
+		expect(screen.getByLabelText('minutes')).toHaveValue('00');
+		expect(screen.getByLabelText(/repeat-at/)).toBeEnabled();
+
+		await user.click(
+			screen.getByRole('checkbox', {name: 'sync-with-start-date-time'})
+		);
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({repeatOnTimeSynced: true})
+		);
+	});
+
+	it('edits the repeat at time independently while unsynced', async () => {
+		const onChange = jest.fn();
+
+		renderPublishScheduler(
+			{
+				enabled: true,
+				repeatOnTime: '',
+				repeatOnTimeSynced: false,
+				startDateTime: '2026-09-08 09:15',
+				unit: IntervalUnit.Week,
+			},
+			onChange
+		);
+
+		fireEvent.keyDown(screen.getByLabelText('hours'), {key: '5'});
+		fireEvent.keyDown(screen.getByLabelText('minutes'), {key: '3'});
+		fireEvent.keyDown(screen.getByLabelText('minutes'), {key: '0'});
+		fireEvent.keyDown(screen.getByLabelText('am-pm'), {key: 'ArrowUp'});
+
+		expect(onChange).toHaveBeenCalledWith(
+			expect.objectContaining({repeatOnTime: '17:30'})
+		);
+	});
+
 	it('has no accessibility violations', async () => {
 		const {container} = renderPublishScheduler({
 			enabled: true,
+			neverEnd: false,
+			repeatOnTimeSynced: false,
 			startDateTime: START_DATE_TIME,
+			unit: IntervalUnit.Week,
 		});
 
 		await checkAccessibility({context: container});

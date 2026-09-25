@@ -12,11 +12,13 @@ import {sub} from 'frontend-js-web';
 import React from 'react';
 
 import '../../../../../css/utilities.scss';
-import {DATE_FORMAT} from '../../../../components/date_filter/types';
 import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
 import {FieldRadio} from '../../../../components/forms/FieldRadio';
 import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
 import FieldText from '../../../../components/forms/FieldText';
+import FieldTimePicker from '../../../../components/forms/FieldTimePicker';
+import {toTimeParts, toWallClockDateTime} from '../../../../utils/dateTime';
+import {toCustomCronExpression} from './cron';
 import {getScheduleSummary} from './summary';
 import {
 	IntervalUnit,
@@ -34,18 +36,37 @@ import {
 	WEEKDAY_ORDINAL_OPTIONS,
 	getIntervalText,
 	getWeekdayName,
+	isRepeatingUnit,
 } from './utils';
 
 const MONTH_MAX_DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const MONTH_VALUES = MONTHS.map((month) => month.value);
 
-const DATE_TIME_PLACEHOLDER = `${DATE_FORMAT} HH:MM`.toUpperCase();
+function getStartDefaultTime(date: string, timeZoneId: string): string {
+	const [today, time] = toWallClockDateTime(
+		new Date().toISOString(),
+		timeZoneId
+	).split(' ');
+
+	if (date !== today) {
+		return '00:00';
+	}
+
+	const nextHour = toTimeParts(time).hour + 1;
+
+	return nextHour > 23 ? '23:59' : `${String(nextHour).padStart(2, '0')}:00`;
+}
 
 export default function PublishScheduler({
 	cronExpressionErrorMessage,
 	endDateTimeErrorMessage,
 	onChange,
+	onCronExpressionBlur,
+	onEndDateTimeBlur,
+	onRepeatOnTimeBlur,
+	onStartDateTimeBlur,
+	repeatOnTimeErrorMessage,
 	startDateTimeErrorMessage,
 	timeZones,
 	value,
@@ -53,6 +74,11 @@ export default function PublishScheduler({
 	cronExpressionErrorMessage?: string;
 	endDateTimeErrorMessage?: string;
 	onChange: (scheduleValues: ScheduleValues) => void;
+	onCronExpressionBlur?: () => void;
+	onEndDateTimeBlur?: () => void;
+	onRepeatOnTimeBlur?: () => void;
+	onStartDateTimeBlur?: () => void;
+	repeatOnTimeErrorMessage?: string;
 	startDateTimeErrorMessage?: string;
 	timeZones: TimeZoneOption[];
 	value: ScheduleValues;
@@ -77,6 +103,8 @@ export default function PublishScheduler({
 	};
 
 	const repeatsOnDayOfWeek = value.repeatType === RepeatType.DayOfWeek;
+
+	const [, startTime = ''] = value.startDateTime.split(' ');
 
 	const scheduleSummary = getScheduleSummary(value);
 
@@ -173,17 +201,20 @@ export default function PublishScheduler({
 					<ClayLayout.Row>
 						<ClayLayout.Col md={6} size={12}>
 							<FieldDatePicker
-								dateFormat={DATE_FORMAT}
+								defaultTime={(date) =>
+									getStartDefaultTime(date, value.timeZoneId)
+								}
 								errorMessage={startDateTimeErrorMessage}
 								id="publishScheduleStartDateTime"
 								label={Liferay.Language.get('start-date')}
 								name="publishScheduleStartDateTime"
+								onBlur={onStartDateTimeBlur}
 								onChange={(startDateTime) =>
 									set({
 										startDateTime: startDateTime as string,
 									})
 								}
-								placeholder={DATE_TIME_PLACEHOLDER}
+								required
 								time
 								value={value.startDateTime}
 								years={{
@@ -224,6 +255,14 @@ export default function PublishScheduler({
 													months: [yearMonth],
 												}
 											: {months: []}),
+										...(unit === IntervalUnit.Custom
+											? {
+													cronExpression:
+														toCustomCronExpression(
+															value
+														),
+												}
+											: {}),
 										unit,
 										yearInterval: 1,
 									});
@@ -265,11 +304,13 @@ export default function PublishScheduler({
 										'cron-expression'
 									)}
 									name="publishScheduleCronExpression"
+									onBlur={onCronExpressionBlur}
 									onChange={(event) =>
 										set({
 											cronExpression: event.target.value,
 										})
 									}
+									required
 									value={value.cronExpression}
 								/>
 							</ClayLayout.Col>
@@ -460,36 +501,89 @@ export default function PublishScheduler({
 						</ClayLayout.Row>
 					)}
 
-					<ClayLayout.Row>
-						<ClayLayout.Col md={6} size={12}>
-							<FieldDatePicker
-								dateFormat={DATE_FORMAT}
-								disabled={value.neverEnd}
-								errorMessage={endDateTimeErrorMessage}
-								id="publishScheduleEndDateTime"
-								label={Liferay.Language.get('end-date')}
-								name="publishScheduleEndDateTime"
-								onChange={(endDateTime) =>
-									set({
-										endDateTime: endDateTime as string,
-									})
-								}
-								placeholder={DATE_TIME_PLACEHOLDER}
-								time
-								value={value.endDateTime}
-								years={{
-									end: currentYear + 10,
-									start: currentYear,
-								}}
-							/>
-						</ClayLayout.Col>
-					</ClayLayout.Row>
+					{isRepeatingUnit(value.unit) && (
+						<>
+							<ClayLayout.Row>
+								<ClayLayout.Col md={6} size={12}>
+									<FieldTimePicker
+										disabled={value.repeatOnTimeSynced}
+										errorMessage={repeatOnTimeErrorMessage}
+										id="publishScheduleRepeatOnTime"
+										label={Liferay.Language.get(
+											'repeat-at'
+										)}
+										name="publishScheduleRepeatOnTime"
+										onBlur={onRepeatOnTimeBlur}
+										onChange={(repeatOnTime) =>
+											set({repeatOnTime})
+										}
+										required={!value.repeatOnTimeSynced}
+										value={
+											value.repeatOnTimeSynced
+												? startTime
+												: value.repeatOnTime
+										}
+									/>
+								</ClayLayout.Col>
+							</ClayLayout.Row>
 
-					<ClayCheckbox
-						checked={value.neverEnd}
-						label={Liferay.Language.get('never-end')}
-						onChange={() => set({neverEnd: !value.neverEnd})}
-					/>
+							<ClayCheckbox
+								checked={value.repeatOnTimeSynced}
+								label={Liferay.Language.get(
+									'sync-with-start-date-time'
+								)}
+								onChange={() =>
+									set(
+										value.repeatOnTimeSynced
+											? {
+													repeatOnTime: startTime,
+													repeatOnTimeSynced: false,
+												}
+											: {repeatOnTimeSynced: true}
+									)
+								}
+							/>
+						</>
+					)}
+
+					{value.unit !== IntervalUnit.Never && (
+						<>
+							<ClayLayout.Row>
+								<ClayLayout.Col md={6} size={12}>
+									<FieldDatePicker
+										defaultTime="23:59"
+										disabled={value.neverEnd}
+										errorMessage={endDateTimeErrorMessage}
+										id="publishScheduleEndDateTime"
+										label={Liferay.Language.get('end-date')}
+										name="publishScheduleEndDateTime"
+										onBlur={onEndDateTimeBlur}
+										onChange={(endDateTime) =>
+											set({
+												endDateTime:
+													endDateTime as string,
+											})
+										}
+										required={!value.neverEnd}
+										time
+										value={value.endDateTime}
+										years={{
+											end: currentYear + 10,
+											start: currentYear,
+										}}
+									/>
+								</ClayLayout.Col>
+							</ClayLayout.Row>
+
+							<ClayCheckbox
+								checked={value.neverEnd}
+								label={Liferay.Language.get('never-end')}
+								onChange={() =>
+									set({neverEnd: !value.neverEnd})
+								}
+							/>
+						</>
+					)}
 
 					{scheduleSummary && (
 						<ClayAlert

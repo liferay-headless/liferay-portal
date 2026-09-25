@@ -26,6 +26,7 @@ import {
 	toProcessRequestFlags,
 	withSelectedLayoutSetCount,
 } from '../../utils/contentSelection';
+import {toWallClockDateTime, toZonedDate} from '../../utils/dateTime';
 import {getProcessFormErrors} from '../../utils/getProcessFormErrors';
 import {toContentSelection} from '../../utils/toContentSelection';
 import {toDateFilterValues} from '../../utils/toDateFilterValues';
@@ -34,14 +35,12 @@ import {FormikFieldPublishScheduler} from './components/scheduler/FormikFieldPub
 import {
 	fromCronExpression,
 	toCronExpression,
-	toWallClockDateTime,
-	toZonedDate,
 } from './components/scheduler/cron';
-import {getDefaultTimeZoneId} from './components/scheduler/timeZones';
 import {ScheduleValues, TimeZoneOption} from './components/scheduler/types';
 import {
 	getInitialScheduleValues,
 	getScheduleValuesErrors,
+	hasEndDate,
 } from './components/scheduler/utils';
 
 type PublishFormValues = {
@@ -60,6 +59,7 @@ export function NewPublish({
 	lastPublishDate,
 	lookAndFeelEnabled = false,
 	pageTreeModalConfiguration,
+	processesBackURL,
 	publishPreviewAPIURL,
 	publishProcessAPIURL,
 	scheduledBackURL,
@@ -74,6 +74,7 @@ export function NewPublish({
 	lastPublishDate?: string;
 	lookAndFeelEnabled?: boolean;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
+	processesBackURL: string;
 	publishPreviewAPIURL: string;
 	publishProcessAPIURL: string;
 	scheduledBackURL: string;
@@ -89,7 +90,7 @@ export function NewPublish({
 		loading,
 		preview,
 		setError,
-	} = usePreview(publishPreviewAPIURL);
+	} = usePreview(publishPreviewAPIURL, timeZoneId);
 	const [initialFormValues, setInitialFormValues] =
 		useState<PublishFormValues>(() => ({
 			contentSelection: undefined,
@@ -98,7 +99,7 @@ export function NewPublish({
 			name: '',
 			permissions: false,
 			scheduleValues: getInitialScheduleValues(
-				getDefaultTimeZoneId(timeZones, timeZoneId),
+				timeZoneId,
 				defaultScheduled
 			),
 		}));
@@ -215,14 +216,12 @@ export function NewPublish({
 				const scheduleFields = scheduled
 					? {
 							cronExpression: toCronExpression(scheduleValues),
-							scheduleEndDate:
-								!scheduleValues.neverEnd &&
-								scheduleValues.endDateTime
-									? toZonedDate(
-											scheduleValues.endDateTime,
-											scheduleValues.timeZoneId
-										).toISOString()
-									: undefined,
+							scheduleEndDate: hasEndDate(scheduleValues)
+								? toZonedDate(
+										scheduleValues.endDateTime,
+										scheduleValues.timeZoneId
+									).toISOString()
+								: undefined,
 							scheduleStartDate: toZonedDate(
 								scheduleValues.startDateTime,
 								scheduleValues.timeZoneId
@@ -270,16 +269,25 @@ export function NewPublish({
 					}
 				}
 
-				Liferay.Util.navigate(scheduled ? scheduledBackURL : backURL);
+				Liferay.Util.navigate(
+					scheduled ? scheduledBackURL : processesBackURL
+				);
 			}}
 			validate={(values: FormikValues) => {
 				const errors = getProcessFormErrors(values);
 
-				const {cronExpression, endDateTime, startDateTime} =
-					getScheduleValuesErrors(values.scheduleValues);
+				const {
+					cronExpression,
+					endDateTime,
+					repeatOnTime,
+					startDateTime,
+				} = getScheduleValuesErrors(values.scheduleValues);
 
 				const scheduleValuesError =
-					startDateTime ?? cronExpression ?? endDateTime;
+					startDateTime ??
+					cronExpression ??
+					repeatOnTime ??
+					endDateTime;
 
 				if (scheduleValuesError) {
 					errors.scheduleValues = scheduleValuesError;
@@ -354,6 +362,7 @@ export function NewPublish({
 							subtitle={Liferay.Language.get(
 								'select-and-filter-the-data-you-want-to-publish'
 							)}
+							timeZoneId={timeZoneId}
 						/>
 
 						<Footer

@@ -8,9 +8,39 @@ import {FieldBase} from 'frontend-js-components-web';
 import {dateUtils} from 'frontend-js-web';
 import React, {useState} from 'react';
 
+import {
+	UNSET_TIME,
+	getLocaleDateFormat,
+	is12HourLocale,
+	toDisplayDateTime,
+	toStorageDateTime,
+} from '../../utils/dateTime';
+
 import type {FirstDayOfWeekLocale} from 'frontend-js-web';
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function applyDefaultTime(
+	value: string,
+	defaultTime: FieldDatePickerProps['defaultTime']
+): string {
+	if (!defaultTime) {
+		return value;
+	}
+
+	const [datePart, timePart] = value.split(' ');
+
+	if (!DATE_PATTERN.test(datePart) || timePart !== UNSET_TIME) {
+		return value;
+	}
+
+	return `${datePart} ${
+		typeof defaultTime === 'function' ? defaultTime(datePart) : defaultTime
+	}`;
+}
+
 export type FieldDatePickerProps = {
+	defaultTime?: string | ((date: string) => string);
 	disabled?: boolean;
 	errorMessage?: string;
 	formGroupProps?: {className: string};
@@ -26,6 +56,8 @@ const FieldDatePicker = (props: FieldDatePickerProps) => {
 	const locale = Liferay.ThemeDisplay.getBCP47LanguageId();
 
 	const {
+		dateFormat = getLocaleDateFormat(locale),
+		defaultTime,
 		disabled,
 		errorMessage: externalErrorMessage,
 		firstDayOfWeek = dateUtils.getFirstDayOfWeek(
@@ -39,20 +71,37 @@ const FieldDatePicker = (props: FieldDatePickerProps) => {
 		name,
 		onBlur,
 		onChange,
+		placeholder,
 		required,
+		time,
 		timezone = '',
+		use12Hours = is12HourLocale(locale),
 		value = '',
 		weekdaysShort = dateUtils.getWeekdaysShort(locale),
 		...restProps
 	} = props;
 
+	const [draft, setDraft] = useState<string | null>(null);
 	const [internalErrorMessage, setInternalErrorMessage] =
 		useState<string>('');
 
 	const fieldId = id ?? name;
 
 	const handleOnBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-		const val = event.target.value;
+		const storageDateTime = toStorageDateTime(
+			event.target.value,
+			dateFormat,
+			use12Hours
+		);
+
+		const val = applyDefaultTime(
+			time && DATE_PATTERN.test(storageDateTime)
+				? `${storageDateTime} ${UNSET_TIME}`
+				: storageDateTime,
+			defaultTime
+		);
+
+		setDraft(null);
 
 		setInternalErrorMessage(
 			val && !dateUtils.isValid(val)
@@ -60,18 +109,38 @@ const FieldDatePicker = (props: FieldDatePickerProps) => {
 				: ''
 		);
 
+		if (val !== value) {
+			onChange?.(val);
+		}
+
 		onBlur?.(event);
 	};
 
 	const handleOnChange = (val: string) => {
-		if (internalErrorMessage && (!val || dateUtils.isValid(val))) {
+		const storageDateTime = applyDefaultTime(
+			toStorageDateTime(val, dateFormat, use12Hours),
+			defaultTime
+		);
+
+		setDraft(val);
+
+		if (
+			internalErrorMessage &&
+			(!storageDateTime || dateUtils.isValid(storageDateTime))
+		) {
 			setInternalErrorMessage('');
 		}
 
-		onChange?.(val);
+		onChange?.(storageDateTime);
 	};
 
 	const errorMessage = internalErrorMessage || externalErrorMessage;
+
+	const displayValue =
+		draft !== null &&
+		toStorageDateTime(draft, dateFormat, use12Hours) === value
+			? draft
+			: toDisplayDateTime(value, dateFormat, use12Hours);
 
 	return (
 		<FieldBase
@@ -91,6 +160,7 @@ const FieldDatePicker = (props: FieldDatePickerProps) => {
 						: undefined
 				}
 				aria-invalid={!!errorMessage}
+				dateFormat={dateFormat}
 				disabled={disabled}
 				firstDayOfWeek={firstDayOfWeek}
 				id={fieldId}
@@ -98,8 +168,16 @@ const FieldDatePicker = (props: FieldDatePickerProps) => {
 				months={months}
 				onBlur={handleOnBlur}
 				onChange={handleOnChange}
+				placeholder={
+					placeholder ??
+					(time
+						? `${dateFormat} ${use12Hours ? 'HH:MM AM' : 'HH:MM'}`.toUpperCase()
+						: undefined)
+				}
+				time={time}
 				timezone={timezone}
-				value={value}
+				use12Hours={use12Hours}
+				value={displayValue}
 				weekdaysShort={weekdaysShort}
 			/>
 		</FieldBase>

@@ -5,35 +5,26 @@
 
 import {sub} from 'frontend-js-web';
 
-import {isCompleteDateTime, toDateTimeParts, toZonedDate} from './cron';
+import {
+	isCompleteDateTime,
+	isCompleteTime,
+	toDateText,
+	toTimeText,
+	toWallClockDate,
+	toZonedDate,
+} from '../../../../utils/dateTime';
 import {
 	IntervalUnit,
+	LAST_WEEKDAY_ORDINAL,
 	MONTH_DAYS,
 	RepeatType,
 	ScheduleValues,
 	WEEKDAYS,
 } from './types';
-import {
-	MONTHS,
-	WEEKDAY_ORDINAL_OPTIONS,
-	getIntervalText,
-	getWeekdayName,
-} from './utils';
-
-function toLocalDate(dateTime: string): Date {
-	const {day, hour, minute, month, year} = toDateTimeParts(dateTime);
-
-	return new Date(year, month - 1, day, hour, minute);
-}
+import {MONTHS, getIntervalText, getWeekdayName, hasEndDate} from './utils';
 
 function getListText(labels: string[], locale: string): string {
-
-	// @ts-ignore
-
 	if (typeof Intl.ListFormat === 'function') {
-
-		// @ts-ignore
-
 		return new Intl.ListFormat(locale, {
 			style: 'long',
 			type: 'conjunction',
@@ -52,15 +43,35 @@ function getWeekdayListText(weekdays: number[], locale: string): string {
 	);
 }
 
+function getWeekdayOrdinalProseText(weekdayOrdinal: string): string {
+	if (weekdayOrdinal === '1') {
+		return Liferay.Language.get('repeat-first');
+	}
+
+	if (weekdayOrdinal === '2') {
+		return Liferay.Language.get('repeat-second');
+	}
+
+	if (weekdayOrdinal === '3') {
+		return Liferay.Language.get('repeat-third');
+	}
+
+	if (weekdayOrdinal === '4') {
+		return Liferay.Language.get('repeat-fourth');
+	}
+
+	if (weekdayOrdinal === LAST_WEEKDAY_ORDINAL) {
+		return Liferay.Language.get('repeat-last');
+	}
+
+	return weekdayOrdinal;
+}
+
 function getWeekdayOrdinalText(
 	scheduleValues: ScheduleValues,
 	locale: string
 ): string {
-	const weekdayOrdinalOption = WEEKDAY_ORDINAL_OPTIONS.find(
-		({value}) => value === scheduleValues.weekdayOrdinal
-	);
-
-	return `${weekdayOrdinalOption?.label ?? scheduleValues.weekdayOrdinal} ${getWeekdayName(scheduleValues.weekday, locale)}`;
+	return `${getWeekdayOrdinalProseText(scheduleValues.weekdayOrdinal)} ${getWeekdayName(scheduleValues.weekday, locale)}`;
 }
 
 function getMonthListText(months: number[], locale: string): string {
@@ -99,26 +110,26 @@ function toMonthDayRanges(monthDays: number[]): string[] {
 
 function getMonthDayListText(monthDays: number[], locale: string): string {
 	if (monthDays.length === 1) {
-		return sub(Liferay.Language.get('day-x'), String(monthDays[0]));
+		return sub(Liferay.Language.get('repeat-day-x'), String(monthDays[0]));
 	}
 
 	return sub(
-		Liferay.Language.get('days-x'),
+		Liferay.Language.get('repeat-days-x'),
 		getListText(toMonthDayRanges(monthDays), locale)
 	);
 }
 
 function getUnitText(scheduleValues: ScheduleValues, locale: string): string {
 	if (scheduleValues.unit === IntervalUnit.Day) {
-		return Liferay.Language.get('day');
+		return Liferay.Language.get('repeat-unit-day');
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Week) {
-		return Liferay.Language.get('week');
+		return Liferay.Language.get('repeat-unit-week');
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Month) {
-		return Liferay.Language.get('month');
+		return Liferay.Language.get('repeat-unit-month');
 	}
 
 	if (scheduleValues.yearInterval > 1) {
@@ -129,12 +140,13 @@ function getUnitText(scheduleValues: ScheduleValues, locale: string): string {
 		);
 	}
 
-	return Liferay.Language.get('year');
+	return Liferay.Language.get('repeat-unit-year');
 }
 
 function getMonthlyRepeatText(
 	scheduleValues: ScheduleValues,
-	locale: string
+	locale: string,
+	timeText: string
 ): string {
 	const everyMonth =
 		!scheduleValues.months.length ||
@@ -151,16 +163,20 @@ function getMonthlyRepeatText(
 
 		if (everyMonth) {
 			return sub(
-				Liferay.Language.get('the-process-repeats-every-x-on-the-x'),
+				Liferay.Language.get(
+					'the-process-repeats-every-x-on-the-x-at-x'
+				),
 				unitText,
-				weekdayOrdinalText
+				weekdayOrdinalText,
+				timeText
 			);
 		}
 
 		return sub(
-			Liferay.Language.get('the-process-repeats-in-x-on-the-x'),
+			Liferay.Language.get('the-process-repeats-in-x-on-the-x-at-x'),
 			monthListText,
-			weekdayOrdinalText
+			weekdayOrdinalText,
+			timeText
 		);
 	}
 
@@ -170,14 +186,16 @@ function getMonthlyRepeatText(
 	) {
 		if (everyMonth) {
 			return sub(
-				Liferay.Language.get('the-process-repeats-every-x'),
-				unitText
+				Liferay.Language.get('the-process-repeats-every-x-at-x'),
+				unitText,
+				timeText
 			);
 		}
 
 		return sub(
-			Liferay.Language.get('the-process-repeats-in-x'),
-			monthListText
+			Liferay.Language.get('the-process-repeats-in-x-at-x'),
+			monthListText,
+			timeText
 		);
 	}
 
@@ -188,22 +206,25 @@ function getMonthlyRepeatText(
 
 	if (everyMonth) {
 		return sub(
-			Liferay.Language.get('the-process-repeats-every-x-on-x'),
+			Liferay.Language.get('the-process-repeats-every-x-on-x-at-x'),
 			unitText,
-			monthDayListText
+			monthDayListText,
+			timeText
 		);
 	}
 
 	return sub(
-		Liferay.Language.get('the-process-repeats-in-x-on-x'),
+		Liferay.Language.get('the-process-repeats-in-x-on-x-at-x'),
 		monthListText,
-		monthDayListText
+		monthDayListText,
+		timeText
 	);
 }
 
 function getYearlyRepeatText(
 	scheduleValues: ScheduleValues,
-	locale: string
+	locale: string,
+	timeText: string
 ): string {
 	const monthListText = getMonthListText(
 		scheduleValues.months.length ? scheduleValues.months : [1],
@@ -213,45 +234,55 @@ function getYearlyRepeatText(
 
 	if (scheduleValues.repeatType === RepeatType.DayOfWeek) {
 		return sub(
-			Liferay.Language.get('the-process-repeats-every-x-in-x-on-the-x'),
+			Liferay.Language.get(
+				'the-process-repeats-every-x-in-x-on-the-x-at-x'
+			),
 			unitText,
 			monthListText,
-			getWeekdayOrdinalText(scheduleValues, locale)
+			getWeekdayOrdinalText(scheduleValues, locale),
+			timeText
 		);
 	}
 
 	return sub(
-		Liferay.Language.get('the-process-repeats-every-x-in-x-on-x'),
+		Liferay.Language.get('the-process-repeats-every-x-in-x-on-x-at-x'),
 		unitText,
 		monthListText,
 		getMonthDayListText(
 			scheduleValues.monthDays.length ? scheduleValues.monthDays : [1],
 			locale
-		)
+		),
+		timeText
 	);
 }
 
-function getRepeatText(scheduleValues: ScheduleValues, locale: string): string {
+function getRepeatText(
+	scheduleValues: ScheduleValues,
+	locale: string,
+	timeText: string
+): string {
 	if (scheduleValues.unit === IntervalUnit.Day) {
 		return sub(
-			Liferay.Language.get('the-process-repeats-every-x'),
-			getUnitText(scheduleValues, locale)
+			Liferay.Language.get('the-process-repeats-every-x-at-x'),
+			getUnitText(scheduleValues, locale),
+			timeText
 		);
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Week) {
 		return sub(
-			Liferay.Language.get('the-process-repeats-every-x-on-x'),
+			Liferay.Language.get('the-process-repeats-every-x-on-x-at-x'),
 			getUnitText(scheduleValues, locale),
-			getWeekdayListText(scheduleValues.weekdays, locale)
+			getWeekdayListText(scheduleValues.weekdays, locale),
+			timeText
 		);
 	}
 
 	if (scheduleValues.unit === IntervalUnit.Year) {
-		return getYearlyRepeatText(scheduleValues, locale);
+		return getYearlyRepeatText(scheduleValues, locale, timeText);
 	}
 
-	return getMonthlyRepeatText(scheduleValues, locale);
+	return getMonthlyRepeatText(scheduleValues, locale, timeText);
 }
 
 export function getScheduleSummary(
@@ -265,7 +296,7 @@ export function getScheduleSummary(
 		return null;
 	}
 
-	const startDate = toLocalDate(scheduleValues.startDateTime);
+	const startDate = toWallClockDate(scheduleValues.startDateTime);
 
 	if (
 		toZonedDate(
@@ -278,11 +309,9 @@ export function getScheduleSummary(
 
 	const locale = Liferay.ThemeDisplay.getBCP47LanguageId();
 
-	const startDateText = startDate.toLocaleDateString(locale);
-	const timeText = startDate.toLocaleTimeString(locale, {
-		hour: 'numeric',
-		minute: '2-digit',
-	});
+	const startDateText = toDateText(startDate, locale);
+
+	const startTimeText = toTimeText(startDate, locale);
 
 	if (scheduleValues.unit === IntervalUnit.Never) {
 		return sub(
@@ -290,40 +319,80 @@ export function getScheduleSummary(
 				'the-process-runs-once-on-x-at-x-and-does-not-repeat'
 			),
 			startDateText,
-			timeText
+			startTimeText
 		);
 	}
 
-	const endDate =
-		!scheduleValues.neverEnd &&
-		isCompleteDateTime(scheduleValues.endDateTime)
-			? toLocalDate(scheduleValues.endDateTime)
-			: null;
+	if (
+		hasEndDate(scheduleValues) &&
+		!isCompleteDateTime(scheduleValues.endDateTime)
+	) {
+		return null;
+	}
 
-	const startsText = endDate
+	const endDate = hasEndDate(scheduleValues)
+		? toWallClockDate(scheduleValues.endDateTime)
+		: null;
+
+	if (scheduleValues.unit === IntervalUnit.Custom) {
+		if (!scheduleValues.cronExpression.trim()) {
+			return null;
+		}
+
+		return endDate
+			? sub(
+					Liferay.Language.get(
+						'the-process-starts-on-x-at-x-and-ends-on-x-at-x'
+					),
+					startDateText,
+					startTimeText,
+					toDateText(endDate, locale),
+					toTimeText(endDate, locale)
+				)
+			: sub(
+					Liferay.Language.get(
+						'the-process-starts-on-x-at-x-and-never-ends'
+					),
+					startDateText,
+					startTimeText
+				);
+	}
+
+	if (
+		!scheduleValues.repeatOnTimeSynced &&
+		!isCompleteTime(scheduleValues.repeatOnTime)
+	) {
+		return null;
+	}
+
+	const timeText = scheduleValues.repeatOnTimeSynced
+		? startTimeText
+		: toTimeText(
+				toWallClockDate(
+					`${scheduleValues.startDateTime.split(' ')[0]} ${
+						scheduleValues.repeatOnTime
+					}`
+				),
+				locale
+			);
+
+	const activeFromText = endDate
 		? sub(
 				Liferay.Language.get(
-					'the-process-starts-on-x-at-x-and-ends-on-x-at-x'
+					'the-process-is-active-from-x-at-x-and-ends-on-x-at-x'
 				),
 				startDateText,
-				timeText,
-				endDate.toLocaleDateString(locale),
-				endDate.toLocaleTimeString(locale, {
-					hour: 'numeric',
-					minute: '2-digit',
-				})
+				startTimeText,
+				toDateText(endDate, locale),
+				toTimeText(endDate, locale)
 			)
 		: sub(
 				Liferay.Language.get(
-					'the-process-starts-on-x-at-x-and-never-ends'
+					'the-process-is-active-from-x-at-x-and-never-ends'
 				),
 				startDateText,
-				timeText
+				startTimeText
 			);
 
-	if (scheduleValues.unit === IntervalUnit.Custom) {
-		return startsText;
-	}
-
-	return `${getRepeatText(scheduleValues, locale)} ${startsText}`;
+	return `${activeFromText} ${getRepeatText(scheduleValues, locale, timeText)}`;
 }

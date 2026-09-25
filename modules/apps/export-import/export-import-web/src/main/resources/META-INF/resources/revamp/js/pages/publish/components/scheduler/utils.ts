@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {isCompleteDateTime, toZonedDate} from './cron';
+import {isCompleteDateTime, toZonedDate} from '../../../../utils/dateTime';
 import {
 	IntervalUnit,
 	LAST_WEEKDAY_ORDINAL,
@@ -51,6 +51,16 @@ export const WEEKDAY_ORDINAL_OPTIONS = [
 	{label: Liferay.Language.get('last'), value: LAST_WEEKDAY_ORDINAL},
 ];
 
+export function hasEndDate(scheduleValues: ScheduleValues): boolean {
+	return (
+		scheduleValues.unit !== IntervalUnit.Never && !scheduleValues.neverEnd
+	);
+}
+
+export function isRepeatingUnit(unit: IntervalUnit): boolean {
+	return unit !== IntervalUnit.Custom && unit !== IntervalUnit.Never;
+}
+
 export function getScheduleValuesErrors(
 	scheduleValues: ScheduleValues
 ): ScheduleValuesErrors {
@@ -90,7 +100,17 @@ export function getScheduleValuesErrors(
 		);
 	}
 
-	if (!scheduleValues.neverEnd) {
+	if (
+		isRepeatingUnit(scheduleValues.unit) &&
+		!scheduleValues.repeatOnTimeSynced &&
+		!scheduleValues.repeatOnTime
+	) {
+		scheduleValuesErrors.repeatOnTime = Liferay.Language.get(
+			'this-field-is-required'
+		);
+	}
+
+	if (hasEndDate(scheduleValues)) {
 		if (!isCompleteDateTime(scheduleValues.endDateTime)) {
 			scheduleValuesErrors.endDateTime = Liferay.Language.get(
 				'please-enter-a-valid-date'
@@ -127,8 +147,11 @@ export function getInitialScheduleValues(
 		monthDays: [1],
 		months: [],
 		neverEnd: true,
+		repeatOnTime: '',
+		repeatOnTimeSynced: true,
 		repeatType: RepeatType.DayOfMonth,
 		startDateTime: '',
+		storedCronExpression: '',
 		timeZoneId,
 		unit: IntervalUnit.Never,
 		weekday: 2,
@@ -147,7 +170,7 @@ export function getIntervalText(
 		style: 'unit',
 		unit,
 		unitDisplay: 'long',
-	} as Intl.NumberFormatOptions).format(interval);
+	}).format(interval);
 }
 
 export function getWeekdayName(weekday: number, locale: string): string {

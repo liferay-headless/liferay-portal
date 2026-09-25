@@ -6,8 +6,7 @@
 import {
 	fromCronExpression,
 	toCronExpression,
-	toWallClockDateTime,
-	toZonedDate,
+	toCustomCronExpression,
 } from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/cron';
 import {
 	IntervalUnit,
@@ -94,6 +93,56 @@ function everyUIState(): ScheduleValues[] {
 					yearInterval,
 				})
 			);
+		})
+	);
+
+	const UNSYNCED_REPEAT_ON_TIME = '09:15';
+
+	states.push(
+		buildScheduleValues({
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Day,
+		}),
+		buildScheduleValues({
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Week,
+			weekdays: [2, 5],
+		}),
+		buildScheduleValues({
+			monthDays: [1, 15],
+			months: [],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Month,
+		}),
+		buildScheduleValues({
+			months: [3, 6, 9, 12],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfWeek,
+			unit: IntervalUnit.Month,
+			weekday: 2,
+			weekdayOrdinal: '1',
+		}),
+		buildScheduleValues({
+			monthDays: [15],
+			months: [7],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			unit: IntervalUnit.Year,
+			yearInterval: 1,
+		}),
+		buildScheduleValues({
+			months: [7],
+			repeatOnTime: UNSYNCED_REPEAT_ON_TIME,
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfWeek,
+			unit: IntervalUnit.Year,
+			weekday: 5,
+			weekdayOrdinal: '2',
+			yearInterval: 1,
 		})
 	);
 
@@ -223,11 +272,70 @@ describe('toCronExpression', () => {
 			})
 		);
 	});
+
+	it('uses the start date time when the repeat time is synced', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					unit: IntervalUnit.Week,
+					weekdays: [2, 6],
+				})
+			)
+		).toBe('0 30 15 ? * MON,FRI *');
+	});
+
+	it('uses the independent repeat time when unsynced', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '00:00',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Week,
+					weekdays: [2, 6],
+				})
+			)
+		).toBe('0 0 0 ? * MON,FRI *');
+	});
+
+	it('falls back to the start time when the repeat time is incomplete', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Day,
+				})
+			)
+		).toBe('0 30 15 * * ? *');
+
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '09',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Day,
+				})
+			)
+		).toBe('0 30 15 * * ? *');
+	});
+
+	it('ignores the repeat time for a one time cron', () => {
+		expect(
+			toCronExpression(
+				buildScheduleValues({
+					repeatOnTime: '00:00',
+					repeatOnTimeSynced: false,
+					unit: IntervalUnit.Never,
+				})
+			)
+		).toBe('0 30 15 20 7 ? 2026');
+	});
 });
 
 describe('fromCronExpression', () => {
 	it('parses a one time cron', () => {
 		expect(decode('0 30 15 20 7 ? 2026')).toEqual({
+			storedCronExpression: '0 30 15 20 7 ? 2026',
 			unit: IntervalUnit.Never,
 		});
 	});
@@ -236,12 +344,14 @@ describe('fromCronExpression', () => {
 		expect(decode('0 30 15 * * ? *')).toEqual({
 			monthDays: [],
 			months: [],
+			storedCronExpression: '0 30 15 * * ? *',
 			unit: IntervalUnit.Day,
 		});
 	});
 
 	it('parses a weekly cron with the selected days', () => {
 		expect(decode('0 30 15 ? * MON,WED *')).toEqual({
+			storedCronExpression: '0 30 15 ? * MON,WED *',
 			unit: IntervalUnit.Week,
 			weekdays: [2, 4],
 		});
@@ -249,11 +359,13 @@ describe('fromCronExpression', () => {
 
 	it('expands the day step of a legacy weekly cron', () => {
 		expect(decode('0 30 15 ? * MON,WED/2 *')).toEqual({
+			storedCronExpression: '0 30 15 ? * MON,WED/2 *',
 			unit: IntervalUnit.Week,
 			weekdays: [2, 4, 6],
 		});
 
 		expect(decode('0 30 15 ? * MON/1 *')).toEqual({
+			storedCronExpression: '0 30 15 ? * MON/1 *',
 			unit: IntervalUnit.Week,
 			weekdays: [2, 3, 4, 5, 6, 7],
 		});
@@ -261,6 +373,7 @@ describe('fromCronExpression', () => {
 
 	it('expands ranges and names', () => {
 		expect(decode('0 30 15 ? * MON-FRI *')).toEqual({
+			storedCronExpression: '0 30 15 ? * MON-FRI *',
 			unit: IntervalUnit.Week,
 			weekdays: [2, 3, 4, 5, 6],
 		});
@@ -269,6 +382,7 @@ describe('fromCronExpression', () => {
 			monthDays: [1, 2, 3],
 			months: [1, 4],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 1-3 JAN,APR ? *',
 			unit: IntervalUnit.Month,
 		});
 	});
@@ -278,6 +392,7 @@ describe('fromCronExpression', () => {
 			monthDays: [15],
 			months: [],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 15 * ? *',
 			unit: IntervalUnit.Month,
 		});
 
@@ -285,6 +400,7 @@ describe('fromCronExpression', () => {
 			monthDays: [1, 15],
 			months: [1, 4, 7, 10],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 1,15 1,4,7,10 ? *',
 			unit: IntervalUnit.Month,
 		});
 	});
@@ -294,6 +410,7 @@ describe('fromCronExpression', () => {
 			monthDays: [15],
 			months: [1, 4, 7, 10],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 15 1/3 ? *',
 			unit: IntervalUnit.Month,
 		});
 
@@ -301,6 +418,7 @@ describe('fromCronExpression', () => {
 			monthDays: [15],
 			months: [1, 6, 11],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 15 1/5 ? *',
 			unit: IntervalUnit.Month,
 		});
 
@@ -308,6 +426,7 @@ describe('fromCronExpression', () => {
 			monthDays: [15],
 			months: [1],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 15 1/12 ? *',
 			unit: IntervalUnit.Month,
 		});
 	});
@@ -317,6 +436,7 @@ describe('fromCronExpression', () => {
 			monthDays: [1, 11, 21, 31],
 			months: [],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 1/10 * ? *',
 			unit: IntervalUnit.Month,
 		});
 	});
@@ -325,6 +445,7 @@ describe('fromCronExpression', () => {
 		expect(decode('0 30 15 ? * THU#4 *')).toEqual({
 			months: [],
 			repeatType: RepeatType.DayOfWeek,
+			storedCronExpression: '0 30 15 ? * THU#4 *',
 			unit: IntervalUnit.Month,
 			weekday: 5,
 			weekdayOrdinal: '4',
@@ -334,6 +455,7 @@ describe('fromCronExpression', () => {
 		expect(decode('0 30 15 ? 2,5,8,11 FRIL *')).toEqual({
 			months: [2, 5, 8, 11],
 			repeatType: RepeatType.DayOfWeek,
+			storedCronExpression: '0 30 15 ? 2,5,8,11 FRIL *',
 			unit: IntervalUnit.Month,
 			weekday: 6,
 			weekdayOrdinal: LAST_WEEKDAY_ORDINAL,
@@ -346,6 +468,7 @@ describe('fromCronExpression', () => {
 			monthDays: [4],
 			months: [7],
 			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 4 7 ? 2026/1',
 			unit: IntervalUnit.Year,
 			yearInterval: 1,
 		});
@@ -355,6 +478,7 @@ describe('fromCronExpression', () => {
 		expect(decode('0 30 15 ? 7 MON#1 2026/1')).toEqual({
 			months: [7],
 			repeatType: RepeatType.DayOfWeek,
+			storedCronExpression: '0 30 15 ? 7 MON#1 2026/1',
 			unit: IntervalUnit.Year,
 			weekday: 2,
 			weekdayOrdinal: '1',
@@ -363,9 +487,14 @@ describe('fromCronExpression', () => {
 	});
 
 	it('parses the day of week names case insensitively', () => {
-		expect(decode('0 30 15 ? * monl *')).toEqual(
-			decode('0 30 15 ? * MONL *')
-		);
+		const {storedCronExpression: lowercaseCronExpression, ...lowercase} =
+			decode('0 30 15 ? * monl *');
+		const {storedCronExpression: uppercaseCronExpression, ...uppercase} =
+			decode('0 30 15 ? * MONL *');
+
+		expect(lowercase).toEqual(uppercase);
+		expect(lowercaseCronExpression).toBe('0 30 15 ? * monl *');
+		expect(uppercaseCronExpression).toBe('0 30 15 ? * MONL *');
 	});
 
 	it('keeps an expression the form cannot represent as a custom one', () => {
@@ -380,13 +509,75 @@ describe('fromCronExpression', () => {
 			'0 30 15 ? * MON#0 *',
 			'0 30 15 ? * MON#5 *',
 			'45 30 15 15 * ? *',
-			'0 45 09 15 * ? *',
 			'0 30 15 15 * ? 2026-2030',
 		].forEach((cronExpression) => {
 			expect(decode(cronExpression)).toEqual({
 				cronExpression,
 				unit: IntervalUnit.Custom,
 			});
+		});
+	});
+
+	it('keeps a cron whose hour or minute is a list or step as a custom one', () => {
+		['0 0,30 9 * * ? *', '0 0 8-17 * * ? *', '0 0/15 9 * * ? *'].forEach(
+			(cronExpression) => {
+				expect(decode(cronExpression)).toEqual({
+					cronExpression,
+					unit: IntervalUnit.Custom,
+				});
+			}
+		);
+	});
+
+	it('classifies a pattern whose time does not match the start date time, unchecking the sync', () => {
+		expect(decode('0 45 09 15 * ? *')).toEqual({
+			monthDays: [15],
+			months: [],
+			repeatOnTime: '09:45',
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 45 09 15 * ? *',
+			unit: IntervalUnit.Month,
+		});
+	});
+
+	it('classifies a pattern whose seconds field is a zero padded zero', () => {
+		expect(decode('00 45 09 15 * ? *')).toEqual({
+			monthDays: [15],
+			months: [],
+			repeatOnTime: '09:45',
+			repeatOnTimeSynced: false,
+			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '00 45 09 15 * ? *',
+			unit: IntervalUnit.Month,
+		});
+	});
+
+	it('keeps the sync when the pattern time matches the start date time', () => {
+		expect(decode('0 30 15 15 * ? *')).toEqual({
+			monthDays: [15],
+			months: [],
+			repeatType: RepeatType.DayOfMonth,
+			storedCronExpression: '0 30 15 15 * ? *',
+			unit: IntervalUnit.Month,
+		});
+	});
+
+	it('round trips a weekly Monday and Friday midnight cron regardless of the start date time', () => {
+		const cronExpression = '0 0 0 ? * MON,FRI *';
+
+		expect(fromCronExpression(cronExpression, '2026-07-20 00:00')).toEqual({
+			storedCronExpression: cronExpression,
+			unit: IntervalUnit.Week,
+			weekdays: [2, 6],
+		});
+
+		expect(fromCronExpression(cronExpression, '2026-07-20 15:30')).toEqual({
+			repeatOnTime: '00:00',
+			repeatOnTimeSynced: false,
+			storedCronExpression: cronExpression,
+			unit: IntervalUnit.Week,
+			weekdays: [2, 6],
 		});
 	});
 });
@@ -501,30 +692,53 @@ describe('UI to cron is faithful', () => {
 	});
 });
 
-describe('toWallClockDateTime', () => {
-	it('formats the instant as a wall clock date time in the time zone', () => {
+describe('toCustomCronExpression', () => {
+	it('keeps a typed custom cron', () => {
 		expect(
-			toWallClockDateTime('2026-07-20T19:30:00.000Z', 'America/New_York')
-		).toBe('2026-07-20 15:30');
-
-		expect(toWallClockDateTime('2026-07-20T19:30:00.000Z', 'UTC')).toBe(
-			'2026-07-20 19:30'
-		);
+			toCustomCronExpression(
+				buildScheduleValues({
+					cronExpression: '0 0 12 ? * SUN *',
+					unit: IntervalUnit.Day,
+				})
+			)
+		).toBe('0 0 12 ? * SUN *');
 	});
-});
 
-describe('toZonedDate', () => {
-	it('interprets the wall clock time in the given time zone', () => {
+	it('leaves the field empty for a schedule without a stored cron', () => {
 		expect(
-			toZonedDate('2026-07-20 15:30', 'America/New_York').toISOString()
-		).toBe('2026-07-20T19:30:00.000Z');
+			toCustomCronExpression(
+				buildScheduleValues({unit: IntervalUnit.Day})
+			)
+		).toBe('');
+	});
 
+	it('leaves the field empty while the start date is incomplete', () => {
 		expect(
-			toZonedDate('2026-07-20 15:30', 'Asia/Tokyo').toISOString()
-		).toBe('2026-07-20T06:30:00.000Z');
+			toCustomCronExpression(
+				buildScheduleValues({
+					...decode('0 30 15 ? * MON-FRI *'),
+					startDateTime: '2026-07',
+				})
+			)
+		).toBe('');
+	});
 
-		expect(toZonedDate('2026-07-20 15:30', 'UTC').toISOString()).toBe(
-			'2026-07-20T15:30:00.000Z'
-		);
+	it('rebuilds the cron once the form has moved on from the stored one', () => {
+		expect(
+			toCustomCronExpression(
+				buildScheduleValues({
+					...decode('0 30 15 ? * MON-FRI *'),
+					weekdays: [2],
+				})
+			)
+		).toBe('0 30 15 ? * MON *');
+	});
+
+	it('returns the stored cron while the form still describes it', () => {
+		expect(
+			toCustomCronExpression(
+				buildScheduleValues(decode('0 30 15 ? * MON-FRI *'))
+			)
+		).toBe('0 30 15 ? * MON-FRI *');
 	});
 });

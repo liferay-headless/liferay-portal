@@ -5,6 +5,8 @@
 
 import {DateFilterValues, LastRange, Range} from '../components/date_filter';
 
+const EPOCH_YEAR = 1970;
+
 const LAST_RANGES: Array<{hours: number; lastRange: LastRange}> = [
 	{hours: 12, lastRange: LastRange.H12},
 	{hours: 24, lastRange: LastRange.H24},
@@ -34,7 +36,7 @@ function toDateTime(
 
 	const year = getNumber('Year');
 
-	if (!year) {
+	if (Number.isNaN(year) || year <= EPOCH_YEAR) {
 		return '';
 	}
 
