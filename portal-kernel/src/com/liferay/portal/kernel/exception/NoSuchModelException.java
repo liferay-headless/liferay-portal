@@ -25,4 +25,14 @@ public class NoSuchModelException extends PortalException {
 		super(throwable);
 	}
 
+	public String getExternalReferenceCode() {
+		return _externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_externalReferenceCode = externalReferenceCode;
+	}
+
+	private String _externalReferenceCode;
+
 }
