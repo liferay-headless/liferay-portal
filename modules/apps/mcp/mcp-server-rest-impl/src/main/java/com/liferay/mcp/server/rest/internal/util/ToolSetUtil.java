@@ -14,6 +14,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -37,6 +39,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.ws.rs.core.Response;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,17 +61,30 @@ public class ToolSetUtil {
 	}
 
 	public static Tool getTool(
-		HttpServletRequest httpServletRequest,
+		HttpServletRequest httpServletRequest, boolean requiredInputSchemaOnly,
 		Map<String, String> restrictFieldsMap, String toolName,
 		String toolSetName) {
 
-		return OpenAPIUtil.getTool(
-			!Objects.equals(toolSetName, _TOOL_SET_NAME),
-			_getOpenAPIJSONObject(
-				httpServletRequest, _getOpenAPIDocument(toolSetName),
-				toolSetName),
+		JSONObject openAPIJSONObject = _getOpenAPIJSONObject(
+			httpServletRequest, _getOpenAPIDocument(toolSetName), toolSetName);
+
+		Tool tool = OpenAPIUtil.getTool(
+			!Objects.equals(toolSetName, _MCP_SERVER_TOOL_SET_NAME),
+			openAPIJSONObject,
 			_getRestrictFields(restrictFieldsMap, toolName, toolSetName),
 			toolName);
+
+		if (!requiredInputSchemaOnly) {
+			return tool;
+		}
+
+		Map<String, Object> requiredInputSchema = _toRequiredInputSchema(
+			tool.getInputSchema(), _isObjectOpenAPI(openAPIJSONObject),
+			toolName);
+
+		tool.setInputSchema(() -> requiredInputSchema);
+
+		return tool;
 	}
 
 	public static String getToolKey(String toolName, String toolSetName) {
@@ -136,11 +154,13 @@ public class ToolSetUtil {
 			inputJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
-		if (Objects.equals(toolSetName, _TOOL_SET_NAME)) {
+		if (Objects.equals(toolSetName, _MCP_SERVER_TOOL_SET_NAME)) {
 			if (Objects.equals(toolName, "getToolSetToolSetNameTool")) {
 				return _getResponse(
 					getTool(
-						httpServletRequest, restrictFieldsMap,
+						httpServletRequest,
+						inputJSONObject.getBoolean("requiredInputSchemaOnly"),
+						restrictFieldsMap,
 						inputJSONObject.getString("toolName"),
 						inputJSONObject.getString("toolSetName")));
 			}
@@ -314,8 +334,12 @@ public class ToolSetUtil {
 				try {
 					return JSONFactoryUtil.createJSONObject(content);
 				}
-				catch (Exception exception) {
-					throw new RuntimeException(exception);
+				catch (JSONException jsonException) {
+					throw new IllegalStateException(
+						StringBundler.concat(
+							"Unable to parse the OpenAPI document of the \"",
+							toolSetName, "\" tool set"),
+						jsonException);
 				}
 			});
 	}
@@ -339,7 +363,169 @@ public class ToolSetUtil {
 		return restrictFieldsMap.get(getToolKey(toolName, toolSetName));
 	}
 
-	private static final String _TOOL_SET_NAME = "mcp-server-v1.0";
+	private static boolean _isObjectOpenAPI(JSONObject openAPIJSONObject) {
+		JSONObject infoJSONObject = openAPIJSONObject.getJSONObject("info");
+
+		if (infoJSONObject == null) {
+			return false;
+		}
+
+		return Objects.equals(infoJSONObject.getString("title"), "Object");
+	}
+
+	private static Map<String, Object> _toNestedTypesOnly(
+		Map<String, Object> schema) {
+
+		Map<String, Object> properties = (Map<String, Object>)schema.get(
+			"properties");
+
+		if (properties == null) {
+			return schema;
+		}
+
+		Map<String, Object> namedProperties = new LinkedHashMap<>();
+
+		for (Map.Entry<String, Object> entry : properties.entrySet()) {
+			Object value = entry.getValue();
+
+			if (value instanceof Map) {
+				Map<String, Object> valueMap = (Map<String, Object>)value;
+
+				if (valueMap.containsKey("properties") ||
+					valueMap.containsKey("items")) {
+
+					value = HashMapBuilder.<String, Object>put(
+						"type", valueMap.get("type")
+					).build();
+				}
+			}
+
+			namedProperties.put(entry.getKey(), value);
+		}
+
+		return HashMapBuilder.<String, Object>putAll(
+			schema
+		).put(
+			"properties", namedProperties
+		).build();
+	}
+
+	private static Map<String, Object> _toObjectType(
+		Map<String, Object> schema) {
+
+		Map<String, Object> bareObject = new LinkedHashMap<>();
+
+		Object description = schema.get("description");
+
+		if (description != null) {
+			bareObject.put("description", description);
+		}
+
+		bareObject.put("type", schema.get("type"));
+
+		return bareObject;
+	}
+
+	private static Map<String, Object> _toRequiredInputSchema(
+		Map<String, ?> inputSchema, boolean objectToolSet, String toolName) {
+
+		Map<String, Object> requiredInputSchema = _toRequiredInputSchemaOnly(
+			0, objectToolSet, inputSchema);
+
+		if (requiredInputSchema == null) {
+			requiredInputSchema = HashMapBuilder.<String, Object>put(
+				"properties", new HashMap<String, Object>()
+			).put(
+				"type", "object"
+			).build();
+		}
+
+		if (!toolName.endsWith("Page")) {
+			return requiredInputSchema;
+		}
+
+		Map<String, ?> properties = (Map<String, ?>)inputSchema.get(
+			"properties");
+
+		if (properties.containsKey("fields")) {
+			Map<String, Object> requiredProperties =
+				(Map<String, Object>)requiredInputSchema.get("properties");
+
+			requiredProperties.put("fields", properties.get("fields"));
+		}
+
+		return requiredInputSchema;
+	}
+
+	private static Map<String, Object> _toRequiredInputSchemaOnly(
+		int depth, boolean objectToolSet, Map<String, ?> schema) {
+
+		if ((schema == null) || (depth > _MAX_SCHEMA_DEPTH)) {
+			return null;
+		}
+
+		List<Object> requiredPropertyNames = (List<Object>)schema.get(
+			"required");
+
+		Map<String, Object> properties = (Map<String, Object>)schema.get(
+			"properties");
+
+		if (ListUtil.isEmpty(requiredPropertyNames) || (properties == null)) {
+			return null;
+		}
+
+		Map<String, Object> requiredProperties = new LinkedHashMap<>();
+
+		for (Object object : requiredPropertyNames) {
+			String requiredPropertyName = String.valueOf(object);
+
+			Object property = properties.get(requiredPropertyName);
+
+			if (!(property instanceof Map)) {
+				continue;
+			}
+
+			Map<String, Object> propertyMap = (Map<String, Object>)property;
+
+			Map<String, Object> requiredNestedProperties =
+				_toRequiredInputSchemaOnly(
+					depth + 1, objectToolSet, propertyMap);
+
+			if (requiredNestedProperties != null) {
+				propertyMap = HashMapBuilder.<String, Object>putAll(
+					requiredNestedProperties
+				).put(
+					"description", propertyMap.get("description")
+				).build();
+			}
+			else if (propertyMap.containsKey("properties")) {
+				if (objectToolSet && (depth == 0)) {
+					propertyMap = _toObjectType(propertyMap);
+				}
+				else {
+					propertyMap = _toNestedTypesOnly(propertyMap);
+				}
+			}
+
+			requiredProperties.put(requiredPropertyName, propertyMap);
+		}
+
+		if (requiredProperties.isEmpty()) {
+			return null;
+		}
+
+		return HashMapBuilder.<String, Object>put(
+			"properties", requiredProperties
+		).put(
+			"required", new ArrayList<>(requiredProperties.keySet())
+		).put(
+			"type", schema.get("type")
+		).build();
+	}
+
+	private static final int _MAX_SCHEMA_DEPTH = 4;
+
+	private static final String _MCP_SERVER_TOOL_SET_NAME = "mcp-server-v1.0";
 
 	private static final Log _log = LogFactoryUtil.getLog(ToolSetUtil.class);
 
