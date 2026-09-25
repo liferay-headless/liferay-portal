@@ -375,7 +375,8 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 					_localization.getLocalizedName(
 						com.liferay.portal.kernel.search.Field.DESCRIPTION,
 						contextAcceptLanguage.getPreferredLanguageId()),
-					com.liferay.portal.kernel.search.Field.MODIFIED_DATE
+					com.liferay.portal.kernel.search.Field.MODIFIED_DATE,
+					com.liferay.portal.kernel.search.Field.TYPE
 				}
 			).from(
 				pagination.getStartPosition()
@@ -414,13 +415,13 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 	@SuppressWarnings("rawtypes")
 	private void _setDTOFields(
 		boolean embedded, String entryClassName, Long entryClassPK,
-		List<String> fields, SearchResult searchResult) {
+		List<String> fields, SearchResult searchResult, String type) {
 
 		DTOConverter dtoConverter = null;
 
 		if (embedded || _isEmptyOrContains(fields, "itemURL")) {
 			dtoConverter = _dtoConverterRegistry.getDTOConverter(
-				entryClassName);
+				entryClassName, type);
 		}
 
 		if (dtoConverter == null) {
@@ -628,6 +629,8 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 			boolean embedded = _isEmbedded();
 			String entryClassName = _getEntryClassName(document);
 			Long entryClassPK = _getEntryClassPK(document);
+			String type = document.getString(
+				com.liferay.portal.kernel.search.Field.TYPE);
 
 			AssetRenderer<?> assetRenderer = null;
 
@@ -656,7 +659,8 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 			searchResult.setEntryClassName(() -> entryClassName);
 
 			_setDTOFields(
-				embedded, entryClassName, entryClassPK, fields, searchResult);
+				embedded, entryClassName, entryClassPK, fields, searchResult,
+				type);
 			_setDateCreated(document, fields, searchResult);
 			_setDateModified(document, fields, searchResult);
 			_setDateReview(document, fields, searchResult);

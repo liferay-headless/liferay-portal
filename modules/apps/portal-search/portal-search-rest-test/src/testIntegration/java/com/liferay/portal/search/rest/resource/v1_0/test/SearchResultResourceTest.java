@@ -20,6 +20,9 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.test.util.LayoutPageTemplateTestUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
@@ -33,6 +36,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.test.util.ObjectRelationshipTestUtil;
 import com.liferay.petra.function.UnsafeTriConsumer;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -51,6 +55,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -114,6 +119,9 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 /**
  * @author Petteri Karttunen
@@ -631,6 +639,19 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 			_serviceContext);
 	}
 
+	private void _assertEmbeddedJSONObject(
+		JSONObject expectedJSONObject, JSONObject jsonObject,
+		LayoutPageTemplateEntry layoutPageTemplateEntry) {
+
+		JSONAssert.assertEquals(
+			expectedJSONObject.put(
+				"key", layoutPageTemplateEntry.getLayoutPageTemplateEntryKey()
+			).put(
+				"name", layoutPageTemplateEntry.getName()
+			).toString(),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
+	}
+
 	private SearchPage<SearchResult> _assertFacetConfiguration(
 			boolean anyMatch, String entryClassNames,
 			Map<String, Object> facetAttributes, String facetName,
@@ -993,6 +1014,7 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 		}
 
 		_testPostSearchPageWithEmbeddedNestedFieldsInLayout();
+		_testPostSearchPageWithEmbeddedNestedFieldsInLayoutPageTemplateEntry();
 		_testPostSearchPageWithEmbeddedNestedFieldsInObjectEntry();
 	}
 
@@ -1021,6 +1043,91 @@ public class SearchResultResourceTest extends BaseSearchResultResourceTestCase {
 				JSONUtil.getValue(
 					searchResultJSONObject, "JSONObject/embedded"));
 		}
+	}
+
+	private void _testPostSearchPageWithEmbeddedNestedFieldsInLayoutPageTemplateEntry()
+		throws Exception {
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry1 =
+			LayoutPageTemplateTestUtil.addLayoutPageTemplateEntry(
+				testGroup.getGroupId(),
+				LayoutPageTemplateEntryTypeConstants.BASIC,
+				WorkflowConstants.STATUS_APPROVED);
+		LayoutPageTemplateEntry layoutPageTemplateEntry2 =
+			LayoutPageTemplateTestUtil.addLayoutPageTemplateEntry(
+				testGroup.getGroupId(),
+				LayoutPageTemplateEntryTypeConstants.DISPLAY_PAGE,
+				WorkflowConstants.STATUS_APPROVED);
+		LayoutPageTemplateEntry layoutPageTemplateEntry3 =
+			LayoutPageTemplateTestUtil.addLayoutPageTemplateEntry(
+				testGroup.getGroupId(),
+				LayoutPageTemplateEntryTypeConstants.MASTER_LAYOUT,
+				WorkflowConstants.STATUS_APPROVED);
+		LayoutPageTemplateEntry layoutPageTemplateEntry4 =
+			LayoutPageTemplateTestUtil.addLayoutPageTemplateEntry(
+				testGroup.getGroupId(),
+				LayoutPageTemplateEntryTypeConstants.WIDGET_PAGE,
+				WorkflowConstants.STATUS_APPROVED);
+
+		SearchPage<SearchResult> searchPage;
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-35443")) {
+
+			searchPage = _postSearchPage(
+				HashMapBuilder.put(
+					"entryClassNames", LayoutPageTemplateEntry.class.getName()
+				).put(
+					"nestedFields", "embedded"
+				).put(
+					"scope", String.valueOf(testGroup.getGroupId())
+				).build(),
+				new SearchRequestBody() {
+					{
+						attributes = HashMapBuilder.<String, Object>put(
+							"search.empty.search", true
+						).build();
+					}
+				});
+		}
+
+		Map<String, JSONObject> embeddedJSONObjects = JSONUtil.toJSONObjectMap(
+			JSONUtil.toJSONArray(
+				searchPage.getItems(),
+				searchResult -> JSONUtil.getValueAsJSONObject(
+					_jsonFactory.createJSONObject(String.valueOf(searchResult)),
+					"JSONObject/embedded")),
+			"key");
+
+		Assert.assertEquals(
+			embeddedJSONObjects.toString(), 4, embeddedJSONObjects.size());
+
+		_assertEmbeddedJSONObject(
+			JSONUtil.put("type", "ContentPageTemplate"),
+			embeddedJSONObjects.get(
+				layoutPageTemplateEntry1.getLayoutPageTemplateEntryKey()),
+			layoutPageTemplateEntry1);
+		_assertEmbeddedJSONObject(
+			JSONUtil.put(
+				"displayPageTemplateSettings", _jsonFactory.createJSONObject()),
+			embeddedJSONObjects.get(
+				layoutPageTemplateEntry2.getLayoutPageTemplateEntryKey()),
+			layoutPageTemplateEntry2);
+		_assertEmbeddedJSONObject(
+			JSONUtil.put(
+				"keywords", _jsonFactory.createJSONArray()
+			).put(
+				"markedAsDefault", false
+			),
+			embeddedJSONObjects.get(
+				layoutPageTemplateEntry3.getLayoutPageTemplateEntryKey()),
+			layoutPageTemplateEntry3);
+		_assertEmbeddedJSONObject(
+			JSONUtil.put("type", "WidgetPageTemplate"),
+			embeddedJSONObjects.get(
+				layoutPageTemplateEntry4.getLayoutPageTemplateEntryKey()),
+			layoutPageTemplateEntry4);
 	}
 
 	private void _testPostSearchPageWithEmbeddedNestedFieldsInObjectEntry()
