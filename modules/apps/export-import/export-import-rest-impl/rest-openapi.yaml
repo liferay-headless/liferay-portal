@@ -1,5 +1,22 @@
 components:
     schemas:
+        Choice:
+            properties:
+                additionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                deletionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                label:
+                    readOnly: true
+                    type: string
+                name:
+                    readOnly: true
+                    type: string
+            type: object
         ExportPreview:
             properties:
                 additionCount:
@@ -285,11 +302,6 @@ components:
                             format: int64
                             readOnly: true
                             type: integer
-                        previewPortletDataHandlerControls:
-                            items:
-                                $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
-                            readOnly: true
-                            type: array
             type: object
         PreviewPortletDataHandlerChoice:
             allOf:
@@ -297,22 +309,7 @@ components:
                 -   properties:
                         choices:
                             items:
-                                properties:
-                                    additionCount:
-                                        format: int64
-                                        readOnly: true
-                                        type: integer
-                                    deletionCount:
-                                        format: int64
-                                        readOnly: true
-                                        type: integer
-                                    label:
-                                        readOnly: true
-                                        type: string
-                                    name:
-                                        readOnly: true
-                                        type: string
-                                type: object
+                                $ref: "#/components/schemas/Choice"
                             readOnly: true
                             type: array
                         defaultChoice:
@@ -325,6 +322,7 @@ components:
                     Boolean: "#/components/schemas/PreviewPortletDataHandlerBoolean"
                     Choice: "#/components/schemas/PreviewPortletDataHandlerChoice"
                     Setting: "#/components/schemas/PreviewPortletDataHandlerSetting"
+                    TreeSelection: "#/components/schemas/PreviewPortletDataHandlerTreeSelection"
                 propertyName: type
             properties:
                 disabled:
@@ -336,8 +334,17 @@ components:
                 name:
                     readOnly: true
                     type: string
+                previewPortletDataHandlerControls:
+                    description:
+                        The nested controls. A `TreeSelection` nests its parts as settings valued with external reference codes of the selected entity. The `all` part selects the whole tree. The `items` and `excluded-items` parts select or deselect single items. The `subtrees` and `excluded-subtrees` parts select or deselect an item together with all its descendants. An item follows its own setting, then the nearest ancestor found in a subtree setting, then `all`.
+                    items:
+                        $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
+                    readOnly: true
+                    type: array
                 type:
-                    enum: [Boolean, Choice, Setting]
+                    description:
+                        How the control is filled in the request. A `Boolean` is sent without values to include its data. A `Choice` is sent with the name of the chosen choice as its only value. A `Setting` is sent with its values. A `TreeSelection` is sent as a control whose nested controls are its parts.
+                    enum: [Boolean, Choice, Setting, TreeSelection]
                     readOnly: true
                     type: string
             required:
@@ -372,11 +379,10 @@ components:
                         defaultState:
                             readOnly: true
                             type: boolean
-                        previewPortletDataHandlerControls:
-                            items:
-                                $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
-                            readOnly: true
-                            type: array
+            type: object
+        PreviewPortletDataHandlerTreeSelection:
+            allOf:
+                -   $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
             type: object
         PreviewSite:
             properties:
@@ -506,6 +512,10 @@ components:
                 ratings:
                     default: false
                     type: boolean
+                remoteConnection:
+                    $ref: "#/components/schemas/RemoteConnection"
+                    description:
+                        The remote live connection to publish to. Any field left absent falls back to the value configured on the staging group.
                 requestPortletDataHandlers:
                     items:
                         $ref: "#/components/schemas/RequestPortletDataHandler"
@@ -538,6 +548,32 @@ components:
                     type: string
             required:
                 -   name
+            type: object
+        RemoteConnection:
+            description:
+                The remote live connection a publish process targets.
+            properties:
+                remoteAddress:
+                    description:
+                        The remote live host or IP.
+                    type: string
+                remotePathContext:
+                    description:
+                        The remote live path context.
+                    type: string
+                remotePort:
+                    description:
+                        The remote live port.
+                    type: integer
+                remoteSiteId:
+                    description:
+                        The remote live site ID.
+                    format: int64
+                    type: integer
+                secureConnection:
+                    description:
+                        Whether to connect to the remote live over a secure network connection.
+                    type: boolean
             type: object
         ReportEntry:
             properties:
@@ -636,12 +672,18 @@ components:
         RequestPortletDataHandlerControl:
             properties:
                 name:
+                    description:
+                        The name of the preview control this control answers.
                     type: string
                 requestPortletDataHandlerControls:
+                    description:
+                        The nested controls, answering the nested controls of the preview control.
                     items:
                         $ref: "#/components/schemas/RequestPortletDataHandlerControl"
                     type: array
                 values:
+                    description:
+                        The values of the control. The values are omitted for a `Boolean`, hold the name of the chosen choice for a `Choice`, and hold the setting's values for a `Setting`.
                     items:
                         type: string
                     type: array
@@ -688,6 +730,11 @@ components:
                         The raw export import parameters the scheduled publication was created with.
                     readOnly: true
                     type: object
+                remoteConnection:
+                    $ref: "#/components/schemas/RemoteConnection"
+                    description:
+                        The remote live connection, present only when the scheduled publication targets a remotely staged site.
+                    readOnly: true
                 scheduleEndDate:
                     description:
                         The date the scheduled publication stops firing.

@@ -15,10 +15,6 @@ import {toWallClockDateTime} from '../../../../../src/main/resources/META-INF/re
 import {ScheduledPublishProcess} from '../../../../../src/main/resources/META-INF/resources/revamp/js/types/exportImportProcess';
 import {mockPreview} from '../../mocks/mockPreview';
 
-jest.mock('staging-taglib', () => ({
-	PagesTree: require('../../mocks/MockPagesTree').MockPagesTree,
-}));
-
 const DAY = 24 * 60 * 60 * 1000;
 
 const FUTURE_DATE = new Date(Date.now() + DAY);
@@ -41,10 +37,10 @@ const SCHEDULED_PUBLISH_PROCESS: ScheduledPublishProcess = {
 
 const DEFAULT_PROPS = {
 	backURL: '/some/back/url',
-	pageTreeModalConfiguration: {
-		groupId: 20121,
+	pagePickerConfiguration: {
 		pageSize: 20,
 		privateLayoutsAvailable: false,
+		siteExternalReferenceCode: 'site-erc',
 	},
 	publishPreviewAPIURL:
 		'/o/export-import/v1.0/sites/site-erc/publish-preview',
@@ -147,6 +143,116 @@ describe('NewPublish', () => {
 		).toBeChecked();
 	});
 
+	it('seeds the editable connection fields and submits the edited values', async () => {
+		renderComponent({
+			remoteConnectionSettings: {
+				remoteAddress: 'remote.example.com',
+				remotePathContext: '/portal',
+				remotePort: '8080',
+				remoteSiteId: '12345',
+				secureConnection: false,
+			},
+		});
+
+		await fillRequiredFields();
+
+		expect(screen.getByLabelText(/remote-host-ip/)).toHaveValue(
+			'remote.example.com'
+		);
+		expect(screen.getByLabelText(/remote-port/)).toHaveValue(8080);
+		expect(screen.getByLabelText(/remote-path-context/)).toHaveValue(
+			'/portal'
+		);
+		expect(screen.getByLabelText(/remote-site-id/)).toHaveValue(12345);
+
+		const secureConnectionCheckbox = screen.getByLabelText(
+			/use-a-secure-network-connection/
+		);
+
+		expect(secureConnectionCheckbox).not.toBeChecked();
+
+		await user.click(secureConnectionCheckbox);
+
+		expect(secureConnectionCheckbox).toBeChecked();
+
+		const addressField = screen.getByLabelText(/remote-host-ip/);
+
+		await user.clear(addressField);
+		await user.click(addressField);
+		await user.paste('other.example.com');
+
+		await user.click(
+			screen.getByRole('button', {name: /publish-to-remote-live/})
+		);
+
+		await waitFor(() => {
+			expect(getPublishProcessCall()).toBeDefined();
+		});
+
+		const body = JSON.parse(getPublishProcessCall()![1]!.body as string);
+
+		expect(body.remoteConnection.remoteAddress).toBe('other.example.com');
+		expect(body.remoteConnection.remoteSiteId).toBe(12345);
+		expect(body.remoteConnection.remotePort).toBe(8080);
+		expect(body.remoteConnection.remotePathContext).toBe('/portal');
+		expect(body.remoteConnection.secureConnection).toBe(true);
+	});
+
+	it('labels the button for a scheduled remote publication', async () => {
+		renderComponent({
+			remoteConnectionSettings: {
+				remoteAddress: 'remote.example.com',
+				remotePathContext: '/portal',
+				remotePort: '8080',
+				remoteSiteId: '12345',
+				secureConnection: false,
+			},
+		});
+
+		await fillRequiredFields();
+
+		await user.click(
+			screen.getByRole('radio', {name: /schedule-for-later/})
+		);
+
+		expect(
+			screen.getByRole('button', {
+				name: /schedule-publication-to-remote-live/,
+			})
+		).toBeInTheDocument();
+	});
+
+	it('clears the required error when a connection field is corrected', async () => {
+		renderComponent({
+			remoteConnectionSettings: {
+				remoteAddress: 'remote.example.com',
+				remotePathContext: '/portal',
+				remotePort: '8080',
+				remoteSiteId: '12345',
+				secureConnection: false,
+			},
+		});
+
+		await fillRequiredFields();
+
+		const siteIdField = screen.getByLabelText(/remote-site-id/);
+
+		await user.clear(siteIdField);
+		await user.tab();
+
+		expect(
+			await screen.findByText('this-field-is-required')
+		).toBeInTheDocument();
+
+		await user.type(siteIdField, '54321');
+
+		await waitFor(() => {
+			expect(
+				screen.queryByText('this-field-is-required')
+			).not.toBeInTheDocument();
+		});
+	});
+
 	it('requires a start date to schedule the publication', async () => {
 		renderComponent();
 
@@ -231,6 +337,42 @@ describe('NewPublish', () => {
 		expect(screen.getByLabelText('filter-content-by')).toHaveValue(
 			'fromLastPublishDate'
 		);
+	});
+
+	it('seeds the connection fields from the scheduled remote process when editing', async () => {
+		mockAPIRoutes({
+			scheduledPublishProcess: {
+				...SCHEDULED_PUBLISH_PROCESS,
+				remoteConnection: {
+					remoteAddress: 'saved.example.com',
+					remotePathContext: '/o',
+					remotePort: 443,
+					remoteSiteId: 98765,
+					secureConnection: true,
+				},
+			},
+		});
+
+		renderComponent({
+			remoteConnectionSettings: {
+				remoteAddress: 'default.example.com',
+				remotePathContext: '',
+				remotePort: '8080',
+				remoteSiteId: '11111',
+				secureConnection: false,
+			},
+			scheduledPublishProcessId: SCHEDULED_PUBLISH_PROCESS.id,
+		});
+
+		expect(await screen.findByLabelText(/remote-host-ip/)).toHaveValue(
+			'saved.example.com'
+		);
+		expect(screen.getByLabelText(/remote-site-id/)).toHaveValue(98765);
+		expect(screen.getByLabelText(/remote-port/)).toHaveValue(443);
+		expect(screen.getByLabelText(/remote-path-context/)).toHaveValue('/o');
+		expect(
+			screen.getByLabelText(/use-a-secure-network-connection/)
+		).toBeChecked();
 	});
 
 	it('replaces the scheduled process on submit when editing', async () => {
