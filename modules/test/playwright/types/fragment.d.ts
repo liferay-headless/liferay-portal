@@ -60,6 +60,7 @@ type FragmentConfigurationFieldSet = {
 
 type FragmentEntry = {
 	fragmentEntryId: string;
+	fragmentEntryKey: string;
 	groupId: string;
 };
 

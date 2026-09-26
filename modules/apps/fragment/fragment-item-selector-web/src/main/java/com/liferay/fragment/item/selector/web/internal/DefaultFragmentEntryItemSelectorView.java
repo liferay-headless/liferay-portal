@@ -11,6 +11,7 @@ import com.liferay.fragment.item.selector.FragmentEntryItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 
 import jakarta.portlet.PortletURL;
 
@@ -54,6 +55,15 @@ public class DefaultFragmentEntryItemSelectorView
 	@Override
 	public String getTitle(Locale locale) {
 		return _language.get(locale, "default");
+	}
+
+	@Override
+	public boolean isVisible(
+		FragmentEntryItemSelectorCriterion fragmentEntryItemSelectorCriterion,
+		ThemeDisplay themeDisplay) {
+
+		return fragmentEntryItemSelectorCriterion.
+			isIncludeFragmentCollectionContributors();
 	}
 
 	@Override

@@ -16,6 +16,9 @@ public class LayoutConstants {
 
 	public static final long DEFAULT_PLID = 0;
 
+	public static final String EXTERNAL_REFERENCE_CODE_INFIX_LAUNCH_DRAFT =
+		"-launch-";
+
 	public static final String EXTERNAL_REFERENCE_CODE_SUFFIX_DEFAULT =
 		"-default";
 

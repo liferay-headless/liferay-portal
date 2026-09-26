@@ -25,6 +25,17 @@ public class FragmentEntryItemSelectorCriterion
 		return _type;
 	}
 
+	public boolean isIncludeFragmentCollectionContributors() {
+		return _includeFragmentCollectionContributors;
+	}
+
+	public void setIncludeFragmentCollectionContributors(
+		boolean includeFragmentCollectionContributors) {
+
+		_includeFragmentCollectionContributors =
+			includeFragmentCollectionContributors;
+	}
+
 	public void setInputTypes(Set<String> inputTypes) {
 		_inputTypes = inputTypes;
 	}
@@ -33,6 +44,7 @@ public class FragmentEntryItemSelectorCriterion
 		_type = type;
 	}
 
+	private boolean _includeFragmentCollectionContributors = true;
 	private Set<String> _inputTypes = new HashSet<>();
 	private int _type = FragmentConstants.TYPE_COMPONENT;
 

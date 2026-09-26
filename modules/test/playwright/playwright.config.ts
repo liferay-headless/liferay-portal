@@ -119,6 +119,7 @@ import {config as iframeWebConfig} from './tests/iframe-web/main/config';
 import {config as itemSelectorTaglibConfig} from './tests/item-selector-taglib/main/config';
 import {config as journalWebConfig} from './tests/journal-web/main/config';
 import {config as knowledgeBaseWebConfig} from './tests/knowledge-base-web/main/config';
+import {config as launchWebConfig} from './tests/launch-web/main/config';
 import {config as layoutAdminWebConfig} from './tests/layout-admin-web/main/config';
 import {config as layoutContentPageEditorWebFormContainerConfig} from './tests/layout-content-page-editor-web/form-container/config';
 import {config as layoutContentPageEditorWebFragmentsConfig} from './tests/layout-content-page-editor-web/fragments/config';
@@ -398,6 +399,7 @@ export default defineConfig({
 		itemSelectorTaglibConfig,
 		journalWebConfig,
 		knowledgeBaseWebConfig,
+		launchWebConfig,
 		layoutAdminWebConfig,
 		layoutContentPageEditorWebConfig,
 		layoutContentPageEditorWebFormContainerConfig,
