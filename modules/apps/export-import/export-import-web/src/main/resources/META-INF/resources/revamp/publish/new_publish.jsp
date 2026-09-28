@@ -58,18 +58,20 @@ renderResponse.setTitle(publishProcessDisplayContext.getTitle(scheduledPublishPr
 			).put(
 				"lookAndFeelEnabled", publishProcessDisplayContext.isLookAndFeelEnabled()
 			).put(
-				"pageTreeModalConfiguration",
+				"pagePickerConfiguration",
 				HashMapBuilder.<String, Object>put(
-					"groupId", publishSourceGroup.getGroupId()
-				).put(
 					"pageSize", PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN
 				).put(
 					"privateLayoutsAvailable", publishSourceGroup.isPrivateLayoutsEnabled() && publishSourceGroup.hasPrivateLayouts()
+				).put(
+					"siteExternalReferenceCode", publishSourceGroup.getExternalReferenceCode()
 				).build()
 			).put(
 				"publishPreviewAPIURL", publishProcessDisplayContext.getPublishPreviewAPIURL()
 			).put(
 				"publishProcessAPIURL", publishProcessDisplayContext.getPublishProcessAPIURL()
+			).put(
+				"remoteConnectionSettings", publishProcessDisplayContext.getRemoteConnectionSettingsJSONObject()
 			).put(
 				"scheduledBackURL", HttpComponentsUtil.setParameter(backURL, liferayPortletResponse.getNamespace() + "tabs1", "scheduled")
 			).put(
