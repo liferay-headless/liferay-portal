@@ -16,6 +16,7 @@ import {
 	createLaunch,
 	createLaunchEntry,
 	getLaunch,
+	isPublished,
 	listLaunchEntriesForAsset,
 	listLaunches,
 } from '../api/launches';
@@ -122,7 +123,7 @@ function AddToLaunchModalContent({
 					return;
 				}
 
-				setLaunches(launches);
+				setLaunches(launches.filter((launch) => !isPublished(launch)));
 				setStatus('picking');
 			}
 			catch (exception) {
@@ -179,7 +180,11 @@ function AddToLaunchModalContent({
 					).id
 				: Number(selectedValue);
 
-			await createLaunchEntry({...detail, launchSetId: launchId});
+			await createLaunchEntry({
+				...detail,
+				baseClassVersion: detail.classVersion,
+				launchSetId: launchId,
+			});
 
 			const launch = creatingNew
 				? {id: launchId, name: trimmedName}

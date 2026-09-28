@@ -104,6 +104,16 @@ public class EditFragmentEntryDisplayContext {
 		_updatePortletDisplay();
 	}
 
+	public String getBackURL() {
+		String backURL = ParamUtil.getString(_httpServletRequest, "backURL");
+
+		if (Validator.isNotNull(backURL)) {
+			return backURL;
+		}
+
+		return getRedirect();
+	}
+
 	public long getFragmentCollectionId() {
 		if (Validator.isNotNull(_fragmentCollectionId)) {
 			return _fragmentCollectionId;
@@ -556,7 +566,7 @@ public class EditFragmentEntryDisplayContext {
 			).put(
 				"publish", _getPublishFragmentEntryActionURL()
 			).put(
-				"redirect", getRedirect()
+				"redirect", getBackURL()
 			).put(
 				"render",
 				() -> {
@@ -650,8 +660,19 @@ public class EditFragmentEntryDisplayContext {
 		}
 
 		portletDisplay.setShowBackIcon(true);
-		portletDisplay.setURLBack(getRedirect());
-		portletDisplay.setURLBackTitle(portletDisplay.getPortletDisplayName());
+		portletDisplay.setURLBack(getBackURL());
+
+		String backURLTitle = ParamUtil.getString(
+			_httpServletRequest, "backURLTitle");
+
+		if (Validator.isNull(backURLTitle) &&
+			Validator.isNull(
+				ParamUtil.getString(_httpServletRequest, "backURL"))) {
+
+			backURLTitle = portletDisplay.getPortletDisplayName();
+		}
+
+		portletDisplay.setURLBackTitle(backURLTitle);
 
 		FragmentEntry fragmentEntry = getFragmentEntry();
 

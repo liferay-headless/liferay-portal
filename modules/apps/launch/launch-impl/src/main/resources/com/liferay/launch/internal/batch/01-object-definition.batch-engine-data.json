@@ -38,6 +38,24 @@
 				{
 					"DBType": "String",
 					"businessType": "Text",
+					"externalReferenceCode": "BASE_CLASS_VERSION",
+					"indexed": true,
+					"indexedAsKeyword": true,
+					"label": {
+						"en_US": "Base Class Version"
+					},
+					"name": "baseClassVersion",
+					"readOnly": "false",
+					"readOnlyConditionExpression": "",
+					"required": true,
+					"state": false,
+					"system": true,
+					"type": "String",
+					"unique": false
+				},
+				{
+					"DBType": "String",
+					"businessType": "Text",
 					"externalReferenceCode": "CLASS_NAME",
 					"indexed": true,
 					"indexedAsKeyword": true,
