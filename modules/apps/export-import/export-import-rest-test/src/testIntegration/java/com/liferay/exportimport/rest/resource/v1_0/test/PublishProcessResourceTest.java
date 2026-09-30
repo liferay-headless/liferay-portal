@@ -20,6 +20,8 @@ import com.liferay.exportimport.rest.client.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandler;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandlerControl;
 import com.liferay.exportimport.rest.client.dto.v1_0.ScheduledPublishProcess;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelection;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelectionEntry;
 import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
 import com.liferay.exportimport.rest.client.resource.v1_0.PublishProcessResource;
@@ -507,17 +509,10 @@ public class PublishProcessResourceTest
 			publishProcessResource.postSitePublishProcess(
 				testGroup.getExternalReferenceCode(),
 				_toPublishProcessRequest(
-					RandomTestUtil.randomString(),
-					new RequestPortletDataHandlerControl() {
-						{
-							name = "_layout_set_all";
-						}
-					},
-					_toTreeSelectionControl(
-						"_layout_set_excluded-items", excludedLayout),
-					_toTreeSelectionControl(
-						"_layout_set_excluded-subtrees",
-						excludedParentLayout)));
+					RandomTestUtil.randomString(), true,
+					_toSitePageSelectionEntry(true, false, excludedLayout),
+					_toSitePageSelectionEntry(
+						true, true, excludedParentLayout)));
 
 		ExportImportTestUtil.assertBackgroundTaskSuccessful(
 			publishProcess.getId());
@@ -611,9 +606,7 @@ public class PublishProcessResourceTest
 		PublishProcess layoutSetPublishProcess =
 			publishProcessResource.postSitePublishProcess(
 				testGroup.getExternalReferenceCode(),
-				_toPublishProcessRequest(
-					RandomTestUtil.randomString(),
-					new RequestPortletDataHandlerControl[0]));
+				_toPublishProcessRequest(RandomTestUtil.randomString(), true));
 
 		ExportImportTestUtil.assertBackgroundTaskSuccessful(
 			layoutSetPublishProcess.getId());
@@ -719,9 +712,8 @@ public class PublishProcessResourceTest
 			publishProcessResource.postSitePublishProcess(
 				testGroup.getExternalReferenceCode(),
 				_toPublishProcessRequest(
-					RandomTestUtil.randomString(),
-					_toTreeSelectionControl(
-						"_layout_set_subtrees", parentLayout)));
+					RandomTestUtil.randomString(), false,
+					_toSitePageSelectionEntry(false, true, parentLayout)));
 
 		ExportImportTestUtil.assertBackgroundTaskSuccessful(
 			publishProcess.getId());
@@ -803,60 +795,47 @@ public class PublishProcessResourceTest
 	}
 
 	private PublishProcessRequest _toPublishProcessRequest(
-		String publishProcessName,
-		RequestPortletDataHandlerControl... treeSelectionControls) {
+		String publishProcessName, boolean all,
+		SitePageSelectionEntry... sitePageSelectionEntries) {
 
 		return new PublishProcessRequest() {
 			{
 				name = publishProcessName;
-
-				setRequestPortletDataHandlers(
-					new RequestPortletDataHandler[] {
-						new RequestPortletDataHandler() {
-							{
-								name = "PORTLET_DATA_" + _PORTLET_ID;
-
-								if (treeSelectionControls.length > 0) {
-									setRequestPortletDataHandlerControls(
-										new RequestPortletDataHandlerControl[] {
-											new RequestPortletDataHandlerControl() {
-												{
-													name = "_layout_set_pages";
-
-													setRequestPortletDataHandlerControls(
-														treeSelectionControls);
-												}
-											}
-										});
-								}
-							}
-						}
-					});
+				sitePages = new SitePageSelection() {
+					{
+						setAll(all);
+						setSitePageSelectionEntries(sitePageSelectionEntries);
+					}
+				};
 			}
 		};
 	}
 
 	private PublishProcessRequest _toPublishProcessRequest(
-		String publishProcessName, String... pageExternalReferenceCodes) {
+		String publishProcessName, String... sitePageExternalReferenceCodes) {
 
 		return _toPublishProcessRequest(
-			publishProcessName,
-			new RequestPortletDataHandlerControl() {
-				{
-					name = "_layout_set_items";
-					values = pageExternalReferenceCodes;
-				}
-			});
+			publishProcessName, false,
+			TransformUtil.transform(
+				sitePageExternalReferenceCodes,
+				sitePageExternalReferenceCode -> new SitePageSelectionEntry() {
+					{
+						setSitePageExternalReferenceCode(
+							sitePageExternalReferenceCode);
+					}
+				},
+				SitePageSelectionEntry.class));
 	}
 
-	private RequestPortletDataHandlerControl _toTreeSelectionControl(
-		String controlName, Layout... layouts) {
+	private SitePageSelectionEntry _toSitePageSelectionEntry(
+		boolean excluded, boolean includeDescendants, Layout layout) {
 
-		return new RequestPortletDataHandlerControl() {
+		return new SitePageSelectionEntry() {
 			{
-				name = controlName;
-				values = TransformUtil.transform(
-					layouts, Layout::getExternalReferenceCode, String.class);
+				setExcluded(excluded);
+				setIncludeDescendants(includeDescendants);
+				setSitePageExternalReferenceCode(
+					layout.getExternalReferenceCode());
 			}
 		};
 	}
@@ -869,9 +848,6 @@ public class PublishProcessResourceTest
 	private static final String _CRON_EXPRESSION_ONE_TIME = "0 0 3 1 1 ? 2099";
 
 	private static final String _CRON_EXPRESSION_PAST = "0 30 9 22 8 ? 2020";
-
-	private static final String _PORTLET_ID =
-		"com_liferay_layout_admin_web_portlet_LayoutSetLayoutsPortlet";
 
 	private static final String _STATUS_MESSAGE =
 		"java.lang.NullPointerException\n\tat com.liferay.exportimport." +
