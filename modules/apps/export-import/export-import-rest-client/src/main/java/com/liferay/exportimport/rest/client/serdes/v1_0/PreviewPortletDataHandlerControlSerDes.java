@@ -126,6 +126,19 @@ public class PreviewPortletDataHandlerControlSerDes {
 				String.valueOf(previewPortletDataHandlerControl.getName()));
 		}
 
+		if (previewPortletDataHandlerControl.
+				getPreviewPortletDataHandlerControls() == null) {
+
+			map.put("previewPortletDataHandlerControls", null);
+		}
+		else {
+			map.put(
+				"previewPortletDataHandlerControls",
+				String.valueOf(
+					previewPortletDataHandlerControl.
+						getPreviewPortletDataHandlerControls()));
+		}
+
 		if (previewPortletDataHandlerControl.getType() == null) {
 			map.put("type", null);
 		}
@@ -160,6 +173,12 @@ public class PreviewPortletDataHandlerControlSerDes {
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
+				return false;
+			}
+			else if (Objects.equals(
+						jsonParserFieldName,
+						"previewPortletDataHandlerControls")) {
+
 				return false;
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {
@@ -219,6 +238,33 @@ public class PreviewPortletDataHandlerControlSerDes {
 				if (jsonParserFieldValue != null) {
 					previewPortletDataHandlerControl.setName(
 						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName,
+						"previewPortletDataHandlerControls")) {
+
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					PreviewPortletDataHandlerControl[]
+						previewPortletDataHandlerControlsArray =
+							new PreviewPortletDataHandlerControl
+								[jsonParserFieldValues.length];
+
+					for (int i = 0;
+						 i < previewPortletDataHandlerControlsArray.length;
+						 i++) {
+
+						previewPortletDataHandlerControlsArray[i] =
+							PreviewPortletDataHandlerControlSerDes.toDTO(
+								(String)jsonParserFieldValues[i]);
+					}
+
+					previewPortletDataHandlerControl.
+						setPreviewPortletDataHandlerControls(
+							previewPortletDataHandlerControlsArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {
@@ -315,4 +361,4 @@ public class PreviewPortletDataHandlerControlSerDes {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1225805541
+// LIFERAY-REST-BUILDER-HASH:418757265

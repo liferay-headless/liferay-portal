@@ -20,6 +20,8 @@ import com.liferay.exportimport.rest.client.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandler;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandlerControl;
 import com.liferay.exportimport.rest.client.dto.v1_0.ScheduledPublishProcess;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelection;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelectionEntry;
 import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
 import com.liferay.exportimport.rest.client.resource.v1_0.PublishProcessResource;
@@ -27,6 +29,7 @@ import com.liferay.exportimport.rest.client.resource.v1_0.ScheduledPublishProces
 import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
@@ -34,6 +37,7 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -179,6 +183,9 @@ public class PublishProcessResourceTest
 		_testPostSitePublishProcessWithoutTimeZoneId();
 		_testPostSitePublishProcessWithLayoutSet();
 		_testPostSitePublishProcessWithDateRangeType();
+		_testPostSitePublishProcessWithExcludedPageExternalReferenceCodes();
+		_testPostSitePublishProcessWithPageExternalReferenceCodes();
+		_testPostSitePublishProcessWithPageTreeExternalReferenceCodes();
 		_testPostSitePublishProcessPerformsDirectBinaryImport();
 	}
 
@@ -481,6 +488,50 @@ public class PublishProcessResourceTest
 			});
 	}
 
+	private void _testPostSitePublishProcessWithExcludedPageExternalReferenceCodes()
+		throws Exception {
+
+		Group stagingGroup = _getStagingGroup(
+			testGroup.getExternalReferenceCode());
+
+		Layout excludedParentLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+
+		Layout excludedChildLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup, excludedParentLayout.getPlid());
+
+		Layout excludedLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+		Layout publishedLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+
+		PublishProcess publishProcess =
+			publishProcessResource.postSitePublishProcess(
+				testGroup.getExternalReferenceCode(),
+				_toPublishProcessRequest(
+					RandomTestUtil.randomString(), true,
+					_toSitePageSelectionEntry(true, false, excludedLayout),
+					_toSitePageSelectionEntry(
+						true, true, excludedParentLayout)));
+
+		ExportImportTestUtil.assertBackgroundTaskSuccessful(
+			publishProcess.getId());
+
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				publishedLayout.getUuid(), testGroup.getGroupId(), false));
+
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				excludedChildLayout.getUuid(), testGroup.getGroupId(), false));
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				excludedLayout.getUuid(), testGroup.getGroupId(), false));
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				excludedParentLayout.getUuid(), testGroup.getGroupId(), false));
+	}
+
 	private void _testPostSitePublishProcessWithInvalidCronExpression()
 		throws Exception {
 
@@ -549,6 +600,18 @@ public class PublishProcessResourceTest
 		assertValid(publishProcess);
 
 		Assert.assertEquals(
+			layoutsCount,
+			_layoutLocalService.getLayoutsCount(testGroup.getGroupId(), false));
+
+		PublishProcess layoutSetPublishProcess =
+			publishProcessResource.postSitePublishProcess(
+				testGroup.getExternalReferenceCode(),
+				_toPublishProcessRequest(RandomTestUtil.randomString(), true));
+
+		ExportImportTestUtil.assertBackgroundTaskSuccessful(
+			layoutSetPublishProcess.getId());
+
+		Assert.assertEquals(
 			layoutsCount + 1,
 			_layoutLocalService.getLayoutsCount(testGroup.getGroupId(), false));
 	}
@@ -586,6 +649,86 @@ public class PublishProcessResourceTest
 
 		Assert.assertEquals(
 			publishProcessName, scheduledPublishProcess.getName());
+	}
+
+	private void _testPostSitePublishProcessWithPageExternalReferenceCodes()
+		throws Exception {
+
+		Group stagingGroup = _getStagingGroup(
+			testGroup.getExternalReferenceCode());
+
+		Layout selectedLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+		Layout unselectedLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+
+		PublishProcess publishProcess =
+			publishProcessResource.postSitePublishProcess(
+				testGroup.getExternalReferenceCode(),
+				_toPublishProcessRequest(
+					RandomTestUtil.randomString(),
+					selectedLayout.getExternalReferenceCode()));
+
+		ExportImportTestUtil.assertBackgroundTaskSuccessful(
+			publishProcess.getId());
+
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				selectedLayout.getUuid(), testGroup.getGroupId(), false));
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				unselectedLayout.getUuid(), testGroup.getGroupId(), false));
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
+					"WebApplicationExceptionMapper",
+				LoggerTestUtil.WARN)) {
+
+			assertHttpResponseStatusCode(
+				400,
+				publishProcessResource.postSitePublishProcessHttpResponse(
+					testGroup.getExternalReferenceCode(),
+					_toPublishProcessRequest(
+						RandomTestUtil.randomString(),
+						RandomTestUtil.randomString())));
+		}
+	}
+
+	private void _testPostSitePublishProcessWithPageTreeExternalReferenceCodes()
+		throws Exception {
+
+		Group stagingGroup = _getStagingGroup(
+			testGroup.getExternalReferenceCode());
+
+		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(stagingGroup);
+
+		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup, parentLayout.getPlid());
+
+		Layout unselectedLayout = LayoutTestUtil.addTypePortletLayout(
+			stagingGroup);
+
+		PublishProcess publishProcess =
+			publishProcessResource.postSitePublishProcess(
+				testGroup.getExternalReferenceCode(),
+				_toPublishProcessRequest(
+					RandomTestUtil.randomString(), false,
+					_toSitePageSelectionEntry(false, true, parentLayout)));
+
+		ExportImportTestUtil.assertBackgroundTaskSuccessful(
+			publishProcess.getId());
+
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByExternalReferenceCode(
+				childLayout.getExternalReferenceCode(),
+				testGroup.getGroupId()));
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				parentLayout.getUuid(), testGroup.getGroupId(), false));
+
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				unselectedLayout.getUuid(), testGroup.getGroupId(), false));
 	}
 
 	private void _testPostSitePublishProcessWithoutStaging() throws Exception {
@@ -649,6 +792,52 @@ public class PublishProcessResourceTest
 
 		Assert.assertEquals(
 			timeZone.getID(), MapUtil.getString(parameterMap, "timeZoneId"));
+	}
+
+	private PublishProcessRequest _toPublishProcessRequest(
+		String publishProcessName, boolean all,
+		SitePageSelectionEntry... sitePageSelectionEntries) {
+
+		return new PublishProcessRequest() {
+			{
+				name = publishProcessName;
+				sitePages = new SitePageSelection() {
+					{
+						setAll(all);
+						setSitePageSelectionEntries(sitePageSelectionEntries);
+					}
+				};
+			}
+		};
+	}
+
+	private PublishProcessRequest _toPublishProcessRequest(
+		String publishProcessName, String... sitePageExternalReferenceCodes) {
+
+		return _toPublishProcessRequest(
+			publishProcessName, false,
+			TransformUtil.transform(
+				sitePageExternalReferenceCodes,
+				sitePageExternalReferenceCode -> new SitePageSelectionEntry() {
+					{
+						setSitePageExternalReferenceCode(
+							sitePageExternalReferenceCode);
+					}
+				},
+				SitePageSelectionEntry.class));
+	}
+
+	private SitePageSelectionEntry _toSitePageSelectionEntry(
+		boolean excluded, boolean includeDescendants, Layout layout) {
+
+		return new SitePageSelectionEntry() {
+			{
+				setExcluded(excluded);
+				setIncludeDescendants(includeDescendants);
+				setSitePageExternalReferenceCode(
+					layout.getExternalReferenceCode());
+			}
+		};
 	}
 
 	private static final String _CRON_EXPRESSION = "0 0 3 * * ?";

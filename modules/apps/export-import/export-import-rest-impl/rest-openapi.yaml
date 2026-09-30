@@ -1,5 +1,22 @@
 components:
     schemas:
+        Choice:
+            properties:
+                additionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                deletionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                label:
+                    readOnly: true
+                    type: string
+                name:
+                    readOnly: true
+                    type: string
+            type: object
         ExportPreview:
             properties:
                 additionCount:
@@ -94,6 +111,8 @@ components:
                     items:
                         type: string
                     type: array
+                sitePages:
+                    $ref: "#/components/schemas/SitePageSelection"
                 sitePagesSettings:
                     default: false
                     type: boolean
@@ -285,11 +304,6 @@ components:
                             format: int64
                             readOnly: true
                             type: integer
-                        previewPortletDataHandlerControls:
-                            items:
-                                $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
-                            readOnly: true
-                            type: array
             type: object
         PreviewPortletDataHandlerChoice:
             allOf:
@@ -297,22 +311,7 @@ components:
                 -   properties:
                         choices:
                             items:
-                                properties:
-                                    additionCount:
-                                        format: int64
-                                        readOnly: true
-                                        type: integer
-                                    deletionCount:
-                                        format: int64
-                                        readOnly: true
-                                        type: integer
-                                    label:
-                                        readOnly: true
-                                        type: string
-                                    name:
-                                        readOnly: true
-                                        type: string
-                                type: object
+                                $ref: "#/components/schemas/Choice"
                             readOnly: true
                             type: array
                         defaultChoice:
@@ -336,7 +335,14 @@ components:
                 name:
                     readOnly: true
                     type: string
+                previewPortletDataHandlerControls:
+                    items:
+                        $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
+                    readOnly: true
+                    type: array
                 type:
+                    description:
+                        How the control is filled in the request. A `Boolean` is sent without values to include its data. A `Choice` is sent with the name of the chosen choice as its only value. A `Setting` is sent with its values.
                     enum: [Boolean, Choice, Setting]
                     readOnly: true
                     type: string
@@ -372,11 +378,6 @@ components:
                         defaultState:
                             readOnly: true
                             type: boolean
-                        previewPortletDataHandlerControls:
-                            items:
-                                $ref: "#/components/schemas/PreviewPortletDataHandlerControl"
-                            readOnly: true
-                            type: array
             type: object
         PreviewSite:
             properties:
@@ -520,6 +521,8 @@ components:
                         When the scheduled publish starts. Applies only when a cron expression is given. Defaults to now.
                     format: date-time
                     type: string
+                sitePages:
+                    $ref: "#/components/schemas/SitePageSelection"
                 sitePagesSettings:
                     default: false
                     type: boolean
@@ -636,12 +639,18 @@ components:
         RequestPortletDataHandlerControl:
             properties:
                 name:
+                    description:
+                        The name of the preview control this control answers.
                     type: string
                 requestPortletDataHandlerControls:
+                    description:
+                        The nested controls, answering the nested controls of the preview control.
                     items:
                         $ref: "#/components/schemas/RequestPortletDataHandlerControl"
                     type: array
                 values:
+                    description:
+                        The values of the control. The values are omitted for a `Boolean`, hold the name of the chosen choice for a `Choice`, and hold the setting's values for a `Setting`.
                     items:
                         type: string
                     type: array
@@ -700,6 +709,41 @@ components:
                     format: date-time
                     readOnly: true
                     type: string
+            type: object
+        SitePageSelection:
+            description:
+                The pages to include. A page follows its own entry for itself, then its own entry for its descendants, then the nearest ancestor with an entry that includes descendants, then `all`. Omitting the field includes no pages.
+            properties:
+                all:
+                    default: false
+                    description:
+                        Includes every page of the chosen visibility. The entries refine the selection.
+                    type: boolean
+                sitePageSelectionEntries:
+                    items:
+                        $ref: "#/components/schemas/SitePageSelectionEntry"
+                    type: array
+                visibility:
+                    default: PUBLIC
+                    enum: [PRIVATE, PUBLIC]
+                    type: string
+            type: object
+        SitePageSelectionEntry:
+            description:
+                One page to include or exclude. A page may appear twice, once for itself and once for its descendants.
+            properties:
+                excluded:
+                    default: false
+                    type: boolean
+                includeDescendants:
+                    default: false
+                    description:
+                        Applies the entry to every page under the page, at any depth, instead of to the page itself.
+                    type: boolean
+                sitePageExternalReferenceCode:
+                    type: string
+            required:
+                -   sitePageExternalReferenceCode
             type: object
         Status:
             properties:

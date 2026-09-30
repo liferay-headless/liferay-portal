@@ -11,7 +11,8 @@ import com.liferay.exportimport.rest.client.dto.v1_0.ExportProcess;
 import com.liferay.exportimport.rest.client.dto.v1_0.ExportProcessRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.ProcessProgress;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandler;
-import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandlerControl;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelection;
+import com.liferay.exportimport.rest.client.dto.v1_0.SitePageSelectionEntry;
 import com.liferay.exportimport.rest.client.http.HttpInvoker;
 import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
@@ -69,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -678,37 +680,77 @@ public class ExportProcessResourceTest
 			JSONCompareMode.LENIENT);
 	}
 
-	private void _assertExportedLayouts(
-			String controlName,
+	private void _assertExportedLayoutExternalReferenceCodes(
+			String[] expectedExternalReferenceCodes,
+			ExportProcess exportProcess,
+			String[] unexpectedExternalReferenceCodes)
+		throws Exception {
+
+		ExportImportTestUtil.assertBackgroundTaskSuccessful(
+			exportProcess.getId());
+
+		BackgroundTask backgroundTask =
+			_backgroundTaskLocalService.getBackgroundTask(
+				exportProcess.getId());
+
+		List<FileEntry> fileEntries =
+			backgroundTask.getAttachmentsFileEntries();
+
+		FileEntry larFileEntry = fileEntries.get(0);
+
+		Set<String> exportedExternalReferenceCodes = JSONUtil.toStringSet(
+			ExportImportTestUtil.getExportedJSONArray(
+				"com.liferay.headless.admin.site.internal.resource.v1_0." +
+					"SitePageResourceImpl",
+				testGroup.getGroupId(), larFileEntry.getContentStream()),
+			"externalReferenceCode");
+
+		for (String expectedExternalReferenceCode :
+				expectedExternalReferenceCodes) {
+
+			Assert.assertTrue(
+				exportedExternalReferenceCodes.contains(
+					expectedExternalReferenceCode));
+		}
+
+		for (String unexpectedExternalReferenceCode :
+				unexpectedExternalReferenceCodes) {
+
+			Assert.assertFalse(
+				exportedExternalReferenceCodes.contains(
+					unexpectedExternalReferenceCode));
+		}
+	}
+
+	private void _assertExportedLayoutTree(
+			Layout childLayout, Layout parentLayout,
 			UnsafeFunction<ExportProcessRequest, ExportProcess, Exception>
 				unsafeFunction,
-			Layout... layouts)
+			Layout unselectedLayout)
 		throws Exception {
 
 		ExportProcess exportProcess = unsafeFunction.apply(
-			new ExportProcessRequest() {
-				{
-					name = RandomTestUtil.randomString();
+			_toExportProcessRequest(
+				false, SitePageSelection.Visibility.PUBLIC,
+				_toSitePageSelectionEntry(false, true, parentLayout)));
 
-					setRequestPortletDataHandlers(
-						new RequestPortletDataHandler[] {
-							new RequestPortletDataHandler() {
-								{
-									name = "PORTLET_DATA_" + _PORTLET_ID;
+		_assertExportedLayoutExternalReferenceCodes(
+			new String[] {
+				childLayout.getExternalReferenceCode(),
+				parentLayout.getExternalReferenceCode()
+			},
+			exportProcess,
+			new String[] {unselectedLayout.getExternalReferenceCode()});
+	}
 
-									setRequestPortletDataHandlerControls(
-										new RequestPortletDataHandlerControl[] {
-											new RequestPortletDataHandlerControl() {
-												{
-													name = controlName;
-												}
-											}
-										});
-								}
-							}
-						});
-				}
-			});
+	private void _assertExportedLayouts(
+			UnsafeFunction<ExportProcessRequest, ExportProcess, Exception>
+				unsafeFunction,
+			SitePageSelection.Visibility visibility, Layout... layouts)
+		throws Exception {
+
+		ExportProcess exportProcess = unsafeFunction.apply(
+			_toExportProcessRequest(true, visibility));
 
 		ExportImportTestUtil.retryAssert(
 			1, TimeUnit.SECONDS, 30, TimeUnit.SECONDS,
@@ -728,6 +770,25 @@ public class ExportProcessResourceTest
 			"com.liferay.headless.admin.site.internal.resource.v1_0." +
 				"SitePageResourceImpl",
 			testGroup.getGroupId(), layouts, Layout::getExternalReferenceCode);
+	}
+
+	private void _assertExportedLayoutsWithExclusion(
+			Layout excludedLayout, Layout expectedLayout,
+			boolean includeDescendants, Layout unexportedLayout,
+			UnsafeFunction<ExportProcessRequest, ExportProcess, Exception>
+				unsafeFunction)
+		throws Exception {
+
+		ExportProcess exportProcess = unsafeFunction.apply(
+			_toExportProcessRequest(
+				true, SitePageSelection.Visibility.PUBLIC,
+				_toSitePageSelectionEntry(
+					true, includeDescendants, excludedLayout)));
+
+		_assertExportedLayoutExternalReferenceCodes(
+			new String[] {expectedLayout.getExternalReferenceCode()},
+			exportProcess,
+			new String[] {unexportedLayout.getExternalReferenceCode()});
 	}
 
 	private long _getCompanyGroupId() throws Exception {
@@ -960,38 +1021,71 @@ public class ExportProcessResourceTest
 			testGroup, false, false);
 
 		_assertExportedLayouts(
-			"privateLayoutPages", unsafeFunction, privateLayout);
+			unsafeFunction, SitePageSelection.Visibility.PRIVATE,
+			privateLayout);
 		_assertExportedLayouts(
-			"publicLayoutPages", unsafeFunction, publicLayout);
+			unsafeFunction, SitePageSelection.Visibility.PUBLIC, publicLayout);
 
-		ExportProcessRequest exportProcessRequest = new ExportProcessRequest() {
-			{
-				name = RandomTestUtil.randomString();
+		Layout excludedPublicLayout = LayoutTestUtil.addTypeContentLayout(
+			testGroup, false, false);
 
-				setRequestPortletDataHandlers(
-					new RequestPortletDataHandler[] {
-						new RequestPortletDataHandler() {
-							{
-								name = "PORTLET_DATA_" + _PORTLET_ID;
+		_assertExportedLayoutsWithExclusion(
+			excludedPublicLayout, publicLayout, false, excludedPublicLayout,
+			unsafeFunction);
 
-								setRequestPortletDataHandlerControls(
-									new RequestPortletDataHandlerControl[] {
-										new RequestPortletDataHandlerControl() {
-											{
-												name = "publicLayoutPages";
-											}
-										},
-										new RequestPortletDataHandlerControl() {
-											{
-												name = "privateLayoutPages";
-											}
-										}
-									});
-							}
-						}
-					});
-			}
-		};
+		Layout excludedParentPublicLayout = LayoutTestUtil.addTypeContentLayout(
+			testGroup, false, false);
+
+		Layout excludedChildPublicLayout = LayoutTestUtil.addTypeContentLayout(
+			testGroup, excludedParentPublicLayout.getPlid());
+
+		_assertExportedLayoutsWithExclusion(
+			excludedParentPublicLayout, publicLayout, true,
+			excludedChildPublicLayout, unsafeFunction);
+
+		Layout reincludedChildPublicLayout =
+			LayoutTestUtil.addTypeContentLayout(
+				testGroup, excludedParentPublicLayout.getPlid());
+
+		_assertExportedLayoutExternalReferenceCodes(
+			new String[] {
+				publicLayout.getExternalReferenceCode(),
+				reincludedChildPublicLayout.getExternalReferenceCode()
+			},
+			unsafeFunction.apply(
+				_toExportProcessRequest(
+					true, SitePageSelection.Visibility.PUBLIC,
+					_toSitePageSelectionEntry(
+						true, true, excludedParentPublicLayout),
+					_toSitePageSelectionEntry(
+						false, false, reincludedChildPublicLayout))),
+			new String[] {
+				excludedChildPublicLayout.getExternalReferenceCode(),
+				excludedParentPublicLayout.getExternalReferenceCode()
+			});
+
+		Layout parentPublicLayout = LayoutTestUtil.addTypeContentLayout(
+			testGroup, false, false);
+
+		Layout childPublicLayout = LayoutTestUtil.addTypeContentLayout(
+			testGroup, parentPublicLayout.getPlid());
+
+		_assertExportedLayoutTree(
+			childPublicLayout, parentPublicLayout, unsafeFunction,
+			publicLayout);
+
+		_assertExportedLayoutExternalReferenceCodes(
+			new String[] {childPublicLayout.getExternalReferenceCode()},
+			unsafeFunction.apply(
+				_toExportProcessRequest(
+					false, SitePageSelection.Visibility.PUBLIC,
+					_toSitePageSelectionEntry(false, true, parentPublicLayout),
+					_toSitePageSelectionEntry(
+						true, false, parentPublicLayout))),
+			new String[] {
+				parentPublicLayout.getExternalReferenceCode(),
+				publicLayout.getExternalReferenceCode()
+			});
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
@@ -999,7 +1093,14 @@ public class ExportProcessResourceTest
 				LoggerTestUtil.WARN)) {
 
 			assertHttpResponseStatusCode(
-				400, httpResponseUnsafeFunction.apply(exportProcessRequest));
+				400,
+				httpResponseUnsafeFunction.apply(
+					_toExportProcessRequest(
+						true, SitePageSelection.Visibility.PUBLIC,
+						_toSitePageSelectionEntry(
+							false, false, parentPublicLayout),
+						_toSitePageSelectionEntry(
+							true, false, parentPublicLayout))));
 		}
 	}
 
@@ -1108,8 +1209,36 @@ public class ExportProcessResourceTest
 		}
 	}
 
-	private static final String _PORTLET_ID =
-		"com_liferay_layout_admin_web_portlet_LayoutSetLayoutsPortlet";
+	private ExportProcessRequest _toExportProcessRequest(
+		boolean all, SitePageSelection.Visibility visibility,
+		SitePageSelectionEntry... sitePageSelectionEntries) {
+
+		return new ExportProcessRequest() {
+			{
+				name = RandomTestUtil.randomString();
+				sitePages = new SitePageSelection() {
+					{
+						setAll(all);
+						setSitePageSelectionEntries(sitePageSelectionEntries);
+						setVisibility(visibility);
+					}
+				};
+			}
+		};
+	}
+
+	private SitePageSelectionEntry _toSitePageSelectionEntry(
+		boolean excluded, boolean includeDescendants, Layout layout) {
+
+		return new SitePageSelectionEntry() {
+			{
+				setExcluded(excluded);
+				setIncludeDescendants(includeDescendants);
+				setSitePageExternalReferenceCode(
+					layout.getExternalReferenceCode());
+			}
+		};
+	}
 
 	private static final String _STATUS_MESSAGE =
 		"java.lang.NullPointerException\n\tat com.liferay.exportimport." +

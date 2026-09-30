@@ -49,10 +49,37 @@ import java.util.TimeZone;
  */
 public class PreviewPortletDataHandlerUtil {
 
-	public static final String PRIVATE_PAGES_CONTROL_NAME =
-		"privateLayoutPages";
+	public static final String CHOICE_NAME_PRIVATE_PAGES = "private-pages";
 
-	public static final String PUBLIC_PAGES_CONTROL_NAME = "publicLayoutPages";
+	public static final String CHOICE_NAME_PUBLIC_PAGES = "public-pages";
+
+	public static final String CONTROL_NAME_PAGES =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "pages");
+
+	public static final String CONTROL_NAME_TREE_SELECTION_ALL =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "all");
+
+	public static final String CONTROL_NAME_TREE_SELECTION_EXCLUDED_ITEMS =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "excluded-items");
+
+	public static final String CONTROL_NAME_TREE_SELECTION_EXCLUDED_SUBTREES =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "excluded-subtrees");
+
+	public static final String CONTROL_NAME_TREE_SELECTION_ITEMS =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "items");
+
+	public static final String CONTROL_NAME_TREE_SELECTION_SUBTREES =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "subtrees");
+
+	public static final String CONTROL_NAME_VISIBILITY =
+		PortletDataHandlerControl.getNamespacedName(
+			PreviewPortletDataHandlerUtil._NAMESPACE, "visibility");
 
 	public static void addConfigurationPreviewPortletDataHandler(
 		Locale locale, Portlet portlet,
@@ -156,14 +183,18 @@ public class PreviewPortletDataHandlerUtil {
 							PortletDataHandlerKeys.PORTLET_DATA + "_" +
 								portlet.getPortletId());
 					setPreviewPortletDataHandlerControls(
-						() -> new PreviewPortletDataHandlerControl[] {
-							_toPreviewPortletDataHandlerChoice(
-								locale, portlet,
-								finalPrivateLayoutAdditionCount,
-								privateLayoutDeletionCount,
-								privateManifestSummary != null,
-								publicLayoutAdditionCount,
-								publicLayoutDeletionCount)
+						() -> {
+							if (privateManifestSummary == null) {
+								return new PreviewPortletDataHandlerControl[0];
+							}
+
+							return new PreviewPortletDataHandlerControl[] {
+								_toPreviewPortletDataHandlerChoice(
+									locale, finalPrivateLayoutAdditionCount,
+									privateLayoutDeletionCount,
+									publicLayoutAdditionCount,
+									publicLayoutDeletionCount)
+							};
 						});
 					setTag(() -> portletDataHandler.getTag(locale));
 				}
@@ -456,52 +487,42 @@ public class PreviewPortletDataHandlerUtil {
 
 	private static PreviewPortletDataHandlerChoice
 		_toPreviewPortletDataHandlerChoice(
-			Locale locale, Portlet portlet, long privateLayoutAdditionCount,
-			long privateLayoutDeletionCount, boolean privateLayoutsEnabled,
-			long publicLayoutAdditionCount, long publicLayoutDeletionCount) {
+			Locale locale, long privateLayoutAdditionCount,
+			long privateLayoutDeletionCount, long publicLayoutAdditionCount,
+			long publicLayoutDeletionCount) {
 
 		return new PreviewPortletDataHandlerChoice() {
 			{
 				setChoices(
-					() -> {
-						List<Choice> choices = new ArrayList<>();
-
-						choices.add(
-							new Choice() {
-								{
-									setAdditionCount(
-										() -> publicLayoutAdditionCount);
-									setDeletionCount(
-										() -> publicLayoutDeletionCount);
-									setLabel(
-										() -> LanguageUtil.get(
-											locale, "public-pages"));
-									setName(() -> PUBLIC_PAGES_CONTROL_NAME);
-								}
-							});
-
-						if (privateLayoutsEnabled) {
-							choices.add(
-								new Choice() {
-									{
-										setAdditionCount(
-											() -> privateLayoutAdditionCount);
-										setDeletionCount(
-											() -> privateLayoutDeletionCount);
-										setLabel(
-											() -> LanguageUtil.get(
-												locale, "private-pages"));
-										setName(
-											() -> PRIVATE_PAGES_CONTROL_NAME);
-									}
-								});
+					() -> new Choice[] {
+						new Choice() {
+							{
+								setAdditionCount(
+									() -> publicLayoutAdditionCount);
+								setDeletionCount(
+									() -> publicLayoutDeletionCount);
+								setLabel(
+									() -> LanguageUtil.get(
+										locale, "public-pages"));
+								setName(() -> CHOICE_NAME_PUBLIC_PAGES);
+							}
+						},
+						new Choice() {
+							{
+								setAdditionCount(
+									() -> privateLayoutAdditionCount);
+								setDeletionCount(
+									() -> privateLayoutDeletionCount);
+								setLabel(
+									() -> LanguageUtil.get(
+										locale, "private-pages"));
+								setName(() -> CHOICE_NAME_PRIVATE_PAGES);
+							}
 						}
-
-						return choices.toArray(new Choice[0]);
 					});
-				setDefaultChoice(() -> PUBLIC_PAGES_CONTROL_NAME);
-				setLabel(() -> PortalUtil.getPortletTitle(portlet, locale));
-				setName(() -> "layoutSet");
+				setDefaultChoice(() -> CHOICE_NAME_PUBLIC_PAGES);
+				setLabel(() -> LanguageUtil.get(locale, "visibility"));
+				setName(() -> CONTROL_NAME_VISIBILITY);
 				setType(() -> PreviewPortletDataHandlerControl.Type.CHOICE);
 			}
 		};
@@ -658,5 +679,7 @@ public class PreviewPortletDataHandlerUtil {
 				},
 			PreviewPortletDataHandlerControl.class);
 	}
+
+	private static final String _NAMESPACE = "layout_set";
 
 }

@@ -199,6 +199,59 @@ public abstract class PreviewPortletDataHandlerControl implements Serializable {
 	private Supplier<String> _nameSupplier;
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
+	public PreviewPortletDataHandlerControl[]
+		getPreviewPortletDataHandlerControls() {
+
+		if (_previewPortletDataHandlerControlsSupplier != null) {
+			previewPortletDataHandlerControls =
+				_previewPortletDataHandlerControlsSupplier.get();
+
+			_previewPortletDataHandlerControlsSupplier = null;
+		}
+
+		return previewPortletDataHandlerControls;
+	}
+
+	public void setPreviewPortletDataHandlerControls(
+		PreviewPortletDataHandlerControl[] previewPortletDataHandlerControls) {
+
+		this.previewPortletDataHandlerControls =
+			previewPortletDataHandlerControls;
+
+		_previewPortletDataHandlerControlsSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setPreviewPortletDataHandlerControls(
+		UnsafeSupplier<PreviewPortletDataHandlerControl[], Exception>
+			previewPortletDataHandlerControlsUnsafeSupplier) {
+
+		_previewPortletDataHandlerControlsSupplier = () -> {
+			try {
+				return previewPortletDataHandlerControlsUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected PreviewPortletDataHandlerControl[]
+		previewPortletDataHandlerControls;
+
+	@JsonIgnore
+	private Supplier<PreviewPortletDataHandlerControl[]>
+		_previewPortletDataHandlerControlsSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema(
+		description = "How the control is filled in the request. A `Boolean` is sent without values to include its data. A `Choice` is sent with the name of the chosen choice as its only value. A `Setting` is sent with its values."
+	)
 	@JsonGetter("type")
 	@Valid
 	public Type getType() {
@@ -243,7 +296,9 @@ public abstract class PreviewPortletDataHandlerControl implements Serializable {
 		};
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "How the control is filled in the request. A `Boolean` is sent without values to include its data. A `Choice` is sent with the name of the chosen choice as its only value. A `Setting` is sent with its values."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@NotNull
 	protected Type type;
@@ -322,6 +377,29 @@ public abstract class PreviewPortletDataHandlerControl implements Serializable {
 			sb.append(_escape(name));
 
 			sb.append("\"");
+		}
+
+		PreviewPortletDataHandlerControl[] previewPortletDataHandlerControls =
+			getPreviewPortletDataHandlerControls();
+
+		if (previewPortletDataHandlerControls != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"previewPortletDataHandlerControls\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < previewPortletDataHandlerControls.length; i++) {
+				sb.append(String.valueOf(previewPortletDataHandlerControls[i]));
+
+				if ((i + 1) < previewPortletDataHandlerControls.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		Type type = getType();
@@ -498,4 +576,4 @@ public abstract class PreviewPortletDataHandlerControl implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-461003025
+// LIFERAY-REST-BUILDER-HASH:-1544642087
