@@ -7,6 +7,7 @@ package com.liferay.exportimport.rest.internal.resource.v1_0;
 
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.lar.ExportImportGroup;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
@@ -15,6 +16,7 @@ import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalSer
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.rest.dto.v1_0.ImportPreview;
+import com.liferay.exportimport.rest.dto.v1_0.PreviewAssetLibrary;
 import com.liferay.exportimport.rest.dto.v1_0.PreviewPortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.PreviewSite;
 import com.liferay.exportimport.rest.internal.util.GroupUtil;
@@ -144,6 +146,18 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 			binaryFile.getInputStream(), binaryFile.getContentType());
 	}
 
+	private boolean _existsInInstance(ExportImportGroup exportImportGroup) {
+		Group group = groupLocalService.fetchGroupByExternalReferenceCode(
+			exportImportGroup.getExternalReferenceCode(),
+			contextCompany.getCompanyId());
+
+		if (group != null) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private ImportPreview _getImportPreview(
 			Group group, MultipartBody multipartBody, long plid,
 			String portletId)
@@ -223,6 +237,8 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 				setExportDate(manifestSummary::getExportDate);
 				setFileName(fileEntry::getFileName);
 				setFileSize(fileEntry::getSize);
+				setPreviewAssetLibraries(
+					() -> _getPreviewAssetLibraries(fileEntry));
 				setPreviewPortletDataHandlerSections(
 					() ->
 						PreviewPortletDataHandlerUtil.
@@ -231,6 +247,31 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 				setPreviewSites(() -> _getPreviewSites(fileEntry));
 			}
 		};
+	}
+
+	private PreviewAssetLibrary[] _getPreviewAssetLibraries(FileEntry fileEntry)
+		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-41307")) {
+
+			return new PreviewAssetLibrary[0];
+		}
+
+		return transformToArray(
+			ListUtil.filter(
+				_exportImportHelper.getExportImportGroups(fileEntry),
+				ExportImportGroup::isDepot),
+			exportImportGroup -> new PreviewAssetLibrary() {
+				{
+					setDescriptiveName(exportImportGroup::getDescriptiveName);
+					setExistsInInstance(
+						() -> _existsInInstance(exportImportGroup));
+					setExternalReferenceCode(
+						exportImportGroup::getExternalReferenceCode);
+				}
+			},
+			PreviewAssetLibrary.class);
 	}
 
 	private PreviewSite[] _getPreviewSites(FileEntry fileEntry)
@@ -243,22 +284,15 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 		}
 
 		return transformToArray(
-			_exportImportHelper.getExportImportGroups(fileEntry),
+			ListUtil.filter(
+				_exportImportHelper.getExportImportGroups(fileEntry),
+				exportImportGroup -> !exportImportGroup.isDepot()),
 			exportImportGroup -> new PreviewSite() {
 				{
 					setChildSitesCount(exportImportGroup::getChildGroupsCount);
 					setDescriptiveName(exportImportGroup::getDescriptiveName);
 					setExistsInInstance(
-						() -> {
-							Group group =
-								groupLocalService.
-									fetchGroupByExternalReferenceCode(
-										exportImportGroup.
-											getExternalReferenceCode(),
-										contextCompany.getCompanyId());
-
-							return group != null;
-						});
+						() -> _existsInInstance(exportImportGroup));
 					setExternalReferenceCode(
 						exportImportGroup::getExternalReferenceCode);
 					setPath(exportImportGroup::getPath);

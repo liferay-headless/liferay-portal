@@ -15,6 +15,7 @@ import {DataStrategy, UserIdStrategy} from '../../types/exportImportProcess';
 import {Scope} from '../../types/scope';
 import {toProcessRequestFlags} from '../../utils/contentSelection';
 import {toRequestPortletDataHandlers} from '../../utils/toRequestPortletDataHandlers';
+import AssetLibrarySelection from './steps/AssetLibrarySelection';
 import DataSelectionStep from './steps/DataSelectionStep';
 import FileSelectionStep from './steps/FileSelectionStep';
 import SettingsStep, {SETTINGS_STEP_INITIAL_VALUES} from './steps/SettingsStep';
@@ -69,18 +70,30 @@ export function NewImport({
 					'select-the-data-from-your-file-that-you-would-like-to-import'
 				)}
 				initialValues={{
+					assetLibraryExternalReferenceCodes: [],
 					contentSelection: undefined,
 					deletions: false,
 					permissions: false,
 					siteExternalReferenceCodes: [],
 				}}
 				isStepValid={(values) =>
+					!!values.assetLibraryExternalReferenceCodes?.length ||
 					!!values.contentSelection ||
 					!!values.siteExternalReferenceCodes?.length
 				}
 				title={Liferay.Language.get('data-selection')}
 			>
 				<DataSelectionStep
+					assetLibrariesSelection={
+						siteSelectionEnabled &&
+						!!importPreview?.previewAssetLibraries?.length && (
+							<AssetLibrarySelection
+								previewAssetLibraries={
+									importPreview.previewAssetLibraries
+								}
+							/>
+						)
+					}
 					commentsAndRatingsEnabled={commentsAndRatingsEnabled}
 					importPreview={importPreview}
 					lookAndFeelEnabled={lookAndFeelEnabled}
@@ -128,6 +141,8 @@ export function NewImport({
 					const result = await postImportProcess({
 						importProcessRequest: {
 							...toProcessRequestFlags(contentSelection),
+							assetLibraryExternalReferenceCodes:
+								values.assetLibraryExternalReferenceCodes,
 							dataStrategy: values.dataStrategy as DataStrategy,
 							deletions: !!values.deletions,
 							name: values.name,

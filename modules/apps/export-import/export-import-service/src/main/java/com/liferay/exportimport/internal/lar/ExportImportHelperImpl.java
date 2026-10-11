@@ -5,6 +5,9 @@
 
 package com.liferay.exportimport.internal.lar;
 
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.exportimport.constants.ExportImportBackgroundTaskContextMapConstants;
 import com.liferay.exportimport.internal.data.handler.BatchEnginePortletDataHandler;
@@ -47,6 +50,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -300,6 +304,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			return _getPortlets(
 				companyId, new DataLevel[] {DataLevel.PORTAL},
 				excludeDataAlwaysStaged, groupId);
+		}
+
+		if (FeatureFlagManagerUtil.isEnabled(companyId, "LPD-41307") &&
+			_isSpaceDepotEntry(groupId)) {
+
+			return ListUtil.filter(
+				_getPortlets(
+					companyId, new DataLevel[] {DataLevel.SITE},
+					excludeDataAlwaysStaged, groupId),
+				portlet -> {
+					PortletDataHandler portletDataHandler =
+						portlet.getPortletDataHandlerInstance();
+
+					return portletDataHandler.isBatch();
+				});
 		}
 
 		return _getPortlets(
@@ -749,7 +768,16 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				LinkedHashMapBuilder.<String, Object>put(
 					"active", Boolean.TRUE
 				).put(
-					"site", Boolean.TRUE
+					"site",
+					() -> {
+						if (FeatureFlagManagerUtil.isEnabled(
+								companyId, "LPD-41307")) {
+
+							return null;
+						}
+
+						return Boolean.TRUE;
+					}
 				).build(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS, orderByComparator),
 			this::isGroupSupported);
@@ -869,8 +897,13 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		if (ArrayUtil.contains(
 				_getSupportedExportImportGroupClassNameIds(),
 				group.getClassNameId()) &&
-			group.isActive() && !group.isCMS() && !group.isDepot() &&
-			group.isSite() && !group.isStaged() && !group.isStagingGroup() &&
+			group.isActive() && !group.isCMS() &&
+			(group.isSite() ||
+			 (group.isDepot() &&
+			  FeatureFlagManagerUtil.isEnabled(
+				  group.getCompanyId(), "LPD-41307") &&
+			  _isSpaceDepotEntry(group.getGroupId()))) &&
+			!group.isStaged() && !group.isStagingGroup() &&
 			!stagingGroupHelper.isCompanyGroup(group)) {
 
 			return true;
@@ -1603,6 +1636,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	private long[] _getSupportedExportImportGroupClassNameIds() {
 		return new long[] {
 			_portal.getClassNameId(Company.class.getName()),
+			_portal.getClassNameId(DepotEntry.class.getName()),
 			_portal.getClassNameId(Group.class.getName())
 		};
 	}
@@ -1649,6 +1683,19 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			parameterMap,
 			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
 				PortletIdCodec.decodePortletName(sourcePortletId));
+	}
+
+	private boolean _isSpaceDepotEntry(long groupId) {
+		DepotEntry depotEntry = _depotEntryLocalService.fetchGroupDepotEntry(
+			groupId);
+
+		if ((depotEntry != null) &&
+			(depotEntry.getType() == DepotConstants.TYPE_SPACE)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isStagedPortlet(PortletDataContext portletDataContext) {
@@ -1728,6 +1775,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		return new ExportImportGroup(
 			GetterUtil.getInteger(element.attributeValue("child-groups-count")),
+			GetterUtil.getBoolean(element.attributeValue("depot")),
 			element.attributeValue("descriptive-name"), externalReferenceCode,
 			GetterUtil.getLong(element.attributeValue("group-id")),
 			element.attributeValue("parent-group-external-reference-code"),
@@ -1775,6 +1823,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;

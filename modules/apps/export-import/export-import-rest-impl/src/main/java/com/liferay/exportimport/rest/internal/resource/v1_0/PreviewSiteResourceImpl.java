@@ -66,9 +66,11 @@ public class PreviewSiteResourceImpl extends BasePreviewSiteResourceImpl {
 			contextCompany.getCompanyId(), companyGroup.getGroupId(),
 			ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		List<Group> groups = _exportImportHelper.getSupportedGroups(
-			contextCompany.getCompanyId(), search,
-			_getOrderByComparator(sorts));
+		List<Group> groups = ListUtil.filter(
+			_exportImportHelper.getSupportedGroups(
+				contextCompany.getCompanyId(), search,
+				_getOrderByComparator(sorts)),
+			group -> !group.isDepot());
 
 		return Page.of(
 			transform(

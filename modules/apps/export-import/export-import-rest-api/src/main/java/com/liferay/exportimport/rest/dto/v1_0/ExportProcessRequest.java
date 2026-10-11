@@ -62,6 +62,52 @@ public class ExportProcessRequest implements Serializable {
 	}
 
 	@io.swagger.v3.oas.annotations.media.Schema
+	public String[] getAssetLibraryExternalReferenceCodes() {
+		if (_assetLibraryExternalReferenceCodesSupplier != null) {
+			assetLibraryExternalReferenceCodes =
+				_assetLibraryExternalReferenceCodesSupplier.get();
+
+			_assetLibraryExternalReferenceCodesSupplier = null;
+		}
+
+		return assetLibraryExternalReferenceCodes;
+	}
+
+	public void setAssetLibraryExternalReferenceCodes(
+		String[] assetLibraryExternalReferenceCodes) {
+
+		this.assetLibraryExternalReferenceCodes =
+			assetLibraryExternalReferenceCodes;
+
+		_assetLibraryExternalReferenceCodesSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setAssetLibraryExternalReferenceCodes(
+		UnsafeSupplier<String[], Exception>
+			assetLibraryExternalReferenceCodesUnsafeSupplier) {
+
+		_assetLibraryExternalReferenceCodesSupplier = () -> {
+			try {
+				return assetLibraryExternalReferenceCodesUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] assetLibraryExternalReferenceCodes;
+
+	@JsonIgnore
+	private Supplier<String[]> _assetLibraryExternalReferenceCodesSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
 	public Boolean getComments() {
 		if (_commentsSupplier != null) {
 			comments = _commentsSupplier.get();
@@ -690,6 +736,35 @@ public class ExportProcessRequest implements Serializable {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		String[] assetLibraryExternalReferenceCodes =
+			getAssetLibraryExternalReferenceCodes();
+
+		if (assetLibraryExternalReferenceCodes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"assetLibraryExternalReferenceCodes\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < assetLibraryExternalReferenceCodes.length;
+				 i++) {
+
+				sb.append("\"");
+
+				sb.append(_escape(assetLibraryExternalReferenceCodes[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) < assetLibraryExternalReferenceCodes.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		Boolean comments = getComments();
 
 		if (comments != null) {
@@ -1057,4 +1132,4 @@ public class ExportProcessRequest implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1295466518
+// LIFERAY-REST-BUILDER-HASH:1757778680

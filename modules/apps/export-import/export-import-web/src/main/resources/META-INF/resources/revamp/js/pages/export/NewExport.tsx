@@ -27,9 +27,11 @@ import {
 } from '../../utils/contentSelection';
 import {getProcessFormErrors} from '../../utils/getProcessFormErrors';
 import {toRequestPortletDataHandlers} from '../../utils/toRequestPortletDataHandlers';
+import AssetLibrarySelection from './components/AssetLibrarySelection';
 import SiteSelection from './components/SiteSelection';
 
 type ExportFormValues = {
+	assetLibraryExternalReferenceCodes: string[];
 	contentSelection: ContentSelection | null | undefined;
 	dateFilter: DateFilterValues;
 	deletions: boolean;
@@ -43,6 +45,7 @@ export function NewExport({
 	commentsAndRatingsEnabled = false,
 	exportPreview,
 	exportPreviewAPIURL,
+	exportPreviewAssetLibrariesAPIURL,
 	exportPreviewSitesAPIURL,
 	exportProcessAPIURL,
 	lookAndFeelEnabled = false,
@@ -54,6 +57,7 @@ export function NewExport({
 	commentsAndRatingsEnabled?: boolean;
 	exportPreview?: Preview;
 	exportPreviewAPIURL: string;
+	exportPreviewAssetLibrariesAPIURL?: string;
 	exportPreviewSitesAPIURL?: string;
 	exportProcessAPIURL: string;
 	lookAndFeelEnabled?: boolean;
@@ -72,6 +76,7 @@ export function NewExport({
 		preview?.previewPortletDataHandlerSections ?? [];
 
 	const initialFormValues: ExportFormValues = {
+		assetLibraryExternalReferenceCodes: [],
 		contentSelection: undefined,
 		dateFilter: {range: Range.All},
 		deletions: false,
@@ -88,6 +93,8 @@ export function NewExport({
 					exportProcessRequest: {
 						...appliedDateFilterRef.current,
 						...toProcessRequestFlags(values.contentSelection),
+						assetLibraryExternalReferenceCodes:
+							values.assetLibraryExternalReferenceCodes,
 						deletions: values.deletions,
 						name: values.name,
 						permissions: values.permissions,
@@ -141,6 +148,16 @@ export function NewExport({
 						/>
 
 						<DataSelection
+							assetLibrariesSelection={
+								siteSelectionEnabled &&
+								exportPreviewAssetLibrariesAPIURL && (
+									<AssetLibrarySelection
+										exportPreviewAssetLibrariesAPIURL={
+											exportPreviewAssetLibrariesAPIURL
+										}
+									/>
+								)
+							}
 							commentsAndRatingsEnabled={
 								commentsAndRatingsEnabled
 							}
@@ -192,7 +209,8 @@ export function NewExport({
 							timeZoneId={timeZoneId}
 						/>
 
-						{(formik.touched.contentSelection ||
+						{(formik.touched.assetLibraryExternalReferenceCodes ||
+							formik.touched.contentSelection ||
 							formik.touched.siteExternalReferenceCodes) &&
 							selectionError && (
 								<ClayAlert
