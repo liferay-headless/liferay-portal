@@ -64,7 +64,7 @@ public class LayoutPermissionImpl implements LayoutPermission {
 				permissionChecker, layout, checkViewableGroup, actionId)) {
 
 			throw new PrincipalException.MustHavePermission(
-				permissionChecker, Layout.class.getName(), layout.getLayoutId(),
+				permissionChecker, Layout.class.getName(), layout.getPlid(),
 				actionId);
 		}
 	}
@@ -76,7 +76,7 @@ public class LayoutPermissionImpl implements LayoutPermission {
 
 		if (!contains(permissionChecker, layout, actionId)) {
 			throw new PrincipalException.MustHavePermission(
-				permissionChecker, Layout.class.getName(), layout.getLayoutId(),
+				permissionChecker, Layout.class.getName(), layout.getPlid(),
 				actionId);
 		}
 	}
