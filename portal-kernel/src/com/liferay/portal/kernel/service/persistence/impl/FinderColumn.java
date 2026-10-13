@@ -33,11 +33,13 @@ public class FinderColumn<T extends BaseModel<T>> {
 		int dotIndex = columnName.indexOf('.');
 
 		if (dotIndex == -1) {
-			_keyFragment = columnName + comparator;
+			_columnName = columnName;
 		}
 		else {
-			_keyFragment = columnName.substring(dotIndex + 1) + comparator;
+			_columnName = columnName.substring(dotIndex + 1);
 		}
+
+		_keyFragment = _columnName + comparator;
 
 		if ((type == Type.STRING) && !caseSensitive) {
 			hqlBind = StringBundler.concat(
@@ -131,6 +133,10 @@ public class FinderColumn<T extends BaseModel<T>> {
 
 	public Object extractValue(T entity) {
 		return valueExtractor.apply(entity);
+	}
+
+	public String getColumnName() {
+		return _columnName;
 	}
 
 	public String getKeyFragment() {
@@ -305,6 +311,7 @@ public class FinderColumn<T extends BaseModel<T>> {
 	protected final Type type;
 	protected final Function<T, Object> valueExtractor;
 
+	private final String _columnName;
 	private final String _comparator;
 	private final String _keyFragment;
 

@@ -131,8 +131,7 @@ public class UniquePersistenceFinder
 			return entity;
 		}
 
-		throw basePersistenceImpl.newNoSuchModelException(
-			buildNoSuchKeyMessage(values));
+		throw newNoSuchModelException(values);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

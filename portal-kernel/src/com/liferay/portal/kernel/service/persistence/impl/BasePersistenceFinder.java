@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Shuyang Zhou
@@ -135,6 +136,27 @@ public abstract class BasePersistenceFinder
 		}
 
 		return true;
+	}
+
+	protected E newNoSuchModelException(Object[] values) {
+		E noSuchModelException = basePersistenceImpl.newNoSuchModelException(
+			buildNoSuchKeyMessage(values));
+
+		for (int i = 0; i < finderColumns.length; i++) {
+			FinderColumn<T> finderColumn = finderColumns[i];
+
+			if (!Objects.equals(
+					finderColumn.getColumnName(), "externalReferenceCode") ||
+				(values[i] == null)) {
+
+				continue;
+			}
+
+			noSuchModelException.setExternalReferenceCode(
+				String.valueOf(values[i]));
+		}
+
+		return noSuchModelException;
 	}
 
 	protected void normalizeValues(Object[] values) {

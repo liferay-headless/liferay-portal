@@ -226,8 +226,7 @@ public class CollectionPersistenceFinder
 			return entity;
 		}
 
-		throw basePersistenceImpl.newNoSuchModelException(
-			buildNoSuchKeyMessage(values));
+		throw newNoSuchModelException(values);
 	}
 
 	public void remove(FinderCache finderCache, Object[] values) {
