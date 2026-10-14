@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -52,17 +52,19 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Feliphe Marinho
  * @generated
  */
+@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-62272")
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseAuthorizationTokenResourceImpl
@@ -74,6 +76,9 @@ public abstract class BaseAuthorizationTokenResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/ai-hub-cell/v1.0/authorization-tokens'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
 			@io.swagger.v3.oas.annotations.tags.Tag(name = "AuthorizationToken")
@@ -148,7 +153,8 @@ public abstract class BaseAuthorizationTokenResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			authorizationTokenUnsafeFunction =
-				authorizationToken -> postAuthorizationToken();
+				authorizationToken ->
+					contextBatchResource.postAuthorizationToken();
 		}
 
 		if (authorizationTokenUnsafeFunction == null) {
@@ -180,14 +186,6 @@ public abstract class BaseAuthorizationTokenResourceImpl
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -268,6 +266,17 @@ public abstract class BaseAuthorizationTokenResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(AuthorizationTokenResource)ProxyUtil.newProxyInstance(
+				AuthorizationTokenResource.class.getClassLoader(),
+				new Class<?>[] {AuthorizationTokenResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -791,6 +800,7 @@ public abstract class BaseAuthorizationTokenResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected AuthorizationTokenResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<AuthorizationToken>,
 		 UnsafeFunction<AuthorizationToken, AuthorizationToken, Exception>,
@@ -822,4 +832,4 @@ public abstract class BaseAuthorizationTokenResourceImpl
 		LogFactoryUtil.getLog(BaseAuthorizationTokenResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:246510993
+// LIFERAY-REST-BUILDER-HASH:-389376491

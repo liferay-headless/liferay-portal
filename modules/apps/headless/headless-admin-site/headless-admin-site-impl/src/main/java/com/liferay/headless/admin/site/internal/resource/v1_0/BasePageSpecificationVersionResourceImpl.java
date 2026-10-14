@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -50,12 +50,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -72,6 +73,7 @@ public abstract class BasePageSpecificationVersionResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-10622")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a specific page specification version of a site page."
 	)
@@ -128,6 +130,7 @@ public abstract class BasePageSpecificationVersionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-10622")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves a specific page specification version of a site page."
 	)
@@ -198,6 +201,7 @@ public abstract class BasePageSpecificationVersionResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-10622")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves all the page specification versions of a site page."
 	)
@@ -258,6 +262,7 @@ public abstract class BasePageSpecificationVersionResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}/restore'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-10622")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Restores a page specification version as the current draft of a site page."
 	)
@@ -330,14 +335,6 @@ public abstract class BasePageSpecificationVersionResourceImpl
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray();
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -418,6 +415,17 @@ public abstract class BasePageSpecificationVersionResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(PageSpecificationVersionResource)ProxyUtil.newProxyInstance(
+				PageSpecificationVersionResource.class.getClassLoader(),
+				new Class<?>[] {PageSpecificationVersionResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -943,6 +951,7 @@ public abstract class BasePageSpecificationVersionResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected PageSpecificationVersionResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<PageSpecificationVersion>,
 		 UnsafeFunction
@@ -975,4 +984,4 @@ public abstract class BasePageSpecificationVersionResourceImpl
 		LogFactoryUtil.getLog(BasePageSpecificationVersionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:863640331
+// LIFERAY-REST-BUILDER-HASH:1915460594

@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -52,12 +52,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Manuele Castro
@@ -74,6 +75,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadata/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -108,6 +110,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadata/by-external-reference-code/{externalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -145,6 +148,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadatas'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
 			@io.swagger.v3.oas.annotations.tags.Tag(
@@ -167,6 +171,10 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadatas' -d $'{"dateCreated": ___, "dateModified": ___, "externalReferenceCode": ___, "localWellKnownEnabled": ___, "localWellKnownURI": ___, "metadataJSON": ___, "protectedResourceURI": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
 			@io.swagger.v3.oas.annotations.tags.Tag(
@@ -191,6 +199,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadatas/batch'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -240,6 +249,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadatas/export-batch'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -305,6 +315,10 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/oauth-client/v1.0/oauth-client-pr-local-metadata/by-external-reference-code/{externalReferenceCode}' -d $'{"dateCreated": ___, "dateModified": ___, "externalReferenceCode": ___, "localWellKnownEnabled": ___, "localWellKnownURI": ___, "metadataJSON": ___, "protectedResourceURI": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-63415")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -355,8 +369,9 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			oAuthClientPRLocalMetadataUnsafeFunction =
-				oAuthClientPRLocalMetadata -> postOAuthClientPRLocalMetadata(
-					oAuthClientPRLocalMetadata);
+				oAuthClientPRLocalMetadata ->
+					contextBatchResource.postOAuthClientPRLocalMetadata(
+						oAuthClientPRLocalMetadata);
 		}
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
@@ -370,10 +385,11 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 							persistedOAuthClientPRLocalMetadata = null;
 
 						persistedOAuthClientPRLocalMetadata =
-							putOAuthClientPRLocalMetadataByExternalReferenceCode(
-								oAuthClientPRLocalMetadata.
-									getExternalReferenceCode(),
-								oAuthClientPRLocalMetadata);
+							contextBatchResource.
+								putOAuthClientPRLocalMetadataByExternalReferenceCode(
+									oAuthClientPRLocalMetadata.
+										getExternalReferenceCode(),
+									oAuthClientPRLocalMetadata);
 
 						return persistedOAuthClientPRLocalMetadata;
 					};
@@ -419,9 +435,10 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 						if (oAuthClientPRLocalMetadata.
 								getExternalReferenceCode() != null) {
 
-							deleteOAuthClientPRLocalMetadataByExternalReferenceCode(
-								oAuthClientPRLocalMetadata.
-									getExternalReferenceCode());
+							contextBatchResource.
+								deleteOAuthClientPRLocalMetadataByExternalReferenceCode(
+									oAuthClientPRLocalMetadata.
+										getExternalReferenceCode());
 
 							return oAuthClientPRLocalMetadata;
 						}
@@ -450,14 +467,6 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 		}
 	}
 
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
-	}
-
 	@Override
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
 		throws Exception {
@@ -482,7 +491,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return getOAuthClientPRLocalMetadatasPage();
+		return contextBatchResource.getOAuthClientPRLocalMetadatasPage();
 	}
 
 	@Override
@@ -535,6 +544,17 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(OAuthClientPRLocalMetadataResource)ProxyUtil.newProxyInstance(
+				OAuthClientPRLocalMetadataResource.class.getClassLoader(),
+				new Class<?>[] {OAuthClientPRLocalMetadataResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1060,6 +1080,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected OAuthClientPRLocalMetadataResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<OAuthClientPRLocalMetadata>,
 		 UnsafeFunction
@@ -1093,4 +1114,4 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 		LogFactoryUtil.getLog(BaseOAuthClientPRLocalMetadataResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:517956176
+// LIFERAY-REST-BUILDER-HASH:-769151740

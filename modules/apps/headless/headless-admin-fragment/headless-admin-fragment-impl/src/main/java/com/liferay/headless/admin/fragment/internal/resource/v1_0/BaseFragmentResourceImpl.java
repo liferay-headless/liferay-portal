@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -52,12 +52,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -74,6 +75,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments/{fragmentExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a specific fragment of a site."
 	)
@@ -115,6 +117,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments/{fragmentExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves a specific fragment of a site."
 	)
@@ -166,6 +169,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragment-sets/{fragmentSetExternalReferenceCode}/fragments'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves the fragments of a fragment set."
 	)
@@ -226,6 +230,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves the fragments of a site."
 	)
@@ -282,6 +287,10 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments' -d $'{"cacheable": ___, "dateCreated": ___, "dateModified": ___, "externalReferenceCode": ___, "fragmentSet": ___, "fragmentSetExternalReferenceCode": ___, "fragmentVersions": ___, "icon": ___, "key": ___, "marketplace": ___, "name": ___, "readOnly": ___, "thumbnailURLReference": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new fragment to a site."
 	)
@@ -317,6 +326,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments/batch'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -369,6 +379,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragment-sets/{fragmentSetExternalReferenceCode}/fragments' -d $'{"cacheable": ___, "dateCreated": ___, "dateModified": ___, "externalReferenceCode": ___, "fragmentSet": ___, "fragmentSetExternalReferenceCode": ___, "fragmentVersions": ___, "icon": ___, "key": ___, "marketplace": ___, "name": ___, "readOnly": ___, "thumbnailURLReference": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new fragment to a fragment set."
 	)
@@ -414,6 +425,7 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments/export-batch'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -490,6 +502,10 @@ public abstract class BaseFragmentResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-fragment/v1.0/sites/{siteExternalReferenceCode}/fragments/{fragmentExternalReferenceCode}' -d $'{"cacheable": ___, "dateCreated": ___, "dateModified": ___, "externalReferenceCode": ___, "fragmentSet": ___, "fragmentSetExternalReferenceCode": ___, "fragmentVersions": ___, "icon": ___, "key": ___, "marketplace": ___, "name": ___, "readOnly": ___, "thumbnailURLReference": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-39244")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates the fragment with the given external reference code, or creates it if it does not exist."
 	)
@@ -553,9 +569,10 @@ public abstract class BaseFragmentResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("siteExternalReferenceCode")) {
-				fragmentUnsafeFunction = fragment -> postSiteFragment(
-					(String)parameters.get("siteExternalReferenceCode"),
-					fragment);
+				fragmentUnsafeFunction =
+					fragment -> contextBatchResource.postSiteFragment(
+						(String)parameters.get("siteExternalReferenceCode"),
+						fragment);
 			}
 			else {
 				throw new NotSupportedException(
@@ -572,9 +589,11 @@ public abstract class BaseFragmentResourceImpl
 					Fragment persistedFragment = null;
 
 					if (parameters.containsKey("siteExternalReferenceCode")) {
-						persistedFragment = putSiteFragment(
-							(String)parameters.get("siteExternalReferenceCode"),
-							fragment.getExternalReferenceCode(), fragment);
+						persistedFragment =
+							contextBatchResource.putSiteFragment(
+								(String)parameters.get(
+									"siteExternalReferenceCode"),
+								fragment.getExternalReferenceCode(), fragment);
 					}
 					else {
 						throw new NotSupportedException(
@@ -616,7 +635,7 @@ public abstract class BaseFragmentResourceImpl
 		UnsafeFunction<Fragment, Fragment, Exception> fragmentUnsafeFunction =
 			fragment -> {
 				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSiteFragment(
+					contextBatchResource.deleteSiteFragment(
 						(String)parameters.get("siteExternalReferenceCode"),
 						fragment.getExternalReferenceCode());
 
@@ -640,14 +659,6 @@ public abstract class BaseFragmentResourceImpl
 				fragmentUnsafeFunction.apply(fragment);
 			}
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -675,7 +686,7 @@ public abstract class BaseFragmentResourceImpl
 		throws Exception {
 
 		if (parameters.containsKey("siteExternalReferenceCode")) {
-			return getSiteFragmentsPage(
+			return contextBatchResource.getSiteFragmentsPage(
 				(String)parameters.get("siteExternalReferenceCode"), filter,
 				pagination);
 		}
@@ -735,6 +746,16 @@ public abstract class BaseFragmentResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource = (FragmentResource)ProxyUtil.newProxyInstance(
+			FragmentResource.class.getClassLoader(),
+			new Class<?>[] {FragmentResource.class},
+			contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1257,6 +1278,7 @@ public abstract class BaseFragmentResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected FragmentResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<Fragment>, UnsafeFunction<Fragment, Fragment, Exception>,
 		 Exception> contextBatchUnsafeBiConsumer;
@@ -1286,4 +1308,4 @@ public abstract class BaseFragmentResourceImpl
 		LogFactoryUtil.getLog(BaseFragmentResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:299727434
+// LIFERAY-REST-BUILDER-HASH:1789865535

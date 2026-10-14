@@ -74,8 +74,6 @@ public class PageTemplateSetResourceImpl
 			String pageTemplateSetExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
-
 		_layoutPageTemplateCollectionService.deleteLayoutPageTemplateCollection(
 			pageTemplateSetExternalReferenceCode,
 			_getDesignLibraryGroupId(designLibraryExternalReferenceCode));
@@ -99,8 +97,6 @@ public class PageTemplateSetResourceImpl
 			String pageTemplateSetExternalReferenceCode)
 		throws Exception {
 
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
-
 		return _toDesignLibraryPageTemplateSet(
 			designLibraryExternalReferenceCode,
 			_layoutPageTemplateCollectionService.
@@ -115,8 +111,6 @@ public class PageTemplateSetResourceImpl
 			String designLibraryExternalReferenceCode,
 			String pageTemplateSetExternalReferenceCode, String roleNames)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		long groupId = _getDesignLibraryGroupId(
 			designLibraryExternalReferenceCode);
@@ -139,8 +133,6 @@ public class PageTemplateSetResourceImpl
 			Aggregation aggregation, Filter filter, Pagination pagination,
 			Sort[] sorts)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		long groupId = _getDesignLibraryGroupId(
 			designLibraryExternalReferenceCode);
@@ -245,8 +237,6 @@ public class PageTemplateSetResourceImpl
 			String pageTemplateSetExternalReferenceCode,
 			Permission[] permissions)
 		throws Exception {
-
-		EnabledUtil.checkDesignLibrariesEnabled(contextCompany);
 
 		super.putSitePageTemplateSetPermissionsPage(
 			designLibraryExternalReferenceCode,

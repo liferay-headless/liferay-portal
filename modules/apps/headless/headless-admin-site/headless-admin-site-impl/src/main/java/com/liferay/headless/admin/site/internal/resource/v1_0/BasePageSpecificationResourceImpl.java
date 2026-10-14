@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -51,12 +51,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -73,6 +74,7 @@ public abstract class BasePageSpecificationResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a page specification of a site page."
 	)
@@ -356,6 +358,7 @@ public abstract class BasePageSpecificationResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/site-pages/{sitePageExternalReferenceCode}/page-specification-versions/{pageSpecificationVersionExternalReferenceCode}/page-specification'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-10622")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves the page specification of a page specification version."
 	)
@@ -537,6 +540,7 @@ public abstract class BasePageSpecificationResourceImpl
 	 *
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}' -d $'{"customFields": ___, "externalReferenceCode": ___, "siteTemplatePageSpecificationExternalReferenceCode": ___, "status": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates a page specification of a site page. Updates only the fields received in the request body, leaving any other fields untouched."
 	)
@@ -689,6 +693,10 @@ public abstract class BasePageSpecificationResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}' -d $'{"customFields": ___, "externalReferenceCode": ___, "siteTemplatePageSpecificationExternalReferenceCode": ___, "status": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates a page specification of a site page."
 	)
@@ -765,10 +773,12 @@ public abstract class BasePageSpecificationResourceImpl
 					PageSpecification persistedPageSpecification = null;
 
 					if (parameters.containsKey("siteExternalReferenceCode")) {
-						persistedPageSpecification = putSitePageSpecification(
-							(String)parameters.get("siteExternalReferenceCode"),
-							pageSpecification.getExternalReferenceCode(),
-							pageSpecification);
+						persistedPageSpecification =
+							contextBatchResource.putSitePageSpecification(
+								(String)parameters.get(
+									"siteExternalReferenceCode"),
+								pageSpecification.getExternalReferenceCode(),
+								pageSpecification);
 					}
 					else {
 						throw new NotSupportedException(
@@ -810,7 +820,7 @@ public abstract class BasePageSpecificationResourceImpl
 		UnsafeFunction<PageSpecification, PageSpecification, Exception>
 			pageSpecificationUnsafeFunction = pageSpecification -> {
 				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSitePageSpecification(
+					contextBatchResource.deleteSitePageSpecification(
 						(String)parameters.get("siteExternalReferenceCode"),
 						pageSpecification.getExternalReferenceCode());
 
@@ -834,14 +844,6 @@ public abstract class BasePageSpecificationResourceImpl
 				pageSpecificationUnsafeFunction.apply(pageSpecification);
 			}
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -922,6 +924,17 @@ public abstract class BasePageSpecificationResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(PageSpecificationResource)ProxyUtil.newProxyInstance(
+				PageSpecificationResource.class.getClassLoader(),
+				new Class<?>[] {PageSpecificationResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1450,6 +1463,7 @@ public abstract class BasePageSpecificationResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected PageSpecificationResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<PageSpecification>,
 		 UnsafeFunction<PageSpecification, PageSpecification, Exception>,
@@ -1481,4 +1495,4 @@ public abstract class BasePageSpecificationResourceImpl
 		LogFactoryUtil.getLog(BasePageSpecificationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:341539390
+// LIFERAY-REST-BUILDER-HASH:-678645907

@@ -55,6 +55,9 @@ import org.osgi.service.component.ComponentServiceObjects;
  * @author ${configYAML.author}
  * @generated
  */
+<#if openAPIYAML.info.featureFlag?has_content>
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("${openAPIYAML.info.featureFlag}")
+</#if>
 @Generated("")
 public class Query {
 
@@ -82,7 +85,9 @@ public class Query {
 		</#if>
 
 		${freeMarkerTool.getGraphQLPropertyName(javaMethodSignature, javaMethodSignatures)}(${freeMarkerTool.getGraphQLParameters(javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, true)}) throws Exception {
-			<#assign arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters, freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)) />
+			<#assign
+				arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters, freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName))
+			/>
 
 			<#if javaMethodSignature.returnType?contains("Collection<")>
 				return _applyComponentServiceObjects(
@@ -116,7 +121,9 @@ public class Query {
 			</#if>
 
 			${freeMarkerTool.getGraphQLRelationName(javaMethodSignature, javaMethodSignatures)}(${freeMarkerTool.getGraphQLParameters(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], javaMethodSignature.operation, true)}) throws Exception {
-				<#assign arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)) />
+				<#assign
+					arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName))
+				/>
 
 				<#if javaMethodSignature.returnType?contains("Collection<")>
 					return _applyComponentServiceObjects(
@@ -204,7 +211,9 @@ public class Query {
 
 			${freeMarkerTool.getGraphQLMethodAnnotations(javaMethodSignature)}
 			public ${javaMethodSignature.returnType} parent${javaMethodSignature.parentSchemaName}(${freeMarkerTool.getGraphQLParameters(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], javaMethodSignature.operation, true)}) throws Exception {
-				<#assign arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)) />
+				<#assign
+					arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters[1..*(javaMethodSignature.javaMethodParameters?size - 1)], freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName))
+				/>
 
 				if (_${javaMethodSignature.parentSchemaName?uncap_first}.getParent${javaMethodSignature.javaMethodParameters[0].parameterName?cap_first}() == null) {
 					return null;

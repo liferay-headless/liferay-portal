@@ -6,19 +6,23 @@
 package com.liferay.portal.vulcan.batch.engine.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegateAdaptorFactory;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -31,6 +35,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -38,8 +43,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
 /**
  * @author Carlos Correa
+ * @author Daniel Raposo
  */
 @RunWith(Arquillian.class)
 public class VulcanBatchEngineTaskItemDelegateAdaptorFactoryTest {
@@ -72,6 +81,44 @@ public class VulcanBatchEngineTaskItemDelegateAdaptorFactoryTest {
 			vulcanBatchEngineTaskItemDelegate._roleLocalService);
 	}
 
+	@Test
+	public void testCreateWithEveryRegisteredVulcanBatchEngineTaskItemDelegate()
+		throws Exception {
+
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+
+		for (ServiceReference<?> serviceReference :
+				bundleContext.getAllServiceReferences(
+					null, "(batch.engine.task.item.delegate=true)")) {
+
+			Object service = bundleContext.getService(serviceReference);
+
+			try {
+				if (service instanceof VulcanBatchEngineTaskItemDelegate) {
+					_vulcanBatchEngineTaskItemDelegateAdaptorFactory.create(
+						(VulcanBatchEngineTaskItemDelegate<?>)service);
+				}
+			}
+			finally {
+				bundleContext.ungetService(serviceReference);
+			}
+		}
+	}
+
+	@Test
+	public void testCreateWithOverriddenStrategies() {
+		BatchEngineTaskItemDelegate<Object> batchEngineTaskItemDelegate =
+			_vulcanBatchEngineTaskItemDelegateAdaptorFactory.create(
+				new OverriddenStrategiesVulcanBatchEngineTaskItemDelegate());
+
+		Assert.assertEquals(
+			SetUtil.fromArray("INSERT"),
+			batchEngineTaskItemDelegate.getAvailableCreateStrategies());
+		Assert.assertEquals(
+			SetUtil.fromArray("UPDATE"),
+			batchEngineTaskItemDelegate.getAvailableUpdateStrategies());
+	}
+
 	@Inject
 	private GroupLocalService _groupLocalService;
 
@@ -87,6 +134,21 @@ public class VulcanBatchEngineTaskItemDelegateAdaptorFactoryTest {
 	@Inject
 	private VulcanBatchEngineTaskItemDelegateAdaptorFactory
 		_vulcanBatchEngineTaskItemDelegateAdaptorFactory;
+
+	private static class OverriddenStrategiesVulcanBatchEngineTaskItemDelegate
+		extends TestVulcanBatchEngineTaskItemDelegate {
+
+		@Override
+		public Set<String> getAvailableCreateStrategies() {
+			return SetUtil.fromArray("INSERT");
+		}
+
+		@VulcanBatchEngineStrategy(updateStrategy = "UPDATE")
+		public Object putObject(Object object) {
+			return object;
+		}
+
+	}
 
 	private static class TestVulcanBatchEngineTaskItemDelegate
 		implements VulcanBatchEngineTaskItemDelegate<Object> {

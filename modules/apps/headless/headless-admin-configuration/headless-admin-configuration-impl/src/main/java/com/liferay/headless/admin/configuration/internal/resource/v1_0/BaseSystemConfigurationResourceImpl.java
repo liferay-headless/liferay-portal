@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -52,17 +52,19 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Thiago Buarque
  * @generated
  */
+@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-65399")
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseSystemConfigurationResourceImpl
@@ -146,6 +148,9 @@ public abstract class BaseSystemConfigurationResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-configuration/v1.0/system-configurations' -d $'{"externalReferenceCode": ___, "properties": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
 			@io.swagger.v3.oas.annotations.tags.Tag(
@@ -283,6 +288,9 @@ public abstract class BaseSystemConfigurationResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-configuration/v1.0/system-configurations/{systemConfigurationExternalReferenceCode}' -d $'{"externalReferenceCode": ___, "properties": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -380,8 +388,9 @@ public abstract class BaseSystemConfigurationResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			systemConfigurationUnsafeFunction =
-				systemConfiguration -> postSystemConfiguration(
-					systemConfiguration);
+				systemConfiguration ->
+					contextBatchResource.postSystemConfiguration(
+						systemConfiguration);
 		}
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
@@ -392,9 +401,10 @@ public abstract class BaseSystemConfigurationResourceImpl
 				systemConfigurationUnsafeFunction = systemConfiguration -> {
 					SystemConfiguration persistedSystemConfiguration = null;
 
-					persistedSystemConfiguration = putSystemConfiguration(
-						systemConfiguration.getExternalReferenceCode(),
-						systemConfiguration);
+					persistedSystemConfiguration =
+						contextBatchResource.putSystemConfiguration(
+							systemConfiguration.getExternalReferenceCode(),
+							systemConfiguration);
 
 					return persistedSystemConfiguration;
 				};
@@ -434,14 +444,6 @@ public abstract class BaseSystemConfigurationResourceImpl
 			"This method needs to be implemented");
 	}
 
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
-	}
-
 	@Override
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
 		throws Exception {
@@ -466,7 +468,7 @@ public abstract class BaseSystemConfigurationResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return getSystemConfigurationsPage(pagination);
+		return contextBatchResource.getSystemConfigurationsPage(pagination);
 	}
 
 	@Override
@@ -519,6 +521,17 @@ public abstract class BaseSystemConfigurationResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(SystemConfigurationResource)ProxyUtil.newProxyInstance(
+				SystemConfigurationResource.class.getClassLoader(),
+				new Class<?>[] {SystemConfigurationResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1043,6 +1056,7 @@ public abstract class BaseSystemConfigurationResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected SystemConfigurationResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<SystemConfiguration>,
 		 UnsafeFunction<SystemConfiguration, SystemConfiguration, Exception>,
@@ -1074,4 +1088,4 @@ public abstract class BaseSystemConfigurationResourceImpl
 		LogFactoryUtil.getLog(BaseSystemConfigurationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-249512621
+// LIFERAY-REST-BUILDER-HASH:-1185480578

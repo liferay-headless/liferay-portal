@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodParameter;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.DTOOpenAPIParser;
@@ -964,6 +965,13 @@ public class FreeMarkerTool {
 			javaMethodSignatures, propertyName);
 	}
 
+	public String getResourceMethodType(
+		ConfigYAML configYAML, JavaMethodSignature javaMethodSignature) {
+
+		return ResourceOpenAPIParser.getResourceMethodType(
+			configYAML, javaMethodSignature);
+	}
+
 	public String getResourceParameters(
 		ConfigYAML configYAML, List<JavaMethodParameter> javaMethodParameters,
 		Operation operation, Map<String, Schema> schemas, boolean annotation) {
@@ -1011,20 +1019,30 @@ public class FreeMarkerTool {
 		return OpenAPIParserUtil.getVersion(openAPIYAML);
 	}
 
-	public Set<String> getVulcanBatchImplementationCreateStrategies(
+	public String getVulcanBatchEngineStrategyAnnotation(
+		ConfigYAML configYAML, JavaMethodSignature javaMethodSignature,
 		List<JavaMethodSignature> javaMethodSignatures,
+		Map<String, String> properties) {
+
+		return ResourceOpenAPIParser.getVulcanBatchEngineStrategyAnnotation(
+			configYAML, javaMethodSignature, javaMethodSignatures, properties);
+	}
+
+	public Set<String> getVulcanBatchImplementationCreateStrategies(
+		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures,
 		Map<String, String> properties) {
 
 		return ResourceOpenAPIParser.
 			getVulcanBatchImplementationCreateStrategies(
-				javaMethodSignatures, properties);
+				configYAML, javaMethodSignatures, properties);
 	}
 
 	public Set<String> getVulcanBatchImplementationUpdateStrategies(
-		List<JavaMethodSignature> javaMethodSignatures) {
+		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures) {
 
 		return ResourceOpenAPIParser.
-			getVulcanBatchImplementationUpdateStrategies(javaMethodSignatures);
+			getVulcanBatchImplementationUpdateStrategies(
+				configYAML, javaMethodSignatures);
 	}
 
 	public Map<String, String> getWritableDTOProperties(
@@ -1070,6 +1088,13 @@ public class FreeMarkerTool {
 		}
 
 		return false;
+	}
+
+	public boolean hasPartialUpsertVulcanBatchImplementation(
+		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures) {
+
+		return ResourceOpenAPIParser.hasPartialUpsertVulcanBatchImplementation(
+			configYAML, javaMethodSignatures);
 	}
 
 	public boolean hasPath(
@@ -1232,6 +1257,31 @@ public class FreeMarkerTool {
 					"ExternalReferenceCode")) {
 
 			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isGenerateFeatureFlag(
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML, String schemaName) {
+
+		Info info = openAPIYAML.getInfo();
+
+		if (Validator.isNotNull(info.getFeatureFlag())) {
+			return true;
+		}
+
+		for (JavaMethodSignature javaMethodSignature :
+				getResourceJavaMethodSignatures(
+					configYAML, openAPIYAML, schemaName)) {
+
+			Operation operation = javaMethodSignature.getOperation();
+
+			if ((operation != null) &&
+				Validator.isNotNull(operation.getFeatureFlag())) {
+
+				return true;
+			}
 		}
 
 		return false;

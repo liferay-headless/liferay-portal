@@ -15,11 +15,14 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.jaxrs.whiteboard.lifecycle.JAXRSLifecycle;
 import com.liferay.portal.vulcan.application.HeadlessApplicationProvider;
+import com.liferay.portal.vulcan.feature.flag.FeatureFlagChecker;
+import com.liferay.portal.vulcan.internal.feature.flag.FeatureFlagCheckerImpl;
 
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -70,10 +73,10 @@ public class HeadlessApplicationProviderImpl
 	implements HeadlessApplicationProvider {
 
 	@Override
-	public List<Application> getApplications() {
+	public List<Application> getApplications(long companyId) {
 		List<Application> applications = new ArrayList<>();
 
-		if (_applicationImpls == null) {
+		if (_applicationDTOs == null) {
 			_jaxrsLifecycle.ensureReady();
 
 			JaxrsServiceRuntime jaxrsServiceRuntime =
@@ -85,26 +88,34 @@ public class HeadlessApplicationProviderImpl
 
 			RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
 
-			_applicationImpls = TransformUtil.transformToList(
-				runtimeDTO.applicationDTOs, ApplicationImpl::new);
+			_applicationDTOs = ListUtil.fromArray(runtimeDTO.applicationDTOs);
 		}
 
-		List<ApplicationImpl> applicationImpls = _applicationImpls;
+		List<ApplicationDTO> applicationDTOs = _applicationDTOs;
 
-		if (applicationImpls == null) {
+		if (applicationDTOs == null) {
 			return applications;
 		}
 
-		long companyId = CompanyThreadLocal.getCompanyId();
-
-		for (ApplicationImpl applicationImpl : applicationImpls) {
-			if (_isRegistered(
+		for (ApplicationDTO applicationDTO : applicationDTOs) {
+			if (!_isRegistered(
 					companyId,
 					_companyIdsServiceTrackerMap.getService(
-						applicationImpl._applicationDTO.serviceId))) {
+						applicationDTO.serviceId))) {
 
-				applications.add(applicationImpl);
+				continue;
 			}
+
+			ApplicationImpl applicationImpl = new ApplicationImpl(
+				applicationDTO, companyId);
+
+			if (SetUtil.isNotEmpty(applicationImpl._getOpenAPIPaths()) &&
+				ListUtil.isEmpty(applicationImpl.getOpenAPIDocuments())) {
+
+				continue;
+			}
+
+			applications.add(applicationImpl);
 		}
 
 		return applications;
@@ -147,7 +158,7 @@ public class HeadlessApplicationProviderImpl
 				public JaxrsServiceRuntime addingService(
 					ServiceReference<JaxrsServiceRuntime> serviceReference) {
 
-					_applicationImpls = null;
+					_applicationDTOs = null;
 
 					return bundleContext.getService(serviceReference);
 				}
@@ -157,7 +168,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationImpls = null;
+					_applicationDTOs = null;
 				}
 
 				@Override
@@ -165,7 +176,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationImpls = null;
+					_applicationDTOs = null;
 
 					bundleContext.ungetService(serviceReference);
 				}
@@ -322,9 +333,12 @@ public class HeadlessApplicationProviderImpl
 	private static final Pattern _versionPattern = Pattern.compile(
 		"v[0-9]+\\.[0-9]+");
 
-	private volatile List<ApplicationImpl> _applicationImpls;
+	private volatile List<ApplicationDTO> _applicationDTOs;
 	private ServiceTrackerMap<Long, ServiceReference<?>>
 		_companyIdsServiceTrackerMap;
+
+	@Reference
+	private FeatureFlagChecker _featureFlagChecker;
 
 	@Reference
 	private JAXRSLifecycle _jaxrsLifecycle;
@@ -385,20 +399,13 @@ public class HeadlessApplicationProviderImpl
 		public List<OpenAPIDocument> getOpenAPIDocuments() {
 			List<OpenAPIDocument> openAPIDocuments = new ArrayList<>();
 
-			Set<String> paths = new HashSet<>();
+			for (String path : _getOpenAPIPaths()) {
+				OpenAPIDocumentImpl openAPIDocumentImpl =
+					new OpenAPIDocumentImpl(this, path);
 
-			for (ResourceMethodInfoDTO resourceMethodInfoDTO :
-					_getResourceMethodInfoDTOs(true)) {
-
-				String path = resourceMethodInfoDTO.path;
-
-				if ((path == null) || !path.contains("/openapi") ||
-					!paths.add(path)) {
-
-					continue;
+				if (openAPIDocumentImpl._isFeatureFlagEnabled()) {
+					openAPIDocuments.add(openAPIDocumentImpl);
 				}
-
-				openAPIDocuments.add(new OpenAPIDocumentImpl(this, path));
 			}
 
 			openAPIDocuments.sort(
@@ -417,8 +424,25 @@ public class HeadlessApplicationProviderImpl
 					getBasePath(), resourceMethodInfoDTO));
 		}
 
-		private ApplicationImpl(ApplicationDTO applicationDTO) {
+		private ApplicationImpl(ApplicationDTO applicationDTO, long companyId) {
 			_applicationDTO = applicationDTO;
+			_companyId = companyId;
+		}
+
+		private Set<String> _getOpenAPIPaths() {
+			Set<String> paths = new HashSet<>();
+
+			for (ResourceMethodInfoDTO resourceMethodInfoDTO :
+					_getResourceMethodInfoDTOs(true)) {
+
+				String path = resourceMethodInfoDTO.path;
+
+				if ((path != null) && path.contains("/openapi")) {
+					paths.add(path);
+				}
+			}
+
+			return paths;
 		}
 
 		private List<ResourceMethodInfoDTO> _getResourceMethodInfoDTOs(
@@ -455,6 +479,7 @@ public class HeadlessApplicationProviderImpl
 		}
 
 		private final ApplicationDTO _applicationDTO;
+		private final long _companyId;
 
 	}
 
@@ -598,7 +623,6 @@ public class HeadlessApplicationProviderImpl
 				return null;
 			}
 
-			long companyId = CompanyThreadLocal.getCompanyId();
 			String version = getVersion();
 
 			for (ServiceReferenceServiceTuple<Object, Object>
@@ -610,13 +634,36 @@ public class HeadlessApplicationProviderImpl
 
 				if (Objects.equals(
 						version, serviceReference.getProperty("api.version")) &&
-					_isRegistered(companyId, serviceReference)) {
+					_isRegistered(
+						_applicationImpl._companyId, serviceReference)) {
 
 					return serviceReferenceServiceTuple;
 				}
 			}
 
 			return null;
+		}
+
+		private boolean _isFeatureFlagEnabled() {
+			ServiceReferenceServiceTuple<Object, Object>
+				serviceReferenceServiceTuple =
+					_getServiceReferenceServiceTuple();
+
+			if (serviceReferenceServiceTuple == null) {
+				return true;
+			}
+
+			Object service = serviceReferenceServiceTuple.getService();
+
+			if (service == null) {
+				return true;
+			}
+
+			FeatureFlagCheckerImpl featureFlagCheckerImpl =
+				(FeatureFlagCheckerImpl)_featureFlagChecker;
+
+			return featureFlagCheckerImpl.isEnabled(
+				_applicationImpl._companyId, service.getClass());
 		}
 
 		private final ApplicationImpl _applicationImpl;

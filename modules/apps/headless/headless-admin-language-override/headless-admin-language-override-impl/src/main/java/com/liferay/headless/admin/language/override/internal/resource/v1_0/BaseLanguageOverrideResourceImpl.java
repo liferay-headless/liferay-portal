@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -52,17 +52,19 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Thiago Buarque
  * @generated
  */
+@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-49852")
 @Generated("")
 @jakarta.ws.rs.Path("/v1.0")
 public abstract class BaseLanguageOverrideResourceImpl
@@ -186,6 +188,9 @@ public abstract class BaseLanguageOverrideResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-language-override/v1.0/language-overrides' -d $'{"externalReferenceCode": ___, "key": ___, "languageId": ___, "value": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {
 			@io.swagger.v3.oas.annotations.tags.Tag(name = "LanguageOverride")
@@ -330,6 +335,9 @@ public abstract class BaseLanguageOverrideResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-language-override/v1.0/language-overrides/by-external-reference-code/{externalReferenceCode}' -d $'{"externalReferenceCode": ___, "key": ___, "languageId": ___, "value": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -376,7 +384,8 @@ public abstract class BaseLanguageOverrideResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			languageOverrideUnsafeFunction =
-				languageOverride -> postLanguageOverride(languageOverride);
+				languageOverride -> contextBatchResource.postLanguageOverride(
+					languageOverride);
 		}
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
@@ -388,9 +397,10 @@ public abstract class BaseLanguageOverrideResourceImpl
 					LanguageOverride persistedLanguageOverride = null;
 
 					persistedLanguageOverride =
-						putLanguageOverrideByExternalReferenceCode(
-							languageOverride.getExternalReferenceCode(),
-							languageOverride);
+						contextBatchResource.
+							putLanguageOverrideByExternalReferenceCode(
+								languageOverride.getExternalReferenceCode(),
+								languageOverride);
 
 					return persistedLanguageOverride;
 				};
@@ -427,8 +437,9 @@ public abstract class BaseLanguageOverrideResourceImpl
 		UnsafeFunction<LanguageOverride, LanguageOverride, Exception>
 			languageOverrideUnsafeFunction = languageOverride -> {
 				if (languageOverride.getExternalReferenceCode() != null) {
-					deleteLanguageOverrideByExternalReferenceCode(
-						languageOverride.getExternalReferenceCode());
+					contextBatchResource.
+						deleteLanguageOverrideByExternalReferenceCode(
+							languageOverride.getExternalReferenceCode());
 
 					return languageOverride;
 				}
@@ -450,14 +461,6 @@ public abstract class BaseLanguageOverrideResourceImpl
 				languageOverrideUnsafeFunction.apply(languageOverride);
 			}
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -484,7 +487,8 @@ public abstract class BaseLanguageOverrideResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return getLanguageOverridesPage(search, pagination, sorts);
+		return contextBatchResource.getLanguageOverridesPage(
+			search, pagination, sorts);
 	}
 
 	@Override
@@ -537,6 +541,17 @@ public abstract class BaseLanguageOverrideResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(LanguageOverrideResource)ProxyUtil.newProxyInstance(
+				LanguageOverrideResource.class.getClassLoader(),
+				new Class<?>[] {LanguageOverrideResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1060,6 +1075,7 @@ public abstract class BaseLanguageOverrideResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected LanguageOverrideResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<LanguageOverride>,
 		 UnsafeFunction<LanguageOverride, LanguageOverride, Exception>,
@@ -1091,4 +1107,4 @@ public abstract class BaseLanguageOverrideResourceImpl
 		LogFactoryUtil.getLog(BaseLanguageOverrideResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1628981695
+// LIFERAY-REST-BUILDER-HASH:109005473

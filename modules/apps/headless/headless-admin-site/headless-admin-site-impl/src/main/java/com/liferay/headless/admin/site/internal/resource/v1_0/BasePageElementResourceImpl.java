@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -49,12 +49,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -71,6 +72,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a page element within an experience of a specific page specification of a site page within a site."
 	)
@@ -128,6 +130,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves a page element within an experience of a specific page specification of a site page within a site."
 	)
@@ -199,6 +202,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}/page-elements'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves all the descendant page elements of a page element within an experience in a page specification of a site page."
 	)
@@ -280,6 +284,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves all the page elements within an experience in a page specification of a site page."
 	)
@@ -353,6 +358,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}' -d $'{"externalReferenceCode": ___, "pageElementDefinition": ___, "pageElements": ___, "parentExternalReferenceCode": ___, "position": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates a page element within an experience of a specific page specification of a site page within a site. Updates only the fields received in the request body, leaving any other fields untouched."
 	)
@@ -452,6 +458,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements' -d $'{"externalReferenceCode": ___, "pageElementDefinition": ___, "pageElements": ___, "parentExternalReferenceCode": ___, "position": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new page element to an experience in a page specification in draft status of a site page."
 	)
@@ -517,6 +524,7 @@ public abstract class BasePageElementResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}/page-elements/{pageElementExternalReferenceCode}' -d $'{"externalReferenceCode": ___, "pageElementDefinition": ___, "pageElements": ___, "parentExternalReferenceCode": ___, "position": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates a page element within an experience of a specific page specification of a site page within a site."
 	)
@@ -606,14 +614,6 @@ public abstract class BasePageElementResourceImpl
 			"This method needs to be implemented");
 	}
 
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray();
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
-	}
-
 	@Override
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
 		throws Exception {
@@ -692,6 +692,16 @@ public abstract class BasePageElementResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource = (PageElementResource)ProxyUtil.newProxyInstance(
+			PageElementResource.class.getClassLoader(),
+			new Class<?>[] {PageElementResource.class},
+			contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1218,6 +1228,7 @@ public abstract class BasePageElementResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected PageElementResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<PageElement>,
 		 UnsafeFunction<PageElement, PageElement, Exception>, Exception>
@@ -1248,4 +1259,4 @@ public abstract class BasePageElementResourceImpl
 		LogFactoryUtil.getLog(BasePageElementResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1007731562
+// LIFERAY-REST-BUILDER-HASH:2000768330

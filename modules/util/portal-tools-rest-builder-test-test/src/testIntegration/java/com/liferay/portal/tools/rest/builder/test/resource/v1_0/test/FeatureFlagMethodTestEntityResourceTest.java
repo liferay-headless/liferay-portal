@@ -1,0 +1,652 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+package com.liferay.portal.tools.rest.builder.test.resource.v1_0.test;
+
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
+import com.liferay.portal.kernel.feature.flag.constants.FeatureFlagConstants;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
+import com.liferay.portal.kernel.test.util.HTTPTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.tools.rest.builder.test.resource.v1_0.FeatureFlagMethodTestEntityResource;
+
+import jakarta.ws.rs.NotFoundException;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+
+/**
+ * @author Alejandro Tardín
+ */
+@RunWith(Arquillian.class)
+public class FeatureFlagMethodTestEntityResourceTest
+	extends BaseFeatureFlagMethodTestEntityResourceTestCase {
+
+	@Ignore
+	@Override
+	@Test
+	public void testBatchEngineDeleteImportTask() throws Exception {
+		super.testBatchEngineDeleteImportTask();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testDeleteFeatureFlagMethodTestEntity() throws Exception {
+		_testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled();
+		_testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabledUsingFactory();
+		_testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled();
+		_testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabledUsingFactory();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testDeleteFeatureFlagMethodTestEntityBatch() throws Exception {
+		_testDeleteFeatureFlagMethodTestEntityBatchWhenFeatureFlagIsDisabled();
+		_testDeleteFeatureFlagMethodTestEntityBatchWhenFeatureFlagIsEnabled();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testDeleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		super.
+			testDeleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testGetFeatureFlagMethodTestEntitiesPage() throws Exception {
+		_testGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsDisabled();
+		_testGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsEnabled();
+		_testGetFeatureFlagMethodTestEntitiesPageWhenOperationIdIsExcluded();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetFeatureFlagMethodTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		super.testGetFeatureFlagMethodTestEntityByExternalReferenceCode();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetSiteFeatureFlagMethodTestEntitiesPage()
+		throws Exception {
+
+		super.testGetSiteFeatureFlagMethodTestEntitiesPage();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testGraphQLDeleteFeatureFlagMethodTestEntity()
+		throws Exception {
+
+		_testGraphQLDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled();
+		_testGraphQLDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLDeleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		super.
+			testGraphQLDeleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testGraphQLGetFeatureFlagMethodTestEntitiesPage()
+		throws Exception {
+
+		_testGraphQLGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsDisabled();
+		_testGraphQLGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsEnabled();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetFeatureFlagMethodTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		super.
+			testGraphQLGetFeatureFlagMethodTestEntityByExternalReferenceCode();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetFeatureFlagMethodTestEntityByExternalReferenceCodeNotFound()
+		throws Exception {
+
+		super.
+			testGraphQLGetFeatureFlagMethodTestEntityByExternalReferenceCodeNotFound();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLGetSiteFeatureFlagMethodTestEntitiesPage()
+		throws Exception {
+
+		super.testGraphQLGetSiteFeatureFlagMethodTestEntitiesPage();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testGraphQLPostFeatureFlagMethodTestEntity() throws Exception {
+		_testGraphQLPostFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLPostSiteFeatureFlagMethodTestEntity()
+		throws Exception {
+
+		super.testGraphQLPostSiteFeatureFlagMethodTestEntity();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testPatchFeatureFlagMethodTestEntity() throws Exception {
+		_testPatchFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled();
+		_testPatchFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled();
+	}
+
+	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
+	@Override
+	@Test
+	public void testPostFeatureFlagMethodTestEntity() throws Exception {
+		_testPostFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled();
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testPostSiteFeatureFlagMethodTestEntity() throws Exception {
+		super.testPostSiteFeatureFlagMethodTestEntity();
+	}
+
+	@FeatureFlag(
+		enable = false, value = _FEATURE_FLAG_KEY_PUT_BY_EXTERNAL_REFERENCE_CODE
+	)
+	@Override
+	@Test
+	public void testPutFeatureFlagMethodTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		_testPutFeatureFlagMethodTestEntityByExternalReferenceCodeWhenFeatureFlagIsDisabled();
+		_testPutFeatureFlagMethodTestEntityByExternalReferenceCodeWhenFeatureFlagIsEnabled();
+	}
+
+	private void _assertFieldUndefined(
+			String fieldName, JSONObject jsonObject, String typeName)
+		throws Exception {
+
+		JSONAssert.assertEquals(
+			JSONUtil.put(
+				"errors",
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"extensions",
+						JSONUtil.put("exception", JSONUtil.put("errno", 400))
+					).put(
+						"message",
+						StringBundler.concat(
+							"Validation error (FieldUndefined@[", fieldName,
+							"]) : Field '", fieldName, "' in type '", typeName,
+							"' is undefined")
+					))
+			).toString(),
+			jsonObject.toString(), JSONCompareMode.LENIENT);
+	}
+
+	private boolean _hasFeatureFlagExtension() throws Exception {
+		String json = HTTPTestUtil.invokeToString(
+			null, "portal-tools-rest-builder-test/v1.0/openapi.json",
+			Http.Method.GET);
+
+		return json.contains("x-feature-flag");
+	}
+
+	private boolean _hasOperation(String httpMethod, String path)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, "portal-tools-rest-builder-test/v1.0/openapi.json",
+			Http.Method.GET);
+
+		JSONObject pathsJSONObject = jsonObject.getJSONObject("paths");
+
+		String versionedPath = "/v1.0/" + path;
+
+		if (!pathsJSONObject.has(versionedPath)) {
+			return false;
+		}
+
+		JSONObject pathJSONObject = pathsJSONObject.getJSONObject(
+			versionedPath);
+
+		return pathJSONObject.has(httpMethod);
+	}
+
+	private void _setFeatureFlagEnabled(String featureFlagKey, boolean enabled)
+		throws Exception {
+
+		PropsUtil.set(
+			FeatureFlagConstants.getKey(featureFlagKey),
+			String.valueOf(enabled));
+
+		FeatureFlagTestUtil.invokeFeatureFlagListeners(
+			TestPropsValues.getCompanyId(), enabled, featureFlagKey);
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityBatchWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				deleteFeatureFlagMethodTestEntityBatchHttpResponse(
+					null,
+					JSONUtil.putAll(
+						JSONUtil.put("id", RandomTestUtil.randomLong()))));
+
+		Assert.assertFalse(_hasOperation("delete", _PATH + "/batch"));
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityBatchWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		testDeleteFeatureFlagMethodTestEntityBatch_deleteFeatureFlagMethodTestEntity(
+			202, null, RandomTestUtil.randomLong());
+
+		Assert.assertTrue(_hasOperation("delete", _PATH + "/batch"));
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				deleteFeatureFlagMethodTestEntityHttpResponse(
+					RandomTestUtil.randomLong()));
+
+		Assert.assertFalse(
+			_hasOperation(
+				"delete", _PATH + "/{featureFlagMethodTestEntityId}"));
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabledUsingFactory()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		FeatureFlagMethodTestEntityResource
+			factoryFeatureFlagMethodTestEntityResource =
+				_featureFlagMethodTestEntityResourceFactory.create(
+				).user(
+					TestPropsValues.getUser()
+				).build();
+
+		AssertUtils.assertFailure(
+			NotFoundException.class, "HTTP 404 Not Found",
+			() ->
+				factoryFeatureFlagMethodTestEntityResource.
+					deleteFeatureFlagMethodTestEntity(
+						RandomTestUtil.randomLong()));
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		assertHttpResponseStatusCode(
+			204,
+			featureFlagMethodTestEntityResource.
+				deleteFeatureFlagMethodTestEntityHttpResponse(
+					RandomTestUtil.randomLong()));
+
+		Assert.assertTrue(
+			_hasOperation(
+				"delete", _PATH + "/{featureFlagMethodTestEntityId}"));
+	}
+
+	private void _testDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabledUsingFactory()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		FeatureFlagMethodTestEntityResource
+			factoryFeatureFlagMethodTestEntityResource =
+				_featureFlagMethodTestEntityResourceFactory.create(
+				).user(
+					TestPropsValues.getUser()
+				).build();
+
+		factoryFeatureFlagMethodTestEntityResource.
+			deleteFeatureFlagMethodTestEntity(RandomTestUtil.randomLong());
+	}
+
+	private void _testGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				getFeatureFlagMethodTestEntitiesPageHttpResponse());
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				postFeatureFlagMethodTestEntitiesPageExportBatchHttpResponse(
+					null, null, null));
+		Assert.assertEquals(
+			"NOT_FOUND",
+			JSONUtil.getValueAsString(
+				HTTPTestUtil.invokeToJSONObject(
+					null, "portal-tools-rest-builder-test/v1.0/" + _PATH,
+					Http.Method.GET),
+				"Object/status"));
+		Assert.assertEquals(
+			200,
+			HTTPTestUtil.invokeToHttpCode(
+				null, "portal-tools-rest-builder-test/v1.0/test-entities",
+				Http.Method.GET));
+
+		Assert.assertFalse(_hasOperation("get", _PATH));
+		Assert.assertFalse(_hasOperation("post", _PATH + "/export-batch"));
+		Assert.assertTrue(_hasOperation("get", "test-entities"));
+	}
+
+	private void _testGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		assertHttpResponseStatusCode(
+			200,
+			featureFlagMethodTestEntityResource.
+				getFeatureFlagMethodTestEntitiesPageHttpResponse());
+		assertHttpResponseStatusCode(
+			202,
+			featureFlagMethodTestEntityResource.
+				postFeatureFlagMethodTestEntitiesPageExportBatchHttpResponse(
+					null, null, null));
+
+		Assert.assertFalse(_hasFeatureFlagExtension());
+		Assert.assertTrue(_hasOperation("get", _PATH));
+		Assert.assertTrue(_hasOperation("post", _PATH + "/export-batch"));
+	}
+
+	private void _testGetFeatureFlagMethodTestEntitiesPageWhenOperationIdIsExcluded()
+		throws Exception {
+
+		String pid = ConfigurationTestUtil.createFactoryConfiguration(
+			"com.liferay.portal.vulcan.internal.configuration." +
+				"VulcanConfiguration",
+			HashMapDictionaryBuilder.<String, Object>put(
+				"excludedOperationIds", "getFeatureFlagMethodTestEntitiesPage"
+			).put(
+				"graphQLEnabled", true
+			).put(
+				"path", "/portal-tools-rest-builder-test"
+			).put(
+				"restEnabled", true
+			).build());
+
+		try {
+			_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+			assertHttpResponseStatusCode(
+				409,
+				featureFlagMethodTestEntityResource.
+					getFeatureFlagMethodTestEntitiesPageHttpResponse());
+
+			Assert.assertFalse(_hasOperation("get", _PATH));
+			Assert.assertTrue(_hasOperation("post", _PATH));
+
+			_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+			assertHttpResponseStatusCode(
+				404,
+				featureFlagMethodTestEntityResource.
+					getFeatureFlagMethodTestEntitiesPageHttpResponse());
+		}
+		finally {
+			ConfigurationTestUtil.deleteConfiguration(pid);
+		}
+	}
+
+	private void _testGraphQLDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"notprivacysafe.graphql.GraphQL", LoggerTestUtil.ERROR)) {
+
+			_assertFieldUndefined(
+				"deleteFeatureFlagMethodTestEntity",
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteFeatureFlagMethodTestEntity",
+						HashMapBuilder.<String, Object>put(
+							"featureFlagMethodTestEntityId",
+							RandomTestUtil.randomLong()
+						).build())),
+				"mutation");
+		}
+	}
+
+	private void _testGraphQLDeleteFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteFeatureFlagMethodTestEntity",
+						HashMapBuilder.<String, Object>put(
+							"featureFlagMethodTestEntityId",
+							RandomTestUtil.randomLong()
+						).build())),
+				"JSONObject/data", "Object/deleteFeatureFlagMethodTestEntity"));
+	}
+
+	private void _testGraphQLGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"notprivacysafe.graphql.GraphQL", LoggerTestUtil.ERROR)) {
+
+			_assertFieldUndefined(
+				"featureFlagMethodTestEntities",
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"featureFlagMethodTestEntities",
+						new GraphQLField("totalCount"))),
+				"query");
+		}
+	}
+
+	private void _testGraphQLGetFeatureFlagMethodTestEntitiesPageWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		Assert.assertEquals(
+			0,
+			JSONUtil.getValueAsLong(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"featureFlagMethodTestEntities",
+						new GraphQLField("totalCount"))),
+				"JSONObject/data", "JSONObject/featureFlagMethodTestEntities",
+				"Object/totalCount"));
+	}
+
+	private void _testGraphQLPostFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		JSONObject dataJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLMutation(
+				new GraphQLField(
+					"createFeatureFlagMethodTestEntity",
+					HashMapBuilder.<String, Object>put(
+						"featureFlagMethodTestEntity", "{}"
+					).build(),
+					new GraphQLField("id"))),
+			"JSONObject/data");
+
+		Assert.assertFalse(
+			dataJSONObject.isNull("createFeatureFlagMethodTestEntity"));
+	}
+
+	private void _testPatchFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				patchFeatureFlagMethodTestEntityHttpResponse(
+					RandomTestUtil.randomLong(),
+					randomFeatureFlagMethodTestEntity()));
+
+		Assert.assertFalse(
+			_hasOperation("patch", _PATH + "/{featureFlagMethodTestEntityId}"));
+	}
+
+	private void _testPatchFeatureFlagMethodTestEntityWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, true);
+
+		assertHttpResponseStatusCode(
+			200,
+			featureFlagMethodTestEntityResource.
+				patchFeatureFlagMethodTestEntityHttpResponse(
+					RandomTestUtil.randomLong(),
+					randomFeatureFlagMethodTestEntity()));
+
+		Assert.assertTrue(
+			_hasOperation("patch", _PATH + "/{featureFlagMethodTestEntityId}"));
+	}
+
+	private void _testPostFeatureFlagMethodTestEntityWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(_FEATURE_FLAG_KEY, false);
+
+		assertHttpResponseStatusCode(
+			200,
+			featureFlagMethodTestEntityResource.
+				postFeatureFlagMethodTestEntityHttpResponse(
+					randomFeatureFlagMethodTestEntity()));
+
+		Assert.assertTrue(_hasOperation("post", _PATH));
+		Assert.assertTrue(_hasOperation("post", _PATH + "/batch"));
+	}
+
+	private void _testPutFeatureFlagMethodTestEntityByExternalReferenceCodeWhenFeatureFlagIsDisabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(
+			_FEATURE_FLAG_KEY_PUT_BY_EXTERNAL_REFERENCE_CODE, false);
+
+		assertHttpResponseStatusCode(
+			404,
+			featureFlagMethodTestEntityResource.
+				putFeatureFlagMethodTestEntityByExternalReferenceCodeHttpResponse(
+					RandomTestUtil.randomString(),
+					randomFeatureFlagMethodTestEntity()));
+
+		Assert.assertFalse(
+			_hasOperation(
+				"put",
+				_PATH + "/by-external-reference-code/{externalReferenceCode}"));
+	}
+
+	private void _testPutFeatureFlagMethodTestEntityByExternalReferenceCodeWhenFeatureFlagIsEnabled()
+		throws Exception {
+
+		_setFeatureFlagEnabled(
+			_FEATURE_FLAG_KEY_PUT_BY_EXTERNAL_REFERENCE_CODE, true);
+
+		assertHttpResponseStatusCode(
+			200,
+			featureFlagMethodTestEntityResource.
+				putFeatureFlagMethodTestEntityByExternalReferenceCodeHttpResponse(
+					RandomTestUtil.randomString(),
+					randomFeatureFlagMethodTestEntity()));
+
+		Assert.assertTrue(
+			_hasOperation(
+				"put",
+				_PATH + "/by-external-reference-code/{externalReferenceCode}"));
+	}
+
+	private static final String _FEATURE_FLAG_KEY = "METHOD-123";
+
+	private static final String
+		_FEATURE_FLAG_KEY_PUT_BY_EXTERNAL_REFERENCE_CODE = "METHOD-125";
+
+	private static final String _PATH = "feature-flag-method-test-entities";
+
+	@Inject
+	private FeatureFlagMethodTestEntityResource.Factory
+		_featureFlagMethodTestEntityResourceFactory;
+
+}

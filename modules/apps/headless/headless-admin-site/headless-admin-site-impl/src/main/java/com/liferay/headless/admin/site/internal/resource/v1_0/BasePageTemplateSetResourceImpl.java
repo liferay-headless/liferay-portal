@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -65,6 +65,8 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,6 +91,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a specific page template set of a design library."
 	)
@@ -175,6 +178,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves a specific page template set of a design library."
 	)
@@ -232,6 +236,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}/permissions'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -289,6 +294,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves the page template sets of a design library."
 	)
@@ -756,6 +762,9 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-template-sets' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "externalReferenceCode": ___, "key": ___, "name": ___, "permissions": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new page template set"
 	)
@@ -965,6 +974,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}/permissions'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -1015,6 +1025,9 @@ public abstract class BasePageTemplateSetResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-template-sets/{pageTemplateSetExternalReferenceCode}' -d $'{"dateCreated": ___, "dateModified": ___, "description": ___, "externalReferenceCode": ___, "key": ___, "name": ___, "permissions": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates the page template set with the given external reference code, or creates it if it does not exist."
 	)
@@ -1213,9 +1226,10 @@ public abstract class BasePageTemplateSetResourceImpl
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("siteExternalReferenceCode")) {
 				pageTemplateSetUnsafeFunction =
-					pageTemplateSet -> postSitePageTemplateSet(
-						(String)parameters.get("siteExternalReferenceCode"),
-						pageTemplateSet);
+					pageTemplateSet ->
+						contextBatchResource.postSitePageTemplateSet(
+							(String)parameters.get("siteExternalReferenceCode"),
+							pageTemplateSet);
 			}
 			else {
 				throw new NotSupportedException(
@@ -1232,10 +1246,12 @@ public abstract class BasePageTemplateSetResourceImpl
 					PageTemplateSet persistedPageTemplateSet = null;
 
 					if (parameters.containsKey("siteExternalReferenceCode")) {
-						persistedPageTemplateSet = putSitePageTemplateSet(
-							(String)parameters.get("siteExternalReferenceCode"),
-							pageTemplateSet.getExternalReferenceCode(),
-							pageTemplateSet);
+						persistedPageTemplateSet =
+							contextBatchResource.putSitePageTemplateSet(
+								(String)parameters.get(
+									"siteExternalReferenceCode"),
+								pageTemplateSet.getExternalReferenceCode(),
+								pageTemplateSet);
 					}
 					else {
 						throw new NotSupportedException(
@@ -1277,7 +1293,7 @@ public abstract class BasePageTemplateSetResourceImpl
 		UnsafeFunction<PageTemplateSet, PageTemplateSet, Exception>
 			pageTemplateSetUnsafeFunction = pageTemplateSet -> {
 				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSitePageTemplateSet(
+					contextBatchResource.deleteSitePageTemplateSet(
 						(String)parameters.get("siteExternalReferenceCode"),
 						pageTemplateSet.getExternalReferenceCode());
 
@@ -1301,14 +1317,6 @@ public abstract class BasePageTemplateSetResourceImpl
 				pageTemplateSetUnsafeFunction.apply(pageTemplateSet);
 			}
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -1336,7 +1344,7 @@ public abstract class BasePageTemplateSetResourceImpl
 		throws Exception {
 
 		if (parameters.containsKey("siteExternalReferenceCode")) {
-			return getSitePageTemplateSetsPage(
+			return contextBatchResource.getSitePageTemplateSetsPage(
 				(String)parameters.get("siteExternalReferenceCode"), search,
 				null, filter, pagination, sorts);
 		}
@@ -1563,6 +1571,17 @@ public abstract class BasePageTemplateSetResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(PageTemplateSetResource)ProxyUtil.newProxyInstance(
+				PageTemplateSetResource.class.getClassLoader(),
+				new Class<?>[] {PageTemplateSetResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -2091,6 +2110,7 @@ public abstract class BasePageTemplateSetResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected PageTemplateSetResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<PageTemplateSet>,
 		 UnsafeFunction<PageTemplateSet, PageTemplateSet, Exception>, Exception>
@@ -2122,4 +2142,4 @@ public abstract class BasePageTemplateSetResourceImpl
 		LogFactoryUtil.getLog(BasePageTemplateSetResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2025626559
+// LIFERAY-REST-BUILDER-HASH:8060653

@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -66,6 +66,8 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -90,6 +92,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes a specific display page template of a design library."
 	)
@@ -182,6 +185,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves a specific display page template of a design library."
 	)
@@ -242,6 +246,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/permissions'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -302,6 +307,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves the display page templates of a design library."
 	)
@@ -867,6 +873,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/copy'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Copies a specific display page template of a design library, leaving the copy with the default permissions."
 	)
@@ -915,6 +922,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/copy-with-permission'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Copies a specific display page template of a design library, carrying the source's permissions into the copy."
 	)
@@ -966,6 +974,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/mark-as-default'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Marks a display page template of a design library as the default for its content type."
 	)
@@ -1017,6 +1026,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/unmark-as-default'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Stops a display page template of a design library from being the default for its content type."
 	)
@@ -1073,6 +1083,9 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/display-page-templates' -d $'{"contentTypeReference": ___, "dateCreated": ___, "dateModified": ___, "datePublished": ___, "displayPageTemplateSettings": ___, "externalReferenceCode": ___, "friendlyUrlHistory": ___, "friendlyUrlPath_i18n": ___, "key": ___, "markedAsDefault": ___, "name": ___, "pageSpecifications": ___, "parentFolder": ___, "permissions": ___, "thumbnailURLReference": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "INSERT"
+	)
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new display page template"
 	)
@@ -1421,6 +1434,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/design-libraries/{designLibraryExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}/permissions'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-57283")
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
@@ -1474,6 +1488,9 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/display-page-templates/{displayPageTemplateExternalReferenceCode}' -d $'{"contentTypeReference": ___, "dateCreated": ___, "dateModified": ___, "datePublished": ___, "displayPageTemplateSettings": ___, "externalReferenceCode": ___, "friendlyUrlHistory": ___, "friendlyUrlPath_i18n": ___, "key": ___, "markedAsDefault": ___, "name": ___, "pageSpecifications": ___, "parentFolder": ___, "permissions": ___, "thumbnailURLReference": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates the display page template with the given external reference code, or creates it if it does not exist."
 	)
@@ -1681,8 +1698,8 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 
 		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
 			if (parameters.containsKey("siteExternalReferenceCode")) {
-				displayPageTemplateUnsafeFunction =
-					displayPageTemplate -> postSiteDisplayPageTemplate(
+				displayPageTemplateUnsafeFunction = displayPageTemplate ->
+					contextBatchResource.postSiteDisplayPageTemplate(
 						(String)parameters.get("siteExternalReferenceCode"),
 						displayPageTemplate);
 			}
@@ -1702,7 +1719,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 
 					if (parameters.containsKey("siteExternalReferenceCode")) {
 						persistedDisplayPageTemplate =
-							putSiteDisplayPageTemplate(
+							contextBatchResource.putSiteDisplayPageTemplate(
 								(String)parameters.get(
 									"siteExternalReferenceCode"),
 								displayPageTemplate.getExternalReferenceCode(),
@@ -1750,7 +1767,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 		UnsafeFunction<DisplayPageTemplate, DisplayPageTemplate, Exception>
 			displayPageTemplateUnsafeFunction = displayPageTemplate -> {
 				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSiteDisplayPageTemplate(
+					contextBatchResource.deleteSiteDisplayPageTemplate(
 						(String)parameters.get("siteExternalReferenceCode"),
 						displayPageTemplate.getExternalReferenceCode());
 
@@ -1778,14 +1795,6 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 		}
 	}
 
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT", "UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
-	}
-
 	@Override
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
 		throws Exception {
@@ -1811,7 +1820,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 		throws Exception {
 
 		if (parameters.containsKey("siteExternalReferenceCode")) {
-			return getSiteDisplayPageTemplatesPage(
+			return contextBatchResource.getSiteDisplayPageTemplatesPage(
 				(String)parameters.get("siteExternalReferenceCode"), search,
 				null, filter, pagination, sorts);
 		}
@@ -2038,6 +2047,17 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(DisplayPageTemplateResource)ProxyUtil.newProxyInstance(
+				DisplayPageTemplateResource.class.getClassLoader(),
+				new Class<?>[] {DisplayPageTemplateResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -2567,6 +2587,7 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected DisplayPageTemplateResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<DisplayPageTemplate>,
 		 UnsafeFunction<DisplayPageTemplate, DisplayPageTemplate, Exception>,
@@ -2598,4 +2619,4 @@ public abstract class BaseDisplayPageTemplateResourceImpl
 		LogFactoryUtil.getLog(BaseDisplayPageTemplateResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-331603534
+// LIFERAY-REST-BUILDER-HASH:539214591

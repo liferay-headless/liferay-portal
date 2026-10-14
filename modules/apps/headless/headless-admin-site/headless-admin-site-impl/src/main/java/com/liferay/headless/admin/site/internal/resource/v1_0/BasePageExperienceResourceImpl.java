@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -51,12 +51,13 @@ import jakarta.ws.rs.core.UriInfo;
 
 import java.io.Serializable;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -73,6 +74,7 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Deletes an experience of a specific page specification of a site page within a site. The default experience cannot be deleted. Priorities of the remaining experiences are compacted after the change, so their priorities may differ from the values previously returned. See PageExperience.priority."
 	)
@@ -128,6 +130,7 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves an experience of a specific page specification of a site page within a site."
 	)
@@ -185,6 +188,7 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences'  -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Retrieves all the experiences of a page specification."
 	)
@@ -242,6 +246,7 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}' -d $'{"externalReferenceCode": ___, "key": ___, "name_i18n": ___, "pageElements": ___, "pageSpecificationExternalReferenceCode": ___, "priority": ___, "segmentItemExternalReference": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates an experience of a specific page specification of a site page within a site. Updates only the fields received in the request body, leaving any other fields untouched. Priorities of the remaining experiences are compacted after the change, so the priority returned may differ from the one supplied. See PageExperience.priority."
 	)
@@ -336,6 +341,7 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-specifications/{pageSpecificationExternalReferenceCode}/page-experiences' -d $'{"externalReferenceCode": ___, "key": ___, "name_i18n": ___, "pageElements": ___, "pageSpecificationExternalReferenceCode": ___, "priority": ___, "segmentItemExternalReference": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Adds a new experience to a page specification of a site page. Priorities of the experiences are compacted after the change, so the priority returned may differ from the one supplied. See PageExperience.priority."
 	)
@@ -395,6 +401,10 @@ public abstract class BasePageExperienceResourceImpl
 	 *
 	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-site/v1.0/sites/{siteExternalReferenceCode}/page-experiences/{pageExperienceExternalReferenceCode}' -d $'{"externalReferenceCode": ___, "key": ___, "name_i18n": ___, "pageElements": ___, "pageSpecificationExternalReferenceCode": ___, "priority": ___, "segmentItemExternalReference": ___, "uuid": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
+	@com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineStrategy(
+		createStrategy = "UPSERT"
+	)
+	@com.liferay.portal.vulcan.feature.flag.FeatureFlag("LPD-74328")
 	@io.swagger.v3.oas.annotations.Operation(
 		description = "Updates an experience of a specific page specification of a site page within a site. Priorities of the remaining experiences are compacted after the change, so the priority returned may differ from the one supplied. See PageExperience.priority."
 	)
@@ -471,10 +481,12 @@ public abstract class BasePageExperienceResourceImpl
 					PageExperience persistedPageExperience = null;
 
 					if (parameters.containsKey("siteExternalReferenceCode")) {
-						persistedPageExperience = putSitePageExperience(
-							(String)parameters.get("siteExternalReferenceCode"),
-							pageExperience.getExternalReferenceCode(),
-							pageExperience);
+						persistedPageExperience =
+							contextBatchResource.putSitePageExperience(
+								(String)parameters.get(
+									"siteExternalReferenceCode"),
+								pageExperience.getExternalReferenceCode(),
+								pageExperience);
 					}
 					else {
 						throw new NotSupportedException(
@@ -516,7 +528,7 @@ public abstract class BasePageExperienceResourceImpl
 		UnsafeFunction<PageExperience, PageExperience, Exception>
 			pageExperienceUnsafeFunction = pageExperience -> {
 				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSitePageExperience(
+					contextBatchResource.deleteSitePageExperience(
 						(String)parameters.get("siteExternalReferenceCode"),
 						pageExperience.getExternalReferenceCode());
 
@@ -540,14 +552,6 @@ public abstract class BasePageExperienceResourceImpl
 				pageExperienceUnsafeFunction.apply(pageExperience);
 			}
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("UPSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray();
 	}
 
 	@Override
@@ -628,6 +632,17 @@ public abstract class BasePageExperienceResourceImpl
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
+	@Override
+	public void setContextBatchResourceInvocationHandler(
+		InvocationHandler contextBatchResourceInvocationHandler) {
+
+		contextBatchResource =
+			(PageExperienceResource)ProxyUtil.newProxyInstance(
+				PageExperienceResource.class.getClassLoader(),
+				new Class<?>[] {PageExperienceResource.class},
+				contextBatchResourceInvocationHandler);
 	}
 
 	public void setContextBatchUnsafeBiConsumer(
@@ -1155,6 +1170,7 @@ public abstract class BasePageExperienceResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
+	protected PageExperienceResource contextBatchResource = this;
 	protected UnsafeBiConsumer
 		<Collection<PageExperience>,
 		 UnsafeFunction<PageExperience, PageExperience, Exception>, Exception>
@@ -1185,4 +1201,4 @@ public abstract class BasePageExperienceResourceImpl
 		LogFactoryUtil.getLog(BasePageExperienceResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-194827776
+// LIFERAY-REST-BUILDER-HASH:-380804925
