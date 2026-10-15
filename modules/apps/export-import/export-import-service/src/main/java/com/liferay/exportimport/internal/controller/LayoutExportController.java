@@ -6,6 +6,7 @@
 package com.liferay.exportimport.internal.controller;
 
 import com.liferay.asset.link.model.adapter.StagedAssetLink;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.controller.PortletExportController;
 import com.liferay.exportimport.internal.lar.GroupExporter;
@@ -283,7 +284,8 @@ public class LayoutExportController implements ExportController {
 		rootElement.addElement("site-services");
 
 		GroupExporter groupExporter = new GroupExporter(
-			_exportImportHelper, _groupService, _portletDataContextFactory);
+			_depotEntryLocalService, _exportImportHelper, _groupService,
+			_portletDataContextFactory);
 
 		groupExporter.addGroupsElement(portletDataContext, rootElement);
 
@@ -426,6 +428,9 @@ public class LayoutExportController implements ExportController {
 
 	@Reference
 	private DeletionSystemEventExporter _deletionSystemEventExporter;
+
+	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private ExportImportHelper _exportImportHelper;

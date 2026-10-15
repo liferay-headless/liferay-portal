@@ -152,6 +152,30 @@ public class ImportPreview implements Cloneable, Serializable {
 
 	protected Long fileSize;
 
+	public PreviewAssetLibrary[] getPreviewAssetLibraries() {
+		return previewAssetLibraries;
+	}
+
+	public void setPreviewAssetLibraries(
+		PreviewAssetLibrary[] previewAssetLibraries) {
+
+		this.previewAssetLibraries = previewAssetLibraries;
+	}
+
+	public void setPreviewAssetLibraries(
+		UnsafeSupplier<PreviewAssetLibrary[], Exception>
+			previewAssetLibrariesUnsafeSupplier) {
+
+		try {
+			previewAssetLibraries = previewAssetLibrariesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected PreviewAssetLibrary[] previewAssetLibraries;
+
 	public PreviewPortletDataHandlerSection[]
 		getPreviewPortletDataHandlerSections() {
 
@@ -234,4 +258,4 @@ public class ImportPreview implements Cloneable, Serializable {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-831052032
+// LIFERAY-REST-BUILDER-HASH:-1780243974

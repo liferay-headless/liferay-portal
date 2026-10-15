@@ -10,7 +10,11 @@ import com.liferay.exportimport.rest.dto.v1_0.ExportProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.ImportProcessRequest;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.test.rule.FeatureFlag;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import jakarta.ws.rs.BadRequestException;
 
 import java.util.Map;
 
@@ -28,6 +32,56 @@ public class ParameterMapUtilTest {
 	@Rule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
+
+	@FeatureFlags(featureFlags = @FeatureFlag("LPD-41307"))
+	@Test
+	public void testToParameterMapWhenExportAssetLibraryAndSiteExternalReferenceCodesAreSet() {
+		ExportProcessRequest exportProcessRequest = new ExportProcessRequest();
+
+		exportProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1, StringPool.BLANK});
+		exportProcessRequest.setSiteExternalReferenceCodes(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_2, _EXTERNAL_REFERENCE_CODE_1
+			});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			exportProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
+			},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
+	}
+
+	@FeatureFlags(featureFlags = @FeatureFlag("LPD-41307"))
+	@Test
+	public void testToParameterMapWhenExportAssetLibraryExternalReferenceCodesAreSet() {
+		ExportProcessRequest exportProcessRequest = new ExportProcessRequest();
+
+		exportProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			exportProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
+	}
+
+	@Test(expected = BadRequestException.class)
+	public void testToParameterMapWhenExportAssetLibraryExternalReferenceCodesAreSetWithoutFeatureFlag() {
+		ExportProcessRequest exportProcessRequest = new ExportProcessRequest();
+
+		exportProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+
+		ParameterMapUtil.toParameterMap(exportProcessRequest, false);
+	}
 
 	@Test
 	public void testToParameterMapWhenExportGroupExternalReferenceCodeIsNull() {
@@ -96,6 +150,37 @@ public class ParameterMapUtilTest {
 			new String[] {
 				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
 			});
+	}
+
+	@FeatureFlags(featureFlags = @FeatureFlag("LPD-41307"))
+	@Test
+	public void testToParameterMapWhenImportAssetLibraryAndSiteExternalReferenceCodesAreSet() {
+		ImportProcessRequest importProcessRequest = new ImportProcessRequest();
+
+		importProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+		importProcessRequest.setSiteExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_2});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			importProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
+			},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
+	}
+
+	@Test(expected = BadRequestException.class)
+	public void testToParameterMapWhenImportAssetLibraryExternalReferenceCodesAreSetWithoutFeatureFlag() {
+		ImportProcessRequest importProcessRequest = new ImportProcessRequest();
+
+		importProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+
+		ParameterMapUtil.toParameterMap(importProcessRequest, false);
 	}
 
 	@Test

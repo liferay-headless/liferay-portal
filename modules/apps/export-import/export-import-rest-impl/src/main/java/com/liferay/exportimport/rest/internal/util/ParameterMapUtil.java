@@ -13,6 +13,7 @@ import com.liferay.exportimport.rest.dto.v1_0.ImportProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.RequestPortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.RequestPortletDataHandlerControl;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
@@ -153,14 +154,14 @@ public class ParameterMapUtil {
 					GetterUtil.getBoolean(exportProcessRequest.getDeletions()))
 			});
 
-		String[] siteExternalReferenceCodes = ArrayUtil.filter(
-			exportProcessRequest.getSiteExternalReferenceCodes(),
-			Validator::isNotNull);
+		String[] groupExternalReferenceCodes = _getGroupExternalReferenceCodes(
+			exportProcessRequest.getAssetLibraryExternalReferenceCodes(),
+			exportProcessRequest.getSiteExternalReferenceCodes());
 
-		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+		if (ArrayUtil.isNotEmpty(groupExternalReferenceCodes)) {
 			parameterMap.put(
 				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
-				ArrayUtil.unique(siteExternalReferenceCodes));
+				ArrayUtil.unique(groupExternalReferenceCodes));
 		}
 
 		parameterMap.put(
@@ -239,14 +240,14 @@ public class ParameterMapUtil {
 					GetterUtil.getBoolean(importProcessRequest.getDeletions()))
 			});
 
-		String[] siteExternalReferenceCodes = ArrayUtil.filter(
-			importProcessRequest.getSiteExternalReferenceCodes(),
-			Validator::isNotNull);
+		String[] groupExternalReferenceCodes = _getGroupExternalReferenceCodes(
+			importProcessRequest.getAssetLibraryExternalReferenceCodes(),
+			importProcessRequest.getSiteExternalReferenceCodes());
 
-		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+		if (ArrayUtil.isNotEmpty(groupExternalReferenceCodes)) {
 			parameterMap.put(
 				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
-				ArrayUtil.unique(siteExternalReferenceCodes));
+				ArrayUtil.unique(groupExternalReferenceCodes));
 		}
 
 		parameterMap.put(
@@ -471,6 +472,29 @@ public class ParameterMapUtil {
 			PortletDataHandlerKeys.USER_ID_STRATEGY,
 			new String[] {UserIdStrategy.CURRENT_USER_ID}
 		).build();
+	}
+
+	private static String[] _getGroupExternalReferenceCodes(
+		String[] assetLibraryExternalReferenceCodes,
+		String[] siteExternalReferenceCodes) {
+
+		assetLibraryExternalReferenceCodes = ArrayUtil.filter(
+			GetterUtil.getStringValues(assetLibraryExternalReferenceCodes),
+			Validator::isNotNull);
+
+		if (ArrayUtil.isNotEmpty(assetLibraryExternalReferenceCodes) &&
+			!FeatureFlagManagerUtil.isEnabled("LPD-41307")) {
+
+			throw new BadRequestException(
+				"Asset library external reference codes require feature flag " +
+					"LPD-41307");
+		}
+
+		return ArrayUtil.append(
+			assetLibraryExternalReferenceCodes,
+			ArrayUtil.filter(
+				GetterUtil.getStringValues(siteExternalReferenceCodes),
+				Validator::isNotNull));
 	}
 
 	private static void _putDateParameters(

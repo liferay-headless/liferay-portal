@@ -303,6 +303,51 @@ public class ImportPreview implements Serializable {
 
 	@io.swagger.v3.oas.annotations.media.Schema
 	@Valid
+	public PreviewAssetLibrary[] getPreviewAssetLibraries() {
+		if (_previewAssetLibrariesSupplier != null) {
+			previewAssetLibraries = _previewAssetLibrariesSupplier.get();
+
+			_previewAssetLibrariesSupplier = null;
+		}
+
+		return previewAssetLibraries;
+	}
+
+	public void setPreviewAssetLibraries(
+		PreviewAssetLibrary[] previewAssetLibraries) {
+
+		this.previewAssetLibraries = previewAssetLibraries;
+
+		_previewAssetLibrariesSupplier = null;
+	}
+
+	@JsonIgnore
+	public void setPreviewAssetLibraries(
+		UnsafeSupplier<PreviewAssetLibrary[], Exception>
+			previewAssetLibrariesUnsafeSupplier) {
+
+		_previewAssetLibrariesSupplier = () -> {
+			try {
+				return previewAssetLibrariesUnsafeSupplier.get();
+			}
+			catch (RuntimeException runtimeException) {
+				throw runtimeException;
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		};
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected PreviewAssetLibrary[] previewAssetLibraries;
+
+	@JsonIgnore
+	private Supplier<PreviewAssetLibrary[]> _previewAssetLibrariesSupplier;
+
+	@io.swagger.v3.oas.annotations.media.Schema
+	@Valid
 	public PreviewPortletDataHandlerSection[]
 		getPreviewPortletDataHandlerSections() {
 
@@ -508,6 +553,29 @@ public class ImportPreview implements Serializable {
 			sb.append(fileSize);
 		}
 
+		PreviewAssetLibrary[] previewAssetLibraries =
+			getPreviewAssetLibraries();
+
+		if (previewAssetLibraries != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"previewAssetLibraries\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < previewAssetLibraries.length; i++) {
+				sb.append(String.valueOf(previewAssetLibraries[i]));
+
+				if ((i + 1) < previewAssetLibraries.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		PreviewPortletDataHandlerSection[] previewPortletDataHandlerSections =
 			getPreviewPortletDataHandlerSections();
 
@@ -675,4 +743,4 @@ public class ImportPreview implements Serializable {
 	private Map<String, Serializable> _extendedProperties;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1461636162
+// LIFERAY-REST-BUILDER-HASH:114458784
