@@ -6,12 +6,20 @@
 package com.liferay.exportimport.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.exportimport.rest.client.dto.v1_0.PreviewSite;
 import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
@@ -41,6 +49,7 @@ public class PreviewSiteResourceTest extends BasePreviewSiteResourceTestCase {
 		_testGetExportPreviewPreviewSitesPage();
 		_testGetExportPreviewPreviewSitesPageWithInactiveSite();
 		_testGetExportPreviewPreviewSitesPageWithSearch();
+		_testGetExportPreviewPreviewSitesPageWithSpace();
 	}
 
 	@Override
@@ -136,6 +145,31 @@ public class PreviewSiteResourceTest extends BasePreviewSiteResourceTestCase {
 			group.getExternalReferenceCode(),
 			previewSite.getExternalReferenceCode());
 	}
+
+	private void _testGetExportPreviewPreviewSitesPageWithSpace()
+		throws Exception {
+
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			DepotConstants.TYPE_SPACE,
+			ServiceContextTestUtil.getServiceContext());
+
+		_depotGroup = depotEntry.getGroup();
+
+		Assert.assertNull(
+			_getExportPreviewSite(_depotGroup.getExternalReferenceCode()));
+	}
+
+	@Inject
+	private DepotEntryLocalService _depotEntryLocalService;
+
+	@DeleteAfterTestRun
+	private Group _depotGroup;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

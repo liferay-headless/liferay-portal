@@ -8,10 +8,23 @@ import ClayLayout from '@clayui/layout';
 import {sub} from 'frontend-js-web';
 import React, {useId, useState} from 'react';
 
-import {PreviewSite} from '../../../types/exportImportPreview';
+import {GroupType, PreviewSite} from '../../../types/exportImportPreview';
 import {ExportImportProcess} from '../../../types/exportImportProcess';
 import SectionTags from '../content_selector/SectionTags';
 import SiteSelectorModal from './SiteSelectorModal';
+
+const LABELS = {
+	assetLibrary: {
+		empty: Liferay.Language.get('no-spaces-are-selected'),
+		select: Liferay.Language.get('select-spaces'),
+		title: Liferay.Language.get('spaces'),
+	},
+	site: {
+		empty: Liferay.Language.get('no-sites-are-selected'),
+		select: Liferay.Language.get('select-sites'),
+		title: Liferay.Language.get('sites'),
+	},
+};
 
 function toEntries(sites: PreviewSite[]) {
 	return sites.map(
@@ -26,6 +39,7 @@ export default function SitesControl({
 	process = 'export',
 	selectedExternalReferenceCodes,
 	totalCount,
+	type = 'site',
 }: {
 	apiURL?: string;
 	onChange: (externalReferenceCodes: string[]) => void;
@@ -33,6 +47,7 @@ export default function SitesControl({
 	process?: ExportImportProcess;
 	selectedExternalReferenceCodes: string[];
 	totalCount?: number;
+	type?: GroupType;
 }) {
 	const descriptionId = useId();
 
@@ -60,7 +75,7 @@ export default function SitesControl({
 					)
 					.join(', ')
 			)
-		: Liferay.Language.get('no-sites-are-selected');
+		: LABELS[type].empty;
 
 	return (
 		<>
@@ -68,7 +83,7 @@ export default function SitesControl({
 				<ClayLayout.ContentCol expand>
 					<span className="align-items-center d-inline-flex">
 						<span className="font-weight-semi-bold text-dark">
-							{Liferay.Language.get('sites')}
+							{LABELS[type].title}
 						</span>
 
 						<SectionTags additionCount={totalCount} />
@@ -91,7 +106,7 @@ export default function SitesControl({
 						onClick={() => setShowModal(true)}
 						size="sm"
 					>
-						{Liferay.Language.get('select-sites')}
+						{LABELS[type].select}
 					</ClayButton>
 				</ClayLayout.ContentCol>
 			</ClayLayout.ContentRow>
@@ -119,6 +134,8 @@ export default function SitesControl({
 					previewSites={previewSites}
 					process={process}
 					selectedSites={selectedSites}
+					title={LABELS[type].select}
+					type={type}
 				/>
 			)}
 		</>

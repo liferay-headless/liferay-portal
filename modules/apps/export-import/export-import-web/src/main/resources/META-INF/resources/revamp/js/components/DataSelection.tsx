@@ -21,6 +21,7 @@ import {
 const LABEL_ID = 'dataSelection-label';
 
 export default function DataSelection({
+	assetLibrariesSelection,
 	commentsAndRatingsEnabled = false,
 	deletionCount = 0,
 	deletionsDescription,
@@ -39,6 +40,7 @@ export default function DataSelection({
 	subtitle,
 	timeZoneId,
 }: {
+	assetLibrariesSelection?: ReactNode;
 	commentsAndRatingsEnabled?: boolean;
 	deletionCount?: number;
 	deletionsDescription: string;
@@ -85,6 +87,12 @@ export default function DataSelection({
 			{sitesSelection && (
 				<ClayLayout.Sheet className="mt-4 option-group">
 					{sitesSelection}
+				</ClayLayout.Sheet>
+			)}
+
+			{assetLibrariesSelection && (
+				<ClayLayout.Sheet className="mt-4 option-group">
+					{assetLibrariesSelection}
 				</ClayLayout.Sheet>
 			)}
 

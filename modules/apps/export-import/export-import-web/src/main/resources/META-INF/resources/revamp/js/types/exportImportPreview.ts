@@ -11,6 +11,8 @@ export interface Preview {
 	previewPortletDataHandlerSections: PreviewPortletDataHandlerSection[];
 }
 
+export type GroupType = 'assetLibrary' | 'site';
+
 export interface ImportPreview {
 	additionCount: number;
 	author: string;
@@ -18,8 +20,15 @@ export interface ImportPreview {
 	exportDate: string;
 	fileName: string;
 	fileSize: number;
+	previewAssetLibraries?: PreviewAssetLibrary[];
 	previewPortletDataHandlerSections: PreviewPortletDataHandlerSection[];
 	previewSites?: PreviewSite[];
+}
+
+export interface PreviewAssetLibrary {
+	descriptiveName?: string;
+	existsInInstance?: boolean;
+	externalReferenceCode: string;
 }
 
 export interface PreviewSite {

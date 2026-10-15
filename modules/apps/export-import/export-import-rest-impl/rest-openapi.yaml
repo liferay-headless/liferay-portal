@@ -61,6 +61,10 @@ components:
             type: object
         ExportProcessRequest:
             properties:
+                assetLibraryExternalReferenceCodes:
+                    items:
+                        type: string
+                    type: array
                 comments:
                     default: false
                     type: boolean
@@ -133,6 +137,11 @@ components:
                     format: int64
                     readOnly: true
                     type: integer
+                previewAssetLibraries:
+                    items:
+                        $ref: "#/components/schemas/PreviewAssetLibrary"
+                    readOnly: true
+                    type: array
                 previewPortletDataHandlerSections:
                     items:
                         $ref: "#/components/schemas/PreviewPortletDataHandlerSection"
@@ -189,6 +198,10 @@ components:
             type: object
         ImportProcessRequest:
             properties:
+                assetLibraryExternalReferenceCodes:
+                    items:
+                        type: string
+                    type: array
                 comments:
                     default: false
                     type: boolean
@@ -238,6 +251,20 @@ components:
                     format: int32
                     type: integer
                 label:
+                    type: string
+            type: object
+        PreviewAssetLibrary:
+            properties:
+                descriptiveName:
+                    readOnly: true
+                    type: string
+                existsInInstance:
+                    description:
+                        Whether the instance being imported into already has an asset library of the same external reference code. Set only when previewing a file to import.
+                    readOnly: true
+                    type: boolean
+                externalReferenceCode:
+                    readOnly: true
                     type: string
             type: object
         PreviewPortletDataHandler:
@@ -1046,6 +1073,42 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ExportPreview"
             tags: ["ExportPreview"]
+    "/export-preview/preview-asset-libraries":
+        get:
+            description:
+                Retrieves the asset libraries that can be exported.
+            operationId: getExportPreviewPreviewAssetLibrariesPage
+            parameters:
+                -   in: query
+                    name: page
+                    schema:
+                        type: integer
+                -   in: query
+                    name: pageSize
+                    schema:
+                        type: integer
+                -   in: query
+                    name: search
+                    schema:
+                        type: string
+                -   in: query
+                    name: sort
+                    schema:
+                        type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PreviewAssetLibrary"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/PreviewAssetLibrary"
+                                type: array
+            tags: ["PreviewAssetLibrary"]
     "/export-preview/preview-sites":
         get:
             description:

@@ -30,6 +30,44 @@ public class ParameterMapUtilTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
+	public void testToParameterMapWhenExportAssetLibraryAndSiteExternalReferenceCodesAreSet() {
+		ExportProcessRequest exportProcessRequest = new ExportProcessRequest();
+
+		exportProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1, StringPool.BLANK});
+		exportProcessRequest.setSiteExternalReferenceCodes(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_2, _EXTERNAL_REFERENCE_CODE_1
+			});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			exportProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
+			},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
+	}
+
+	@Test
+	public void testToParameterMapWhenExportAssetLibraryExternalReferenceCodesAreSet() {
+		ExportProcessRequest exportProcessRequest = new ExportProcessRequest();
+
+		exportProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			exportProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
+	}
+
+	@Test
 	public void testToParameterMapWhenExportGroupExternalReferenceCodeIsNull() {
 		_assertExportGroupExternalReferenceCodes(
 			new String[] {_EXTERNAL_REFERENCE_CODE_1, null},
@@ -96,6 +134,26 @@ public class ParameterMapUtilTest {
 			new String[] {
 				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
 			});
+	}
+
+	@Test
+	public void testToParameterMapWhenImportAssetLibraryAndSiteExternalReferenceCodesAreSet() {
+		ImportProcessRequest importProcessRequest = new ImportProcessRequest();
+
+		importProcessRequest.setAssetLibraryExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_1});
+		importProcessRequest.setSiteExternalReferenceCodes(
+			new String[] {_EXTERNAL_REFERENCE_CODE_2});
+
+		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
+			importProcessRequest, false);
+
+		Assert.assertArrayEquals(
+			new String[] {
+				_EXTERNAL_REFERENCE_CODE_1, _EXTERNAL_REFERENCE_CODE_2
+			},
+			parameterMap.get(
+				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES));
 	}
 
 	@Test

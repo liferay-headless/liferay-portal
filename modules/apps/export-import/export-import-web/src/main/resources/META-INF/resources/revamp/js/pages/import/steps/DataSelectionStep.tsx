@@ -14,11 +14,13 @@ import {ImportPreview} from '../../../types/exportImportPreview';
 import FileSummary from './FileSummary';
 
 export default function DataSelectionStep({
+	assetLibrariesSelection,
 	commentsAndRatingsEnabled = false,
 	importPreview,
 	lookAndFeelEnabled = false,
 	sitesSelection,
 }: {
+	assetLibrariesSelection?: ReactNode;
 	commentsAndRatingsEnabled?: boolean;
 	importPreview?: ImportPreview;
 	lookAndFeelEnabled?: boolean;
@@ -55,6 +57,12 @@ export default function DataSelectionStep({
 			{sitesSelection && (
 				<ClayLayout.Sheet className="mt-4 option-group">
 					{sitesSelection}
+				</ClayLayout.Sheet>
+			)}
+
+			{assetLibrariesSelection && (
+				<ClayLayout.Sheet className="mt-4 option-group">
+					{assetLibrariesSelection}
 				</ClayLayout.Sheet>
 			)}
 

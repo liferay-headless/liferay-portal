@@ -6,6 +6,9 @@
 package com.liferay.exportimport.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.depot.constants.DepotConstants;
+import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.lar.ExportImportGroup;
@@ -18,6 +21,8 @@ import com.liferay.exportimport.report.constants.ExportImportReportEntryConstant
 import com.liferay.exportimport.report.model.ExportImportReportEntry;
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.object.model.ObjectEntryFolder;
+import com.liferay.object.service.ObjectEntryFolderLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Group;
@@ -27,6 +32,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -66,7 +72,8 @@ import org.junit.runner.RunWith;
  */
 @FeatureFlags(
 	featureFlags = {
-		@FeatureFlag(value = "LPD-57655"), @FeatureFlag("LPD-85946")
+		@FeatureFlag(value = "LPD-41307"), @FeatureFlag("LPD-57655"),
+		@FeatureFlag("LPD-85946")
 	}
 )
 @RunWith(Arquillian.class)
@@ -144,6 +151,24 @@ public class GroupExportImportTest {
 			exportImportGroups, _group.getExternalReferenceCode());
 
 		Assert.assertEquals(1, exportImportGroup.getChildGroupsCount());
+	}
+
+	@Test
+	public void testExportGroupsWithDepotGroup() throws Exception {
+		Group depotGroup = _addSpaceDepotGroup();
+
+		List<ExportImportGroup> exportImportGroups = _getExportImportGroups(
+			_exportLayouts(_group, depotGroup));
+
+		ExportImportGroup depotExportImportGroup = _getExportImportGroup(
+			exportImportGroups, depotGroup.getExternalReferenceCode());
+
+		Assert.assertTrue(depotExportImportGroup.isDepot());
+
+		ExportImportGroup exportImportGroup = _getExportImportGroup(
+			exportImportGroups, _group.getExternalReferenceCode());
+
+		Assert.assertFalse(exportImportGroup.isDepot());
 	}
 
 	@Test
@@ -278,6 +303,49 @@ public class GroupExportImportTest {
 	}
 
 	@Test
+	public void testImportGroupsWithDepotGroup() throws Exception {
+		Group depotGroup = _addSpaceDepotGroup();
+
+		ObjectEntryFolder contentsObjectEntryFolder =
+			_objectEntryFolderLocalService.
+				getObjectEntryFolderByExternalReferenceCode(
+					"L_CONTENTS", depotGroup.getGroupId(),
+					depotGroup.getCompanyId());
+
+		String name = RandomTestUtil.randomString();
+
+		ObjectEntryFolder objectEntryFolder =
+			_objectEntryFolderLocalService.addObjectEntryFolder(
+				null, depotGroup.getGroupId(), TestPropsValues.getUserId(),
+				contentsObjectEntryFolder.getObjectEntryFolderId(), null,
+				HashMapBuilder.put(
+					LocaleUtil.getDefault(), name
+				).build(),
+				name,
+				ServiceContextTestUtil.getServiceContext(
+					depotGroup.getGroupId(), TestPropsValues.getUserId()));
+
+		File file = _exportLayouts(depotGroup);
+
+		_objectEntryFolderLocalService.deleteObjectEntryFolder(
+			objectEntryFolder);
+
+		Assert.assertNull(
+			_objectEntryFolderLocalService.
+				fetchObjectEntryFolderByExternalReferenceCode(
+					objectEntryFolder.getExternalReferenceCode(),
+					depotGroup.getGroupId(), depotGroup.getCompanyId()));
+
+		_importLayouts(file, _getExternalReferenceCodes(depotGroup));
+
+		Assert.assertNotNull(
+			_objectEntryFolderLocalService.
+				fetchObjectEntryFolderByExternalReferenceCode(
+					objectEntryFolder.getExternalReferenceCode(),
+					depotGroup.getGroupId(), depotGroup.getCompanyId()));
+	}
+
+	@Test
 	public void testImportGroupsWithMissingGroup() throws Exception {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -331,6 +399,22 @@ public class GroupExportImportTest {
 		Assert.assertNull(
 			_layoutLocalService.fetchLayoutByExternalReferenceCode(
 				layout2.getExternalReferenceCode(), group2.getGroupId()));
+	}
+
+	private Group _addSpaceDepotGroup() throws Exception {
+		DepotEntry depotEntry = _depotEntryLocalService.addDepotEntry(
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()
+			).build(),
+			DepotConstants.TYPE_SPACE,
+			ServiceContextTestUtil.getServiceContext());
+
+		_depotGroup = depotEntry.getGroup();
+
+		return _depotGroup;
 	}
 
 	private void _deleteLayout(Layout layout) throws Exception {
@@ -479,6 +563,12 @@ public class GroupExportImportTest {
 	private Group _companyGroup;
 
 	@Inject
+	private DepotEntryLocalService _depotEntryLocalService;
+
+	@DeleteAfterTestRun
+	private Group _depotGroup;
+
+	@Inject
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 
@@ -503,6 +593,9 @@ public class GroupExportImportTest {
 
 	@Inject
 	private LayoutService _layoutService;
+
+	@Inject
+	private ObjectEntryFolderLocalService _objectEntryFolderLocalService;
 
 	@Inject
 	private ZipReaderFactory _zipReaderFactory;

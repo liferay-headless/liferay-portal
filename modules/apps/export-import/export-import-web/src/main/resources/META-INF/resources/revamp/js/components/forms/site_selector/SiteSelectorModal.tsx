@@ -12,7 +12,7 @@ import {
 } from '@liferay/frontend-data-set-web';
 import React, {useState} from 'react';
 
-import {PreviewSite} from '../../../types/exportImportPreview';
+import {GroupType, PreviewSite} from '../../../types/exportImportPreview';
 import {ExportImportProcess} from '../../../types/exportImportProcess';
 
 const SORTS = [
@@ -25,33 +25,46 @@ const SORTS = [
 	},
 ];
 
-function getView(process: ExportImportProcess): IView {
+function getFields(process: ExportImportProcess, type: GroupType) {
+	const fields: {expand?: boolean; fieldName: string; label: string}[] = [
+		{
+			expand: true,
+			fieldName: 'descriptiveName',
+			label: Liferay.Language.get('title'),
+		},
+	];
+
+	if (type === 'site') {
+		fields.push({
+			fieldName: 'path',
+			label: Liferay.Language.get('path'),
+		});
+	}
+
+	if (process === 'import') {
+		fields.push({
+			fieldName: 'existsInInstance',
+			label: Liferay.Language.get('exists-in-instance'),
+		});
+	}
+	else if (type === 'site') {
+		fields.push({
+			fieldName: 'childSitesCount',
+			label: Liferay.Language.get('child-sites'),
+		});
+	}
+
+	return fields;
+}
+
+function getView(process: ExportImportProcess, type: GroupType): IView {
 	return {
 		contentRenderer: 'table',
 		default: true,
 		label: Liferay.Language.get('table'),
 		name: 'table',
 		schema: {
-			fields: [
-				{
-					expand: true,
-					fieldName: 'descriptiveName',
-					label: Liferay.Language.get('title'),
-				},
-				{
-					fieldName: 'path',
-					label: Liferay.Language.get('path'),
-				},
-				process === 'import'
-					? {
-							fieldName: 'existsInInstance',
-							label: Liferay.Language.get('exists-in-instance'),
-						}
-					: {
-							fieldName: 'childSitesCount',
-							label: Liferay.Language.get('child-sites'),
-						},
-			],
+			fields: getFields(process, type),
 		},
 	};
 }
@@ -71,6 +84,8 @@ export default function SiteSelectorModal({
 	previewSites,
 	process = 'export',
 	selectedSites,
+	title,
+	type = 'site',
 }: {
 	apiURL?: string;
 	onClose: () => void;
@@ -78,6 +93,8 @@ export default function SiteSelectorModal({
 	previewSites?: PreviewSite[];
 	process?: ExportImportProcess;
 	selectedSites: PreviewSite[];
+	title: string;
+	type?: GroupType;
 }) {
 	const {observer, onClose: closeModal} = useModal({onClose});
 
@@ -88,14 +105,14 @@ export default function SiteSelectorModal({
 			<ClayModal.Header
 				closeButtonAriaLabel={Liferay.Language.get('close')}
 			>
-				{Liferay.Language.get('select-sites')}
+				{title}
 			</ClayModal.Header>
 
 			<ClayModal.Body className="p-0">
 				<FrontendDataSet
 					apiURL={apiURL}
 					configInURLBehavior={EConfigInURLBehavior.OFF}
-					id={`exportImportSiteSelector_${process}`}
+					id={`exportImport${type === 'site' ? 'Site' : 'AssetLibrary'}Selector_${process}`}
 					onItemsPropSearch={(item, query) =>
 						(item.descriptiveName ?? '')
 							.toLowerCase()
@@ -107,7 +124,7 @@ export default function SiteSelectorModal({
 					selectedItemsKey="externalReferenceCode"
 					selectionType="multiple"
 					style="fluid"
-					views={[getView(process)]}
+					views={[getView(process, type)]}
 					{...(previewSites
 						? {items: sortByDescriptiveName(previewSites)}
 						: {sorts: SORTS})}

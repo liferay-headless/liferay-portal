@@ -153,14 +153,19 @@ public class ParameterMapUtil {
 					GetterUtil.getBoolean(exportProcessRequest.getDeletions()))
 			});
 
-		String[] siteExternalReferenceCodes = ArrayUtil.filter(
-			exportProcessRequest.getSiteExternalReferenceCodes(),
+		String[] groupExternalReferenceCodes = ArrayUtil.filter(
+			ArrayUtil.append(
+				GetterUtil.getStringValues(
+					exportProcessRequest.
+						getAssetLibraryExternalReferenceCodes()),
+				GetterUtil.getStringValues(
+					exportProcessRequest.getSiteExternalReferenceCodes())),
 			Validator::isNotNull);
 
-		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+		if (ArrayUtil.isNotEmpty(groupExternalReferenceCodes)) {
 			parameterMap.put(
 				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
-				ArrayUtil.unique(siteExternalReferenceCodes));
+				ArrayUtil.unique(groupExternalReferenceCodes));
 		}
 
 		parameterMap.put(
@@ -239,14 +244,19 @@ public class ParameterMapUtil {
 					GetterUtil.getBoolean(importProcessRequest.getDeletions()))
 			});
 
-		String[] siteExternalReferenceCodes = ArrayUtil.filter(
-			importProcessRequest.getSiteExternalReferenceCodes(),
+		String[] groupExternalReferenceCodes = ArrayUtil.filter(
+			ArrayUtil.append(
+				GetterUtil.getStringValues(
+					importProcessRequest.
+						getAssetLibraryExternalReferenceCodes()),
+				GetterUtil.getStringValues(
+					importProcessRequest.getSiteExternalReferenceCodes())),
 			Validator::isNotNull);
 
-		if (ArrayUtil.isNotEmpty(siteExternalReferenceCodes)) {
+		if (ArrayUtil.isNotEmpty(groupExternalReferenceCodes)) {
 			parameterMap.put(
 				PortletDataHandlerKeys.GROUP_EXTERNAL_REFERENCE_CODES,
-				ArrayUtil.unique(siteExternalReferenceCodes));
+				ArrayUtil.unique(groupExternalReferenceCodes));
 		}
 
 		parameterMap.put(
