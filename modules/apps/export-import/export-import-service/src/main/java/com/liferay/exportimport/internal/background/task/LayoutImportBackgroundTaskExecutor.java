@@ -62,6 +62,8 @@ public class LayoutImportBackgroundTaskExecutor
 		ExportImportConfiguration exportImportConfiguration =
 			getExportImportConfiguration(backgroundTask);
 
+		setTotalPhases(backgroundTask, exportImportConfiguration);
+
 		List<FileEntry> attachmentsFileEntries =
 			backgroundTask.getAttachmentsFileEntries();
 

@@ -157,6 +157,20 @@ public class BackgroundTaskUtil {
 			return null;
 		}
 
+		int phaseIndex = GetterUtil.getInteger(
+			backgroundTaskStatus.getAttribute("phaseIndex"));
+		int totalPhases = GetterUtil.getInteger(
+			backgroundTaskStatus.getAttribute("totalPhases"), 1);
+
+		return Math.min(
+			100,
+			((phaseIndex * 100) + _getPhasePercentage(backgroundTaskStatus)) /
+				totalPhases);
+	}
+
+	private static int _getPhasePercentage(
+		BackgroundTaskStatus backgroundTaskStatus) {
+
 		long allModelAdditionCountersTotal = GetterUtil.getLong(
 			backgroundTaskStatus.getAttribute("allModelAdditionCountersTotal"));
 		long allPortletAdditionCounter = GetterUtil.getLong(
