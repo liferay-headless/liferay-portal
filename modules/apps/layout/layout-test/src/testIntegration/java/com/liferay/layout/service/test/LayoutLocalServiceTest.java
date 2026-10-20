@@ -342,6 +342,9 @@ public class LayoutLocalServiceTest {
 	public void testConvertEmptyLayoutToContentLayout() throws Exception {
 		Layout layout = _addEmptyLayout();
 
+		_serviceContext.setAttribute(
+			"layout.instanceable.allowed", Boolean.TRUE);
+
 		try {
 			layout = _layoutLocalService.updateLayout(
 				_group.getGroupId(), layout.isPrivateLayout(),
@@ -366,9 +369,6 @@ public class LayoutLocalServiceTest {
 				_log.debug(layoutTypeException);
 			}
 		}
-
-		_serviceContext.setAttribute(
-			"layout.instanceable.allowed", Boolean.TRUE);
 
 		try {
 			layout = _layoutLocalService.convertEmptyLayout(
@@ -608,7 +608,7 @@ public class LayoutLocalServiceTest {
 		try {
 			_layoutLocalService.getOrAddEmptyLayout(
 				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-				_group.getGroupId(), false, _serviceContext);
+				_group.getGroupId(), false);
 
 			Assert.fail();
 		}
@@ -623,7 +623,7 @@ public class LayoutLocalServiceTest {
 
 			Layout layout = _layoutLocalService.getOrAddEmptyLayout(
 				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-				_group.getGroupId(), false, _serviceContext);
+				_group.getGroupId(), false);
 
 			Assert.assertEquals(
 				WorkflowConstants.STATUS_EMPTY, layout.getStatus());
@@ -1289,7 +1289,7 @@ public class LayoutLocalServiceTest {
 
 			return _layoutLocalService.getOrAddEmptyLayout(
 				RandomTestUtil.randomString(), TestPropsValues.getUserId(),
-				_group.getGroupId(), false, _serviceContext);
+				_group.getGroupId(), false);
 		}
 	}
 
