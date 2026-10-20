@@ -24,15 +24,15 @@ import SettingsStep, {SETTINGS_STEP_INITIAL_VALUES} from './steps/SettingsStep';
 export function NewImport({
 	backURL,
 	commentsAndRatingsEnabled = false,
-	importPreviewAPIURL,
 	importProcessAPIURL,
+	importUploadAPIURL,
 	scope,
 	siteSelectionEnabled = false,
 }: {
 	backURL: string;
 	commentsAndRatingsEnabled?: boolean;
-	importPreviewAPIURL: string;
 	importProcessAPIURL: string;
+	importUploadAPIURL: string;
 	scope: Scope;
 	siteSelectionEnabled?: boolean;
 }) {
@@ -45,17 +45,19 @@ export function NewImport({
 			<WizardStep
 				initialValues={{
 					fileSelector: undefined,
+					importUploadId: undefined,
 					name: '',
 				}}
 				isStepValid={(values) =>
 					values.fileSelector instanceof File &&
+					!!values.importUploadId &&
 					!!values.name.trim() &&
 					!!importPreview
 				}
 				title={Liferay.Language.get('setup')}
 			>
 				<FileSelectionStep
-					importPreviewAPIURL={importPreviewAPIURL}
+					importUploadAPIURL={importUploadAPIURL}
 					setImportPreview={setImportPreview}
 				/>
 			</WizardStep>
@@ -105,6 +107,7 @@ export function NewImport({
 							...toProcessRequestFlags(contentSelection),
 							dataStrategy: values.dataStrategy as DataStrategy,
 							deletions: !!values.deletions,
+							importUploadId: values.importUploadId as string,
 							name: values.name,
 							permissions: !!values.permissions,
 							portletDataHandlers: toPortletDataHandlers(
