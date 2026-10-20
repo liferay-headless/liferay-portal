@@ -69,6 +69,20 @@ const STATUS_CONFIG: Record<
 	},
 };
 
+const VALIDATING_PROGRESS_BAR_VALUE = 99.99;
+
+function getProgressBarValue(status: FileSelectorStatus, progress?: number) {
+	if (status === 'SUCCESS') {
+		return 100;
+	}
+
+	if (status === 'VALIDATING') {
+		return VALIDATING_PROGRESS_BAR_VALUE;
+	}
+
+	return Math.min(progress ?? 0, 99);
+}
+
 export default function FileSelector({
 	'aria-describedby': ariaDescribedby,
 	'aria-labelledby': ariaLabelledby,
@@ -148,15 +162,34 @@ export default function FileSelector({
 										fillBarClassName={
 											status === 'VALIDATING'
 												? 'progress-bar-animated progress-bar-striped'
-												: ''
+												: undefined
 										}
-										value={
-											status === 'SUCCESS' ||
+										messages={
 											status === 'VALIDATING'
-												? 100
-												: progress ?? 0
+												? {
+														ariaLabelAttention:
+															Liferay.Language.get(
+																'validating'
+															),
+														ariaLabelComplete:
+															Liferay.Language.get(
+																'validating'
+															),
+														ariaLabelInProgress:
+															Liferay.Language.get(
+																'validating'
+															),
+													}
+												: undefined
 										}
-									/>
+										value={getProgressBarValue(
+											status,
+											progress
+										)}
+									>
+										{status === 'VALIDATING' &&
+											`${progress ?? 0}%`}
+									</ProgressBar>
 
 									<div
 										aria-live="polite"
