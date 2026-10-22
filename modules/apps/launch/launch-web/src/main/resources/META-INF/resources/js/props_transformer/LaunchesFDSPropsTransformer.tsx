@@ -7,6 +7,10 @@ import ClayLabel from '@clayui/label';
 import React from 'react';
 
 import {Launch, isPublished} from '../api/launches';
+import {
+	WORKFLOW_STATUS_DRAFT,
+	WORKFLOW_STATUS_SCHEDULED,
+} from '../components/WorkflowStatusLabel';
 import openNewLaunchModal from '../modals/openNewLaunchModal';
 
 interface CreationMenu {
@@ -40,16 +44,42 @@ export default function LaunchesFDSPropsTransformer({
 		customRenderers: {
 			tableCell: [
 				{
-					component: ({itemData}: {itemData: Launch}) =>
-						isPublished(itemData) ? (
-							<ClayLabel displayType="success">
-								{Liferay.Language.get('published')}
-							</ClayLabel>
-						) : (
+					component: ({itemData}: {itemData: Launch}) => {
+						if (isPublished(itemData)) {
+							return (
+								<ClayLabel displayType="success">
+									{Liferay.Language.get('published')}
+								</ClayLabel>
+							);
+						}
+
+						if (
+							itemData.scheduledDate &&
+							itemData.status?.code === WORKFLOW_STATUS_DRAFT
+						) {
+							return (
+								<ClayLabel displayType="danger">
+									{Liferay.Language.get('failed')}
+								</ClayLabel>
+							);
+						}
+
+						if (
+							itemData.status?.code === WORKFLOW_STATUS_SCHEDULED
+						) {
+							return (
+								<ClayLabel displayType="info">
+									{Liferay.Language.get('scheduled')}
+								</ClayLabel>
+							);
+						}
+
+						return (
 							<ClayLabel displayType="info">
 								{Liferay.Language.get('in-progress')}
 							</ClayLabel>
-						),
+						);
+					},
 					name: 'launchStatus',
 					type: 'internal',
 				},

@@ -34,6 +34,11 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.Serializable;
+
+import java.time.Instant;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -181,6 +186,53 @@ public class ViewLaunchDisplayContext {
 			"launchSetId", getLaunchSetId()
 		).setParameter(
 			"launchSetName", getLaunchSetName()
+		).buildString();
+	}
+
+	public String getScheduleLaunchURL() {
+		return PortletURLBuilder.createActionURL(
+			_liferayPortletResponse
+		).setActionName(
+			"/launch/schedule_launch"
+		).setRedirect(
+			PortalUtil.getCurrentCompleteURL(_httpServletRequest)
+		).setParameter(
+			"launchSetId", getLaunchSetId()
+		).buildString();
+	}
+
+	public String getScheduledDate() {
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			getLaunchSetId());
+
+		if ((objectEntry == null) ||
+			(objectEntry.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) {
+
+			return null;
+		}
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Date scheduledDate = (Date)values.get("scheduledDate");
+
+		if (scheduledDate == null) {
+			return null;
+		}
+
+		Instant instant = scheduledDate.toInstant();
+
+		return instant.toString();
+	}
+
+	public String getUnscheduleLaunchURL() {
+		return PortletURLBuilder.createActionURL(
+			_liferayPortletResponse
+		).setActionName(
+			"/launch/unschedule_launch"
+		).setRedirect(
+			PortalUtil.getCurrentCompleteURL(_httpServletRequest)
+		).setParameter(
+			"launchSetId", getLaunchSetId()
 		).buildString();
 	}
 

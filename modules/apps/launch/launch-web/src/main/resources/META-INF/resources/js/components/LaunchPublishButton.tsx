@@ -11,11 +11,13 @@ import React, {useRef} from 'react';
 interface Props {
 	publishLaunchURL: string;
 	published: boolean;
+	scheduled: boolean;
 }
 
 export default function LaunchPublishButton({
 	publishLaunchURL,
 	published,
+	scheduled,
 }: Props) {
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -35,7 +37,7 @@ export default function LaunchPublishButton({
 	return (
 		<form action={publishLaunchURL} method="post" ref={formRef}>
 			<ClayButton
-				disabled={published}
+				disabled={published || scheduled}
 				displayType="primary"
 				onClick={handleClick}
 				small
