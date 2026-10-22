@@ -85,6 +85,10 @@ public class PortletDataContextFactoryImpl
 				Arrays.copyOf(layoutIds, layoutIds.length));
 		}
 
+		_setSourceCompanyGroupExternalReferenceCode(
+			clonePortletDataContext,
+			_getSourceCompanyGroupExternalReferenceCode(portletDataContext));
+
 		ManifestSummary manifestSummary =
 			portletDataContext.getManifestSummary();
 
@@ -277,6 +281,20 @@ public class PortletDataContextFactoryImpl
 		return portletDataContext;
 	}
 
+	private String _getSourceCompanyGroupExternalReferenceCode(
+		PortletDataContext portletDataContext) {
+
+		if (!(portletDataContext instanceof PortletDataContextImpl)) {
+			return null;
+		}
+
+		PortletDataContextImpl portletDataContextImpl =
+			(PortletDataContextImpl)portletDataContext;
+
+		return portletDataContextImpl.
+			getSourceCompanyGroupExternalReferenceCode();
+	}
+
 	private void _readXML(PortletDataContext portletDataContext)
 		throws PortletDataException {
 
@@ -310,6 +328,11 @@ public class PortletDataContextFactoryImpl
 		portletDataContext.setSourceUserPersonalSiteGroupId(
 			GetterUtil.getLong(
 				headerElement.attributeValue("user-personal-site-group-id")));
+
+		_setSourceCompanyGroupExternalReferenceCode(
+			portletDataContext,
+			headerElement.attributeValue(
+				"company-group-external-reference-code"));
 
 		Element missingReferencesElement = rootElement.element(
 			"missing-references");
@@ -366,6 +389,21 @@ public class PortletDataContextFactoryImpl
 		catch (PortalException portalException) {
 			_log.error(portalException);
 		}
+	}
+
+	private void _setSourceCompanyGroupExternalReferenceCode(
+		PortletDataContext portletDataContext,
+		String sourceCompanyGroupExternalReferenceCode) {
+
+		if (!(portletDataContext instanceof PortletDataContextImpl)) {
+			return;
+		}
+
+		PortletDataContextImpl portletDataContextImpl =
+			(PortletDataContextImpl)portletDataContext;
+
+		portletDataContextImpl.setSourceCompanyGroupExternalReferenceCode(
+			sourceCompanyGroupExternalReferenceCode);
 	}
 
 	private void _validateDateRange(Date startDate, Date endDate)

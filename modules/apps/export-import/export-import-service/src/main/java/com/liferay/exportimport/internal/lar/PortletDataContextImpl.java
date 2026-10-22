@@ -1118,6 +1118,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _scopedPrimaryKeys;
 	}
 
+	public String getSourceCompanyGroupExternalReferenceCode() {
+		return _sourceCompanyGroupExternalReferenceCode;
+	}
+
 	@Override
 	public long getSourceCompanyGroupId() {
 		return _sourceCompanyGroupId;
@@ -1763,6 +1767,13 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void setScopeType(String scopeType) {
 		_scopeType = scopeType;
+	}
+
+	public void setSourceCompanyGroupExternalReferenceCode(
+		String sourceCompanyGroupExternalReferenceCode) {
+
+		_sourceCompanyGroupExternalReferenceCode =
+			sourceCompanyGroupExternalReferenceCode;
 	}
 
 	@Override
@@ -2911,6 +2922,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private String _scopeLayoutUuid;
 	private String _scopeType;
 	private final Set<String> _scopedPrimaryKeys = new HashSet<>();
+	private String _sourceCompanyGroupExternalReferenceCode;
 	private long _sourceCompanyGroupId;
 	private long _sourceCompanyId;
 	private long _sourceGroupId;

@@ -5,6 +5,8 @@
 
 package com.liferay.exportimport.internal.portlet.preferences.processor;
 
+import com.liferay.exportimport.internal.lar.PortletDataContextImpl;
+import com.liferay.exportimport.internal.lar.PortletDataContextThreadLocal;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
@@ -32,6 +34,7 @@ import com.liferay.portal.service.http.GroupServiceHttp;
 import jakarta.portlet.PortletPreferences;
 import jakarta.portlet.ReadOnlyException;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
@@ -82,6 +85,24 @@ public class ExportImportPortletPreferencesProcessorHelperImpl
 	}
 
 	@Override
+	public String getGroupImportPortletPreferencesExternalReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return _getGroupImportPortletPreferencesExternalReferenceCode(
+			companyId, PortletDataContextThreadLocal.getPortletDataContext(),
+			externalReferenceCode);
+	}
+
+	@Override
+	public String getGroupImportPortletPreferencesExternalReferenceCode(
+		PortletDataContext portletDataContext, String externalReferenceCode) {
+
+		return _getGroupImportPortletPreferencesExternalReferenceCode(
+			portletDataContext.getCompanyId(), portletDataContext,
+			externalReferenceCode);
+	}
+
+	@Override
 	public void updateExportPortletPreferencesClassPKs(
 			PortletDataContext portletDataContext, Portlet portlet,
 			PortletPreferences portletPreferences, String key, String className,
@@ -110,22 +131,38 @@ public class ExportImportPortletPreferencesProcessorHelperImpl
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		String externalReferenceCode = portletPreferences.getValue(
-			externalReferenceCodePreferenceKey, null);
-
-		if (Validator.isBlank(externalReferenceCode)) {
-			return;
-		}
-
-		try {
-			portletPreferences.setValue(
-				externalReferenceCodePreferenceKey,
+		_updateGroupPortletPreferencesExternalReferenceCode(
+			externalReferenceCodePreferenceKey, portletPreferences,
+			externalReferenceCode ->
 				getGroupExportPortletPreferencesExternalReferenceCode(
 					companyId, externalReferenceCode));
-		}
-		catch (ReadOnlyException readOnlyException) {
-			throw new PortletDataException(readOnlyException);
-		}
+	}
+
+	@Override
+	public void updateGroupImportPortletPreferencesExternalReferenceCode(
+			long companyId, String externalReferenceCodePreferenceKey,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		_updateGroupPortletPreferencesExternalReferenceCode(
+			externalReferenceCodePreferenceKey, portletPreferences,
+			externalReferenceCode ->
+				getGroupImportPortletPreferencesExternalReferenceCode(
+					companyId, externalReferenceCode));
+	}
+
+	@Override
+	public void updateGroupImportPortletPreferencesExternalReferenceCode(
+			PortletDataContext portletDataContext,
+			String externalReferenceCodePreferenceKey,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		_updateGroupPortletPreferencesExternalReferenceCode(
+			externalReferenceCodePreferenceKey, portletPreferences,
+			externalReferenceCode ->
+				getGroupImportPortletPreferencesExternalReferenceCode(
+					portletDataContext, externalReferenceCode));
 	}
 
 	@Override
@@ -148,6 +185,35 @@ public class ExportImportPortletPreferencesProcessorHelperImpl
 
 		_updateImportPortletPreferencesClassPKs(
 			portletPreferences, key, importPortletPreferencesNewValueFunction);
+	}
+
+	private String _getGroupImportPortletPreferencesExternalReferenceCode(
+		long companyId, PortletDataContext portletDataContext,
+		String externalReferenceCode) {
+
+		String sourceCompanyGroupExternalReferenceCode =
+			_getSourceCompanyGroupExternalReferenceCode(portletDataContext);
+
+		if (Validator.isNull(sourceCompanyGroupExternalReferenceCode) ||
+			!Objects.equals(
+				externalReferenceCode,
+				sourceCompanyGroupExternalReferenceCode)) {
+
+			return externalReferenceCode;
+		}
+
+		Group companyGroup = _groupLocalService.fetchCompanyGroup(companyId);
+
+		if (companyGroup == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to find the company group of company " + companyId);
+			}
+
+			return externalReferenceCode;
+		}
+
+		return companyGroup.getExternalReferenceCode();
 	}
 
 	private String _getRemoteGroupExternalReferenceCode(Group group) {
@@ -210,6 +276,20 @@ public class ExportImportPortletPreferencesProcessorHelperImpl
 		return null;
 	}
 
+	private String _getSourceCompanyGroupExternalReferenceCode(
+		PortletDataContext portletDataContext) {
+
+		if (!(portletDataContext instanceof PortletDataContextImpl)) {
+			return null;
+		}
+
+		PortletDataContextImpl portletDataContextImpl =
+			(PortletDataContextImpl)portletDataContext;
+
+		return portletDataContextImpl.
+			getSourceCompanyGroupExternalReferenceCode();
+	}
+
 	private void _updateExportPortletPreferencesClassPKs(
 			PortletPreferences portletPreferences, String key, String className,
 			Function<String, String> exportPortletPreferencesNewValueFunction)
@@ -260,6 +340,29 @@ public class ExportImportPortletPreferencesProcessorHelperImpl
 		}
 
 		portletPreferences.setValues(key, newValues);
+	}
+
+	private void _updateGroupPortletPreferencesExternalReferenceCode(
+			String externalReferenceCodePreferenceKey,
+			PortletPreferences portletPreferences,
+			Function<String, String> externalReferenceCodeFunction)
+		throws PortletDataException {
+
+		String externalReferenceCode = portletPreferences.getValue(
+			externalReferenceCodePreferenceKey, null);
+
+		if (Validator.isBlank(externalReferenceCode)) {
+			return;
+		}
+
+		try {
+			portletPreferences.setValue(
+				externalReferenceCodePreferenceKey,
+				externalReferenceCodeFunction.apply(externalReferenceCode));
+		}
+		catch (ReadOnlyException readOnlyException) {
+			throw new PortletDataException(readOnlyException);
+		}
 	}
 
 	private void _updateImportPortletPreferencesClassPKs(

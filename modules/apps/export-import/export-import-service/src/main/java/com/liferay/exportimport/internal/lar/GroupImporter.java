@@ -183,6 +183,16 @@ public class GroupImporter {
 		groupPortletDataContext.setSourceCompanyGroupId(
 			GetterUtil.getLong(
 				headerElement.attributeValue("company-group-id")));
+
+		if (groupPortletDataContext instanceof PortletDataContextImpl) {
+			PortletDataContextImpl portletDataContextImpl =
+				(PortletDataContextImpl)groupPortletDataContext;
+
+			portletDataContextImpl.setSourceCompanyGroupExternalReferenceCode(
+				headerElement.attributeValue(
+					"company-group-external-reference-code"));
+		}
+
 		groupPortletDataContext.setSourceGroupId(
 			exportImportGroup.getGroupId());
 		groupPortletDataContext.setSourceUserPersonalSiteGroupId(
