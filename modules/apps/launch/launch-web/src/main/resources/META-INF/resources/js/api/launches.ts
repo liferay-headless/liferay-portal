@@ -32,13 +32,35 @@ export interface Launch {
 	description?: string;
 	id: number;
 	name: string;
+	publishErrorMessage?: string;
+	scheduledDate?: string;
 	status?: {code: number};
 }
 
+export type LaunchStatus = 'failed' | 'open' | 'published' | 'scheduled';
+
 const WORKFLOW_STATUS_APPROVED = 0;
 
+const WORKFLOW_STATUS_SCHEDULED = 7;
+
+export function getLaunchStatus(launch: Launch): LaunchStatus {
+	if (launch.status?.code === WORKFLOW_STATUS_APPROVED) {
+		return 'published';
+	}
+
+	if (launch.status?.code === WORKFLOW_STATUS_SCHEDULED) {
+		return 'scheduled';
+	}
+
+	if (launch.publishErrorMessage) {
+		return 'failed';
+	}
+
+	return 'open';
+}
+
 export function isPublished(launch: Launch): boolean {
-	return launch.status?.code === WORKFLOW_STATUS_APPROVED;
+	return getLaunchStatus(launch) === 'published';
 }
 
 export interface LaunchEntry {

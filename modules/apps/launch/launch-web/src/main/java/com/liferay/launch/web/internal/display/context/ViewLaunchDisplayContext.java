@@ -26,17 +26,25 @@ import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.Serializable;
+
+import java.time.Instant;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Alejandro Tardín
@@ -141,6 +149,15 @@ public class ViewLaunchDisplayContext {
 		return ParamUtil.getString(_httpServletRequest, "launchSetName");
 	}
 
+	public String getLaunchStatus() {
+		if (_launchStatus == null) {
+			_launchStatus = _getLaunchStatus(
+				_objectEntryLocalService.fetchObjectEntry(getLaunchSetId()));
+		}
+
+		return _launchStatus;
+	}
+
 	public String getPreviewPageItemSelectedEventName() {
 		String portletNamespace = PortalUtil.getPortletNamespace(
 			LaunchPortletKeys.LAUNCH);
@@ -184,17 +201,43 @@ public class ViewLaunchDisplayContext {
 		).buildString();
 	}
 
-	public boolean isPublished() {
-		if (_published == null) {
-			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-				getLaunchSetId());
+	public String getScheduleLaunchURL() {
+		return PortletURLBuilder.createActionURL(
+			_liferayPortletResponse
+		).setActionName(
+			"/launch/schedule_launch"
+		).setRedirect(
+			PortalUtil.getCurrentCompleteURL(_httpServletRequest)
+		).setParameter(
+			"launchSetId", getLaunchSetId()
+		).buildString();
+	}
 
-			_published =
-				(objectEntry != null) &&
-				(objectEntry.getStatus() == WorkflowConstants.STATUS_APPROVED);
+	public String getScheduledDate() {
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			getLaunchSetId());
+
+		if ((objectEntry == null) ||
+			(objectEntry.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) {
+
+			return null;
 		}
 
-		return _published;
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Date scheduledDate = (Date)values.get("scheduledDate");
+
+		if (scheduledDate == null) {
+			return null;
+		}
+
+		Instant instant = scheduledDate.toInstant();
+
+		return instant.toString();
+	}
+
+	public boolean isPublished() {
+		return Objects.equals(getLaunchStatus(), "published");
 	}
 
 	private String _getClassName(LaunchEntryManager launchEntryManager) {
@@ -250,6 +293,29 @@ public class ViewLaunchDisplayContext {
 		return launchEntryManagers;
 	}
 
+	private String _getLaunchStatus(ObjectEntry objectEntry) {
+		if (objectEntry == null) {
+			return "open";
+		}
+
+		if (objectEntry.isApproved()) {
+			return "published";
+		}
+
+		if (objectEntry.getStatus() == WorkflowConstants.STATUS_SCHEDULED) {
+			return "scheduled";
+		}
+
+		if (Validator.isNotNull(
+				MapUtil.getString(
+					objectEntry.getValues(), "publishErrorMessage"))) {
+
+			return "failed";
+		}
+
+		return "open";
+	}
+
 	private Locale _getLocale() {
 		ThemeDisplay themeDisplay = _getThemeDisplay();
 
@@ -273,8 +339,8 @@ public class ViewLaunchDisplayContext {
 	private final ItemSelector _itemSelector;
 	private final LaunchEntryManagerRegistry _launchEntryManagerRegistry;
 	private Long _launchSetId;
+	private String _launchStatus;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final ObjectEntryLocalService _objectEntryLocalService;
-	private Boolean _published;
 
 }
