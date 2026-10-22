@@ -20,6 +20,7 @@ import com.liferay.exportimport.rest.client.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandler;
 import com.liferay.exportimport.rest.client.dto.v1_0.RequestPortletDataHandlerControl;
 import com.liferay.exportimport.rest.client.dto.v1_0.ScheduledPublishProcess;
+import com.liferay.exportimport.rest.client.http.HttpInvoker;
 import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
 import com.liferay.exportimport.rest.client.resource.v1_0.PublishProcessResource;
@@ -33,6 +34,8 @@ import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -267,6 +270,29 @@ public class PublishProcessResourceTest
 		return publishProcess;
 	}
 
+	private void _assertPostSitePublishProcessProblem(
+			String publishProcessCronExpression, String title, String type)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			publishProcessResource.postSitePublishProcessHttpResponse(
+				testGroup.getExternalReferenceCode(),
+				new PublishProcessRequest() {
+					{
+						cronExpression = publishProcessCronExpression;
+						name = RandomTestUtil.randomString();
+					}
+				});
+
+		assertHttpResponseStatusCode(400, httpResponse);
+
+		JSONObject jsonObject = _jsonFactory.createJSONObject(
+			httpResponse.getContent());
+
+		Assert.assertEquals(title, jsonObject.getString("title"));
+		Assert.assertEquals(type, jsonObject.getString("type"));
+	}
+
 	private void _assertScheduledPublishProcess(
 			String expectedRange,
 			PublishProcessRequest.DateRangeType publishProcessDateRangeType,
@@ -484,29 +510,17 @@ public class PublishProcessResourceTest
 	private void _testPostSitePublishProcessWithInvalidCronExpression()
 		throws Exception {
 
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
-					"WebApplicationExceptionMapper",
-				LoggerTestUtil.WARN)) {
-
-			for (String publishProcessCronExpression :
-					new String[] {
-						RandomTestUtil.randomString(), _CRON_EXPRESSION_PAST,
-						_CRON_EXPRESSION_NEVER_FIRING
-					}) {
-
-				assertHttpResponseStatusCode(
-					400,
-					publishProcessResource.postSitePublishProcessHttpResponse(
-						testGroup.getExternalReferenceCode(),
-						new PublishProcessRequest() {
-							{
-								cronExpression = publishProcessCronExpression;
-								name = RandomTestUtil.randomString();
-							}
-						}));
-			}
-		}
+		_assertPostSitePublishProcessProblem(
+			RandomTestUtil.randomString(),
+			"The publication schedule is invalid",
+			"PublishProcessScheduleException.MustBeValid");
+		_assertPostSitePublishProcessProblem(
+			_CRON_EXPRESSION_NEVER_FIRING,
+			"The publication schedule never runs",
+			"PublishProcessScheduleException.MustRunAtLeastOnce");
+		_assertPostSitePublishProcessProblem(
+			_CRON_EXPRESSION_PAST, "The publication schedule never runs",
+			"PublishProcessScheduleException.MustRunAtLeastOnce");
 	}
 
 	private void _testPostSitePublishProcessWithInvalidDateRange()
@@ -674,6 +688,9 @@ public class PublishProcessResourceTest
 
 	@Inject
 	private GroupLocalService _groupLocalService;
+
+	@Inject
+	private JSONFactory _jsonFactory;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;

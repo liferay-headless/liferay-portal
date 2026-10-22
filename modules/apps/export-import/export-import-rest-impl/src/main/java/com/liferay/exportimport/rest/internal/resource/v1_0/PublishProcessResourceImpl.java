@@ -19,6 +19,7 @@ import com.liferay.exportimport.rest.dto.v1_0.ProcessProgress;
 import com.liferay.exportimport.rest.dto.v1_0.PublishProcess;
 import com.liferay.exportimport.rest.dto.v1_0.PublishProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.Status;
+import com.liferay.exportimport.rest.internal.resource.exception.PublishProcessScheduleException;
 import com.liferay.exportimport.rest.internal.util.BackgroundTaskUtil;
 import com.liferay.exportimport.rest.internal.util.GroupUtil;
 import com.liferay.exportimport.rest.internal.util.ParameterMapUtil;
@@ -34,6 +35,8 @@ import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplayFac
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.scheduler.Trigger;
@@ -460,8 +463,9 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 	}
 
 	private void _validateCronExpression(
-		String cronExpression, String groupName, String name,
-		Date scheduleEndDate, Date scheduleStartDate, String timeZoneId) {
+			String cronExpression, String groupName, String name,
+			Date scheduleEndDate, Date scheduleStartDate, String timeZoneId)
+		throws Exception {
 
 		Trigger trigger = null;
 
@@ -471,19 +475,24 @@ public class PublishProcessResourceImpl extends BasePublishProcessResourceImpl {
 				cronExpression, TimeZone.getTimeZone(timeZoneId));
 		}
 		catch (Exception exception) {
-			throw new BadRequestException(
-				"The publication schedule is invalid", exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			throw new PublishProcessScheduleException.MustBeValid();
 		}
 
 		if (trigger.getFireDateAfter(new Date(0)) == null) {
-			throw new BadRequestException(
-				"The publication schedule never runs");
+			throw new PublishProcessScheduleException.MustRunAtLeastOnce();
 		}
 	}
 
 	private static final String[] _CLASS_NAMES_TASK_EXECUTOR = {
 		BackgroundTaskExecutorNames.LAYOUT_STAGING_BACKGROUND_TASK_EXECUTOR
 	};
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PublishProcessResourceImpl.class);
 
 	@Reference
 	private BackgroundTaskDisplayFactory _backgroundTaskDisplayFactory;
