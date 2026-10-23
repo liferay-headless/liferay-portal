@@ -43,9 +43,6 @@ export function NewImport({
 	return (
 		<Wizard backURL={backURL}>
 			<WizardStep
-				description={Liferay.Language.get(
-					'name-your-import-process-and-upload-your-file'
-				)}
 				initialValues={{
 					fileSelector: undefined,
 					name: '',
@@ -94,9 +91,6 @@ export function NewImport({
 						{Liferay.Language.get('import')}
 					</ClayButton>
 				}
-				description={Liferay.Language.get(
-					'set-up-your-import-configuration'
-				)}
 				initialValues={SETTINGS_STEP_INITIAL_VALUES}
 				onSubmit={async (values) => {
 					if (!importPreview) {

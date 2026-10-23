@@ -108,19 +108,13 @@ export function NewStaticSiteExport({
 				<Form noValidate>
 					<Setup
 						placeholder={Liferay.Language.get('add-an-export-name')}
-						subtitle={Liferay.Language.get(
-							'provide-a-descriptive-name-for-your-file'
-						)}
 						title={sub(
 							Liferay.Language.get('x-details'),
 							Liferay.Language.get('static-site')
 						)}
 					/>
 
-					<SectionHeader
-						className="mb-4 mt-4"
-						title={Liferay.Language.get('languages')}
-					/>
+					<SectionHeader title={Liferay.Language.get('languages')} />
 
 					<ClayLayout.Sheet>
 						<ClayMultiSelect
@@ -167,10 +161,7 @@ export function NewStaticSiteExport({
 						</ClayMultiSelect>
 					</ClayLayout.Sheet>
 
-					<SectionHeader
-						className="mb-4 mt-4"
-						title={Liferay.Language.get('pages')}
-					/>
+					<SectionHeader title={Liferay.Language.get('pages')} />
 
 					<ClayLayout.Sheet>
 						<ClayCheckbox

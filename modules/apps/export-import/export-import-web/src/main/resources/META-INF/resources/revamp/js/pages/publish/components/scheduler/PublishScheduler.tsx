@@ -4,10 +4,12 @@
  */
 
 import ClayAlert from '@clayui/alert';
+import ClayForm from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import React from 'react';
 
 import '../../../../../css/utilities.scss';
+import SectionHeader from '../../../../components/SectionHeader';
 import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
 import {FieldRadio} from '../../../../components/forms/FieldRadio';
 import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
@@ -87,32 +89,34 @@ export default function PublishScheduler({
 	const scheduleSummary = getScheduleSummary(value);
 
 	return (
-		<ClayLayout.Sheet className="mt-4 option-group">
-			<div className="mb-3 sheet-title">
-				{Liferay.Language.get('when-to-publish')}
-			</div>
+		<>
+			<SectionHeader title={Liferay.Language.get('when-to-publish')} />
 
-			<FieldRadio
-				checked={!value.enabled}
-				description={Liferay.Language.get(
-					'the-process-starts-as-soon-as-you-publish'
-				)}
-				label={Liferay.Language.get('publish-now')}
-				name="whenToPublish"
-				onChange={() => set({enabled: false})}
-				value="now"
-			/>
+			<ClayForm.Group>
+				<FieldRadio
+					checked={!value.enabled}
+					description={Liferay.Language.get(
+						'the-process-starts-as-soon-as-you-publish'
+					)}
+					label={Liferay.Language.get('publish-now')}
+					name="whenToPublish"
+					onChange={() => set({enabled: false})}
+					value="now"
+				/>
+			</ClayForm.Group>
 
-			<FieldRadio
-				checked={value.enabled}
-				description={Liferay.Language.get(
-					'choose-a-start-date-time-and-an-optional-recurrence'
-				)}
-				label={Liferay.Language.get('schedule-for-later')}
-				name="whenToPublish"
-				onChange={() => set({enabled: true})}
-				value="schedule"
-			/>
+			<ClayForm.Group>
+				<FieldRadio
+					checked={value.enabled}
+					description={Liferay.Language.get(
+						'choose-a-start-date-time-and-an-optional-recurrence'
+					)}
+					label={Liferay.Language.get('schedule-for-later')}
+					name="whenToPublish"
+					onChange={() => set({enabled: true})}
+					value="schedule"
+				/>
+			</ClayForm.Group>
 
 			{value.enabled && (
 				<div className="mt-4">
@@ -266,6 +270,6 @@ export default function PublishScheduler({
 					)}
 				</div>
 			)}
-		</ClayLayout.Sheet>
+		</>
 	);
 }
