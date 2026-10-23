@@ -7,9 +7,13 @@ package com.liferay.exportimport.rest.internal.resource.v1_0;
 
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.lar.ExportImportGroup;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
@@ -18,27 +22,40 @@ import com.liferay.exportimport.rest.dto.v1_0.ImportPreview;
 import com.liferay.exportimport.rest.dto.v1_0.PreviewPortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.PreviewSite;
 import com.liferay.exportimport.rest.internal.util.GroupUtil;
+import com.liferay.exportimport.rest.internal.util.ImportTempFileEntryUtil;
 import com.liferay.exportimport.rest.internal.util.PermissionUtil;
 import com.liferay.exportimport.rest.internal.util.PreviewPortletDataHandlerUtil;
 import com.liferay.exportimport.rest.resource.v1_0.ImportPreviewResource;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.upload.UploadServletRequest;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.zip.ZipReader;
+import com.liferay.portal.kernel.zip.ZipReaderFactory;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
+
 import jakarta.ws.rs.BadRequestException;
 
+import java.io.File;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -124,25 +141,74 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 				new ServiceContext());
 	}
 
-	private FileEntry _addTempFileEntry(
-			long groupId, MultipartBody multipartBody)
+	private List<ExportImportGroup> _getExportImportGroups(
+			PortletDataContext portletDataContext)
 		throws Exception {
 
-		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-85946")) {
 
-		String folderName = ImportPreviewResource.class.getName();
-
-		String[] tempFileNames = _layoutService.getTempFileNames(
-			groupId, folderName);
-
-		for (String tempFileEntryName : tempFileNames) {
-			_layoutService.deleteTempFileEntry(
-				groupId, folderName, tempFileEntryName);
+			return Collections.emptyList();
 		}
 
-		return _layoutService.addTempFileEntry(
-			groupId, folderName, binaryFile.getFileName(),
-			binaryFile.getInputStream(), binaryFile.getContentType());
+		return _exportImportHelper.getExportImportGroups(portletDataContext);
+	}
+
+	private ImportPreview _getImportPreview(
+			BinaryFile binaryFile, File file, long groupId, long plid,
+			String portletId)
+		throws Exception {
+
+		_validateImportFile(file, groupId, plid, portletId);
+
+		try (ZipReader zipReader = _zipReaderFactory.getZipReader(file)) {
+			PortletDataContext portletDataContext =
+				_portletDataContextFactory.createImportPortletDataContext(
+					contextCompany.getCompanyId(), groupId, new HashMap<>(),
+					_exportImportHelper.getUserIdStrategy(
+						contextUser.getUserId(),
+						UserIdStrategy.CURRENT_USER_ID),
+					zipReader);
+
+			ManifestSummary manifestSummary =
+				_exportImportHelper.getManifestSummary(portletDataContext);
+
+			List<ExportImportGroup> exportImportGroups = _getExportImportGroups(
+				portletDataContext);
+
+			Locale locale = contextAcceptLanguage.getPreferredLocale();
+
+			Map<String, List<PreviewPortletDataHandler>>
+				previewPortletDataHandlersMap =
+					_getPreviewPortletDataHandlersMap(
+						locale, manifestSummary, portletId);
+
+			FileEntry fileEntry = ImportTempFileEntryUtil.addTempFileEntry(
+				groupId, contextUser.getUserId(), binaryFile.getFileName(),
+				file, binaryFile.getContentType());
+
+			return new ImportPreview() {
+				{
+					setAdditionCount(
+						() -> PreviewPortletDataHandlerUtil.getAdditionCount(
+							previewPortletDataHandlersMap));
+					setAuthor(fileEntry::getUserName);
+					setDeletionCount(
+						() -> PreviewPortletDataHandlerUtil.getDeletionCount(
+							previewPortletDataHandlersMap));
+					setExportDate(manifestSummary::getExportDate);
+					setFileName(
+						() -> ImportTempFileEntryUtil.getFileName(fileEntry));
+					setFileSize(fileEntry::getSize);
+					setPreviewPortletDataHandlerSections(
+						() ->
+							PreviewPortletDataHandlerUtil.
+								toPreviewPortletDataHandlerSections(
+									locale, previewPortletDataHandlersMap));
+					setPreviewSites(() -> _toPreviewSites(exportImportGroups));
+				}
+			};
+		}
 	}
 
 	private ImportPreview _getImportPreview(
@@ -156,18 +222,66 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 			contextCompany.getCompanyId(), groupId,
 			PermissionUtil.getGroupActionId(portletId));
 
-		FileEntry fileEntry = _addTempFileEntry(groupId, multipartBody);
+		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
-		_validateImportFile(fileEntry, groupId, plid, portletId);
+		File uploadedFile = _getUploadedFile();
+
+		File file = uploadedFile;
+
+		if (file == null) {
+			file = FileUtil.createTempFile(binaryFile.getInputStream());
+		}
+
+		try {
+			return _getImportPreview(
+				binaryFile, file, groupId, plid, portletId);
+		}
+		finally {
+			if (uploadedFile == null) {
+				FileUtil.delete(file);
+			}
+		}
+	}
+
+	private String _getMessage(JSONObject jsonObject) {
+		JSONArray messageListItemsJSONArray = jsonObject.getJSONArray(
+			"messageListItems");
+
+		if ((messageListItemsJSONArray == null) ||
+			(messageListItemsJSONArray.length() == 0)) {
+
+			return jsonObject.getString("message");
+		}
+
+		StringBundler sb = new StringBundler(
+			(messageListItemsJSONArray.length() * 7) + 1);
+
+		sb.append(jsonObject.getString("message"));
+
+		for (int i = 0; i < messageListItemsJSONArray.length(); i++) {
+			JSONObject messageListItemJSONObject =
+				messageListItemsJSONArray.getJSONObject(i);
+
+			sb.append(StringPool.NEW_LINE);
+			sb.append(messageListItemJSONObject.getString("type"));
+			sb.append(StringPool.SPACE);
+			sb.append(messageListItemJSONObject.getString("name"));
+			sb.append(StringPool.COLON);
+			sb.append(StringPool.SPACE);
+			sb.append(messageListItemJSONObject.getString("info"));
+		}
+
+		return sb.toString();
+	}
+
+	private Map<String, List<PreviewPortletDataHandler>>
+			_getPreviewPortletDataHandlersMap(
+				Locale locale, ManifestSummary manifestSummary,
+				String portletId)
+		throws Exception {
 
 		Map<String, List<PreviewPortletDataHandler>>
 			previewPortletDataHandlersMap = new LinkedHashMap<>();
-
-		Locale locale = contextAcceptLanguage.getPreferredLocale();
-
-		ManifestSummary manifestSummary =
-			_exportImportHelper.getManifestSummary(
-				contextUser.getUserId(), groupId, new HashMap<>(), fileEntry);
 
 		boolean portletScoped = !Validator.isBlank(portletId);
 
@@ -216,39 +330,38 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 			}
 		}
 
-		return new ImportPreview() {
-			{
-				setAdditionCount(
-					() -> PreviewPortletDataHandlerUtil.getAdditionCount(
-						previewPortletDataHandlersMap));
-				setAuthor(fileEntry::getUserName);
-				setDeletionCount(
-					() -> PreviewPortletDataHandlerUtil.getDeletionCount(
-						previewPortletDataHandlersMap));
-				setExportDate(manifestSummary::getExportDate);
-				setFileName(fileEntry::getFileName);
-				setFileSize(fileEntry::getSize);
-				setPreviewPortletDataHandlerSections(
-					() ->
-						PreviewPortletDataHandlerUtil.
-							toPreviewPortletDataHandlerSections(
-								locale, previewPortletDataHandlersMap));
-				setPreviewSites(() -> _getPreviewSites(fileEntry));
-			}
-		};
+		return previewPortletDataHandlersMap;
 	}
 
-	private PreviewSite[] _getPreviewSites(FileEntry fileEntry)
-		throws Exception {
+	private File _getUploadedFile() {
+		ServletRequest servletRequest = contextHttpServletRequest;
 
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-85946")) {
+		while (servletRequest instanceof ServletRequestWrapper) {
+			if (servletRequest instanceof UploadServletRequest) {
+				break;
+			}
 
-			return new PreviewSite[0];
+			ServletRequestWrapper servletRequestWrapper =
+				(ServletRequestWrapper)servletRequest;
+
+			servletRequest = servletRequestWrapper.getRequest();
 		}
 
+		if (!(servletRequest instanceof UploadServletRequest)) {
+			return null;
+		}
+
+		UploadServletRequest uploadServletRequest =
+			(UploadServletRequest)servletRequest;
+
+		return uploadServletRequest.getFile("file", true);
+	}
+
+	private PreviewSite[] _toPreviewSites(
+		List<ExportImportGroup> exportImportGroups) {
+
 		return transformToArray(
-			_exportImportHelper.getExportImportGroups(fileEntry),
+			exportImportGroups,
 			exportImportGroup -> new PreviewSite() {
 				{
 					setChildSitesCount(exportImportGroup::getChildGroupsCount);
@@ -273,7 +386,7 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 	}
 
 	private void _validateImportFile(
-			FileEntry fileEntry, long groupId, long plid, String portletId)
+			File file, long groupId, long plid, String portletId)
 		throws Exception {
 
 		ExportImportConfiguration exportImportConfiguration =
@@ -282,23 +395,19 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 		try {
 			if (Validator.isBlank(portletId)) {
 				_exportImportLocalService.validateImportLayoutsFile(
-					exportImportConfiguration, fileEntry.getContentStream());
+					exportImportConfiguration, file);
 			}
 			else {
 				_exportImportLocalService.validateImportPortletInfo(
-					exportImportConfiguration, fileEntry.getContentStream());
+					exportImportConfiguration, file);
 			}
 		}
 		catch (PortalException portalException) {
-			_layoutService.deleteTempFileEntry(
-				groupId, ImportPreviewResource.class.getName(),
-				fileEntry.getFileName());
-
 			JSONObject jsonObject = _staging.getExceptionMessagesJSONObject(
 				contextAcceptLanguage.getPreferredLocale(), portalException,
 				exportImportConfiguration);
 
-			throw new BadRequestException(jsonObject.getString("message"));
+			throw new BadRequestException(_getMessage(jsonObject));
 		}
 		finally {
 			_exportImportConfigurationLocalService.
@@ -317,12 +426,15 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 	private ExportImportLocalService _exportImportLocalService;
 
 	@Reference
-	private LayoutService _layoutService;
+	private PortletDataContextFactory _portletDataContextFactory;
 
 	@Reference
 	private PortletLocalService _portletLocalService;
 
 	@Reference
 	private Staging _staging;
+
+	@Reference
+	private ZipReaderFactory _zipReaderFactory;
 
 }

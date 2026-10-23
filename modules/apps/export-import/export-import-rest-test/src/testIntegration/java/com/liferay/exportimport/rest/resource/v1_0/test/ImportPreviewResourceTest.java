@@ -505,8 +505,13 @@ public class ImportPreviewResourceTest
 			UnsafeFunction<File, ImportPreview, Exception> unsafeFunction)
 		throws Exception {
 
-		ImportPreview importPreview = unsafeFunction.apply(
-			_exportLayoutAsFile(groupId));
+		File file = _exportLayoutAsFile(groupId);
+
+		ImportPreview importPreview = unsafeFunction.apply(file);
+
+		Assert.assertEquals(file.getName(), importPreview.getFileName());
+		Assert.assertEquals(
+			Long.valueOf(file.length()), importPreview.getFileSize());
 
 		long additionCount = _getAdditionCount(
 			importPreview, objectDefinition.getPortletId());
