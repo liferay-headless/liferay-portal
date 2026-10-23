@@ -39,6 +39,8 @@ renderResponse.setTitle(exportImportProcessDisplayContext.getImportTitle());
 			).put(
 				"commentsAndRatingsEnabled", exportImportProcessDisplayContext.isCommentsAndRatingsEnabled()
 			).put(
+				"importFDSName", exportImportProcessDisplayContext.getImportFDSName()
+			).put(
 				"importPreviewAPIURL", exportImportProcessDisplayContext.getImportPreviewAPIURL()
 			).put(
 				"importProcessAPIURL", exportImportProcessDisplayContext.getImportProcessAPIURL()

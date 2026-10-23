@@ -14,6 +14,8 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {navigate} from 'frontend-js-web';
+import fetch from 'jest-fetch-mock';
 import React from 'react';
 
 import {NewImport} from '../../../../../src/main/resources/META-INF/resources/revamp/js/pages/import/NewImport';
@@ -22,6 +24,11 @@ import {SCOPES} from '../../../../../src/main/resources/META-INF/resources/revam
 import formatDate from '../../../../../src/main/resources/META-INF/resources/revamp/js/utils/formatDate';
 import {mockImportPreview} from '../../mocks/mockImportPreview';
 import {mockPreviewPortletDataHandlerSectionsForFilterTest} from '../../mocks/mockSectionsForFilterTest';
+
+jest.mock('frontend-js-web', () => ({
+	...(jest.requireActual('frontend-js-web') as object),
+	navigate: jest.fn(),
+}));
 
 jest.mock(
 	'../../../../../src/main/resources/META-INF/resources/revamp/js/services/postImportPreview',
@@ -45,6 +52,7 @@ const renderComponent = ({
 		<NewImport
 			backURL="/some/back/url"
 			commentsAndRatingsEnabled={commentsAndRatingsEnabled}
+			importFDSName="importProcesses"
 			importPreviewAPIURL="/o/export-import/v1.0/import-preview"
 			importProcessAPIURL="/o/export-import/v1.0/import-processes"
 			lookAndFeelEnabled={lookAndFeelEnabled}
@@ -327,6 +335,113 @@ describe('NewImport', () => {
 		).not.toBeInTheDocument();
 
 		await checkAccessibility({context: container});
+	});
+
+	it('disables Import and goes to the processes list once the import has started', async () => {
+		fetch.mockResponseOnce(JSON.stringify({id: 1}));
+
+		await goToDataSelectionStep();
+
+		await user.click(screen.getByRole('button', {name: /continue/i}));
+
+		const importButton = screen.getByRole('button', {name: /^import$/i});
+
+		await waitFor(() => expect(importButton).toBeEnabled());
+
+		await user.click(importButton);
+
+		await waitFor(() =>
+			expect(navigate).toHaveBeenCalledWith('/some/back/url')
+		);
+
+		expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+			message: 'the-process-has-started',
+			type: 'success',
+		});
+		expect(screen.getByRole('button', {name: /^import$/i})).toBeDisabled();
+	});
+
+	describe('with single page navigation', () => {
+		const liferay = Liferay as unknown as {SPA?: object};
+
+		beforeEach(() => {
+			jest.clearAllMocks();
+
+			liferay.SPA = {app: {canNavigate: () => true}};
+		});
+
+		afterEach(() => {
+			delete liferay.SPA;
+		});
+
+		it('goes to the processes list before the import request answers and refreshes it once the process exists', async () => {
+			let answerImport: (body: string) => void = () => {};
+
+			fetch.mockResponseOnce(
+				() =>
+					new Promise((resolve) => {
+						answerImport = resolve;
+					})
+			);
+
+			await goToDataSelectionStep();
+
+			await user.click(screen.getByRole('button', {name: /continue/i}));
+
+			const importButton = screen.getByRole('button', {
+				name: /^import$/i,
+			});
+
+			await waitFor(() => expect(importButton).toBeEnabled());
+
+			await user.click(importButton);
+
+			await waitFor(() =>
+				expect(navigate).toHaveBeenCalledWith('/some/back/url')
+			);
+
+			expect(Liferay.fire).not.toHaveBeenCalledWith(
+				'fds-update-display',
+				expect.anything()
+			);
+
+			answerImport(JSON.stringify({id: 1}));
+
+			await waitFor(() =>
+				expect(Liferay.fire).toHaveBeenCalledWith(
+					'fds-update-display',
+					{id: 'importProcesses'}
+				)
+			);
+		});
+
+		it('shows the error once the import request fails after leaving the wizard', async () => {
+			fetch.mockResponseOnce(
+				JSON.stringify({title: 'The import could not start.'}),
+				{status: 400}
+			);
+
+			await goToDataSelectionStep();
+
+			await user.click(screen.getByRole('button', {name: /continue/i}));
+
+			const importButton = screen.getByRole('button', {
+				name: /^import$/i,
+			});
+
+			await waitFor(() => expect(importButton).toBeEnabled());
+
+			await user.click(importButton);
+
+			await waitFor(() =>
+				expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+					message: 'The import could not start.',
+					type: 'danger',
+				})
+			);
+
+			expect(navigate).toHaveBeenCalledWith('/some/back/url');
+		});
 	});
 
 	it('shows the section as indeterminate and summarizes the selected handlers when the selection is partial', async () => {

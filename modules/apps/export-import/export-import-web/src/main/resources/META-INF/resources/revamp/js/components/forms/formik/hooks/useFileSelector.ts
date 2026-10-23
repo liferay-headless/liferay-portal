@@ -17,12 +17,15 @@ const TRANSIENT_STATUSES: FileSelectorStatus[] = [
 	'VALIDATING',
 ];
 
+export type UploadRequest<T> = (
+	file: File,
+	onProgress: (percent: number) => void,
+	signal?: AbortSignal
+) => Promise<RequestResult<T>>;
+
 export function useFileSelector<T>(
 	name: string,
-	uploadRequest: (
-		file: File,
-		signal?: AbortSignal
-	) => Promise<RequestResult<T>>
+	uploadRequest: UploadRequest<T>
 ) {
 	const [field, meta, helpers] = useField(name);
 
@@ -32,6 +35,8 @@ export function useFileSelector<T>(
 		field.value ? 'STABLE_SUCCESS' : 'IDLE'
 	);
 
+	const [progress, setProgress] = useState<number>();
+
 	const [selectedFile, setSelectedFile] = useState<File | undefined>(
 		field.value instanceof File ? field.value : undefined
 	);
@@ -40,15 +45,6 @@ export function useFileSelector<T>(
 
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const isMountedRef = useRef(true);
-	const uploadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	const cleanupProcesses = useCallback(() => {
-		abortControllerRef.current?.abort();
-
-		if (uploadTimeoutRef.current) {
-			clearTimeout(uploadTimeoutRef.current);
-		}
-	}, []);
 
 	const handleRejection = useCallback(
 		(message: string) => {
@@ -62,10 +58,11 @@ export function useFileSelector<T>(
 	);
 
 	const handleRemove = () => {
-		cleanupProcesses();
+		abortControllerRef.current?.abort();
 		abortControllerRef.current = null;
 
 		setStatus('IDLE');
+		setProgress(undefined);
 		setSelectedFile(undefined);
 		setValue(undefined);
 		setServerError(undefined);
@@ -73,24 +70,40 @@ export function useFileSelector<T>(
 	};
 
 	const handleUpload = async (file: File) => {
-		cleanupProcesses();
+		abortControllerRef.current?.abort();
 
 		const controller = new AbortController();
 		abortControllerRef.current = controller;
 
+		const isCurrentUpload = () =>
+			isMountedRef.current && !controller.signal.aborted;
+
 		setStatus('UPLOADING');
+		setProgress(0);
 		setServerError(undefined);
 		setSelectedFile(file);
 		setValue(undefined);
 
-		try {
-			const result = await uploadRequest(file, controller.signal);
+		const handleProgress = (percent: number) => {
+			if (!isCurrentUpload()) {
+				return;
+			}
 
-			if (
-				!isMountedRef.current ||
-				controller.signal.aborted ||
-				result.error === 'Aborted'
-			) {
+			setProgress(percent);
+
+			if (percent === 100) {
+				setStatus('VALIDATING');
+			}
+		};
+
+		try {
+			const result = await uploadRequest(
+				file,
+				handleProgress,
+				controller.signal
+			);
+
+			if (!isCurrentUpload() || result.error === 'Aborted') {
 				return;
 			}
 
@@ -103,22 +116,12 @@ export function useFileSelector<T>(
 				return;
 			}
 
-			setStatus('VALIDATING');
-
-			uploadTimeoutRef.current = setTimeout(() => {
-				if (isMountedRef.current && !controller.signal.aborted) {
-					setStatus('SUCCESS');
-					setValue(file);
-					setTouched(true);
-				}
-			}, STATUS_CHANGE_DELAY);
+			setStatus('SUCCESS');
+			setValue(file);
+			setTouched(true);
 		}
 		catch (error: any) {
-			if (
-				!isMountedRef.current ||
-				controller.signal.aborted ||
-				error.name === 'AbortError'
-			) {
+			if (!isCurrentUpload() || error.name === 'AbortError') {
 				return;
 			}
 
@@ -151,9 +154,9 @@ export function useFileSelector<T>(
 	useEffect(() => {
 		return () => {
 			isMountedRef.current = false;
-			cleanupProcesses();
+			abortControllerRef.current?.abort();
 		};
-	}, [cleanupProcesses]);
+	}, []);
 
 	useEffect(() => {
 		if (status === 'SUCCESS') {
@@ -179,6 +182,7 @@ export function useFileSelector<T>(
 		handleRejection,
 		handleRemove,
 		handleUpload,
+		progress,
 		selectedFile,
 		status,
 		validate,

@@ -7,6 +7,7 @@
 import {checkAccessibility} from '@liferay/layout-js-components-web/test/__lib__/index';
 import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {navigate} from 'frontend-js-web';
 import fetch from 'jest-fetch-mock';
 import React from 'react';
 
@@ -17,6 +18,11 @@ import {Preview} from '../../../../../src/main/resources/META-INF/resources/reva
 import {LAYOUT_SET_LAYOUTS_PORTLET_DATA_KEY} from '../../../../../src/main/resources/META-INF/resources/revamp/js/utils/contentSelection';
 import {mockPageTreeItems} from '../../mocks/mockPageTreeItems';
 import {mockPreview} from '../../mocks/mockPreview';
+
+jest.mock('frontend-js-web', () => ({
+	...(jest.requireActual('frontend-js-web') as object),
+	navigate: jest.fn(),
+}));
 
 jest.mock('staging-taglib', () => ({
 	PagesTree: require('../../mocks/MockPagesTree').MockPagesTree,
@@ -674,10 +680,16 @@ describe('NewExport', () => {
 			);
 
 			await waitFor(() =>
-				expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-					'/some/back/url'
-				)
+				expect(navigate).toHaveBeenCalledWith('/some/back/url')
 			);
+
+			expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+				message: 'the-process-has-started',
+				type: 'success',
+			});
+			expect(
+				screen.getByRole('button', {name: /^export$/i})
+			).toBeDisabled();
 		});
 
 		it('exports all private pages by default when the private layout is the default', async () => {

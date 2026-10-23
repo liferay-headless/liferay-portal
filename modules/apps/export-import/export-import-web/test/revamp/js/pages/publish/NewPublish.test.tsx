@@ -11,6 +11,7 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {navigate} from 'frontend-js-web';
 import fetch from 'jest-fetch-mock';
 import React from 'react';
 
@@ -23,6 +24,11 @@ import {
 	toWallClockDateTime,
 } from '../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
 import {mockPreview} from '../../mocks/mockPreview';
+
+jest.mock('frontend-js-web', () => ({
+	...(jest.requireActual('frontend-js-web') as object),
+	navigate: jest.fn(),
+}));
 
 jest.mock('staging-taglib', () => ({
 	PagesTree: require('../../mocks/MockPagesTree').MockPagesTree,
@@ -186,9 +192,15 @@ describe('NewPublish', () => {
 		expect(body.permissions).toBe(false);
 		expect(body.requestPortletDataHandlers.length).toBeGreaterThan(0);
 
-		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.processesBackURL
-		);
+		expect(navigate).toHaveBeenCalledWith(DEFAULT_PROPS.processesBackURL);
+
+		expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+			message: 'the-process-has-started',
+			type: 'success',
+		});
+		expect(
+			screen.getByRole('button', {name: /publish-to-live/i})
+		).toBeDisabled();
 	});
 
 	it('selects the schedule option when it is the default', async () => {
@@ -515,9 +527,12 @@ describe('NewPublish', () => {
 		);
 		expect(body.timeZoneId).toBe('UTC');
 
-		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.scheduledBackURL
-		);
+		expect(navigate).toHaveBeenCalledWith(DEFAULT_PROPS.scheduledBackURL);
+
+		expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+			message: 'the-publication-has-been-scheduled',
+			type: 'success',
+		});
 	});
 
 	it('drops the end date once the repetition goes back to never', async () => {
@@ -884,9 +899,7 @@ describe('NewPublish', () => {
 		expect(String(getUnscheduleCall()![0])).toContain(
 			String(SCHEDULED_PUBLISH_PROCESS.id)
 		);
-		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.scheduledBackURL
-		);
+		expect(navigate).toHaveBeenCalledWith(DEFAULT_PROPS.scheduledBackURL);
 	});
 
 	it('navigates to processes when an edited scheduled process is switched to publish now', async () => {
@@ -908,9 +921,7 @@ describe('NewPublish', () => {
 		expect(String(getUnscheduleCall()![0])).toContain(
 			String(SCHEDULED_PUBLISH_PROCESS.id)
 		);
-		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.processesBackURL
-		);
+		expect(navigate).toHaveBeenCalledWith(DEFAULT_PROPS.processesBackURL);
 	});
 
 	it('requires a future start date when the edited process has started', async () => {
@@ -994,9 +1005,7 @@ describe('NewPublish', () => {
 			expect(getPublishProcessCall()).toBeDefined();
 		});
 
-		expect(Liferay.Util.navigate).toHaveBeenCalledWith(
-			DEFAULT_PROPS.scheduledBackURL
-		);
+		expect(navigate).toHaveBeenCalledWith(DEFAULT_PROPS.scheduledBackURL);
 	});
 
 	it('keeps the old process scheduled until the new one is created', async () => {

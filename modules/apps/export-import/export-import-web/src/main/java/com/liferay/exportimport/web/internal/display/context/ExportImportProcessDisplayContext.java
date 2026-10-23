@@ -10,6 +10,7 @@ import com.liferay.exportimport.rest.dto.v1_0.ExportPreview;
 import com.liferay.exportimport.rest.resource.v1_0.ExportPreviewResource;
 import com.liferay.exportimport.util.ScopeUtil;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate.Scope;
+import com.liferay.exportimport.web.internal.constants.ExportImportFDSNames;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -202,6 +203,14 @@ public class ExportImportProcessDisplayContext {
 
 	public String getExportTitle() {
 		return _getTitle("new-export-process");
+	}
+
+	public String getImportFDSName() {
+		if (ScopeUtil.isInstanceScoped(_group)) {
+			return ExportImportFDSNames.COMPANY_IMPORT_PROCESSES;
+		}
+
+		return ExportImportFDSNames.IMPORT_PROCESSES;
 	}
 
 	public String getImportPreviewAPIURL() {

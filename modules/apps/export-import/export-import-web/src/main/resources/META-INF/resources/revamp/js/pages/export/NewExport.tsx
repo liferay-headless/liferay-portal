@@ -27,6 +27,7 @@ import {
 	withSelectedLayoutSetCount,
 } from '../../utils/contentSelection';
 import {getProcessFormErrors} from '../../utils/getProcessFormErrors';
+import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toRequestPortletDataHandlers} from '../../utils/toRequestPortletDataHandlers';
 import SiteSelection from './components/SiteSelection';
 
@@ -84,7 +85,7 @@ export function NewExport({
 	return (
 		<Formik
 			initialValues={initialFormValues}
-			onSubmit={async (values) => {
+			onSubmit={async (values, formikHelpers) => {
 				const result = await postExportProcess({
 					exportProcessRequest: {
 						...appliedDateFilterRef.current,
@@ -112,7 +113,11 @@ export function NewExport({
 					return;
 				}
 
-				Liferay.Util.navigate(backURL);
+				navigateToProcesses(
+					formikHelpers,
+					Liferay.Language.get('the-process-has-started'),
+					backURL
+				);
 			}}
 			validate={(values) =>
 				getProcessFormErrors(values, siteSelectionEnabled)
@@ -131,9 +136,6 @@ export function NewExport({
 						<Setup
 							placeholder={Liferay.Language.get(
 								'add-an-export-name'
-							)}
-							subtitle={Liferay.Language.get(
-								'provide-a-descriptive-name-for-your-file'
 							)}
 							title={sub(
 								Liferay.Language.get('x-details'),
@@ -213,7 +215,9 @@ export function NewExport({
 							actionButton={
 								<ClayButton
 									disabled={
-										formik.isSubmitting || !formik.isValid
+										formik.isSubmitting ||
+										formik.status?.submitted ||
+										!formik.isValid
 									}
 									type="submit"
 								>

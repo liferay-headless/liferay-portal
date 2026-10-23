@@ -21,7 +21,7 @@ function Footer({
 	onPrevious?: () => void;
 }) {
 	return (
-		<ClayLayout.SheetFooter>
+		<ClayLayout.SheetFooter className="mt-5">
 			<ClayLayout.Row className="flex-fill">
 				{onPrevious && (
 					<ClayLayout.Col lg={4}>
@@ -46,7 +46,11 @@ function Footer({
 						</ClayLink>
 
 						{actionButton ? (
-							actionButton
+							React.cloneElement(actionButton, {
+								disabled:
+									actionButton.props.disabled ||
+									continueDisabled,
+							})
 						) : (
 							<ClayButton
 								disabled={continueDisabled}

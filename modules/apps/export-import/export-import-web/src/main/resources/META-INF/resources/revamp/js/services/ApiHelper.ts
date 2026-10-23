@@ -97,7 +97,7 @@ async function postFormDataWithProgress<T>(
 		if (onProgress && xhr.upload) {
 			xhr.upload.onprogress = (event) => {
 				if (event.lengthComputable) {
-					onProgress(Math.round((event.loaded / event.total) * 100));
+					onProgress(Math.floor((event.loaded / event.total) * 100));
 				}
 			};
 		}

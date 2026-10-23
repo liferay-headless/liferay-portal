@@ -12,6 +12,7 @@ import ClayAlert from '@clayui/alert';
 import {ButtonWithIcon} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
 import {formatStorage} from 'frontend-js-web';
 
@@ -144,19 +145,40 @@ export default function FileSelector({
 
 							{config.showProgressBar && (
 								<div className="mt-2">
-									<ProgressBar
-										fillBarClassName={
-											status === 'VALIDATING'
-												? 'progress-bar-animated progress-bar-striped'
-												: ''
-										}
-										value={
-											status === 'SUCCESS' ||
-											status === 'VALIDATING'
-												? 100
-												: progress ?? 0
-										}
-									/>
+									{status === 'VALIDATING' ? (
+										<ProgressBar
+											fillBarClassName="progress-bar-animated progress-bar-striped"
+											messages={{
+												ariaLabelAttention:
+													Liferay.Language.get(
+														'validating'
+													),
+												ariaLabelComplete:
+													Liferay.Language.get(
+														'validating'
+													),
+												ariaLabelInProgress:
+													Liferay.Language.get(
+														'validating'
+													),
+											}}
+											value={99.99}
+										>
+											<ClayLoadingIndicator
+												className="m-0"
+												displayType="secondary"
+												size="sm"
+											/>
+										</ProgressBar>
+									) : (
+										<ProgressBar
+											value={
+												status === 'SUCCESS'
+													? 100
+													: progress ?? 0
+											}
+										/>
+									)}
 
 									<div
 										aria-live="polite"

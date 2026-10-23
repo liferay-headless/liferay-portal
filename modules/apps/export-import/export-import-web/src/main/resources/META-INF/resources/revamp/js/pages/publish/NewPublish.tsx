@@ -28,6 +28,7 @@ import {
 } from '../../utils/contentSelection';
 import {toWallClockDateTime, toZonedDate} from '../../utils/dateTime';
 import {getProcessFormErrors} from '../../utils/getProcessFormErrors';
+import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toContentSelection} from '../../utils/toContentSelection';
 import {toDateFilterValues} from '../../utils/toDateFilterValues';
 import {toRequestPortletDataHandlers} from '../../utils/toRequestPortletDataHandlers';
@@ -208,7 +209,7 @@ export function NewPublish({
 	return (
 		<Formik
 			initialValues={initialFormValues}
-			onSubmit={async (values) => {
+			onSubmit={async (values, formikHelpers) => {
 				const scheduleValues = values.scheduleValues;
 
 				const scheduled = scheduleValues.enabled;
@@ -269,7 +270,13 @@ export function NewPublish({
 					}
 				}
 
-				Liferay.Util.navigate(
+				navigateToProcesses(
+					formikHelpers,
+					scheduled
+						? Liferay.Language.get(
+								'the-publication-has-been-scheduled'
+							)
+						: Liferay.Language.get('the-process-has-started'),
 					scheduled ? scheduledBackURL : processesBackURL
 				);
 			}}
@@ -305,9 +312,6 @@ export function NewPublish({
 						<Setup
 							placeholder={Liferay.Language.get(
 								'process-name-placeholder'
-							)}
-							subtitle={Liferay.Language.get(
-								'name-your-process-and-choose-when-to-publish'
 							)}
 							title={sub(
 								Liferay.Language.get('x-details'),
@@ -369,7 +373,9 @@ export function NewPublish({
 							actionButton={
 								<ClayButton
 									disabled={
-										formik.isSubmitting || !formik.isValid
+										formik.isSubmitting ||
+										formik.status?.submitted ||
+										!formik.isValid
 									}
 									type="submit"
 								>
