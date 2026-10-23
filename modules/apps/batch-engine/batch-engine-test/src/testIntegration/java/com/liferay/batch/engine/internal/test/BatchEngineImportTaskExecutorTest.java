@@ -6,6 +6,7 @@
 package com.liferay.batch.engine.internal.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.batch.engine.BatchEngineContentProcessor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
 import com.liferay.batch.engine.BatchEngineTaskOperation;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.spring.orm.LastSessionRecorderHelper;
 import com.liferay.portal.kernel.spring.orm.LastSessionRecorderHelperUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -390,6 +392,106 @@ public class BatchEngineImportTaskExecutorTest
 				LastSessionRecorderHelperUtil.class,
 				"_lastSessionRecorderHelper",
 				originalLastSessionRecorderHelper);
+		}
+	}
+
+	@Test
+	@TestInfo("LPD-108617")
+	public void testCreateBlogPostingsWithBatchEngineContentProcessor()
+		throws Exception {
+
+		Bundle bundle = FrameworkUtil.getBundle(
+			BatchEngineImportTaskExecutorTest.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		List<String> headlines = new ArrayList<>();
+
+		List<ServiceRegistration<BatchEngineContentProcessor>>
+			serviceRegistrations = Arrays.asList(
+				bundleContext.registerService(
+					BatchEngineContentProcessor.class,
+					(content, fieldNameValueMap) -> "unexpected",
+					HashMapDictionaryBuilder.<String, Object>put(
+						"field.name", "articleBody1"
+					).put(
+						"model.class.name", BlogsEntry.class.getName()
+					).build()),
+				bundleContext.registerService(
+					BatchEngineContentProcessor.class,
+					(content, fieldNameValueMap) -> {
+						headlines.add(content);
+
+						return StringBundler.concat(
+							content, StringPool.DASH,
+							fieldNameValueMap.get("articleBody1"));
+					},
+					HashMapDictionaryBuilder.<String, Object>put(
+						"field.name", "headline1"
+					).put(
+						"model.class.name", BlogPosting.class.getName()
+					).build()));
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(StringPool.OPEN_BRACKET);
+
+		for (int i = 0; i < ROWS_COUNT; i++) {
+			_createJSONRow(
+				sb, _ALTERNATE_FIELD_NAMES[0],
+				_toJSONValue("alternativeHeadline" + i),
+				_ALTERNATE_FIELD_NAMES[1], _toJSONValue("articleBody" + i),
+				_ALTERNATE_FIELD_NAMES[2],
+				_toJSONValue(
+					dateFormat.format(new Date(_toTime(baseDate, i - 1000)))),
+				_ALTERNATE_FIELD_NAMES[3], _toJSONValue("headline" + i),
+				_ALTERNATE_FIELD_NAMES[4],
+				String.valueOf(TestPropsValues.getGroupId()), "nested",
+				"{\"headline1\": \"nested\"}");
+
+			sb.append(StringPool.COMMA);
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		sb.append(StringPool.CLOSE_BRACKET);
+
+		ExportImportThreadLocal.setPortletImportInProcess(true);
+
+		try {
+			_importBlogPostings(
+				BatchEngineTaskOperation.CREATE, _toContent("JSON", sb), "JSON",
+				_fieldNamesMappingMap);
+		}
+		finally {
+			ExportImportThreadLocal.setPortletImportInProcess(false);
+
+			for (ServiceRegistration<BatchEngineContentProcessor>
+					serviceRegistration : serviceRegistrations) {
+
+				serviceRegistration.unregister();
+			}
+		}
+
+		Assert.assertEquals(
+			ROWS_COUNT, _batchEngineImportTask.getProcessedItemsCount());
+		Assert.assertEquals(headlines.toString(), ROWS_COUNT, headlines.size());
+		Assert.assertFalse(headlines.contains("nested"));
+
+		List<BlogsEntry> blogsEntries = new ArrayList<>(
+			blogsEntryLocalService.getGroupEntries(
+				TestPropsValues.getGroupId(),
+				new QueryDefinition<>(WorkflowConstants.STATUS_ANY)));
+
+		blogsEntries.sort(Comparator.comparingLong(BlogsEntry::getEntryId));
+
+		for (int i = 0; i < ROWS_COUNT; i++) {
+			BlogsEntry blogsEntry = blogsEntries.get(i + initialCount);
+
+			Assert.assertEquals("articleBody" + i, blogsEntry.getContent());
+			Assert.assertEquals(
+				StringBundler.concat("headline", i, "-articleBody", i),
+				blogsEntry.getTitle());
 		}
 	}
 

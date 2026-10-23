@@ -639,7 +639,7 @@ public class PageTemplateResourceImpl
 
 			ServiceContextUtil.setLayoutSetPrototypeLayoutERC(
 				serviceContext.getScopeGroupId(), widgetPageSpecification,
-				serviceContext,
+				false, serviceContext,
 				widgetPageSpecification.
 					getSiteTemplatePageSpecificationExternalReferenceCode());
 		}
