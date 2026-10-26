@@ -12,21 +12,29 @@ import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
+import com.liferay.exportimport.rest.dto.v1_0.ImportPreview;
 import com.liferay.exportimport.rest.dto.v1_0.ImportProcess;
 import com.liferay.exportimport.rest.dto.v1_0.ImportProcessRequest;
 import com.liferay.exportimport.rest.dto.v1_0.InstanceImportProcessRequest;
+import com.liferay.exportimport.rest.dto.v1_0.PortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.ProcessProgress;
 import com.liferay.exportimport.rest.dto.v1_0.Site;
 import com.liferay.exportimport.rest.dto.v1_0.Status;
 import com.liferay.exportimport.rest.internal.util.BackgroundTaskUtil;
 import com.liferay.exportimport.rest.internal.util.GroupUtil;
+import com.liferay.exportimport.rest.internal.util.ImportPreviewUtil;
 import com.liferay.exportimport.rest.internal.util.ImportTempFileEntryUtil;
+import com.liferay.exportimport.rest.internal.util.ImportUploadUtil;
 import com.liferay.exportimport.rest.internal.util.LayoutUtil;
 import com.liferay.exportimport.rest.internal.util.ParameterMapUtil;
 import com.liferay.exportimport.rest.internal.util.PermissionUtil;
 import com.liferay.exportimport.rest.internal.util.PortletDataHandlerUtil;
 import com.liferay.exportimport.rest.resource.v1_0.ImportProcessResource;
+import com.liferay.exportimport.upload.ImportUploadEntry;
+import com.liferay.exportimport.upload.ImportUploadException;
+import com.liferay.exportimport.upload.ImportUploadManager;
 import com.liferay.headless.delivery.dto.v1_0.util.CreatorUtil;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
@@ -52,6 +60,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+
+import jakarta.ws.rs.BadRequestException;
 
 import java.io.Serializable;
 
@@ -86,14 +96,11 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
 
-		long tempFileEntryId = MapUtil.getLong(
-			backgroundTask.getTaskContextMap(), "tempFileEntryId");
-
-		if ((tempFileEntryId > 0) && !backgroundTask.isCompleted() &&
+		if (!backgroundTask.isCompleted() &&
 			(backgroundTask.getStatus() !=
 				BackgroundTaskConstants.STATUS_IN_PROGRESS)) {
 
-			PortletFileRepositoryUtil.deletePortletFileEntry(tempFileEntryId);
+			_deleteImportFile(backgroundTask);
 		}
 
 		_backgroundTaskLocalService.deleteBackgroundTask(backgroundTask);
@@ -236,7 +243,8 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 	private ImportProcess _addImportProcess(
 			String backgroundTaskExecutorName,
 			ExportImportConfiguration exportImportConfiguration,
-			FileEntry fileEntry, boolean resolvePrivateLayout)
+			Map<String, Serializable> fileTaskContextMap,
+			boolean resolvePrivateLayout, long uploadGroupId)
 		throws Exception {
 
 		BackgroundTask backgroundTask =
@@ -248,12 +256,49 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 					exportImportConfiguration.getExportImportConfigurationId()
 				).put(
 					"resolvePrivateLayout", resolvePrivateLayout
-				).put(
-					"tempFileEntryId", fileEntry.getFileEntryId()
+				).putAll(
+					fileTaskContextMap
 				).build(),
 				new ServiceContext());
 
+		String importUploadId = MapUtil.getString(
+			fileTaskContextMap, "importUploadId");
+
+		if (Validator.isNotNull(importUploadId)) {
+			long previewBackgroundTaskId =
+				ImportUploadUtil.fetchPreviewBackgroundTaskId(
+					uploadGroupId, importUploadId);
+
+			if (previewBackgroundTaskId > 0) {
+				_backgroundTaskLocalService.deleteBackgroundTask(
+					previewBackgroundTaskId);
+			}
+		}
+
 		return _toImportProcess(backgroundTask);
+	}
+
+	private void _deleteImportFile(BackgroundTask backgroundTask)
+		throws Exception {
+
+		Map<String, Serializable> taskContextMap =
+			backgroundTask.getTaskContextMap();
+
+		if (taskContextMap.containsKey("importUploadId")) {
+			_importUploadManager.deleteImportUpload(
+				MapUtil.getLong(taskContextMap, "uploadGroupId"),
+				backgroundTask.getUserId(),
+				MapUtil.getString(taskContextMap, "importUploadId"));
+
+			return;
+		}
+
+		long tempFileEntryId = MapUtil.getLong(
+			taskContextMap, "tempFileEntryId");
+
+		if (tempFileEntryId > 0) {
+			PortletFileRepositoryUtil.deletePortletFileEntry(tempFileEntryId);
+		}
 	}
 
 	private List<BackgroundTask> _getBackgroundTasks(
@@ -319,6 +364,120 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 		return dynamicQuery;
 	}
 
+	private Map<String, Serializable> _getFileTaskContextMap(
+			long groupId, ImportProcessRequest importProcessRequest,
+			long uploadGroupId)
+		throws Exception {
+
+		String importUploadId = importProcessRequest.getImportUploadId();
+
+		if (Validator.isNull(importUploadId)) {
+			FileEntry fileEntry = ImportTempFileEntryUtil.getTempFileEntry(
+				groupId, contextUser.getUserId());
+
+			return HashMapBuilder.<String, Serializable>put(
+				"fileName", ImportTempFileEntryUtil.getFileName(fileEntry)
+			).put(
+				"tempFileEntryId", fileEntry.getFileEntryId()
+			).build();
+		}
+
+		ImportUploadEntry importUploadEntry = null;
+
+		try {
+			importUploadEntry = _importUploadManager.fetchImportUpload(
+				uploadGroupId, contextUser.getUserId(), importUploadId);
+		}
+		catch (ImportUploadException importUploadException) {
+			throw new BadRequestException(
+				importUploadException.getMessage(), importUploadException);
+		}
+
+		if (importUploadEntry == null) {
+			throw new BadRequestException(
+				_language.get(
+					contextAcceptLanguage.getPreferredLocale(),
+					"the-uploaded-file-has-expired-please-upload-it-again"));
+		}
+
+		BackgroundTask backgroundTask =
+			_backgroundTaskLocalService.fetchBackgroundTask(
+				ImportUploadUtil.fetchPreviewBackgroundTaskId(
+					uploadGroupId, importUploadId));
+
+		if (backgroundTask == null) {
+			throw new BadRequestException(
+				_language.get(
+					contextAcceptLanguage.getPreferredLocale(),
+					"the-upload-is-not-complete"));
+		}
+
+		int status = backgroundTask.getStatus();
+
+		if ((status == BackgroundTaskConstants.STATUS_CANCELLED) ||
+			(status == BackgroundTaskConstants.STATUS_FAILED)) {
+
+			String errorMessage = ImportUploadUtil.getErrorMessage(
+				backgroundTask.getStatusMessage());
+
+			if (errorMessage == null) {
+				errorMessage = _language.get(
+					contextAcceptLanguage.getPreferredLocale(),
+					"an-unexpected-error-occurred");
+			}
+
+			throw new BadRequestException(errorMessage);
+		}
+
+		if (status != BackgroundTaskConstants.STATUS_SUCCESSFUL) {
+			throw new BadRequestException(
+				_language.get(
+					contextAcceptLanguage.getPreferredLocale(),
+					"the-upload-is-not-complete"));
+		}
+
+		if (!importUploadEntry.isComplete()) {
+			throw new BadRequestException(
+				_language.get(
+					contextAcceptLanguage.getPreferredLocale(),
+					"the-uploaded-file-has-expired-please-upload-it-again"));
+		}
+
+		return HashMapBuilder.<String, Serializable>put(
+			"fileName", importUploadEntry.getFileName()
+		).put(
+			"importUploadId", importUploadId
+		).put(
+			"uploadGroupId", uploadGroupId
+		).build();
+	}
+
+	private PortletDataHandler[] _getImportPortletDataHandlers(
+			Map<String, Serializable> fileTaskContextMap, long uploadGroupId,
+			UnsafeFunction<FileEntry, PortletDataHandler[], Exception>
+				unsafeFunction)
+		throws Exception {
+
+		String importUploadId = MapUtil.getString(
+			fileTaskContextMap, "importUploadId");
+
+		if (Validator.isNull(importUploadId)) {
+			return unsafeFunction.apply(
+				PortletFileRepositoryUtil.getPortletFileEntry(
+					MapUtil.getLong(fileTaskContextMap, "tempFileEntryId")));
+		}
+
+		BackgroundTask backgroundTask =
+			_backgroundTaskLocalService.getBackgroundTask(
+				ImportUploadUtil.fetchPreviewBackgroundTaskId(
+					uploadGroupId, importUploadId));
+
+		ImportPreview importPreview = ImportPreviewUtil.toImportPreview(
+			backgroundTask.getStatusMessage());
+
+		return importPreview.getPortletDataHandlers();
+	}
+
 	private Page<ImportProcess> _getImportProcessesPage(
 			Long creatorId, Group group, Pagination pagination,
 			String portletId, String search, Sort[] sorts, Integer status)
@@ -354,7 +513,7 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 
 		return _postPortletImportProcess(
 			GroupUtil.getScopeGroup(group, layout, portletId),
-			importProcessRequest, layout, portletId);
+			importProcessRequest, layout, portletId, group.getGroupId());
 	}
 
 	private ImportProcess _postLayoutImportProcess(
@@ -368,24 +527,31 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 			contextCompany.getCompanyId(), groupId,
 			ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
-		FileEntry fileEntry = ImportTempFileEntryUtil.getTempFileEntry(
-			groupId, contextUser.getUserId());
+		Map<String, Serializable> fileTaskContextMap = _getFileTaskContextMap(
+			groupId, importProcessRequest, groupId);
 
 		String name = importProcessRequest.getName();
 
 		if (Validator.isBlank(name)) {
-			name = ImportTempFileEntryUtil.getFileName(fileEntry);
+			name = MapUtil.getString(fileTaskContextMap, "fileName");
 		}
-
-		ManifestSummary manifestSummary =
-			_exportImportHelper.getManifestSummary(
-				contextUser.getUserId(), groupId, new HashMap<>(), fileEntry);
 
 		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
 			importProcessRequest,
-			PortletDataHandlerUtil.getImportPortletDataHandlers(
-				false, group, contextAcceptLanguage.getPreferredLocale(),
-				manifestSummary, manifestSummary.getDataPortlets(), false),
+			_getImportPortletDataHandlers(
+				fileTaskContextMap, groupId,
+				fileEntry -> {
+					ManifestSummary manifestSummary =
+						_exportImportHelper.getManifestSummary(
+							contextUser.getUserId(), groupId, new HashMap<>(),
+							fileEntry);
+
+					return PortletDataHandlerUtil.getImportPortletDataHandlers(
+						false, group,
+						contextAcceptLanguage.getPreferredLocale(),
+						manifestSummary, manifestSummary.getDataPortlets(),
+						false);
+				}),
 			false);
 
 		ParameterMapUtil.putSiteExternalReferenceCodes(
@@ -408,13 +574,13 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 
 		return _addImportProcess(
 			BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR,
-			exportImportConfiguration, fileEntry,
-			!group.isLayoutSetPrototype());
+			exportImportConfiguration, fileTaskContextMap,
+			!group.isLayoutSetPrototype(), groupId);
 	}
 
 	private ImportProcess _postPortletImportProcess(
 			Group group, ImportProcessRequest importProcessRequest,
-			Layout layout, String portletId)
+			Layout layout, String portletId, long uploadGroupId)
 		throws Exception {
 
 		long groupId = group.getGroupId();
@@ -423,26 +589,30 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 			contextCompany.getCompanyId(), groupId,
 			ActionKeys.EXPORT_IMPORT_PORTLET_INFO);
 
-		FileEntry fileEntry = ImportTempFileEntryUtil.getTempFileEntry(
-			groupId, contextUser.getUserId());
+		Map<String, Serializable> fileTaskContextMap = _getFileTaskContextMap(
+			groupId, importProcessRequest, uploadGroupId);
 
 		String name = importProcessRequest.getName();
 
 		if (Validator.isBlank(name)) {
-			name = ImportTempFileEntryUtil.getFileName(fileEntry);
+			name = MapUtil.getString(fileTaskContextMap, "fileName");
 		}
 
 		Map<String, String[]> parameterMap = ParameterMapUtil.toParameterMap(
 			importProcessRequest,
-			PortletDataHandlerUtil.getImportPortletDataHandlers(
-				false, group, contextAcceptLanguage.getPreferredLocale(),
-				_exportImportHelper.getManifestSummary(
-					contextUser.getUserId(), groupId, new HashMap<>(),
-					fileEntry),
-				ListUtil.fromArray(
-					_portletLocalService.getPortletById(
-						contextCompany.getCompanyId(), portletId)),
-				true),
+			_getImportPortletDataHandlers(
+				fileTaskContextMap, uploadGroupId,
+				fileEntry ->
+					PortletDataHandlerUtil.getImportPortletDataHandlers(
+						false, group,
+						contextAcceptLanguage.getPreferredLocale(),
+						_exportImportHelper.getManifestSummary(
+							contextUser.getUserId(), groupId, new HashMap<>(),
+							fileEntry),
+						ListUtil.fromArray(
+							_portletLocalService.getPortletById(
+								contextCompany.getCompanyId(), portletId)),
+						true)),
 			true);
 
 		Map<String, Serializable> settingsMap =
@@ -464,7 +634,8 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 
 		return _addImportProcess(
 			BackgroundTaskExecutorNames.PORTLET_IMPORT_BACKGROUND_TASK_EXECUTOR,
-			exportImportConfiguration, fileEntry, false);
+			exportImportConfiguration, fileTaskContextMap, false,
+			uploadGroupId);
 	}
 
 	private ImportProcess _toImportProcess(BackgroundTask backgroundTask)
@@ -561,6 +732,9 @@ public class ImportProcessResourceImpl extends BaseImportProcessResourceImpl {
 
 	@Reference
 	private ExportImportHelper _exportImportHelper;
+
+	@Reference
+	private ImportUploadManager _importUploadManager;
 
 	@Reference
 	private Language _language;
