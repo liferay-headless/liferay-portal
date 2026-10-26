@@ -12,6 +12,7 @@ import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
+import com.liferay.exportimport.upload.ImportUploadManager;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -111,16 +112,8 @@ public class LayoutImportBackgroundTaskExecutor
 
 				FileUtil.write(file, attachmentsFileEntry.getContentStream());
 
-				if (MapUtil.getBoolean(
-						taskContextMap, "resolvePrivateLayout")) {
-
-					exportImportConfiguration = _updatePrivateLayout(
-						exportImportConfiguration, file);
-				}
-
-				TransactionInvokerUtil.invoke(
-					transactionConfig,
-					new LayoutImportCallable(exportImportConfiguration, file));
+				exportImportConfiguration = _importFile(
+					exportImportConfiguration, file, taskContextMap);
 			}
 			catch (IOException ioException) {
 				ExportImportIOException exportImportIOException =
@@ -152,6 +145,11 @@ public class LayoutImportBackgroundTaskExecutor
 			}
 		}
 
+		if (taskContextMap.containsKey("importUploadId")) {
+			exportImportConfiguration = _importFromUpload(
+				backgroundTask, exportImportConfiguration, taskContextMap);
+		}
+
 		int count =
 			_exportImportReportEntryLocalService.
 				getExportImportReportEntriesCount(
@@ -163,6 +161,66 @@ public class LayoutImportBackgroundTaskExecutor
 		}
 
 		return BackgroundTaskResult.SUCCESS;
+	}
+
+	private ExportImportConfiguration _importFile(
+			ExportImportConfiguration exportImportConfiguration, File file,
+			Map<String, Serializable> taskContextMap)
+		throws Throwable {
+
+		if (MapUtil.getBoolean(taskContextMap, "resolvePrivateLayout")) {
+			exportImportConfiguration = _updatePrivateLayout(
+				exportImportConfiguration, file);
+		}
+
+		TransactionInvokerUtil.invoke(
+			transactionConfig,
+			new LayoutImportCallable(exportImportConfiguration, file));
+
+		return exportImportConfiguration;
+	}
+
+	private ExportImportConfiguration _importFromUpload(
+			BackgroundTask backgroundTask,
+			ExportImportConfiguration exportImportConfiguration,
+			Map<String, Serializable> taskContextMap)
+		throws Exception {
+
+		String importUploadId = MapUtil.getString(
+			taskContextMap, "importUploadId");
+		long uploadGroupId = MapUtil.getLong(taskContextMap, "uploadGroupId");
+
+		File file = null;
+
+		try {
+			file = FileUtil.createTempFile("lar");
+
+			_importUploadManager.writeTo(
+				uploadGroupId, backgroundTask.getUserId(), importUploadId,
+				file);
+
+			return _importFile(exportImportConfiguration, file, taskContextMap);
+		}
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(getClass().getName(), ioException);
+
+			exportImportIOException.setFileName(
+				MapUtil.getString(taskContextMap, "fileName"));
+			exportImportIOException.setType(
+				ExportImportIOException.LAYOUT_IMPORT_FILE);
+
+			throw exportImportIOException;
+		}
+		catch (Throwable throwable) {
+			throw new SystemException(throwable);
+		}
+		finally {
+			FileUtil.delete(file);
+
+			_importUploadManager.deleteImportUpload(
+				uploadGroupId, backgroundTask.getUserId(), importUploadId);
+		}
 	}
 
 	private ExportImportConfiguration _updatePrivateLayout(
@@ -212,6 +270,9 @@ public class LayoutImportBackgroundTaskExecutor
 	@Reference
 	private ExportImportReportEntryLocalService
 		_exportImportReportEntryLocalService;
+
+	@Reference
+	private ImportUploadManager _importUploadManager;
 
 	@Reference
 	private Language _language;
