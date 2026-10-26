@@ -5,8 +5,6 @@
 
 package com.liferay.exportimport.internal.background.task;
 
-import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
@@ -18,9 +16,6 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -37,8 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -79,36 +72,19 @@ public class LayoutImportBackgroundTaskExecutor
 
 		setPhasesTotal(backgroundTask, exportImportConfiguration);
 
-		List<FileEntry> attachmentsFileEntries = new ArrayList<>(
-			backgroundTask.getAttachmentsFileEntries());
-
 		Map<String, Serializable> taskContextMap =
 			backgroundTask.getTaskContextMap();
 
-		long tempFileEntryId = MapUtil.getLong(
-			taskContextMap, "tempFileEntryId");
-
-		if (tempFileEntryId > 0) {
-			try {
-				attachmentsFileEntries.add(
-					_dlAppLocalService.getFileEntry(tempFileEntryId));
-			}
-			catch (NoSuchFileEntryException noSuchFileEntryException) {
-				throw new PortalException(
-					_language.get(
-						getLocale(backgroundTask),
-						"the-uploaded-file-has-expired-please-upload-it-again"),
-					noSuchFileEntryException);
-			}
-		}
-
 		File file = null;
 
-		for (FileEntry attachmentsFileEntry : attachmentsFileEntries) {
+		for (ImportFileSource importFileSource :
+				_importFileSourceHelper.getImportFileSources(
+					backgroundTask, getLocale(backgroundTask))) {
+
 			try {
 				file = FileUtil.createTempFile("lar");
 
-				FileUtil.write(file, attachmentsFileEntry.getContentStream());
+				importFileSource.write(file);
 
 				if (MapUtil.getBoolean(
 						taskContextMap, "resolvePrivateLayout")) {
@@ -127,9 +103,9 @@ public class LayoutImportBackgroundTaskExecutor
 						LayoutImportBackgroundTaskExecutor.class.getName(),
 						ioException);
 
-				if (Validator.isNotNull(attachmentsFileEntry.getFileName())) {
+				if (Validator.isNotNull(importFileSource.getFileName())) {
 					exportImportIOException.setFileName(
-						attachmentsFileEntry.getFileName());
+						importFileSource.getFileName());
 					exportImportIOException.setType(
 						ExportImportIOException.LAYOUT_IMPORT_FILE);
 				}
@@ -146,8 +122,7 @@ public class LayoutImportBackgroundTaskExecutor
 			finally {
 				FileUtil.delete(file);
 
-				PortletFileRepositoryUtil.deletePortletFileEntry(
-					attachmentsFileEntry.getFileEntryId());
+				importFileSource.delete();
 			}
 		}
 
@@ -199,9 +174,6 @@ public class LayoutImportBackgroundTaskExecutor
 	}
 
 	@Reference
-	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 
@@ -213,7 +185,7 @@ public class LayoutImportBackgroundTaskExecutor
 		_exportImportReportEntryLocalService;
 
 	@Reference
-	private Language _language;
+	private ImportFileSourceHelper _importFileSourceHelper;
 
 	private class LayoutImportCallable implements Callable<Void> {
 
