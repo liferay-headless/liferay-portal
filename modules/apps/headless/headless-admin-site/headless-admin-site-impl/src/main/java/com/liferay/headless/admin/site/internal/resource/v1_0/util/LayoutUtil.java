@@ -222,7 +222,7 @@ public class LayoutUtil {
 			(ContentPageSpecification)sortedContentPageSpecifications[0];
 
 		ServiceContextUtil.setContentPageSpecificationsAttributes(
-			draftContentPageSpecification, groupId,
+			draftContentPageSpecification, groupId, privateLayout,
 			publishedContentPageSpecification, serviceContext);
 
 		if (GetterUtil.getBoolean(serviceContext.getAttribute("published"))) {
