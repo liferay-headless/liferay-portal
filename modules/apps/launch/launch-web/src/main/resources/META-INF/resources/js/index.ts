@@ -10,4 +10,5 @@ export {default as LaunchPreviewTopbar} from './components/LaunchPreviewTopbar';
 export {default as LaunchPublishButton} from './components/LaunchPublishButton';
 export {default as LaunchScheduleButton} from './components/LaunchScheduleButton';
 export {default as LaunchEntriesFDSPropsTransformer} from './props_transformer/LaunchEntriesFDSPropsTransformer';
+export {default as LaunchSetErrorsFDSPropsTransformer} from './props_transformer/LaunchSetErrorsFDSPropsTransformer';
 export {default as LaunchesFDSPropsTransformer} from './props_transformer/LaunchesFDSPropsTransformer';

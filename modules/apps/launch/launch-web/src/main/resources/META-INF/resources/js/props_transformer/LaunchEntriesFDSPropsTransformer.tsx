@@ -121,6 +121,7 @@ export default function LaunchEntriesFDSPropsTransformer({
 						<LaunchEntryStatusCell
 							{...cellProps}
 							{...summaryCellProps}
+							launchSetId={additionalProps.launchSetId}
 						/>
 					),
 					name: 'launchEntryStatus',

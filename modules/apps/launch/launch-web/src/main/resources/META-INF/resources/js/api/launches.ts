@@ -10,6 +10,7 @@ const DEFAULT_HEADERS = {
 };
 
 const LAUNCH_ENTRIES_BASE_URL = '/o/launch-entries';
+const LAUNCH_SET_ERRORS_BASE_URL = '/o/launch-set-errors';
 const LAUNCH_SETS_BASE_URL = '/o/launch-sets';
 
 async function readJSON(response: Response, message: string) {
@@ -32,14 +33,35 @@ export interface Launch {
 	description?: string;
 	id: number;
 	name: string;
+	publishErrorsCount?: number | string;
 	scheduledDate?: string;
 	status?: {code: number};
 }
 
+export type LaunchStatus = 'failed' | 'open' | 'published' | 'scheduled';
+
 const WORKFLOW_STATUS_APPROVED = 0;
 
+const WORKFLOW_STATUS_SCHEDULED = 7;
+
+export function getLaunchStatus(launch: Launch): LaunchStatus {
+	if (launch.status?.code === WORKFLOW_STATUS_APPROVED) {
+		return 'published';
+	}
+
+	if (launch.status?.code === WORKFLOW_STATUS_SCHEDULED) {
+		return 'scheduled';
+	}
+
+	if (Number(launch.publishErrorsCount) > 0) {
+		return 'failed';
+	}
+
+	return 'open';
+}
+
 export function isPublished(launch: Launch): boolean {
-	return launch.status?.code === WORKFLOW_STATUS_APPROVED;
+	return getLaunchStatus(launch) === 'published';
 }
 
 export interface LaunchEntry {
@@ -51,6 +73,17 @@ export interface LaunchEntry {
 	r_launchSetToLaunchEntries_c_launchSetId: number;
 	versionKey?: string;
 }
+
+export interface LaunchSetError {
+	dateCreated?: string;
+	id: number;
+	launchEntryId: number;
+	launchEntryTitle?: string;
+	message: string;
+	severity: LaunchSetErrorSeverity;
+}
+
+export type LaunchSetErrorSeverity = 'critical' | 'error';
 
 export interface LaunchEntrySummary {
 	author: string;
@@ -141,6 +174,17 @@ export async function getLaunch(id: number): Promise<Launch> {
 	return response.json();
 }
 
+export async function getLaunchEntry(id: number): Promise<LaunchEntry> {
+	const response = await fetch(`${LAUNCH_ENTRIES_BASE_URL}/${id}`, {
+		headers: DEFAULT_HEADERS,
+	});
+
+	return readJSON(
+		response,
+		Liferay.Language.get('an-unexpected-error-occurred')
+	);
+}
+
 export async function listLaunchEntriesForAsset({
 	className,
 	classPK,
@@ -193,6 +237,28 @@ export async function listLaunchEntries({
 	}
 
 	const data = await response.json();
+
+	return data.items || [];
+}
+
+export async function listLaunchSetErrors(
+	launchSetId: number
+): Promise<LaunchSetError[]> {
+	const filter = encodeURIComponent(
+		`r_launchSetToLaunchSetErrors_c_launchSetId eq '${launchSetId}'`
+	);
+
+	const response = await fetch(
+		`${LAUNCH_SET_ERRORS_BASE_URL}?filter=${filter}&pageSize=-1`,
+		{
+			headers: DEFAULT_HEADERS,
+		}
+	);
+
+	const data = await readJSON(
+		response,
+		Liferay.Language.get('an-unexpected-error-occurred')
+	);
 
 	return data.items || [];
 }

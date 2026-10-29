@@ -15,20 +15,20 @@ import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.test.portlet.MockActionResponse;
-import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -44,11 +44,10 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
-import jakarta.portlet.PortletException;
-
 import java.io.Serializable;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
@@ -114,50 +113,21 @@ public class LaunchSetPublisherTest {
 			_launchSetObjectEntry.getObjectEntryId(), unknownClassName,
 			RandomTestUtil.randomInt(), RandomTestUtil.randomString());
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
-			new MockLiferayPortletActionRequest();
-
-		mockLiferayPortletActionRequest.setParameter(
-			"launchSetId",
-			String.valueOf(_launchSetObjectEntry.getObjectEntryId()));
-
 		try {
-			_mvcActionCommand.processAction(
-				mockLiferayPortletActionRequest, new MockActionResponse());
+			_launchSetPublisher.publish(
+				_launchSetObjectEntry.getObjectEntryId());
 
 			Assert.fail();
 		}
-		catch (PortletException portletException) {
-			Throwable throwable = portletException.getCause();
-
+		catch (PortalException portalException) {
 			Assert.assertEquals(
-				"No launch entry manager exists for " + unknownClassName,
-				throwable.getMessage());
+				"Unable to publish 1 launch entries of launch set " +
+					_launchSetObjectEntry.getObjectEntryId(),
+				portalException.getMessage());
 		}
 
 		LaunchEntryManager launchEntryManager =
 			_getJournalArticleLaunchEntryManager();
-
-		LaunchEntryManager.Version version =
-			launchEntryManager.fetchPublishedVersion(
-				journalArticle.getResourcePrimKey());
-
-		Assert.assertEquals(
-			String.valueOf(journalArticle.getVersion()),
-			version.getVersionKey());
-
-		ObjectEntry launchSetObjectEntry =
-			_objectEntryLocalService.getObjectEntry(
-				_launchSetObjectEntry.getObjectEntryId());
-
-		Assert.assertNotEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			launchSetObjectEntry.getStatus());
-
-		_objectEntryLocalService.deleteObjectEntry(
-			unknownLaunchEntryObjectEntry);
-
-		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
 
 		LaunchEntryManager.Version publishedVersion =
 			launchEntryManager.fetchPublishedVersion(
@@ -172,12 +142,65 @@ public class LaunchSetPublisherTest {
 			draftId, launchEntryObjectEntry, launchEntryManager,
 			publishedVersion);
 
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, launchSetObjectEntry.getStatus());
+		Assert.assertEquals(
+			1,
+			MapUtil.getLong(
+				launchSetObjectEntry.getValues(), "publishErrorsCount"));
+
+		List<ObjectEntry> launchSetErrorObjectEntries =
+			_getLaunchSetErrorObjectEntries();
+
+		Assert.assertEquals(
+			launchSetErrorObjectEntries.toString(), 1,
+			launchSetErrorObjectEntries.size());
+
+		ObjectEntry launchSetErrorObjectEntry = launchSetErrorObjectEntries.get(
+			0);
+
+		Map<String, Serializable> values =
+			launchSetErrorObjectEntry.getValues();
+
+		Assert.assertEquals(
+			unknownLaunchEntryObjectEntry.getObjectEntryId(),
+			MapUtil.getLong(values, "launchEntryId"));
+		Assert.assertEquals(
+			StringPool.BLANK, MapUtil.getString(values, "launchEntryTitle"));
+		Assert.assertEquals(
+			"No launch entry manager exists for " + unknownClassName,
+			MapUtil.getString(values, "message"));
+		Assert.assertEquals("error", MapUtil.getString(values, "severity"));
+
+		_objectEntryLocalService.deleteObjectEntry(
+			unknownLaunchEntryObjectEntry);
+
+		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
+
+		LaunchEntryManager.Version republishedVersion =
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey());
+
+		Assert.assertEquals(
+			publishedVersion.getVersionKey(),
+			republishedVersion.getVersionKey());
+
 		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
 			_launchSetObjectEntry.getObjectEntryId());
 
 		Assert.assertEquals(
 			WorkflowConstants.STATUS_APPROVED,
 			launchSetObjectEntry.getStatus());
+
+		launchSetErrorObjectEntries = _getLaunchSetErrorObjectEntries();
+
+		Assert.assertEquals(
+			launchSetErrorObjectEntries.toString(), 0,
+			launchSetErrorObjectEntries.size());
 
 		try {
 			_launchSetPublisher.publish(
@@ -394,6 +417,21 @@ public class LaunchSetPublisherTest {
 			JournalArticle.class.getName());
 	}
 
+	private List<ObjectEntry> _getLaunchSetErrorObjectEntries()
+		throws Exception {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				_launchSetObjectEntry.getObjectDefinitionId(),
+				"launchSetToLaunchSetErrors");
+
+		return _objectEntryLocalService.getOneToManyObjectEntries(
+			_launchSetObjectEntry.getGroupId(),
+			objectRelationship.getObjectRelationshipId(), null, false,
+			_launchSetObjectEntry.getObjectEntryId(), true, null,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
 	private String _getTitle(JournalArticle journalArticle) throws Exception {
 		JournalArticle latestJournalArticle =
 			_journalArticleLocalService.getLatestArticle(
@@ -460,14 +498,14 @@ public class LaunchSetPublisherTest {
 	@Inject
 	private LaunchSetPublisher _launchSetPublisher;
 
-	@Inject(filter = "mvc.command.name=/launch/publish_launch")
-	private MVCActionCommand _mvcActionCommand;
-
 	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Inject
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Inject
 	private SchedulerEngineHelper _schedulerEngineHelper;

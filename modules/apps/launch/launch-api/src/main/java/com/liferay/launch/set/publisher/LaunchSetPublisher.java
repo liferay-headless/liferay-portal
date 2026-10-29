@@ -17,6 +17,9 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface LaunchSetPublisher {
 
+	public void failPublish(long launchSetId, long userId, String errorMessage)
+		throws PortalException;
+
 	public void publish(long launchSetId) throws PortalException;
 
 	public void schedulePublish(Date date, long launchSetId, long userId)

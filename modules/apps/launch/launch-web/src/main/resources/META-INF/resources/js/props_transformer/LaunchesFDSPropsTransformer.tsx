@@ -6,26 +6,35 @@
 import ClayLabel from '@clayui/label';
 import React from 'react';
 
-import {Launch, isPublished} from '../api/launches';
-import {
-	WORKFLOW_STATUS_DRAFT,
-	WORKFLOW_STATUS_SCHEDULED,
-} from '../components/WorkflowStatusLabel';
+import {Launch, getLaunchStatus} from '../api/launches';
 import openNewLaunchModal from '../modals/openNewLaunchModal';
 
 interface CreationMenu {
 	primaryItems: Array<{[key: string]: unknown}>;
 }
 
+interface ItemAction {
+	data?: {id?: string};
+	[key: string]: unknown;
+}
+
 interface Props {
 	additionalProps: {viewLaunchURL: string};
 	creationMenu?: CreationMenu;
+	itemsActions?: ItemAction[];
 	[key: string]: unknown;
 }
+
+const ITEM_ACTION_VISIBILITIES: {
+	[key: string]: ((launch: Launch) => boolean) | undefined;
+} = {
+	'view-error-details': (launch) => getLaunchStatus(launch) === 'failed',
+};
 
 export default function LaunchesFDSPropsTransformer({
 	additionalProps,
 	creationMenu,
+	itemsActions,
 	...props
 }: Props) {
 	return {
@@ -45,7 +54,9 @@ export default function LaunchesFDSPropsTransformer({
 			tableCell: [
 				{
 					component: ({itemData}: {itemData: Launch}) => {
-						if (isPublished(itemData)) {
+						const launchStatus = getLaunchStatus(itemData);
+
+						if (launchStatus === 'published') {
 							return (
 								<ClayLabel displayType="success">
 									{Liferay.Language.get('published')}
@@ -53,10 +64,7 @@ export default function LaunchesFDSPropsTransformer({
 							);
 						}
 
-						if (
-							itemData.scheduledDate &&
-							itemData.status?.code === WORKFLOW_STATUS_DRAFT
-						) {
+						if (launchStatus === 'failed') {
 							return (
 								<ClayLabel displayType="danger">
 									{Liferay.Language.get('failed')}
@@ -64,9 +72,7 @@ export default function LaunchesFDSPropsTransformer({
 							);
 						}
 
-						if (
-							itemData.status?.code === WORKFLOW_STATUS_SCHEDULED
-						) {
+						if (launchStatus === 'scheduled') {
 							return (
 								<ClayLabel displayType="info">
 									{Liferay.Language.get('scheduled')}
@@ -85,5 +91,11 @@ export default function LaunchesFDSPropsTransformer({
 				},
 			],
 		},
+		itemsActions: itemsActions?.map((itemAction) => {
+			const isVisible =
+				ITEM_ACTION_VISIBILITIES[itemAction.data?.id ?? ''];
+
+			return isVisible ? {...itemAction, isVisible} : itemAction;
+		}),
 	};
 }

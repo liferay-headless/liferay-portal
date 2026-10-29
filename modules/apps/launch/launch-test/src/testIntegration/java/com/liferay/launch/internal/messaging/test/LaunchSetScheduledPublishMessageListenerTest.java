@@ -149,6 +149,7 @@ public class LaunchSetScheduledPublishMessageListenerTest {
 
 		_assertBackgroundTasks(2, BackgroundTaskConstants.STATUS_FAILED);
 		_assertStatus(WorkflowConstants.STATUS_DRAFT);
+		_assertPublishErrorsCount();
 
 		// Scheduled launch set with a publish error
 
@@ -162,6 +163,7 @@ public class LaunchSetScheduledPublishMessageListenerTest {
 
 		_assertBackgroundTasks(3, BackgroundTaskConstants.STATUS_FAILED);
 		_assertStatus(WorkflowConstants.STATUS_DRAFT);
+		_assertPublishErrorsCount();
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(
@@ -215,6 +217,17 @@ public class LaunchSetScheduledPublishMessageListenerTest {
 			backgroundTasks.size() - 1);
 
 		Assert.assertEquals(expectedStatus, backgroundTask.getStatus());
+	}
+
+	private void _assertPublishErrorsCount() throws Exception {
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			1,
+			MapUtil.getLong(
+				launchSetObjectEntry.getValues(), "publishErrorsCount"));
 	}
 
 	private void _assertStatus(int expectedStatus) throws Exception {
