@@ -71,7 +71,10 @@ import com.liferay.portal.vulcan.internal.graphql.data.fetcher.GraphQLDTOContrib
 import com.liferay.portal.vulcan.internal.graphql.data.fetcher.LiferayMethodDataFetcher;
 import com.liferay.portal.vulcan.internal.graphql.data.processor.GraphQLDTOContributorDataFetchingProcessor;
 import com.liferay.portal.vulcan.internal.graphql.data.processor.LiferayMethodDataFetchingProcessor;
+import com.liferay.portal.vulcan.internal.graphql.exception.IntrospectionFieldLimitExceededException;
 import com.liferay.portal.vulcan.internal.graphql.exception.QueryDepthLimitExceededException;
+import com.liferay.portal.vulcan.internal.graphql.input.BatchOperationLimitInputPreProcessor;
+import com.liferay.portal.vulcan.internal.graphql.instrumentation.IntrospectionFieldLimitInstrumentation;
 import com.liferay.portal.vulcan.internal.graphql.instrumentation.QueryDepthLimitInstrumentation;
 import com.liferay.portal.vulcan.internal.graphql.util.GraphQLUtil;
 import com.liferay.portal.vulcan.internal.graphql.validation.GraphQLDTOContributorRequestContext;
@@ -121,6 +124,8 @@ import graphql.execution.DataFetcherExceptionHandler;
 import graphql.execution.DataFetcherExceptionHandlerParameters;
 import graphql.execution.DataFetcherExceptionHandlerResult;
 import graphql.execution.ExecutionStrategy;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
 
 import graphql.kickstart.execution.GraphQLObjectMapper;
 import graphql.kickstart.execution.GraphQLQueryInvoker;
@@ -130,6 +135,7 @@ import graphql.kickstart.execution.error.GraphQLErrorHandler;
 import graphql.kickstart.servlet.GraphQLConfiguration;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.kickstart.servlet.apollo.ApolloScalars;
+import graphql.kickstart.servlet.input.BatchInputPreProcessor;
 
 import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
@@ -1129,10 +1135,13 @@ public class GraphQLServletExtender {
 				).withExecutionStrategyProvider(
 					executionStrategyProvider
 				).withInstrumentation(
-					() -> _getQueryDepthLimitInstrumentation(companyId)
+					() -> _getInstrumentation(companyId)
 				).build();
 
 			graphQLConfigurationBuilder.with(graphQLQueryInvoker);
+
+			graphQLConfigurationBuilder.with(
+				() -> _getBatchInputPreProcessor(companyId));
 
 			GraphQLObjectMapper.Builder objectMapperBuilder =
 				GraphQLObjectMapper.newBuilder();
@@ -1164,6 +1173,14 @@ public class GraphQLServletExtender {
 
 			return servlet;
 		}
+	}
+
+	private BatchInputPreProcessor _getBatchInputPreProcessor(long companyId) {
+		HeadlessAPICompanyConfiguration headlessAPICompanyConfiguration =
+			_getHeadlessAPICompanyConfiguration(companyId);
+
+		return new BatchOperationLimitInputPreProcessor(
+			headlessAPICompanyConfiguration.graphQLBatchOperationLimit());
 	}
 
 	private GraphQLInputObjectType _getGraphQLInputObjectType(
@@ -1274,6 +1291,28 @@ public class GraphQLServletExtender {
 		return graphQLObjectTypeBuilder.build();
 	}
 
+	private HeadlessAPICompanyConfiguration _getHeadlessAPICompanyConfiguration(
+		long companyId) {
+
+		try {
+			return _configurationProvider.getCompanyConfiguration(
+				HeadlessAPICompanyConfiguration.class, companyId);
+		}
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
+	}
+
+	private Instrumentation _getInstrumentation(long companyId) {
+		HeadlessAPICompanyConfiguration headlessAPICompanyConfiguration =
+			_getHeadlessAPICompanyConfiguration(companyId);
+
+		return new ChainedInstrumentation(
+			new QueryDepthLimitInstrumentation(
+				headlessAPICompanyConfiguration.queryDepthLimit()),
+			_introspectionFieldLimitInstrumentation);
+	}
+
 	private GraphQLObjectType _getPageGraphQLObjectType(
 		GraphQLType facetGraphQLType, GraphQLType objectGraphQLType,
 		String name) {
@@ -1304,22 +1343,6 @@ public class GraphQLServletExtender {
 		String path = servletData.getPath();
 
 		return path.substring(0, path.indexOf("-graphql"));
-	}
-
-	private QueryDepthLimitInstrumentation _getQueryDepthLimitInstrumentation(
-		long companyId) {
-
-		try {
-			HeadlessAPICompanyConfiguration headlessAPICompanyConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					HeadlessAPICompanyConfiguration.class, companyId);
-
-			return new QueryDepthLimitInstrumentation(
-				headlessAPICompanyConfiguration.queryDepthLimit());
-		}
-		catch (Exception exception) {
-			throw new RuntimeException(exception);
-		}
 	}
 
 	private Integer _getVersion(Method method) {
@@ -1971,6 +1994,9 @@ public class GraphQLServletExtender {
 		GraphQLServletExtender.class);
 
 	private static final GraphQLScalarType _dateGraphQLScalarType;
+	private static final IntrospectionFieldLimitInstrumentation
+		_introspectionFieldLimitInstrumentation =
+			new IntrospectionFieldLimitInstrumentation();
 	private static final GraphQLScalarType _mapGraphQLScalarType;
 	private static final GraphQLScalarType _objectGraphQLScalarType;
 	private static final Snapshot<ScopeChecker> _scopeCheckerSnapshot =
@@ -2502,7 +2528,10 @@ public class GraphQLServletExtender {
 					GraphQLError;
 			}
 
-			if (graphQLError instanceof QueryDepthLimitExceededException) {
+			if (graphQLError instanceof
+					IntrospectionFieldLimitExceededException ||
+				graphQLError instanceof QueryDepthLimitExceededException) {
+
 				return true;
 			}
 
