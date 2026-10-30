@@ -7,8 +7,12 @@ package com.liferay.exportimport.rest.internal.resource.v1_0;
 
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.lar.ExportImportGroup;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataContextFactory;
+import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
@@ -17,27 +21,37 @@ import com.liferay.exportimport.rest.dto.v1_0.ImportPreview;
 import com.liferay.exportimport.rest.dto.v1_0.PortletDataHandler;
 import com.liferay.exportimport.rest.dto.v1_0.Site;
 import com.liferay.exportimport.rest.internal.util.GroupUtil;
+import com.liferay.exportimport.rest.internal.util.ImportTempFileEntryUtil;
 import com.liferay.exportimport.rest.internal.util.LayoutUtil;
 import com.liferay.exportimport.rest.internal.util.PermissionUtil;
 import com.liferay.exportimport.rest.internal.util.PortletDataHandlerUtil;
 import com.liferay.exportimport.rest.resource.v1_0.ImportPreviewResource;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.zip.ZipReader;
+import com.liferay.portal.kernel.zip.ZipReaderFactory;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 
 import jakarta.ws.rs.BadRequestException;
 
+import java.io.File;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,6 +61,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  * @author Daniel Raposo
+ * @author Jaime León
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/import-preview.properties",
@@ -121,25 +136,84 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 				new ServiceContext());
 	}
 
-	private FileEntry _addTempFileEntry(
-			long groupId, MultipartBody multipartBody)
+	private List<ExportImportGroup> _getExportImportGroups(
+			PortletDataContext portletDataContext)
 		throws Exception {
 
-		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
+		if (!FeatureFlagManagerUtil.isEnabled(
+				contextCompany.getCompanyId(), "LPD-85946")) {
 
-		String folderName = ImportPreviewResource.class.getName();
-
-		String[] tempFileNames = _layoutService.getTempFileNames(
-			groupId, folderName);
-
-		for (String tempFileEntryName : tempFileNames) {
-			_layoutService.deleteTempFileEntry(
-				groupId, folderName, tempFileEntryName);
+			return Collections.emptyList();
 		}
 
-		return _layoutService.addTempFileEntry(
-			groupId, folderName, binaryFile.getFileName(),
-			binaryFile.getInputStream(), binaryFile.getContentType());
+		return _exportImportHelper.getExportImportGroups(portletDataContext);
+	}
+
+	private ImportPreview _getImportPreview(
+			BinaryFile binaryFile, File file, Layout layout, String portletId,
+			Group scopeGroup)
+		throws Exception {
+
+		long groupId = scopeGroup.getGroupId();
+
+		ImportTempFileEntryUtil.deleteUnreservedTempFileEntries(
+			groupId, contextUser.getUserId());
+
+		_validateImportFile(file, groupId, layout, portletId);
+
+		try (ZipReader zipReader = _zipReaderFactory.getZipReader(file)) {
+			PortletDataContext portletDataContext =
+				_portletDataContextFactory.createImportPortletDataContext(
+					contextCompany.getCompanyId(), groupId, new HashMap<>(),
+					_exportImportHelper.getUserIdStrategy(
+						contextUser.getUserId(),
+						UserIdStrategy.CURRENT_USER_ID),
+					zipReader);
+
+			ManifestSummary manifestSummary =
+				_exportImportHelper.getManifestSummary(portletDataContext);
+
+			boolean portletScoped = !Validator.isBlank(portletId);
+
+			List<Portlet> portlets = manifestSummary.getDataPortlets();
+
+			if (portletScoped) {
+				portlets = ListUtil.fromArray(
+					_portletLocalService.getPortletById(
+						contextCompany.getCompanyId(), portletId));
+			}
+
+			PortletDataHandler[] importPortletDataHandlers =
+				PortletDataHandlerUtil.getImportPortletDataHandlers(
+					true, scopeGroup,
+					contextAcceptLanguage.getPreferredLocale(), manifestSummary,
+					portlets, portletScoped);
+
+			FileEntry fileEntry = ImportTempFileEntryUtil.addTempFileEntry(
+				file, binaryFile.getFileName(), groupId,
+				binaryFile.getContentType());
+
+			List<ExportImportGroup> exportImportGroups = _getExportImportGroups(
+				portletDataContext);
+
+			return new ImportPreview() {
+				{
+					setAdditionCount(
+						() -> PortletDataHandlerUtil.getAdditionCount(
+							importPortletDataHandlers));
+					setAuthor(fileEntry::getUserName);
+					setDeletionCount(
+						() -> PortletDataHandlerUtil.getDeletionCount(
+							importPortletDataHandlers));
+					setExportDate(manifestSummary::getExportDate);
+					setFileName(
+						() -> ImportTempFileEntryUtil.getFileName(fileEntry));
+					setFileSize(fileEntry::getSize);
+					setPortletDataHandlers(() -> importPortletDataHandlers);
+					setSites(() -> _toSites(exportImportGroups));
+				}
+			};
+		}
 	}
 
 	private ImportPreview _getImportPreview(
@@ -152,62 +226,75 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 
 		Group scopeGroup = GroupUtil.getScopeGroup(group, layout, portletId);
 
-		long groupId = scopeGroup.getGroupId();
-
 		PermissionUtil.checkImportPermission(
-			contextCompany.getCompanyId(), groupId,
+			contextCompany.getCompanyId(), scopeGroup.getGroupId(),
 			PermissionUtil.getGroupActionId(portletId));
 
-		FileEntry fileEntry = _addTempFileEntry(groupId, multipartBody);
+		UploadServletRequest uploadServletRequest =
+			_portal.getUploadServletRequest(contextHttpServletRequest);
 
-		_validateImportFile(fileEntry, groupId, layout, portletId);
+		File file = uploadServletRequest.getFile("file", true);
 
-		ManifestSummary manifestSummary =
-			_exportImportHelper.getManifestSummary(
-				contextUser.getUserId(), groupId, new HashMap<>(), fileEntry);
-
-		boolean portletScoped = !Validator.isBlank(portletId);
-
-		List<Portlet> portlets = manifestSummary.getDataPortlets();
-
-		if (portletScoped) {
-			portlets = ListUtil.fromArray(
-				_portletLocalService.getPortletById(
-					contextCompany.getCompanyId(), portletId));
+		if (file == null) {
+			throw new BadRequestException("The request has no \"file\" part");
 		}
 
-		PortletDataHandler[] importPortletDataHandlers =
-			PortletDataHandlerUtil.getImportPortletDataHandlers(
-				true, scopeGroup, contextAcceptLanguage.getPreferredLocale(),
-				manifestSummary, portlets, portletScoped);
-
-		return new ImportPreview() {
-			{
-				setAdditionCount(
-					() -> PortletDataHandlerUtil.getAdditionCount(
-						importPortletDataHandlers));
-				setAuthor(fileEntry::getUserName);
-				setDeletionCount(
-					() -> PortletDataHandlerUtil.getDeletionCount(
-						importPortletDataHandlers));
-				setExportDate(manifestSummary::getExportDate);
-				setFileName(fileEntry::getFileName);
-				setFileSize(fileEntry::getSize);
-				setPortletDataHandlers(() -> importPortletDataHandlers);
-				setSites(() -> _getSites(fileEntry));
-			}
-		};
+		return _getImportPreview(
+			multipartBody.getBinaryFile("file"), file, layout, portletId,
+			scopeGroup);
 	}
 
-	private Site[] _getSites(FileEntry fileEntry) throws Exception {
-		if (!FeatureFlagManagerUtil.isEnabled(
-				contextCompany.getCompanyId(), "LPD-85946")) {
+	private String _getMessage(JSONObject jsonObject) {
+		JSONArray messageListItemsJSONArray = jsonObject.getJSONArray(
+			"messageListItems");
 
-			return new Site[0];
+		if ((messageListItemsJSONArray == null) ||
+			(messageListItemsJSONArray.length() == 0)) {
+
+			return jsonObject.getString("message");
 		}
 
+		StringBundler sb = new StringBundler(
+			(messageListItemsJSONArray.length() * 10) + 1);
+
+		sb.append(jsonObject.getString("message"));
+
+		for (int i = 0; i < messageListItemsJSONArray.length(); i++) {
+			JSONObject messageListItemJSONObject =
+				messageListItemsJSONArray.getJSONObject(i);
+
+			sb.append(StringPool.NEW_LINE);
+			sb.append(messageListItemJSONObject.getString("type"));
+
+			String site = messageListItemJSONObject.getString("site");
+
+			if (Validator.isNotNull(site)) {
+				sb.append(StringPool.SPACE);
+				sb.append(site);
+			}
+
+			sb.append(StringPool.COLON);
+			sb.append(StringPool.SPACE);
+			sb.append(messageListItemJSONObject.getString("name"));
+
+			String info = messageListItemJSONObject.getString("info");
+
+			if (Validator.isNull(info)) {
+				continue;
+			}
+
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(info);
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+		}
+
+		return sb.toString();
+	}
+
+	private Site[] _toSites(List<ExportImportGroup> exportImportGroups) {
 		return transformToArray(
-			_exportImportHelper.getExportImportGroups(fileEntry),
+			exportImportGroups,
 			exportImportGroup -> new Site() {
 				{
 					setChildSitesCount(exportImportGroup::getChildGroupsCount);
@@ -232,7 +319,7 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 	}
 
 	private void _validateImportFile(
-			FileEntry fileEntry, long groupId, Layout layout, String portletId)
+			File file, long groupId, Layout layout, String portletId)
 		throws Exception {
 
 		ExportImportConfiguration exportImportConfiguration =
@@ -241,23 +328,19 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 		try {
 			if (Validator.isBlank(portletId)) {
 				_exportImportLocalService.validateImportLayoutsFile(
-					exportImportConfiguration, fileEntry.getContentStream());
+					exportImportConfiguration, file);
 			}
 			else {
 				_exportImportLocalService.validateImportPortletInfo(
-					exportImportConfiguration, fileEntry.getContentStream());
+					exportImportConfiguration, file);
 			}
 		}
 		catch (PortalException portalException) {
-			_layoutService.deleteTempFileEntry(
-				groupId, ImportPreviewResource.class.getName(),
-				fileEntry.getFileName());
-
 			JSONObject jsonObject = _staging.getExceptionMessagesJSONObject(
 				contextAcceptLanguage.getPreferredLocale(), portalException,
 				exportImportConfiguration);
 
-			throw new BadRequestException(jsonObject.getString("message"));
+			throw new BadRequestException(_getMessage(jsonObject));
 		}
 		finally {
 			_exportImportConfigurationLocalService.
@@ -276,12 +359,18 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 	private ExportImportLocalService _exportImportLocalService;
 
 	@Reference
-	private LayoutService _layoutService;
+	private Portal _portal;
+
+	@Reference
+	private PortletDataContextFactory _portletDataContextFactory;
 
 	@Reference
 	private PortletLocalService _portletLocalService;
 
 	@Reference
 	private Staging _staging;
+
+	@Reference
+	private ZipReaderFactory _zipReaderFactory;
 
 }
