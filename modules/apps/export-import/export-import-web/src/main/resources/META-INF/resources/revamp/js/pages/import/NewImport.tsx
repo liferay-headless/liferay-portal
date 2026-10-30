@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayButton from '@clayui/button';
-import ClayIcon from '@clayui/icon';
 import React, {useState} from 'react';
 
 import {Wizard, WizardStep} from '../../components/Wizard';
@@ -17,6 +15,7 @@ import {
 	toPortletDataHandlerSections,
 	toProcessRequestFlags,
 } from '../../utils/contentSelection';
+import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toPortletDataHandlers} from '../../utils/toPortletDataHandlers';
 import DataSelectionStep from './steps/DataSelectionStep';
 import FileSelectionStep from './steps/FileSelectionStep';
@@ -25,15 +24,15 @@ import SettingsStep, {SETTINGS_STEP_INITIAL_VALUES} from './steps/SettingsStep';
 export function NewImport({
 	backURL,
 	commentsAndRatingsEnabled = false,
-	importPreviewAPIURL,
 	importProcessAPIURL,
+	importUploadAPIURL,
 	scope,
 	siteSelectionEnabled = false,
 }: {
 	backURL: string;
 	commentsAndRatingsEnabled?: boolean;
-	importPreviewAPIURL: string;
 	importProcessAPIURL: string;
+	importUploadAPIURL: string;
 	scope: Scope;
 	siteSelectionEnabled?: boolean;
 }) {
@@ -46,17 +45,19 @@ export function NewImport({
 			<WizardStep
 				initialValues={{
 					fileSelector: undefined,
+					importUploadId: undefined,
 					name: '',
 				}}
 				isStepValid={(values) =>
 					values.fileSelector instanceof File &&
+					!!values.importUploadId &&
 					!!values.name.trim() &&
 					!!importPreview
 				}
 				title={Liferay.Language.get('setup')}
 			>
 				<FileSelectionStep
-					importPreviewAPIURL={importPreviewAPIURL}
+					importUploadAPIURL={importUploadAPIURL}
 					setImportPreview={setImportPreview}
 				/>
 			</WizardStep>
@@ -82,17 +83,10 @@ export function NewImport({
 			</WizardStep>
 
 			<WizardStep
-				actionButton={
-					<ClayButton type="submit">
-						<span className="inline-item inline-item-before">
-							<ClayIcon className="mr-1" symbol="import" />
-						</span>
-
-						{Liferay.Language.get('import')}
-					</ClayButton>
-				}
+				actionButtonLabel={Liferay.Language.get('import')}
+				actionButtonSymbol="import"
 				initialValues={SETTINGS_STEP_INITIAL_VALUES}
-				onSubmit={async (values) => {
+				onSubmit={async (values, formikHelpers) => {
 					if (!importPreview) {
 						Liferay.Util.openToast({
 							message: Liferay.Language.get(
@@ -113,6 +107,7 @@ export function NewImport({
 							...toProcessRequestFlags(contentSelection),
 							dataStrategy: values.dataStrategy as DataStrategy,
 							deletions: !!values.deletions,
+							importUploadId: values.importUploadId as string,
 							name: values.name,
 							permissions: !!values.permissions,
 							portletDataHandlers: toPortletDataHandlers(
@@ -143,7 +138,11 @@ export function NewImport({
 						return;
 					}
 
-					Liferay.Util.navigate(backURL);
+					navigateToProcesses(
+						formikHelpers,
+						Liferay.Language.get('the-process-has-started'),
+						backURL
+					);
 				}}
 				title={Liferay.Language.get('settings')}
 			>

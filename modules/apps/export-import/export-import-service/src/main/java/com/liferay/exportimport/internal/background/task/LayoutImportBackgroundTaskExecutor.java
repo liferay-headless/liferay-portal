@@ -5,10 +5,13 @@
 
 package com.liferay.exportimport.internal.background.task;
 
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
+import com.liferay.exportimport.upload.ImportUploadManager;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -17,14 +20,26 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.zip.ZipReader;
+import com.liferay.portal.kernel.zip.ZipReaderFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.osgi.service.component.annotations.Component;
@@ -64,8 +79,19 @@ public class LayoutImportBackgroundTaskExecutor
 
 		setPhasesTotal(backgroundTask, exportImportConfiguration);
 
-		List<FileEntry> attachmentsFileEntries =
-			backgroundTask.getAttachmentsFileEntries();
+		List<FileEntry> attachmentsFileEntries = new ArrayList<>(
+			backgroundTask.getAttachmentsFileEntries());
+
+		Map<String, Serializable> taskContextMap =
+			backgroundTask.getTaskContextMap();
+
+		long tempFileEntryId = MapUtil.getLong(
+			taskContextMap, "tempFileEntryId");
+
+		if (tempFileEntryId > 0) {
+			attachmentsFileEntries.add(
+				_dlAppLocalService.getFileEntry(tempFileEntryId));
+		}
 
 		File file = null;
 
@@ -75,9 +101,8 @@ public class LayoutImportBackgroundTaskExecutor
 
 				FileUtil.write(file, attachmentsFileEntry.getContentStream());
 
-				TransactionInvokerUtil.invoke(
-					transactionConfig,
-					new LayoutImportCallable(exportImportConfiguration, file));
+				exportImportConfiguration = _importFile(
+					exportImportConfiguration, file, taskContextMap);
 			}
 			catch (IOException ioException) {
 				ExportImportIOException exportImportIOException =
@@ -109,6 +134,11 @@ public class LayoutImportBackgroundTaskExecutor
 			}
 		}
 
+		if (taskContextMap.containsKey("importUploadId")) {
+			exportImportConfiguration = _importFromUpload(
+				backgroundTask, exportImportConfiguration, taskContextMap);
+		}
+
 		int count =
 			_exportImportReportEntryLocalService.
 				getExportImportReportEntriesCount(
@@ -122,12 +152,119 @@ public class LayoutImportBackgroundTaskExecutor
 		return BackgroundTaskResult.SUCCESS;
 	}
 
+	private ExportImportConfiguration _importFile(
+			ExportImportConfiguration exportImportConfiguration, File file,
+			Map<String, Serializable> taskContextMap)
+		throws Throwable {
+
+		if (MapUtil.getBoolean(taskContextMap, "resolvePrivateLayout")) {
+			exportImportConfiguration = _updatePrivateLayout(
+				exportImportConfiguration, file);
+		}
+
+		TransactionInvokerUtil.invoke(
+			transactionConfig,
+			new LayoutImportCallable(exportImportConfiguration, file));
+
+		return exportImportConfiguration;
+	}
+
+	private ExportImportConfiguration _importFromUpload(
+			BackgroundTask backgroundTask,
+			ExportImportConfiguration exportImportConfiguration,
+			Map<String, Serializable> taskContextMap)
+		throws Exception {
+
+		String importUploadId = MapUtil.getString(
+			taskContextMap, "importUploadId");
+		long uploadGroupId = MapUtil.getLong(taskContextMap, "uploadGroupId");
+
+		File file = null;
+
+		try {
+			file = FileUtil.createTempFile("lar");
+
+			_importUploadManager.writeTo(
+				uploadGroupId, backgroundTask.getUserId(), importUploadId,
+				file);
+
+			return _importFile(exportImportConfiguration, file, taskContextMap);
+		}
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(getClass().getName(), ioException);
+
+			exportImportIOException.setFileName(
+				MapUtil.getString(taskContextMap, "fileName"));
+			exportImportIOException.setType(
+				ExportImportIOException.LAYOUT_IMPORT_FILE);
+
+			throw exportImportIOException;
+		}
+		catch (Throwable throwable) {
+			throw new SystemException(throwable);
+		}
+		finally {
+			FileUtil.delete(file);
+
+			_importUploadManager.deleteImportUpload(
+				uploadGroupId, backgroundTask.getUserId(), importUploadId);
+		}
+	}
+
+	private ExportImportConfiguration _updatePrivateLayout(
+			ExportImportConfiguration exportImportConfiguration, File file)
+		throws Exception {
+
+		boolean privateLayout = false;
+
+		try (ZipReader zipReader = _zipReaderFactory.getZipReader(file)) {
+			Document document = SAXReaderUtil.read(
+				zipReader.getEntryAsString("/manifest.xml"));
+
+			Element rootElement = document.getRootElement();
+
+			Element headerElement = rootElement.element("header");
+
+			if (headerElement != null) {
+				privateLayout = GetterUtil.getBoolean(
+					headerElement.attributeValue("private-layout"));
+			}
+		}
+
+		return _exportImportConfigurationLocalService.
+			updateExportImportConfiguration(
+				exportImportConfiguration.getUserId(),
+				exportImportConfiguration.getExportImportConfigurationId(),
+				exportImportConfiguration.getName(),
+				exportImportConfiguration.getDescription(),
+				HashMapBuilder.<String, Serializable>putAll(
+					exportImportConfiguration.getSettingsMap()
+				).put(
+					"privateLayout", privateLayout
+				).build(),
+				new ServiceContext());
+	}
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private ExportImportConfigurationLocalService
+		_exportImportConfigurationLocalService;
+
 	@Reference
 	private ExportImportLocalService _exportImportLocalService;
 
 	@Reference
 	private ExportImportReportEntryLocalService
 		_exportImportReportEntryLocalService;
+
+	@Reference
+	private ImportUploadManager _importUploadManager;
+
+	@Reference
+	private ZipReaderFactory _zipReaderFactory;
 
 	private class LayoutImportCallable implements Callable<Void> {
 

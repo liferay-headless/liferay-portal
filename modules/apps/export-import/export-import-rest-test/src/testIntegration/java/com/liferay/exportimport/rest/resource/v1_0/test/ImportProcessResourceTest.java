@@ -18,6 +18,8 @@ import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.exportimport.rest.client.dto.v1_0.ImportPreview;
 import com.liferay.exportimport.rest.client.dto.v1_0.ImportProcess;
 import com.liferay.exportimport.rest.client.dto.v1_0.ImportProcessRequest;
+import com.liferay.exportimport.rest.client.dto.v1_0.ImportUpload;
+import com.liferay.exportimport.rest.client.dto.v1_0.ImportUploadRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.InstanceImportProcessRequest;
 import com.liferay.exportimport.rest.client.dto.v1_0.PortletDataHandler;
 import com.liferay.exportimport.rest.client.dto.v1_0.PortletDataHandlerControl;
@@ -28,6 +30,7 @@ import com.liferay.exportimport.rest.client.pagination.Page;
 import com.liferay.exportimport.rest.client.pagination.Pagination;
 import com.liferay.exportimport.rest.client.resource.v1_0.ImportPreviewResource;
 import com.liferay.exportimport.rest.client.resource.v1_0.ImportProcessResource;
+import com.liferay.exportimport.rest.client.resource.v1_0.ImportUploadResource;
 import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.test.util.LayoutTestUtil;
@@ -44,6 +47,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
@@ -67,6 +71,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -427,6 +432,7 @@ public class ImportProcessResourceTest
 				).build()),
 			importProcessRequest -> importProcessResource.postSiteImportProcess(
 				externalReferenceCode, null, null, importProcessRequest));
+		_testPostSiteImportProcessWithImportUpload();
 		_testPostSiteImportProcessWithLayoutSetPrototypeGroup();
 	}
 
@@ -1035,6 +1041,114 @@ public class ImportProcessResourceTest
 			assertHttpResponseStatusCode(
 				404, unsafeFunction.apply(new ImportProcessRequest()));
 		}
+	}
+
+	private void _testPostSiteImportProcessWithImportUpload() throws Exception {
+		String externalReferenceCode = testGroup.getExternalReferenceCode();
+
+		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
+
+		File file = _exportLayoutAsFile(
+			testGroup.getGroupId(), false, new long[] {layout.getLayoutId()});
+
+		_layoutLocalService.deleteLayout(
+			layout, ServiceContextTestUtil.getServiceContext());
+
+		byte[] bytes = FileUtil.getBytes(file);
+
+		FileUtil.delete(file);
+
+		ImportUploadResource importUploadResource =
+			ImportUploadResource.builder(
+			).authentication(
+				_adminUser.getEmailAddress(), PropsValues.DEFAULT_ADMIN_PASSWORD
+			).endpoint(
+				testCompany.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(false), "http"
+			).locale(
+				LocaleUtil.getDefault()
+			).build();
+
+		ImportUpload importUpload = importUploadResource.postSiteImportUpload(
+			externalReferenceCode, null, null,
+			new ImportUploadRequest() {
+				{
+					setFileName(RandomTestUtil.randomString());
+					setSize((long)bytes.length);
+				}
+			});
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
+					"WebApplicationExceptionMapper",
+				LoggerTestUtil.WARN)) {
+
+			assertHttpResponseStatusCode(
+				400,
+				importProcessResource.postSiteImportProcessHttpResponse(
+					externalReferenceCode, null, null,
+					new ImportProcessRequest() {
+						{
+							setImportUploadId(importUpload.getId());
+						}
+					}));
+		}
+
+		Assert.assertEquals(
+			200,
+			ExportImportTestUtil.putImportUploadChunk(
+				bytes, _adminUser.getEmailAddress(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD,
+				StringBundler.concat(
+					"http://", testCompany.getVirtualHostname(), ":",
+					PortalUtil.getPortalServerPort(false),
+					"/o/export-import/v1.0/sites/", externalReferenceCode,
+					"/import-uploads/", importUpload.getId(), "/chunks/0")));
+
+		ExportImportTestUtil.retryAssert(
+			1, TimeUnit.SECONDS, 30, TimeUnit.SECONDS,
+			() -> {
+				ImportUpload validatingImportUpload =
+					importUploadResource.getSiteImportUpload(
+						externalReferenceCode, importUpload.getId());
+
+				Assert.assertEquals(
+					ImportUpload.Status.READY,
+					validatingImportUpload.getStatus());
+			});
+
+		ImportProcess importProcess =
+			importProcessResource.postSiteImportProcess(
+				externalReferenceCode, null, null,
+				new ImportProcessRequest() {
+					{
+						setImportUploadId(importUpload.getId());
+					}
+				});
+
+		Assert.assertEquals(
+			importUpload.getFileName(), importProcess.getName());
+
+		ExportImportTestUtil.retryAssert(
+			1, TimeUnit.SECONDS, 30, TimeUnit.SECONDS,
+			() -> {
+				BackgroundTask backgroundTask =
+					_backgroundTaskLocalService.getBackgroundTask(
+						importProcess.getId());
+
+				Assert.assertEquals(
+					BackgroundTaskConstants.STATUS_SUCCESSFUL,
+					backgroundTask.getStatus());
+			});
+
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByUuidAndGroupId(
+				layout.getUuid(), testGroup.getGroupId(), false));
+
+		assertHttpResponseStatusCode(
+			404,
+			importUploadResource.getSiteImportUploadHttpResponse(
+				externalReferenceCode, importUpload.getId()));
 	}
 
 	private void _testPostSiteImportProcessWithLayoutSetPrototypeGroup()
