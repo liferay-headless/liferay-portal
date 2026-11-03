@@ -186,6 +186,12 @@ public class OpenAPIUtilTest {
 			"getItems");
 		_testGetRequest(
 			null, null, "GET",
+			"/v1.0/items?aggregationTerms=name&aggregationTerms=string&" +
+				"restrictFields=actions",
+			JSONUtil.put("aggregationTerms", JSONUtil.putAll("name", "string")),
+			"getItems");
+		_testGetRequest(
+			null, null, "GET",
 			"/v1.0/items?filter=name+eq+%27John+Doe%27&restrictFields=actions",
 			JSONUtil.put("filter", "name eq 'John Doe'"), "getItems");
 		_testGetRequest(
