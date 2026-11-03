@@ -1487,7 +1487,19 @@ public class OpenAPIUtil {
 				continue;
 			}
 
-			_appendQueryParameter(name, sb, entry.getValue());
+			Object value = entry.getValue();
+
+			if (value instanceof JSONArray) {
+				JSONArray jsonArray = (JSONArray)value;
+
+				for (int i = 0; i < jsonArray.length(); i++) {
+					_appendQueryParameter(name, sb, jsonArray.get(i));
+				}
+
+				continue;
+			}
+
+			_appendQueryParameter(name, sb, value);
 		}
 
 		Set<String> fieldNames = _getFieldNames(inputJSONObject.opt("fields"));
