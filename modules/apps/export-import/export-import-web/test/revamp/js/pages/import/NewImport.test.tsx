@@ -14,10 +14,11 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import fetch from 'jest-fetch-mock';
 import React from 'react';
 
 import {NewImport} from '../../../../../src/main/resources/META-INF/resources/revamp/js/pages/import/NewImport';
-import {postImportPreview} from '../../../../../src/main/resources/META-INF/resources/revamp/js/services/postImportPreview';
+import {uploadImportFile} from '../../../../../src/main/resources/META-INF/resources/revamp/js/services/uploadImportFile';
 import {SCOPES} from '../../../../../src/main/resources/META-INF/resources/revamp/js/types/scope';
 import formatDate from '../../../../../src/main/resources/META-INF/resources/revamp/js/utils/formatDate';
 import {mockImportPreview} from '../../mocks/mockImportPreview';
@@ -25,10 +26,16 @@ import {toMockPortletDataHandlers} from '../../mocks/mockPortletDataHandlerSecti
 import {mockPortletDataHandlerSectionsForFilterTest} from '../../mocks/mockSectionsForFilterTest';
 
 jest.mock(
-	'../../../../../src/main/resources/META-INF/resources/revamp/js/services/postImportPreview',
+	'../../../../../src/main/resources/META-INF/resources/revamp/js/services/uploadImportFile',
 	() => ({
-		postImportPreview: jest.fn(() =>
-			Promise.resolve({data: mockImportPreview, error: null})
+		uploadImportFile: jest.fn(() =>
+			Promise.resolve({
+				data: {
+					importPreview: mockImportPreview,
+					importUploadId: 'upload',
+				},
+				error: null,
+			})
 		),
 	})
 );
@@ -44,8 +51,8 @@ const renderComponent = ({
 		<NewImport
 			backURL="/some/back/url"
 			commentsAndRatingsEnabled={commentsAndRatingsEnabled}
-			importPreviewAPIURL="/o/export-import/v1.0/import-preview"
 			importProcessAPIURL="/o/export-import/v1.0/import-processes"
+			importUploadAPIURL="/o/export-import/v1.0/import-uploads"
 			scope={SCOPES.SITE}
 			siteSelectionEnabled={siteSelectionEnabled}
 		/>
@@ -111,6 +118,8 @@ describe('NewImport', () => {
 	});
 
 	beforeEach(() => {
+		jest.clearAllMocks();
+
 		user = userEvent.setup();
 	});
 
@@ -172,7 +181,7 @@ describe('NewImport', () => {
 	});
 
 	it('shows the import preview error and keeps Continue disabled when the lar is invalid', async () => {
-		(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+		(uploadImportFile as jest.Mock).mockImplementationOnce(() =>
 			Promise.resolve({
 				data: null,
 				error: 'Uploaded LAR file type Portlet does not match layout-prototype, layout-set, layout-set-prototype.',
@@ -188,6 +197,66 @@ describe('NewImport', () => {
 		);
 
 		expect(screen.getByRole('button', {name: /continue/i})).toBeDisabled();
+	});
+
+	it('deletes the validated upload when the file is removed', async () => {
+		fetch.mockResponseOnce('');
+
+		renderComponent();
+
+		await uploadFile('site.lar');
+
+		await user.click(
+			await screen.findByRole('button', {name: 'remove-file'})
+		);
+
+		await waitFor(() =>
+			expect(fetch).toHaveBeenCalledWith(
+				'/o/export-import/v1.0/import-uploads/upload',
+				expect.objectContaining({method: 'DELETE'})
+			)
+		);
+	});
+
+	it('resumes the interrupted upload when the same file is selected again', async () => {
+		(uploadImportFile as jest.Mock).mockImplementationOnce(
+			({onImportUpload}: {onImportUpload: (id: string) => void}) => {
+				onImportUpload('interrupted');
+
+				return new Promise((resolve) =>
+					setTimeout(() =>
+						resolve({
+							data: null,
+							error: 'the-upload-was-interrupted-select-the-same-file-again-to-resume-it',
+						})
+					)
+				);
+			}
+		);
+
+		renderComponent();
+
+		const file = new File(['test'], 'site.lar', {type: '.lar'});
+
+		await user.upload(
+			document.querySelector('input[type="file"]') as HTMLInputElement,
+			file
+		);
+
+		expect(await screen.findByRole('alert')).toHaveTextContent(
+			'the-upload-was-interrupted-select-the-same-file-again-to-resume-it'
+		);
+
+		await user.upload(
+			document.querySelector('input[type="file"]') as HTMLInputElement,
+			file
+		);
+
+		await waitFor(() =>
+			expect(uploadImportFile).toHaveBeenLastCalledWith(
+				expect.objectContaining({importUploadId: 'interrupted'})
+			)
+		);
 	});
 
 	it('auto-fills the Name field with the uploaded file name when Name is empty', async () => {
@@ -289,9 +358,12 @@ describe('NewImport', () => {
 	});
 
 	it('shows the file summary and the lar contents on the Data Selection step after uploading a file and clicking Continue', async () => {
-		(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+		(uploadImportFile as jest.Mock).mockImplementationOnce(() =>
 			Promise.resolve({
-				data: {...mockImportPreview, deletionCount: 0},
+				data: {
+					importPreview: {...mockImportPreview, deletionCount: 0},
+					importUploadId: 'upload',
+				},
 				error: null,
 			})
 		);
@@ -324,6 +396,81 @@ describe('NewImport', () => {
 		).not.toBeInTheDocument();
 
 		await checkAccessibility({context: container});
+	});
+
+	it('disables Import and goes to the processes list once the import has started', async () => {
+		fetch.mockResponseOnce(JSON.stringify({id: 1}));
+
+		await goToDataSelectionStep();
+
+		await user.click(screen.getByRole('button', {name: /continue/i}));
+
+		const importButton = screen.getByRole('button', {name: /^import$/i});
+
+		await waitFor(() => expect(importButton).toBeEnabled());
+
+		await user.click(importButton);
+
+		await waitFor(() =>
+			expect(Liferay.Util.navigate).toHaveBeenCalledWith('/some/back/url')
+		);
+
+		expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+			message: 'the-process-has-started',
+			type: 'success',
+		});
+		expect(screen.getByRole('button', {name: /^import$/i})).toBeDisabled();
+	});
+
+	it('sends the uploaded file with the import request', async () => {
+		fetch.mockResponseOnce(JSON.stringify({id: 1}));
+
+		await goToDataSelectionStep();
+
+		await user.click(screen.getByRole('button', {name: /continue/i}));
+
+		const importButton = screen.getByRole('button', {name: /^import$/i});
+
+		await waitFor(() => expect(importButton).toBeEnabled());
+
+		await user.click(importButton);
+
+		await waitFor(() =>
+			expect(Liferay.Util.navigate).toHaveBeenCalledWith('/some/back/url')
+		);
+
+		expect(String(fetch.mock.calls[0][0])).toBe(
+			'/o/export-import/v1.0/import-processes'
+		);
+		expect(
+			JSON.parse(String(fetch.mock.calls[0][1]?.body)).importUploadId
+		).toBe('upload');
+	});
+
+	it('shows the error and stays in the wizard when the import request fails', async () => {
+		fetch.mockResponseOnce(
+			JSON.stringify({title: 'The import could not start.'}),
+			{status: 400}
+		);
+
+		await goToDataSelectionStep();
+
+		await user.click(screen.getByRole('button', {name: /continue/i}));
+
+		const importButton = screen.getByRole('button', {name: /^import$/i});
+
+		await waitFor(() => expect(importButton).toBeEnabled());
+
+		await user.click(importButton);
+
+		await waitFor(() =>
+			expect(Liferay.Util.openToast).toHaveBeenCalledWith({
+				message: 'The import could not start.',
+				type: 'danger',
+			})
+		);
+
+		expect(Liferay.Util.navigate).not.toHaveBeenCalled();
 	});
 
 	it('shows the section as indeterminate and summarizes the selected handlers when the selection is partial', async () => {
@@ -381,13 +528,16 @@ describe('NewImport', () => {
 	});
 
 	it('filters deletions-only sections based on the deletions toggle', async () => {
-		(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+		(uploadImportFile as jest.Mock).mockImplementationOnce(() =>
 			Promise.resolve({
 				data: {
-					...mockImportPreview,
-					portletDataHandlers: toMockPortletDataHandlers(
-						mockPortletDataHandlerSectionsForFilterTest
-					),
+					importPreview: {
+						...mockImportPreview,
+						portletDataHandlers: toMockPortletDataHandlers(
+							mockPortletDataHandlerSectionsForFilterTest
+						),
+					},
+					importUploadId: 'upload',
 				},
 				error: null,
 			})
@@ -420,18 +570,21 @@ describe('NewImport', () => {
 	});
 
 	it('keeps the entity types deselected when going back after selecting only sites', async () => {
-		(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+		(uploadImportFile as jest.Mock).mockImplementationOnce(() =>
 			Promise.resolve({
 				data: {
-					...mockImportPreview,
-					sites: [
-						{
-							descriptiveName: 'Support',
-							existsInInstance: true,
-							externalReferenceCode: 'erc-support',
-							path: 'Global / Support',
-						},
-					],
+					importPreview: {
+						...mockImportPreview,
+						sites: [
+							{
+								descriptiveName: 'Support',
+								existsInInstance: true,
+								externalReferenceCode: 'erc-support',
+								path: 'Global / Support',
+							},
+						],
+					},
+					importUploadId: 'upload',
 				},
 				error: null,
 			})
