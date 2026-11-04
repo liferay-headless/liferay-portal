@@ -5,19 +5,15 @@
 
 package com.liferay.layout.internal.upgrade.v6_1_1;
 
-import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
-import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.segments.model.SegmentsExperience;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,35 +40,13 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 
 		for (boolean privateLayout : new boolean[] {true, false}) {
 			_upgrade(
-				FragmentEntryLink.class.getName(),
 				layoutSetPrototypeClassNameId, "uuid_",
 				"originalFragmentEntryLinkERC", "fragmentEntryLinkId",
 				privateLayout, "FragmentEntryLink");
 			_upgrade(
-				SegmentsExperience.class.getName(),
 				layoutSetPrototypeClassNameId, "segmentsExperienceKey", null,
 				"segmentsExperienceId", privateLayout, "SegmentsExperience");
 		}
-	}
-
-	private String _getExternalReferenceCode(
-		String className, String externalReferenceCode, boolean privateLayout) {
-
-		if (!privateLayout) {
-			return externalReferenceCode;
-		}
-
-		String newExternalReferenceCode =
-			externalReferenceCode +
-				LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE;
-
-		if (newExternalReferenceCode.length() <= ModelHintsUtil.getMaxLength(
-				className, "externalReferenceCode")) {
-
-			return newExternalReferenceCode;
-		}
-
-		return PortalUUIDUtil.generate(newExternalReferenceCode.getBytes());
 	}
 
 	private String _getSelectSQL(
@@ -136,8 +110,7 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 	}
 
 	private void _upgrade(
-			String className, long layoutSetPrototypeClassNameId,
-			String matchColumnName,
+			long layoutSetPrototypeClassNameId, String matchColumnName,
 			String originalExternalReferenceCodeColumnName,
 			String primaryKeyColumnName, boolean privateLayout,
 			String tableName)
@@ -161,6 +134,12 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 			preparedStatement1.setLong(1, layoutSetPrototypeClassNameId);
 			preparedStatement1.setBoolean(2, privateLayout);
 
+			String suffix = StringPool.BLANK;
+
+			if (privateLayout) {
+				suffix = LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE;
+			}
+
 			Map<Long, String> uuids = new HashMap<>();
 
 			try (ResultSet resultSet = preparedStatement1.executeQuery()) {
@@ -170,9 +149,8 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 					long primaryKey = resultSet.getLong(primaryKeyColumnName);
 					String uuid = resultSet.getString("uuid_");
 
-					String newExternalReferenceCode = _getExternalReferenceCode(
-						className, resultSet.getString("layoutSetPrototypeERC"),
-						privateLayout);
+					String newExternalReferenceCode =
+						resultSet.getString("layoutSetPrototypeERC") + suffix;
 
 					String newUUID = uuid;
 
@@ -212,9 +190,7 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 								layoutSetPrototypeOriginalERC)) {
 
 							newOriginalExternalReferenceCode =
-								_getExternalReferenceCode(
-									className, layoutSetPrototypeOriginalERC,
-									privateLayout);
+								layoutSetPrototypeOriginalERC + suffix;
 						}
 
 						if (!Objects.equals(
@@ -249,59 +225,14 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 		// Update the private pages first so that the public pages can take over
 		// the external reference code of the site template page.
 
-		int maxLength = ModelHintsUtil.getMaxLength(
-			Layout.class.getName(), "externalReferenceCode");
-
-		String suffix = LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE;
-
-		int suffixLength = suffix.length();
-
-		String longLayoutSetPrototypeLayoutERCPattern =
-			StringPool.UNDERLINE.repeat(maxLength - suffixLength + 1) +
-				StringPool.PERCENT;
-
 		runSQL(
 			StringBundler.concat(
 				"update Layout set externalReferenceCode = CONCAT(",
-				"layoutSetPrototypeLayoutERC, '", suffix,
+				"layoutSetPrototypeLayoutERC, '",
+				LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE,
 				"') where privateLayout = [$TRUE$] and ",
 				"layoutSetPrototypeLayoutERC is not null and ",
-				"layoutSetPrototypeLayoutERC != '' and ",
-				"layoutSetPrototypeLayoutERC not like '",
-				longLayoutSetPrototypeLayoutERCPattern, "'"));
-
-		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-				"select ctCollectionId, plid, layoutSetPrototypeLayoutERC " +
-					"from Layout where privateLayout = ? and " +
-						"layoutSetPrototypeLayoutERC like ?");
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update Layout set externalReferenceCode = ? where " +
-						"ctCollectionId = ? and plid = ?")) {
-
-			preparedStatement1.setBoolean(1, true);
-			preparedStatement1.setString(
-				2, longLayoutSetPrototypeLayoutERCPattern);
-
-			try (ResultSet resultSet = preparedStatement1.executeQuery()) {
-				while (resultSet.next()) {
-					preparedStatement2.setString(
-						1,
-						_getExternalReferenceCode(
-							Layout.class.getName(),
-							resultSet.getString("layoutSetPrototypeLayoutERC"),
-							true));
-					preparedStatement2.setLong(
-						2, resultSet.getLong("ctCollectionId"));
-					preparedStatement2.setLong(3, resultSet.getLong("plid"));
-
-					preparedStatement2.addBatch();
-				}
-
-				preparedStatement2.executeBatch();
-			}
-		}
+				"layoutSetPrototypeLayoutERC != ''"));
 
 		runSQL(
 			StringBundler.concat(
