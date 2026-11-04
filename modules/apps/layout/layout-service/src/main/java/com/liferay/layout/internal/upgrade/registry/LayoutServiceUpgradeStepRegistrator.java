@@ -19,6 +19,7 @@ import com.liferay.layout.internal.upgrade.v1_2_2.LayoutSEOUpgradeProcess;
 import com.liferay.layout.internal.upgrade.v1_2_3.LayoutRevisionUpgradeProcess;
 import com.liferay.layout.internal.upgrade.v1_3_0.util.LayoutLocalizationTable;
 import com.liferay.layout.internal.upgrade.v1_3_1.LayoutLocalizationUpgradeProcess;
+import com.liferay.layout.internal.upgrade.v6_1_1.LayoutLayoutSetPrototypeLayoutERCUpgradeProcess;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.model.Release;
@@ -164,7 +165,12 @@ public class LayoutServiceUpgradeStepRegistrator
 
 		registry.register(
 			"6.1.0", "6.1.1",
-			new com.liferay.layout.internal.upgrade.v6_1_1.LayoutUpgradeProcess(
+			new LayoutLayoutSetPrototypeLayoutERCUpgradeProcess(
+				_classNameLocalService));
+
+		registry.register(
+			"6.1.1", "6.1.2",
+			new com.liferay.layout.internal.upgrade.v6_1_2.LayoutUpgradeProcess(
 				_classNameLocalService));
 	}
 
