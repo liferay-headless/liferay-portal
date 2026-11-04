@@ -2021,9 +2021,9 @@ public class LayoutSetPrototypePropagationTest
 			testGroup, publicLayoutSetPrototypeId, privateLayoutSetPrototypeId,
 			publicLayoutSetPrototypeLink, privateLayoutSetPrototypeLink);
 
-		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(
-			_layoutSetPrototypeGroup, true);
 		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+			_layoutSetPrototypeGroup, true);
+		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(
 			_layoutSetPrototypeGroup, true);
 
 		childLayout = _layoutLocalService.updateParentLayoutId(
@@ -2097,9 +2097,9 @@ public class LayoutSetPrototypePropagationTest
 			LocaleUtil.getSiteDefault());
 		String name = RandomTestUtil.randomString();
 
+		_layoutLocalService.updateName(childLayout.getPlid(), name, languageId);
 		_layoutLocalService.updateName(
 			contentLayout.getPlid(), name, languageId);
-		_layoutLocalService.updateName(childLayout.getPlid(), name, languageId);
 
 		timestamp = System.currentTimeMillis();
 
@@ -2114,6 +2114,13 @@ public class LayoutSetPrototypePropagationTest
 		Assert.assertEquals(
 			publicLayoutsCount,
 			_layoutLocalService.getLayoutsCount(testGroup, false));
+
+		List<FragmentEntryLink> prototypeFragmentEntryLinks =
+			FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinksByPlid(
+				contentLayout.getGroupId(), contentLayout.getPlid());
+
+		FragmentEntryLink prototypeFragmentEntryLink =
+			prototypeFragmentEntryLinks.get(0);
 
 		for (boolean privateLayout : new boolean[] {false, true}) {
 			if ((privateLayout && !privateLayoutSetPrototypeLink) ||
@@ -2162,13 +2169,6 @@ public class LayoutSetPrototypePropagationTest
 				_getEditableValuesLayout(
 					fragmentEntryLink.getEditableValues(),
 					testGroup.getGroupId()));
-
-			List<FragmentEntryLink> prototypeFragmentEntryLinks =
-				FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinksByPlid(
-					contentLayout.getGroupId(), contentLayout.getPlid());
-
-			FragmentEntryLink prototypeFragmentEntryLink =
-				prototypeFragmentEntryLinks.get(0);
 
 			if (privateLayout) {
 				Assert.assertNotEquals(
