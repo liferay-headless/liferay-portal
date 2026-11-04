@@ -6,8 +6,6 @@
 package com.liferay.layout.internal.upgrade.v6_1_1.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.change.tracking.model.CTCollection;
-import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.test.util.BaseCTUpgradeProcessTestCase;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -16,10 +14,9 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocal
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalService;
 import com.liferay.layout.test.util.ContentLayoutTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
-import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPool;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
@@ -31,7 +28,6 @@ import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -42,7 +38,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
@@ -157,52 +153,16 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	@Test
 	@TestInfo("LPD-108617")
 	public void testUpgrade() throws Exception {
-		Layout linkedChildLayout = _getLinkedLayout(_childLayout, false);
-
-		Layout linkToLayoutLayout = LayoutTestUtil.addTypeLinkToLayoutLayout(
-			_group.getGroupId(), false, linkedChildLayout.getLayoutId());
-
-		_resetExternalReferenceCodes();
-		_resetUUIDs();
-
-		Layout privateLinkedContentLayout = _getLinkedLayout(
-			_contentLayout, true);
-
-		_copyLayoutSetPrototypeLayout(
-			_contentLayout, privateLinkedContentLayout);
-		_copyLayoutSetPrototypeLayout(
-			_contentLayout.fetchDraftLayout(),
-			privateLinkedContentLayout.fetchDraftLayout());
-
-		UnicodeProperties unicodeProperties =
-			linkToLayoutLayout.getTypeSettingsProperties();
-
-		unicodeProperties.setProperty(
-			"linkToLayoutExternalReferenceCode",
-			String.valueOf(linkedChildLayout.getPlid()));
-
-		_executeUpdate(
-			"update Layout set typeSettings = ? where plid = ?",
-			unicodeProperties.toString(), linkToLayoutLayout.getPlid());
+		_resetExternalReferenceCodes(_group);
 
 		runUpgrade();
 
-		_assertExternalReferenceCodes(_childLayout, false);
-		_assertExternalReferenceCodes(_childLayout, true);
-		_assertExternalReferenceCodes(_contentLayout, false);
-		_assertExternalReferenceCodes(_contentLayout, true);
-		_assertExternalReferenceCodes(_parentLayout, false);
-		_assertExternalReferenceCodes(_parentLayout, true);
-
-		linkedChildLayout = _layoutLocalService.getLayout(
-			linkedChildLayout.getPlid());
-		linkToLayoutLayout = _layoutLocalService.getLayout(
-			linkToLayoutLayout.getPlid());
-
-		Assert.assertEquals(
-			linkedChildLayout.getExternalReferenceCode(),
-			linkToLayoutLayout.getTypeSettingsProperty(
-				"linkToLayoutExternalReferenceCode"));
+		_assertExternalReferenceCodes(_group, _childLayout, false);
+		_assertExternalReferenceCodes(_group, _contentLayout, false);
+		_assertExternalReferenceCodes(_group, _parentLayout, false);
+		_assertLayoutExternalReferenceCodes(_group, _childLayout, true);
+		_assertLayoutExternalReferenceCodes(_group, _contentLayout, true);
+		_assertLayoutExternalReferenceCodes(_group, _parentLayout, true);
 
 		int privateLayoutsCount = _layoutLocalService.getLayoutsCount(
 			_group, true);
@@ -226,73 +186,83 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 			publicLayoutsCount,
 			_layoutLocalService.getLayoutsCount(_group, false));
 
-		Layout privateLinkedChildLayout = _getLinkedLayout(_childLayout, true);
+		Layout privateLinkedChildLayout = _getLinkedLayout(
+			_group, _childLayout, true);
 
 		Assert.assertEquals(name, privateLinkedChildLayout.getName(languageId));
 
-		Layout publicLinkedChildLayout = _getLinkedLayout(_childLayout, false);
+		Layout publicLinkedChildLayout = _getLinkedLayout(
+			_group, _childLayout, false);
 
 		Assert.assertEquals(name, publicLinkedChildLayout.getName(languageId));
 	}
 
 	@Test
 	@TestInfo("LPD-108617")
-	public void testUpgradeWithCTCollection() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(
-			_layoutSetPrototypeGroup, true);
+	public void testUpgradeWithPrivateLayoutSetPrototypeLink()
+		throws Exception {
 
-		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
-			null, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			0, RandomTestUtil.randomString(), RandomTestUtil.randomString());
+		Group group = GroupTestUtil.addGroup();
 
 		try {
-			Layout linkedLayout = null;
+			_sites.updateLayoutSetPrototypesLinks(
+				group, 0, _layoutSetPrototype.getLayoutSetPrototypeId(), false,
+				true);
 
-			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
-						ctCollection.getCtCollectionId())) {
+			_sites.mergeLayoutSetPrototypeLayouts(
+				_layoutSetPrototype, TestPropsValues.getUserId());
 
-				ServiceContext serviceContext =
-					ServiceContextTestUtil.getServiceContext(
-						_group.getGroupId(), TestPropsValues.getUserId());
+			_resetExternalReferenceCodes(group);
 
-				serviceContext.setAttribute(
-					"layoutSetPrototypeLayoutERC",
-					layout.getExternalReferenceCode());
+			for (Layout layout :
+					new Layout[] {
+						_childLayout, _contentLayout, _parentLayout
+					}) {
 
-				linkedLayout = _layoutLocalService.addLayout(
-					null, TestPropsValues.getUserId(), _group.getGroupId(),
-					false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-					RandomTestUtil.randomString(), null, null,
-					LayoutConstants.TYPE_PORTLET, false, null, serviceContext);
+				Layout linkedLayout = _getLinkedLayout(group, layout, true);
+
+				_copyLayoutSetPrototypeLayout(linkedLayout, layout);
+
+				Layout draftLayout = layout.fetchDraftLayout();
+
+				if (draftLayout == null) {
+					continue;
+				}
+
+				_copyLayoutSetPrototypeLayout(
+					linkedLayout.fetchDraftLayout(), draftLayout);
 			}
-
-			_resetExternalReferenceCodes();
 
 			runUpgrade();
 
-			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
-						ctCollection.getCtCollectionId())) {
-
-				linkedLayout = _layoutLocalService.getLayout(
-					linkedLayout.getPlid());
-
-				Assert.assertEquals(
-					layout.getExternalReferenceCode(),
-					linkedLayout.getExternalReferenceCode());
-			}
+			_assertExternalReferenceCodes(group, _childLayout, true);
+			_assertExternalReferenceCodes(group, _contentLayout, true);
+			_assertExternalReferenceCodes(group, _parentLayout, true);
 		}
 		finally {
-			_ctCollectionLocalService.deleteCTCollection(ctCollection);
+			GroupTestUtil.deleteGroup(group);
 		}
+	}
+
+	@Test
+	@TestInfo("LPD-108617")
+	public void testUpgradeWithPrivateSegmentsExperienceUUIDs()
+		throws Exception {
+
+		_resetExternalReferenceCodes(_group);
+
+		runUpgrade();
+
+		_assertSegmentsExperienceExternalReferenceCodes(
+			_contentLayout, _getLinkedLayout(_group, _contentLayout, true),
+			true);
 	}
 
 	@Override
 	protected CTModel<?> addCTModel() throws Exception {
-		_resetExternalReferenceCodes();
+		_resetExternalReferenceCodes(_group);
 
-		return _getLinkedLayout(_contentLayout, false);
+		return _getLinkedLayout(_group, _contentLayout, false);
 	}
 
 	@Override
@@ -312,7 +282,7 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	@Override
 	protected void runUpgrade() throws Exception {
 		UpgradeProcess[] upgradeProcesses = UpgradeTestUtil.getUpgradeSteps(
-			_upgradeStepRegistrator, new Version(6, 1, 1));
+			_upgradeStepRegistrator, new Version(6, 1, 2));
 
 		for (UpgradeProcess upgradeProcess : upgradeProcesses) {
 			upgradeProcess.upgrade();
@@ -328,10 +298,10 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	}
 
 	private void _assertExternalReferenceCodes(
-			Layout layout, boolean privateLayout)
+			Group group, Layout layout, boolean privateLayout)
 		throws Exception {
 
-		Layout linkedLayout = _getLinkedLayout(layout, privateLayout);
+		Layout linkedLayout = _getLinkedLayout(group, layout, privateLayout);
 
 		_assertExternalReferenceCodes(layout, linkedLayout, privateLayout);
 
@@ -346,18 +316,9 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	private void _assertExternalReferenceCodes(
 		Layout layout, Layout linkedLayout, boolean privateLayout) {
 
-		String suffix = StringPool.BLANK;
+		_assertLayoutExternalReferenceCode(layout, linkedLayout, privateLayout);
 
-		if (privateLayout) {
-			suffix = LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE;
-		}
-
-		Assert.assertEquals(
-			layout.getExternalReferenceCode() + suffix,
-			linkedLayout.getExternalReferenceCode());
-		Assert.assertEquals(
-			layout.getExternalReferenceCode(),
-			linkedLayout.getLayoutSetPrototypeLayoutERC());
+		String suffix = _getSuffix(privateLayout);
 
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
@@ -369,6 +330,9 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 		Assert.assertEquals(
 			_getExternalReferenceCodes(fragmentEntryLinks, suffix),
 			_getExternalReferenceCodes(linkedFragmentEntryLinks, null));
+		Assert.assertEquals(
+			_getOriginalFragmentEntryLinkERCs(fragmentEntryLinks, suffix),
+			_getOriginalFragmentEntryLinkERCs(linkedFragmentEntryLinks, null));
 
 		if (privateLayout) {
 			Set<String> uuids = _getUUIDs(fragmentEntryLinks);
@@ -377,6 +341,42 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 
 			Assert.assertEquals(uuids.toString(), 0, uuids.size());
 		}
+
+		_assertSegmentsExperienceExternalReferenceCodes(
+			layout, linkedLayout, privateLayout);
+	}
+
+	private void _assertLayoutExternalReferenceCode(
+		Layout layout, Layout linkedLayout, boolean privateLayout) {
+
+		Assert.assertEquals(
+			layout.getExternalReferenceCode() + _getSuffix(privateLayout),
+			linkedLayout.getExternalReferenceCode());
+		Assert.assertEquals(
+			layout.getExternalReferenceCode(),
+			linkedLayout.getLayoutSetPrototypeLayoutERC());
+	}
+
+	private void _assertLayoutExternalReferenceCodes(
+			Group group, Layout layout, boolean privateLayout)
+		throws Exception {
+
+		Layout linkedLayout = _getLinkedLayout(group, layout, privateLayout);
+
+		_assertLayoutExternalReferenceCode(layout, linkedLayout, privateLayout);
+
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		if (draftLayout != null) {
+			_assertLayoutExternalReferenceCode(
+				draftLayout, linkedLayout.fetchDraftLayout(), privateLayout);
+		}
+	}
+
+	private void _assertSegmentsExperienceExternalReferenceCodes(
+		Layout layout, Layout linkedLayout, boolean privateLayout) {
+
+		String suffix = _getSuffix(privateLayout);
 
 		for (SegmentsExperience segmentsExperience :
 				_segmentsExperienceLocalService.getSegmentsExperiences(
@@ -401,7 +401,7 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	}
 
 	private void _copyLayoutSetPrototypeLayout(
-			Layout layoutSetPrototypeLayout, Layout layout)
+			Layout layout, Layout layoutSetPrototypeLayout)
 		throws Exception {
 
 		_executeUpdate(
@@ -425,6 +425,10 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
 				layoutSetPrototypeLayout.getGroupId(),
 				layoutSetPrototypeLayout.getPlid());
+
+		if (fragmentEntryLinks.isEmpty()) {
+			return;
+		}
 
 		Assert.assertEquals(
 			fragmentEntryLinks.toString(), 1, fragmentEntryLinks.size());
@@ -472,12 +476,13 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 		return externalReferenceCodes;
 	}
 
-	private Layout _getLinkedLayout(Layout layout, boolean privateLayout)
+	private Layout _getLinkedLayout(
+			Group group, Layout layout, boolean privateLayout)
 		throws Exception {
 
 		for (Layout linkedLayout :
 				_layoutLocalService.getLayouts(
-					_group.getGroupId(), privateLayout)) {
+					group.getGroupId(), privateLayout)) {
 
 			if (Objects.equals(
 					layout.getExternalReferenceCode(),
@@ -491,6 +496,35 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 			"No layout is linked to " + layout.getExternalReferenceCode());
 	}
 
+	private Set<String> _getOriginalFragmentEntryLinkERCs(
+		List<FragmentEntryLink> fragmentEntryLinks, String suffix) {
+
+		Set<String> originalFragmentEntryLinkERCs = new HashSet<>();
+
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			String originalFragmentEntryLinkERC =
+				fragmentEntryLink.getOriginalFragmentEntryLinkERC();
+
+			if (Validator.isNotNull(originalFragmentEntryLinkERC) &&
+				(suffix != null)) {
+
+				originalFragmentEntryLinkERC += suffix;
+			}
+
+			originalFragmentEntryLinkERCs.add(originalFragmentEntryLinkERC);
+		}
+
+		return originalFragmentEntryLinkERCs;
+	}
+
+	private String _getSuffix(boolean privateLayout) {
+		if (privateLayout) {
+			return LayoutConstants.EXTERNAL_REFERENCE_CODE_SUFFIX_PRIVATE;
+		}
+
+		return StringPool.BLANK;
+	}
+
 	private Set<String> _getUUIDs(List<FragmentEntryLink> fragmentEntryLinks) {
 		Set<String> uuids = new HashSet<>();
 
@@ -501,36 +535,29 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 		return uuids;
 	}
 
-	private void _resetExternalReferenceCodes() throws Exception {
+	private void _resetExternalReferenceCodes(Group group) throws Exception {
 		DB db = DBManagerUtil.getDB();
 
 		db.runSQL(
-			"update Layout set externalReferenceCode = CAST_TEXT(plid) where " +
-				"groupId = " + _group.getGroupId());
+			StringBundler.concat(
+				"update Layout set externalReferenceCode = CAST_TEXT(plid) ",
+				"where groupId = ", group.getGroupId()));
 		db.runSQL(
-			"update SegmentsExperience set externalReferenceCode = " +
-				"CAST_TEXT(segmentsExperienceId) where groupId = " +
-					_group.getGroupId());
+			StringBundler.concat(
+				"update SegmentsExperience set externalReferenceCode = ",
+				"CAST_TEXT(segmentsExperienceId) where groupId = ",
+				group.getGroupId()));
 		db.runSQL(
-			"update FragmentEntryLink set externalReferenceCode = " +
-				"CAST_TEXT(fragmentEntryLinkId) where groupId = " +
-					_group.getGroupId());
-
-		_entityCache.clearCache();
-		_multiVMPool.clear();
-	}
-
-	private void _resetUUIDs() throws Exception {
-		DB db = DBManagerUtil.getDB();
-
+			StringBundler.concat(
+				"update FragmentEntryLink set externalReferenceCode = ",
+				"CAST_TEXT(fragmentEntryLinkId) where groupId = ",
+				group.getGroupId()));
 		db.runSQL(
-			"update SegmentsExperience set uuid_ = " +
-				"CAST_TEXT(segmentsExperienceId) where groupId = " +
-					_group.getGroupId());
-		db.runSQL(
-			"update FragmentEntryLink set uuid_ = " +
-				"CAST_TEXT(fragmentEntryLinkId) where groupId = " +
-					_group.getGroupId());
+			StringBundler.concat(
+				"update FragmentEntryLink set originalFragmentEntryLinkERC = ",
+				"CAST_TEXT(fragmentEntryLinkId) where groupId = ",
+				group.getGroupId(),
+				" and originalFragmentEntryLinkERC is not null"));
 
 		_entityCache.clearCache();
 		_multiVMPool.clear();
@@ -539,9 +566,6 @@ public class LayoutUpgradeProcessTest extends BaseCTUpgradeProcessTestCase {
 	private Layout _childLayout;
 	private Connection _connection;
 	private Layout _contentLayout;
-
-	@Inject
-	private CTCollectionLocalService _ctCollectionLocalService;
 
 	@Inject
 	private EntityCache _entityCache;
