@@ -258,6 +258,53 @@ public class LaunchSetPublisherTest {
 	}
 
 	@Test
+	public void testPublishWhenLaunchSetStatusIsScheduled() throws Exception {
+		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
+
+		_launchSetPublisher.schedulePublish(
+			new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
+			TestPropsValues.getUserId());
+
+		_launchSetPublisher.publish(launchSetId);
+
+		Assert.assertNull(_getSchedulerResponse());
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(launchSetId);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED,
+			launchSetObjectEntry.getStatus());
+	}
+
+	@Test
+	public void testPublishWhenLaunchSetStatusIsScheduledWithErrors()
+		throws Exception {
+
+		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
+
+		_addLaunchEntryObjectEntry(
+			launchSetId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomInt(), RandomTestUtil.randomString());
+
+		_launchSetPublisher.schedulePublish(
+			new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
+			TestPropsValues.getUserId());
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.publish(launchSetId));
+
+		Assert.assertNull(_getSchedulerResponse());
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(launchSetId);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, launchSetObjectEntry.getStatus());
+	}
+
+	@Test
 	public void testSchedulePublish() throws Exception {
 		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
 
@@ -414,12 +461,7 @@ public class LaunchSetPublisherTest {
 
 		Assert.assertEquals(expectedStatus, launchSetObjectEntry.getStatus());
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				StringBundler.concat(
-					launchSetId, StringPool.AT,
-					launchSetObjectEntry.getCompanyId()),
-				"liferay/launch_set_scheduled_publish", StorageType.PERSISTED);
+		SchedulerResponse schedulerResponse = _getSchedulerResponse();
 
 		Date scheduledDate = null;
 
@@ -463,6 +505,14 @@ public class LaunchSetPublisherTest {
 			objectRelationship.getObjectRelationshipId(), null, false,
 			_launchSetObjectEntry.getObjectEntryId(), true, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	private SchedulerResponse _getSchedulerResponse() throws Exception {
+		return _schedulerEngineHelper.getScheduledJob(
+			StringBundler.concat(
+				_launchSetObjectEntry.getObjectEntryId(), StringPool.AT,
+				_launchSetObjectEntry.getCompanyId()),
+			"liferay/launch_set_scheduled_publish", StorageType.PERSISTED);
 	}
 
 	private String _getTitle(JournalArticle journalArticle) throws Exception {
