@@ -68,6 +68,15 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				"Launch set " + launchSetId + " was already published");
 		}
 
+		if (launchSetObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_SCHEDULED) {
+
+			_schedulerEngineHelper.delete(
+				_getJobName(launchSetObjectEntry),
+				LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
+				StorageType.PERSISTED);
+		}
+
 		List<Map<String, Serializable>> launchSetErrorValuesList =
 			new ArrayList<>();
 		ServiceContext serviceContext =
