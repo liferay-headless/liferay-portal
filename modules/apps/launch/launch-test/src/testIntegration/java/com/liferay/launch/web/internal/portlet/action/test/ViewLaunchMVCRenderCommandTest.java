@@ -104,21 +104,11 @@ public class ViewLaunchMVCRenderCommandTest {
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				TestPropsValues.getCompanyId(), "LaunchSet");
-
 		_removeViewPermissions(
-			objectDefinition.getClassName(),
+			_getClassName("LaunchSet"),
 			_launchSetObjectEntry.getObjectEntryId());
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
-		_resourcePermissionLocalService.setResourcePermissions(
-			TestPropsValues.getCompanyId(), objectDefinition.getClassName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(_launchSetObjectEntry.getObjectEntryId()),
-			_role.getRoleId(), new String[] {ActionKeys.VIEW});
 
 		_user = UserTestUtil.addUser();
 
@@ -133,17 +123,30 @@ public class ViewLaunchMVCRenderCommandTest {
 	@Test
 	public void testRender() throws Exception {
 
-		// Cannot view one of the launch's articles
+		// Cannot view the launch
+
+		_setViewPermission(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+
+		Assert.assertFalse(_isPreviewable());
+
+		// Can view the launch but not one of its articles
+
+		_removeViewPermissions(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+		_setViewPermission(
+			_getClassName("LaunchSet"),
+			_launchSetObjectEntry.getObjectEntryId());
 
 		Assert.assertFalse(_isPreviewable());
 
 		// Can view everything
 
-		_resourcePermissionLocalService.setResourcePermissions(
-			TestPropsValues.getCompanyId(), JournalArticle.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(_journalArticle.getResourcePrimKey()),
-			_role.getRoleId(), new String[] {ActionKeys.VIEW});
+		_setViewPermission(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
 
 		Assert.assertTrue(_isPreviewable());
 	}
@@ -167,6 +170,14 @@ public class ViewLaunchMVCRenderCommandTest {
 			objectDefinition.getObjectDefinitionId(), 0,
 			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()), values,
 			serviceContext);
+	}
+
+	private String _getClassName(String objectDefinitionName) throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		return objectDefinition.getClassName();
 	}
 
 	private boolean _isPreviewable() throws Exception {
@@ -215,6 +226,15 @@ public class ViewLaunchMVCRenderCommandTest {
 				ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(primKey),
 				resourcePermission.getRoleId(), ActionKeys.VIEW);
 		}
+	}
+
+	private void _setViewPermission(String name, long primKey)
+		throws Exception {
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), name,
+			ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(primKey),
+			_role.getRoleId(), new String[] {ActionKeys.VIEW});
 	}
 
 	@Inject
