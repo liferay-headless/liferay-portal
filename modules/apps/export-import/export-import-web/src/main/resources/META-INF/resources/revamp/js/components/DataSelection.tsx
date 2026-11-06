@@ -35,38 +35,38 @@ export default function DataSelection({
 	process = 'export',
 	subtitle,
 	timeZoneId,
+	title = Liferay.Language.get('data-selection'),
 }: {
 	commentsAndRatingsEnabled?: boolean;
 	deletionCount?: number;
-	deletionsDescription: string;
-	deletionsLabel: string;
+	deletionsDescription?: string;
+	deletionsLabel?: string;
 	itemsCount?: number;
 	lastPublishDate?: string;
 	loading?: boolean;
-	onApplyFilter: (dateFilterValues: DateFilterValues) => void;
+	onApplyFilter?: (dateFilterValues: DateFilterValues) => void;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
-	permissionsDescription: string;
-	permissionsLabel: string;
+	permissionsDescription?: string;
+	permissionsLabel?: string;
 	portletDataHandlerSections: PortletDataHandlerSection[];
 	process?: ExportImportProcess;
 	subtitle: string;
 	timeZoneId: string;
+	title?: string;
 }) {
 	return (
 		<>
-			<SectionHeader
-				id={LABEL_ID}
-				subtitle={subtitle}
-				title={Liferay.Language.get('data-selection')}
-			/>
+			<SectionHeader id={LABEL_ID} subtitle={subtitle} title={title} />
 
-			<FormikFieldCheckbox
-				description={permissionsDescription}
-				label={permissionsLabel}
-				name="permissions"
-			/>
+			{permissionsLabel && (
+				<FormikFieldCheckbox
+					description={permissionsDescription}
+					label={permissionsLabel}
+					name="permissions"
+				/>
+			)}
 
-			{deletionCount > 0 && (
+			{deletionCount > 0 && deletionsLabel && (
 				<FormikFieldCheckbox
 					description={deletionsDescription}
 					label={deletionsLabel}
@@ -74,13 +74,15 @@ export default function DataSelection({
 				/>
 			)}
 
-			<FormikFieldDateFilter
-				itemsCount={itemsCount}
-				lastPublishDate={lastPublishDate}
-				name="dateFilterValues"
-				onApplyFilter={onApplyFilter}
-				timeZoneId={timeZoneId}
-			/>
+			{onApplyFilter && (
+				<FormikFieldDateFilter
+					itemsCount={itemsCount}
+					lastPublishDate={lastPublishDate}
+					name="dateFilterValues"
+					onApplyFilter={onApplyFilter}
+					timeZoneId={timeZoneId}
+				/>
+			)}
 
 			<div className="sr-only" role="status">
 				{loading
