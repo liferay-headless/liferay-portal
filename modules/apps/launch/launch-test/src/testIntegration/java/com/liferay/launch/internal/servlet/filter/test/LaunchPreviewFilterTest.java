@@ -134,10 +134,17 @@ public class LaunchPreviewFilterTest {
 
 		// Cannot view the launch
 
+		_setViewPermission(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+
 		_assertForbidden(_user);
 
 		// Can view the launch but not one of its articles
 
+		_removeViewPermissions(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
 		_setViewPermission(
 			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
 
