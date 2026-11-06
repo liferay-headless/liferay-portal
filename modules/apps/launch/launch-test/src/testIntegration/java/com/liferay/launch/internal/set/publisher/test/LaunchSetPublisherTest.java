@@ -107,6 +107,104 @@ public class LaunchSetPublisherTest {
 
 		long draftId = _updateLaunchDraft(launchEntryObjectEntry, title);
 
+		LaunchEntryManager launchEntryManager =
+			_getJournalArticleLaunchEntryManager();
+
+		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
+
+		LaunchEntryManager.Version publishedVersion =
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey());
+
+		Assert.assertEquals(title, _getTitle(journalArticle));
+		Assert.assertNotEquals(
+			String.valueOf(journalArticle.getVersion()),
+			publishedVersion.getVersionKey());
+
+		_assertPublished(
+			draftId, launchEntryObjectEntry, launchEntryManager,
+			publishedVersion);
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED,
+			launchSetObjectEntry.getStatus());
+
+		List<ObjectEntry> launchSetErrorObjectEntries =
+			_getLaunchSetErrorObjectEntries();
+
+		Assert.assertEquals(
+			launchSetErrorObjectEntries.toString(), 0,
+			launchSetErrorObjectEntries.size());
+
+		try {
+			_launchSetPublisher.publish(
+				_launchSetObjectEntry.getObjectEntryId());
+
+			Assert.fail();
+		}
+		catch (PortalException portalException) {
+			Assert.assertTrue(
+				portalException.getMessage(),
+				StringUtil.endsWith(
+					portalException.getMessage(), "was already published"));
+		}
+
+		ObjectEntry otherLaunchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		ObjectEntry otherLaunchEntryObjectEntry = _addLaunchEntryObjectEntry(
+			otherLaunchSetObjectEntry.getObjectEntryId(),
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			String.valueOf(journalArticle.getVersion()));
+
+		String otherTitle = RandomTestUtil.randomString();
+
+		long otherDraftId = _updateLaunchDraft(
+			otherLaunchEntryObjectEntry, otherTitle);
+
+		JournalTestUtil.updateArticle(
+			_journalArticleLocalService.getLatestArticle(
+				journalArticle.getResourcePrimKey(),
+				WorkflowConstants.STATUS_APPROVED),
+			RandomTestUtil.randomString());
+
+		_launchSetPublisher.publish(
+			otherLaunchSetObjectEntry.getObjectEntryId());
+
+		LaunchEntryManager.Version otherPublishedVersion =
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey());
+
+		Assert.assertEquals(otherTitle, _getTitle(journalArticle));
+		Assert.assertNotEquals(
+			publishedVersion.getVersionKey(),
+			otherPublishedVersion.getVersionKey());
+
+		_assertPublished(
+			otherDraftId, otherLaunchEntryObjectEntry, launchEntryManager,
+			otherPublishedVersion);
+	}
+
+	@Test
+	public void testPublishWhenLaunchEntryClassNameIsUnknown()
+		throws Exception {
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
+			_launchSetObjectEntry.getObjectEntryId(),
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			String.valueOf(journalArticle.getVersion()));
+
+		String title = RandomTestUtil.randomString();
+
+		long draftId = _updateLaunchDraft(launchEntryObjectEntry, title);
+
 		String unknownClassName1 = RandomTestUtil.randomString();
 
 		ObjectEntry unknownLaunchEntryObjectEntry1 = _addLaunchEntryObjectEntry(
@@ -175,86 +273,18 @@ public class LaunchSetPublisherTest {
 		_assertLaunchSetError(
 			unknownLaunchEntryObjectEntry2, launchSetErrorObjectEntries,
 			"No launch entry manager exists for " + unknownClassName2);
+	}
 
-		_objectEntryLocalService.deleteObjectEntry(
-			unknownLaunchEntryObjectEntry1);
-		_objectEntryLocalService.deleteObjectEntry(
-			unknownLaunchEntryObjectEntry2);
+	@Test
+	public void testPublishWhenLaunchSetStatusIsFailed() throws Exception {
+		ObjectEntry launchSetErrorObjectEntry = _failPublish();
 
-		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.publish(
+				_launchSetObjectEntry.getObjectEntryId()));
 
-		LaunchEntryManager.Version publishedVersion =
-			launchEntryManager.fetchPublishedVersion(
-				journalArticle.getResourcePrimKey());
-
-		Assert.assertEquals(title, _getTitle(journalArticle));
-		Assert.assertNotEquals(
-			String.valueOf(journalArticle.getVersion()),
-			publishedVersion.getVersionKey());
-
-		_assertPublished(
-			draftId, launchEntryObjectEntry, launchEntryManager,
-			publishedVersion);
-
-		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
-			_launchSetObjectEntry.getObjectEntryId());
-
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			launchSetObjectEntry.getStatus());
-
-		launchSetErrorObjectEntries = _getLaunchSetErrorObjectEntries();
-
-		Assert.assertEquals(
-			launchSetErrorObjectEntries.toString(), 0,
-			launchSetErrorObjectEntries.size());
-
-		try {
-			_launchSetPublisher.publish(
-				_launchSetObjectEntry.getObjectEntryId());
-
-			Assert.fail();
-		}
-		catch (PortalException portalException) {
-			Assert.assertTrue(
-				portalException.getMessage(),
-				StringUtil.endsWith(
-					portalException.getMessage(), "was already published"));
-		}
-
-		ObjectEntry otherLaunchSetObjectEntry = _addLaunchSetObjectEntry();
-
-		ObjectEntry otherLaunchEntryObjectEntry = _addLaunchEntryObjectEntry(
-			otherLaunchSetObjectEntry.getObjectEntryId(),
-			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
-			String.valueOf(journalArticle.getVersion()));
-
-		String otherTitle = RandomTestUtil.randomString();
-
-		long otherDraftId = _updateLaunchDraft(
-			otherLaunchEntryObjectEntry, otherTitle);
-
-		JournalTestUtil.updateArticle(
-			_journalArticleLocalService.getLatestArticle(
-				journalArticle.getResourcePrimKey(),
-				WorkflowConstants.STATUS_APPROVED),
-			RandomTestUtil.randomString());
-
-		_launchSetPublisher.publish(
-			otherLaunchSetObjectEntry.getObjectEntryId());
-
-		LaunchEntryManager.Version otherPublishedVersion =
-			launchEntryManager.fetchPublishedVersion(
-				journalArticle.getResourcePrimKey());
-
-		Assert.assertEquals(otherTitle, _getTitle(journalArticle));
-		Assert.assertNotEquals(
-			publishedVersion.getVersionKey(),
-			otherPublishedVersion.getVersionKey());
-
-		_assertPublished(
-			otherDraftId, otherLaunchEntryObjectEntry, launchEntryManager,
-			otherPublishedVersion);
+		_assertFailed(launchSetErrorObjectEntry);
 	}
 
 	@Test
@@ -334,6 +364,23 @@ public class LaunchSetPublisherTest {
 	}
 
 	@Test
+	public void testSchedulePublishWhenLaunchSetStatusIsFailed()
+		throws Exception {
+
+		ObjectEntry launchSetErrorObjectEntry = _failPublish();
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.schedulePublish(
+				new Date(System.currentTimeMillis() + Time.DAY),
+				_launchSetObjectEntry.getObjectEntryId(),
+				TestPropsValues.getUserId()));
+
+		_assertFailed(launchSetErrorObjectEntry);
+		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+	}
+
+	@Test
 	public void testUnschedulePublish() throws Exception {
 		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
 
@@ -404,6 +451,25 @@ public class LaunchSetPublisherTest {
 			objectDefinition.getObjectDefinitionId(), 0,
 			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()), values,
 			serviceContext);
+	}
+
+	private void _assertFailed(ObjectEntry launchSetErrorObjectEntry)
+		throws Exception {
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			1,
+			MapUtil.getLong(
+				launchSetObjectEntry.getValues(), "publishErrorsCount"));
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, launchSetObjectEntry.getStatus());
+
+		Assert.assertEquals(
+			List.of(launchSetErrorObjectEntry),
+			_getLaunchSetErrorObjectEntries());
 	}
 
 	private void _assertLaunchSetError(
@@ -485,6 +551,29 @@ public class LaunchSetPublisherTest {
 		Assert.assertEquals(
 			expectedDate.getTime() / Time.SECOND,
 			scheduledDateValue.getTime() / Time.SECOND);
+	}
+
+	private ObjectEntry _failPublish() throws Exception {
+		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
+			_launchSetObjectEntry.getObjectEntryId(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
+			RandomTestUtil.randomString());
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.publish(
+				_launchSetObjectEntry.getObjectEntryId()));
+
+		_objectEntryLocalService.deleteObjectEntry(launchEntryObjectEntry);
+
+		List<ObjectEntry> launchSetErrorObjectEntries =
+			_getLaunchSetErrorObjectEntries();
+
+		Assert.assertEquals(
+			launchSetErrorObjectEntries.toString(), 1,
+			launchSetErrorObjectEntries.size());
+
+		return launchSetErrorObjectEntries.get(0);
 	}
 
 	private LaunchEntryManager _getJournalArticleLaunchEntryManager() {
