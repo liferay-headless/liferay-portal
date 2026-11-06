@@ -95,7 +95,20 @@ public class LaunchSetPublisherTest {
 	@Test
 	public void testPublish() throws Exception {
 
+		// Failed launch set
+
+		ObjectEntry launchSetErrorObjectEntry = _failPublish();
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.publish(
+				_launchSetObjectEntry.getObjectEntryId()));
+
+		_assertFailed(launchSetErrorObjectEntry);
+
 		// Launch set
+
+		_launchSetObjectEntry = _addLaunchSetObjectEntry();
 
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
 			_group.getGroupId(),
@@ -270,19 +283,6 @@ public class LaunchSetPublisherTest {
 		_assertLaunchSetError(
 			unknownLaunchEntryObjectEntry2, launchSetErrorObjectEntries,
 			"No launch entry manager exists for " + unknownClassName2);
-
-		// Failed launch set
-
-		_launchSetObjectEntry = _addLaunchSetObjectEntry();
-
-		ObjectEntry launchSetErrorObjectEntry = _failPublish();
-
-		Assert.assertThrows(
-			PortalException.class,
-			() -> _launchSetPublisher.publish(
-				_launchSetObjectEntry.getObjectEntryId()));
-
-		_assertFailed(launchSetErrorObjectEntry);
 
 		// Scheduled launch set
 
