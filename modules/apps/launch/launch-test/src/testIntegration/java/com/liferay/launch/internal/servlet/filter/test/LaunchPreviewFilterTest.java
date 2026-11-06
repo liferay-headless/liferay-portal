@@ -8,6 +8,7 @@ package com.liferay.launch.internal.servlet.filter.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -94,25 +95,18 @@ public class LaunchPreviewFilterTest {
 			_group.getGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		_addObjectEntry(
-			"LaunchEntry",
-			HashMapBuilder.<String, Serializable>put(
-				"baseVersionKey", String.valueOf(_journalArticle.getVersion())
-			).put(
-				"className", JournalArticle.class.getName()
-			).put(
-				"classPK", _journalArticle.getResourcePrimKey()
-			).put(
-				"r_launchSetToLaunchEntries_c_launchSetId",
-				_launchSetObjectEntry.getObjectEntryId()
-			).build());
+		_addLaunchEntryObjectEntry(
+			String.valueOf(_journalArticle.getVersion()),
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
 
 		_removeViewPermissions(
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 
 		_removeViewPermissions(
-			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
+			_getClassName("LaunchSet"),
+			_launchSetObjectEntry.getObjectEntryId());
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
 
@@ -131,7 +125,7 @@ public class LaunchPreviewFilterTest {
 
 		// Signed out
 
-		_assertForbidden(null);
+		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), null);
 
 		// Cannot view the launch
 
@@ -139,7 +133,7 @@ public class LaunchPreviewFilterTest {
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 
-		_assertForbidden(_user);
+		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), _user);
 
 		// Can view the launch but not one of its articles
 
@@ -147,9 +141,10 @@ public class LaunchPreviewFilterTest {
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 		_setViewPermission(
-			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
+			_getClassName("LaunchSet"),
+			_launchSetObjectEntry.getObjectEntryId());
 
-		_assertForbidden(_user);
+		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), _user);
 
 		// Can view everything
 
@@ -157,15 +152,53 @@ public class LaunchPreviewFilterTest {
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 
-		MockFilterChain mockFilterChain = new MockFilterChain();
-		MockHttpServletResponse mockHttpServletResponse =
-			new MockHttpServletResponse();
+		_assertProcessed();
 
-		_processFilter(mockFilterChain, mockHttpServletResponse, _user);
+		// Can view everything, and the article of another entry no longer
+		// exists
 
-		Assert.assertNotNull(mockFilterChain.getRequest());
-		Assert.assertEquals(
-			HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		_addLaunchEntryObjectEntry(
+			String.valueOf(journalArticle.getVersion()),
+			JournalArticle.class.getName(),
+			journalArticle.getResourcePrimKey());
+
+		_journalArticleLocalService.deleteArticle(journalArticle);
+
+		_assertProcessed();
+
+		// Can view everything, but another entry has an unknown type
+
+		_addLaunchEntryObjectEntry(
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomInt());
+
+		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), _user);
+
+		// No launch matches the ID
+
+		_assertForbidden(RandomTestUtil.randomLong(), _user);
+	}
+
+	private ObjectEntry _addLaunchEntryObjectEntry(
+			String baseVersionKey, String className, long classPK)
+		throws Exception {
+
+		return _addObjectEntry(
+			"LaunchEntry",
+			HashMapBuilder.<String, Serializable>put(
+				"baseVersionKey", baseVersionKey
+			).put(
+				"className", className
+			).put(
+				"classPK", classPK
+			).put(
+				"r_launchSetToLaunchEntries_c_launchSetId",
+				_launchSetObjectEntry.getObjectEntryId()
+			).build());
 	}
 
 	private ObjectEntry _addObjectEntry(
@@ -189,13 +222,15 @@ public class LaunchPreviewFilterTest {
 			serviceContext);
 	}
 
-	private void _assertForbidden(User user) throws Exception {
+	private void _assertForbidden(long previewLaunchSetId, User user)
+		throws Exception {
+
 		MockFilterChain mockFilterChain = new MockFilterChain();
 		MockHttpServletResponse mockHttpServletResponse =
 			new MockHttpServletResponse();
 
 		MockHttpServletRequest mockHttpServletRequest = _processFilter(
-			mockFilterChain, mockHttpServletResponse, user);
+			mockFilterChain, mockHttpServletResponse, previewLaunchSetId, user);
 
 		Assert.assertNull(mockFilterChain.getRequest());
 		Assert.assertEquals(
@@ -215,17 +250,32 @@ public class LaunchPreviewFilterTest {
 				String.valueOf(_journalArticle.getResourcePrimKey())));
 	}
 
-	private String _getLaunchSetClassName() throws Exception {
+	private void _assertProcessed() throws Exception {
+		MockFilterChain mockFilterChain = new MockFilterChain();
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		_processFilter(
+			mockFilterChain, mockHttpServletResponse,
+			_launchSetObjectEntry.getObjectEntryId(), _user);
+
+		Assert.assertNotNull(mockFilterChain.getRequest());
+		Assert.assertEquals(
+			HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+	}
+
+	private String _getClassName(String objectDefinitionName) throws Exception {
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
-				TestPropsValues.getCompanyId(), "LaunchSet");
+				TestPropsValues.getCompanyId(), objectDefinitionName);
 
 		return objectDefinition.getClassName();
 	}
 
 	private MockHttpServletRequest _processFilter(
 			FilterChain filterChain,
-			MockHttpServletResponse mockHttpServletResponse, User user)
+			MockHttpServletResponse mockHttpServletResponse,
+			long previewLaunchSetId, User user)
 		throws Exception {
 
 		MockHttpServletRequest mockHttpServletRequest =
@@ -233,8 +283,7 @@ public class LaunchPreviewFilterTest {
 
 		mockHttpServletRequest.setParameter("p_l_mode", Constants.PREVIEW);
 		mockHttpServletRequest.setParameter(
-			"previewLaunchSetId",
-			String.valueOf(_launchSetObjectEntry.getObjectEntryId()));
+			"previewLaunchSetId", String.valueOf(previewLaunchSetId));
 
 		if (user != null) {
 			mockHttpServletRequest.setAttribute(WebKeys.USER, user);
@@ -283,6 +332,10 @@ public class LaunchPreviewFilterTest {
 	private Group _group;
 
 	private JournalArticle _journalArticle;
+
+	@Inject
+	private JournalArticleLocalService _journalArticleLocalService;
+
 	private ObjectEntry _launchSetObjectEntry;
 
 	@Inject
