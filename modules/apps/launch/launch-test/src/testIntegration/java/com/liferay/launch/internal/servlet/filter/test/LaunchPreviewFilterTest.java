@@ -15,6 +15,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
@@ -106,13 +107,10 @@ public class LaunchPreviewFilterTest {
 				_launchSetObjectEntry.getObjectEntryId()
 			).build());
 
-		_resourcePermissionLocalService.deleteResourcePermissions(
-			TestPropsValues.getCompanyId(), _getLaunchSetClassName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			_launchSetObjectEntry.getObjectEntryId());
-		_resourcePermissionLocalService.deleteResourcePermissions(
-			TestPropsValues.getCompanyId(), JournalArticle.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
+		_removeViewPermissions(
+			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
+		_removeViewPermissions(
+			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
@@ -246,6 +244,22 @@ public class LaunchPreviewFilterTest {
 			mockHttpServletRequest, mockHttpServletResponse, filterChain);
 
 		return mockHttpServletRequest;
+	}
+
+	private void _removeViewPermissions(String name, long primKey)
+		throws Exception {
+
+		for (ResourcePermission resourcePermission :
+				_resourcePermissionLocalService.getResourcePermissions(
+					TestPropsValues.getCompanyId(), name,
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(primKey))) {
+
+			_resourcePermissionLocalService.removeResourcePermission(
+				TestPropsValues.getCompanyId(), name,
+				ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(primKey),
+				resourcePermission.getRoleId(), ActionKeys.VIEW);
+		}
 	}
 
 	private void _setViewPermission(String name, long primKey)
