@@ -104,6 +104,21 @@ public class LaunchSetErrorHelper {
 		).build();
 	}
 
+	public boolean isFailed(ObjectEntry launchSetObjectEntry) {
+		if (!launchSetObjectEntry.isDraft()) {
+			return false;
+		}
+
+		long publishErrorsCount = MapUtil.getLong(
+			launchSetObjectEntry.getValues(), "publishErrorsCount");
+
+		if (publishErrorsCount > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public void markPublishFailed(
 			List<Map<String, Serializable>> launchSetErrorValuesList,
 			ObjectEntry launchSetObjectEntry, long userId)
