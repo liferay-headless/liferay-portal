@@ -109,7 +109,6 @@ public class ViewLaunchMVCRenderCommandTest {
 			_launchSetObjectEntry.getObjectEntryId());
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
 		_user = UserTestUtil.addUser();
 
 		_roleLocalService.addUserRole(_user.getUserId(), _role.getRoleId());
