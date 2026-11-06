@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import java.io.Serializable;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -52,7 +53,8 @@ public class LaunchSetPreviewPermissionImpl
 			_objectDefinitionLocalService.getObjectDefinition(
 				launchSetObjectEntry.getObjectDefinitionId());
 
-		if (!_contains(
+		if (!Objects.equals(objectDefinition.getName(), "LaunchSet") ||
+			!_contains(
 				permissionChecker, objectDefinition.getClassName(),
 				launchSetId)) {
 
