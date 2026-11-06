@@ -172,7 +172,7 @@ public class LaunchPreviewFilterTest {
 
 		// Can view everything, but another entry has an unknown type
 
-		_addLaunchEntryObjectEntry(
+		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomInt());
 
@@ -181,6 +181,14 @@ public class LaunchPreviewFilterTest {
 		// No launch matches the ID
 
 		_assertForbidden(RandomTestUtil.randomLong(), _user);
+
+		// The ID matches an object entry that is not a launch
+
+		_setViewPermission(
+			_getClassName("LaunchEntry"),
+			launchEntryObjectEntry.getObjectEntryId());
+
+		_assertForbidden(launchEntryObjectEntry.getObjectEntryId(), _user);
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(
