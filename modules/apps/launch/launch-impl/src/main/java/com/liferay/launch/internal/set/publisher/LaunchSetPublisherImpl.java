@@ -64,6 +64,12 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				"Launch set " + launchSetId + " was already published");
 		}
 
+		if (_launchSetErrorHelper.isFailed(launchSetObjectEntry)) {
+			throw new PortalException(
+				"Launch set " + launchSetId +
+					" failed to publish and cannot be published again");
+		}
+
 		if (launchSetObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_SCHEDULED) {
 
@@ -125,6 +131,12 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 			throw new PortalException(
 				"Launch set " + launchSetId + " must be open to be scheduled");
+		}
+
+		if (_launchSetErrorHelper.isFailed(launchSetObjectEntry)) {
+			throw new PortalException(
+				"Launch set " + launchSetId +
+					" failed to publish and cannot be scheduled");
 		}
 
 		if ((date == null) || !date.after(new Date())) {
