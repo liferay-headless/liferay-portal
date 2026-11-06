@@ -108,10 +108,11 @@ public class LaunchPreviewFilterTest {
 			).build());
 
 		_removeViewPermissions(
-			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
-		_removeViewPermissions(
 			JournalArticle.class.getName(),
 			_journalArticle.getResourcePrimKey());
+
+		_removeViewPermissions(
+			_getLaunchSetClassName(), _launchSetObjectEntry.getObjectEntryId());
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
 
@@ -204,15 +205,12 @@ public class LaunchPreviewFilterTest {
 		Exception exception = (Exception)mockHttpServletRequest.getAttribute(
 			WebKeys.PORTAL_STATUS_EXCEPTION);
 
-		Assert.assertTrue(
-			String.valueOf(exception), exception instanceof PrincipalException);
+		Assert.assertTrue(exception instanceof PrincipalException);
 
 		String message = exception.getMessage();
 
+		Assert.assertFalse(message.contains(JournalArticle.class.getName()));
 		Assert.assertFalse(
-			message, message.contains(JournalArticle.class.getName()));
-		Assert.assertFalse(
-			message,
 			message.contains(
 				String.valueOf(_journalArticle.getResourcePrimKey())));
 	}
