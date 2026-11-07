@@ -45,9 +45,12 @@ import java.lang.reflect.Method;
 import java.net.URI;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -79,7 +82,7 @@ public class HeadlessApplicationProviderImpl
 	public List<Application> getApplications(long companyId) {
 		List<Application> applications = new ArrayList<>();
 
-		if (_applicationDTOs == null) {
+		if (_applicationDTOsStale) {
 			_jaxrsLifecycle.ensureReady();
 
 			JaxrsServiceRuntime jaxrsServiceRuntime =
@@ -89,11 +92,16 @@ public class HeadlessApplicationProviderImpl
 				return applications;
 			}
 
+			_applicationDTOsStale = false;
+
 			RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
 
-			_applicationDTOs = ListUtil.fromArray(runtimeDTO.applicationDTOs);
+			List<ApplicationDTO> applicationDTOs = ListUtil.fromArray(
+				runtimeDTO.applicationDTOs);
 
-			_openAPIDocumentCache.clear();
+			_clearStaleOpenAPIDocuments(_applicationDTOs, applicationDTOs);
+
+			_applicationDTOs = applicationDTOs;
 		}
 
 		List<ApplicationDTO> applicationDTOs = _applicationDTOs;
@@ -146,6 +154,11 @@ public class HeadlessApplicationProviderImpl
 					public void modifiedService(
 						ServiceReference<Object> serviceReference,
 						ServiceReference<?> trackedServiceReference) {
+
+						_openAPIDocumentCache.clear(
+							_getBasePath(
+								(String)serviceReference.getProperty(
+									"osgi.jaxrs.application.base")));
 					}
 
 					@Override
@@ -163,7 +176,7 @@ public class HeadlessApplicationProviderImpl
 				public JaxrsServiceRuntime addingService(
 					ServiceReference<JaxrsServiceRuntime> serviceReference) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 
 					return bundleContext.getService(serviceReference);
 				}
@@ -173,7 +186,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 				}
 
 				@Override
@@ -181,7 +194,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 
 					bundleContext.ungetService(serviceReference);
 				}
@@ -200,6 +213,76 @@ public class HeadlessApplicationProviderImpl
 		_companyIdsServiceTrackerMap.close();
 		_jaxrsServiceRuntimeServiceTracker.close();
 		_openAPIResourceServiceTrackerMap.close();
+	}
+
+	private void _clearStaleOpenAPIDocuments(
+		List<ApplicationDTO> applicationDTOs1,
+		List<ApplicationDTO> applicationDTOs2) {
+
+		if (applicationDTOs1 == null) {
+			_openAPIDocumentCache.clear();
+
+			return;
+		}
+
+		Map<String, List<Long>> serviceIdsMap1 = _getServiceIdsMap(
+			applicationDTOs1);
+		Map<String, List<Long>> serviceIdsMap2 = _getServiceIdsMap(
+			applicationDTOs2);
+
+		Set<String> basePaths = new HashSet<>(serviceIdsMap1.keySet());
+
+		basePaths.addAll(serviceIdsMap2.keySet());
+
+		for (String basePath : basePaths) {
+			if (Objects.equals(
+					serviceIdsMap1.get(basePath),
+					serviceIdsMap2.get(basePath))) {
+
+				continue;
+			}
+
+			_openAPIDocumentCache.clear(basePath);
+		}
+	}
+
+	private String _getBasePath(String base) {
+		if (Validator.isNull(base)) {
+			return StringPool.BLANK;
+		}
+
+		if (base.startsWith(StringPool.SLASH)) {
+			return base;
+		}
+
+		return StringPool.SLASH + base;
+	}
+
+	private Map<String, List<Long>> _getServiceIdsMap(
+		List<ApplicationDTO> applicationDTOs) {
+
+		Map<String, List<Long>> serviceIdsMap = new HashMap<>();
+
+		for (ApplicationDTO applicationDTO : applicationDTOs) {
+			List<Long> serviceIds = serviceIdsMap.computeIfAbsent(
+				_getBasePath(applicationDTO.base), key -> new ArrayList<>());
+
+			serviceIds.add(applicationDTO.serviceId);
+
+			if (applicationDTO.resourceDTOs == null) {
+				continue;
+			}
+
+			for (ResourceDTO resourceDTO : applicationDTO.resourceDTOs) {
+				serviceIds.add(resourceDTO.serviceId);
+			}
+		}
+
+		for (List<Long> serviceIds : serviceIdsMap.values()) {
+			Collections.sort(serviceIds);
+		}
+
+		return serviceIdsMap;
 	}
 
 	private UriInfo _getUriInfo(String baseURL, String version) {
@@ -339,6 +422,7 @@ public class HeadlessApplicationProviderImpl
 		"v[0-9]+\\.[0-9]+");
 
 	private volatile List<ApplicationDTO> _applicationDTOs;
+	private volatile boolean _applicationDTOsStale = true;
 	private ServiceTrackerMap<Long, ServiceReference<?>>
 		_companyIdsServiceTrackerMap;
 
@@ -388,17 +472,7 @@ public class HeadlessApplicationProviderImpl
 
 		@Override
 		public String getBasePath() {
-			String base = _applicationDTO.base;
-
-			if (Validator.isNull(base)) {
-				return StringPool.BLANK;
-			}
-
-			if (base.startsWith(StringPool.SLASH)) {
-				return base;
-			}
-
-			return StringPool.SLASH + base;
+			return _getBasePath(_applicationDTO.base);
 		}
 
 		@Override
