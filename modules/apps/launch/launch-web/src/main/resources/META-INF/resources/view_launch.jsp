@@ -29,20 +29,22 @@ String scheduledDate = viewLaunchDisplayContext.getScheduledDate();
 
 		<%-- A React component renders into its placeholder's parent, so each one needs a parent of its own --%>
 
-		<div>
-			<react:component
-				module="{LaunchPreviewButton} from launch-web"
-				props='<%=
-					HashMapBuilder.<String, Object>put(
-						"itemSelectedEventName", viewLaunchDisplayContext.getPreviewPageItemSelectedEventName()
-					).put(
-						"itemSelectorURL", viewLaunchDisplayContext.getPreviewPageItemSelectorURL()
-					).put(
-						"launchSetId", viewLaunchDisplayContext.getLaunchSetId()
-					).build()
-				%>'
-			/>
-		</div>
+		<c:if test="<%= viewLaunchDisplayContext.isPreviewable() %>">
+			<div>
+				<react:component
+					module="{LaunchPreviewButton} from launch-web"
+					props='<%=
+						HashMapBuilder.<String, Object>put(
+							"itemSelectedEventName", viewLaunchDisplayContext.getPreviewPageItemSelectedEventName()
+						).put(
+							"itemSelectorURL", viewLaunchDisplayContext.getPreviewPageItemSelectorURL()
+						).put(
+							"launchSetId", viewLaunchDisplayContext.getLaunchSetId()
+						).build()
+					%>'
+				/>
+			</div>
+		</c:if>
 
 		<div>
 			<react:component
