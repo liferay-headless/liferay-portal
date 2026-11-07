@@ -352,8 +352,6 @@ public class MCPToolIndexWriterTest {
 	public void testUpdateIfStaleWhenToolSetIsInvalidatedDuringUpdate() {
 		_updateIfStale();
 
-		ToolSetUtil.clearOpenAPIJSONObjectCache(_COMPANY_ID);
-
 		_mcpToolIndexWriter.invalidate(_COMPANY_ID, _TOOL_SET_NAME_1);
 
 		String openAPIDocumentContent = _getOpenAPIDocumentContent(

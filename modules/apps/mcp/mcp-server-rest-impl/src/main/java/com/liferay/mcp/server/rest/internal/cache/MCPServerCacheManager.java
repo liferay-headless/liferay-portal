@@ -10,8 +10,6 @@ package com.liferay.mcp.server.rest.internal.cache;
  */
 public interface MCPServerCacheManager {
 
-	public void clearOpenAPIJSONObjectCache(long companyId);
-
 	public void clearServletCache(long companyId);
 
 	public void clearServletCache(long companyId, String mcpServerProfileName);
