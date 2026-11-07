@@ -5,12 +5,17 @@
 
 package com.liferay.portal.vulcan.internal.cache;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Component;
@@ -25,6 +30,10 @@ public class OpenAPIDocumentCache {
 		_clearCount.incrementAndGet();
 
 		_contents.clear();
+	}
+
+	public void clear(String basePath) {
+		_clear(keyParts -> Objects.equals(keyParts[1], basePath));
 	}
 
 	public String getContent(
@@ -50,6 +59,15 @@ public class OpenAPIDocumentCache {
 		}
 
 		return content;
+	}
+
+	private void _clear(Predicate<String[]> predicate) {
+		_clearCount.incrementAndGet();
+
+		Set<String> keys = _contents.keySet();
+
+		keys.removeIf(
+			key -> predicate.test(StringUtil.split(key, CharPool.POUND)));
 	}
 
 	private final AtomicLong _clearCount = new AtomicLong();
