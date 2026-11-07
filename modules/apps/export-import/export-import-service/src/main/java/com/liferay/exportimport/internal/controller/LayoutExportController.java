@@ -453,11 +453,11 @@ public class LayoutExportController implements ExportController {
 					group.getGroupId(), DepotConstants.TYPE_ANY,
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
 
-			Group depotGroup = depotEntry.getGroup();
-
 			Element groupExternalReferenceCodeElement =
 				groupExternalReferenceCodesElement.addElement(
 					"group-external-reference-code");
+
+			Group depotGroup = depotEntry.getGroup();
 
 			groupExternalReferenceCodeElement.addAttribute(
 				"source", depotGroup.getExternalReferenceCode());

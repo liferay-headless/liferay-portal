@@ -77,13 +77,13 @@ public class LayoutRemoteStagingExportImportTest {
 			RandomTestUtil.randomLocaleStringMap(),
 			DepotConstants.TYPE_ASSET_LIBRARY,
 			ServiceContextTestUtil.getServiceContext());
+		Group remoteLiveGroup = GroupTestUtil.addGroup();
 		DepotEntry remoteStagingDepotEntry =
 			_depotEntryLocalService.addDepotEntry(
 				RandomTestUtil.randomLocaleStringMap(),
 				RandomTestUtil.randomLocaleStringMap(),
 				DepotConstants.TYPE_ASSET_LIBRARY,
 				ServiceContextTestUtil.getServiceContext());
-		Group remoteLiveGroup = GroupTestUtil.addGroup();
 		Group remoteStagingGroup = GroupTestUtil.addGroup();
 
 		try (SafeCloseable safeCloseable1 =
