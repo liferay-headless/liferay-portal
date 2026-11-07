@@ -32,6 +32,30 @@ public class OpenAPIDocumentCache {
 		_contents.clear();
 	}
 
+	public void clear(long companyId) {
+		_clear(
+			keyParts -> Objects.equals(keyParts[0], String.valueOf(companyId)));
+	}
+
+	public void clear(long companyId, String restContextPath) {
+		_clear(
+			keyParts -> {
+				if (!Objects.equals(keyParts[0], String.valueOf(companyId))) {
+					return false;
+				}
+
+				String basePath = keyParts[1];
+
+				if (restContextPath.equals(basePath) ||
+					restContextPath.startsWith(basePath + StringPool.SLASH)) {
+
+					return true;
+				}
+
+				return false;
+			});
+	}
+
 	public void clear(String basePath) {
 		_clear(keyParts -> Objects.equals(keyParts[1], basePath));
 	}
