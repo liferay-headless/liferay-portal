@@ -154,12 +154,6 @@ public class ObjectDefinitionToolSetInvalidatorTest {
 	private void _assertCachesCleared() {
 		Mockito.verify(
 			_mcpServerCacheManager
-		).clearOpenAPIJSONObjectCache(
-			_COMPANY_ID
-		);
-
-		Mockito.verify(
-			_mcpServerCacheManager
 		).clearServletCache(
 			_COMPANY_ID
 		);
@@ -176,12 +170,6 @@ public class ObjectDefinitionToolSetInvalidatorTest {
 	}
 
 	private void _assertToolSetNotInvalidated() {
-		Mockito.verify(
-			_mcpServerCacheManager, Mockito.never()
-		).clearOpenAPIJSONObjectCache(
-			Mockito.anyLong()
-		);
-
 		Mockito.verify(
 			_mcpServerCacheManager, Mockito.never()
 		).clearServletCache(

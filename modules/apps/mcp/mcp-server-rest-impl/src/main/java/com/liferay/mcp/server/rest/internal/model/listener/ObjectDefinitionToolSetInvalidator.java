@@ -38,7 +38,6 @@ public class ObjectDefinitionToolSetInvalidator {
 
 		long companyId = objectDefinition.getCompanyId();
 
-		_mcpServerCacheManager.clearOpenAPIJSONObjectCache(companyId);
 		_mcpServerCacheManager.clearServletCache(companyId);
 
 		String restContextPath = _getRESTContextPath(objectDefinition);
