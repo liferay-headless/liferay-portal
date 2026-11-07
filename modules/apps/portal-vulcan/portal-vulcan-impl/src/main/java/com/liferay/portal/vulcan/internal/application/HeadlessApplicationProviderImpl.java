@@ -5,6 +5,8 @@
 
 package com.liferay.portal.vulcan.internal.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerCustomizerFactory;
@@ -21,11 +23,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.jaxrs.whiteboard.lifecycle.JAXRSLifecycle;
 import com.liferay.portal.vulcan.application.HeadlessApplicationProvider;
+import com.liferay.portal.vulcan.internal.cache.OpenAPIDocumentCache;
 import com.liferay.portal.vulcan.internal.feature.flag.FeatureFlagUtil;
 
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.OpenAPI;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -88,6 +92,8 @@ public class HeadlessApplicationProviderImpl
 			RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
 
 			_applicationDTOs = ListUtil.fromArray(runtimeDTO.applicationDTOs);
+
+			_openAPIDocumentCache.clear();
 		}
 
 		List<ApplicationDTO> applicationDTOs = _applicationDTOs;
@@ -341,6 +347,10 @@ public class HeadlessApplicationProviderImpl
 
 	private ServiceTracker<JaxrsServiceRuntime, JaxrsServiceRuntime>
 		_jaxrsServiceRuntimeServiceTracker;
+
+	@Reference
+	private OpenAPIDocumentCache _openAPIDocumentCache;
+
 	private ServiceTrackerMap
 		<String, List<ServiceReferenceServiceTuple<Object, Object>>>
 			_openAPIResourceServiceTrackerMap;
@@ -521,22 +531,31 @@ public class HeadlessApplicationProviderImpl
 
 		@Override
 		public Object getContentObject(String serverURL) {
-			return _getEntity(serverURL, Type.JSON);
+			String content = getContentString(serverURL, Type.JSON);
+
+			if (content == null) {
+				return null;
+			}
+
+			try {
+				return Json.mapper(
+				).readValue(
+					content, OpenAPI.class
+				);
+			}
+			catch (JsonProcessingException jsonProcessingException) {
+				_log.error(jsonProcessingException);
+
+				return null;
+			}
 		}
 
 		@Override
 		public String getContentString(String serverURL, Type type) {
-			Object entity = _getEntity(serverURL, type);
-
-			if (entity == null) {
-				return null;
-			}
-
-			if (entity instanceof String) {
-				return (String)entity;
-			}
-
-			return Json.pretty(entity);
+			return _openAPIDocumentCache.getContent(
+				_applicationImpl.getBasePath(), _applicationImpl._companyId,
+				() -> _getContentString(serverURL, type), getPath(type),
+				serverURL);
 		}
 
 		@Override
@@ -605,6 +624,20 @@ public class HeadlessApplicationProviderImpl
 
 			_applicationImpl = applicationImpl;
 			_path = path;
+		}
+
+		private String _getContentString(String serverURL, Type type) {
+			Object entity = _getEntity(serverURL, type);
+
+			if (entity == null) {
+				return null;
+			}
+
+			if (entity instanceof String) {
+				return (String)entity;
+			}
+
+			return Json.pretty(entity);
 		}
 
 		private Object _getEntity(String serverURL, Type type) {
