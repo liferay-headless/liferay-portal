@@ -10,7 +10,9 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManager;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.log.LogCapture;
@@ -22,18 +24,23 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.application.HeadlessApplicationProvider;
 import com.liferay.portal.vulcan.internal.test.util.FeatureFlagManagerTestUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -65,6 +72,10 @@ public class HeadlessApplicationProviderTest {
 			HeadlessApplicationProviderTest.class);
 
 		_bundleContext = bundle.getBundleContext();
+
+		_contentApplicationServiceRegistration = _bundleContext.registerService(
+			Application.class, new TestApplication(),
+			_getContentApplicationProperties());
 
 		_serviceRegistrations = Arrays.asList(
 			_bundleContext.registerService(
@@ -119,6 +130,21 @@ public class HeadlessApplicationProviderTest {
 					"(osgi.jaxrs.name=Liferay.Vulcan)"
 				).put(
 					"osgi.jaxrs.name", "Test.Vulcan.Company"
+				).build()),
+			_contentApplicationServiceRegistration,
+			_bundleContext.registerService(
+				TestContentResource_v1_0.class, new TestContentResource_v1_0(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"api.version", "v1.0"
+				).put(
+					"openapi.resource", "true"
+				).put(
+					"openapi.resource.path", "/test-vulcan-application-content"
+				).put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=Test.Vulcan.Content)"
+				).put(
+					"osgi.jaxrs.resource", "true"
 				).build()),
 			_bundleContext.registerService(
 				Application.class, new TestApplication(),
@@ -370,12 +396,186 @@ public class HeadlessApplicationProviderTest {
 		}
 	}
 
+	@Test
+	public void testGetContentString() throws Exception {
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+			_getOpenAPIDocument(
+				_getApplication("/test-vulcan-application-content"), "v1.0");
+
+		String serverURL = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+		Assert.assertEquals(
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		Object contentObject = openAPIDocument.getContentObject(serverURL);
+
+		Assert.assertNotNull(contentObject);
+		Assert.assertNotSame(
+			contentObject, openAPIDocument.getContentObject(serverURL));
+
+		Assert.assertEquals(
+			"{\"openapi\": \"2\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.YAML));
+
+		Assert.assertEquals(
+			"{\"openapi\": \"3\"}",
+			openAPIDocument.getContentString(
+				RandomTestUtil.randomString(),
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+	}
+
+	@Test
+	public void testGetContentStringWhenApplicationIsModified()
+		throws Exception {
+
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+			_getOpenAPIDocument(
+				_getApplication("/test-vulcan-application-content"), "v1.0");
+
+		String serverURL = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		_contentApplicationServiceRegistration.setProperties(
+			_getContentApplicationProperties());
+
+		Assert.assertEquals(
+			"{\"openapi\": \"2\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+	}
+
+	@Test
+	public void testGetContentStringWhenOtherApplicationIsRegistered()
+		throws Exception {
+
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+			_getOpenAPIDocument(
+				_getApplication("/test-vulcan-application-content"), "v1.0");
+
+		String serverURL = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		ServiceRegistration<?> serviceRegistration =
+			_bundleContext.registerService(
+				Application.class, new TestApplication(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"liferay.auth.verifier", true
+				).put(
+					"liferay.oauth2", false
+				).put(
+					"osgi.jaxrs.application.base",
+					"/test-vulcan-application-added"
+				).put(
+					"osgi.jaxrs.extension.select",
+					"(osgi.jaxrs.name=Liferay.Vulcan)"
+				).put(
+					"osgi.jaxrs.name", "Test.Vulcan.Added"
+				).build());
+
+		try {
+			Assert.assertNotNull(
+				_getApplication("/test-vulcan-application-added"));
+
+			Assert.assertEquals(
+				"{\"openapi\": \"1\"}",
+				openAPIDocument.getContentString(
+					serverURL,
+					HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+		}
+		finally {
+			serviceRegistration.unregister();
+		}
+	}
+
+	@Test
+	public void testGetContentStringWhenResourceIsRegistered()
+		throws Exception {
+
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+			_getOpenAPIDocument(
+				_getApplication("/test-vulcan-application-content"), "v1.0");
+
+		String serverURL = RandomTestUtil.randomString();
+
+		Assert.assertEquals(
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		ServiceRegistration<?> serviceRegistration =
+			_bundleContext.registerService(
+				TestResource_v2_0.class, new TestResource_v2_0(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"api.version", "v2.0"
+				).put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=Test.Vulcan.Content)"
+				).put(
+					"osgi.jaxrs.resource", "true"
+				).build());
+
+		try {
+			Assert.assertNotNull(
+				_getApplication("/test-vulcan-application-content"));
+
+			Assert.assertEquals(
+				"{\"openapi\": \"2\"}",
+				openAPIDocument.getContentString(
+					serverURL,
+					HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+		}
+		finally {
+			serviceRegistration.unregister();
+		}
+	}
+
 	public static class TestApplication extends Application {
 
 		@Override
 		public Set<Object> getSingletons() {
 			return Collections.singleton(this);
 		}
+
+	}
+
+	@Path("/v1.0")
+	public static class TestContentResource_v1_0 {
+
+		@GET
+		@Path("/openapi.{type:json|yaml}")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response getOpenAPI(
+			HttpServletRequest httpServletRequest,
+			@PathParam("type") String type, UriInfo uriInfo) {
+
+			return Response.ok(
+				"{\"openapi\": \"" + _count.incrementAndGet() + "\"}"
+			).build();
+		}
+
+		private final AtomicInteger _count = new AtomicInteger();
 
 	}
 
@@ -472,6 +672,26 @@ public class HeadlessApplicationProviderTest {
 		return null;
 	}
 
+	private HashMapDictionary<String, Object> _getContentApplicationProperties()
+		throws Exception {
+
+		return HashMapDictionaryBuilder.<String, Object>put(
+			"companyId",
+			Collections.singletonList(
+				String.valueOf(TestPropsValues.getCompanyId()))
+		).put(
+			"liferay.auth.verifier", true
+		).put(
+			"liferay.oauth2", false
+		).put(
+			"osgi.jaxrs.application.base", "/test-vulcan-application-content"
+		).put(
+			"osgi.jaxrs.extension.select", "(osgi.jaxrs.name=Liferay.Vulcan)"
+		).put(
+			"osgi.jaxrs.name", "Test.Vulcan.Content"
+		).build();
+	}
+
 	private HeadlessApplicationProvider.OpenAPIDocument _getOpenAPIDocument(
 		HeadlessApplicationProvider.Application application, String version) {
 
@@ -505,6 +725,8 @@ public class HeadlessApplicationProviderTest {
 	private static final String _FEATURE_FLAG_KEY_UNDECLARED = "UNDECLARED-123";
 
 	private BundleContext _bundleContext;
+	private ServiceRegistration<Application>
+		_contentApplicationServiceRegistration;
 
 	@Inject
 	private FeatureFlagManager _featureFlagManager;
