@@ -6,6 +6,7 @@
 package com.liferay.portal.vulcan.internal.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
@@ -265,7 +266,8 @@ public class HeadlessApplicationProviderImpl
 
 		for (ApplicationDTO applicationDTO : applicationDTOs) {
 			List<Long> serviceIds = serviceIdsMap.computeIfAbsent(
-				_getBasePath(applicationDTO.base), key -> new ArrayList<>());
+				_getBasePath(applicationDTO.base),
+				basePath -> new ArrayList<>());
 
 			serviceIds.add(applicationDTO.serviceId);
 
@@ -612,10 +614,9 @@ public class HeadlessApplicationProviderImpl
 			}
 
 			try {
-				return Json.mapper(
-				).readValue(
-					content, OpenAPI.class
-				);
+				ObjectMapper objectMapper = Json.mapper();
+
+				return objectMapper.readValue(content, OpenAPI.class);
 			}
 			catch (JsonProcessingException jsonProcessingException) {
 				_log.error(jsonProcessingException);
