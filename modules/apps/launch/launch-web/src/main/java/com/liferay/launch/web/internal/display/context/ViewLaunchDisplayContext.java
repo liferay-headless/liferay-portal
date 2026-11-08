@@ -310,19 +310,17 @@ public class ViewLaunchDisplayContext {
 	private List<LaunchEntryManager> _getLaunchEntryManagers() {
 		Locale locale = _getLocale();
 
-		List<LaunchEntryManager> launchEntryManagers =
-			_launchEntryManagerRegistry.getLaunchEntryManagers();
-
-		ListUtil.sort(
-			launchEntryManagers,
+		return ListUtil.sort(
+			ListUtil.filter(
+				_launchEntryManagerRegistry.getLaunchEntryManagers(),
+				launchEntryManager ->
+					launchEntryManager.getItemSelectorCriterion() != null),
 			(launchEntryManager1, launchEntryManager2) -> {
 				String label1 = launchEntryManager1.getLabel(locale);
 				String label2 = launchEntryManager2.getLabel(locale);
 
 				return label1.compareTo(label2);
 			});
-
-		return launchEntryManagers;
 	}
 
 	private Locale _getLocale() {
