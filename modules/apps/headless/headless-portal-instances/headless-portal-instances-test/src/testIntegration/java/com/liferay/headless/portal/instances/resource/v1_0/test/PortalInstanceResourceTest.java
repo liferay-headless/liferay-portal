@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.VirtualHostLocalService;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.PrefsPropsTestUtil;
+import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -181,6 +182,8 @@ public class PortalInstanceResourceTest
 		_testPostPortalInstanceWithAdminCredentials();
 		_testPostPortalInstanceWithAdminWithoutRequiredFields();
 		_testPostPortalInstanceWithExistingCompanyId();
+		_testPostPortalInstanceWithInvalidAdminCredentials();
+		_testPostPortalInstanceWithInvalidMaxUsers();
 		_testPostPortalInstanceWithoutOmniadminPermission();
 	}
 
@@ -1015,6 +1018,66 @@ public class PortalInstanceResourceTest
 		finally {
 			_deletePortalInstance(postPortalInstance);
 		}
+	}
+
+	private void _testPostPortalInstanceWithInvalidAdminCredentials()
+		throws Exception {
+
+		PortalInstance randomPortalInstance1 = randomPortalInstance();
+
+		randomPortalInstance1.setAdmin(
+			Admin.toDTO(
+				JSONUtil.put(
+					"emailAddress",
+					RandomTestUtil.randomString() + "@liferay.com"
+				).put(
+					"familyName", RandomTestUtil.randomString()
+				).put(
+					"givenName", RandomTestUtil.randomString()
+				).put(
+					"password", "12345"
+				).toString()));
+
+		try (SafeCloseable safeCloseable =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"PASSWORDS_DEFAULT_POLICY_CHECK_SYNTAX", true)) {
+
+			_assertProblemExceptionProblemStatus(
+				"BAD_REQUEST",
+				() -> portalInstanceResource.postPortalInstance(
+					randomPortalInstance1));
+		}
+
+		PortalInstance randomPortalInstance2 = randomPortalInstance();
+
+		randomPortalInstance2.setAdmin(
+			Admin.toDTO(
+				JSONUtil.put(
+					"emailAddress",
+					RandomTestUtil.randomString() + "@liferay.com"
+				).put(
+					"familyName", RandomTestUtil.randomString()
+				).put(
+					"givenName", RandomTestUtil.randomString()
+				).put(
+					"screenName", "bad name!"
+				).toString()));
+
+		_assertProblemExceptionProblemStatus(
+			"BAD_REQUEST",
+			() -> portalInstanceResource.postPortalInstance(
+				randomPortalInstance2));
+	}
+
+	private void _testPostPortalInstanceWithInvalidMaxUsers() throws Exception {
+		PortalInstance randomPortalInstance = randomPortalInstance();
+
+		randomPortalInstance.setMaxUsers(-1);
+
+		_assertProblemExceptionProblemStatus(
+			"BAD_REQUEST",
+			() -> portalInstanceResource.postPortalInstance(
+				randomPortalInstance));
 	}
 
 	private void _testPostPortalInstanceWithSiteInitializerKeyNonexistent()
