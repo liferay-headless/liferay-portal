@@ -174,7 +174,7 @@ public class BatchEngineImportTaskExecutorImpl
 
 			batchEngineImportTask =
 				_batchEngineImportTaskLocalService.updateBatchEngineImportTask(
-					batchEngineImportTask);
+					batchEngineImportTask, batchEngineTaskItemDelegate);
 
 			User user = _userLocalService.getUser(
 				batchEngineImportTask.getUserId());
@@ -333,7 +333,7 @@ public class BatchEngineImportTaskExecutorImpl
 		batchEngineImportTask.setProcessedItemsCount(processedItemsCount);
 
 		return _batchEngineImportTaskLocalService.updateBatchEngineImportTask(
-			batchEngineImportTask);
+			batchEngineImportTask, batchEngineTaskItemDelegate);
 	}
 
 	private BatchEngineImportTaskItemReader _getBatchEngineImportTaskItemReader(
