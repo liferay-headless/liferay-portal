@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
+import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -74,15 +75,6 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 					" failed to publish and cannot be published again");
 		}
 
-		if (launchSetObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_SCHEDULED) {
-
-			_schedulerEngineHelper.delete(
-				_getJobName(launchSetObjectEntry),
-				LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
-				StorageType.PERSISTED);
-		}
-
 		List<Map<String, Serializable>> launchSetErrorValuesList =
 			new ArrayList<>();
 		ServiceContext serviceContext =
@@ -110,6 +102,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				_launchSetErrorHelper.markPublishFailed(
 					launchSetErrorValuesList, launchSetObjectEntry,
 					serviceContext.getUserId());
+
+				_delete(launchSetObjectEntry);
 			}
 			catch (Throwable throwable2) {
 				_log.error(
@@ -126,6 +120,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 			throw new PortalException(throwable);
 		}
+
+		_delete(launchSetObjectEntry);
 	}
 
 	@Override
@@ -224,6 +220,21 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		return serviceContext;
+	}
+
+	private void _delete(ObjectEntry launchSetObjectEntry) {
+		try {
+			_schedulerEngineHelper.delete(
+				_getJobName(launchSetObjectEntry),
+				LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
+				StorageType.PERSISTED);
+		}
+		catch (SchedulerException schedulerException) {
+			_log.error(
+				"Unable to delete the scheduled publish job of launch set " +
+					launchSetObjectEntry.getObjectEntryId(),
+				schedulerException);
+		}
 	}
 
 	private String _getJobName(ObjectEntry launchSetObjectEntry) {
