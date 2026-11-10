@@ -18,7 +18,9 @@ import com.liferay.change.tracking.service.CTProcessLocalService;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.exportimport.kernel.background.task.BackgroundTaskExecutorNames;
 import com.liferay.exportimport.kernel.background.task.constants.LayoutSetPrototypeBackgroundTaskConstants;
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.fragment.constants.FragmentConstants;
@@ -30,6 +32,7 @@ import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.journal.constants.JournalContentPortletKeys;
+import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
@@ -927,6 +930,67 @@ public class LayoutSetPrototypePropagationTest
 	}
 
 	@Test
+	public void testLayoutSetPrototypePropagationWithLayoutSelection()
+		throws Exception {
+
+		Layout syncedLayout = LayoutTestUtil.addTypePortletLayout(
+			_layoutSetPrototypeGroup, true);
+		Layout skippedLayout = LayoutTestUtil.addTypePortletLayout(
+			_layoutSetPrototypeGroup, true);
+
+		int initialCount = _layoutLocalService.getLayoutsCount(
+			group.getGroupId(), false);
+
+		_sites.mergeLayoutSetPrototypeLayouts(
+			_layoutSetPrototype, TestPropsValues.getUserId(),
+			new long[] {syncedLayout.getLayoutId()},
+			_getSelectionParameterMap(false));
+
+		Assert.assertEquals(
+			initialCount + 1,
+			_layoutLocalService.getLayoutsCount(group.getGroupId(), false));
+		Assert.assertNotNull(
+			_layoutLocalService.fetchLayoutByFriendlyURL(
+				group.getGroupId(), false, syncedLayout.getFriendlyURL()));
+		Assert.assertNull(
+			_layoutLocalService.fetchLayoutByFriendlyURL(
+				group.getGroupId(), false, skippedLayout.getFriendlyURL()));
+	}
+
+	@Test
+	public void testLayoutSetPrototypePropagationWithLayoutSetSettingsUnselected()
+		throws Exception {
+
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			group.getGroupId(), false);
+
+		UnicodeProperties settingsUnicodeProperties =
+			layoutSet.getSettingsProperties();
+
+		settingsUnicodeProperties.setProperty(
+			Sites.SHOW_SITE_NAME, Boolean.FALSE.toString());
+
+		layoutSet.setSettingsProperties(settingsUnicodeProperties);
+
+		layoutSet = LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet);
+
+		_sites.mergeLayoutSetPrototypeLayouts(
+			_layoutSetPrototype, TestPropsValues.getUserId(),
+			ExportImportHelperUtil.getAllLayoutIds(
+				_layoutSetPrototypeGroup.getGroupId(), true),
+			_getSelectionParameterMap(false));
+
+		layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			layoutSet.getLayoutSetId());
+
+		settingsUnicodeProperties = layoutSet.getSettingsProperties();
+
+		Assert.assertEquals(
+			Boolean.FALSE.toString(),
+			settingsUnicodeProperties.getProperty(Sites.SHOW_SITE_NAME));
+	}
+
+	@Test
 	public void testLayoutSetPrototypePropagationWithLinkDisabled()
 		throws Exception {
 
@@ -950,6 +1014,87 @@ public class LayoutSetPrototypePropagationTest
 		Assert.assertEquals(
 			initialCount,
 			_layoutLocalService.getLayoutsCount(group.getGroupId(), false));
+	}
+
+	@Test
+	public void testLayoutSetPrototypePropagationWithLookAndFeelUnselected()
+		throws Exception {
+
+		LayoutSet prototypePrivateLayoutSet =
+			_layoutSetPrototypeGroup.getPrivateLayoutSet();
+
+		prototypePrivateLayoutSet.setThemeId(_THEME_ID);
+
+		LayoutSetLocalServiceUtil.updateLayoutSet(prototypePrivateLayoutSet);
+
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			group.getGroupId(), false);
+
+		String themeId = layoutSet.getThemeId();
+
+		Assert.assertNotEquals(_THEME_ID, themeId);
+
+		_sites.mergeLayoutSetPrototypeLayouts(
+			_layoutSetPrototype, TestPropsValues.getUserId(),
+			ExportImportHelperUtil.getAllLayoutIds(
+				_layoutSetPrototypeGroup.getGroupId(), true),
+			_getSelectionParameterMap(false));
+
+		layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			layoutSet.getLayoutSetId());
+
+		Assert.assertEquals(themeId, layoutSet.getThemeId());
+	}
+
+	@Test
+	public void testLayoutSetPrototypePropagationWithPortletDataSelection()
+		throws Exception {
+
+		String content = RandomTestUtil.randomString();
+
+		JournalTestUtil.updateArticle(
+			_layoutSetPrototypeJournalArticle, RandomTestUtil.randomString(),
+			DDMStructureTestUtil.getSampleStructuredContent(content));
+
+		_sites.mergeLayoutSetPrototypeLayouts(
+			_layoutSetPrototype, TestPropsValues.getUserId(),
+			ExportImportHelperUtil.getAllLayoutIds(
+				_layoutSetPrototypeGroup.getGroupId(), true),
+			_getSelectionParameterMap(true));
+
+		Assert.assertEquals(
+			content,
+			_journalContent.getContent(
+				journalArticle.getGroupId(), journalArticle.getArticleId(),
+				Constants.VIEW, LocaleUtil.toLanguageId(LocaleUtil.US)));
+	}
+
+	@Test
+	public void testLayoutSetPrototypePropagationWithPortletDataUnselected()
+		throws Exception {
+
+		String languageId = LocaleUtil.toLanguageId(LocaleUtil.US);
+
+		String content = _journalContent.getContent(
+			journalArticle.getGroupId(), journalArticle.getArticleId(),
+			Constants.VIEW, languageId);
+
+		JournalTestUtil.updateArticle(
+			_layoutSetPrototypeJournalArticle, RandomTestUtil.randomString(),
+			DDMStructureTestUtil.getSampleStructuredContent(
+				RandomTestUtil.randomString()));
+
+		_sites.mergeLayoutSetPrototypeLayouts(
+			_layoutSetPrototype, TestPropsValues.getUserId(),
+			ExportImportHelperUtil.getAllLayoutIds(
+				_layoutSetPrototypeGroup.getGroupId(), true),
+			_getSelectionParameterMap(false));
+
+		Assert.assertEquals(
+			content,
+			_journalContent.getContent(
+				journalArticle.getGroupId(), journalArticle.getArticleId(),
+				Constants.VIEW, languageId));
 	}
 
 	@FeatureFlag("LPD-104837")
@@ -1398,8 +1543,8 @@ public class LayoutSetPrototypePropagationTest
 			prototypeLayout, initialLayoutTemplateId);
 
 		_layoutSetPrototypeJournalArticle = JournalTestUtil.addArticle(
-			_layoutSetPrototypeGroup.getGroupId(), "Test Article",
-			"Test Content");
+			_layoutSetPrototypeGroup.getGroupId(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString());
 
 		portletId = addPortletToLayout(
 			TestPropsValues.getUserId(), prototypeLayout,
@@ -1597,11 +1742,11 @@ public class LayoutSetPrototypePropagationTest
 			content.put(languageId, localization);
 		}
 
-		String newContent = DDMStructureTestUtil.getSampleStructuredContent(
-			"New Test Content");
+		String newContent = RandomTestUtil.randomString();
 
 		JournalTestUtil.updateArticle(
-			_layoutSetPrototypeJournalArticle, "New Test Title", newContent);
+			_layoutSetPrototypeJournalArticle, RandomTestUtil.randomString(),
+			DDMStructureTestUtil.getSampleStructuredContent(newContent));
 
 		propagateChanges(group);
 
@@ -1613,7 +1758,7 @@ public class LayoutSetPrototypePropagationTest
 				Constants.VIEW, languageId);
 
 			if (linkEnabled) {
-				Assert.assertEquals("New Test Content", importedLocalization);
+				Assert.assertEquals(newContent, importedLocalization);
 			}
 			else {
 				Assert.assertEquals(localization, importedLocalization);
@@ -1941,6 +2086,31 @@ public class LayoutSetPrototypePropagationTest
 
 	private int _getRandomStatus(int... statuses) {
 		return statuses[RandomTestUtil.randomInt(0, statuses.length - 1)];
+	}
+
+	private Map<String, String[]> _getSelectionParameterMap(
+		boolean journalPortletData) {
+
+		return HashMapBuilder.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				JournalPortletKeys.JOURNAL,
+			new String[] {String.valueOf(journalPortletData)}
+		).put(
+			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
+			new String[] {Boolean.TRUE.toString()}
+		).put(
+			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
+			new String[] {Boolean.TRUE.toString()}
+		).build();
 	}
 
 	private SafeCloseable _registerMessageListenerWithSafeCloseable(

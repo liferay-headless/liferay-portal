@@ -840,6 +840,43 @@ components:
                     type: integer
                 label:
                     type: string
+        SyncPreview:
+            description:
+                Represents what a site template sync can cover, with the counts of the site template's content.
+            properties:
+                additionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                deletionCount:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                portletDataHandlers:
+                    items:
+                        $ref: "#/components/schemas/PortletDataHandler"
+                    readOnly: true
+                    type: array
+            type: object
+        SyncProcessRequest:
+            description:
+                Represents a sync of a site template to the sites linked to it.
+            properties:
+                comments:
+                    default: false
+                    type: boolean
+                portletDataHandlers:
+                    description:
+                        The portlet data handlers to sync, taken from the sync preview.
+                    items:
+                        $ref: "#/components/schemas/PortletDataHandler"
+                    type: array
+                ratings:
+                    default: false
+                    type: boolean
+            required:
+                -   portletDataHandlers
+            type: object
         Type:
             properties:
                 code:
@@ -850,7 +887,7 @@ components:
             type: object
 info:
     description:
-        "Exports, imports, and publishes the content of the instance, a site, an asset library, or one of their portlets. Get the preview first, then send its portlet data handlers back in the process request with the controls you want. Only the handlers and controls in the request are processed. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.exportimport.rest.client', and version '1.0.13'."
+        "Exports, imports, and publishes the content of the instance, a site, an asset library, or one of their portlets, and syncs a site template to its sites. Get the preview first, then send its portlet data handlers back in the process request with the controls you want. Only the handlers and controls in the request are processed. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.exportimport.rest.client', and version '1.0.13'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -1931,6 +1968,55 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ReportEntry"
             tags: ["ReportEntry"]
+    "/site-templates/{siteTemplateId}/sync-preview":
+        get:
+            description:
+                Retrieves the portlet data handlers and counts for a sync of the specified site template to the sites linked to it.
+            operationId: getSiteTemplateSyncPreview
+            parameters:
+                -   in: path
+                    name: siteTemplateId
+                    required: true
+                    schema:
+                        format: int64
+                        type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/SyncPreview"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/SyncPreview"
+            tags: ["SyncPreview"]
+            x-feature-flag: LPD-82107
+    "/site-templates/{siteTemplateId}/sync-processes":
+        post:
+            description:
+                Starts a sync of the specified site template to the sites linked to it, with a background process for each site. A notification reports the result once every site is synced.
+            parameters:
+                -   in: path
+                    name: siteTemplateId
+                    required: true
+                    schema:
+                        format: int64
+                        type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/SyncProcessRequest"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/SyncProcessRequest"
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["SyncProcess"]
+            x-feature-flag: LPD-82107
     "/sites/{siteExternalReferenceCode}/export-preview":
         get:
             description:
