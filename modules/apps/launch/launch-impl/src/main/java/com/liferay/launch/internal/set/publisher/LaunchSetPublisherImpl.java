@@ -7,6 +7,7 @@ package com.liferay.launch.internal.set.publisher;
 
 import com.liferay.launch.internal.background.task.LaunchSetPublishBackgroundTaskExecutor;
 import com.liferay.launch.internal.constants.LaunchDestinationNames;
+import com.liferay.launch.set.publisher.LaunchSetPublishException;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -50,7 +51,7 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		if (launchSetObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_APPROVED) {
 
-			throw new PortalException(
+			throw new LaunchSetPublishException(
 				"Launch set " + launchSetId + " was already published");
 		}
 
@@ -62,7 +63,7 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				LaunchSetPublishBackgroundTaskExecutor.class.getName(), false);
 
 		if (backgroundTasksCount > 0) {
-			throw new PortalException(
+			throw new LaunchSetPublishException(
 				"Launch set " + launchSetId + " is already being published");
 		}
 
