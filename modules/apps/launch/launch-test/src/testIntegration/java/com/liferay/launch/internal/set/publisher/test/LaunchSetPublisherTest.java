@@ -370,7 +370,8 @@ public class LaunchSetPublisherTest {
 			PortalException.class.getName(),
 			MapUtil.getString(values, "message"));
 
-		// Launch entry whose publish fails with a long message
+		// Launch entry whose publish fails with a long message of characters
+		// outside the BMP
 
 		ObjectEntry longMessageLaunchSetObjectEntry =
 			_addLaunchSetObjectEntry();
@@ -385,7 +386,7 @@ public class LaunchSetPublisherTest {
 				longMessageLaunchSetObjectEntry.getObjectEntryId(),
 				longMessageClassName, RandomTestUtil.randomInt(), null);
 
-		String longMessage = RandomTestUtil.randomString(70000);
+		String longMessage = "a" + "\uD83D\uDE00".repeat(35000);
 
 		serviceRegistration = _registerLaunchEntryManager(
 			longMessageClassName,
@@ -423,8 +424,7 @@ public class LaunchSetPublisherTest {
 
 		String message = MapUtil.getString(values, "message");
 
-		Assert.assertEquals(65000, message.length());
-		Assert.assertTrue(message.startsWith(longMessage.substring(0, 64000)));
+		Assert.assertEquals(longMessage.substring(0, 64999), message);
 
 		// Launch entry with a title longer than a text field
 
