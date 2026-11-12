@@ -2,6 +2,7 @@ Bundle-Name: Liferay Launch API
 Bundle-SymbolicName: com.liferay.launch.api
 Bundle-Version: 5.1.0
 Export-Package:\
+	com.liferay.launch.constants,\
 	com.liferay.launch.entry.manager,\
 	com.liferay.launch.set.details,\
 	com.liferay.launch.set.details.provider,\
