@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -96,9 +95,9 @@ public class LaunchSetErrorHelper {
 		return HashMapBuilder.<String, Serializable>put(
 			"launchEntryId", launchEntryId
 		).put(
-			"launchEntryTitle", StringUtil.shorten(launchEntryTitle, 65000)
+			"launchEntryTitle", _shorten(launchEntryTitle)
 		).put(
-			"message", StringUtil.shorten(message, 65000)
+			"message", _shorten(message)
 		).put(
 			"severity", "error"
 		).build();
@@ -221,6 +220,20 @@ public class LaunchSetErrorHelper {
 				).build(),
 				serviceContext);
 		}
+	}
+
+	private String _shorten(String s) {
+		if ((s == null) || (s.length() <= 65000)) {
+			return s;
+		}
+
+		int endIndex = 65000;
+
+		if (Character.isHighSurrogate(s.charAt(endIndex - 1))) {
+			endIndex--;
+		}
+
+		return s.substring(0, endIndex);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
