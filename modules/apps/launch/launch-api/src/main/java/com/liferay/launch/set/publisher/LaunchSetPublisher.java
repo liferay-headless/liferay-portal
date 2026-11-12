@@ -5,6 +5,7 @@
 
 package com.liferay.launch.set.publisher;
 
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.Date;
@@ -16,6 +17,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface LaunchSetPublisher {
+
+	public BackgroundTask fetchPublishBackgroundTask(long launchSetId);
 
 	public void publish(long launchSetId, long userId) throws PortalException;
 

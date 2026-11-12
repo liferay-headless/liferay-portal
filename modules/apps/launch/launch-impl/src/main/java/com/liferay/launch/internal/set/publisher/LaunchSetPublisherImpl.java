@@ -15,6 +15,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.background.task.util.comparator.BackgroundTaskCreateDateComparator;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.io.Serializable;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -42,6 +45,22 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(service = LaunchSetPublisher.class)
 public class LaunchSetPublisherImpl implements LaunchSetPublisher {
+
+	@Override
+	public BackgroundTask fetchPublishBackgroundTask(long launchSetId) {
+		List<BackgroundTask> backgroundTasks =
+			_backgroundTaskManager.getBackgroundTasks(
+				BackgroundTaskConstants.GROUP_ID_DEFAULT,
+				String.valueOf(launchSetId),
+				LaunchSetPublishBackgroundTaskExecutor.class.getName(), 0, 1,
+				BackgroundTaskCreateDateComparator.getInstance(false));
+
+		if (backgroundTasks.isEmpty()) {
+			return null;
+		}
+
+		return backgroundTasks.get(0);
+	}
 
 	@Override
 	public void publish(long launchSetId, long userId) throws PortalException {
