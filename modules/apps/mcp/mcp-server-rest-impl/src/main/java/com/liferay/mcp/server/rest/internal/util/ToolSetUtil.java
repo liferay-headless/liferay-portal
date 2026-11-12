@@ -26,12 +26,12 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -48,6 +48,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.ws.rs.core.Response;
 
+import java.lang.ref.WeakReference;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -62,18 +64,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ToolSetUtil {
 
 	public static final String TOOL_SET_NAME = "mcp-server-v1.0";
-
-	public static void clearOpenAPIJSONObjectCache(long companyId) {
-		if (companyId == CompanyConstants.SYSTEM) {
-			_openAPIJSONObjects.clear();
-
-			return;
-		}
-
-		Set<String> keys = _openAPIJSONObjects.keySet();
-
-		keys.removeIf(key -> key.startsWith(companyId + StringPool.POUND));
-	}
 
 	public static Map<String, HeadlessApplicationProvider.OpenAPIDocument>
 		getLatestOpenAPIDocuments(long companyId) {
@@ -94,34 +84,50 @@ public class ToolSetUtil {
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument,
 		String toolSetName) {
 
-		return _openAPIJSONObjects.computeIfAbsent(
-			StringBundler.concat(
-				PortalUtil.getCompanyId(httpServletRequest), StringPool.POUND,
-				openAPIDocument.getPath(
-					HeadlessApplicationProvider.OpenAPIDocument.Type.JSON)),
-			key -> {
-				String content = openAPIDocument.getContentString(
-					PortalUtil.getPortalURL(httpServletRequest) +
-						PortalUtil.getPathContext() + Portal.PATH_MODULE,
-					HeadlessApplicationProvider.OpenAPIDocument.Type.JSON);
+		String content = openAPIDocument.getContentString(
+			PortalUtil.getPortalURL(httpServletRequest) +
+				PortalUtil.getPathContext() + Portal.PATH_MODULE,
+			HeadlessApplicationProvider.OpenAPIDocument.Type.JSON);
 
-				if (Validator.isNull(content)) {
-					throw new IllegalStateException(
-						"Unable to read the OpenAPI document of the \"" +
-							toolSetName + "\" tool set");
-				}
+		if (Validator.isNull(content)) {
+			throw new IllegalStateException(
+				"Unable to read the OpenAPI document of the \"" + toolSetName +
+					"\" tool set");
+		}
 
-				try {
-					return JSONFactoryUtil.createJSONObject(content);
-				}
-				catch (JSONException jsonException) {
-					throw new IllegalStateException(
-						StringBundler.concat(
-							"Unable to parse the OpenAPI document of the \"",
-							toolSetName, "\" tool set"),
-						jsonException);
-				}
-			});
+		String key = StringBundler.concat(
+			PortalUtil.getCompanyId(httpServletRequest), StringPool.POUND,
+			openAPIDocument.getPath(
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		ObjectValuePair<WeakReference<String>, JSONObject> objectValuePair =
+			_openAPIJSONObjects.get(key);
+
+		if (objectValuePair != null) {
+			WeakReference<String> contentReference = objectValuePair.getKey();
+
+			if (Objects.equals(contentReference.get(), content)) {
+				return objectValuePair.getValue();
+			}
+		}
+
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(content);
+
+			_openAPIJSONObjects.put(
+				key,
+				new ObjectValuePair<>(
+					new WeakReference<>(content), jsonObject));
+
+			return jsonObject;
+		}
+		catch (JSONException jsonException) {
+			throw new IllegalStateException(
+				StringBundler.concat(
+					"Unable to parse the OpenAPI document of the \"",
+					toolSetName, "\" tool set"),
+				jsonException);
+		}
 	}
 
 	public static Tool getTool(
@@ -622,8 +628,9 @@ public class ToolSetUtil {
 	private static final Snapshot<MCPToolIndexWriter>
 		_mcpToolIndexWriterSnapshot = new Snapshot<>(
 			ToolSetUtil.class, MCPToolIndexWriter.class);
-	private static final Map<String, JSONObject> _openAPIJSONObjects =
-		new ConcurrentHashMap<>();
+	private static final Map
+		<String, ObjectValuePair<WeakReference<String>, JSONObject>>
+			_openAPIJSONObjects = new ConcurrentHashMap<>();
 	private static final Snapshot<SearchCapabilities>
 		_searchCapabilitiesSnapshot = new Snapshot<>(
 			ToolSetUtil.class, SearchCapabilities.class);

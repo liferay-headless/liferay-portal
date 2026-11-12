@@ -5,6 +5,9 @@
 
 package com.liferay.portal.vulcan.internal.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerCustomizerFactory;
@@ -21,11 +24,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.remote.jaxrs.whiteboard.lifecycle.JAXRSLifecycle;
 import com.liferay.portal.vulcan.application.HeadlessApplicationProvider;
+import com.liferay.portal.vulcan.internal.cache.OpenAPIDocumentCache;
 import com.liferay.portal.vulcan.internal.feature.flag.FeatureFlagUtil;
 
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.OpenAPI;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -41,9 +46,12 @@ import java.lang.reflect.Method;
 import java.net.URI;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -75,7 +83,7 @@ public class HeadlessApplicationProviderImpl
 	public List<Application> getApplications(long companyId) {
 		List<Application> applications = new ArrayList<>();
 
-		if (_applicationDTOs == null) {
+		if (_applicationDTOsStale) {
 			_jaxrsLifecycle.ensureReady();
 
 			JaxrsServiceRuntime jaxrsServiceRuntime =
@@ -85,9 +93,16 @@ public class HeadlessApplicationProviderImpl
 				return applications;
 			}
 
+			_applicationDTOsStale = false;
+
 			RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
 
-			_applicationDTOs = ListUtil.fromArray(runtimeDTO.applicationDTOs);
+			List<ApplicationDTO> applicationDTOs = ListUtil.fromArray(
+				runtimeDTO.applicationDTOs);
+
+			_clearStaleOpenAPIDocuments(_applicationDTOs, applicationDTOs);
+
+			_applicationDTOs = applicationDTOs;
 		}
 
 		List<ApplicationDTO> applicationDTOs = _applicationDTOs;
@@ -140,6 +155,11 @@ public class HeadlessApplicationProviderImpl
 					public void modifiedService(
 						ServiceReference<Object> serviceReference,
 						ServiceReference<?> trackedServiceReference) {
+
+						_openAPIDocumentCache.clear(
+							_getBasePath(
+								(String)serviceReference.getProperty(
+									"osgi.jaxrs.application.base")));
 					}
 
 					@Override
@@ -157,7 +177,7 @@ public class HeadlessApplicationProviderImpl
 				public JaxrsServiceRuntime addingService(
 					ServiceReference<JaxrsServiceRuntime> serviceReference) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 
 					return bundleContext.getService(serviceReference);
 				}
@@ -167,7 +187,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 				}
 
 				@Override
@@ -175,7 +195,7 @@ public class HeadlessApplicationProviderImpl
 					ServiceReference<JaxrsServiceRuntime> serviceReference,
 					JaxrsServiceRuntime jaxrsServiceRuntime) {
 
-					_applicationDTOs = null;
+					_applicationDTOsStale = true;
 
 					bundleContext.ungetService(serviceReference);
 				}
@@ -194,6 +214,77 @@ public class HeadlessApplicationProviderImpl
 		_companyIdsServiceTrackerMap.close();
 		_jaxrsServiceRuntimeServiceTracker.close();
 		_openAPIResourceServiceTrackerMap.close();
+	}
+
+	private void _clearStaleOpenAPIDocuments(
+		List<ApplicationDTO> applicationDTOs1,
+		List<ApplicationDTO> applicationDTOs2) {
+
+		if (applicationDTOs1 == null) {
+			_openAPIDocumentCache.clear();
+
+			return;
+		}
+
+		Map<String, List<Long>> serviceIdsMap1 = _getServiceIdsMap(
+			applicationDTOs1);
+		Map<String, List<Long>> serviceIdsMap2 = _getServiceIdsMap(
+			applicationDTOs2);
+
+		Set<String> basePaths = new HashSet<>(serviceIdsMap1.keySet());
+
+		basePaths.addAll(serviceIdsMap2.keySet());
+
+		for (String basePath : basePaths) {
+			if (Objects.equals(
+					serviceIdsMap1.get(basePath),
+					serviceIdsMap2.get(basePath))) {
+
+				continue;
+			}
+
+			_openAPIDocumentCache.clear(basePath);
+		}
+	}
+
+	private String _getBasePath(String base) {
+		if (Validator.isNull(base)) {
+			return StringPool.BLANK;
+		}
+
+		if (base.startsWith(StringPool.SLASH)) {
+			return base;
+		}
+
+		return StringPool.SLASH + base;
+	}
+
+	private Map<String, List<Long>> _getServiceIdsMap(
+		List<ApplicationDTO> applicationDTOs) {
+
+		Map<String, List<Long>> serviceIdsMap = new HashMap<>();
+
+		for (ApplicationDTO applicationDTO : applicationDTOs) {
+			List<Long> serviceIds = serviceIdsMap.computeIfAbsent(
+				_getBasePath(applicationDTO.base),
+				basePath -> new ArrayList<>());
+
+			serviceIds.add(applicationDTO.serviceId);
+
+			if (applicationDTO.resourceDTOs == null) {
+				continue;
+			}
+
+			for (ResourceDTO resourceDTO : applicationDTO.resourceDTOs) {
+				serviceIds.add(resourceDTO.serviceId);
+			}
+		}
+
+		for (List<Long> serviceIds : serviceIdsMap.values()) {
+			Collections.sort(serviceIds);
+		}
+
+		return serviceIdsMap;
 	}
 
 	private UriInfo _getUriInfo(String baseURL, String version) {
@@ -333,6 +424,7 @@ public class HeadlessApplicationProviderImpl
 		"v[0-9]+\\.[0-9]+");
 
 	private volatile List<ApplicationDTO> _applicationDTOs;
+	private volatile boolean _applicationDTOsStale = true;
 	private ServiceTrackerMap<Long, ServiceReference<?>>
 		_companyIdsServiceTrackerMap;
 
@@ -341,6 +433,10 @@ public class HeadlessApplicationProviderImpl
 
 	private ServiceTracker<JaxrsServiceRuntime, JaxrsServiceRuntime>
 		_jaxrsServiceRuntimeServiceTracker;
+
+	@Reference
+	private OpenAPIDocumentCache _openAPIDocumentCache;
+
 	private ServiceTrackerMap
 		<String, List<ServiceReferenceServiceTuple<Object, Object>>>
 			_openAPIResourceServiceTrackerMap;
@@ -378,17 +474,7 @@ public class HeadlessApplicationProviderImpl
 
 		@Override
 		public String getBasePath() {
-			String base = _applicationDTO.base;
-
-			if (Validator.isNull(base)) {
-				return StringPool.BLANK;
-			}
-
-			if (base.startsWith(StringPool.SLASH)) {
-				return base;
-			}
-
-			return StringPool.SLASH + base;
+			return _getBasePath(_applicationDTO.base);
 		}
 
 		@Override
@@ -521,22 +607,30 @@ public class HeadlessApplicationProviderImpl
 
 		@Override
 		public Object getContentObject(String serverURL) {
-			return _getEntity(serverURL, Type.JSON);
+			String content = getContentString(serverURL, Type.JSON);
+
+			if (content == null) {
+				return null;
+			}
+
+			try {
+				ObjectMapper objectMapper = Json.mapper();
+
+				return objectMapper.readValue(content, OpenAPI.class);
+			}
+			catch (JsonProcessingException jsonProcessingException) {
+				_log.error(jsonProcessingException);
+
+				return null;
+			}
 		}
 
 		@Override
 		public String getContentString(String serverURL, Type type) {
-			Object entity = _getEntity(serverURL, type);
-
-			if (entity == null) {
-				return null;
-			}
-
-			if (entity instanceof String) {
-				return (String)entity;
-			}
-
-			return Json.pretty(entity);
+			return _openAPIDocumentCache.getContent(
+				_applicationImpl.getBasePath(), _applicationImpl._companyId,
+				() -> _getContentString(serverURL, type), getPath(type),
+				serverURL);
 		}
 
 		@Override
@@ -605,6 +699,20 @@ public class HeadlessApplicationProviderImpl
 
 			_applicationImpl = applicationImpl;
 			_path = path;
+		}
+
+		private String _getContentString(String serverURL, Type type) {
+			Object entity = _getEntity(serverURL, type);
+
+			if (entity == null) {
+				return null;
+			}
+
+			if (entity instanceof String) {
+				return (String)entity;
+			}
+
+			return Json.pretty(entity);
 		}
 
 		private Object _getEntity(String serverURL, Type type) {
