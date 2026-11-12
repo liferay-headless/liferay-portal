@@ -11,6 +11,7 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
+import com.liferay.launch.set.permission.LaunchSetPreviewPermission;
 import com.liferay.launch.web.internal.constants.LaunchFDSNames;
 import com.liferay.launch.web.internal.constants.LaunchPortletKeys;
 import com.liferay.layout.item.selector.LayoutItemSelectorCriterion;
@@ -18,6 +19,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
@@ -51,12 +53,14 @@ public class ViewLaunchDisplayContext {
 	public ViewLaunchDisplayContext(
 		HttpServletRequest httpServletRequest, ItemSelector itemSelector,
 		LaunchEntryManagerRegistry launchEntryManagerRegistry,
+		LaunchSetPreviewPermission launchSetPreviewPermission,
 		LiferayPortletResponse liferayPortletResponse,
 		ObjectEntryLocalService objectEntryLocalService) {
 
 		_httpServletRequest = httpServletRequest;
 		_itemSelector = itemSelector;
 		_launchEntryManagerRegistry = launchEntryManagerRegistry;
+		_launchSetPreviewPermission = launchSetPreviewPermission;
 		_liferayPortletResponse = liferayPortletResponse;
 		_objectEntryLocalService = objectEntryLocalService;
 	}
@@ -236,6 +240,13 @@ public class ViewLaunchDisplayContext {
 		).buildString();
 	}
 
+	public boolean isPreviewable() throws PortalException {
+		ThemeDisplay themeDisplay = _getThemeDisplay();
+
+		return _launchSetPreviewPermission.contains(
+			themeDisplay.getPermissionChecker(), getLaunchSetId());
+	}
+
 	public boolean isPublished() {
 		if (_published == null) {
 			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
@@ -325,6 +336,7 @@ public class ViewLaunchDisplayContext {
 	private final ItemSelector _itemSelector;
 	private final LaunchEntryManagerRegistry _launchEntryManagerRegistry;
 	private Long _launchSetId;
+	private final LaunchSetPreviewPermission _launchSetPreviewPermission;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private Boolean _published;
