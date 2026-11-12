@@ -69,18 +69,24 @@ const STATUS_CONFIG: Record<
 	},
 };
 
-const VALIDATING_PROGRESS_BAR_VALUE = 99.99;
+const UPLOAD_PROGRESS_BAR_SHARE = 80;
 
 function getProgressBarValue(status: FileSelectorStatus, progress?: number) {
 	if (status === 'SUCCESS') {
 		return 100;
 	}
 
+	const percent = Math.min(progress ?? 0, 100);
+
 	if (status === 'VALIDATING') {
-		return VALIDATING_PROGRESS_BAR_VALUE;
+		return Math.min(
+			UPLOAD_PROGRESS_BAR_SHARE +
+				Math.floor((percent * (100 - UPLOAD_PROGRESS_BAR_SHARE)) / 100),
+			99
+		);
 	}
 
-	return Math.min(progress ?? 0, 99);
+	return Math.floor((percent * UPLOAD_PROGRESS_BAR_SHARE) / 100);
 }
 
 export default function FileSelector({
@@ -186,10 +192,7 @@ export default function FileSelector({
 											status,
 											progress
 										)}
-									>
-										{status === 'VALIDATING' &&
-											`${progress ?? 0}%`}
-									</ProgressBar>
+									/>
 
 									<div
 										aria-live="polite"
