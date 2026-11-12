@@ -48,7 +48,7 @@ public abstract class BaseLaunchResourceImpl implements LaunchResource {
 	 * curl -X 'POST' 'http://localhost:8080/o/launches/v1.0/launches/{launchId}/publish'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Operation(
-		description = "Publishes the In Progress Launch with the given ID, exactly as publishing it from the Launches application does. The publish runs in the background and makes every asset in the Launch live together, so a failure publishes nothing. The request returns as soon as the publish is queued and does not wait for it to finish. Responds 202 with no body once the publish is queued, 400 when the Launch has no assets, and 404 when no Launch has the given ID. Only an In Progress Launch can be published: a Launch that is Scheduled, already Published, or already being published is rejected with 409, and the response's title says which. To publish a Scheduled Launch now, unschedule it first."
+		description = "Publishes the In Progress Launch with the given ID, exactly as publishing it from the Launches application does. The publish runs in the background and makes every asset in the Launch live together, so a failure publishes nothing. The request returns as soon as the publish is queued and does not wait for it to finish. Responds 202 with no body once the publish is queued, 400 when the Launch has no assets, and 404 when no Launch has the given ID. Only an In Progress Launch can be published: a Launch that is Scheduled, already Published, or already being published is rejected with 409, and the response's title says which. To publish a Scheduled Launch now, unschedule it first. To follow the publish, retrieve the Launch's publish status."
 	)
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -522,4 +522,4 @@ public abstract class BaseLaunchResourceImpl implements LaunchResource {
 		LogFactoryUtil.getLog(BaseLaunchResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1777848135
+// LIFERAY-REST-BUILDER-HASH:-1327993022

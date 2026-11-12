@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 @Generated("")
 @OpenAPIDefinition(
-	info = @Info(description = "API for publishing Launches. A Launch groups specific versions of assets, such as web content and pages, so that they go live together. This API covers only publishing: Launches and their assets are created and managed in the Launches application, which also shows each Launch's ID and status. Publishing runs in the background, so a publish request returns as soon as the publish is queued, and the Launch's status shows Published once it completes. The API is available only while the Launches feature is enabled. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.launch.rest.client', and version '1.0.0'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Launches", version = "v1.0")
+	info = @Info(description = "API for publishing Launches and checking how their publish went. A Launch groups specific versions of assets, such as web content and pages, so that they go live together. Launches and their assets are created and managed in the Launches application, which also shows each Launch's ID. Publishing runs in the background, so a publish request returns as soon as the publish is queued, and the Launch's publish status shows when the publish finishes and whether it worked. The API is available only while the Launches feature is enabled. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.launch.rest.client', and version '1.0.0'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Launches", version = "v1.0")
 )
 @Path("/v1.0")
 public class OpenAPIResourceImpl {
@@ -88,9 +88,11 @@ public class OpenAPIResourceImpl {
 		{
 			add(LaunchResourceImpl.class);
 
+			add(LaunchPublishStatusResourceImpl.class);
+
 			add(OpenAPIResourceImpl.class);
 		}
 	};
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1206473845
+// LIFERAY-REST-BUILDER-HASH:-948757018
