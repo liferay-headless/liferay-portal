@@ -17,9 +17,37 @@ import {
 	PortletDataHandlerSelection,
 } from '../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/contentSelection';
 
-jest.mock('@liferay/layout-js-components-web', () => ({
-	PageTreePickerModal: () => null,
-}));
+jest.mock('@liferay/layout-js-components-web', () => {
+	const {createElement} = jest.requireActual('react');
+
+	return {
+		PageTreePickerModal: ({
+			onSubmit,
+		}: {
+			onSubmit: (selection: object | null, count: number | null) => void;
+		}) =>
+			createElement(
+				'div',
+				null,
+				createElement(
+					'button',
+					{
+						onClick: () =>
+							onSubmit(
+								{items: ['home'], privateLayout: false},
+								1
+							),
+					},
+					'submit-pages'
+				),
+				createElement(
+					'button',
+					{onClick: () => onSubmit(null, 0)},
+					'submit-nothing'
+				)
+			),
+	};
+});
 
 function renderLayoutSetControl(
 	{
@@ -141,6 +169,38 @@ describe('LayoutSetControl', () => {
 		expect(
 			screen.getByRole('button', {name: 'select-x'})
 		).toBeInTheDocument();
+	});
+
+	it('stores the page count picked in the page tree with the selection', async () => {
+		const user = userEvent.setup();
+
+		const onChange = jest.fn();
+
+		renderLayoutSetControl({onChange});
+
+		await user.click(screen.getByRole('button', {name: 'select-layouts'}));
+
+		await user.click(screen.getByRole('button', {name: 'submit-pages'}));
+
+		expect(onChange).toHaveBeenCalledWith({
+			items: ['home'],
+			privateLayout: false,
+			selectionCount: 1,
+		});
+	});
+
+	it('clears the selection when no page is picked in the page tree', async () => {
+		const user = userEvent.setup();
+
+		const onChange = jest.fn();
+
+		renderLayoutSetControl({onChange});
+
+		await user.click(screen.getByRole('button', {name: 'select-layouts'}));
+
+		await user.click(screen.getByRole('button', {name: 'submit-nothing'}));
+
+		expect(onChange).toHaveBeenCalledWith(undefined);
 	});
 
 	it('has no accessibility violations', async () => {

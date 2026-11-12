@@ -21,6 +21,7 @@ interface ContentSelectorProps {
 	'aria-labelledby'?: string;
 	'commentsAndRatingsEnabled'?: boolean;
 	'contentSelection': ContentSelection | undefined;
+	'dateFiltered'?: boolean;
 	'errorMessage'?: string;
 	'name': string;
 	'onChange': (value: ContentSelection | undefined) => void;
@@ -34,6 +35,7 @@ export default function ContentSelector({
 	'aria-labelledby': ariaLabelledby,
 	commentsAndRatingsEnabled = false,
 	contentSelection = {},
+	dateFiltered,
 	errorMessage,
 	name,
 	onChange,
@@ -60,6 +62,7 @@ export default function ContentSelector({
 				(portletDataHandlerSection: PortletDataHandlerSection) => (
 					<ContentSection
 						commentsAndRatingsEnabled={commentsAndRatingsEnabled}
+						dateFiltered={dateFiltered}
 						key={portletDataHandlerSection.key}
 						onChange={(sectionSelection) =>
 							onChange(

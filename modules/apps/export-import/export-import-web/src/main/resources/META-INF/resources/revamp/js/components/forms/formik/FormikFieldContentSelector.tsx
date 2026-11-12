@@ -10,6 +10,7 @@ import {ExportImportProcess} from '../../../types/exportImportProcess';
 import {PortletDataHandlerSection} from '../../../types/portletDataHandler';
 import {getFullDataSelection} from '../../../utils/contentSelection';
 import {PageTreeModalConfiguration} from '../../PageTreeModal';
+import {DateFilterValues, Range} from '../../date_filter/types';
 import ContentSelector, {
 	ContentSelection,
 } from '../content_selector/ContentSelector';
@@ -34,6 +35,9 @@ export function FormikFieldContentSelector({
 	const [field, meta, helpers] = useField<
 		ContentSelection | null | undefined
 	>(name);
+	const [{value: dateFilterValues}] = useField<DateFilterValues | undefined>(
+		'dateFilterValues'
+	);
 	const [{value: deletions}] = useField<boolean | undefined>('deletions');
 	const {setFieldTouched, setFieldValue} = useFormikContext();
 
@@ -66,6 +70,9 @@ export function FormikFieldContentSelector({
 			aria-labelledby={ariaLabelledby}
 			commentsAndRatingsEnabled={commentsAndRatingsEnabled}
 			contentSelection={field.value ?? defaultContentSelection}
+			dateFiltered={
+				!!dateFilterValues && dateFilterValues.range !== Range.All
+			}
 			errorMessage={meta.touched && meta.error ? meta.error : undefined}
 			name={name}
 			onChange={(newValue) => {
