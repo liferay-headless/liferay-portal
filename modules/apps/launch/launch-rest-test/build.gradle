@@ -9,6 +9,7 @@ dependencies {
 	testIntegrationImplementation project(":apps:launch:launch-rest-api")
 	testIntegrationImplementation project(":apps:launch:launch-rest-client")
 	testIntegrationImplementation project(":apps:object:object-api")
+	testIntegrationImplementation project(":apps:portal-background-task:portal-background-task-api")
 	testIntegrationImplementation project(":apps:portal-odata:portal-odata-api")
 	testIntegrationImplementation project(":apps:portal-vulcan:portal-vulcan-api")
 	testIntegrationImplementation project(":test:arquillian-extension-junit-bridge")

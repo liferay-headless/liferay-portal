@@ -249,6 +249,14 @@ public class LaunchSetPublisherTest {
 			BackgroundTask backgroundTask = backgroundTasks.get(1);
 
 			Assert.assertEquals(message, backgroundTask.getStatusMessage());
+
+			BackgroundTask latestBackgroundTask =
+				_launchSetPublisher.fetchPublishBackgroundTask(
+					publishedLaunchSetId);
+
+			Assert.assertEquals(
+				backgroundTask.getBackgroundTaskId(),
+				latestBackgroundTask.getBackgroundTaskId());
 		}
 
 		publishedLaunchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
