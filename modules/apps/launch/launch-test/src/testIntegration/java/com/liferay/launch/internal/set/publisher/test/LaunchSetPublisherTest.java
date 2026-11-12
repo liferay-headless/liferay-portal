@@ -159,25 +159,24 @@ public class LaunchSetPublisherTest {
 					portalException.getMessage());
 			}
 
-			Map<String, String> messages = new HashMap<>();
+			List<LogEntry> logEntries = logCapture.getLogEntries();
 
-			for (LogEntry logEntry : logCapture.getLogEntries()) {
-				Throwable throwable = logEntry.getThrowable();
+			Assert.assertEquals(logEntries.toString(), 2, logEntries.size());
 
-				messages.put(logEntry.getMessage(), throwable.getMessage());
+			Map<String, LogEntry> logEntriesMap = new HashMap<>();
+
+			for (LogEntry logEntry : logEntries) {
+				logEntriesMap.put(logEntry.getMessage(), logEntry);
 			}
 
-			Assert.assertEquals(messages.toString(), 2, messages.size());
-			Assert.assertEquals(
+			_assertLogEntry(
+				PortalException.class,
 				"No launch entry manager exists for " + unknownClassName1,
-				messages.get(
-					"Unable to publish launch entry " +
-						unknownLaunchEntryObjectEntry1.getObjectEntryId()));
-			Assert.assertEquals(
+				unknownLaunchEntryObjectEntry1, logEntriesMap);
+			_assertLogEntry(
+				PortalException.class,
 				"No launch entry manager exists for " + unknownClassName2,
-				messages.get(
-					"Unable to publish launch entry " +
-						unknownLaunchEntryObjectEntry2.getObjectEntryId()));
+				unknownLaunchEntryObjectEntry2, logEntriesMap);
 		}
 
 		LaunchEntryManager launchEntryManager =
@@ -704,10 +703,23 @@ public class LaunchSetPublisherTest {
 
 		LogEntry logEntry = logEntries.get(0);
 
-		Assert.assertEquals(
+		_assertLogEntry(
+			exceptionClass, exceptionMessage, launchEntryObjectEntry,
+			HashMapBuilder.put(
+				logEntry.getMessage(), logEntry
+			).build());
+	}
+
+	private void _assertLogEntry(
+		Class<?> exceptionClass, String exceptionMessage,
+		ObjectEntry launchEntryObjectEntry,
+		Map<String, LogEntry> logEntriesMap) {
+
+		LogEntry logEntry = logEntriesMap.get(
 			"Unable to publish launch entry " +
-				launchEntryObjectEntry.getObjectEntryId(),
-			logEntry.getMessage());
+				launchEntryObjectEntry.getObjectEntryId());
+
+		Assert.assertNotNull(logEntriesMap.toString(), logEntry);
 		Assert.assertEquals("WARN", logEntry.getPriority());
 
 		Throwable throwable = logEntry.getThrowable();
