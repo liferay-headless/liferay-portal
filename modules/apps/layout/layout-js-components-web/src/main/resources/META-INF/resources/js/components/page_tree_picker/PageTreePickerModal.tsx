@@ -19,7 +19,10 @@ import createSitePageDataSource, {
 interface Props {
 	initialSelection?: SitePageTreeSelection | null;
 	onClose: () => void;
-	onSubmit: (selection: SitePageTreeSelection | null) => void;
+	onSubmit: (
+		selection: SitePageTreeSelection | null,
+		selectionCount: number | null
+	) => void;
 	pageSize?: number;
 	privateLayout: boolean;
 	rootLabel?: string;
@@ -60,6 +63,7 @@ export default function PageTreePickerModal({
 	const [entries, setEntries] = useState<
 		Array<PageTreePickerSelectionEntry<SitePage | null>>
 	>(defaultSelectedEntries);
+	const [selectionCount, setSelectionCount] = useState<number | null>(null);
 
 	return (
 		<ClayModal observer={observer} size="lg">
@@ -76,6 +80,7 @@ export default function PageTreePickerModal({
 					defaultRegisteredItems={[dataSource.getRootItem()]}
 					defaultSelectedEntries={defaultSelectedEntries}
 					onSelectionChange={setEntries}
+					onSelectionCountChange={setSelectionCount}
 				/>
 			</ClayModal.Body>
 
@@ -88,7 +93,10 @@ export default function PageTreePickerModal({
 
 						<ClayButton
 							onClick={() =>
-								onSubmit(dataSource.toSelection(entries))
+								onSubmit(
+									dataSource.toSelection(entries),
+									selectionCount
+								)
 							}
 						>
 							{Liferay.Language.get('select')}
