@@ -6,12 +6,19 @@
 import {ImportUpload, ImportUploadRequest} from '../types/importUpload';
 import ApiHelper from './ApiHelper';
 
-function deleteImportUpload(importUploadURL: string) {
-	return ApiHelper.delete(importUploadURL);
+function deleteImportUpload(
+	importUploadAPIURL: string,
+	importUploadId: string
+) {
+	return ApiHelper.delete(
+		getImportUploadURL(importUploadAPIURL, importUploadId)
+	);
 }
 
-function getImportUpload(importUploadURL: string) {
-	return ApiHelper.get<ImportUpload>(importUploadURL);
+function getImportUpload(importUploadAPIURL: string, importUploadId: string) {
+	return ApiHelper.get<ImportUpload>(
+		getImportUploadURL(importUploadAPIURL, importUploadId)
+	);
 }
 
 function getImportUploadURL(
@@ -31,14 +38,15 @@ function postImportUpload(
 }
 
 function putImportUploadChunk(
-	importUploadURL: string,
+	importUploadAPIURL: string,
+	importUploadId: string,
 	chunkIndex: number,
 	blob: Blob,
 	onProgress?: (loadedBytes: number) => void,
 	signal?: AbortSignal
 ) {
 	return ApiHelper.putBlobWithProgress<ImportUpload>(
-		`${importUploadURL}/chunks/${chunkIndex}`,
+		`${getImportUploadURL(importUploadAPIURL, importUploadId)}/chunks/${chunkIndex}`,
 		blob,
 		onProgress,
 		signal
@@ -48,7 +56,6 @@ function putImportUploadChunk(
 export default {
 	deleteImportUpload,
 	getImportUpload,
-	getImportUploadURL,
 	postImportUpload,
 	putImportUploadChunk,
 };
