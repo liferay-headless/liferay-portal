@@ -7,6 +7,7 @@ import React, {useState} from 'react';
 
 import {Wizard, WizardStep} from '../../components/Wizard';
 import {ContentSelection} from '../../components/forms/content_selector/ContentSelector';
+import ImportUploadService from '../../services/ImportUploadService';
 import {postImportProcess} from '../../services/postImportProcess';
 import {ImportPreview} from '../../types/exportImportPreview';
 import {DataStrategy, UserIdStrategy} from '../../types/exportImportProcess';
@@ -25,16 +26,16 @@ import SettingsStep, {SETTINGS_STEP_INITIAL_VALUES} from './steps/SettingsStep';
 export function NewImport({
 	backURL,
 	commentsAndRatingsEnabled = false,
-	importPreviewAPIURL,
 	importProcessAPIURL,
+	importUploadAPIURL,
 	scope,
 	siteSelectionEnabled = false,
 	spaceSelectionEnabled = false,
 }: {
 	backURL: string;
 	commentsAndRatingsEnabled?: boolean;
-	importPreviewAPIURL: string;
 	importProcessAPIURL: string;
+	importUploadAPIURL: string;
 	scope: Scope;
 	siteSelectionEnabled?: boolean;
 	spaceSelectionEnabled?: boolean;
@@ -44,21 +45,33 @@ export function NewImport({
 	>();
 
 	return (
-		<Wizard backURL={backURL}>
+		<Wizard
+			backURL={backURL}
+			onCancel={(values) => {
+				if (values.importUploadId) {
+					ImportUploadService.deleteImportUpload(
+						importUploadAPIURL,
+						values.importUploadId
+					);
+				}
+			}}
+		>
 			<WizardStep
 				initialValues={{
 					fileSelector: undefined,
+					importUploadId: undefined,
 					name: '',
 				}}
 				isStepValid={(values) =>
 					values.fileSelector instanceof File &&
+					!!values.importUploadId &&
 					!!values.name.trim() &&
 					!!importPreview
 				}
 				title={Liferay.Language.get('setup')}
 			>
 				<FileSelectionStep
-					importPreviewAPIURL={importPreviewAPIURL}
+					importUploadAPIURL={importUploadAPIURL}
 					setImportPreview={setImportPreview}
 				/>
 			</WizardStep>
@@ -116,6 +129,7 @@ export function NewImport({
 							}),
 							dataStrategy: values.dataStrategy as DataStrategy,
 							deletions: !!values.deletions,
+							importUploadId: values.importUploadId as string,
 							name: values.name,
 							permissions: !!values.permissions,
 							portletDataHandlers: toPortletDataHandlers(
