@@ -7,11 +7,12 @@ package com.liferay.mcp.server.rest.internal.upgrade.registry;
 
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.mcp.server.rest.internal.constants.MCPServerConstants;
-import com.liferay.mcp.server.rest.internal.upgrade.MCPProfileDataMaskUpgradeProcess;
-import com.liferay.mcp.server.rest.internal.upgrade.MCPProfileStatusUpgradeProcess;
-import com.liferay.mcp.server.rest.internal.upgrade.MCPProfileToolUpgradeProcess;
-import com.liferay.mcp.server.rest.internal.upgrade.MCPProfileUpgradeProcess;
-import com.liferay.mcp.server.rest.internal.upgrade.MCPPromptUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerProfileDataMaskUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerProfilePathUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerProfileStatusUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerProfileToolUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerProfileUpgradeProcess;
+import com.liferay.mcp.server.rest.internal.upgrade.MCPServerPromptUpgradeProcess;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -43,7 +44,7 @@ public class MCPServerRestUpgradeStepRegistrator
 
 		registry.register(
 			"0.0.1", "1.0.0",
-			new MCPPromptUpgradeProcess(
+			new MCPServerPromptUpgradeProcess(
 				_companyLocalService, _listTypeDefinitionLocalService,
 				_objectDefinitionLocalService, _objectEntryLocalService,
 				_objectFieldLocalService, _objectFieldSettingLocalService,
@@ -51,13 +52,13 @@ public class MCPServerRestUpgradeStepRegistrator
 
 		registry.register(
 			"1.0.0", "1.1.0",
-			new MCPProfileDataMaskUpgradeProcess(
+			new MCPServerProfileDataMaskUpgradeProcess(
 				_companyLocalService, _filterFactory,
 				_objectDefinitionLocalService, _objectEntryLocalService));
 
 		registry.register(
 			"1.1.0", "1.2.0",
-			new MCPProfileUpgradeProcess(
+			new MCPServerProfileUpgradeProcess(
 				_companyLocalService, _listTypeDefinitionLocalService,
 				_objectDefinitionLocalService, _objectEntryLocalService,
 				_objectFieldLocalService, _objectFieldSettingLocalService,
@@ -65,15 +66,16 @@ public class MCPServerRestUpgradeStepRegistrator
 
 		registry.register(
 			"1.2.0", "1.3.0",
-			new MCPProfileToolUpgradeProcess(
+			new MCPServerProfileToolUpgradeProcess(
 				_companyLocalService, _objectDefinitionLocalService,
 				_objectFieldLocalService));
 
 		registry.register(
 			"1.3.0", "1.4.0",
-			new MCPProfileStatusUpgradeProcess(
+			new MCPServerProfileStatusUpgradeProcess(
 				_companyLocalService, _objectDefinitionLocalService,
-				_objectEntryLocalService, _objectRelationshipLocalService));
+				_objectEntryLocalService, _objectFieldLocalService,
+				_objectRelationshipLocalService));
 
 		registry.register(
 			"1.4.0", "1.5.0",
@@ -93,6 +95,14 @@ public class MCPServerRestUpgradeStepRegistrator
 					MCPServerConstants.
 						EXTERNAL_REFERENCE_CODE_MCP_SERVER_PROMPT,
 					"')")));
+
+		registry.register(
+			"1.5.0", "1.6.0",
+			new MCPServerProfilePathUpgradeProcess(
+				_companyLocalService, _objectDefinitionLocalService,
+				_objectEntryLocalService, _objectFieldLocalService,
+				_objectFieldSettingLocalService,
+				_objectValidationRuleLocalService));
 	}
 
 	@Reference

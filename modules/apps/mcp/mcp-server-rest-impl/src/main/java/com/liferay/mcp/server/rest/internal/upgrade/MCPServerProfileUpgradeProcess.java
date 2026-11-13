@@ -10,6 +10,7 @@ import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.mcp.server.rest.internal.constants.MCPServerConstants;
+import com.liferay.mcp.server.rest.internal.upgrade.util.MCPServerProfileUpgradeProcessUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
@@ -58,9 +59,9 @@ import java.util.Set;
 /**
  * @author Alberto Javier Moreno Lage
  */
-public class MCPProfileUpgradeProcess extends UpgradeProcess {
+public class MCPServerProfileUpgradeProcess extends UpgradeProcess {
 
-	public MCPProfileUpgradeProcess(
+	public MCPServerProfileUpgradeProcess(
 		CompanyLocalService companyLocalService,
 		ListTypeDefinitionLocalService listTypeDefinitionLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
@@ -539,6 +540,11 @@ public class MCPProfileUpgradeProcess extends UpgradeProcess {
 				values.put("profileStatus", "inactive");
 			}
 
+			MCPServerProfileUpgradeProcessUtil.putProfilePath(
+				objectEntry.getExternalReferenceCode(),
+				objectDefinition.getObjectDefinitionId(),
+				_objectFieldLocalService, values);
+
 			_objectEntryLocalService.updateObjectEntry(
 				objectEntry.getUserId(), objectEntry.getObjectEntryId(),
 				objectEntry.getObjectEntryFolderId(), values,
@@ -592,7 +598,7 @@ public class MCPProfileUpgradeProcess extends UpgradeProcess {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		MCPProfileUpgradeProcess.class);
+		MCPServerProfileUpgradeProcess.class);
 
 	private static final Map<String, String>
 		_defaultProfileToolExternalReferenceCodes = HashMapBuilder.put(

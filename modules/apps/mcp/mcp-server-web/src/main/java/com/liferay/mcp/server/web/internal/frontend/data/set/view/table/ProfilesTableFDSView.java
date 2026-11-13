@@ -39,7 +39,9 @@ public class ProfilesTableFDSView extends BaseTableFDSView {
 				true
 			)
 		).add(
-			"friendlyUrlPath", "path"
+			"profilePath", "url",
+			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
+				"profilePathRenderer")
 		).add(
 			"description", "description"
 		).add(
