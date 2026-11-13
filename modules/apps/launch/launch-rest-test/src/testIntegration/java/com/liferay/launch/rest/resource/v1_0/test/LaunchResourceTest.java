@@ -6,6 +6,7 @@
 package com.liferay.launch.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.launch.rest.client.resource.v1_0.LaunchResource;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -15,6 +16,7 @@ import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlag;
@@ -81,6 +84,7 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 		_testPostLaunchPublishWithFeatureFlagDisabled();
 		_testPostLaunchPublishWithMissingLaunch();
 		_testPostLaunchPublishWithScheduledLaunch();
+		_testPostLaunchPublishWithoutViewPermission();
 	}
 
 	private ObjectEntry _addLaunchSetObjectEntry() throws Exception {
@@ -105,6 +109,7 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 			ServiceContextTestUtil.getServiceContext(
 				testGroup.getGroupId(), TestPropsValues.getUserId());
 
+		serviceContext.setAddGuestPermissions(false);
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		return _objectEntryLocalService.addObjectEntry(
@@ -217,6 +222,33 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 		finally {
 			_launchSetPublisher.unschedulePublish(launchSetId);
 		}
+	}
+
+	private void _testPostLaunchPublishWithoutViewPermission()
+		throws Exception {
+
+		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(testCompany, password);
+
+		LaunchResource launchResource = LaunchResource.builder(
+		).authentication(
+			user.getEmailAddress(), password
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
+
+		long launchSetId = launchSetObjectEntry.getObjectEntryId();
+
+		assertHttpResponseStatusCode(
+			403, launchResource.postLaunchPublishHttpResponse(launchSetId));
+
+		_assertStatus(launchSetId, WorkflowConstants.STATUS_DRAFT);
 	}
 
 	private static final String _TASK_EXECUTOR_CLASS_NAME =
