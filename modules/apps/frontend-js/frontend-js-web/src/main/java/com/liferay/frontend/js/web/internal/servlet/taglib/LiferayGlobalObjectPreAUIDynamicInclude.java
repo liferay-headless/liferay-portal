@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlag;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManager;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.launch.LaunchEditThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -632,6 +633,8 @@ public class LiferayGlobalObjectPreAUIDynamicInclude
 		_renderMethod(
 			"getDoAsUserIdEncoded", sb,
 			UnicodeFormatter.toString(themeDisplay.getDoAsUserId()));
+		_renderMethod(
+			"getEditLaunchSetId", sb, LaunchEditThreadLocal.getLaunchSetId());
 		_renderMethod(
 			"getLanguageId", sb, _language.getLanguageId(httpServletRequest));
 		_renderMethod("getParentGroupId", sb, themeDisplay.getSiteGroupId());
