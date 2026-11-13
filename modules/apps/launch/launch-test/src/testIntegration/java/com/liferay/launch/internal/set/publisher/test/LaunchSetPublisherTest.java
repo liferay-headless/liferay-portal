@@ -575,14 +575,34 @@ public class LaunchSetPublisherTest {
 		_launchSetPublisher.schedulePublish(
 			date, launchSetId, TestPropsValues.getUserId());
 
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertScheduledDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId);
 
 		Assert.assertThrows(
 			PortalException.class,
 			() -> _launchSetPublisher.schedulePublish(
 				new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
 				TestPropsValues.getUserId()));
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertScheduledDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId);
+
+		// Failed launch set
+
+		ObjectEntry failedLaunchSetObjectEntry =
+			_addFailedLaunchSetObjectEntry();
+
+		long failedLaunchSetId = failedLaunchSetObjectEntry.getObjectEntryId();
+
+		date = new Date(System.currentTimeMillis() + Time.DAY);
+
+		_launchSetPublisher.schedulePublish(
+			date, failedLaunchSetId, TestPropsValues.getUserId());
+
+		_assertPublishErrorsCount(1, failedLaunchSetId);
+		_assertScheduledDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, failedLaunchSetId);
+
+		_launchSetPublisher.unschedulePublish(failedLaunchSetId);
 	}
 
 	@Test
@@ -600,7 +620,8 @@ public class LaunchSetPublisherTest {
 
 		_launchSetPublisher.unschedulePublish(launchSetId);
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertScheduledDateAndStatus(
+			null, WorkflowConstants.STATUS_DRAFT, launchSetId);
 
 		_launchSetPublisher.schedulePublish(
 			new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
@@ -608,14 +629,63 @@ public class LaunchSetPublisherTest {
 
 		_launchSetPublisher.unschedulePublish(launchSetId);
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertScheduledDateAndStatus(
+			null, WorkflowConstants.STATUS_DRAFT, launchSetId);
 
 		Date date = new Date(System.currentTimeMillis() + Time.WEEK);
 
 		_launchSetPublisher.schedulePublish(
 			date, launchSetId, TestPropsValues.getUserId());
 
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertScheduledDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId);
+
+		// Failed launch set
+
+		ObjectEntry failedLaunchSetObjectEntry =
+			_addFailedLaunchSetObjectEntry();
+
+		long failedLaunchSetId = failedLaunchSetObjectEntry.getObjectEntryId();
+
+		_launchSetPublisher.schedulePublish(
+			new Date(System.currentTimeMillis() + Time.DAY), failedLaunchSetId,
+			TestPropsValues.getUserId());
+
+		_launchSetPublisher.unschedulePublish(failedLaunchSetId);
+
+		_assertPublishErrorsCount(1, failedLaunchSetId);
+		_assertScheduledDateAndStatus(
+			null, WorkflowConstants.STATUS_DRAFT, failedLaunchSetId);
+	}
+
+	private ObjectEntry _addFailedLaunchSetObjectEntry() throws Exception {
+		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		String className = RandomTestUtil.randomString();
+
+		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
+			launchSetObjectEntry.getObjectEntryId(), className,
+			RandomTestUtil.randomInt(), RandomTestUtil.randomString());
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.launch.internal.set.publisher." +
+					"LaunchSetPublisherImpl",
+				LoggerTestUtil.WARN)) {
+
+			Assert.assertThrows(
+				PortalException.class,
+				() -> _launchSetPublisher.publish(
+					launchSetObjectEntry.getObjectEntryId()));
+
+			_assertLogEntry(
+				PortalException.class,
+				"No launch entry manager exists for " + className,
+				launchEntryObjectEntry, logCapture);
+		}
+
+		_assertPublishErrorsCount(1, launchSetObjectEntry.getObjectEntryId());
+
+		return launchSetObjectEntry;
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(
@@ -728,6 +798,18 @@ public class LaunchSetPublisherTest {
 		Assert.assertEquals(exceptionMessage, throwable.getMessage());
 	}
 
+	private void _assertPublishErrorsCount(
+			long expectedPublishErrorsCount, long launchSetId)
+		throws Exception {
+
+		Assert.assertEquals(
+			expectedPublishErrorsCount,
+			MapUtil.getLong(
+				_getValues(
+					_objectEntryLocalService.getObjectEntry(launchSetId)),
+				"publishErrorsCount"));
+	}
+
 	private void _assertPublished(
 			long draftId, ObjectEntry launchEntryObjectEntry,
 			LaunchEntryManager launchEntryManager,
@@ -747,10 +829,8 @@ public class LaunchSetPublisherTest {
 	}
 
 	private void _assertScheduledDateAndStatus(
-			Date expectedDate, int expectedStatus)
+			Date expectedDate, int expectedStatus, long launchSetId)
 		throws Exception {
-
-		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
 
 		ObjectEntry launchSetObjectEntry =
 			_objectEntryLocalService.getObjectEntry(launchSetId);

@@ -179,6 +179,26 @@ public class LaunchSetScheduledPublishMessageListenerTest {
 		_assertBackgroundTasks(3, BackgroundTaskConstants.STATUS_FAILED);
 		_assertLaunchSetError(launchEntryObjectEntry.getObjectEntryId());
 		_assertStatus(WorkflowConstants.STATUS_DRAFT);
+
+		// Scheduled launch set with errors of a previous publish
+
+		_objectEntryLocalService.deleteObjectEntry(launchEntryObjectEntry);
+
+		_updateStatus(WorkflowConstants.STATUS_SCHEDULED);
+
+		_receive(_launchSetObjectEntry.getObjectEntryId());
+
+		_assertBackgroundTasks(4, BackgroundTaskConstants.STATUS_SUCCESSFUL);
+		_assertStatus(WorkflowConstants.STATUS_APPROVED);
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			0,
+			MapUtil.getLong(
+				launchSetObjectEntry.getValues(), "publishErrorsCount"));
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(
