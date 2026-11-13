@@ -5,6 +5,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
 import {openConfirmModal} from 'frontend-js-components-web';
 import React, {useRef} from 'react';
 
@@ -36,8 +37,14 @@ export default function LaunchPublishButton({
 
 	return (
 		<form action={publishLaunchURL} method="post" ref={formRef}>
+			{launchStatus === 'failed' && (
+				<ClayLabel className="mr-2" displayType="danger">
+					{Liferay.Language.get('failed')}
+				</ClayLabel>
+			)}
+
 			<ClayButton
-				disabled={launchStatus !== 'open'}
+				disabled={launchStatus !== 'failed' && launchStatus !== 'open'}
 				displayType="primary"
 				onClick={handleClick}
 				small
@@ -48,11 +55,9 @@ export default function LaunchPublishButton({
 					symbol="rocket"
 				/>
 
-				{launchStatus === 'failed'
-					? Liferay.Language.get('failed')
-					: launchStatus === 'published'
-						? Liferay.Language.get('published')
-						: Liferay.Language.get('publish')}
+				{launchStatus === 'published'
+					? Liferay.Language.get('published')
+					: Liferay.Language.get('publish')}
 			</ClayButton>
 		</form>
 	);

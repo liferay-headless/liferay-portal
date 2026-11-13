@@ -76,7 +76,7 @@ export default function LaunchScheduleButton({
 		);
 	}
 
-	if (launchStatus !== 'open') {
+	if (launchStatus !== 'failed' && launchStatus !== 'open') {
 		return null;
 	}
 
