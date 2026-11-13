@@ -12,7 +12,7 @@ import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.ws.rs.core.Response;
@@ -34,8 +34,7 @@ public class LaunchResourceImpl extends BaseLaunchResourceImpl {
 
 	@Override
 	public Response postLaunchPublish(Long launchId) throws Exception {
-		ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
-			launchId);
+		ObjectEntry objectEntry = _objectEntryService.getObjectEntry(launchId);
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
@@ -66,6 +65,6 @@ public class LaunchResourceImpl extends BaseLaunchResourceImpl {
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
+	private ObjectEntryService _objectEntryService;
 
 }
