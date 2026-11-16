@@ -51,7 +51,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		if (launchSetObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_APPROVED) {
 
-			throw new LaunchSetPublishException.MustNotBePublished(launchSetId);
+			throw new LaunchSetPublishException.MustNotBePublished(
+				launchSetId, launchSetObjectEntry.getTitleValue());
 		}
 
 		String name = String.valueOf(launchSetId);
@@ -63,7 +64,7 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 		if (backgroundTasksCount > 0) {
 			throw new LaunchSetPublishException.MustNotBePublishing(
-				launchSetId);
+				launchSetId, launchSetObjectEntry.getTitleValue());
 		}
 
 		_backgroundTaskManager.addBackgroundTask(

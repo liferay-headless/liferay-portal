@@ -7,38 +7,66 @@ package com.liferay.launch.set.publisher;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Alberto Moreno
  */
 public class LaunchSetPublishException extends PortalException {
 
+	public List<Object> getArguments() {
+		return _arguments;
+	}
+
+	public String getMessageKey() {
+		return _messageKey;
+	}
+
 	public static class MustNotBePublished extends LaunchSetPublishException {
 
-		public MustNotBePublished(long launchSetId) {
-			super("Launch set " + launchSetId + " was already published");
+		public MustNotBePublished(long launchSetId, String launchSetName) {
+			super(
+				launchSetName,
+				"Launch set " + launchSetId + " was already published",
+				"the-launch-x-was-already-published");
 		}
 
 	}
 
 	public static class MustNotBePublishing extends LaunchSetPublishException {
 
-		public MustNotBePublishing(long launchSetId) {
-			super("Launch set " + launchSetId + " is already being published");
+		public MustNotBePublishing(long launchSetId, String launchSetName) {
+			super(
+				launchSetName,
+				"Launch set " + launchSetId + " is already being published",
+				"the-launch-x-is-already-being-published");
 		}
 
 	}
 
 	public static class MustNotBeScheduled extends LaunchSetPublishException {
 
-		public MustNotBeScheduled(long launchSetId) {
+		public MustNotBeScheduled(long launchSetId, String launchSetName) {
 			super(
-				"Launch set " + launchSetId + " is scheduled to be published");
+				launchSetName,
+				"Launch set " + launchSetId + " is scheduled to be published",
+				"the-launch-x-is-scheduled-to-be-published");
 		}
 
 	}
 
-	private LaunchSetPublishException(String msg) {
-		super(msg);
+	private LaunchSetPublishException(
+		String launchSetName, String message, String messageKey) {
+
+		super(message);
+
+		_messageKey = messageKey;
+
+		_arguments = Collections.singletonList(launchSetName);
 	}
+
+	private final List<Object> _arguments;
+	private final String _messageKey;
 
 }
