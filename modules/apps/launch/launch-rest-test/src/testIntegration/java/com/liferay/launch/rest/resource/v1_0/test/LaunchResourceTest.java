@@ -6,6 +6,7 @@
 package com.liferay.launch.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.launch.rest.client.http.HttpInvoker;
 import com.liferay.launch.rest.client.resource.v1_0.LaunchResource;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
@@ -16,6 +17,9 @@ import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.Sync;
@@ -119,6 +123,26 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 			serviceContext);
 	}
 
+	private void _assertPostLaunchPublishConflict(
+			ObjectEntry launchSetObjectEntry, String messageKey)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			launchResource.postLaunchPublishHttpResponse(
+				launchSetObjectEntry.getObjectEntryId());
+
+		assertHttpResponseStatusCode(409, httpResponse);
+
+		JSONObject jsonObject = _jsonFactory.createJSONObject(
+			httpResponse.getContent());
+
+		Assert.assertEquals(
+			_language.format(
+				LocaleUtil.getDefault(), messageKey,
+				launchSetObjectEntry.getTitleValue(), false),
+			jsonObject.getString("title"));
+	}
+
 	private void _assertStatus(long launchSetId, int expectedStatus)
 		throws Exception {
 
@@ -154,8 +178,8 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 			BackgroundTaskConstants.STATUS_SUCCESSFUL,
 			backgroundTask.getStatus());
 
-		assertHttpResponseStatusCode(
-			409, launchResource.postLaunchPublishHttpResponse(launchSetId));
+		_assertPostLaunchPublishConflict(
+			launchSetObjectEntry, "the-launch-x-was-already-published");
 	}
 
 	private void _testPostLaunchPublishWithFeatureFlagDisabled()
@@ -214,8 +238,9 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 			TestPropsValues.getUserId());
 
 		try {
-			assertHttpResponseStatusCode(
-				409, launchResource.postLaunchPublishHttpResponse(launchSetId));
+			_assertPostLaunchPublishConflict(
+				launchSetObjectEntry,
+				"the-launch-x-is-scheduled-to-be-published");
 
 			_assertStatus(launchSetId, WorkflowConstants.STATUS_SCHEDULED);
 		}
@@ -257,6 +282,12 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 
 	@Inject
 	private BackgroundTaskManager _backgroundTaskManager;
+
+	@Inject
+	private JSONFactory _jsonFactory;
+
+	@Inject
+	private Language _language;
 
 	@Inject
 	private LaunchSetPublisher _launchSetPublisher;
