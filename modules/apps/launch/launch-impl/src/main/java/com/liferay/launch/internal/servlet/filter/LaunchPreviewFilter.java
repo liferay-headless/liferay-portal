@@ -7,6 +7,7 @@ package com.liferay.launch.internal.servlet.filter;
 
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
+import com.liferay.launch.set.permission.LaunchSetPreviewPermission;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -29,6 +30,9 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -112,6 +116,20 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 			_portal.sendError(
 				new PrincipalException.MustBeAuthenticated(
 					(user == null) ? 0 : user.getUserId()),
+				httpServletRequest, httpServletResponse);
+
+			return;
+		}
+
+		PermissionChecker permissionChecker =
+			PermissionCheckerFactoryUtil.create(user);
+
+		if (!_launchSetPreviewPermission.contains(
+				permissionChecker, previewLaunchSetId)) {
+
+			_portal.sendError(
+				new PrincipalException.MustHavePermission(
+					permissionChecker, ActionKeys.VIEW),
 				httpServletRequest, httpServletResponse);
 
 			return;
@@ -294,6 +312,9 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 
 	@Reference
 	private LaunchEntryManagerRegistry _launchEntryManagerRegistry;
+
+	@Reference
+	private LaunchSetPreviewPermission _launchSetPreviewPermission;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
