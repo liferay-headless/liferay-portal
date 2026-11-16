@@ -229,6 +229,8 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 
 		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
 
+		long launchSetId = launchSetObjectEntry.getObjectEntryId();
+
 		String password = RandomTestUtil.randomString();
 
 		User user = UserTestUtil.addUser(testCompany, password);
@@ -242,8 +244,6 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 		).locale(
 			LocaleUtil.getDefault()
 		).build();
-
-		long launchSetId = launchSetObjectEntry.getObjectEntryId();
 
 		assertHttpResponseStatusCode(
 			403, launchResource.postLaunchPublishHttpResponse(launchSetId));
