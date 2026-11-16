@@ -12,7 +12,32 @@ import com.liferay.portal.kernel.exception.PortalException;
  */
 public class LaunchSetPublishException extends PortalException {
 
-	public LaunchSetPublishException(String msg) {
+	public static class MustNotBePublished extends LaunchSetPublishException {
+
+		public MustNotBePublished(long launchSetId) {
+			super("Launch set " + launchSetId + " was already published");
+		}
+
+	}
+
+	public static class MustNotBePublishing extends LaunchSetPublishException {
+
+		public MustNotBePublishing(long launchSetId) {
+			super("Launch set " + launchSetId + " is already being published");
+		}
+
+	}
+
+	public static class MustNotBeScheduled extends LaunchSetPublishException {
+
+		public MustNotBeScheduled(long launchSetId) {
+			super(
+				"Launch set " + launchSetId + " is scheduled to be published");
+		}
+
+	}
+
+	private LaunchSetPublishException(String msg) {
 		super(msg);
 	}
 

@@ -48,8 +48,7 @@ public class LaunchResourceImpl extends BaseLaunchResourceImpl {
 		}
 
 		if (objectEntry.getStatus() == WorkflowConstants.STATUS_SCHEDULED) {
-			throw new LaunchSetPublishException(
-				"Launch set " + launchId + " is scheduled to be published");
+			throw new LaunchSetPublishException.MustNotBeScheduled(launchId);
 		}
 
 		_launchSetPublisher.publish(launchId, contextUser.getUserId());
