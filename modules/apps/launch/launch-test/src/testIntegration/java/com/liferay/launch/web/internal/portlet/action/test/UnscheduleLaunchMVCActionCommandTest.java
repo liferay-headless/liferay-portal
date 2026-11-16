@@ -101,6 +101,25 @@ public class UnscheduleLaunchMVCActionCommandTest {
 			).build(),
 			serviceContext);
 
+		objectDefinition = _objectDefinitionLocalService.getObjectDefinition(
+			TestPropsValues.getCompanyId(), "LaunchEntry");
+
+		_objectEntryLocalService.addObjectEntry(
+			0, TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
+			HashMapBuilder.<String, Serializable>put(
+				"baseVersionKey", RandomTestUtil.randomString()
+			).put(
+				"className", RandomTestUtil.randomString()
+			).put(
+				"classPK", RandomTestUtil.randomInt()
+			).put(
+				"r_launchSetToLaunchEntries_c_launchSetId",
+				_launchSetObjectEntry.getObjectEntryId()
+			).build(),
+			serviceContext);
+
 		ServiceContextThreadLocal.pushServiceContext(
 			ServiceContextTestUtil.getServiceContext(
 				TestPropsValues.getGroupId(), TestPropsValues.getUserId()));
