@@ -23,6 +23,18 @@ public class LaunchSetPublishException extends PortalException {
 		return _messageKey;
 	}
 
+	public static class MustHaveLaunchEntries
+		extends LaunchSetPublishException {
+
+		public MustHaveLaunchEntries(long launchSetId, String launchSetName) {
+			super(
+				launchSetName,
+				"Launch set " + launchSetId + " has no launch entries",
+				"the-launch-x-must-contain-at-least-one-asset");
+		}
+
+	}
+
 	public static class MustNotBePublished extends LaunchSetPublishException {
 
 		public MustNotBePublished(long launchSetId, String launchSetName) {
