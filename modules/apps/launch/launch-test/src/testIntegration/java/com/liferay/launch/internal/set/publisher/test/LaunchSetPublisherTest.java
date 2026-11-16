@@ -12,6 +12,7 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
+import com.liferay.launch.set.publisher.LaunchSetPublishException;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
@@ -49,7 +50,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -327,7 +327,9 @@ public class LaunchSetPublisherTest {
 				// The background task does not run until the transaction
 				// commits, so it is still unfinished
 
-				_assertPublishFails(launchSetId, "is already being published");
+				_assertPublishFails(
+					LaunchSetPublishException.MustNotBePublishing.class,
+					launchSetId);
 
 				return null;
 			});
@@ -395,7 +397,8 @@ public class LaunchSetPublisherTest {
 
 		// Launch set that was already published
 
-		_assertPublishFails(launchSetId, "was already published");
+		_assertPublishFails(
+			LaunchSetPublishException.MustNotBePublished.class, launchSetId);
 
 		_assertBackgroundTaskStatuses(
 			launchSetId, BackgroundTaskConstants.STATUS_FAILED,
@@ -597,14 +600,14 @@ public class LaunchSetPublisherTest {
 		}
 	}
 
-	private void _assertPublishFails(long launchSetId, String messageSuffix) {
-		PortalException portalException = Assert.assertThrows(
-			PortalException.class,
+	private void _assertPublishFails(
+		Class<? extends LaunchSetPublishException> exceptionClass,
+		long launchSetId) {
+
+		Assert.assertThrows(
+			exceptionClass,
 			() -> _launchSetPublisher.publish(
 				launchSetId, TestPropsValues.getUserId()));
-
-		Assert.assertTrue(
-			StringUtil.endsWith(portalException.getMessage(), messageSuffix));
 	}
 
 	private void _assertPublished(
