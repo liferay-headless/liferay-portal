@@ -463,6 +463,14 @@ public class LaunchSetPublisherTest {
 	public void testSchedulePublish() throws Exception {
 		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
 
+		Assert.assertThrows(
+			LaunchSetPublishException.MustHaveLaunchEntries.class,
+			() -> _launchSetPublisher.schedulePublish(
+				new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
+				TestPropsValues.getUserId()));
+
+		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+
 		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
 			launchSetId, RandomTestUtil.randomString(),
 			RandomTestUtil.randomInt(), RandomTestUtil.randomString());

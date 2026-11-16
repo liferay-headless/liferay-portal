@@ -124,6 +124,21 @@ public class ScheduleLaunchMVCActionCommandTest {
 
 		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
 
+		// Empty launch
+
+		jsonObject = _processAction(
+			System.currentTimeMillis() + Time.DAY, TestPropsValues.getUser());
+
+		Assert.assertEquals(
+			_language.format(
+				LocaleUtil.US, "the-launch-x-must-contain-at-least-one-asset",
+				_launchSetObjectEntry.getTitleValue(), false),
+			jsonObject.getString("validationError"));
+
+		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+
+		_addLaunchEntryObjectEntry();
+
 		// External redirect
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
@@ -219,6 +234,34 @@ public class ScheduleLaunchMVCActionCommandTest {
 
 		_assertScheduledDateAndStatus(
 			new Date(publishTime), WorkflowConstants.STATUS_SCHEDULED);
+	}
+
+	private void _addLaunchEntryObjectEntry() throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), "LaunchEntry");
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		_objectEntryLocalService.addObjectEntry(
+			0, TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
+			HashMapBuilder.<String, Serializable>put(
+				"baseVersionKey", RandomTestUtil.randomString()
+			).put(
+				"className", RandomTestUtil.randomString()
+			).put(
+				"classPK", RandomTestUtil.randomInt()
+			).put(
+				"r_launchSetToLaunchEntries_c_launchSetId",
+				_launchSetObjectEntry.getObjectEntryId()
+			).build(),
+			serviceContext);
 	}
 
 	private void _assertScheduledDateAndStatus(
