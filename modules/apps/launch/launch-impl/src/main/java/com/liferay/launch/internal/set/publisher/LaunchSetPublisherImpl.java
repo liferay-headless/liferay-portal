@@ -57,20 +57,11 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				"Launch set " + launchSetId + " was already published");
 		}
 
-		String name = String.valueOf(launchSetId);
-
-		int backgroundTasksCount =
-			_backgroundTaskManager.getBackgroundTasksCount(
-				BackgroundTaskConstants.GROUP_ID_DEFAULT, name,
-				LaunchSetPublishBackgroundTaskExecutor.class.getName(), false);
-
-		if (backgroundTasksCount > 0) {
-			throw new PortalException(
-				"Launch set " + launchSetId + " is already being published");
-		}
+		_validateNotBeingPublished(launchSetId);
 
 		_backgroundTaskManager.addBackgroundTask(
-			userId, BackgroundTaskConstants.GROUP_ID_DEFAULT, name, null,
+			userId, BackgroundTaskConstants.GROUP_ID_DEFAULT,
+			String.valueOf(launchSetId), null,
 			LaunchSetPublishBackgroundTaskExecutor.class,
 			HashMapBuilder.<String, Serializable>put(
 				"launchSetId", launchSetId
@@ -101,6 +92,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				"Launch set " + launchSetId +
 					" must be scheduled for a future date");
 		}
+
+		_validateNotBeingPublished(launchSetId);
 
 		_deleteLaunchSetErrors(launchSetObjectEntry);
 
@@ -227,6 +220,21 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 			userId, launchSetObjectEntry.getObjectEntryId(),
 			launchSetObjectEntry.getObjectEntryFolderId(), values,
 			serviceContext);
+	}
+
+	private void _validateNotBeingPublished(long launchSetId)
+		throws PortalException {
+
+		int backgroundTasksCount =
+			_backgroundTaskManager.getBackgroundTasksCount(
+				BackgroundTaskConstants.GROUP_ID_DEFAULT,
+				String.valueOf(launchSetId),
+				LaunchSetPublishBackgroundTaskExecutor.class.getName(), false);
+
+		if (backgroundTasksCount > 0) {
+			throw new PortalException(
+				"Launch set " + launchSetId + " is already being published");
+		}
 	}
 
 	@Reference
