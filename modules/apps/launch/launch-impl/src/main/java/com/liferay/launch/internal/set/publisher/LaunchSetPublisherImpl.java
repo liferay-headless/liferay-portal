@@ -113,6 +113,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		message.put("launchSetId", launchSetId);
 		message.put("userId", userId);
 
+		_deleteJob(launchSetObjectEntry);
+
 		_schedulerEngineHelper.schedule(
 			_triggerFactory.createTrigger(
 				_getJobName(launchSetObjectEntry),
@@ -143,10 +145,7 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				null, launchSetObjectEntry, serviceContext, userId);
 		}
 
-		_schedulerEngineHelper.delete(
-			_getJobName(launchSetObjectEntry),
-			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
-			StorageType.PERSISTED);
+		_deleteJob(launchSetObjectEntry);
 	}
 
 	private ServiceContext _createServiceContext(
@@ -159,6 +158,15 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		return serviceContext;
+	}
+
+	private void _deleteJob(ObjectEntry launchSetObjectEntry)
+		throws PortalException {
+
+		_schedulerEngineHelper.delete(
+			_getJobName(launchSetObjectEntry),
+			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
+			StorageType.PERSISTED);
 	}
 
 	private void _deleteLaunchSetErrors(ObjectEntry launchSetObjectEntry)
