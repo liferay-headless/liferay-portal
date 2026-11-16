@@ -38,10 +38,18 @@ public class LaunchSetPublishExceptionMapper
 	protected Problem getProblem(
 		LaunchSetPublishException launchSetPublishException) {
 
+		Response.Status status = Response.Status.CONFLICT;
+
+		if (launchSetPublishException instanceof
+				LaunchSetPublishException.MustHaveLaunchEntries) {
+
+			status = Response.Status.BAD_REQUEST;
+		}
+
 		List<Object> arguments = launchSetPublishException.getArguments();
 
 		return new Problem(
-			Response.Status.CONFLICT,
+			status,
 			_language.format(
 				_acceptLanguage.getPreferredLocale(),
 				launchSetPublishException.getMessageKey(), arguments.toArray(),

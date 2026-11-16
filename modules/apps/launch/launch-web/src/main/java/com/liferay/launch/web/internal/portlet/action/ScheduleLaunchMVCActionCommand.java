@@ -5,11 +5,14 @@
 
 package com.liferay.launch.web.internal.portlet.action;
 
+import com.liferay.launch.set.publisher.LaunchSetPublishException;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.launch.web.internal.constants.LaunchPortletKeys;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -68,8 +71,28 @@ public class ScheduleLaunchMVCActionCommand extends BaseLaunchMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_launchSetPublisher.schedulePublish(
-			publishDate, launchSetId, themeDisplay.getUserId());
+		try {
+			_launchSetPublisher.schedulePublish(
+				publishDate, launchSetId, themeDisplay.getUserId());
+		}
+		catch (LaunchSetPublishException launchSetPublishException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(launchSetPublishException);
+			}
+
+			JSONPortletResponseUtil.writeJSON(
+				actionRequest, actionResponse,
+				JSONUtil.put(
+					"validationError",
+					language.format(
+						portal.getHttpServletRequest(actionRequest),
+						launchSetPublishException.getMessageKey(),
+						launchSetPublishException.getArguments(
+						).toArray(),
+						false)));
+
+			return;
+		}
 
 		JSONPortletResponseUtil.writeJSON(
 			actionRequest, actionResponse,
@@ -78,6 +101,9 @@ public class ScheduleLaunchMVCActionCommand extends BaseLaunchMVCActionCommand {
 				portal.escapeRedirect(
 					ParamUtil.getString(actionRequest, "redirect"))));
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ScheduleLaunchMVCActionCommand.class);
 
 	@Reference
 	private LaunchSetPublisher _launchSetPublisher;

@@ -11,8 +11,10 @@ import com.liferay.launch.set.publisher.LaunchSetPublishException;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -98,6 +100,22 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 			throw new PortalException(
 				"Launch set " + launchSetId +
 					" must be scheduled for a future date");
+		}
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				launchSetObjectEntry.getObjectDefinitionId(),
+				"launchSetToLaunchEntries");
+
+		int launchEntryObjectEntriesCount =
+			_objectEntryLocalService.getOneToManyObjectEntriesCount(
+				launchSetObjectEntry.getGroupId(),
+				objectRelationship.getObjectRelationshipId(), null,
+				launchSetObjectEntry.getObjectEntryId(), true, null);
+
+		if (launchEntryObjectEntriesCount == 0) {
+			throw new LaunchSetPublishException.MustHaveLaunchEntries(
+				launchSetId, launchSetObjectEntry.getTitleValue());
 		}
 
 		ServiceContext serviceContext = _createServiceContext(
@@ -213,6 +231,9 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
