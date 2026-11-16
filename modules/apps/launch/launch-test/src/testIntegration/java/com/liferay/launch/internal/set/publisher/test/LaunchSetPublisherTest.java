@@ -180,6 +180,10 @@ public class LaunchSetPublisherTest {
 		long unscheduledLaunchSetId =
 			unscheduledLaunchSetObjectEntry.getObjectEntryId();
 
+		_addLaunchEntryObjectEntry(
+			unscheduledLaunchSetId, RandomTestUtil.randomString(),
+			RandomTestUtil.randomInt(), RandomTestUtil.randomString());
+
 		_launchSetPublisher.schedulePublish(
 			new Date(System.currentTimeMillis() + Time.DAY),
 			unscheduledLaunchSetId, TestPropsValues.getUserId());

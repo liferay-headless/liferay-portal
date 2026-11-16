@@ -233,6 +233,16 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 
 		long launchSetId = launchSetObjectEntry.getObjectEntryId();
 
+		_addObjectEntry(
+			"LaunchEntry",
+			HashMapBuilder.<String, Serializable>put(
+				"className", RandomTestUtil.randomString()
+			).put(
+				"classPK", RandomTestUtil.randomInt()
+			).put(
+				"r_launchSetToLaunchEntries_c_launchSetId", launchSetId
+			).build());
+
 		_launchSetPublisher.schedulePublish(
 			new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
 			TestPropsValues.getUserId());
