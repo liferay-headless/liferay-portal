@@ -15,6 +15,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 
+import java.util.List;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -36,13 +38,13 @@ public class LaunchSetPublishExceptionMapper
 	protected Problem getProblem(
 		LaunchSetPublishException launchSetPublishException) {
 
+		List<Object> arguments = launchSetPublishException.getArguments();
+
 		return new Problem(
 			Response.Status.CONFLICT,
 			_language.format(
 				_acceptLanguage.getPreferredLocale(),
-				launchSetPublishException.getMessageKey(),
-				launchSetPublishException.getArguments(
-				).toArray(),
+				launchSetPublishException.getMessageKey(), arguments.toArray(),
 				false));
 	}
 

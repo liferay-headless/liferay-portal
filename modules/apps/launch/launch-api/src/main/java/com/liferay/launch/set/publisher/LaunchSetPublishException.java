@@ -61,9 +61,9 @@ public class LaunchSetPublishException extends PortalException {
 
 		super(message);
 
-		_messageKey = messageKey;
-
 		_arguments = Collections.singletonList(launchSetName);
+
+		_messageKey = messageKey;
 	}
 
 	private final List<Object> _arguments;

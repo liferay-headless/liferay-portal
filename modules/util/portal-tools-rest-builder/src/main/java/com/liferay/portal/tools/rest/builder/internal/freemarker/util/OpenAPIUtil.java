@@ -402,7 +402,7 @@ public class OpenAPIUtil {
 		else if ((s.endsWith("ches") || s.endsWith("shes")) &&
 				 ConfigUtil.isVersionCompatible(configYAML, 17)) {
 
-			// launches to launch
+			// Launches to launch
 
 			s = s.substring(0, s.length() - 2);
 		}
