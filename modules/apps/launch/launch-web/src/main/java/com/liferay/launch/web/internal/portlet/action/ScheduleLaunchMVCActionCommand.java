@@ -24,6 +24,7 @@ import jakarta.portlet.ActionRequest;
 import jakarta.portlet.ActionResponse;
 
 import java.util.Date;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -80,6 +81,8 @@ public class ScheduleLaunchMVCActionCommand extends BaseLaunchMVCActionCommand {
 				_log.debug(launchSetPublishException);
 			}
 
+			List<Object> arguments = launchSetPublishException.getArguments();
+
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse,
 				JSONUtil.put(
@@ -87,9 +90,7 @@ public class ScheduleLaunchMVCActionCommand extends BaseLaunchMVCActionCommand {
 					language.format(
 						portal.getHttpServletRequest(actionRequest),
 						launchSetPublishException.getMessageKey(),
-						launchSetPublishException.getArguments(
-						).toArray(),
-						false)));
+						arguments.toArray(), false)));
 
 			return;
 		}

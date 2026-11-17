@@ -262,10 +262,6 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 	private void _testPostLaunchPublishWithoutViewPermission()
 		throws Exception {
 
-		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
-
-		long launchSetId = launchSetObjectEntry.getObjectEntryId();
-
 		String password = RandomTestUtil.randomString();
 
 		User user = UserTestUtil.addUser(testCompany, password);
@@ -279,6 +275,10 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 		).locale(
 			LocaleUtil.getDefault()
 		).build();
+
+		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		long launchSetId = launchSetObjectEntry.getObjectEntryId();
 
 		assertHttpResponseStatusCode(
 			403, launchResource.postLaunchPublishHttpResponse(launchSetId));
