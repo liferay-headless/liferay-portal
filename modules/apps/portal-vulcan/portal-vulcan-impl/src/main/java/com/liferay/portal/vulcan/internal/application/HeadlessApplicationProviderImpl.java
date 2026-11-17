@@ -16,6 +16,8 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -603,6 +605,21 @@ public class HeadlessApplicationProviderImpl
 		@Override
 		public Application getApplication() {
 			return _applicationImpl;
+		}
+
+		@Override
+		public JSONObject getContentJSONObject(String serverURL) {
+			try {
+				return _openAPIDocumentCache.getContentJSONObject(
+					_applicationImpl.getBasePath(), _applicationImpl._companyId,
+					() -> _getContentString(serverURL, Type.JSON),
+					getPath(Type.JSON), serverURL);
+			}
+			catch (JSONException jsonException) {
+				_log.error(jsonException);
+
+				return null;
+			}
 		}
 
 		@Override

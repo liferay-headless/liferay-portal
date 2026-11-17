@@ -8,6 +8,9 @@ package com.liferay.portal.vulcan.internal.cache;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Map;
@@ -19,6 +22,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Petteri Karttunen
@@ -29,7 +33,7 @@ public class OpenAPIDocumentCache {
 	public void clear() {
 		_clearCount.incrementAndGet();
 
-		_contents.clear();
+		_entries.clear();
 	}
 
 	public void clear(long companyId) {
@@ -64,37 +68,92 @@ public class OpenAPIDocumentCache {
 		String basePath, long companyId, Supplier<String> contentSupplier,
 		String path, String serverURL) {
 
-		String key = StringBundler.concat(
-			companyId, StringPool.POUND, basePath, StringPool.POUND, path,
-			StringPool.POUND, serverURL);
+		Entry entry = _getEntry(
+			basePath, companyId, contentSupplier, path, serverURL);
 
-		String content = _contents.get(key);
-
-		if (content != null) {
-			return content;
+		if (entry == null) {
+			return null;
 		}
 
-		long clearCount = _clearCount.get();
+		return entry._content;
+	}
 
-		content = contentSupplier.get();
+	public JSONObject getContentJSONObject(
+			String basePath, long companyId, Supplier<String> contentSupplier,
+			String path, String serverURL)
+		throws JSONException {
 
-		if ((content != null) && (clearCount == _clearCount.get())) {
-			_contents.put(key, content);
+		Entry entry = _getEntry(
+			basePath, companyId, contentSupplier, path, serverURL);
+
+		if (entry == null) {
+			return null;
 		}
 
-		return content;
+		JSONObject contentJSONObject = entry._contentJSONObject;
+
+		if (contentJSONObject == null) {
+			contentJSONObject = _jsonFactory.createJSONObject(entry._content);
+
+			entry._contentJSONObject = contentJSONObject;
+		}
+
+		return contentJSONObject;
 	}
 
 	private void _clear(Predicate<String[]> predicate) {
 		_clearCount.incrementAndGet();
 
-		Set<String> keys = _contents.keySet();
+		Set<String> keys = _entries.keySet();
 
 		keys.removeIf(
 			key -> predicate.test(StringUtil.split(key, CharPool.POUND)));
 	}
 
+	private Entry _getEntry(
+		String basePath, long companyId, Supplier<String> contentSupplier,
+		String path, String serverURL) {
+
+		String key = StringBundler.concat(
+			companyId, StringPool.POUND, basePath, StringPool.POUND, path,
+			StringPool.POUND, serverURL);
+
+		Entry entry = _entries.get(key);
+
+		if (entry != null) {
+			return entry;
+		}
+
+		long clearCount = _clearCount.get();
+
+		String content = contentSupplier.get();
+
+		if (content != null) {
+			entry = new Entry(content);
+		}
+
+		if ((entry != null) && (clearCount == _clearCount.get())) {
+			_entries.put(key, entry);
+		}
+
+		return entry;
+	}
+
 	private final AtomicLong _clearCount = new AtomicLong();
-	private final Map<String, String> _contents = new ConcurrentHashMap<>();
+	private final Map<String, Entry> _entries = new ConcurrentHashMap<>();
+
+	@Reference
+	private JSONFactory _jsonFactory;
+
+	private static class Entry {
+
+		private Entry(String content) {
+			_content = content;
+		}
+
+		private final String _content;
+		private volatile JSONObject _contentJSONObject;
+
+	}
 
 }

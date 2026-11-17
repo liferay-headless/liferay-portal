@@ -10,6 +10,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManager;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -415,6 +416,13 @@ public class HeadlessApplicationProviderTest {
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
 
+		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
+			serverURL);
+
+		Assert.assertEquals("1", contentJSONObject.getString("openapi"));
+		Assert.assertSame(
+			contentJSONObject, openAPIDocument.getContentJSONObject(serverURL));
+
 		Object contentObject = openAPIDocument.getContentObject(serverURL);
 
 		Assert.assertNotNull(contentObject);
@@ -450,6 +458,11 @@ public class HeadlessApplicationProviderTest {
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
 
+		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
+			serverURL);
+
+		Assert.assertEquals("1", contentJSONObject.getString("openapi"));
+
 		_contentApplicationServiceRegistration.setProperties(
 			_getContentApplicationProperties());
 
@@ -458,6 +471,10 @@ public class HeadlessApplicationProviderTest {
 			openAPIDocument.getContentString(
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		contentJSONObject = openAPIDocument.getContentJSONObject(serverURL);
+
+		Assert.assertEquals("2", contentJSONObject.getString("openapi"));
 	}
 
 	@Test
