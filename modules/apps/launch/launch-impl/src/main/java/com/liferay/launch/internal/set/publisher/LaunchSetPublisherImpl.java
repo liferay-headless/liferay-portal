@@ -16,6 +16,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -128,6 +129,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 	public void unschedulePublish(long launchSetId) throws PortalException {
 		ObjectEntry launchSetObjectEntry = _getLaunchSetObjectEntry(
 			launchSetId);
+
+		_validateNotPublishing(launchSetId);
 
 		if (launchSetObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_SCHEDULED) {
@@ -242,6 +245,25 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		if (backgroundTasksCount > 0) {
 			throw new PortalException(
 				"Launch set " + launchSetId + " is already being published");
+		}
+	}
+
+	private void _validateNotPublishing(long launchSetId)
+		throws PortalException {
+
+		for (BackgroundTask backgroundTask :
+				_backgroundTaskManager.getBackgroundTasks(
+					BackgroundTaskConstants.GROUP_ID_DEFAULT,
+					LaunchSetPublishBackgroundTaskExecutor.class.getName(),
+					BackgroundTaskConstants.STATUS_IN_PROGRESS)) {
+
+			if (Objects.equals(
+					backgroundTask.getName(), String.valueOf(launchSetId))) {
+
+				throw new PortalException(
+					"Launch set " + launchSetId +
+						" is already being published");
+			}
 		}
 	}
 
