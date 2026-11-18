@@ -138,8 +138,10 @@ public class LaunchPreviewFilterTest {
 			new MockHttpServletResponse();
 
 		_processFilter(
-			mockFilterChain, mockHttpServletResponse,
-			_launchSetObjectEntry.getObjectEntryId(), null);
+			mockFilterChain,
+			_getMockHttpServletRequest(
+				_launchSetObjectEntry.getObjectEntryId(), null),
+			mockHttpServletResponse);
 
 		Assert.assertNull(mockFilterChain.getRequest());
 
@@ -164,6 +166,18 @@ public class LaunchPreviewFilterTest {
 
 		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), _user);
 
+		// Cannot view the launch, forwarded to the status page
+
+		MockHttpServletRequest mockHttpServletRequest =
+			_getMockHttpServletRequest(
+				_launchSetObjectEntry.getObjectEntryId(), _user);
+
+		mockHttpServletRequest.setAttribute(
+			WebKeys.PORTAL_STATUS_EXCEPTION,
+			new PrincipalException(RandomTestUtil.randomString()));
+
+		_assertProcessed(mockHttpServletRequest);
+
 		// Can view the launch but not one of its articles
 
 		_removeViewPermissions(
@@ -173,7 +187,9 @@ public class LaunchPreviewFilterTest {
 			_getClassName("LaunchSet"),
 			_launchSetObjectEntry.getObjectEntryId());
 
-		_assertProcessed();
+		_assertProcessed(
+			_getMockHttpServletRequest(
+				_launchSetObjectEntry.getObjectEntryId(), _user));
 
 		// No launch matches the ID
 
@@ -216,8 +232,11 @@ public class LaunchPreviewFilterTest {
 		MockHttpServletResponse mockHttpServletResponse =
 			new MockHttpServletResponse();
 
-		MockHttpServletRequest mockHttpServletRequest = _processFilter(
-			mockFilterChain, mockHttpServletResponse, previewLaunchSetId, user);
+		MockHttpServletRequest mockHttpServletRequest =
+			_getMockHttpServletRequest(previewLaunchSetId, user);
+
+		_processFilter(
+			mockFilterChain, mockHttpServletRequest, mockHttpServletResponse);
 
 		Assert.assertNull(mockFilterChain.getRequest());
 		Assert.assertEquals(
@@ -230,14 +249,15 @@ public class LaunchPreviewFilterTest {
 		Assert.assertTrue(exception instanceof PrincipalException);
 	}
 
-	private void _assertProcessed() throws Exception {
+	private void _assertProcessed(MockHttpServletRequest mockHttpServletRequest)
+		throws Exception {
+
 		MockFilterChain mockFilterChain = new MockFilterChain();
 		MockHttpServletResponse mockHttpServletResponse =
 			new MockHttpServletResponse();
 
 		_processFilter(
-			mockFilterChain, mockHttpServletResponse,
-			_launchSetObjectEntry.getObjectEntryId(), _user);
+			mockFilterChain, mockHttpServletRequest, mockHttpServletResponse);
 
 		Assert.assertNotNull(mockFilterChain.getRequest());
 		Assert.assertEquals(
@@ -252,11 +272,8 @@ public class LaunchPreviewFilterTest {
 		return objectDefinition.getClassName();
 	}
 
-	private MockHttpServletRequest _processFilter(
-			FilterChain filterChain,
-			MockHttpServletResponse mockHttpServletResponse,
-			long previewLaunchSetId, User user)
-		throws Exception {
+	private MockHttpServletRequest _getMockHttpServletRequest(
+		long previewLaunchSetId, User user) {
 
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
@@ -272,6 +289,15 @@ public class LaunchPreviewFilterTest {
 			mockHttpServletRequest.setAttribute(WebKeys.USER, user);
 		}
 
+		return mockHttpServletRequest;
+	}
+
+	private void _processFilter(
+			FilterChain filterChain,
+			MockHttpServletRequest mockHttpServletRequest,
+			MockHttpServletResponse mockHttpServletResponse)
+		throws Exception {
+
 		ReflectionTestUtil.invoke(
 			_filter, "processFilter",
 			new Class<?>[] {
@@ -279,8 +305,6 @@ public class LaunchPreviewFilterTest {
 				FilterChain.class
 			},
 			mockHttpServletRequest, mockHttpServletResponse, filterChain);
-
-		return mockHttpServletRequest;
 	}
 
 	private void _removeViewPermissions(String name, long primKey)
