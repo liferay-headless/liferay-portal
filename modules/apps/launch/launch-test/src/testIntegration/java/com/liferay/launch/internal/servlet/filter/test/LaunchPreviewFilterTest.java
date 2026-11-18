@@ -6,15 +6,41 @@
 package com.liferay.launch.internal.servlet.filter.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.journal.constants.JournalFolderConstants;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -24,7 +50,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serializable;
+
+import java.util.Map;
+
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,25 +78,68 @@ public class LaunchPreviewFilterTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@Before
+	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId()));
+
+		_launchSetObjectEntry = _addObjectEntry(
+			"LaunchSet",
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		_journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		_launchEntryObjectEntry = _addObjectEntry(
+			"LaunchEntry",
+			HashMapBuilder.<String, Serializable>put(
+				"baseVersionKey", String.valueOf(_journalArticle.getVersion())
+			).put(
+				"className", JournalArticle.class.getName()
+			).put(
+				"classPK", _journalArticle.getResourcePrimKey()
+			).put(
+				"r_launchSetToLaunchEntries_c_launchSetId",
+				_launchSetObjectEntry.getObjectEntryId()
+			).build());
+
+		_removeViewPermissions(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+
+		_removeViewPermissions(
+			_getClassName("LaunchSet"),
+			_launchSetObjectEntry.getObjectEntryId());
+
+		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+		_user = UserTestUtil.addUser();
+
+		_roleLocalService.addUserRole(_user.getUserId(), _role.getRoleId());
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		ServiceContextThreadLocal.popServiceContext();
+	}
+
 	@Test
 	public void testProcessFilter() throws Exception {
+
+		// Signed out
+
 		MockFilterChain mockFilterChain = new MockFilterChain();
 		MockHttpServletResponse mockHttpServletResponse =
 			new MockHttpServletResponse();
-		long previewLaunchSetId = RandomTestUtil.randomLong();
 
 		_processFilter(
-			mockFilterChain, mockHttpServletResponse, previewLaunchSetId,
-			TestPropsValues.getUser());
-
-		Assert.assertNotNull(mockFilterChain.getRequest());
-		Assert.assertNull(mockHttpServletResponse.getRedirectedUrl());
-
-		mockFilterChain = new MockFilterChain();
-		mockHttpServletResponse = new MockHttpServletResponse();
-
-		_processFilter(
-			mockFilterChain, mockHttpServletResponse, previewLaunchSetId, null);
+			mockFilterChain, mockHttpServletResponse,
+			_launchSetObjectEntry.getObjectEntryId(), null);
 
 		Assert.assertNull(mockFilterChain.getRequest());
 
@@ -73,16 +148,111 @@ public class LaunchPreviewFilterTest {
 		Assert.assertEquals(
 			_portal.getPathMain() + "/portal/login",
 			HttpComponentsUtil.getPath(redirectedURL));
-
 		Assert.assertEquals(
 			"http://localhost/web/guest/home?p_l_mode=preview&" +
-				"previewLaunchSetId=" + previewLaunchSetId,
+				"previewLaunchSetId=" +
+					_launchSetObjectEntry.getObjectEntryId(),
 			HttpComponentsUtil.decodeURL(
 				HttpComponentsUtil.getParameter(
 					redirectedURL, "redirect", false)));
+
+		// Cannot view the launch
+
+		_setViewPermission(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+
+		_assertForbidden(_launchSetObjectEntry.getObjectEntryId(), _user);
+
+		// Can view the launch but not one of its articles
+
+		_removeViewPermissions(
+			JournalArticle.class.getName(),
+			_journalArticle.getResourcePrimKey());
+		_setViewPermission(
+			_getClassName("LaunchSet"),
+			_launchSetObjectEntry.getObjectEntryId());
+
+		_assertProcessed();
+
+		// No launch matches the ID
+
+		_assertForbidden(RandomTestUtil.randomLong(), _user);
+
+		// The ID matches an object entry that is not a launch
+
+		_setViewPermission(
+			_getClassName("LaunchEntry"),
+			_launchEntryObjectEntry.getObjectEntryId());
+
+		_assertForbidden(_launchEntryObjectEntry.getObjectEntryId(), _user);
 	}
 
-	private void _processFilter(
+	private ObjectEntry _addObjectEntry(
+			String objectDefinitionName, Map<String, Serializable> values)
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
+
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+
+		return _objectEntryLocalService.addObjectEntry(
+			0, TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(), 0,
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()), values,
+			serviceContext);
+	}
+
+	private void _assertForbidden(long previewLaunchSetId, User user)
+		throws Exception {
+
+		MockFilterChain mockFilterChain = new MockFilterChain();
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		MockHttpServletRequest mockHttpServletRequest = _processFilter(
+			mockFilterChain, mockHttpServletResponse, previewLaunchSetId, user);
+
+		Assert.assertNull(mockFilterChain.getRequest());
+		Assert.assertEquals(
+			HttpServletResponse.SC_FORBIDDEN,
+			mockHttpServletResponse.getStatus());
+
+		Exception exception = (Exception)mockHttpServletRequest.getAttribute(
+			WebKeys.PORTAL_STATUS_EXCEPTION);
+
+		Assert.assertTrue(exception instanceof PrincipalException);
+	}
+
+	private void _assertProcessed() throws Exception {
+		MockFilterChain mockFilterChain = new MockFilterChain();
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		_processFilter(
+			mockFilterChain, mockHttpServletResponse,
+			_launchSetObjectEntry.getObjectEntryId(), _user);
+
+		Assert.assertNotNull(mockFilterChain.getRequest());
+		Assert.assertEquals(
+			HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+	}
+
+	private String _getClassName(String objectDefinitionName) throws Exception {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				TestPropsValues.getCompanyId(), objectDefinitionName);
+
+		return objectDefinition.getClassName();
+	}
+
+	private MockHttpServletRequest _processFilter(
 			FilterChain filterChain,
 			MockHttpServletResponse mockHttpServletResponse,
 			long previewLaunchSetId, User user)
@@ -109,12 +279,64 @@ public class LaunchPreviewFilterTest {
 				FilterChain.class
 			},
 			mockHttpServletRequest, mockHttpServletResponse, filterChain);
+
+		return mockHttpServletRequest;
+	}
+
+	private void _removeViewPermissions(String name, long primKey)
+		throws Exception {
+
+		for (ResourcePermission resourcePermission :
+				_resourcePermissionLocalService.getResourcePermissions(
+					TestPropsValues.getCompanyId(), name,
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(primKey))) {
+
+			_resourcePermissionLocalService.removeResourcePermission(
+				TestPropsValues.getCompanyId(), name,
+				ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(primKey),
+				resourcePermission.getRoleId(), ActionKeys.VIEW);
+		}
+	}
+
+	private void _setViewPermission(String name, long primKey)
+		throws Exception {
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), name,
+			ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(primKey),
+			_role.getRoleId(), new String[] {ActionKeys.VIEW});
 	}
 
 	@Inject(filter = "servlet-filter-name=Launch Preview Filter")
 	private Filter _filter;
 
+	@DeleteAfterTestRun
+	private Group _group;
+
+	private JournalArticle _journalArticle;
+	private ObjectEntry _launchEntryObjectEntry;
+	private ObjectEntry _launchSetObjectEntry;
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Inject
+	private ObjectEntryLocalService _objectEntryLocalService;
+
 	@Inject
 	private Portal _portal;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@DeleteAfterTestRun
+	private Role _role;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 }
