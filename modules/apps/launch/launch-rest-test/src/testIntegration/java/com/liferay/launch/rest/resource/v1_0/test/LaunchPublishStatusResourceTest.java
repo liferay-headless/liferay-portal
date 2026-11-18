@@ -289,10 +289,6 @@ public class LaunchPublishStatusResourceTest
 	private void _testGetLaunchPublishStatusWithoutViewPermission()
 		throws Exception {
 
-		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
-
-		long launchSetId = launchSetObjectEntry.getObjectEntryId();
-
 		String password = RandomTestUtil.randomString();
 
 		User user = UserTestUtil.addUser(testCompany, password);
@@ -307,6 +303,10 @@ public class LaunchPublishStatusResourceTest
 			).locale(
 				LocaleUtil.getDefault()
 			).build();
+
+		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		long launchSetId = launchSetObjectEntry.getObjectEntryId();
 
 		assertHttpResponseStatusCode(
 			404,
