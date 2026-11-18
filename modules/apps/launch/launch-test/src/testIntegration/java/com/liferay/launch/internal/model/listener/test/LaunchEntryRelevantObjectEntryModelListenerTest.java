@@ -148,6 +148,9 @@ public class LaunchEntryRelevantObjectEntryModelListenerTest {
 			ServiceContextThreadLocal.getServiceContext());
 
 		Assert.assertEquals(draftId1, _getDraftId(launchEntryObjectEntry));
+		Assert.assertEquals(
+			_journalArticle.getTitle(LocaleUtil.getSiteDefault()),
+			_getDraftTitle(draftId1));
 
 		_objectEntryLocalService.partialUpdateObjectEntry(
 			TestPropsValues.getUserId(),
