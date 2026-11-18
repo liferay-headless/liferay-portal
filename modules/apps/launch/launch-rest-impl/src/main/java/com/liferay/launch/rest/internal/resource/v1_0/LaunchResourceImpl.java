@@ -60,13 +60,13 @@ public class LaunchResourceImpl extends BaseLaunchResourceImpl {
 				objectEntry.getObjectDefinitionId(),
 				"launchSetToLaunchEntries");
 
-		int launchEntryObjectEntriesCount =
+		int relatedObjectEntriesCount =
 			_objectEntryLocalService.getRelatedObjectEntriesCount(
 				objectEntry.getGroupId(),
 				objectRelationship.getObjectRelationshipId(), null, launchId,
 				true, null);
 
-		if (launchEntryObjectEntriesCount == 0) {
+		if (relatedObjectEntriesCount == 0) {
 			throw new LaunchSetPublishException.MustHaveLaunchEntries(
 				launchId, objectEntry.getTitleValue());
 		}

@@ -91,8 +91,8 @@ public class LaunchResourceTest extends BaseLaunchResourceTestCase {
 		_testPostLaunchPublishWithEmptyLaunch();
 		_testPostLaunchPublishWithFeatureFlagDisabled();
 		_testPostLaunchPublishWithMissingLaunch();
-		_testPostLaunchPublishWithoutViewPermission();
 		_testPostLaunchPublishWithScheduledLaunch();
+		_testPostLaunchPublishWithoutViewPermission();
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(long launchSetId)
