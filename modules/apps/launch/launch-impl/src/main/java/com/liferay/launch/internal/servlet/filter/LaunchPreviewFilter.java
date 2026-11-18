@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.preview.PreviewableResolverUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
@@ -80,7 +81,9 @@ public class LaunchPreviewFilter extends BasePortalFilter {
 			httpServletRequest, "previewLaunchSetId", -1);
 
 		if ((previewLaunchSetId == -1) ||
-			(PreviewableResolverUtil.getPreviewId() != null)) {
+			(PreviewableResolverUtil.getPreviewId() != null) ||
+			(httpServletRequest.getAttribute(WebKeys.PORTAL_STATUS_EXCEPTION) !=
+				null)) {
 
 			processFilter(
 				LaunchPreviewFilter.class.getName(), httpServletRequest,
