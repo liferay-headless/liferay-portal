@@ -15,6 +15,7 @@ import com.liferay.exportimport.test.util.ExportImportTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.lock.LockManagerUtil;
 import com.liferay.portal.kernel.model.User;
@@ -417,7 +418,7 @@ public class ImportUploadResourceTest extends BaseImportUploadResourceTestCase {
 			return unsafeSupplier.get();
 		}
 		catch (Exception exception) {
-			throw new RuntimeException(exception);
+			return ReflectionUtil.throwException(exception);
 		}
 	}
 
