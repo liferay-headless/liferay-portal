@@ -15,6 +15,7 @@ import LaunchService from '../services/LaunchService';
 import {openErrorToast} from '../util/toasts';
 
 interface Props {
+	pending: boolean;
 	portletNamespace: string;
 	published: boolean;
 	scheduleLaunchURL: string;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function LaunchScheduleButton({
+	pending,
 	portletNamespace,
 	published,
 	scheduleLaunchURL,
@@ -75,7 +77,7 @@ export default function LaunchScheduleButton({
 		);
 	}
 
-	if (published) {
+	if (pending || published) {
 		return null;
 	}
 

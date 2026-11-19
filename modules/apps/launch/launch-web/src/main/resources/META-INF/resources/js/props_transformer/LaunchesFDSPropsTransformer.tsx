@@ -9,7 +9,9 @@ import React from 'react';
 import confirmAndUnscheduleLaunchAction from '../actions/confirmAndUnscheduleLaunchAction';
 import {Launch, isPublished} from '../api/launches';
 import {
+	WORKFLOW_STATUS_DENIED,
 	WORKFLOW_STATUS_DRAFT,
+	WORKFLOW_STATUS_PENDING,
 	WORKFLOW_STATUS_SCHEDULED,
 } from '../components/WorkflowStatusLabel';
 import openNewLaunchModal from '../modals/openNewLaunchModal';
@@ -69,6 +71,22 @@ export default function LaunchesFDSPropsTransformer({
 							return (
 								<ClayLabel displayType="danger">
 									{Liferay.Language.get('failed')}
+								</ClayLabel>
+							);
+						}
+
+						if (itemData.status?.code === WORKFLOW_STATUS_PENDING) {
+							return (
+								<ClayLabel displayType="info">
+									{Liferay.Language.get('pending')}
+								</ClayLabel>
+							);
+						}
+
+						if (itemData.status?.code === WORKFLOW_STATUS_DENIED) {
+							return (
+								<ClayLabel displayType="danger">
+									{Liferay.Language.get('denied')}
 								</ClayLabel>
 							);
 						}

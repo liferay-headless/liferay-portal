@@ -241,6 +241,19 @@ public class ViewLaunchDisplayContext {
 		).buildString();
 	}
 
+	public boolean isPending() {
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			getLaunchSetId());
+
+		if ((objectEntry != null) &&
+			(objectEntry.getStatus() == WorkflowConstants.STATUS_PENDING)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isPublished() {
 		if (_published == null) {
 			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(

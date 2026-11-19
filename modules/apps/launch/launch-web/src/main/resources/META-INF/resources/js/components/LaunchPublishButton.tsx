@@ -9,12 +9,26 @@ import {openConfirmModal} from 'frontend-js-components-web';
 import React, {useRef} from 'react';
 
 interface Props {
+	pending: boolean;
 	publishLaunchURL: string;
 	published: boolean;
 	scheduled: boolean;
 }
 
+function getLabel(pending: boolean, published: boolean) {
+	if (published) {
+		return Liferay.Language.get('published');
+	}
+
+	if (pending) {
+		return Liferay.Language.get('pending');
+	}
+
+	return Liferay.Language.get('publish');
+}
+
 export default function LaunchPublishButton({
+	pending,
 	publishLaunchURL,
 	published,
 	scheduled,
@@ -37,7 +51,7 @@ export default function LaunchPublishButton({
 	return (
 		<form action={publishLaunchURL} method="post" ref={formRef}>
 			<ClayButton
-				disabled={published || scheduled}
+				disabled={pending || published || scheduled}
 				displayType="primary"
 				onClick={handleClick}
 				small
@@ -48,9 +62,7 @@ export default function LaunchPublishButton({
 					symbol="rocket"
 				/>
 
-				{published
-					? Liferay.Language.get('published')
-					: Liferay.Language.get('publish')}
+				{getLabel(pending, published)}
 			</ClayButton>
 		</form>
 	);
