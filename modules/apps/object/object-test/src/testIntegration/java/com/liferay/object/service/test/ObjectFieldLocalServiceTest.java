@@ -97,6 +97,9 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -935,6 +938,12 @@ public class ObjectFieldLocalServiceTest {
 
 		_testAddCustomObjectFieldReadOnly();
 		_testAddCustomObjectFieldWithDescription();
+	}
+
+	@Test
+	public void testAddCustomObjectFieldRollback() throws Exception {
+		_testAddCustomObjectFieldRollback(Propagation.NESTED);
+		_testAddCustomObjectFieldRollback(Propagation.REQUIRED);
 	}
 
 	@Test
@@ -3883,6 +3892,68 @@ public class ObjectFieldLocalServiceTest {
 					ObjectFieldConstants.READ_ONLY_TRUE, null)));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition1);
+	}
+
+	private void _testAddCustomObjectFieldRollback(Propagation propagation)
+		throws Exception {
+
+		ObjectDefinition objectDefinition = _publishCustomObjectDefinition();
+
+		TransactionConfig.Builder transactionConfigBuilder =
+			new TransactionConfig.Builder();
+
+		try {
+			TransactionInvokerUtil.invoke(
+				transactionConfigBuilder.setPropagation(
+					propagation
+				).setRollbackForClasses(
+					Exception.class
+				).build(),
+				() -> {
+					_addCustomObjectField(
+						new TextObjectFieldBuilder(
+						).labelMap(
+							LocalizedMapUtil.getLocalizedMap(
+								RandomTestUtil.randomString())
+						).name(
+							"fieldName1"
+						).objectDefinitionId(
+							objectDefinition.getObjectDefinitionId()
+						).build());
+					_addCustomObjectField(
+						new TextObjectFieldBuilder(
+						).labelMap(
+							LocalizedMapUtil.getLocalizedMap(
+								RandomTestUtil.randomString())
+						).name(
+							"fieldName2"
+						).objectDefinitionId(
+							objectDefinition.getObjectDefinitionId()
+						).build());
+
+					throw new Exception();
+				});
+
+			Assert.fail();
+		}
+		catch (Throwable throwable) {
+			Assert.assertSame(Exception.class, throwable.getClass());
+		}
+
+		Assert.assertNull(
+			_objectFieldLocalService.fetchObjectField(
+				objectDefinition.getObjectDefinitionId(), "fieldName1"));
+		Assert.assertNull(
+			_objectFieldLocalService.fetchObjectField(
+				objectDefinition.getObjectDefinitionId(), "fieldName2"));
+		Assert.assertFalse(
+			_hasColumn(
+				objectDefinition.getExtensionDBTableName(), "fieldName1_"));
+		Assert.assertFalse(
+			_hasColumn(
+				objectDefinition.getExtensionDBTableName(), "fieldName2_"));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	private void _testAddCustomObjectFieldWithDescription() throws Exception {
