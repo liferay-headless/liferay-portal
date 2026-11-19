@@ -62,6 +62,7 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -93,6 +94,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -253,7 +255,7 @@ public class SitePageResourceImpl
 	public Page<SitePage> getSiteSitePageSitePagesPage(
 			String siteExternalReferenceCode,
 			String sitePageExternalReferenceCode, Boolean flatten,
-			Pagination pagination)
+			Filter filter, Pagination pagination)
 		throws Exception {
 
 		Layout layout = SitePageUtil.getSitePageLayout(
@@ -268,10 +270,53 @@ public class SitePageResourceImpl
 		List<Layout> layouts = null;
 
 		if (GetterUtil.getBoolean(flatten)) {
-			layouts = layout.getAllChildren();
+			layouts = _getDescendantLayouts(layout);
 		}
 		else {
 			layouts = layout.getChildren();
+		}
+
+		if (filter != null) {
+			if (layouts.isEmpty()) {
+				return Page.of(Collections.emptyList(), pagination, 0);
+			}
+
+			TermsFilter termsFilter = new TermsFilter(Field.ENTRY_CLASS_PK);
+
+			for (Layout curLayout : layouts) {
+				termsFilter.addValue(String.valueOf(curLayout.getPlid()));
+			}
+
+			return SearchUtil.search(
+				null,
+				booleanQuery -> {
+					BooleanFilter booleanFilter =
+						booleanQuery.getPreBooleanFilter();
+
+					booleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
+				},
+				filter, Layout.class.getName(), null, pagination,
+				queryConfig -> queryConfig.setSelectedFieldNames(
+					Field.ENTRY_CLASS_PK),
+				searchContext -> {
+					searchContext.setAttribute(Field.TYPE, _TYPES);
+					searchContext.setAttribute(
+						"status", WorkflowConstants.STATUS_ANY);
+					searchContext.setAttribute(
+						"systemLayout", Boolean.FALSE.toString());
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+					searchContext.setGroupIds(new long[] {layout.getGroupId()});
+				},
+				new Sort[] {
+					new Sort(
+						"parentLayoutId_Number_sortable", Sort.LONG_TYPE,
+						false),
+					new Sort(Field.PRIORITY, Sort.LONG_TYPE, false)
+				},
+				document -> _toSitePage(
+					_layoutService.getLayout(
+						GetterUtil.getLong(
+							document.get(Field.ENTRY_CLASS_PK)))));
 		}
 
 		List<Layout> sitePageLayouts = transform(
@@ -708,6 +753,42 @@ public class SitePageResourceImpl
 		}
 
 		return null;
+	}
+
+	private List<Layout> _getDescendantLayouts(Layout layout) {
+		Map<Long, List<Layout>> childLayoutsMap = new HashMap<>();
+		List<Layout> parentLayouts = Collections.singletonList(layout);
+
+		while (!parentLayouts.isEmpty()) {
+			Map<Long, List<Layout>> layoutChildLayoutsMap =
+				_layoutLocalService.getLayoutChildLayouts(parentLayouts);
+
+			childLayoutsMap.putAll(layoutChildLayoutsMap);
+
+			parentLayouts = new ArrayList<>();
+
+			for (List<Layout> childLayouts : layoutChildLayoutsMap.values()) {
+				parentLayouts.addAll(childLayouts);
+			}
+		}
+
+		return _getDescendantLayouts(childLayoutsMap, layout.getPlid());
+	}
+
+	private List<Layout> _getDescendantLayouts(
+		Map<Long, List<Layout>> childLayoutsMap, long plid) {
+
+		List<Layout> descendantLayouts = new ArrayList<>();
+
+		for (Layout childLayout :
+				childLayoutsMap.getOrDefault(plid, Collections.emptyList())) {
+
+			descendantLayouts.add(childLayout);
+			descendantLayouts.addAll(
+				_getDescendantLayouts(childLayoutsMap, childLayout.getPlid()));
+		}
+
+		return descendantLayouts;
 	}
 
 	private OpenGraphSettings _getOpenGraphSettings(PageSettings pageSettings) {

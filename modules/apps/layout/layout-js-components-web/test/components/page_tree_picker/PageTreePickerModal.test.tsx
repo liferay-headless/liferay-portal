@@ -11,8 +11,41 @@ import React from 'react';
 import '@testing-library/jest-dom';
 
 import PageTreePickerModal from '../../../src/main/resources/META-INF/resources/js/components/page_tree_picker/PageTreePickerModal';
-import {SitePage} from '../../../src/main/resources/META-INF/resources/js/components/page_tree_picker/createSitePageDataSource';
+import {
+	SitePage,
+	SitePageTreeSelection,
+} from '../../../src/main/resources/META-INF/resources/js/components/page_tree_picker/createSitePageDataSource';
 import checkAccessibility from '../../__lib__/checkAccessibility';
+
+const DATED_SITE_PAGES: SitePage[] = [
+	{
+		dateModified: '2026-01-01T00:00:00Z',
+		externalReferenceCode: 'home-erc',
+		name_i18n: {'en-US': 'Home'},
+	},
+	{
+		dateModified: '2026-11-10T00:00:00Z',
+		externalReferenceCode: 'news-erc',
+		name_i18n: {'en-US': 'News'},
+	},
+	{
+		dateModified: '2026-01-01T00:00:00Z',
+		externalReferenceCode: 'products-erc',
+		name_i18n: {'en-US': 'Products'},
+	},
+	{
+		dateModified: '2026-01-01T00:00:00Z',
+		externalReferenceCode: 'laptops-erc',
+		name_i18n: {'en-US': 'Laptops'},
+		parentSitePageExternalReferenceCode: 'products-erc',
+	},
+	{
+		dateModified: '2026-11-10T00:00:00Z',
+		externalReferenceCode: 'phones-erc',
+		name_i18n: {'en-US': 'Phones'},
+		parentSitePageExternalReferenceCode: 'products-erc',
+	},
+];
 
 const MIXED_CASE_SITE_PAGES: SitePage[] = [
 	{
@@ -87,6 +120,7 @@ function mockSitePagesRoutes(sitePages: SitePage[] = SITE_PAGES) {
 		}
 
 		const fields = url.searchParams.get('fields')?.split(',');
+		const filter = url.searchParams.get('filter');
 		const flatten = url.searchParams.get('flatten') === 'true';
 		const page = Number(url.searchParams.get('page') ?? 1);
 		const pageSize = Number(url.searchParams.get('pageSize') ?? 20);
@@ -94,6 +128,7 @@ function mockSitePagesRoutes(sitePages: SitePage[] = SITE_PAGES) {
 		const toSitePage = (sitePage: SitePage): Partial<SitePage> =>
 			Object.fromEntries(
 				Object.entries({
+					dateModified: sitePage.dateModified,
 					externalReferenceCode: sitePage.externalReferenceCode,
 					name_i18n: sitePage.name_i18n,
 					parentSitePageExternalReferenceCode:
@@ -101,6 +136,17 @@ function mockSitePagesRoutes(sitePages: SitePage[] = SITE_PAGES) {
 					type: sitePage.type,
 				}).filter(([name]) => !fields || fields.includes(name))
 			);
+
+		const matchesFilter = (sitePage: SitePage) =>
+			Array.from(
+				(filter ?? '').matchAll(/dateModified (ge|le) (\S+)/g)
+			).every(([, operator, date]) => {
+				const dateModified = Date.parse(sitePage.dateModified ?? '');
+
+				return operator === 'ge'
+					? dateModified >= Date.parse(date)
+					: dateModified <= Date.parse(date);
+			});
 
 		const toPage = (items: SitePage[]) =>
 			JSON.stringify({
@@ -124,7 +170,9 @@ function mockSitePagesRoutes(sitePages: SitePage[] = SITE_PAGES) {
 			return {
 				body: toPage(
 					flatten
-						? getDescendants(externalReferenceCode)
+						? getDescendants(externalReferenceCode).filter(
+								matchesFilter
+							)
 						: getChildren(externalReferenceCode)
 				),
 			};
@@ -159,7 +207,13 @@ function mockSitePagesRoutes(sitePages: SitePage[] = SITE_PAGES) {
 				};
 			}
 
-			return {body: toPage(flatten ? sitePages : getChildren(null))};
+			return {
+				body: toPage(
+					flatten
+						? sitePages.filter(matchesFilter)
+						: getChildren(null)
+				),
+			};
 		}
 
 		return {body: JSON.stringify({}), status: 404};
@@ -184,6 +238,21 @@ async function renderPageTreePickerModal(
 	await screen.findByText('Home');
 
 	return result;
+}
+
+function renderDateFilteredPageTreePickerModal(
+	props: Partial<React.ComponentProps<typeof PageTreePickerModal>> = {}
+) {
+	return render(
+		<PageTreePickerModal
+			dateModifiedRange={{startDate: '2026-11-01T00:00:00.000Z'}}
+			onClose={() => {}}
+			onSubmit={() => {}}
+			privateLayout={false}
+			siteExternalReferenceCode="site-erc"
+			{...props}
+		/>
+	);
 }
 
 function expandTreeItem(nameOrElement: HTMLElement | string) {
@@ -459,6 +528,177 @@ describe('PageTreePickerModal', () => {
 		});
 
 		expect(await screen.findByText('2 items-selected')).toBeInTheDocument();
+	});
+
+	it('counts only the pages modified in the date range when the root is shift selected', async () => {
+		mockSitePagesRoutes(DATED_SITE_PAGES);
+
+		renderDateFilteredPageTreePickerModal();
+
+		await screen.findByText('News');
+
+		fireEvent.click(screen.getByRole('checkbox', {name: 'public-pages'}), {
+			shiftKey: true,
+		});
+
+		expect(await screen.findByText('2 items-selected')).toBeInTheDocument();
+	});
+
+	it('counts only the reopened pages modified in the date range', async () => {
+		mockSitePagesRoutes(DATED_SITE_PAGES);
+
+		const cases: Array<{
+			initialSelection: SitePageTreeSelection;
+			selectedItemsCount: string;
+		}> = [
+			{
+				initialSelection: {
+					all: true,
+					excludedItems: ['phones-erc'],
+					privateLayout: false,
+				},
+				selectedItemsCount: '1 item-selected',
+			},
+			{
+				initialSelection: {
+					items: ['home-erc', 'news-erc', 'phones-erc'],
+					privateLayout: false,
+				},
+				selectedItemsCount: '2 items-selected',
+			},
+		];
+
+		for (const {initialSelection, selectedItemsCount} of cases) {
+			const {unmount} = renderDateFilteredPageTreePickerModal({
+				initialSelection,
+			});
+
+			await screen.findByText('News');
+
+			expect(
+				await screen.findByText(selectedItemsCount)
+			).toBeInTheDocument();
+
+			unmount();
+		}
+	});
+
+	it('counts only the pages modified in the date range when a page is shift selected', async () => {
+		mockSitePagesRoutes([
+			...DATED_SITE_PAGES,
+			{
+				dateModified: '2026-11-10T00:00:00Z',
+				externalReferenceCode: 'archive-erc',
+				name_i18n: {'en-US': 'Archive'},
+			},
+			{
+				dateModified: '2026-01-01T00:00:00Z',
+				externalReferenceCode: 'old-archived-erc',
+				name_i18n: {'en-US': 'Old Archived'},
+				parentSitePageExternalReferenceCode: 'archive-erc',
+			},
+			{
+				dateModified: '2026-11-10T00:00:00Z',
+				externalReferenceCode: 'new-archived-erc',
+				name_i18n: {'en-US': 'New Archived'},
+				parentSitePageExternalReferenceCode: 'archive-erc',
+			},
+		]);
+
+		renderDateFilteredPageTreePickerModal();
+
+		fireEvent.click(
+			await screen.findByRole('checkbox', {name: 'Archive'}),
+			{shiftKey: true}
+		);
+
+		expect(await screen.findByText('2 items-selected')).toBeInTheDocument();
+	});
+
+	it('fills each page of children with the pages to show in the date range', async () => {
+		mockSitePagesRoutes([
+			{
+				dateModified: '2026-11-10T00:00:00Z',
+				externalReferenceCode: 'archive-erc',
+				name_i18n: {'en-US': 'Archive'},
+			},
+			...Array.from({length: 3}, (_, index) => ({
+				dateModified: '2026-01-01T00:00:00Z',
+				externalReferenceCode: `old-archived-erc-${index}`,
+				name_i18n: {'en-US': `Old Archived ${index}`},
+				parentSitePageExternalReferenceCode: 'archive-erc',
+			})),
+			...Array.from({length: 3}, (_, index) => ({
+				dateModified: '2026-11-10T00:00:00Z',
+				externalReferenceCode: `new-archived-erc-${index}`,
+				name_i18n: {'en-US': `New Archived ${index}`},
+				parentSitePageExternalReferenceCode: 'archive-erc',
+			})),
+		]);
+
+		renderDateFilteredPageTreePickerModal({pageSize: 2});
+
+		expandTreeItem(await screen.findByText('Archive'));
+
+		expect(
+			await screen.findByRole('checkbox', {name: 'New Archived 1'})
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole('checkbox', {name: 'New Archived 0'})
+		).toBeInTheDocument();
+		expect(screen.queryByText(/Old Archived/)).not.toBeInTheDocument();
+
+		await userEvent.click(
+			screen.getByRole('button', {name: 'load-more-results'})
+		);
+
+		expect(
+			await screen.findByRole('checkbox', {name: 'New Archived 2'})
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole('button', {name: 'load-more-results'})
+		).not.toBeInTheDocument();
+		expect(screen.queryByText(/Old Archived/)).not.toBeInTheDocument();
+	});
+
+	it('shows the pages not modified in the date range disabled only when pages modified in the date range are below them', async () => {
+		mockSitePagesRoutes(DATED_SITE_PAGES);
+
+		renderDateFilteredPageTreePickerModal();
+
+		await screen.findByText('News');
+
+		expect(
+			screen.getByText(
+				'only-pages-modified-in-the-selected-date-range-can-be-selected'
+			)
+		).toBeInTheDocument();
+		expect(
+			screen
+				.getAllByRole('treeitem', {
+					description:
+						'this-page-was-not-modified-in-the-selected-date-range',
+				})
+				.map((element) => element.textContent)
+		).toEqual(['Products']);
+		expect(
+			screen.getByRole('treeitem', {name: 'Products'})
+		).toHaveAttribute('aria-disabled', 'true');
+		expect(
+			screen.getByRole('treeitem', {name: 'News'})
+		).not.toHaveAttribute('aria-disabled');
+		expect(
+			screen.getByRole('checkbox', {name: 'News'})
+		).toBeInTheDocument();
+		expect(screen.queryByText('Home')).not.toBeInTheDocument();
+		expect(screen.getByRole('checkbox', {name: 'Products'})).toBeDisabled();
+
+		expandTreeItem('Products');
+
+		expect(
+			await screen.findByRole('checkbox', {name: 'Phones'})
+		).toBeInTheDocument();
+		expect(screen.queryByText('Laptops')).not.toBeInTheDocument();
 	});
 
 	it('subtracts a deselected page from the exact count', async () => {
