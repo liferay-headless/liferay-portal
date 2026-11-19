@@ -7,8 +7,10 @@ package com.liferay.launch.web.internal.portlet.action;
 
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.launch.web.internal.constants.LaunchPortletKeys;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -37,12 +39,22 @@ public class PublishLaunchMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		_launchSetPublisher.publish(
-			ParamUtil.getLong(actionRequest, "launchSetId"),
-			themeDisplay.getUserId());
+			_launchSetPublisher.publish(
+				ParamUtil.getLong(actionRequest, "launchSetId"),
+				themeDisplay.getUserId());
+		}
+		catch (PortalException portalException) {
+			SessionErrors.add(
+				actionRequest, PortalException.class, portalException);
+
+			hideDefaultErrorMessage(actionRequest);
+
+			throw portalException;
+		}
 
 		sendRedirect(actionRequest, actionResponse);
 	}

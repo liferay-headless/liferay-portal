@@ -10,12 +10,16 @@ import com.liferay.launch.internal.constants.LaunchDestinationNames;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
@@ -54,20 +58,13 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				"Launch set " + launchSetId + " was already published");
 		}
 
-		String name = String.valueOf(launchSetId);
+		_validateNotBeingPublished(launchSetId);
 
-		int backgroundTasksCount =
-			_backgroundTaskManager.getBackgroundTasksCount(
-				BackgroundTaskConstants.GROUP_ID_DEFAULT, name,
-				LaunchSetPublishBackgroundTaskExecutor.class.getName(), false);
-
-		if (backgroundTasksCount > 0) {
-			throw new PortalException(
-				"Launch set " + launchSetId + " is already being published");
-		}
+		_deleteLaunchSetErrors(launchSetObjectEntry);
 
 		_backgroundTaskManager.addBackgroundTask(
-			userId, BackgroundTaskConstants.GROUP_ID_DEFAULT, name, null,
+			userId, BackgroundTaskConstants.GROUP_ID_DEFAULT,
+			String.valueOf(launchSetId), null,
 			LaunchSetPublishBackgroundTaskExecutor.class,
 			HashMapBuilder.<String, Serializable>put(
 				"launchSetId", launchSetId
@@ -99,6 +96,10 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 					" must be scheduled for a future date");
 		}
 
+		_validateNotBeingPublished(launchSetId);
+
+		_deleteLaunchSetErrors(launchSetObjectEntry);
+
 		ServiceContext serviceContext = _createServiceContext(
 			launchSetObjectEntry, userId);
 
@@ -115,6 +116,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		message.put("launchSetId", launchSetId);
 		message.put("userId", userId);
 
+		_deleteJob(launchSetObjectEntry);
+
 		_schedulerEngineHelper.schedule(
 			_triggerFactory.createTrigger(
 				_getJobName(launchSetObjectEntry),
@@ -128,6 +131,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 	public void unschedulePublish(long launchSetId) throws PortalException {
 		ObjectEntry launchSetObjectEntry = _getLaunchSetObjectEntry(
 			launchSetId);
+
+		_validateNotPublishing(launchSetId);
 
 		if (launchSetObjectEntry.getStatus() ==
 				WorkflowConstants.STATUS_SCHEDULED) {
@@ -145,10 +150,7 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				null, launchSetObjectEntry, serviceContext, userId);
 		}
 
-		_schedulerEngineHelper.delete(
-			_getJobName(launchSetObjectEntry),
-			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
-			StorageType.PERSISTED);
+		_deleteJob(launchSetObjectEntry);
 	}
 
 	private ServiceContext _createServiceContext(
@@ -161,6 +163,35 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		return serviceContext;
+	}
+
+	private void _deleteJob(ObjectEntry launchSetObjectEntry)
+		throws PortalException {
+
+		_schedulerEngineHelper.delete(
+			_getJobName(launchSetObjectEntry),
+			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
+			StorageType.PERSISTED);
+	}
+
+	private void _deleteLaunchSetErrors(ObjectEntry launchSetObjectEntry)
+		throws PortalException {
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				launchSetObjectEntry.getObjectDefinitionId(),
+				"launchSetToLaunchSetErrors");
+
+		for (ObjectEntry launchSetErrorObjectEntry :
+				_objectEntryLocalService.getOneToManyObjectEntries(
+					launchSetObjectEntry.getGroupId(),
+					objectRelationship.getObjectRelationshipId(), null, false,
+					launchSetObjectEntry.getObjectEntryId(), true, null,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			_objectEntryLocalService.deleteObjectEntry(
+				launchSetErrorObjectEntry);
+		}
 	}
 
 	private String _getJobName(ObjectEntry launchSetObjectEntry) {
@@ -204,6 +235,40 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 			serviceContext);
 	}
 
+	private void _validateNotBeingPublished(long launchSetId)
+		throws PortalException {
+
+		int backgroundTasksCount =
+			_backgroundTaskManager.getBackgroundTasksCount(
+				BackgroundTaskConstants.GROUP_ID_DEFAULT,
+				String.valueOf(launchSetId),
+				LaunchSetPublishBackgroundTaskExecutor.class.getName(), false);
+
+		if (backgroundTasksCount > 0) {
+			throw new PortalException(
+				"Launch set " + launchSetId + " is already being published");
+		}
+	}
+
+	private void _validateNotPublishing(long launchSetId)
+		throws PortalException {
+
+		for (BackgroundTask backgroundTask :
+				_backgroundTaskManager.getBackgroundTasks(
+					BackgroundTaskConstants.GROUP_ID_DEFAULT,
+					LaunchSetPublishBackgroundTaskExecutor.class.getName(),
+					BackgroundTaskConstants.STATUS_IN_PROGRESS)) {
+
+			if (Objects.equals(
+					backgroundTask.getName(), String.valueOf(launchSetId))) {
+
+				throw new PortalException(
+					"Launch set " + launchSetId +
+						" is already being published");
+			}
+		}
+	}
+
 	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;
 
@@ -212,6 +277,9 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
