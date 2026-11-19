@@ -27,19 +27,24 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.portlet.MockActionResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowTask;
+import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -49,6 +54,7 @@ import jakarta.portlet.PortletException;
 import java.io.Serializable;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
@@ -63,6 +69,7 @@ import org.junit.runner.RunWith;
  * @author Alejandro Tardín
  * @author Jose Luis Navarro
  */
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class LaunchSetPublisherTest {
 
@@ -113,6 +120,47 @@ public class LaunchSetPublisherTest {
 
 		long draftId = _updateLaunchDraft(launchEntryObjectEntry, title);
 
+		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(title, _getTitle(journalArticle));
+
+		LaunchEntryManager launchEntryManager =
+			_getJournalArticleLaunchEntryManager();
+
+		_assertPublished(
+			draftId, launchEntryObjectEntry, launchEntryManager,
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey()));
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(
+				_launchSetObjectEntry.getObjectEntryId());
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_DRAFT, launchSetObjectEntry.getStatus());
+	}
+
+	@Test
+	public void testRequestPublish() throws Exception {
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		ObjectEntry launchEntryObjectEntry1 = _addLaunchEntryObjectEntry(
+			_launchSetObjectEntry.getObjectEntryId(),
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			String.valueOf(journalArticle.getVersion()));
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.requestPublish(
+				launchEntryObjectEntry1.getObjectEntryId(),
+				TestPropsValues.getUserId()));
+
+		String title = RandomTestUtil.randomString();
+
+		long draftId = _updateLaunchDraft(launchEntryObjectEntry1, title);
+
 		String unknownClassName = RandomTestUtil.randomString();
 
 		ObjectEntry unknownLaunchEntryObjectEntry = _addLaunchEntryObjectEntry(
@@ -162,7 +210,9 @@ public class LaunchSetPublisherTest {
 		_objectEntryLocalService.deleteObjectEntry(
 			unknownLaunchEntryObjectEntry);
 
-		_launchSetPublisher.publish(_launchSetObjectEntry.getObjectEntryId());
+		_launchSetPublisher.requestPublish(
+			_launchSetObjectEntry.getObjectEntryId(),
+			TestPropsValues.getUserId());
 
 		LaunchEntryManager.Version publishedVersion =
 			launchEntryManager.fetchPublishedVersion(
@@ -174,7 +224,7 @@ public class LaunchSetPublisherTest {
 			publishedVersion.getVersionKey());
 
 		_assertPublished(
-			draftId, launchEntryObjectEntry, launchEntryManager,
+			draftId, launchEntryObjectEntry1, launchEntryManager,
 			publishedVersion);
 
 		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
@@ -185,8 +235,9 @@ public class LaunchSetPublisherTest {
 			launchSetObjectEntry.getStatus());
 
 		try {
-			_launchSetPublisher.publish(
-				_launchSetObjectEntry.getObjectEntryId());
+			_launchSetPublisher.requestPublish(
+				_launchSetObjectEntry.getObjectEntryId(),
+				TestPropsValues.getUserId());
 
 			Assert.fail();
 		}
@@ -215,8 +266,9 @@ public class LaunchSetPublisherTest {
 				WorkflowConstants.STATUS_APPROVED),
 			RandomTestUtil.randomString());
 
-		_launchSetPublisher.publish(
-			otherLaunchSetObjectEntry.getObjectEntryId());
+		_launchSetPublisher.requestPublish(
+			otherLaunchSetObjectEntry.getObjectEntryId(),
+			TestPropsValues.getUserId());
 
 		LaunchEntryManager.Version otherPublishedVersion =
 			launchEntryManager.fetchPublishedVersion(
@@ -230,6 +282,82 @@ public class LaunchSetPublisherTest {
 		_assertPublished(
 			otherDraftId, otherLaunchEntryObjectEntry, launchEntryManager,
 			otherPublishedVersion);
+
+		// Publish with workflow
+
+		launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		ObjectEntry launchEntryObjectEntry2 = _addLaunchEntryObjectEntry(
+			launchSetObjectEntry.getObjectEntryId(),
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			String.valueOf(journalArticle.getVersion()));
+
+		title = RandomTestUtil.randomString();
+
+		draftId = _updateLaunchDraft(launchEntryObjectEntry2, title);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				launchSetObjectEntry.getObjectDefinitionId());
+
+		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
+			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
+			objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
+
+		long launchSetId = launchSetObjectEntry.getObjectEntryId();
+
+		_launchSetPublisher.requestPublish(
+			launchSetId, TestPropsValues.getUserId());
+
+		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
+			launchSetId);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_PENDING, launchSetObjectEntry.getStatus());
+
+		version = launchEntryManager.fetchPublishedVersion(
+			journalArticle.getResourcePrimKey());
+
+		Assert.assertEquals(
+			String.valueOf(journalArticle.getVersion()),
+			version.getVersionKey());
+
+		Assert.assertNotNull(
+			launchEntryManager.fetchDraft(
+				journalArticle.getResourcePrimKey(), draftId));
+
+		try {
+			_launchSetPublisher.requestPublish(
+				launchSetId, TestPropsValues.getUserId());
+
+			Assert.fail();
+		}
+		catch (PortalException portalException) {
+			Assert.assertTrue(
+				portalException.getMessage(),
+				StringUtil.endsWith(
+					portalException.getMessage(), "is pending approval"));
+		}
+
+		_completeWorkflowTask();
+
+		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
+			launchSetId);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED,
+			launchSetObjectEntry.getStatus());
+
+		Assert.assertEquals(title, _getTitle(journalArticle));
+
+		_assertPublished(
+			draftId, launchEntryObjectEntry2, launchEntryManager,
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey()));
 	}
 
 	@Test
@@ -414,6 +542,25 @@ public class LaunchSetPublisherTest {
 			scheduledDateValue.getTime() / Time.SECOND);
 	}
 
+	private void _completeWorkflowTask() throws Exception {
+		List<WorkflowTask> workflowTasks =
+			_workflowTaskManager.getWorkflowTasksBySubmittingUser(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				false, 0, 1, null);
+
+		WorkflowTask workflowTask = workflowTasks.get(0);
+
+		_workflowTaskManager.assignWorkflowTaskToUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			workflowTask.getWorkflowTaskId(), TestPropsValues.getUserId(),
+			StringPool.BLANK, null, null);
+
+		_workflowTaskManager.completeWorkflowTask(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			workflowTask.getWorkflowTaskId(), Constants.APPROVE,
+			StringPool.BLANK, null);
+	}
+
 	private LaunchEntryManager _getJournalArticleLaunchEntryManager() {
 		return _launchEntryManagerRegistry.getLaunchEntryManager(
 			JournalArticle.class.getName());
@@ -498,5 +645,12 @@ public class LaunchSetPublisherTest {
 	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	private ServiceContext _serviceContext;
+
+	@Inject
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
+
+	@Inject
+	private WorkflowTaskManager _workflowTaskManager;
 
 }
