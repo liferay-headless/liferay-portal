@@ -5,9 +5,13 @@
 
 package com.liferay.portal.vulcan.internal.configuration.util;
 
+import com.liferay.configuration.admin.util.ConfigurationFilterStringUtil;
+import com.liferay.configuration.admin.util.ConfigurationPidUtil;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -16,8 +20,10 @@ import com.liferay.portal.vulcan.internal.configuration.VulcanConfiguration;
 
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -26,6 +32,10 @@ import org.osgi.service.cm.ConfigurationAdmin;
  * @author Javier Gamarra
  */
 public class ConfigurationUtil {
+
+	public static void clearRESTEnabledCache(String path) {
+		_restEnabledMaps.remove(path);
+	}
 
 	public static Configuration fetchConfiguration(
 		Configuration[] configurations) {
@@ -76,6 +86,33 @@ public class ConfigurationUtil {
 		return new HashSet<>();
 	}
 
+	public static boolean isRESTEnabled(
+		Company company, ConfigurationAdmin configurationAdmin, String path) {
+
+		try {
+			Map<Long, Boolean> restEnabledMap =
+				_restEnabledMaps.computeIfAbsent(
+					path, key -> new ConcurrentHashMap<>());
+
+			Boolean restEnabled = restEnabledMap.get(company.getCompanyId());
+
+			if (restEnabled == null) {
+				restEnabled = _isRESTEnabled(company, configurationAdmin, path);
+
+				restEnabledMap.put(company.getCompanyId(), restEnabled);
+			}
+
+			return restEnabled;
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
+		return true;
+	}
+
 	private static Set<String> _getExcludedOperationIds(
 		Configuration configuration) {
 
@@ -87,7 +124,76 @@ public class ConfigurationUtil {
 		return SetUtil.fromArray(excludedOperationIds.split(","));
 	}
 
+	private static boolean _isCompanyFactoryPid(String factoryPid) {
+		if (factoryPid == null) {
+			return false;
+		}
+
+		return Objects.equals(
+			ConfigurationPidUtil.getRawPid(factoryPid),
+			VulcanCompanyConfiguration.class.getName());
+	}
+
+	private static Boolean _isRESTEnabled(
+		boolean companyScope, Configuration[] configurations) {
+
+		if (configurations == null) {
+			return null;
+		}
+
+		for (Configuration configuration : configurations) {
+			if (_isCompanyFactoryPid(configuration.getFactoryPid()) !=
+					companyScope) {
+
+				continue;
+			}
+
+			Dictionary<String, Object> properties =
+				configuration.getProperties();
+
+			Object restEnabled = properties.get("restEnabled");
+
+			if (restEnabled != null) {
+				return GetterUtil.getBoolean(restEnabled);
+			}
+		}
+
+		return null;
+	}
+
+	private static boolean _isRESTEnabled(
+			Company company, ConfigurationAdmin configurationAdmin, String path)
+		throws Exception {
+
+		Configuration[] configurations = configurationAdmin.listConfigurations(
+			String.format(
+				"(&(path=%s)(|(service.factoryPid=%s)%s))",
+				SystemBundleUtil.escapeFilterValue(path),
+				VulcanConfiguration.class.getName(),
+				ConfigurationFilterStringUtil.getCompanyScopedFilterString(
+					company.getCompanyId(),
+					VulcanCompanyConfiguration.class.getName(),
+					company.getWebId())));
+
+		Boolean restEnabled = _isRESTEnabled(true, configurations);
+
+		if (restEnabled != null) {
+			return restEnabled;
+		}
+
+		restEnabled = _isRESTEnabled(false, configurations);
+
+		if (restEnabled != null) {
+			return restEnabled;
+		}
+
+		return true;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ConfigurationUtil.class);
+
+	private static final Map<String, Map<Long, Boolean>> _restEnabledMaps =
+		new ConcurrentHashMap<>();
 
 }

@@ -5,6 +5,7 @@
 
 package com.liferay.portal.vulcan.internal.configuration.util;
 
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -13,6 +14,7 @@ import com.liferay.portal.vulcan.internal.configuration.VulcanCompanyConfigurati
 import com.liferay.portal.vulcan.internal.configuration.VulcanConfiguration;
 
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -49,8 +51,77 @@ public class ConfigurationUtilTest {
 			_getExcludedOperationIds(systemConfiguration));
 	}
 
+	@Test
+	public void testIsRESTEnabled() {
+		Assert.assertTrue(_isRESTEnabled());
+
+		Configuration systemConfiguration = _createConfiguration(
+			false, VulcanConfiguration.class.getName());
+
+		Assert.assertFalse(_isRESTEnabled(systemConfiguration));
+		Assert.assertTrue(
+			_isRESTEnabled(
+				systemConfiguration,
+				_createConfiguration(
+					true, VulcanCompanyConfiguration.class.getName())));
+
+		systemConfiguration = _createConfiguration(
+			true, VulcanConfiguration.class.getName());
+
+		Assert.assertFalse(
+			_isRESTEnabled(
+				systemConfiguration,
+				_createConfiguration(
+					false, VulcanCompanyConfiguration.class.getName())));
+		Assert.assertFalse(
+			_isRESTEnabled(
+				systemConfiguration,
+				_createConfiguration(
+					false,
+					VulcanCompanyConfiguration.class.getName() + ".scoped")));
+
+		long companyId = RandomTestUtil.randomLong();
+		String path = RandomTestUtil.randomString();
+
+		Assert.assertTrue(_isRESTEnabled(companyId, path, systemConfiguration));
+
+		systemConfiguration = _createConfiguration(
+			false, VulcanConfiguration.class.getName());
+
+		Assert.assertTrue(_isRESTEnabled(companyId, path, systemConfiguration));
+
+		ConfigurationUtil.clearRESTEnabledCache(RandomTestUtil.randomString());
+
+		Assert.assertTrue(_isRESTEnabled(companyId, path, systemConfiguration));
+
+		ConfigurationUtil.clearRESTEnabledCache(path);
+
+		Assert.assertFalse(
+			_isRESTEnabled(companyId, path, systemConfiguration));
+	}
+
+	private Configuration _createConfiguration(
+		boolean restEnabled, String factoryPid) {
+
+		return _createConfiguration(
+			factoryPid,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"restEnabled", restEnabled
+			).build());
+	}
+
 	private Configuration _createConfiguration(
 		String excludedOperationIds, Class<?> factoryClass) {
+
+		return _createConfiguration(
+			factoryClass.getName(),
+			HashMapDictionaryBuilder.<String, Object>put(
+				"excludedOperationIds", excludedOperationIds
+			).build());
+	}
+
+	private Configuration _createConfiguration(
+		String factoryPid, Dictionary<String, Object> properties) {
 
 		return (Configuration)ProxyUtil.newProxyInstance(
 			ConfigurationUtilTest.class.getClassLoader(),
@@ -59,13 +130,28 @@ public class ConfigurationUtilTest {
 				String methodName = method.getName();
 
 				if (methodName.equals("getFactoryPid")) {
-					return factoryClass.getName();
+					return factoryPid;
 				}
 
 				if (methodName.equals("getProperties")) {
-					return HashMapDictionaryBuilder.<String, Object>put(
-						"excludedOperationIds", excludedOperationIds
-					).build();
+					return properties;
+				}
+
+				throw new UnsupportedOperationException(methodName);
+			});
+	}
+
+	private ConfigurationAdmin _createConfigurationAdmin(
+		Configuration... configurations) {
+
+		return (ConfigurationAdmin)ProxyUtil.newProxyInstance(
+			ConfigurationUtilTest.class.getClassLoader(),
+			new Class<?>[] {ConfigurationAdmin.class},
+			(proxy, method, args) -> {
+				String methodName = method.getName();
+
+				if (methodName.equals("listConfigurations")) {
+					return configurations;
 				}
 
 				throw new UnsupportedOperationException(methodName);
@@ -77,19 +163,37 @@ public class ConfigurationUtilTest {
 
 		return ConfigurationUtil.getExcludedOperationIds(
 			RandomTestUtil.randomLong(),
-			(ConfigurationAdmin)ProxyUtil.newProxyInstance(
+			_createConfigurationAdmin(configurations),
+			RandomTestUtil.randomString());
+	}
+
+	private boolean _isRESTEnabled(Configuration... configurations) {
+		return _isRESTEnabled(
+			RandomTestUtil.randomLong(), RandomTestUtil.randomString(),
+			configurations);
+	}
+
+	private boolean _isRESTEnabled(
+		long companyId, String path, Configuration... configurations) {
+
+		return ConfigurationUtil.isRESTEnabled(
+			(Company)ProxyUtil.newProxyInstance(
 				ConfigurationUtilTest.class.getClassLoader(),
-				new Class<?>[] {ConfigurationAdmin.class},
+				new Class<?>[] {Company.class},
 				(proxy, method, args) -> {
 					String methodName = method.getName();
 
-					if (methodName.equals("listConfigurations")) {
-						return configurations;
+					if (methodName.equals("getCompanyId")) {
+						return companyId;
+					}
+
+					if (methodName.equals("getWebId")) {
+						return RandomTestUtil.randomString();
 					}
 
 					throw new UnsupportedOperationException(methodName);
 				}),
-			RandomTestUtil.randomString());
+			_createConfigurationAdmin(configurations), path);
 	}
 
 }
