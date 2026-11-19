@@ -5,6 +5,8 @@
 
 package com.liferay.exportimport.internal.background.task;
 
+import com.liferay.exportimport.internal.upload.ImportFileSource;
+import com.liferay.exportimport.internal.upload.ImportFileSourceUtil;
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
@@ -78,7 +80,7 @@ public class LayoutImportBackgroundTaskExecutor
 		File file = null;
 
 		for (ImportFileSource importFileSource :
-				_importFileSourceHelper.getImportFileSources(
+				ImportFileSourceUtil.getImportFileSources(
 					backgroundTask, getLocale(backgroundTask))) {
 
 			try {
@@ -183,9 +185,6 @@ public class LayoutImportBackgroundTaskExecutor
 	@Reference
 	private ExportImportReportEntryLocalService
 		_exportImportReportEntryLocalService;
-
-	@Reference
-	private ImportFileSourceHelper _importFileSourceHelper;
 
 	private class LayoutImportCallable implements Callable<Void> {
 
