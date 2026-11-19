@@ -10,7 +10,6 @@ import confirmAndUnscheduleLaunchAction from '../actions/confirmAndUnscheduleLau
 import {Launch, isPublished} from '../api/launches';
 import {
 	WORKFLOW_STATUS_DENIED,
-	WORKFLOW_STATUS_DRAFT,
 	WORKFLOW_STATUS_PENDING,
 	WORKFLOW_STATUS_SCHEDULED,
 } from '../components/WorkflowStatusLabel';
@@ -60,17 +59,6 @@ export default function LaunchesFDSPropsTransformer({
 							return (
 								<ClayLabel displayType="success">
 									{Liferay.Language.get('published')}
-								</ClayLabel>
-							);
-						}
-
-						if (
-							itemData.scheduledDate &&
-							itemData.status?.code === WORKFLOW_STATUS_DRAFT
-						) {
-							return (
-								<ClayLabel displayType="danger">
-									{Liferay.Language.get('failed')}
 								</ClayLabel>
 							);
 						}

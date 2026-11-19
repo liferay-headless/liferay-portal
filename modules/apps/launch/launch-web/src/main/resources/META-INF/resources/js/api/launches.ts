@@ -30,9 +30,9 @@ async function readJSON(response: Response, message: string) {
 export interface Launch {
 	dateModified?: string;
 	description?: string;
+	displayDate?: string;
 	id: number;
 	name: string;
-	scheduledDate?: string;
 	status?: {code: number};
 }
 

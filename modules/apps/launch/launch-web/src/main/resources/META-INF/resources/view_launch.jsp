@@ -19,7 +19,7 @@ if (Validator.isNotNull(launchSetName)) {
 	renderResponse.setTitle(launchSetName);
 }
 
-String scheduledDate = viewLaunchDisplayContext.getScheduledDate();
+String displayDate = viewLaunchDisplayContext.getDisplayDate();
 %>
 
 <liferay-ui:error exception="<%= PortalException.class %>" message="unable-to-publish-the-launch" />
@@ -49,11 +49,11 @@ String scheduledDate = viewLaunchDisplayContext.getScheduledDate();
 				module="{LaunchScheduleButton} from launch-web"
 				props='<%=
 					HashMapBuilder.<String, Object>put(
+						"displayDate", displayDate
+					).put(
 						"pending", viewLaunchDisplayContext.isPending()
 					).put(
 						"published", viewLaunchDisplayContext.isPublished()
-					).put(
-						"scheduledDate", scheduledDate
 					).put(
 						"scheduleLaunchURL", viewLaunchDisplayContext.getScheduleLaunchURL()
 					).build()
@@ -66,7 +66,7 @@ String scheduledDate = viewLaunchDisplayContext.getScheduledDate();
 				module="{LaunchUnscheduleButton} from launch-web"
 				props='<%=
 					HashMapBuilder.<String, Object>put(
-						"scheduled", scheduledDate != null
+						"scheduled", displayDate != null
 					).put(
 						"unscheduleLaunchURL", viewLaunchDisplayContext.getUnscheduleLaunchURL()
 					).build()
@@ -85,7 +85,7 @@ String scheduledDate = viewLaunchDisplayContext.getScheduledDate();
 					).put(
 						"publishLaunchURL", viewLaunchDisplayContext.getPublishLaunchURL()
 					).put(
-						"scheduled", scheduledDate != null
+						"scheduled", displayDate != null
 					).build()
 				%>'
 			/>

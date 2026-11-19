@@ -17,14 +17,13 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -362,42 +361,119 @@ public class LaunchSetPublisherTest {
 
 	@Test
 	public void testSchedulePublish() throws Exception {
-		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
+		long launchSetId1 = _launchSetObjectEntry.getObjectEntryId();
 
-		ObjectEntry launchEntryObjectEntry = _addLaunchEntryObjectEntry(
-			launchSetId, RandomTestUtil.randomString(),
+		ObjectEntry launchEntryObjectEntry1 = _addLaunchEntryObjectEntry(
+			launchSetId1, RandomTestUtil.randomString(),
 			RandomTestUtil.randomInt(), RandomTestUtil.randomString());
 
 		Assert.assertThrows(
 			PortalException.class,
 			() -> _launchSetPublisher.schedulePublish(
 				new Date(System.currentTimeMillis() + Time.DAY),
-				launchEntryObjectEntry.getObjectEntryId(),
+				launchEntryObjectEntry1.getObjectEntryId(),
 				TestPropsValues.getUserId()));
 
 		Assert.assertThrows(
 			PortalException.class,
 			() -> _launchSetPublisher.schedulePublish(
-				new Date(System.currentTimeMillis() - Time.MINUTE), launchSetId,
-				TestPropsValues.getUserId()));
+				new Date(System.currentTimeMillis() - Time.MINUTE),
+				launchSetId1, TestPropsValues.getUserId()));
 		Assert.assertThrows(
 			PortalException.class,
 			() -> _launchSetPublisher.schedulePublish(
-				null, launchSetId, TestPropsValues.getUserId()));
+				null, launchSetId1, TestPropsValues.getUserId()));
 
 		Date date = new Date(System.currentTimeMillis() + Time.DAY);
 
 		_launchSetPublisher.schedulePublish(
-			date, launchSetId, TestPropsValues.getUserId());
+			date, launchSetId1, TestPropsValues.getUserId());
 
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertDisplayDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId1);
 
 		Assert.assertThrows(
 			PortalException.class,
 			() -> _launchSetPublisher.schedulePublish(
-				new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
+				new Date(System.currentTimeMillis() + Time.DAY), launchSetId1,
 				TestPropsValues.getUserId()));
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertDisplayDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId1);
+
+		// Schedule publish with workflow
+
+		ObjectEntry launchSetObjectEntry = _addLaunchSetObjectEntry();
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		ObjectEntry launchEntryObjectEntry2 = _addLaunchEntryObjectEntry(
+			launchSetObjectEntry.getObjectEntryId(),
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			String.valueOf(journalArticle.getVersion()));
+
+		String title = RandomTestUtil.randomString();
+
+		long draftId = _updateLaunchDraft(launchEntryObjectEntry2, title);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				launchSetObjectEntry.getObjectDefinitionId());
+
+		_workflowDefinitionLinkLocalService.updateWorkflowDefinitionLink(
+			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(), 0,
+			objectDefinition.getClassName(), 0, 0, "Single Approver", 1);
+
+		long launchSetId2 = launchSetObjectEntry.getObjectEntryId();
+
+		date = new Date(System.currentTimeMillis() + Time.DAY);
+
+		_launchSetPublisher.schedulePublish(
+			date, launchSetId2, TestPropsValues.getUserId());
+
+		_assertDisplayDateAndStatus(
+			date, WorkflowConstants.STATUS_PENDING, launchSetId2);
+
+		Assert.assertThrows(
+			PortalException.class,
+			() -> _launchSetPublisher.unschedulePublish(launchSetId2));
+
+		_completeWorkflowTask();
+
+		_assertDisplayDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId2);
+
+		LaunchEntryManager launchEntryManager =
+			_getJournalArticleLaunchEntryManager();
+
+		Assert.assertNotNull(
+			launchEntryManager.fetchDraft(
+				journalArticle.getResourcePrimKey(), draftId));
+
+		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
+			launchSetId2);
+
+		launchSetObjectEntry.setDisplayDate(
+			new Date(System.currentTimeMillis() - Time.MINUTE));
+
+		_objectEntryLocalService.updateObjectEntry(launchSetObjectEntry);
+
+		_checkObjectEntries();
+
+		launchSetObjectEntry = _objectEntryLocalService.getObjectEntry(
+			launchSetId2);
+
+		Assert.assertEquals(
+			WorkflowConstants.STATUS_APPROVED,
+			launchSetObjectEntry.getStatus());
+
+		Assert.assertEquals(title, _getTitle(journalArticle));
+
+		_assertPublished(
+			draftId, launchEntryObjectEntry2, launchEntryManager,
+			launchEntryManager.fetchPublishedVersion(
+				journalArticle.getResourcePrimKey()));
 	}
 
 	@Test
@@ -415,7 +491,8 @@ public class LaunchSetPublisherTest {
 
 		_launchSetPublisher.unschedulePublish(launchSetId);
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertDisplayDateAndStatus(
+			null, WorkflowConstants.STATUS_DRAFT, launchSetId);
 
 		_launchSetPublisher.schedulePublish(
 			new Date(System.currentTimeMillis() + Time.DAY), launchSetId,
@@ -423,14 +500,16 @@ public class LaunchSetPublisherTest {
 
 		_launchSetPublisher.unschedulePublish(launchSetId);
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertDisplayDateAndStatus(
+			null, WorkflowConstants.STATUS_DRAFT, launchSetId);
 
 		Date date = new Date(System.currentTimeMillis() + Time.WEEK);
 
 		_launchSetPublisher.schedulePublish(
 			date, launchSetId, TestPropsValues.getUserId());
 
-		_assertScheduledDateAndStatus(date, WorkflowConstants.STATUS_SCHEDULED);
+		_assertDisplayDateAndStatus(
+			date, WorkflowConstants.STATUS_SCHEDULED, launchSetId);
 	}
 
 	private ObjectEntry _addLaunchEntryObjectEntry(
@@ -482,6 +561,28 @@ public class LaunchSetPublisherTest {
 			serviceContext);
 	}
 
+	private void _assertDisplayDateAndStatus(
+			Date expectedDate, int expectedStatus, long launchSetId)
+		throws Exception {
+
+		ObjectEntry launchSetObjectEntry =
+			_objectEntryLocalService.getObjectEntry(launchSetId);
+
+		Assert.assertEquals(expectedStatus, launchSetObjectEntry.getStatus());
+
+		Date displayDate = launchSetObjectEntry.getDisplayDate();
+
+		if (expectedDate == null) {
+			Assert.assertNull(displayDate);
+
+			return;
+		}
+
+		Assert.assertEquals(
+			expectedDate.getTime() / Time.SECOND,
+			displayDate.getTime() / Time.SECOND);
+	}
+
 	private void _assertPublished(
 			long draftId, ObjectEntry launchEntryObjectEntry,
 			LaunchEntryManager launchEntryManager,
@@ -500,46 +601,29 @@ public class LaunchSetPublisherTest {
 				MapUtil.getLong(values, "classPK"), draftId));
 	}
 
-	private void _assertScheduledDateAndStatus(
-			Date expectedDate, int expectedStatus)
-		throws Exception {
+	private void _checkObjectEntries() throws Exception {
+		String name = PrincipalThreadLocal.getName();
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
 
-		long launchSetId = _launchSetObjectEntry.getObjectEntryId();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.popServiceContext();
 
-		ObjectEntry launchSetObjectEntry =
-			_objectEntryLocalService.getObjectEntry(launchSetId);
+		try {
+			PermissionThreadLocal.setPermissionChecker(null);
+			PrincipalThreadLocal.setName(null);
 
-		Assert.assertEquals(expectedStatus, launchSetObjectEntry.getStatus());
+			Assert.assertNull(ServiceContextThreadLocal.getServiceContext());
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				StringBundler.concat(
-					launchSetId, StringPool.AT,
-					launchSetObjectEntry.getCompanyId()),
-				"liferay/launch_set_scheduled_publish", StorageType.PERSISTED);
-
-		Date scheduledDate = null;
-
-		if (schedulerResponse != null) {
-			scheduledDate = _schedulerEngineHelper.getStartDate(
-				schedulerResponse);
+			_objectEntryLocalService.checkObjectEntries(
+				TestPropsValues.getCompanyId());
 		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(permissionChecker);
+			PrincipalThreadLocal.setName(name);
 
-		Map<String, Serializable> values = launchSetObjectEntry.getValues();
-
-		Date scheduledDateValue = (Date)values.get("scheduledDate");
-
-		if (expectedDate == null) {
-			Assert.assertNull(scheduledDate);
-			Assert.assertNull(scheduledDateValue);
-
-			return;
+			ServiceContextThreadLocal.pushServiceContext(serviceContext);
 		}
-
-		Assert.assertEquals(expectedDate, scheduledDate);
-		Assert.assertEquals(
-			expectedDate.getTime() / Time.SECOND,
-			scheduledDateValue.getTime() / Time.SECOND);
 	}
 
 	private void _completeWorkflowTask() throws Exception {
@@ -640,9 +724,6 @@ public class LaunchSetPublisherTest {
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Inject
-	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	private ServiceContext _serviceContext;
 

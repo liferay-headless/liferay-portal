@@ -50,7 +50,6 @@ import java.io.Serializable;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -122,7 +121,7 @@ public class ScheduleLaunchMVCActionCommandTest {
 				LocaleUtil.US, "the-publish-time-must-be-in-the-future"),
 			jsonObject.getString("validationError"));
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertDisplayDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
 
 		// External redirect
 
@@ -175,7 +174,7 @@ public class ScheduleLaunchMVCActionCommandTest {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 
-		_assertScheduledDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
+		_assertDisplayDateAndStatus(null, WorkflowConstants.STATUS_DRAFT);
 
 		// Future date
 
@@ -185,7 +184,7 @@ public class ScheduleLaunchMVCActionCommandTest {
 
 		Assert.assertEquals(_REDIRECT, jsonObject.getString("redirect"));
 
-		_assertScheduledDateAndStatus(
+		_assertDisplayDateAndStatus(
 			new Date(publishTime), WorkflowConstants.STATUS_SCHEDULED);
 
 		// Already scheduled
@@ -217,11 +216,11 @@ public class ScheduleLaunchMVCActionCommandTest {
 			_language.get(LocaleUtil.US, "an-unexpected-error-occurred"),
 			jsonObject.getString("error"));
 
-		_assertScheduledDateAndStatus(
+		_assertDisplayDateAndStatus(
 			new Date(publishTime), WorkflowConstants.STATUS_SCHEDULED);
 	}
 
-	private void _assertScheduledDateAndStatus(
+	private void _assertDisplayDateAndStatus(
 			Date expectedDate, int expectedStatus)
 		throws Exception {
 
@@ -231,19 +230,17 @@ public class ScheduleLaunchMVCActionCommandTest {
 
 		Assert.assertEquals(expectedStatus, launchSetObjectEntry.getStatus());
 
-		Map<String, Serializable> values = launchSetObjectEntry.getValues();
-
-		Date scheduledDate = (Date)values.get("scheduledDate");
+		Date displayDate = launchSetObjectEntry.getDisplayDate();
 
 		if (expectedDate == null) {
-			Assert.assertNull(scheduledDate);
+			Assert.assertNull(displayDate);
 
 			return;
 		}
 
 		Assert.assertEquals(
 			expectedDate.getTime() / Time.SECOND,
-			scheduledDate.getTime() / Time.SECOND);
+			displayDate.getTime() / Time.SECOND);
 	}
 
 	private ThemeDisplay _getThemeDisplay(User user) throws Exception {

@@ -7,7 +7,6 @@ package com.liferay.launch.internal.set.publisher;
 
 import com.liferay.launch.entry.manager.LaunchEntryManager;
 import com.liferay.launch.entry.manager.LaunchEntryManagerRegistry;
-import com.liferay.launch.internal.constants.LaunchDestinationNames;
 import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -15,14 +14,8 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -166,29 +159,8 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 					" must be scheduled for a future date");
 		}
 
-		ServiceContext serviceContext = _createServiceContext(
-			launchSetObjectEntry, userId);
-
-		_updateScheduledDate(
-			date, launchSetObjectEntry, serviceContext, userId);
-
-		_objectEntryLocalService.updateStatus(
-			userId, launchSetId, WorkflowConstants.STATUS_SCHEDULED,
-			serviceContext);
-
-		Message message = new Message();
-
-		message.put("companyId", launchSetObjectEntry.getCompanyId());
-		message.put("launchSetId", launchSetId);
-		message.put("userId", userId);
-
-		_schedulerEngineHelper.schedule(
-			_triggerFactory.createTrigger(
-				_getJobName(launchSetObjectEntry),
-				LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH, date, null,
-				0, null),
-			StorageType.PERSISTED, String.valueOf(launchSetId),
-			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH, message);
+		_startWorkflowInstance(
+			_updateDisplayDate(date, launchSetObjectEntry), userId);
 	}
 
 	@Override
@@ -197,43 +169,25 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 			launchSetId);
 
 		if (launchSetObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_SCHEDULED) {
+				WorkflowConstants.STATUS_PENDING) {
 
-			long userId = PrincipalThreadLocal.getUserId();
-
-			ServiceContext serviceContext = _createServiceContext(
-				launchSetObjectEntry, userId);
-
-			_objectEntryLocalService.updateStatus(
-				userId, launchSetId, WorkflowConstants.STATUS_DRAFT,
-				serviceContext);
-
-			_updateScheduledDate(
-				null, launchSetObjectEntry, serviceContext, userId);
+			throw new PortalException(
+				"Launch set " + launchSetId + " is pending approval");
 		}
 
-		_schedulerEngineHelper.delete(
-			_getJobName(launchSetObjectEntry),
-			LaunchDestinationNames.LAUNCH_SET_SCHEDULED_PUBLISH,
-			StorageType.PERSISTED);
-	}
+		if (launchSetObjectEntry.getStatus() !=
+				WorkflowConstants.STATUS_SCHEDULED) {
 
-	private ServiceContext _createServiceContext(
-		ObjectEntry launchSetObjectEntry, long userId) {
+			return;
+		}
 
-		ServiceContext serviceContext = new ServiceContext();
+		long userId = PrincipalThreadLocal.getUserId();
 
-		serviceContext.setCompanyId(launchSetObjectEntry.getCompanyId());
-		serviceContext.setUserId(userId);
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
-
-		return serviceContext;
-	}
-
-	private String _getJobName(ObjectEntry launchSetObjectEntry) {
-		return StringBundler.concat(
-			launchSetObjectEntry.getObjectEntryId(), StringPool.AT,
-			launchSetObjectEntry.getCompanyId());
+		_updateDisplayDate(
+			null,
+			_objectEntryLocalService.updateStatus(
+				userId, launchSetId, WorkflowConstants.STATUS_DRAFT,
+				_getServiceContext(launchSetObjectEntry, userId)));
 	}
 
 	private ObjectEntry _getLaunchSetObjectEntry(long launchSetId)
@@ -306,21 +260,6 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		return _objectEntryLocalService.updateObjectEntry(launchSetObjectEntry);
 	}
 
-	private void _updateScheduledDate(
-			Date date, ObjectEntry launchSetObjectEntry,
-			ServiceContext serviceContext, long userId)
-		throws PortalException {
-
-		Map<String, Serializable> values = launchSetObjectEntry.getValues();
-
-		values.put("scheduledDate", date);
-
-		_objectEntryLocalService.updateObjectEntry(
-			userId, launchSetObjectEntry.getObjectEntryId(),
-			launchSetObjectEntry.getObjectEntryFolderId(), values,
-			serviceContext);
-	}
-
 	@Reference
 	private LaunchEntryManagerRegistry _launchEntryManagerRegistry;
 
@@ -332,11 +271,5 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
-
-	@Reference
-	private SchedulerEngineHelper _schedulerEngineHelper;
-
-	@Reference
-	private TriggerFactory _triggerFactory;
 
 }

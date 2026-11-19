@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.io.Serializable;
-
 import java.time.Instant;
 
 import java.util.Date;
@@ -115,6 +113,27 @@ public class ViewLaunchDisplayContext {
 		}
 
 		return creationMenu;
+	}
+
+	public String getDisplayDate() {
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			getLaunchSetId());
+
+		if ((objectEntry == null) ||
+			(objectEntry.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) {
+
+			return null;
+		}
+
+		Date displayDate = objectEntry.getDisplayDate();
+
+		if (displayDate == null) {
+			return null;
+		}
+
+		Instant instant = displayDate.toInstant();
+
+		return instant.toString();
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems() {
@@ -204,29 +223,6 @@ public class ViewLaunchDisplayContext {
 		).setParameter(
 			"launchSetId", getLaunchSetId()
 		).buildString();
-	}
-
-	public String getScheduledDate() {
-		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-			getLaunchSetId());
-
-		if ((objectEntry == null) ||
-			(objectEntry.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) {
-
-			return null;
-		}
-
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		Date scheduledDate = (Date)values.get("scheduledDate");
-
-		if (scheduledDate == null) {
-			return null;
-		}
-
-		Instant instant = scheduledDate.toInstant();
-
-		return instant.toString();
 	}
 
 	public String getUnscheduleLaunchURL() {

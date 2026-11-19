@@ -11,16 +11,11 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -55,7 +50,6 @@ import java.io.Serializable;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -195,28 +189,17 @@ public class UnscheduleLaunchMVCActionCommandTest {
 
 		Assert.assertEquals(expectedStatus, launchSetObjectEntry.getStatus());
 
-		Map<String, Serializable> values = launchSetObjectEntry.getValues();
-
-		Date scheduledDate = (Date)values.get("scheduledDate");
-
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				StringBundler.concat(
-					launchSetObjectEntry.getObjectEntryId(), StringPool.AT,
-					launchSetObjectEntry.getCompanyId()),
-				"liferay/launch_set_scheduled_publish", StorageType.PERSISTED);
+		Date displayDate = launchSetObjectEntry.getDisplayDate();
 
 		if (expectedDate == null) {
-			Assert.assertNull(scheduledDate);
-			Assert.assertNull(schedulerResponse);
+			Assert.assertNull(displayDate);
 
 			return;
 		}
 
 		Assert.assertEquals(
 			expectedDate.getTime() / Time.SECOND,
-			scheduledDate.getTime() / Time.SECOND);
-		Assert.assertNotNull(schedulerResponse);
+			displayDate.getTime() / Time.SECOND);
 	}
 
 	private ThemeDisplay _getThemeDisplay(User user) throws Exception {
@@ -300,9 +283,6 @@ public class UnscheduleLaunchMVCActionCommandTest {
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Inject
-	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	@DeleteAfterTestRun
 	private User _user;

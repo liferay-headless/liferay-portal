@@ -48,7 +48,7 @@ public class LaunchSetsTableFDSView extends BaseTableFDSView {
 				true
 			)
 		).add(
-			"scheduledDate", "scheduled-date",
+			"displayDate", "scheduled-date",
 			fdsTableSchemaField -> fdsTableSchemaField.setContentRenderer(
 				"dateTime")
 		).add(

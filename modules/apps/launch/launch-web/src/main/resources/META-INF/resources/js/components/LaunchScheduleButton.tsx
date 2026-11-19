@@ -15,19 +15,19 @@ import LaunchService from '../services/LaunchService';
 import {openErrorToast} from '../util/toasts';
 
 interface Props {
+	displayDate: string | null;
 	pending: boolean;
 	portletNamespace: string;
 	published: boolean;
 	scheduleLaunchURL: string;
-	scheduledDate: string | null;
 }
 
 export default function LaunchScheduleButton({
+	displayDate,
 	pending,
 	portletNamespace,
 	published,
 	scheduleLaunchURL,
-	scheduledDate,
 }: Props) {
 	const [publishDate, setPublishDate] = useState('');
 	const [scheduleActive, setScheduleActive] = useState(false);
@@ -67,11 +67,11 @@ export default function LaunchScheduleButton({
 		}
 	}
 
-	if (scheduledDate) {
+	if (displayDate) {
 		return (
 			<ClayLabel displayType="info">
 				{`${Liferay.Language.get('scheduled')}: ${new Date(
-					scheduledDate
+					displayDate
 				).toLocaleString()}`}
 			</ClayLabel>
 		);
