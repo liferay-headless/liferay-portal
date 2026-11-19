@@ -26,8 +26,10 @@ import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 
 import java.io.Serializable;
 
@@ -49,13 +51,6 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 	public void publish(long launchSetId) throws PortalException {
 		ObjectEntry launchSetObjectEntry = _getLaunchSetObjectEntry(
 			launchSetId);
-
-		if (launchSetObjectEntry.getStatus() ==
-				WorkflowConstants.STATUS_APPROVED) {
-
-			throw new PortalException(
-				"Launch set " + launchSetId + " was already published");
-		}
 
 		ObjectRelationship objectRelationship =
 			_objectRelationshipLocalService.getObjectRelationship(
@@ -99,10 +94,56 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 				launchEntryObjectEntry.getObjectEntryFolderId(), values,
 				serviceContext);
 		}
+	}
 
-		_objectEntryLocalService.updateStatus(
-			serviceContext.getUserId(), launchSetId,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+	@Override
+	public void requestPublish(long launchSetId, long userId)
+		throws PortalException {
+
+		ObjectEntry launchSetObjectEntry = _getLaunchSetObjectEntry(
+			launchSetId);
+
+		if (launchSetObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_APPROVED) {
+
+			throw new PortalException(
+				"Launch set " + launchSetId + " was already published");
+		}
+
+		if (launchSetObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_PENDING) {
+
+			throw new PortalException(
+				"Launch set " + launchSetId + " is pending approval");
+		}
+
+		Date displayDate = launchSetObjectEntry.getDisplayDate();
+
+		if (launchSetObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_SCHEDULED) {
+
+			Date date = new Date();
+
+			if ((displayDate != null) && displayDate.after(date)) {
+				launchSetObjectEntry.setDisplayDate(date);
+			}
+
+			_objectEntryLocalService.updateStatus(
+				userId, launchSetObjectEntry, WorkflowConstants.STATUS_APPROVED,
+				_getServiceContext(launchSetObjectEntry, userId));
+
+			return;
+		}
+
+		if ((displayDate != null) &&
+			(launchSetObjectEntry.getStatus() ==
+				WorkflowConstants.STATUS_DRAFT)) {
+
+			launchSetObjectEntry = _updateDisplayDate(
+				null, launchSetObjectEntry);
+		}
+
+		_startWorkflowInstance(launchSetObjectEntry, userId);
 	}
 
 	@Override
@@ -213,6 +254,56 @@ public class LaunchSetPublisherImpl implements LaunchSetPublisher {
 		}
 
 		return objectEntry;
+	}
+
+	private ServiceContext _getServiceContext(
+		ObjectEntry launchSetObjectEntry, long userId) {
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			serviceContext = new ServiceContext();
+		}
+		else {
+			serviceContext = (ServiceContext)serviceContext.clone();
+		}
+
+		serviceContext.setCompanyId(launchSetObjectEntry.getCompanyId());
+		serviceContext.setUserId(userId);
+
+		return serviceContext;
+	}
+
+	private void _startWorkflowInstance(
+			ObjectEntry launchSetObjectEntry, long userId)
+		throws PortalException {
+
+		ServiceContext serviceContext = _getServiceContext(
+			launchSetObjectEntry, userId);
+
+		serviceContext.setAttribute(
+			"workflowContext",
+			HashMapBuilder.<String, Serializable>put(
+				WorkflowConstants.CONTEXT_WAIT_FOR_COMPLETION,
+				Boolean.TRUE.toString()
+			).build());
+		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			launchSetObjectEntry.getCompanyId(),
+			launchSetObjectEntry.getNonzeroGroupId(), userId,
+			launchSetObjectEntry.getModelClassName(),
+			launchSetObjectEntry.getObjectEntryId(), launchSetObjectEntry,
+			serviceContext);
+	}
+
+	private ObjectEntry _updateDisplayDate(
+		Date displayDate, ObjectEntry launchSetObjectEntry) {
+
+		launchSetObjectEntry.setDisplayDate(displayDate);
+
+		return _objectEntryLocalService.updateObjectEntry(launchSetObjectEntry);
 	}
 
 	private void _updateScheduledDate(

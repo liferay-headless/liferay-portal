@@ -5,7 +5,6 @@
 
 package com.liferay.launch.internal.background.task;
 
-import com.liferay.launch.set.publisher.LaunchSetPublisher;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
@@ -92,8 +91,9 @@ public class LaunchSetScheduledPublishBackgroundTaskExecutor
 			TransactionInvokerUtil.invoke(
 				_transactionConfig,
 				() -> {
-					_launchSetPublisher.publish(
-						launchSetObjectEntry.getObjectEntryId());
+					_objectEntryLocalService.updateStatus(
+						userId, launchSetObjectEntry.getObjectEntryId(),
+						WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 					return null;
 				});
@@ -148,9 +148,6 @@ public class LaunchSetScheduledPublishBackgroundTaskExecutor
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private LaunchSetPublisher _launchSetPublisher;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
