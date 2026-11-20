@@ -8,7 +8,7 @@ package com.liferay.portal.vulcan.internal.cache;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
-import com.liferay.portal.vulcan.application.OpenAPIDocumentCacheInvalidator;
+import com.liferay.portal.vulcan.cache.OpenAPIDocumentCacheInvalidator;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
