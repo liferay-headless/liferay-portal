@@ -74,9 +74,10 @@ public class HeadlessApplicationProviderTest {
 
 		_bundleContext = bundle.getBundleContext();
 
-		_contentApplicationServiceRegistration = _bundleContext.registerService(
-			Application.class, new TestApplication(),
-			_getContentApplicationProperties());
+		_changingApplicationServiceRegistration =
+			_bundleContext.registerService(
+				Application.class, new TestApplication(),
+				_getChangingApplicationProperties());
 
 		_serviceRegistrations = Arrays.asList(
 			_bundleContext.registerService(
@@ -131,21 +132,6 @@ public class HeadlessApplicationProviderTest {
 					"(osgi.jaxrs.name=Liferay.Vulcan)"
 				).put(
 					"osgi.jaxrs.name", "Test.Vulcan.Company"
-				).build()),
-			_contentApplicationServiceRegistration,
-			_bundleContext.registerService(
-				TestContentResource_v1_0.class, new TestContentResource_v1_0(),
-				HashMapDictionaryBuilder.<String, Object>put(
-					"api.version", "v1.0"
-				).put(
-					"openapi.resource", "true"
-				).put(
-					"openapi.resource.path", "/test-vulcan-application-content"
-				).put(
-					"osgi.jaxrs.application.select",
-					"(osgi.jaxrs.name=Test.Vulcan.Content)"
-				).put(
-					"osgi.jaxrs.resource", "true"
 				).build()),
 			_bundleContext.registerService(
 				Application.class, new TestApplication(),
@@ -248,6 +234,22 @@ public class HeadlessApplicationProviderTest {
 				HashMapDictionaryBuilder.<String, Object>put(
 					"osgi.jaxrs.application.select",
 					"(osgi.jaxrs.name=Test.Vulcan.Unversioned)"
+				).put(
+					"osgi.jaxrs.resource", "true"
+				).build()),
+			_changingApplicationServiceRegistration,
+			_bundleContext.registerService(
+				TestChangingResource_v1_0.class,
+				new TestChangingResource_v1_0(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"api.version", "v1.0"
+				).put(
+					"openapi.resource", "true"
+				).put(
+					"openapi.resource.path", "/test-vulcan-application-changing"
+				).put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=Test.Vulcan.Changing)"
 				).put(
 					"osgi.jaxrs.resource", "true"
 				).build()));
@@ -401,20 +403,9 @@ public class HeadlessApplicationProviderTest {
 	public void testGetContentString() throws Exception {
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
 			_getOpenAPIDocument(
-				_getApplication("/test-vulcan-application-content"), "v1.0");
+				_getApplication("/test-vulcan-application-changing"), "v1.0");
 
 		String serverURL = RandomTestUtil.randomString();
-
-		Assert.assertEquals(
-			"{\"openapi\": \"1\"}",
-			openAPIDocument.getContentString(
-				serverURL,
-				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
-		Assert.assertEquals(
-			"{\"openapi\": \"1\"}",
-			openAPIDocument.getContentString(
-				serverURL,
-				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
 
 		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
 			serverURL);
@@ -423,14 +414,16 @@ public class HeadlessApplicationProviderTest {
 		Assert.assertSame(
 			contentJSONObject, openAPIDocument.getContentJSONObject(serverURL));
 
-		Object contentObject = openAPIDocument.getContentObject(serverURL);
-
-		Assert.assertNotNull(contentObject);
-		Assert.assertNotSame(
-			contentObject, openAPIDocument.getContentObject(serverURL));
+		Assert.assertNotNull(openAPIDocument.getContentObject(serverURL));
 
 		Assert.assertEquals(
-			"{\"openapi\": \"2\"}",
+			"{\"openapi\": \"1\"}",
+			openAPIDocument.getContentString(
+				serverURL,
+				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
+
+		Assert.assertEquals(
+			"openapi: \"2\"",
 			openAPIDocument.getContentString(
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.YAML));
@@ -448,9 +441,14 @@ public class HeadlessApplicationProviderTest {
 
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
 			_getOpenAPIDocument(
-				_getApplication("/test-vulcan-application-content"), "v1.0");
+				_getApplication("/test-vulcan-application-changing"), "v1.0");
 
 		String serverURL = RandomTestUtil.randomString();
+
+		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
+			serverURL);
+
+		Assert.assertEquals("1", contentJSONObject.getString("openapi"));
 
 		Assert.assertEquals(
 			"{\"openapi\": \"1\"}",
@@ -458,23 +456,18 @@ public class HeadlessApplicationProviderTest {
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
 
-		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
-			serverURL);
+		_changingApplicationServiceRegistration.setProperties(
+			_getChangingApplicationProperties());
 
-		Assert.assertEquals("1", contentJSONObject.getString("openapi"));
+		contentJSONObject = openAPIDocument.getContentJSONObject(serverURL);
 
-		_contentApplicationServiceRegistration.setProperties(
-			_getContentApplicationProperties());
+		Assert.assertEquals("2", contentJSONObject.getString("openapi"));
 
 		Assert.assertEquals(
 			"{\"openapi\": \"2\"}",
 			openAPIDocument.getContentString(
 				serverURL,
 				HeadlessApplicationProvider.OpenAPIDocument.Type.JSON));
-
-		contentJSONObject = openAPIDocument.getContentJSONObject(serverURL);
-
-		Assert.assertEquals("2", contentJSONObject.getString("openapi"));
 	}
 
 	@Test
@@ -483,7 +476,7 @@ public class HeadlessApplicationProviderTest {
 
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
 			_getOpenAPIDocument(
-				_getApplication("/test-vulcan-application-content"), "v1.0");
+				_getApplication("/test-vulcan-application-changing"), "v1.0");
 
 		String serverURL = RandomTestUtil.randomString();
 
@@ -531,7 +524,7 @@ public class HeadlessApplicationProviderTest {
 
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
 			_getOpenAPIDocument(
-				_getApplication("/test-vulcan-application-content"), "v1.0");
+				_getApplication("/test-vulcan-application-changing"), "v1.0");
 
 		String serverURL = RandomTestUtil.randomString();
 
@@ -548,14 +541,14 @@ public class HeadlessApplicationProviderTest {
 					"api.version", "v2.0"
 				).put(
 					"osgi.jaxrs.application.select",
-					"(osgi.jaxrs.name=Test.Vulcan.Content)"
+					"(osgi.jaxrs.name=Test.Vulcan.Changing)"
 				).put(
 					"osgi.jaxrs.resource", "true"
 				).build());
 
 		try {
 			Assert.assertNotNull(
-				_getApplication("/test-vulcan-application-content"));
+				_getApplication("/test-vulcan-application-changing"));
 
 			Assert.assertEquals(
 				"{\"openapi\": \"2\"}",
@@ -578,7 +571,7 @@ public class HeadlessApplicationProviderTest {
 	}
 
 	@Path("/v1.0")
-	public static class TestContentResource_v1_0 {
+	public static class TestChangingResource_v1_0 {
 
 		@GET
 		@Path("/openapi.{type:json|yaml}")
@@ -587,8 +580,16 @@ public class HeadlessApplicationProviderTest {
 			HttpServletRequest httpServletRequest,
 			@PathParam("type") String type, UriInfo uriInfo) {
 
+			int count = _count.incrementAndGet();
+
+			if (Objects.equals(type, "yaml")) {
+				return Response.ok(
+					"openapi: \"" + count + "\""
+				).build();
+			}
+
 			return Response.ok(
-				"{\"openapi\": \"" + _count.incrementAndGet() + "\"}"
+				"{\"openapi\": \"" + count + "\"}"
 			).build();
 		}
 
@@ -689,7 +690,8 @@ public class HeadlessApplicationProviderTest {
 		return null;
 	}
 
-	private HashMapDictionary<String, Object> _getContentApplicationProperties()
+	private HashMapDictionary<String, Object>
+			_getChangingApplicationProperties()
 		throws Exception {
 
 		return HashMapDictionaryBuilder.<String, Object>put(
@@ -701,11 +703,11 @@ public class HeadlessApplicationProviderTest {
 		).put(
 			"liferay.oauth2", false
 		).put(
-			"osgi.jaxrs.application.base", "/test-vulcan-application-content"
+			"osgi.jaxrs.application.base", "/test-vulcan-application-changing"
 		).put(
 			"osgi.jaxrs.extension.select", "(osgi.jaxrs.name=Liferay.Vulcan)"
 		).put(
-			"osgi.jaxrs.name", "Test.Vulcan.Content"
+			"osgi.jaxrs.name", "Test.Vulcan.Changing"
 		).build();
 	}
 
@@ -743,7 +745,7 @@ public class HeadlessApplicationProviderTest {
 
 	private BundleContext _bundleContext;
 	private ServiceRegistration<Application>
-		_contentApplicationServiceRegistration;
+		_changingApplicationServiceRegistration;
 
 	@Inject
 	private FeatureFlagManager _featureFlagManager;
