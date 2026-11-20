@@ -10,6 +10,7 @@ import {featureFlagsTest} from '../../../../fixtures/featureFlagsTest';
 import {loginTest} from '../../../../fixtures/loginTest';
 import {clickAndExpectToBeVisible} from '../../../../utils/clickAndExpectToBeVisible';
 import getRandomString from '../../../../utils/getRandomString';
+import {PORTLET_URLS} from '../../../../utils/portletUrls';
 import {exportImportPagesTest} from '../../../export-import-web/revamp/fixtures/exportImportPagesTest';
 import {cmsPagesTest} from '../fixtures/cmsPagesTest';
 
@@ -67,5 +68,97 @@ test(
 			await exportImportDataSelectionPage.getExportableItems();
 
 		expect(exportableItems.get('Object Entry Folders')).toBe(1);
+	}
+);
+
+test(
+	'Export and Import of a Space stay in the CMS and name the Space in the title',
+	{tag: '@LPD-115187'},
+	async ({apiHelpers, exportImportPage, page}) => {
+		const space = await apiHelpers.headlessAssetLibrary.createSpace();
+
+		for (const action of ['Export', 'Import']) {
+			await test.step(`Open ${action} from All Spaces`, async () => {
+				await page.goto(PORTLET_URLS.cmsAllSpaces);
+
+				await clickAndExpectToBeVisible({
+					autoClick: true,
+					target: page.getByRole('menuitem', {
+						exact: true,
+						name: action,
+					}),
+					trigger: page.getByRole('button', {
+						name: `${space.name} Actions`,
+					}),
+				});
+
+				await expect(page).toHaveURL(/\/web\/cms\/export-import/);
+				await expect(
+					page.getByRole('heading', {
+						exact: true,
+						level: 1,
+						name: `${space.name} ${action}`,
+					})
+				).toBeVisible();
+
+				await page.getByRole('link', {name: 'Back'}).click();
+
+				await expect(page).toHaveURL(/\/web\/cms\/all-spaces/);
+			});
+
+			await test.step(`Open ${action} from the Space`, async () => {
+				await page
+					.getByRole('link', {exact: true, name: space.name})
+					.click();
+
+				await page
+					.getByRole('button', {name: 'More Actions'})
+					.waitFor();
+
+				await clickAndExpectToBeVisible({
+					autoClick: true,
+					target: page.getByRole('menuitem', {
+						exact: true,
+						name: action,
+					}),
+					trigger: page.getByRole('button', {name: 'More Actions'}),
+				});
+
+				await expect(page).toHaveURL(/\/web\/cms\/export-import/);
+				await expect(
+					page.getByRole('heading', {
+						exact: true,
+						level: 1,
+						name: `${space.name} ${action}`,
+					})
+				).toBeVisible();
+			});
+		}
+
+		await test.step('Open the new export wizard', async () => {
+			await page.goto(PORTLET_URLS.cmsAllSpaces);
+
+			await clickAndExpectToBeVisible({
+				autoClick: true,
+				target: page.getByRole('menuitem', {
+					exact: true,
+					name: 'Export',
+				}),
+				trigger: page.getByRole('button', {
+					name: `${space.name} Actions`,
+				}),
+			});
+
+			await exportImportPage.clickNew();
+
+			await expect(page).toHaveURL(/\/web\/cms\/export-import/);
+			await expect(
+				page.getByRole('heading', {
+					exact: true,
+					level: 1,
+					name: `New Export Process - ${space.name}`,
+				})
+			).toBeVisible();
+		});
 	}
 );

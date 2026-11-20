@@ -9,6 +9,7 @@ import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPort
 import com.liferay.asset.tags.constants.AssetTagsAdminPortletKeys;
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -146,6 +147,24 @@ public class ExportImportUtil {
 			themeDisplay, title);
 	}
 
+	public static String getGroupExportURL(
+		String controlPanelURL, String groupId,
+		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
+
+		return _getGroupURL(
+			controlPanelURL, groupId, httpServletRequest,
+			"/revamp/export/view_export.jsp", themeDisplay);
+	}
+
+	public static String getGroupImportURL(
+		String controlPanelURL, String groupId,
+		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
+
+		return _getGroupURL(
+			controlPanelURL, groupId, httpServletRequest,
+			"/revamp/import/view_import.jsp", themeDisplay);
+	}
+
 	public static JSONObject getImportActionItemJSONObject(
 		HttpServletRequest httpServletRequest, String portletResource,
 		String subjectKey, ThemeDisplay themeDisplay) {
@@ -219,6 +238,31 @@ public class ExportImportUtil {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+	}
+
+	private static String _getGroupURL(
+		String controlPanelURL, String groupId,
+		HttpServletRequest httpServletRequest, String mvcPath,
+		ThemeDisplay themeDisplay) {
+
+		if (!FeatureFlagManagerUtil.isEnabled(
+				themeDisplay.getCompanyId(), "LPD-57655")) {
+
+			return controlPanelURL;
+		}
+
+		return StringBundler.concat(
+			PortletURLBuilder.create(
+				_getPortletURL(themeDisplay.getScopeGroup(), httpServletRequest)
+			).setMVCPath(
+				mvcPath
+			).setRedirect(
+				PortalUtil.getCurrentURL(httpServletRequest)
+			).buildString(),
+			"&",
+			PortalUtil.getPortletNamespace(
+				ExportImportPortletKeys.EXPORT_IMPORT),
+			"groupId=", groupId);
 	}
 
 	private static PortletURL _getPortletURL(

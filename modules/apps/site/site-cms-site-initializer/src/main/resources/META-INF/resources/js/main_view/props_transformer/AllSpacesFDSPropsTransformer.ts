@@ -171,18 +171,16 @@ export default function AllSpacesFDSPropsTransformer({
 			}
 			else if (action.data.id === 'export') {
 				navigate(
-					additionalProps.exportURL.replace(
-						'{friendlyURL}',
-						itemData.friendlyURL
-					)
+					additionalProps.exportURL
+						.replace('{friendlyURL}', itemData.friendlyURL)
+						.replace('{siteId}', itemData.siteId)
 				);
 			}
 			else if (action.data.id === 'import') {
 				navigate(
-					additionalProps.importURL.replace(
-						'{friendlyURL}',
-						itemData.friendlyURL
-					)
+					additionalProps.importURL
+						.replace('{friendlyURL}', itemData.friendlyURL)
+						.replace('{siteId}', itemData.siteId)
 				);
 			}
 			else if (action.data.id === 'pin' || action.data.id === 'unpin') {
