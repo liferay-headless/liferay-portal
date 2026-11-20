@@ -292,8 +292,7 @@ public class MCPToolIndexWriterTest {
 	@Test
 	public void testUpdateIfStaleWhenToolSetCannotBeBuilt() {
 		Mockito.when(
-			_openAPIDocument2.getContentString(
-				Mockito.anyString(), Mockito.any())
+			_openAPIDocument2.getContentJSONObject(Mockito.anyString())
 		).thenReturn(
 			null
 		);
@@ -321,8 +320,8 @@ public class MCPToolIndexWriterTest {
 
 		Mockito.verify(
 			_openAPIDocument2
-		).getContentString(
-			Mockito.anyString(), Mockito.any()
+		).getContentJSONObject(
+			Mockito.anyString()
 		);
 	}
 
@@ -352,21 +351,18 @@ public class MCPToolIndexWriterTest {
 	public void testUpdateIfStaleWhenToolSetIsInvalidatedDuringUpdate() {
 		_updateIfStale();
 
-		ToolSetUtil.clearOpenAPIJSONObjectCache(_COMPANY_ID);
-
 		_mcpToolIndexWriter.invalidate(_COMPANY_ID, _TOOL_SET_NAME_1);
 
-		String openAPIDocumentContent = _getOpenAPIDocumentContent(
+		JSONObject openAPIJSONObject = _getOpenAPIJSONObject(
 			_toolSetToolNames.get(_TOOL_SET_NAME_1));
 
 		Mockito.when(
-			_openAPIDocument1.getContentString(
-				Mockito.anyString(), Mockito.any())
+			_openAPIDocument1.getContentJSONObject(Mockito.anyString())
 		).thenAnswer(
 			invocation -> {
 				_mcpToolIndexWriter.invalidate(_COMPANY_ID, _TOOL_SET_NAME_1);
 
-				return openAPIDocumentContent;
+				return openAPIJSONObject;
 			}
 		);
 
@@ -466,7 +462,7 @@ public class MCPToolIndexWriterTest {
 		return documents;
 	}
 
-	private String _getOpenAPIDocumentContent(String... toolNames) {
+	private JSONObject _getOpenAPIJSONObject(String... toolNames) {
 		JSONObject pathsJSONObject = JSONFactoryUtil.createJSONObject();
 
 		for (String toolName : toolNames) {
@@ -475,9 +471,7 @@ public class MCPToolIndexWriterTest {
 				JSONUtil.put("post", JSONUtil.put("operationId", toolName)));
 		}
 
-		return JSONUtil.put(
-			"paths", pathsJSONObject
-		).toString();
+		return JSONUtil.put("paths", pathsJSONObject);
 	}
 
 	private Set<String> _getToolKeys(String... toolSetNames) {
@@ -594,9 +588,9 @@ public class MCPToolIndexWriterTest {
 		);
 
 		Mockito.when(
-			openAPIDocument.getContentString(Mockito.anyString(), Mockito.any())
+			openAPIDocument.getContentJSONObject(Mockito.anyString())
 		).thenReturn(
-			_getOpenAPIDocumentContent(toolNames)
+			_getOpenAPIJSONObject(toolNames)
 		);
 
 		Mockito.when(

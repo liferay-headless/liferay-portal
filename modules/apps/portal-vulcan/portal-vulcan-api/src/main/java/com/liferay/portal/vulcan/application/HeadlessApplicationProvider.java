@@ -5,6 +5,8 @@
 
 package com.liferay.portal.vulcan.application;
 
+import com.liferay.portal.kernel.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -27,6 +29,8 @@ public interface HeadlessApplicationProvider {
 	public interface OpenAPIDocument {
 
 		public Application getApplication();
+
+		public JSONObject getContentJSONObject(String serverURL);
 
 		public Object getContentObject(String serverURL);
 

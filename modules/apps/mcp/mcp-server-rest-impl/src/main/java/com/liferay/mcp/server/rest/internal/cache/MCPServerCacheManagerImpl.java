@@ -6,7 +6,6 @@
 package com.liferay.mcp.server.rest.internal.cache;
 
 import com.liferay.mcp.server.rest.internal.servlet.MCPServerServlet;
-import com.liferay.mcp.server.rest.internal.util.ToolSetUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -22,12 +21,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = AopService.class)
 public class MCPServerCacheManagerImpl
 	implements AopService, IdentifiableOSGiService, MCPServerCacheManager {
-
-	@Clusterable
-	@Override
-	public void clearOpenAPIJSONObjectCache(long companyId) {
-		ToolSetUtil.clearOpenAPIJSONObjectCache(companyId);
-	}
 
 	@Clusterable
 	@Override
