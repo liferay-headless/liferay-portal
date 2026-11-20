@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -31,9 +33,18 @@ import org.osgi.service.component.annotations.Reference;
 public class OpenAPIDocumentCache {
 
 	public void clear() {
-		_clearCount.incrementAndGet();
+		Lock writeLock = _entriesLock.writeLock();
 
-		_entries.clear();
+		writeLock.lock();
+
+		try {
+			_clearCount.incrementAndGet();
+
+			_entries.clear();
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 	public void clear(long companyId) {
@@ -102,12 +113,21 @@ public class OpenAPIDocumentCache {
 	}
 
 	private void _clear(Predicate<String[]> predicate) {
-		_clearCount.incrementAndGet();
+		Lock writeLock = _entriesLock.writeLock();
 
-		Set<String> keys = _entries.keySet();
+		writeLock.lock();
 
-		keys.removeIf(
-			key -> predicate.test(StringUtil.split(key, CharPool.POUND)));
+		try {
+			_clearCount.incrementAndGet();
+
+			Set<String> keys = _entries.keySet();
+
+			keys.removeIf(
+				key -> predicate.test(StringUtil.split(key, CharPool.POUND)));
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 	private Entry _getEntry(
@@ -132,8 +152,19 @@ public class OpenAPIDocumentCache {
 			entry = new Entry(content);
 		}
 
-		if ((entry != null) && (clearCount == _clearCount.get())) {
-			_entries.put(key, entry);
+		if (entry != null) {
+			Lock readLock = _entriesLock.readLock();
+
+			readLock.lock();
+
+			try {
+				if (clearCount == _clearCount.get()) {
+					_entries.put(key, entry);
+				}
+			}
+			finally {
+				readLock.unlock();
+			}
 		}
 
 		return entry;
@@ -141,6 +172,8 @@ public class OpenAPIDocumentCache {
 
 	private final AtomicLong _clearCount = new AtomicLong();
 	private final Map<String, Entry> _entries = new ConcurrentHashMap<>();
+	private final ReentrantReadWriteLock _entriesLock =
+		new ReentrantReadWriteLock();
 
 	@Reference
 	private JSONFactory _jsonFactory;
