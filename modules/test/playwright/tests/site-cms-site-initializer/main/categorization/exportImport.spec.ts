@@ -119,6 +119,11 @@ test(
 		await expect(
 			page.getByRole('heading', {level: 1, name: 'Vocabularies Export'})
 		).toBeVisible();
+		await expect(
+			page.locator('.sidebar-body .nav-link.active', {
+				hasText: 'Categorization',
+			})
+		).toBeVisible();
 
 		await page.getByRole('link', {name: 'Back'}).click();
 
