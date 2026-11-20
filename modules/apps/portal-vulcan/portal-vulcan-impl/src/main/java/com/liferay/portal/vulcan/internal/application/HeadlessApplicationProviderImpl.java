@@ -95,16 +95,9 @@ public class HeadlessApplicationProviderImpl
 				return applications;
 			}
 
+			_refreshApplicationDTOs(jaxrsServiceRuntime);
+
 			_applicationDTOsStale = false;
-
-			RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
-
-			List<ApplicationDTO> applicationDTOs = ListUtil.fromArray(
-				runtimeDTO.applicationDTOs);
-
-			_clearStaleOpenAPIDocuments(_applicationDTOs, applicationDTOs);
-
-			_applicationDTOs = applicationDTOs;
 		}
 
 		List<ApplicationDTO> applicationDTOs = _applicationDTOs;
@@ -216,37 +209,6 @@ public class HeadlessApplicationProviderImpl
 		_companyIdsServiceTrackerMap.close();
 		_jaxrsServiceRuntimeServiceTracker.close();
 		_openAPIResourceServiceTrackerMap.close();
-	}
-
-	private void _clearStaleOpenAPIDocuments(
-		List<ApplicationDTO> applicationDTOs1,
-		List<ApplicationDTO> applicationDTOs2) {
-
-		if (applicationDTOs1 == null) {
-			_openAPIDocumentCache.clear();
-
-			return;
-		}
-
-		Map<String, List<Long>> serviceIdsMap1 = _getServiceIdsMap(
-			applicationDTOs1);
-		Map<String, List<Long>> serviceIdsMap2 = _getServiceIdsMap(
-			applicationDTOs2);
-
-		Set<String> basePaths = new HashSet<>(serviceIdsMap1.keySet());
-
-		basePaths.addAll(serviceIdsMap2.keySet());
-
-		for (String basePath : basePaths) {
-			if (Objects.equals(
-					serviceIdsMap1.get(basePath),
-					serviceIdsMap2.get(basePath))) {
-
-				continue;
-			}
-
-			_openAPIDocumentCache.clear(basePath);
-		}
 	}
 
 	private String _getBasePath(String base) {
@@ -417,6 +379,45 @@ public class HeadlessApplicationProviderImpl
 
 		return Objects.equals(
 			String.valueOf(companyIds), String.valueOf(companyId));
+	}
+
+	private void _refreshApplicationDTOs(
+		JaxrsServiceRuntime jaxrsServiceRuntime) {
+
+		RuntimeDTO runtimeDTO = jaxrsServiceRuntime.getRuntimeDTO();
+
+		List<ApplicationDTO> applicationDTOs = ListUtil.fromArray(
+			runtimeDTO.applicationDTOs);
+
+		if (_applicationDTOs == null) {
+			_applicationDTOs = applicationDTOs;
+
+			_openAPIDocumentCache.clear();
+
+			return;
+		}
+
+		Map<String, List<Long>> previousServiceIdsMap = _getServiceIdsMap(
+			_applicationDTOs);
+		Map<String, List<Long>> currentServiceIdsMap = _getServiceIdsMap(
+			applicationDTOs);
+
+		Set<String> basePaths = new HashSet<>(previousServiceIdsMap.keySet());
+
+		basePaths.addAll(currentServiceIdsMap.keySet());
+
+		for (String basePath : basePaths) {
+			if (Objects.equals(
+					previousServiceIdsMap.get(basePath),
+					currentServiceIdsMap.get(basePath))) {
+
+				continue;
+			}
+
+			_openAPIDocumentCache.clear(basePath);
+		}
+
+		_applicationDTOs = applicationDTOs;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
