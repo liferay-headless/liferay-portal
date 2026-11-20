@@ -6,6 +6,7 @@
 package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
@@ -18,9 +19,14 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.rest.odata.entity.v1_0.provider.EntityModelProvider;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -36,6 +42,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Carlos Correa
@@ -48,16 +55,22 @@ public class ObjectEntryRelatedObjectsResourceImpl
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
+		ObjectEntryService objectEntryService,
 		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
-		ObjectRelationshipLocalService objectRelationshipLocalService) {
+		ObjectRelationshipLocalService objectRelationshipLocalService,
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		_entityModelProvider = entityModelProvider;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
+		_objectEntryService = objectEntryService;
 		_objectRelatedModelsProviderRegistry =
 			objectRelatedModelsProviderRegistry;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
+		_systemObjectDefinitionManagerRegistry =
+			systemObjectDefinitionManagerRegistry;
 	}
 
 	@Override
@@ -112,6 +125,17 @@ public class ObjectEntryRelatedObjectsResourceImpl
 				relatedObjectEntryId, objectRelationship, currentObjectEntryId);
 
 			return;
+		}
+
+		_checkModelResourcePermission(
+			relatedObjectDefinition, relatedObjectEntryId);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+			_checkModelResourcePermission(
+				_objectDefinition, currentObjectEntryId);
 		}
 
 		ObjectRelatedModelsProvider objectRelatedModelsProvider =
@@ -564,6 +588,28 @@ public class ObjectEntryRelatedObjectsResourceImpl
 			relatedObjectEntryId);
 	}
 
+	private void _checkModelResourcePermission(
+			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception {
+
+		if (objectDefinition.isUnmodifiableSystemObject()) {
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
+						objectDefinition.getName());
+
+			systemObjectDefinitionManager.checkModelResourcePermission(
+				objectDefinition.getObjectDefinitionId(),
+				PermissionThreadLocal.getPermissionChecker(), objectEntryId,
+				ActionKeys.UPDATE);
+		}
+		else {
+			_objectEntryService.checkModelResourcePermission(
+				objectDefinition.getObjectDefinitionId(), objectEntryId,
+				ActionKeys.UPDATE);
+		}
+	}
+
 	private void _checkRelatedObjectEntry(
 			DefaultObjectEntryManager defaultObjectEntryManager,
 			String objectRelationshipName, long relatedObjectEntryId)
@@ -708,9 +754,12 @@ public class ObjectEntryRelatedObjectsResourceImpl
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+	private final ObjectEntryService _objectEntryService;
 	private final ObjectRelatedModelsProviderRegistry
 		_objectRelatedModelsProviderRegistry;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
+	private final SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }
