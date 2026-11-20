@@ -11,6 +11,7 @@ import com.liferay.exportimport.rest.resource.v1_0.ExportPreviewResource;
 import com.liferay.exportimport.util.ScopeUtil;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate.Scope;
 import com.liferay.exportimport.web.internal.util.ExportImportAPIURLUtil;
+import com.liferay.exportimport.web.internal.util.ExportImportTitleUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -369,16 +370,15 @@ public class ExportImportProcessDisplayContext {
 	private String _getTitle(String key) {
 		String label = LanguageUtil.get(_httpServletRequest, key);
 
-		String portletId = _getPortletId();
+		String subject = ExportImportTitleUtil.getSubject(
+			_group, _httpServletRequest,
+			PortalUtil.getLocale(_httpServletRequest), _getPortletId());
 
-		if (Validator.isBlank(portletId)) {
+		if (subject == null) {
 			return label;
 		}
 
-		return StringBundler.concat(
-			label, " - ",
-			PortalUtil.getPortletTitle(
-				portletId, PortalUtil.getLocale(_httpServletRequest)));
+		return StringBundler.concat(label, " - ", subject);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

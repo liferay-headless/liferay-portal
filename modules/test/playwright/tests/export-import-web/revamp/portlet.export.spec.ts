@@ -72,7 +72,7 @@ portletTest(
 
 		await expect(
 			page.locator('.portlet-title-text', {
-				hasText: 'Export Documents and Media',
+				hasText: 'Documents and Media Export',
 			})
 		).toBeVisible();
 
