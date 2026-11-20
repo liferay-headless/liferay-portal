@@ -130,10 +130,10 @@ public class ViewStructuresDisplayContext {
 			JSONUtil.putAll(
 				ExportImportUtil.getExportActionItemJSONObject(
 					_httpServletRequest, ObjectPortletKeys.OBJECT_DEFINITIONS,
-					"export-content-structures", _themeDisplay),
+					"content-structures", _themeDisplay),
 				ExportImportUtil.getImportActionItemJSONObject(
 					_httpServletRequest, ObjectPortletKeys.OBJECT_DEFINITIONS,
-					"import-content-structures", _themeDisplay)
+					"content-structures", _themeDisplay)
 			).put(
 				JSONUtil.put(
 					"href",

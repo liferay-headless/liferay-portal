@@ -45,7 +45,7 @@ public class ExportImportUtil {
 	public static JSONObject getActionItemJSONObject(
 		HttpServletRequest httpServletRequest, String labelKey,
 		String portletResource, String symbolLeft, String tabs2,
-		String titleKey, ThemeDisplay themeDisplay) {
+		ThemeDisplay themeDisplay, String title) {
 
 		if (!_hasConfigurationPermission(portletResource, themeDisplay)) {
 			return null;
@@ -65,7 +65,7 @@ public class ExportImportUtil {
 		).put(
 			"target", "modal"
 		).put(
-			"title", LanguageUtil.get(httpServletRequest, titleKey)
+			"title", title
 		);
 	}
 
@@ -101,18 +101,18 @@ public class ExportImportUtil {
 				getExportActionItemJSONObject(
 					httpServletRequest,
 					AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN,
-					"export-vocabularies", themeDisplay),
+					"vocabularies", themeDisplay),
 				getImportActionItemJSONObject(
 					httpServletRequest,
 					AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN,
-					"import-vocabularies", themeDisplay),
+					"vocabularies", themeDisplay),
 				getExportActionItemJSONObject(
 					httpServletRequest,
-					AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN, "export-tags",
+					AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN, "tags",
 					themeDisplay),
 				getImportActionItemJSONObject(
 					httpServletRequest,
-					AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN, "import-tags",
+					AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN, "tags",
 					themeDisplay));
 		}
 
@@ -128,48 +128,52 @@ public class ExportImportUtil {
 
 	public static JSONObject getExportActionItemJSONObject(
 		HttpServletRequest httpServletRequest, String portletResource,
-		String titleKey, ThemeDisplay themeDisplay) {
+		String subjectKey, ThemeDisplay themeDisplay) {
+
+		String title = LanguageUtil.format(
+			httpServletRequest, "x-export", subjectKey);
 
 		if (FeatureFlagManagerUtil.isEnabled(
 				themeDisplay.getCompanyId(), "LPD-57655")) {
 
 			return _getActionItemJSONObject(
 				httpServletRequest, "/revamp/export/view_export.jsp",
-				portletResource, "export", titleKey, themeDisplay);
+				portletResource, subjectKey, "export", themeDisplay, title);
 		}
 
 		return getActionItemJSONObject(
 			httpServletRequest, "export", portletResource, "export", "export",
-			titleKey, themeDisplay);
+			themeDisplay, title);
 	}
 
 	public static JSONObject getImportActionItemJSONObject(
 		HttpServletRequest httpServletRequest, String portletResource,
-		String titleKey, ThemeDisplay themeDisplay) {
+		String subjectKey, ThemeDisplay themeDisplay) {
+
+		String title = LanguageUtil.format(
+			httpServletRequest, "x-import", subjectKey);
 
 		if (FeatureFlagManagerUtil.isEnabled(
 				themeDisplay.getCompanyId(), "LPD-57655")) {
 
 			return _getActionItemJSONObject(
 				httpServletRequest, "/revamp/import/view_import.jsp",
-				portletResource, "import", titleKey, themeDisplay);
+				portletResource, subjectKey, "import", themeDisplay, title);
 		}
 
 		return getActionItemJSONObject(
 			httpServletRequest, "import", portletResource, "import", "import",
-			titleKey, themeDisplay);
+			themeDisplay, title);
 	}
 
 	private static JSONObject _getActionItemJSONObject(
 		HttpServletRequest httpServletRequest, String mvcPath,
-		String portletResource, String symbolLeft, String titleKey,
-		ThemeDisplay themeDisplay) {
+		String portletResource, String subjectKey, String symbolLeft,
+		ThemeDisplay themeDisplay, String title) {
 
 		if (!_hasConfigurationPermission(portletResource, themeDisplay)) {
 			return null;
 		}
-
-		String title = LanguageUtil.get(httpServletRequest, titleKey);
 
 		return JSONUtil.put(
 			"href",
@@ -181,6 +185,8 @@ public class ExportImportUtil {
 				PortalUtil.getCurrentURL(httpServletRequest)
 			).setPortletResource(
 				portletResource
+			).setParameter(
+				"subjectKey", subjectKey
 			).buildString()
 		).put(
 			"label", title

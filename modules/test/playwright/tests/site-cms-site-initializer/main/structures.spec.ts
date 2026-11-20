@@ -465,13 +465,13 @@ testWithExportImport(
 	'Export and Import Content Structures actions open the export and import views from the breadcrumb',
 	{tag: '@LPD-78381'},
 	async ({exportImportPage, page, structuresPage}) => {
-		await structuresPage.openMenuItem('Export Content Structures');
+		await structuresPage.openMenuItem('Content Structures Export');
 
 		await expect(page).toHaveURL(/view_export\.jsp/);
 
 		await expect(exportImportPage.newButton).toBeVisible();
 
-		await structuresPage.openMenuItem('Import Content Structures');
+		await structuresPage.openMenuItem('Content Structures Import');
 
 		await expect(page).toHaveURL(/view_import\.jsp/);
 
@@ -494,7 +494,7 @@ testWithExportImport(
 		});
 
 		await test.step('Export content structures and download the LAR', async () => {
-			await structuresPage.openMenuItem('Export Content Structures');
+			await structuresPage.openMenuItem('Content Structures Export');
 
 			await exportImportPage.export(exportName);
 
@@ -506,7 +506,7 @@ testWithExportImport(
 		});
 
 		await test.step('Import the downloaded LAR back', async () => {
-			await structuresPage.openMenuItem('Import Content Structures');
+			await structuresPage.openMenuItem('Content Structures Import');
 
 			await exportImportPage.newButton.click();
 
@@ -555,7 +555,7 @@ testWithExportImport(
 		});
 
 		await test.step('Export content structures and download the LAR', async () => {
-			await structuresPage.openMenuItem('Export Content Structures');
+			await structuresPage.openMenuItem('Content Structures Export');
 
 			await exportImportPage.export(exportName);
 
@@ -600,7 +600,7 @@ testWithExportImport(
 		});
 
 		await test.step('Import the LAR back without errors', async () => {
-			await structuresPage.openMenuItem('Import Content Structures');
+			await structuresPage.openMenuItem('Content Structures Import');
 
 			await exportImportPage.newButton.click();
 
@@ -632,7 +632,7 @@ testWithExportImport(
 );
 
 testWithExportImport(
-	'Export Content Structures list includes only object definitions from CMS folders',
+	'Content Structures Export list includes only object definitions from CMS folders',
 	{tag: '@LPD-78381'},
 	async ({
 		apiHelpers,
@@ -641,7 +641,7 @@ testWithExportImport(
 		structuresPage,
 	}) => {
 		const getObjectDefinitionsCount = async () => {
-			await structuresPage.openMenuItem('Export Content Structures');
+			await structuresPage.openMenuItem('Content Structures Export');
 
 			await exportImportPage.clickNew();
 
