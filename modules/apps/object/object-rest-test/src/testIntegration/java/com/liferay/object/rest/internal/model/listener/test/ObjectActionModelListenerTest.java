@@ -42,7 +42,7 @@ public class ObjectActionModelListenerTest {
 			ObjectDefinitionTestUtil.publishObjectDefinition();
 
 		Assert.assertNotNull(
-			OpenAPIDocumentTestUtil.getContent(
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 				objectDefinition.getRESTContextPath(),
 				_headlessApplicationProvider));
 
@@ -55,11 +55,12 @@ public class ObjectActionModelListenerTest {
 				"url", "https://" + RandomTestUtil.randomString()
 			).build());
 
-		String content = OpenAPIDocumentTestUtil.getContent(
-			objectDefinition.getRESTContextPath(),
-			_headlessApplicationProvider);
+		String openAPIDocumentJSON =
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
+				objectDefinition.getRESTContextPath(),
+				_headlessApplicationProvider);
 
-		Assert.assertTrue(content.contains(objectAction.getName()));
+		Assert.assertTrue(openAPIDocumentJSON.contains(objectAction.getName()));
 	}
 
 	@Inject

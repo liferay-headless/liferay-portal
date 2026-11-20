@@ -42,11 +42,11 @@ public class ObjectRelationshipModelListenerTest {
 			ObjectDefinitionTestUtil.publishObjectDefinition();
 
 		Assert.assertNotNull(
-			OpenAPIDocumentTestUtil.getContent(
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 				objectDefinition1.getRESTContextPath(),
 				_headlessApplicationProvider));
 		Assert.assertNotNull(
-			OpenAPIDocumentTestUtil.getContent(
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 				objectDefinition2.getRESTContextPath(),
 				_headlessApplicationProvider));
 
@@ -57,17 +57,18 @@ public class ObjectRelationshipModelListenerTest {
 			objectDefinition2,
 			ObjectRelationshipConstants.DELETION_TYPE_CASCADE, name);
 
-		String content = OpenAPIDocumentTestUtil.getContent(
-			objectDefinition1.getRESTContextPath(),
-			_headlessApplicationProvider);
+		String openAPIDocumentJSON =
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
+				objectDefinition1.getRESTContextPath(),
+				_headlessApplicationProvider);
 
-		Assert.assertTrue(content.contains(name));
+		Assert.assertTrue(openAPIDocumentJSON.contains(name));
 
-		content = OpenAPIDocumentTestUtil.getContent(
+		openAPIDocumentJSON = OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 			objectDefinition2.getRESTContextPath(),
 			_headlessApplicationProvider);
 
-		Assert.assertTrue(content.contains(name));
+		Assert.assertTrue(openAPIDocumentJSON.contains(name));
 	}
 
 	@Inject

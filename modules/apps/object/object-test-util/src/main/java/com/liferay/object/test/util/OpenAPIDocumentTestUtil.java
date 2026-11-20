@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class OpenAPIDocumentTestUtil {
 
-	public static String getContent(
+	public static String getOpenAPIDocumentJSON(
 			String basePath,
 			HeadlessApplicationProvider headlessApplicationProvider)
 		throws Exception {

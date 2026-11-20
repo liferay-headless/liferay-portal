@@ -57,7 +57,7 @@ public class ObjectFieldModelListenerTest {
 		throws Exception {
 
 		Assert.assertNotNull(
-			OpenAPIDocumentTestUtil.getContent(
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 				basePath, _headlessApplicationProvider));
 
 		String name = "a" + RandomTestUtil.randomString();
@@ -74,10 +74,11 @@ public class ObjectFieldModelListenerTest {
 				TestPropsValues.getUserId()
 			).build());
 
-		String content = OpenAPIDocumentTestUtil.getContent(
-			basePath, _headlessApplicationProvider);
+		String openAPIDocumentJSON =
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
+				basePath, _headlessApplicationProvider);
 
-		Assert.assertTrue(content.contains(name));
+		Assert.assertTrue(openAPIDocumentJSON.contains(name));
 	}
 
 	@Inject

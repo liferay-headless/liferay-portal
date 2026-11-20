@@ -35,8 +35,8 @@ public class APIApplicationPublisherTest extends BaseTestCase {
 	public void testPublish() throws Exception {
 		UserTestUtil.setUser(TestPropsValues.getUser());
 
+		String applicationExternalReferenceCode = RandomTestUtil.randomString();
 		String baseURL = StringUtil.toLowerCase(RandomTestUtil.randomString());
-		String externalReferenceCode = RandomTestUtil.randomString();
 
 		assertSuccessfulJSONObject(
 			JSONUtil.put(
@@ -44,14 +44,14 @@ public class APIApplicationPublisherTest extends BaseTestCase {
 			).put(
 				"baseURL", baseURL
 			).put(
-				"externalReferenceCode", externalReferenceCode
+				"externalReferenceCode", applicationExternalReferenceCode
 			).put(
 				"title", RandomTestUtil.randomString()
 			).toString(),
 			"headless-builder/applications", Http.Method.POST);
 
 		Assert.assertNotNull(
-			OpenAPIDocumentTestUtil.getContent(
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
 				"/c/" + baseURL, _headlessApplicationProvider));
 
 		String apiSchemaExternalReferenceCode = RandomTestUtil.randomString();
@@ -65,7 +65,7 @@ public class APIApplicationPublisherTest extends BaseTestCase {
 				"name", RandomTestUtil.randomString()
 			).put(
 				"r_apiApplicationToAPISchemas_l_apiApplicationERC",
-				externalReferenceCode
+				applicationExternalReferenceCode
 			).toString(),
 			"headless-builder/schemas", Http.Method.POST);
 
@@ -82,7 +82,7 @@ public class APIApplicationPublisherTest extends BaseTestCase {
 				"path", path
 			).put(
 				"r_apiApplicationToAPIEndpoints_l_apiApplicationERC",
-				externalReferenceCode
+				applicationExternalReferenceCode
 			).put(
 				"r_responseAPISchemaToAPIEndpoints_l_apiSchemaERC",
 				apiSchemaExternalReferenceCode
@@ -94,10 +94,11 @@ public class APIApplicationPublisherTest extends BaseTestCase {
 			).toString(),
 			"headless-builder/endpoints", Http.Method.POST);
 
-		String content = OpenAPIDocumentTestUtil.getContent(
-			"/c/" + baseURL, _headlessApplicationProvider);
+		String openAPIDocumentJSON =
+			OpenAPIDocumentTestUtil.getOpenAPIDocumentJSON(
+				"/c/" + baseURL, _headlessApplicationProvider);
 
-		Assert.assertTrue(content.contains(path));
+		Assert.assertTrue(openAPIDocumentJSON.contains(path));
 	}
 
 	@Inject
