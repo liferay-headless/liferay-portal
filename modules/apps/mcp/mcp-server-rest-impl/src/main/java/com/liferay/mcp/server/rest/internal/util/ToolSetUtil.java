@@ -79,17 +79,17 @@ public class ToolSetUtil {
 		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument,
 		String toolSetName) {
 
-		JSONObject openAPIJSONObject = openAPIDocument.getContentJSONObject(
+		JSONObject contentJSONObject = openAPIDocument.getContentJSONObject(
 			PortalUtil.getPortalURL(httpServletRequest) +
 				PortalUtil.getPathContext() + Portal.PATH_MODULE);
 
-		if (openAPIJSONObject == null) {
+		if (contentJSONObject == null) {
 			throw new IllegalStateException(
 				"Unable to read the OpenAPI document of the \"" + toolSetName +
 					"\" tool set");
 		}
 
-		return openAPIJSONObject;
+		return contentJSONObject;
 	}
 
 	public static Tool getTool(
