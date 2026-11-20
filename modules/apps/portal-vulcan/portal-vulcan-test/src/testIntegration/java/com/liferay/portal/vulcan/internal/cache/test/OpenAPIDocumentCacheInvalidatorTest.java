@@ -9,7 +9,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.Inject;
-import com.liferay.portal.vulcan.application.OpenAPIDocumentCacheInvalidator;
+import com.liferay.portal.vulcan.cache.OpenAPIDocumentCacheInvalidator;
 
 import org.junit.Assert;
 import org.junit.Test;

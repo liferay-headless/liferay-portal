@@ -90,8 +90,6 @@ public abstract class BaseOpenAPIDocumentCacheTestCase {
 				).put(
 					"osgi.jaxrs.resource", "true"
 				).build()));
-
-		openAPIDocument = _getOpenAPIDocument();
 	}
 
 	@After
@@ -99,21 +97,8 @@ public abstract class BaseOpenAPIDocumentCacheTestCase {
 		_serviceRegistrations.forEach(ServiceRegistration::unregister);
 	}
 
-	public static class TestApplication extends Application {
-
-		@Override
-		public Set<Object> getSingletons() {
-			return Collections.singleton(this);
-		}
-
-	}
-
 	@Path("/v1.0")
 	public static class TestResource_v1_0 {
-
-		public int getCount() {
-			return _count.get();
-		}
 
 		@GET
 		@Path("/openapi.{type:json|yaml}")
@@ -140,24 +125,22 @@ public abstract class BaseOpenAPIDocumentCacheTestCase {
 
 	}
 
-	protected String getContentString(String serverURL) {
+	protected String getContentString(String serverURL) throws Exception {
+		HeadlessApplicationProvider.OpenAPIDocument openAPIDocument =
+			_getOpenAPIDocument();
+
 		return openAPIDocument.getContentString(
 			serverURL, HeadlessApplicationProvider.OpenAPIDocument.Type.JSON);
 	}
 
 	protected String basePath;
-
-	@Inject
-	protected HeadlessApplicationProvider headlessApplicationProvider;
-
-	protected HeadlessApplicationProvider.OpenAPIDocument openAPIDocument;
 	protected final TestResource_v1_0 testResource = new TestResource_v1_0();
 
 	private HeadlessApplicationProvider.OpenAPIDocument _getOpenAPIDocument()
 		throws Exception {
 
 		for (HeadlessApplicationProvider.Application application :
-				headlessApplicationProvider.getApplications(
+				_headlessApplicationProvider.getApplications(
 					TestPropsValues.getCompanyId())) {
 
 			if (!Objects.equals(application.getBasePath(), basePath)) {
@@ -173,6 +156,18 @@ public abstract class BaseOpenAPIDocumentCacheTestCase {
 		return null;
 	}
 
+	@Inject
+	private HeadlessApplicationProvider _headlessApplicationProvider;
+
 	private List<ServiceRegistration<?>> _serviceRegistrations;
+
+	private static class TestApplication extends Application {
+
+		@Override
+		public Set<Object> getSingletons() {
+			return Collections.singleton(this);
+		}
+
+	}
 
 }
