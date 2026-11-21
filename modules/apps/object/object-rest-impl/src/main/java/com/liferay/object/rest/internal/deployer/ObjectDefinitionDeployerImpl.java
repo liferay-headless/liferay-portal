@@ -826,8 +826,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 									_objectDefinitionLocalService,
 									_objectEntryLocalService,
 									_objectEntryManagerRegistry,
+									_objectEntryService,
 									_objectRelatedModelsProviderRegistry,
-									_objectRelationshipLocalService);
+									_objectRelationshipLocalService,
+									_systemObjectDefinitionManagerRegistry);
 							}
 
 							@Override
