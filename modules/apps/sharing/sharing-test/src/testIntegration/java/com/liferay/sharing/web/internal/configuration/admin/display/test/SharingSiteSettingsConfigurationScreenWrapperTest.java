@@ -7,8 +7,6 @@ package com.liferay.sharing.web.internal.configuration.admin.display.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -23,17 +21,11 @@ import com.liferay.sharing.configuration.SharingConfigurationFactory;
 
 import java.util.Dictionary;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jürgen Kappler
@@ -45,28 +37,6 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
-
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			SharingSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
 
 	@Test
 	public void testExportImportProperties() throws Exception {
@@ -80,11 +50,8 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 		_groupLocalService.updateGroup(
 			sourceGroup.getGroupId(), typeSettingsUnicodeProperties.toString());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-sharing");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("sharingEnabled"));
 
@@ -96,7 +63,7 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 
 		Assert.assertTrue(sharingConfiguration.isEnabled());
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		sharingConfiguration =
@@ -105,7 +72,7 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 
 		Assert.assertFalse(sharingConfiguration.isEnabled());
 
-		properties = configurationScreen.exportProperties(
+		properties = _configurationScreen.exportProperties(
 			sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("sharingEnabled"));
@@ -115,11 +82,8 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-sharing");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -128,32 +92,32 @@ public class SharingSiteSettingsConfigurationScreenWrapperTest {
 	public void testImportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-sharing");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"sharingEnabled", RandomTestUtil.randomString()
 			).build(),
 			group.getGroupId());
 
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("sharingEnabled"));
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
-		properties = configurationScreen.exportProperties(group.getGroupId());
+		properties = _configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("sharingEnabled"));
 	}
 
+	@Inject(
+		filter = "component.name=com.liferay.sharing.web.internal.configuration.admin.display.SharingSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 	@Inject
 	private SharingConfigurationFactory _sharingConfigurationFactory;

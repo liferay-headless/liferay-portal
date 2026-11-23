@@ -13,8 +13,6 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.test.util.AssetTestUtil;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -34,17 +32,11 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jonathan McCann
@@ -58,28 +50,6 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
-
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CategorizationSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
 
 	@Test
 	public void testExportImportProperties() throws Exception {
@@ -113,11 +83,8 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 			},
 			sourceAssetTagNames);
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-categorization");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals(properties.toString(), 2, properties.size());
 		Assert.assertEquals(
@@ -149,7 +116,7 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 			sourceAssetCategory.getExternalReferenceCode(),
 			targetGroup.getGroupId(), targetAssetVocabulary.getVocabularyId());
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		_assertAssetCategoryIds(
@@ -162,11 +129,8 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-categorization");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -189,10 +153,7 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 			TestPropsValues.getUserId(), group, assetCategoryIds,
 			assetTagNames);
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-categorization");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
 		_assertAssetCategoryIds(group, assetCategoryIds);
@@ -200,7 +161,7 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 
 		assetTagNames = new String[] {RandomTestUtil.randomString()};
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"assetTagNames", ListUtil.fromArray(assetTagNames)
 			).build(),
@@ -214,7 +175,7 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 
 		assetCategoryIds = new long[] {assetCategory.getCategoryId()};
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"assetCategories",
 				ListUtil.fromArray(
@@ -229,7 +190,7 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 		_assertAssetTagNames(group, assetTagNames);
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"assetCategories",
 					ListUtil.fromArray(
@@ -275,9 +236,12 @@ public class CategorizationSiteSettingsConfigurationScreenWrapperTest {
 	@Inject
 	private AssetTagLocalService _assetTagLocalService;
 
+	@Inject(
+		filter = "component.name=com.liferay.site.admin.web.internal.configuration.admin.display.CategorizationSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 }

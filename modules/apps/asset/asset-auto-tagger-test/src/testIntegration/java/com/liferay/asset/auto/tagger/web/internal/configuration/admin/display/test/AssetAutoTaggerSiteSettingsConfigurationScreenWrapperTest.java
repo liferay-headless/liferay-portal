@@ -9,8 +9,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.auto.tagger.configuration.AssetAutoTaggerConfiguration;
 import com.liferay.asset.auto.tagger.configuration.AssetAutoTaggerConfigurationFactory;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -23,17 +21,11 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Dictionary;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jürgen Kappler
@@ -45,28 +37,6 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
-
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
 
 	@Test
 	public void testExportImportProperties() throws Exception {
@@ -80,11 +50,8 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 		_groupLocalService.updateGroup(
 			sourceGroup.getGroupId(), typeSettingsUnicodeProperties.toString());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-asset-auto-tagger");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("assetAutoTaggingEnabled"));
 
@@ -96,7 +63,7 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 
 		Assert.assertTrue(assetAutoTaggerConfiguration.isEnabled());
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		assetAutoTaggerConfiguration =
@@ -106,7 +73,7 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 
 		Assert.assertFalse(assetAutoTaggerConfiguration.isEnabled());
 
-		properties = configurationScreen.exportProperties(
+		properties = _configurationScreen.exportProperties(
 			sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("assetAutoTaggingEnabled"));
@@ -116,11 +83,8 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-asset-auto-tagger");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -129,24 +93,21 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 	public void testImportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-asset-auto-tagger");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"assetAutoTaggingEnabled", RandomTestUtil.randomString()
 			).build(),
 			group.getGroupId());
 
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("assetAutoTaggingEnabled"));
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
-		properties = configurationScreen.exportProperties(group.getGroupId());
+		properties = _configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("assetAutoTaggingEnabled"));
 	}
@@ -155,9 +116,12 @@ public class AssetAutoTaggerSiteSettingsConfigurationScreenWrapperTest {
 	private AssetAutoTaggerConfigurationFactory
 		_assetAutoTaggerConfigurationFactory;
 
+	@Inject(
+		filter = "component.name=com.liferay.asset.auto.tagger.web.internal.configuration.admin.display.AssetAutoTaggerSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 }
