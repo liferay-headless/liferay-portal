@@ -1973,6 +1973,29 @@ public class BatchEnginePortletDataHandlerTest {
 		Assert.assertNotNull(
 			_fetchNotificationTemplate(
 				notificationTemplate2.getExternalReferenceCode()));
+
+		ExportImportConfiguration exportImportConfiguration =
+			new ExportImportExecutor(
+			).withDeletions(
+			).withGroupId(
+				_getCompanyGroupId()
+			).withIncludeNotificationTemplates(
+			).withLARFile(
+				larFile2
+			).executeImport();
+
+		List<ExportImportReportEntry> exportImportReportEntries =
+			_exportImportReportEntryLocalService.getExportImportReportEntries(
+				TestPropsValues.getCompanyId(),
+				exportImportConfiguration.getExportImportConfigurationId());
+
+		Assert.assertEquals(
+			exportImportReportEntries.toString(), 0,
+			exportImportReportEntries.size());
+
+		Assert.assertNotNull(
+			_fetchNotificationTemplate(
+				notificationTemplate2.getExternalReferenceCode()));
 	}
 
 	@Test
