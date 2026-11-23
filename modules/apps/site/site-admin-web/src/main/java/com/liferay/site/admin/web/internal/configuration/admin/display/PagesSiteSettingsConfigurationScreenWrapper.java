@@ -10,19 +10,29 @@ import com.liferay.configuration.admin.display.ConfigurationScreenWrapper;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.site.settings.configuration.admin.display.SiteSettingsConfigurationScreenContributor;
 import com.liferay.site.settings.configuration.admin.display.SiteSettingsConfigurationScreenFactory;
+import com.liferay.sites.kernel.util.Sites;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.Serializable;
+
+import java.util.Dictionary;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,7 +52,13 @@ public class PagesSiteSettingsConfigurationScreenWrapper
 	}
 
 	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private Language _language;
+
+	@Reference
+	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Reference
 	private LayoutSetPrototypeLocalService _layoutSetPrototypeLocalService;
@@ -54,8 +70,44 @@ public class PagesSiteSettingsConfigurationScreenWrapper
 	private SiteSettingsConfigurationScreenFactory
 		_siteSettingsConfigurationScreenFactory;
 
+	@Reference
+	private Sites _sites;
+
 	private class PagesSiteSettingsConfigurationScreenContributor
 		implements SiteSettingsConfigurationScreenContributor {
+
+		@Override
+		public Dictionary<String, Object> exportProperties(
+			Serializable scopePK) {
+
+			LayoutSet layoutSet = _layoutSetLocalService.fetchLayoutSet(
+				(long)scopePK, false);
+
+			LayoutSetPrototype layoutSetPrototype = _fetchLayoutSetPrototype(
+				layoutSet);
+
+			return HashMapDictionaryBuilder.<String, Object>put(
+				"publicLayoutSetPrototypeLinkEnabled",
+				() -> {
+					if (layoutSetPrototype == null) {
+						return null;
+					}
+
+					return layoutSet.isLayoutSetPrototypeLinkEnabled();
+				}
+			).put(
+				"publicLayoutSetPrototypeSiteExternalReferenceCode",
+				() -> {
+					if (layoutSetPrototype == null) {
+						return null;
+					}
+
+					Group group = layoutSetPrototype.getGroup();
+
+					return group.getExternalReferenceCode();
+				}
+			).build();
+		}
 
 		@Override
 		public String getCategoryKey() {
@@ -94,6 +146,59 @@ public class PagesSiteSettingsConfigurationScreenWrapper
 		}
 
 		@Override
+		public void importProperties(
+				Dictionary<String, Object> properties, Serializable scopePK)
+			throws Exception {
+
+			Object publicLayoutSetPrototypeLinkEnabled = properties.get(
+				"publicLayoutSetPrototypeLinkEnabled");
+			String publicLayoutSetPrototypeSiteExternalReferenceCode =
+				GetterUtil.getString(
+					properties.get(
+						"publicLayoutSetPrototypeSiteExternalReferenceCode"));
+
+			if ((publicLayoutSetPrototypeLinkEnabled == null) &&
+				Validator.isNull(
+					publicLayoutSetPrototypeSiteExternalReferenceCode)) {
+
+				return;
+			}
+
+			Group group = _groupLocalService.getGroup((long)scopePK);
+
+			if (group.hasStagingGroup() && !group.isStagedRemotely()) {
+				group = group.getStagingGroup();
+			}
+
+			LayoutSet publicLayoutSet = group.getPublicLayoutSet();
+
+			long publicLayoutSetPrototypeId =
+				publicLayoutSet.getLayoutSetPrototypeId();
+
+			if (Validator.isNotNull(
+					publicLayoutSetPrototypeSiteExternalReferenceCode)) {
+
+				Group layoutSetPrototypeGroup =
+					_groupLocalService.getGroupByExternalReferenceCode(
+						publicLayoutSetPrototypeSiteExternalReferenceCode,
+						group.getCompanyId());
+
+				publicLayoutSetPrototypeId =
+					layoutSetPrototypeGroup.getClassPK();
+			}
+
+			LayoutSet privateLayoutSet = group.getPrivateLayoutSet();
+
+			_sites.updateLayoutSetPrototypesLinks(
+				group, false, publicLayoutSetPrototypeId,
+				privateLayoutSet.getLayoutSetPrototypeId(),
+				GetterUtil.getBoolean(
+					publicLayoutSetPrototypeLinkEnabled,
+					publicLayoutSet.isLayoutSetPrototypeLinkEnabled()),
+				privateLayoutSet.isLayoutSetPrototypeLinkEnabled());
+		}
+
+		@Override
 		public boolean isVisible(Group group) {
 			if ((group != null) && group.isCompany()) {
 				return false;
@@ -124,6 +229,21 @@ public class PagesSiteSettingsConfigurationScreenWrapper
 			}
 
 			return false;
+		}
+
+		private LayoutSetPrototype _fetchLayoutSetPrototype(
+			LayoutSet layoutSet) {
+
+			if ((layoutSet == null) ||
+				Validator.isNull(layoutSet.getLayoutSetPrototypeUuid())) {
+
+				return null;
+			}
+
+			return _layoutSetPrototypeLocalService.
+				fetchLayoutSetPrototypeByUuidAndCompanyId(
+					layoutSet.getLayoutSetPrototypeUuid(),
+					layoutSet.getCompanyId());
 		}
 
 	}
