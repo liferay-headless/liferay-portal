@@ -51,6 +51,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageSender;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -605,6 +606,24 @@ public class BatchEngineImportTaskExecutorImpl
 			LastSessionRecorderHelperUtil.syncLastSessionState();
 		}
 		catch (Throwable throwable) {
+			BatchEngineTaskOperation batchEngineTaskOperation =
+				BatchEngineTaskOperation.valueOf(
+					batchEngineImportTask.getOperation());
+
+			if ((batchEngineTaskOperation == BatchEngineTaskOperation.DELETE) &&
+				(throwable instanceof NoSuchModelException) &&
+				ExportImportThreadLocal.isDataDeletionImportInProcess()) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Skipping deletion of missing item " +
+							PasswordFieldUtil.toString(item),
+						throwable);
+				}
+
+				return;
+			}
+
 			Exception exception =
 				throwable instanceof Exception ? (Exception)throwable :
 					new Exception(throwable.getMessage(), throwable);
