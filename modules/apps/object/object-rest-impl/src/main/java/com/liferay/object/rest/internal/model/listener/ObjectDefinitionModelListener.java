@@ -44,6 +44,15 @@ public class ObjectDefinitionModelListener
 		}
 	}
 
+	@Override
+	public void onAfterUpdate(
+		ObjectDefinition originalObjectDefinition,
+		ObjectDefinition objectDefinition) {
+
+		_objectDefinitionOpenAPIDocumentInvalidator.invalidate(
+			objectDefinition);
+	}
+
 	private void _deleteOAuth2ScopeGrants(ObjectDefinition objectDefinition)
 		throws PortalException {
 
@@ -71,5 +80,9 @@ public class ObjectDefinitionModelListener
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
+
+	@Reference
+	private ObjectDefinitionOpenAPIDocumentInvalidator
+		_objectDefinitionOpenAPIDocumentInvalidator;
 
 }
