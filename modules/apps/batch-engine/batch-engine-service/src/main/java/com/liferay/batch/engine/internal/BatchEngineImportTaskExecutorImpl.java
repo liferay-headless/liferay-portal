@@ -607,20 +607,14 @@ public class BatchEngineImportTaskExecutorImpl
 			LastSessionRecorderHelperUtil.syncLastSessionState();
 		}
 		catch (Throwable throwable) {
-			BatchEngineTaskOperation batchEngineTaskOperation =
-				BatchEngineTaskOperation.valueOf(
-					batchEngineImportTask.getOperation());
-
-			if ((batchEngineTaskOperation == BatchEngineTaskOperation.DELETE) &&
-				(throwable instanceof NoSuchModelException) &&
+			if ((throwable instanceof NoSuchModelException) &&
 				GetterUtil.getBoolean(
 					batchEngineImportTask.getParameterValue(
 						"ignoreMissingItems"))) {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Skipping deletion of missing item " +
-							PasswordFieldUtil.toString(item),
+						"Skipping item " + PasswordFieldUtil.toString(item),
 						throwable);
 				}
 
