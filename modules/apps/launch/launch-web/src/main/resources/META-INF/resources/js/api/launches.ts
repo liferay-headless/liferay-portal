@@ -168,6 +168,17 @@ export async function listLaunchEntriesForAsset({
 	return data.items || [];
 }
 
+export async function listLaunchIdsForAsset(asset: {
+	className: string;
+	classPK: number;
+}): Promise<number[]> {
+	const launchEntries = await listLaunchEntriesForAsset(asset);
+
+	return launchEntries.map(
+		(launchEntry) => launchEntry.r_launchSetToLaunchEntries_c_launchSetId
+	);
+}
+
 export async function listLaunchEntries({
 	className,
 	classPK,
