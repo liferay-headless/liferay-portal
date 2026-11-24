@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {openAddToLaunchModal} from '@liferay/launch-web';
 import {
 	openConfirmModal,
 	openModal,
@@ -14,7 +15,7 @@ import openDeleteArticleModal from './modals/openDeleteArticleModal';
 
 const ACTIONS = {
 	addToLaunch({itemData}) {
-		Liferay.fire('addToLaunch', {
+		openAddToLaunchModal({
 			className: itemData.className,
 			classPK: itemData.classPK,
 			classVersion: itemData.classVersion,
