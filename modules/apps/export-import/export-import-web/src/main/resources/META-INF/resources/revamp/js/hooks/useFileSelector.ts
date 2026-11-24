@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {useField} from 'formik';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
@@ -39,7 +40,7 @@ export function useFileSelector<T>(
 	const [serverError, setServerError] = useState<string | undefined>();
 
 	const abortControllerRef = useRef<AbortController | null>(null);
-	const isMountedRef = useRef(true);
+	const isMounted = useIsMounted();
 	const uploadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const cleanupProcesses = useCallback(() => {
@@ -87,7 +88,7 @@ export function useFileSelector<T>(
 			const result = await uploadRequest(file, controller.signal);
 
 			if (
-				!isMountedRef.current ||
+				!isMounted() ||
 				controller.signal.aborted ||
 				result.error === 'Aborted'
 			) {
@@ -106,7 +107,7 @@ export function useFileSelector<T>(
 			setStatus('VALIDATING');
 
 			uploadTimeoutRef.current = setTimeout(() => {
-				if (isMountedRef.current && !controller.signal.aborted) {
+				if (isMounted() && !controller.signal.aborted) {
 					setStatus('SUCCESS');
 					setValue(file);
 					setTouched(true);
@@ -115,7 +116,7 @@ export function useFileSelector<T>(
 		}
 		catch (error: any) {
 			if (
-				!isMountedRef.current ||
+				!isMounted() ||
 				controller.signal.aborted ||
 				error.name === 'AbortError'
 			) {
@@ -150,7 +151,6 @@ export function useFileSelector<T>(
 
 	useEffect(() => {
 		return () => {
-			isMountedRef.current = false;
 			cleanupProcesses();
 		};
 	}, [cleanupProcesses]);
@@ -158,14 +158,14 @@ export function useFileSelector<T>(
 	useEffect(() => {
 		if (status === 'SUCCESS') {
 			const timeout = setTimeout(() => {
-				if (isMountedRef.current) {
+				if (isMounted()) {
 					setStatus('STABLE_SUCCESS');
 				}
 			}, STATUS_CHANGE_DELAY);
 
 			return () => clearTimeout(timeout);
 		}
-	}, [status]);
+	}, [isMounted, status]);
 
 	useEffect(() => {
 		const error = validate(field.value);
