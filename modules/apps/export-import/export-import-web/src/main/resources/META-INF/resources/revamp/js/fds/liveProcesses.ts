@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {useEffect, useState} from 'react';
+import {useSyncExternalStore} from 'react';
 
 export interface Process {
 	dateCompleted?: string;
@@ -17,8 +17,16 @@ export interface Process {
 	};
 }
 
-const listeners = new Map<number, Set<() => void>>();
+const listeners = new Set<() => void>();
 const processes = new Map<number, Process>();
+
+function subscribe(listener: () => void) {
+	listeners.add(listener);
+
+	return () => {
+		listeners.delete(listener);
+	};
+}
 
 export function getLiveProcess(processId: number): Process | undefined {
 	return processes.get(processId);
@@ -27,34 +35,11 @@ export function getLiveProcess(processId: number): Process | undefined {
 export function publishLiveProcess(process: Process) {
 	processes.set(process.id, process);
 
-	listeners.get(process.id)?.forEach((listener: () => void) => listener());
+	listeners.forEach((listener) => listener());
 }
 
 export function useLiveProcess(processId?: number): Process | undefined {
-	const [process, setProcess] = useState(
+	return useSyncExternalStore(subscribe, () =>
 		processId ? processes.get(processId) : undefined
 	);
-
-	useEffect(() => {
-		if (!processId) {
-			return;
-		}
-
-		setProcess(processes.get(processId));
-
-		const processListeners =
-			listeners.get(processId) ?? new Set<() => void>();
-
-		listeners.set(processId, processListeners);
-
-		const listener = () => setProcess(processes.get(processId));
-
-		processListeners.add(listener);
-
-		return () => {
-			processListeners.delete(listener);
-		};
-	}, [processId]);
-
-	return process;
 }
