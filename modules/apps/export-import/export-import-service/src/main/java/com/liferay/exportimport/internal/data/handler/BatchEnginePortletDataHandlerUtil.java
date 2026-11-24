@@ -61,6 +61,8 @@ public class BatchEnginePortletDataHandlerUtil {
 		Map<String, Serializable> deleteParameters =
 			HashMapBuilder.<String, Serializable>putAll(
 				exportImportDescriptor.getParameters(portletDataContext)
+			).put(
+				"ignoreMissingItems", true
 			).build();
 
 		Group group = groupLocalService.fetchGroup(

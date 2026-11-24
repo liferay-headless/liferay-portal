@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
@@ -612,7 +613,9 @@ public class BatchEngineImportTaskExecutorImpl
 
 			if ((batchEngineTaskOperation == BatchEngineTaskOperation.DELETE) &&
 				(throwable instanceof NoSuchModelException) &&
-				ExportImportThreadLocal.isDataDeletionImportInProcess()) {
+				GetterUtil.getBoolean(
+					batchEngineImportTask.getParameterValue(
+						"ignoreMissingItems"))) {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
