@@ -140,14 +140,10 @@ export function getScheduleSummary(
 }
 
 function getListText(labels: string[], locale: string): string {
-	if (typeof Intl.ListFormat === 'function') {
-		return new Intl.ListFormat(locale, {
-			style: 'long',
-			type: 'conjunction',
-		}).format(labels);
-	}
-
-	return labels.join(', ');
+	return new Intl.ListFormat(locale, {
+		style: 'long',
+		type: 'conjunction',
+	}).format(labels);
 }
 
 function getMonthDayListText(monthDays: number[], locale: string): string {
