@@ -4,7 +4,6 @@
  */
 
 export type {Launch, LaunchEntry} from './api/launches';
-export {default as AddToLaunchModal} from './components/AddToLaunchModal';
 export {default as LaunchDetailsForm} from './components/LaunchDetailsForm';
 export {default as LaunchPreviewButton} from './components/LaunchPreviewButton';
 export {default as LaunchPreviewTopbar} from './components/LaunchPreviewTopbar';
