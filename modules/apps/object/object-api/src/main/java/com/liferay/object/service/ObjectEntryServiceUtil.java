@@ -153,6 +153,12 @@ public class ObjectEntryServiceUtil {
 			groupId, objectDefinitionId, status, start, end);
 	}
 
+	public static List<ObjectEntry> getObjectEntries(long[] objectEntryIds)
+		throws PortalException {
+
+		return getService().getObjectEntries(objectEntryIds);
+	}
+
 	public static int getObjectEntriesCount(
 		long groupId, long objectDefinitionId, int status) {
 
@@ -325,4 +331,4 @@ public class ObjectEntryServiceUtil {
 		new Snapshot<>(ObjectEntryServiceUtil.class, ObjectEntryService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-812823718
+// LIFERAY-SERVICE-BUILDER-HASH:-1575781076
