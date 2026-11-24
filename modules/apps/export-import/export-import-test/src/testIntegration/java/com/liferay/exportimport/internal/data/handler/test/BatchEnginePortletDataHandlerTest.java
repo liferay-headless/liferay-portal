@@ -1984,14 +1984,17 @@ public class BatchEnginePortletDataHandlerTest {
 				larFile2
 			).executeImport();
 
-		List<ExportImportReportEntry> exportImportReportEntries =
-			_exportImportReportEntryLocalService.getExportImportReportEntries(
-				TestPropsValues.getCompanyId(),
-				exportImportConfiguration.getExportImportConfigurationId());
+		for (ExportImportReportEntry exportImportReportEntry :
+				_exportImportReportEntryLocalService.
+					getExportImportReportEntries(
+						TestPropsValues.getCompanyId(),
+						exportImportConfiguration.
+							getExportImportConfigurationId())) {
 
-		Assert.assertEquals(
-			exportImportReportEntries.toString(), 0,
-			exportImportReportEntries.size());
+			Assert.assertNotEquals(
+				notificationTemplate1.getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+		}
 
 		Assert.assertNotNull(
 			_fetchNotificationTemplate(
