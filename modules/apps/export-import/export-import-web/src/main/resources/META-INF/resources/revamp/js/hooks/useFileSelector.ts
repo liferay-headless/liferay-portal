@@ -6,8 +6,8 @@
 import {useField} from 'formik';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {RequestResult} from '../../../../services/ApiHelper';
-import {FileSelectorStatus} from '../../../FileSelector';
+import {FileSelectorStatus} from '../components/FileSelector';
+import {RequestResult} from '../services/ApiHelper';
 
 const STATUS_CHANGE_DELAY = 1000;
 

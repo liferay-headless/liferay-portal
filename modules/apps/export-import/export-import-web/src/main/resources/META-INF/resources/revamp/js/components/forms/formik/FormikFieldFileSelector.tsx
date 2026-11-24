@@ -5,10 +5,10 @@
 
 import React from 'react';
 
+import {useFileSelector} from '../../../hooks/useFileSelector';
 import {RequestResult} from '../../../services/ApiHelper';
 import FileSelector from '../../FileSelector';
 import {FormikWrapper} from './FormikWrapper';
-import {useFileSelector} from './hooks/useFileSelector';
 
 export function FormikFieldFileSelector<T>({
 	'aria-describedby': ariaDescribedby,
