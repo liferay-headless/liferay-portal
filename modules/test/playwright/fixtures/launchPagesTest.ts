@@ -5,11 +5,16 @@
 
 import {test} from '@playwright/test';
 
+import {LaunchItemSelectorPage} from '../pages/launch-web/LaunchItemSelectorPage';
 import {LaunchesPage} from '../pages/launch-web/LaunchesPage';
 
 const launchPagesTest = test.extend<{
+	launchItemSelectorPage: LaunchItemSelectorPage;
 	launchesPage: LaunchesPage;
 }>({
+	launchItemSelectorPage: async ({page}, use) => {
+		await use(new LaunchItemSelectorPage(page));
+	},
 	launchesPage: async ({page}, use) => {
 		await use(new LaunchesPage(page));
 	},
