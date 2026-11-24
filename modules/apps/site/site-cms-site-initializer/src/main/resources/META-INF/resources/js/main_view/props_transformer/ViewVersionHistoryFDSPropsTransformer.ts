@@ -8,6 +8,7 @@ import {
 	IInternalRenderer,
 	replaceTokens,
 } from '@liferay/frontend-data-set-web';
+import {openAddToLaunchModal} from '@liferay/launch-web';
 import {navigate, sessionStorage, sub} from 'frontend-js-web';
 
 import StatusLabel from '../../common/components/StatusLabel';
@@ -140,7 +141,7 @@ export default function ViewVersionHistoryFDSPropsTransformer({
 			if (action.data.id === 'addToLaunch') {
 				event?.preventDefault();
 
-				Liferay.fire('addToLaunch', {
+				openAddToLaunchModal({
 					className: additionalProps.className,
 					classPK: additionalProps.classPK,
 					classVersion: String(

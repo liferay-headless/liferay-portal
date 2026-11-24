@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import {openAddToLaunchModal} from '@liferay/launch-web';
+
 import {
 	ASSET_STATUS_TO_DISPLAY_TYPE,
 	OBJECT_ENTRY_CLASS_NAME,
@@ -22,6 +24,10 @@ jest.mock('@liferay/frontend-data-set-web', () => ({
 
 jest.mock('@liferay/frontend-js-item-selector-web', () => ({
 	getCMSItemSelectorGroupedFilters: jest.fn(() => []),
+}));
+
+jest.mock('@liferay/launch-web', () => ({
+	openAddToLaunchModal: jest.fn(),
 }));
 
 jest.mock(
@@ -428,9 +434,26 @@ describe('AssetsFDSPropsTransformer', () => {
 			expect(openCMSModal).not.toHaveBeenCalled();
 		});
 
-		it('does not fire addToLaunch for an asset without embedded data', async () => {
-			const fireSpy = jest.spyOn(Liferay, 'fire');
+		it('opens the Launch selector for the version of the asset', async () => {
+			await getTransformedProps().onActionDropdownItemClick({
+				action: {data: {id: 'addToLaunch'}},
+				event: mockEvent,
+				itemData: {
+					embedded: {id: 1, systemProperties: {version: {number: 3}}},
+					entryClassName: OBJECT_ENTRY_CLASS_NAME,
+				} as any,
+				items: [],
+				loadData: jest.fn(),
+			});
 
+			expect(openAddToLaunchModal).toHaveBeenCalledWith({
+				className: OBJECT_ENTRY_CLASS_NAME,
+				classPK: 1,
+				classVersion: '3',
+			});
+		});
+
+		it('does not open the Launch selector for an asset without embedded data', async () => {
 			await getTransformedProps().onActionDropdownItemClick({
 				action: {data: {id: 'addToLaunch'}},
 				event: mockEvent,
@@ -439,12 +462,10 @@ describe('AssetsFDSPropsTransformer', () => {
 				loadData: jest.fn(),
 			});
 
-			expect(fireSpy).not.toHaveBeenCalled();
+			expect(openAddToLaunchModal).not.toHaveBeenCalled();
 		});
 
-		it('does not fire addToLaunch for an asset without a version', async () => {
-			const fireSpy = jest.spyOn(Liferay, 'fire');
-
+		it('does not open the Launch selector for an asset without a version', async () => {
 			await getTransformedProps().onActionDropdownItemClick({
 				action: {data: {id: 'addToLaunch'}},
 				event: mockEvent,
@@ -456,7 +477,7 @@ describe('AssetsFDSPropsTransformer', () => {
 				loadData: jest.fn(),
 			});
 
-			expect(fireSpy).not.toHaveBeenCalled();
+			expect(openAddToLaunchModal).not.toHaveBeenCalled();
 		});
 
 		it('does not reset the permissions of an asset without embedded data', async () => {
