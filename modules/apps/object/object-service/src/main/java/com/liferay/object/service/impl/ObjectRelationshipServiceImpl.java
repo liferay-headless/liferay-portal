@@ -111,6 +111,33 @@ public class ObjectRelationshipServiceImpl
 	}
 
 	@Override
+	public void deleteObjectRelationshipMappingTableValues(
+			long objectRelationshipId, long primaryKey1, long primaryKey2)
+		throws PortalException {
+
+		ObjectRelationship objectRelationship =
+			objectRelationshipPersistence.findByPrimaryKey(
+				objectRelationshipId);
+
+		_checkModelResourcePermission(
+			objectRelationship.getObjectDefinitionId2(), primaryKey2,
+			ActionKeys.UPDATE);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+			_checkModelResourcePermission(
+				objectRelationship.getObjectDefinitionId1(), primaryKey1,
+				ActionKeys.UPDATE);
+		}
+
+		objectRelationshipLocalService.
+			deleteObjectRelationshipMappingTableValues(
+				objectRelationshipId, primaryKey1, primaryKey2);
+	}
+
+	@Override
 	public ObjectRelationship fetchObjectRelationshipByExternalReferenceCode(
 			String externalReferenceCode, long companyId,
 			long objectDefinitionId1)
