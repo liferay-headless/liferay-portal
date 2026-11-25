@@ -3,11 +3,45 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {EConfigInURLBehavior} from '@liferay/frontend-data-set-web';
+import {
+	EConfigInURLBehavior,
+	IFrontendDataSetProps,
+} from '@liferay/frontend-data-set-web';
 import {openItemSelectorModal} from '@liferay/frontend-js-item-selector-web';
 
 import {Launch} from '../api/launches';
 import LaunchStatusCell from '../renderers/LaunchStatusCell';
+
+const LAUNCH_ITEM_SELECTOR_VIEWS: IFrontendDataSetProps['views'] = [
+	{
+		contentRenderer: 'table',
+		label: Liferay.Language.get('table'),
+		name: 'table',
+		schema: {
+			fields: [
+				{
+					fieldName: 'name',
+					label: Liferay.Language.get('name'),
+					sortable: true,
+				},
+				{
+					fieldName: 'description',
+					label: Liferay.Language.get('description'),
+				},
+				{
+					contentRenderer: 'launchStatus',
+					fieldName: 'status',
+					label: Liferay.Language.get('status'),
+				},
+				{
+					contentRenderer: 'dateTime',
+					fieldName: 'scheduledDate',
+					label: Liferay.Language.get('scheduled-date'),
+				},
+			],
+		},
+	},
+];
 
 const LAUNCH_SETS_API_URL = '/o/launch-sets';
 
@@ -68,36 +102,7 @@ export default function openLaunchItemSelectorModal({
 					label: Liferay.Language.get('last-modified'),
 				},
 			],
-			views: [
-				{
-					contentRenderer: 'table',
-					label: Liferay.Language.get('table'),
-					name: 'table',
-					schema: {
-						fields: [
-							{
-								fieldName: 'name',
-								label: Liferay.Language.get('name'),
-								sortable: true,
-							},
-							{
-								fieldName: 'description',
-								label: Liferay.Language.get('description'),
-							},
-							{
-								contentRenderer: 'launchStatus',
-								fieldName: 'status',
-								label: Liferay.Language.get('status'),
-							},
-							{
-								contentRenderer: 'dateTime',
-								fieldName: 'scheduledDate',
-								label: Liferay.Language.get('scheduled-date'),
-							},
-						],
-					},
-				},
-			],
+			views: LAUNCH_ITEM_SELECTOR_VIEWS,
 		},
 		itemTypeLabel: Liferay.Language.get('launch'),
 		items: [],
