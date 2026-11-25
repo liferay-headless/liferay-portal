@@ -6,6 +6,10 @@
 package com.liferay.object.rest.internal.manager.v1_0;
 
 import com.liferay.account.exception.NoSuchGroupException;
+import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRelTable;
+import com.liferay.asset.kernel.model.AssetEntries_AssetTagsTable;
+import com.liferay.asset.kernel.model.AssetEntryTable;
+import com.liferay.asset.kernel.model.AssetTagTable;
 import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.model.DepotEntryModel;
@@ -3722,6 +3726,74 @@ public class DefaultObjectEntryManagerImpl
 
 		dtoConverterContext.setAttribute(
 			"friendlyURLTitleMaps", friendlyURLTitleMaps);
+
+		if (!objectDefinition.isEnableCategorization()) {
+			return;
+		}
+
+		Map<Long, List<String>> keywordsMap = new HashMap<>();
+
+		rows = objectEntryLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				AssetEntryTable.INSTANCE.classPK, AssetTagTable.INSTANCE.name
+			).from(
+				AssetEntryTable.INSTANCE
+			).innerJoinON(
+				AssetEntries_AssetTagsTable.INSTANCE,
+				AssetEntries_AssetTagsTable.INSTANCE.entryId.eq(
+					AssetEntryTable.INSTANCE.entryId)
+			).innerJoinON(
+				AssetTagTable.INSTANCE,
+				AssetTagTable.INSTANCE.tagId.eq(
+					AssetEntries_AssetTagsTable.INSTANCE.tagId)
+			).where(
+				AssetEntryTable.INSTANCE.classNameId.eq(
+					classNameId
+				).and(
+					AssetEntryTable.INSTANCE.classPK.in(classPKs)
+				)
+			).orderBy(
+				AssetTagTable.INSTANCE.tagId.ascending()
+			));
+
+		for (Object[] row : rows) {
+			List<String> keywords = keywordsMap.computeIfAbsent(
+				(Long)row[0], key -> new ArrayList<>());
+
+			keywords.add((String)row[1]);
+		}
+
+		dtoConverterContext.setAttribute("keywordsMap", keywordsMap);
+
+		Map<Long, List<Long>> assetCategoryIdsMap = new HashMap<>();
+
+		rows = objectEntryLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				AssetEntryTable.INSTANCE.classPK,
+				AssetEntryAssetCategoryRelTable.INSTANCE.assetCategoryId
+			).from(
+				AssetEntryTable.INSTANCE
+			).innerJoinON(
+				AssetEntryAssetCategoryRelTable.INSTANCE,
+				AssetEntryAssetCategoryRelTable.INSTANCE.assetEntryId.eq(
+					AssetEntryTable.INSTANCE.entryId)
+			).where(
+				AssetEntryTable.INSTANCE.classNameId.eq(
+					classNameId
+				).and(
+					AssetEntryTable.INSTANCE.classPK.in(classPKs)
+				)
+			));
+
+		for (Object[] row : rows) {
+			List<Long> assetCategoryIds = assetCategoryIdsMap.computeIfAbsent(
+				(Long)row[0], key -> new ArrayList<>());
+
+			assetCategoryIds.add((Long)row[1]);
+		}
+
+		dtoConverterContext.setAttribute(
+			"assetCategoryIdsMap", assetCategoryIdsMap);
 	}
 
 	private void _setLatestApprovedObjectEntryVersionAttribute(

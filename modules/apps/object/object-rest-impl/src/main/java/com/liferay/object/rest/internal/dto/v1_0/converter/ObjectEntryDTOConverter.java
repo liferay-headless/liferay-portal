@@ -385,6 +385,18 @@ public class ObjectEntryDTOConverter
 					return null;
 				}
 
+				if (dtoConverterContext.getAttribute("keywordsMap") != null) {
+					List<String> keywords = _getBulkAttribute(
+						dtoConverterContext, "keywordsMap",
+						serviceBuilderObjectEntry);
+
+					if (keywords == null) {
+						return new String[0];
+					}
+
+					return keywords.toArray(new String[0]);
+				}
+
 				return ListUtil.toArray(
 					_assetTagLocalService.getTags(
 						objectDefinition.getClassName(),
@@ -524,6 +536,28 @@ public class ObjectEntryDTOConverter
 				}
 				else if (!objectDefinition.isEnableCategorization()) {
 					return null;
+				}
+
+				if (dtoConverterContext.getAttribute("assetCategoryIdsMap") !=
+						null) {
+
+					List<Long> assetCategoryIds = _getBulkAttribute(
+						dtoConverterContext, "assetCategoryIdsMap",
+						serviceBuilderObjectEntry);
+
+					if (assetCategoryIds == null) {
+						return new TaxonomyCategoryBrief[0];
+					}
+
+					return TransformUtil.transformToArray(
+						assetCategoryIds,
+						assetCategoryId ->
+							TaxonomyCategoryBriefUtil.toTaxonomyCategoryBrief(
+								_assetCategoryLocalService.getAssetCategory(
+									assetCategoryId),
+								dtoConverterContext,
+								serviceBuilderObjectEntry.getGroupId()),
+						TaxonomyCategoryBrief.class);
 				}
 
 				return TransformUtil.transformToArray(
