@@ -829,4 +829,4 @@ public abstract class BaseMostActiveVisitorsResourceTestCase {
 		MostActiveVisitorsResource _mostActiveVisitorsResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:919066570
+// LIFERAY-REST-BUILDER-HASH:-1637074511

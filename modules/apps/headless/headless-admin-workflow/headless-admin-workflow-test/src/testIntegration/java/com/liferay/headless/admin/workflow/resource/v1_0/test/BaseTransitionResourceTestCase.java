@@ -1378,4 +1378,4 @@ public abstract class BaseTransitionResourceTestCase {
 		_transitionResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:998402890
+// LIFERAY-REST-BUILDER-HASH:-887116111

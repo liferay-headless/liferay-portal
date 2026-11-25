@@ -1379,4 +1379,4 @@ public abstract class BaseRoleResourceTestCase {
 		_roleResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:921557394
+// LIFERAY-REST-BUILDER-HASH:1971359993

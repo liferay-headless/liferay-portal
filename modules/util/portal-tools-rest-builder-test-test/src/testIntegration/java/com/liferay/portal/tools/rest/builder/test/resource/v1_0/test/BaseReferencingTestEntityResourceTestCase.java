@@ -927,4 +927,4 @@ public abstract class BaseReferencingTestEntityResourceTestCase {
 		ReferencingTestEntityResource _referencingTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:904902118
+// LIFERAY-REST-BUILDER-HASH:2065035469

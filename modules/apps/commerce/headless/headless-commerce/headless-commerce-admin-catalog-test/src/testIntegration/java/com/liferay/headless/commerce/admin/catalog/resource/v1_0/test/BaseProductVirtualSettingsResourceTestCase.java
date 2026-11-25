@@ -1954,4 +1954,4 @@ public abstract class BaseProductVirtualSettingsResourceTestCase {
 		ProductVirtualSettingsResource _productVirtualSettingsResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1272460650
+// LIFERAY-REST-BUILDER-HASH:-591881839

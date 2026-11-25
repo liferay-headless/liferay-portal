@@ -857,4 +857,4 @@ public abstract class BaseInventoryAnalysisResourceTestCase {
 			_inventoryAnalysisResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1147834138
+// LIFERAY-REST-BUILDER-HASH:-1202124833

@@ -871,4 +871,4 @@ public abstract class BaseLinkResourceTestCase {
 	private com.liferay.headless.pim.resource.v1_0.LinkResource _linkResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1399759161
+// LIFERAY-REST-BUILDER-HASH:-141450656

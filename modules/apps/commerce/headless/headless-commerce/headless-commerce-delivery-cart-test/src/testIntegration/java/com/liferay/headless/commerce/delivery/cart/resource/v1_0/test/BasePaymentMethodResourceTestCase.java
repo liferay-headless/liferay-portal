@@ -1129,4 +1129,4 @@ public abstract class BasePaymentMethodResourceTestCase {
 		PaymentMethodResource _paymentMethodResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:964254175
+// LIFERAY-REST-BUILDER-HASH:-220798010

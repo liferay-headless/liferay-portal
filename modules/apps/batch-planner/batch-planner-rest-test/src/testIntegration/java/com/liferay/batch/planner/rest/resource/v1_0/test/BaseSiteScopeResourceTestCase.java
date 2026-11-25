@@ -925,4 +925,4 @@ public abstract class BaseSiteScopeResourceTestCase {
 		_siteScopeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:610131484
+// LIFERAY-REST-BUILDER-HASH:872078339

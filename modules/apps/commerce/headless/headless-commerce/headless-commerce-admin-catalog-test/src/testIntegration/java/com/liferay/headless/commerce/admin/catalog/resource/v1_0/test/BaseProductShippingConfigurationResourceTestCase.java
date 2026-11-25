@@ -1067,4 +1067,4 @@ public abstract class BaseProductShippingConfigurationResourceTestCase {
 			_productShippingConfigurationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1603352252
+// LIFERAY-REST-BUILDER-HASH:859786869

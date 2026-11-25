@@ -915,4 +915,4 @@ public abstract class BaseBatchTestEntityActionResourceTestCase {
 		BatchTestEntityActionResource _batchTestEntityActionResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:381933132
+// LIFERAY-REST-BUILDER-HASH:-205389307

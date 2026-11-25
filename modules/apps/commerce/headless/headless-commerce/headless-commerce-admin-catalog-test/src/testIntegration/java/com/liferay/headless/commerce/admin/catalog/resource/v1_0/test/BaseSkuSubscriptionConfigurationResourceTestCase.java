@@ -1189,4 +1189,4 @@ public abstract class BaseSkuSubscriptionConfigurationResourceTestCase {
 			_skuSubscriptionConfigurationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1323663119
+// LIFERAY-REST-BUILDER-HASH:-1548100136

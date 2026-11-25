@@ -812,4 +812,4 @@ public abstract class BaseKeywordResourceTestCase {
 		_keywordResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1547286324
+// LIFERAY-REST-BUILDER-HASH:-810876155

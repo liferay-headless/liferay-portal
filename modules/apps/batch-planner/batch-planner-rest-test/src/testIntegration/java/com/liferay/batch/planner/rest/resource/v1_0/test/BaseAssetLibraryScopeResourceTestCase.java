@@ -996,4 +996,4 @@ public abstract class BaseAssetLibraryScopeResourceTestCase {
 			_assetLibraryScopeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-750259067
+// LIFERAY-REST-BUILDER-HASH:1301463724

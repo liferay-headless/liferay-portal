@@ -859,4 +859,4 @@ public abstract class BaseUserAccountFullNameDefinitionResourceTestCase {
 			_userAccountFullNameDefinitionResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-278766328
+// LIFERAY-REST-BUILDER-HASH:-1228554385

@@ -864,4 +864,4 @@ public abstract class BaseConnectionInfoResourceTestCase {
 		_connectionInfoResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-143933370
+// LIFERAY-REST-BUILDER-HASH:-801135041

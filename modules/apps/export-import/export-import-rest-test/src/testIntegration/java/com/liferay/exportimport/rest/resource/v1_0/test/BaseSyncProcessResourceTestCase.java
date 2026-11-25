@@ -649,4 +649,4 @@ public abstract class BaseSyncProcessResourceTestCase {
 		_syncProcessResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1588976104
+// LIFERAY-REST-BUILDER-HASH:1833796223

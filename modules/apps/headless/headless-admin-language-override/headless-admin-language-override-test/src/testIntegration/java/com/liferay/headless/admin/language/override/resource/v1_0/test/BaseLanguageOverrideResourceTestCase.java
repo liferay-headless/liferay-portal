@@ -2222,4 +2222,4 @@ public abstract class BaseLanguageOverrideResourceTestCase {
 		LanguageOverrideResource _languageOverrideResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1496612149
+// LIFERAY-REST-BUILDER-HASH:-97367826

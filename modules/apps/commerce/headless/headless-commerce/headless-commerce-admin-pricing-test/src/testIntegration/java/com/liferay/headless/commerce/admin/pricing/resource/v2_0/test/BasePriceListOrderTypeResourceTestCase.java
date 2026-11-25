@@ -1781,4 +1781,4 @@ public abstract class BasePriceListOrderTypeResourceTestCase {
 		PriceListOrderTypeResource _priceListOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-153287307
+// LIFERAY-REST-BUILDER-HASH:-1043214738

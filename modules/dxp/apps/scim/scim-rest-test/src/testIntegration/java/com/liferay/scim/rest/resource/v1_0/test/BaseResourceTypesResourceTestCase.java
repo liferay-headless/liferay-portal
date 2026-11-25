@@ -656,4 +656,4 @@ public abstract class BaseResourceTypesResourceTestCase {
 		_resourceTypesResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-947249195
+// LIFERAY-REST-BUILDER-HASH:-1611615538

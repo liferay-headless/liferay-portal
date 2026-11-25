@@ -64,7 +64,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -419,55 +419,57 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 			messageBoardSectionResource.getMessageBoardSection(
 				postMessageBoardSection.getId());
 
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-			_vulcanCRUDItemDelegateBuilderRegistry.builder(
-				testCompany,
-				"com.liferay.headless.delivery.dto.v1_0.MessageBoardSection"
-			).acceptLanguage(
-				new AcceptLanguage() {
+		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_vulcanCRUDItemDelegateBuilderRegistry.builder(
+					testCompany,
+					"com.liferay.headless.delivery.dto.v1_0.MessageBoardSection"
+				).acceptLanguage(
+					new AcceptLanguage() {
 
-					@Override
-					public List<Locale> getLocales() {
-						return Arrays.asList(LocaleUtil.getDefault());
+						@Override
+						public List<Locale> getLocales() {
+							return Arrays.asList(LocaleUtil.getDefault());
+						}
+
+						@Override
+						public String getPreferredLanguageId() {
+							return LocaleUtil.toLanguageId(
+								LocaleUtil.getDefault());
+						}
+
+						@Override
+						public Locale getPreferredLocale() {
+							return LocaleUtil.getDefault();
+						}
+
 					}
+				).groupLocalService(
+					_groupLocalService
+				).httpServletRequest(
+					testVulcanCRUDItemDelegate_getHttpServletRequest()
+				).httpServletResponse(
+					new MockHttpServletResponse()
+				).resourceActionLocalService(
+					_resourceActionLocalService
+				).resourcePermissionLocalService(
+					_resourcePermissionLocalService
+				).roleLocalService(
+					_roleLocalService
+				).scopeChecker(
+					_scopeChecker
+				).uriInfo(
+					testVulcanCRUDItemDelegate_getUriInfo()
+				).user(
+					testVulcanCRUDItemDelegate_getUser()
+				).build()) {
 
-					@Override
-					public String getPreferredLanguageId() {
-						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
-					}
+			Object item = vulcanCRUDItemDelegate.getItem(
+				postMessageBoardSection.getId());
 
-					@Override
-					public Locale getPreferredLocale() {
-						return LocaleUtil.getDefault();
-					}
-
-				}
-			).groupLocalService(
-				_groupLocalService
-			).httpServletRequest(
-				testVulcanCRUDItemDelegate_getHttpServletRequest()
-			).httpServletResponse(
-				new MockHttpServletResponse()
-			).resourceActionLocalService(
-				_resourceActionLocalService
-			).resourcePermissionLocalService(
-				_resourcePermissionLocalService
-			).roleLocalService(
-				_roleLocalService
-			).scopeChecker(
-				_scopeChecker
-			).uriInfo(
-				testVulcanCRUDItemDelegate_getUriInfo()
-			).user(
-				testVulcanCRUDItemDelegate_getUser()
-			).build();
-
-		Object item = vulcanCRUDItemDelegate.getItem(
-			postMessageBoardSection.getId());
-
-		assertEquals(
-			getMessageBoardSection,
-			MessageBoardSectionSerDes.toDTO(item.toString()));
+			assertEquals(
+				getMessageBoardSection,
+				MessageBoardSectionSerDes.toDTO(item.toString()));
+		}
 	}
 
 	protected HttpServletRequest
@@ -3884,4 +3886,4 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:978631343
+// LIFERAY-REST-BUILDER-HASH:-1952616441

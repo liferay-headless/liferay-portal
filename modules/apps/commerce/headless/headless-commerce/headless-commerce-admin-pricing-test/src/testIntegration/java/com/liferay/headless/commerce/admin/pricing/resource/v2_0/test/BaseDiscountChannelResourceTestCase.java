@@ -1968,4 +1968,4 @@ public abstract class BaseDiscountChannelResourceTestCase {
 		DiscountChannelResource _discountChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-937430203
+// LIFERAY-REST-BUILDER-HASH:1531106430

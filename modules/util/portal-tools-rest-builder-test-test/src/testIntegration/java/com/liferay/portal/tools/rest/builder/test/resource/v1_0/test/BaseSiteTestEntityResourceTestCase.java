@@ -59,7 +59,7 @@ import com.liferay.portal.tools.rest.builder.test.client.permission.Permission;
 import com.liferay.portal.tools.rest.builder.test.client.resource.v1_0.SiteTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.client.serdes.v1_0.SiteTestEntitySerDes;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -762,54 +762,56 @@ public abstract class BaseSiteTestEntityResourceTestCase {
 			siteTestEntityResource.getSiteTestEntity(
 				postSiteTestEntity.getId());
 
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-			_vulcanCRUDItemDelegateBuilderRegistry.builder(
-				testCompany,
-				"com.liferay.portal.tools.rest.builder.test.dto.v1_0.SiteTestEntity"
-			).acceptLanguage(
-				new AcceptLanguage() {
+		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_vulcanCRUDItemDelegateBuilderRegistry.builder(
+					testCompany,
+					"com.liferay.portal.tools.rest.builder.test.dto.v1_0.SiteTestEntity"
+				).acceptLanguage(
+					new AcceptLanguage() {
 
-					@Override
-					public List<Locale> getLocales() {
-						return Arrays.asList(LocaleUtil.getDefault());
+						@Override
+						public List<Locale> getLocales() {
+							return Arrays.asList(LocaleUtil.getDefault());
+						}
+
+						@Override
+						public String getPreferredLanguageId() {
+							return LocaleUtil.toLanguageId(
+								LocaleUtil.getDefault());
+						}
+
+						@Override
+						public Locale getPreferredLocale() {
+							return LocaleUtil.getDefault();
+						}
+
 					}
+				).groupLocalService(
+					_groupLocalService
+				).httpServletRequest(
+					testVulcanCRUDItemDelegate_getHttpServletRequest()
+				).httpServletResponse(
+					new MockHttpServletResponse()
+				).resourceActionLocalService(
+					_resourceActionLocalService
+				).resourcePermissionLocalService(
+					_resourcePermissionLocalService
+				).roleLocalService(
+					_roleLocalService
+				).scopeChecker(
+					_scopeChecker
+				).uriInfo(
+					testVulcanCRUDItemDelegate_getUriInfo()
+				).user(
+					testVulcanCRUDItemDelegate_getUser()
+				).build()) {
 
-					@Override
-					public String getPreferredLanguageId() {
-						return LocaleUtil.toLanguageId(LocaleUtil.getDefault());
-					}
+			Object item = vulcanCRUDItemDelegate.getItem(
+				postSiteTestEntity.getId());
 
-					@Override
-					public Locale getPreferredLocale() {
-						return LocaleUtil.getDefault();
-					}
-
-				}
-			).groupLocalService(
-				_groupLocalService
-			).httpServletRequest(
-				testVulcanCRUDItemDelegate_getHttpServletRequest()
-			).httpServletResponse(
-				new MockHttpServletResponse()
-			).resourceActionLocalService(
-				_resourceActionLocalService
-			).resourcePermissionLocalService(
-				_resourcePermissionLocalService
-			).roleLocalService(
-				_roleLocalService
-			).scopeChecker(
-				_scopeChecker
-			).uriInfo(
-				testVulcanCRUDItemDelegate_getUriInfo()
-			).user(
-				testVulcanCRUDItemDelegate_getUser()
-			).build();
-
-		Object item = vulcanCRUDItemDelegate.getItem(
-			postSiteTestEntity.getId());
-
-		assertEquals(
-			getSiteTestEntity, SiteTestEntitySerDes.toDTO(item.toString()));
+			assertEquals(
+				getSiteTestEntity, SiteTestEntitySerDes.toDTO(item.toString()));
+		}
 	}
 
 	protected HttpServletRequest
@@ -2544,4 +2546,4 @@ public abstract class BaseSiteTestEntityResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1597179641
+// LIFERAY-REST-BUILDER-HASH:562877649

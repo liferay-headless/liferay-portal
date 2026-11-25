@@ -830,4 +830,4 @@ public abstract class BaseSyncPreviewResourceTestCase {
 		_syncPreviewResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:880206083
+// LIFERAY-REST-BUILDER-HASH:1145753898

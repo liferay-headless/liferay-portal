@@ -961,4 +961,4 @@ public abstract class BaseDataSourceResourceTestCase {
 		_dataSourceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:225012269
+// LIFERAY-REST-BUILDER-HASH:372244244

@@ -1888,4 +1888,4 @@ public abstract class BaseContentElementResourceTestCase {
 		_contentElementResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:222722296
+// LIFERAY-REST-BUILDER-HASH:407278001

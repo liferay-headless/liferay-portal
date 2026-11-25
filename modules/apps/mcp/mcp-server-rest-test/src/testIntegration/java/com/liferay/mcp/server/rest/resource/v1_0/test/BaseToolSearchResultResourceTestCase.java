@@ -1071,4 +1071,4 @@ public abstract class BaseToolSearchResultResourceTestCase {
 		_toolSearchResultResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1231540221
+// LIFERAY-REST-BUILDER-HASH:-941915594

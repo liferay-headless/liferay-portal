@@ -972,4 +972,4 @@ public abstract class BaseFeatureFlagApplicationTestEntityResourceTestCase {
 			_featureFlagApplicationTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:508278523
+// LIFERAY-REST-BUILDER-HASH:-390713502

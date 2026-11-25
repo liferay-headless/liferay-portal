@@ -951,4 +951,4 @@ public abstract class BaseRoomResourceTestCase {
 		_roomResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1974345978
+// LIFERAY-REST-BUILDER-HASH:1163808481

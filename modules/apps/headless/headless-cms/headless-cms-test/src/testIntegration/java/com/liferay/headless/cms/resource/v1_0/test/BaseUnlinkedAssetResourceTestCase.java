@@ -1289,4 +1289,4 @@ public abstract class BaseUnlinkedAssetResourceTestCase {
 		_unlinkedAssetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1953036204
+// LIFERAY-REST-BUILDER-HASH:533424467
