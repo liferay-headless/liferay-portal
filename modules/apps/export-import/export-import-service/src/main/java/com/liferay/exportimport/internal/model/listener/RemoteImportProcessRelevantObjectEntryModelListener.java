@@ -147,35 +147,6 @@ public class RemoteImportProcessRelevantObjectEntryModelListener
 		}
 	}
 
-	@Override
-	public void onBeforeUpdate(
-			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
-		throws ModelListenerException {
-
-		Map<String, Serializable> originalValues =
-			originalObjectEntry.getValues();
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		for (String key : _IMMUTABLE_OBJECT_FIELD_NAMES) {
-			if (!values.containsKey(key) ||
-				Objects.equals(originalValues.get(key), values.get(key))) {
-
-				continue;
-			}
-
-			throw new ModelListenerException(
-				new ObjectEntryValuesException.InvalidObjectField(
-					null,
-					"The export process and remote instance cannot change",
-					"the-export-process-and-remote-instance-cannot-change"));
-		}
-	}
-
-	private static final String[] _IMMUTABLE_OBJECT_FIELD_NAMES = {
-		"exportProcessId",
-		RemoteInstanceConstants.OBJECT_FIELD_NAME_REMOTE_INSTANCE_ID
-	};
-
 	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;
 

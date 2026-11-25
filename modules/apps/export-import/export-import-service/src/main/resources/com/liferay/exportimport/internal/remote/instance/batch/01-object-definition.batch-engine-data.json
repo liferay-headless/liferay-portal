@@ -56,7 +56,7 @@
 						"en_US": "Export Process ID"
 					},
 					"name": "exportProcessId",
-					"readOnly": "false",
+					"readOnly": "true",
 					"readOnlyConditionExpression": "",
 					"required": true,
 					"state": false,
@@ -306,7 +306,7 @@
 								"value": "r_remoteInstanceToRemoteImportProcesses_c_remoteInstanceERC"
 							}
 						],
-						"readOnly": "false",
+						"readOnly": "true",
 						"readOnlyConditionExpression": "",
 						"relationshipType": "oneToMany",
 						"required": true,
