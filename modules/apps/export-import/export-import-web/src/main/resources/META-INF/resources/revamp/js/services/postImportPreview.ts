@@ -4,7 +4,7 @@
  */
 
 import {ImportPreview} from '../types/exportImportPreview';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface ImportPreviewParams {
 	file: File;
@@ -18,7 +18,7 @@ export function postImportPreview({
 	onProgress,
 	signal,
 	url,
-}: ImportPreviewParams): Promise<RequestResult<ImportPreview>> {
+}: ImportPreviewParams) {
 	return ApiHelper.postFormDataWithProgress<ImportPreview>(
 		url,
 		Liferay.Util.objectToFormData({file}),

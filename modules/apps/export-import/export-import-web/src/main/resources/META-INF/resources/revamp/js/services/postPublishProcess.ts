@@ -7,7 +7,7 @@ import {
 	PublishProcess,
 	PublishProcessRequest,
 } from '../types/exportImportProcess';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface PublishProcessParams {
 	publishProcessRequest: PublishProcessRequest;
@@ -17,6 +17,6 @@ export interface PublishProcessParams {
 export function postPublishProcess({
 	publishProcessRequest,
 	url,
-}: PublishProcessParams): Promise<RequestResult<PublishProcess>> {
+}: PublishProcessParams) {
 	return ApiHelper.post<PublishProcess>(url, publishProcessRequest);
 }

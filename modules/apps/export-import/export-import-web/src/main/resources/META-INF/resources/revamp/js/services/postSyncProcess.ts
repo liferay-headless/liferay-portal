@@ -4,16 +4,13 @@
  */
 
 import {SyncProcessRequest} from '../types/exportImportProcess';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface SyncProcessParams {
 	syncProcessRequest: SyncProcessRequest;
 	url: string;
 }
 
-export function postSyncProcess({
-	syncProcessRequest,
-	url,
-}: SyncProcessParams): Promise<RequestResult<void>> {
+export function postSyncProcess({syncProcessRequest, url}: SyncProcessParams) {
 	return ApiHelper.post<void>(url, syncProcessRequest);
 }

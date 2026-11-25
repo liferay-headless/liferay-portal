@@ -6,7 +6,7 @@
 import {addParams} from 'frontend-js-web';
 
 import {Group} from '../types/exportImportPreview';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface GroupsPage {
 	items: Group[];
@@ -16,9 +16,7 @@ export interface GroupsPage {
 	totalCount: number;
 }
 
-export function getExportPreviewGroupsCount(
-	url: string
-): Promise<RequestResult<GroupsPage>> {
+export function getExportPreviewGroupsCount(url: string) {
 	return ApiHelper.get<GroupsPage>(
 		addParams({page: '1', pageSize: '1'}, url)
 	);

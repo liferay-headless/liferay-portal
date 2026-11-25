@@ -7,17 +7,14 @@ import {addParams} from 'frontend-js-web';
 
 import {Preview} from '../types/exportImportPreview';
 import {DateFilter} from '../types/exportImportProcess';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface PreviewParams {
 	dateFilter?: DateFilter;
 	url: string;
 }
 
-export function getPreview({
-	dateFilter,
-	url,
-}: PreviewParams): Promise<RequestResult<Preview>> {
+export function getPreview({dateFilter, url}: PreviewParams) {
 	if (!dateFilter) {
 		return ApiHelper.get<Preview>(url);
 	}

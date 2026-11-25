@@ -8,7 +8,7 @@ import {
 	ImportProcessRequest,
 	InstanceImportProcessRequest,
 } from '../types/exportImportProcess';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface ImportProcessParams {
 	importProcessRequest: ImportProcessRequest | InstanceImportProcessRequest;
@@ -18,6 +18,6 @@ export interface ImportProcessParams {
 export function postImportProcess({
 	importProcessRequest,
 	url,
-}: ImportProcessParams): Promise<RequestResult<ImportProcess>> {
+}: ImportProcessParams) {
 	return ApiHelper.post<ImportProcess>(url, importProcessRequest);
 }

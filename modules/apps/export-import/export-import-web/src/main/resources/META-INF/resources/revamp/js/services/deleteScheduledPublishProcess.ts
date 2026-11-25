@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 import {ScheduledPublishProcessParams} from './getScheduledPublishProcess';
 
 export function deleteScheduledPublishProcess({
 	url,
-}: ScheduledPublishProcessParams): Promise<RequestResult<void>> {
+}: ScheduledPublishProcessParams) {
 	return ApiHelper.delete(url);
 }

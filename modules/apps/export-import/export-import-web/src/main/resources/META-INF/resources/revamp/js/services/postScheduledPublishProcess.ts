@@ -7,7 +7,7 @@ import {
 	ScheduledPublishProcess,
 	ScheduledPublishProcessRequest,
 } from '../types/exportImportProcess';
-import ApiHelper, {RequestResult} from './ApiHelper';
+import ApiHelper from './ApiHelper';
 
 export interface ScheduledPublishProcessRequestParams {
 	scheduledPublishProcessRequest: ScheduledPublishProcessRequest;
@@ -17,9 +17,7 @@ export interface ScheduledPublishProcessRequestParams {
 export function postScheduledPublishProcess({
 	scheduledPublishProcessRequest,
 	url,
-}: ScheduledPublishProcessRequestParams): Promise<
-	RequestResult<ScheduledPublishProcess>
-> {
+}: ScheduledPublishProcessRequestParams) {
 	return ApiHelper.post<ScheduledPublishProcess>(
 		url,
 		scheduledPublishProcessRequest
