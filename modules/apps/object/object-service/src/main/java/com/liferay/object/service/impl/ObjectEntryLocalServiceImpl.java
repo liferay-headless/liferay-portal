@@ -825,7 +825,8 @@ public class ObjectEntryLocalServiceImpl
 				objectDefinition.getObjectDefinitionId());
 
 		for (ObjectField objectField : objectFields) {
-			if (!ObjectFieldUtil.isReadOnly(
+			if (ObjectFieldUtil.isAddOnly(objectField) ||
+				!ObjectFieldUtil.isReadOnly(
 					_ddmExpressionFactory, objectEntry, objectField, userId)) {
 
 				continue;
@@ -8511,6 +8512,13 @@ public class ObjectEntryLocalServiceImpl
 
 		objectEntry.setObjectDefinition(objectDefinition);
 
+		ObjectFieldBag objectFieldBag = objectDefinition.getObjectFieldBag();
+
+		List<ObjectField> objectFields = objectFieldBag.getObjectFields();
+
+		ObjectFieldUtil.validateAddOnlyObjectFields(
+			objectEntry.getValues(), objectFields, values);
+
 		if (!partialUpdate) {
 			_fillDefaultValue(
 				objectEntry.getDefaultLanguageId(), objectEntry.getGroupId(),
@@ -8528,10 +8536,6 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		Map<ObjectField, Set<DLFileEntry>> dlFileEntriesMap = new HashMap<>();
-
-		ObjectFieldBag objectFieldBag = objectDefinition.getObjectFieldBag();
-
-		List<ObjectField> objectFields = objectFieldBag.getObjectFields();
 
 		_validateValues(
 			objectEntry.getDefaultLanguageId(), dlFileEntriesMap,

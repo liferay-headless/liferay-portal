@@ -396,7 +396,7 @@ public class DefaultObjectEntryManagerImpl
 		objectEntry.setExternalReferenceCode(() -> null);
 		objectEntry.setId(() -> null);
 
-		_removeReadOnlyProperties(objectDefinition, objectEntry);
+		_removeReadOnlyProperties(true, objectDefinition, objectEntry);
 
 		ServiceContext serviceContext = _createServiceContext(
 			dtoConverterContext, objectDefinition, objectEntry,
@@ -1408,7 +1408,7 @@ public class DefaultObjectEntryManagerImpl
 			dtoConverterContext, externalReferenceCode, objectDefinition,
 			scopeKey, version);
 
-		_removeReadOnlyProperties(objectDefinition, objectEntry);
+		_removeReadOnlyProperties(false, objectDefinition, objectEntry);
 
 		return updateObjectEntry(
 			_getObjectEntryVersionDTOConverterContext(
@@ -3610,7 +3610,8 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private void _removeReadOnlyProperties(
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry)
+			boolean add, ObjectDefinition objectDefinition,
+			ObjectEntry objectEntry)
 		throws Exception {
 
 		Map<String, Object> properties = objectEntry.getProperties();
@@ -3620,7 +3621,8 @@ public class DefaultObjectEntryManagerImpl
 				objectDefinition.getObjectDefinitionId());
 
 		for (ObjectField objectField : objectFields) {
-			if (!ObjectFieldUtil.isReadOnly(
+			if ((add && ObjectFieldUtil.isAddOnly(objectField)) ||
+				!ObjectFieldUtil.isReadOnly(
 					ddmExpressionFactory, objectField,
 					objectEntry.getProperties())) {
 

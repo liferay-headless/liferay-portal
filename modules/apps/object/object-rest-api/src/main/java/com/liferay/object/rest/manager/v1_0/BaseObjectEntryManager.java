@@ -352,8 +352,8 @@ public abstract class BaseObjectEntryManager {
 				objectDefinition.getObjectFieldBag();
 
 			ObjectFieldUtil.validateReadOnlyObjectFields(
-				ddmExpressionFactory, new HashMap<>(),
-				objectFieldBag.getObjectFields(), objectEntry.getProperties());
+				ddmExpressionFactory, objectFieldBag.getObjectFields(),
+				objectEntry.getProperties());
 
 			return;
 		}

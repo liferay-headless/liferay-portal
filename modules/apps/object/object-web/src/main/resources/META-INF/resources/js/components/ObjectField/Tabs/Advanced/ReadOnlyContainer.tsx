@@ -33,10 +33,7 @@ export function ReadOnlyContainer({
 	const setReadOnly = (value: ReadOnlyFieldValue) => {
 		setValues({
 			readOnly: value,
-			required:
-				value === 'true' || value === 'conditional'
-					? false
-					: requiredField,
+			required: value === 'conditional' ? false : requiredField,
 		});
 	};
 
@@ -75,7 +72,7 @@ export function ReadOnlyContainer({
 						/>
 
 						<ClayRadio
-							disabled={disabled}
+							disabled={disabled || requiredField}
 							label={Liferay.Language.get('conditional')}
 							onClick={() => setReadOnly('conditional')}
 							value="conditional"
