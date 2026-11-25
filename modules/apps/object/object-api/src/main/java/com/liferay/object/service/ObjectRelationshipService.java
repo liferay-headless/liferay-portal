@@ -63,6 +63,10 @@ public interface ObjectRelationshipService extends BaseService {
 			long objectRelationshipId)
 		throws PortalException;
 
+	public void deleteObjectRelationshipMappingTableValues(
+			long objectRelationshipId, long primaryKey1, long primaryKey2)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectRelationship fetchObjectRelationshipByExternalReferenceCode(
 			String externalReferenceCode, long companyId,
@@ -98,4 +102,4 @@ public interface ObjectRelationshipService extends BaseService {
 		throws PortalException;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:703295495
+// LIFERAY-SERVICE-BUILDER-HASH:-1744986974

@@ -172,6 +172,44 @@ public class ObjectRelationshipServiceHttp {
 		}
 	}
 
+	public static void deleteObjectRelationshipMappingTableValues(
+			HttpPrincipal httpPrincipal, long objectRelationshipId,
+			long primaryKey1, long primaryKey2)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ObjectRelationshipServiceUtil.class,
+				"deleteObjectRelationshipMappingTableValues",
+				_deleteObjectRelationshipMappingTableValuesParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, objectRelationshipId, primaryKey1, primaryKey2);
+
+			try {
+				TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static com.liferay.object.model.ObjectRelationship
 			fetchObjectRelationshipByExternalReferenceCode(
 				HttpPrincipal httpPrincipal, String externalReferenceCode,
@@ -182,7 +220,7 @@ public class ObjectRelationshipServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class,
 				"fetchObjectRelationshipByExternalReferenceCode",
-				_fetchObjectRelationshipByExternalReferenceCodeParameterTypes3);
+				_fetchObjectRelationshipByExternalReferenceCodeParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, companyId,
@@ -224,7 +262,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "getObjectRelationship",
-				_getObjectRelationshipParameterTypes4);
+				_getObjectRelationshipParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectRelationshipId);
@@ -266,7 +304,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "getObjectRelationship",
-				_getObjectRelationshipParameterTypes5);
+				_getObjectRelationshipParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectDefinitionId1, name);
@@ -308,7 +346,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "getObjectRelationships",
-				_getObjectRelationshipsParameterTypes6);
+				_getObjectRelationshipsParameterTypes7);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectDefinitionId1, start, end);
@@ -355,7 +393,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "updateObjectRelationship",
-				_updateObjectRelationshipParameterTypes7);
+				_updateObjectRelationshipParameterTypes8);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, objectRelationshipId,
@@ -408,15 +446,18 @@ public class ObjectRelationshipServiceHttp {
 	private static final Class<?>[] _deleteObjectRelationshipParameterTypes2 =
 		new Class[] {long.class};
 	private static final Class<?>[]
-		_fetchObjectRelationshipByExternalReferenceCodeParameterTypes3 =
+		_deleteObjectRelationshipMappingTableValuesParameterTypes3 =
+			new Class[] {long.class, long.class, long.class};
+	private static final Class<?>[]
+		_fetchObjectRelationshipByExternalReferenceCodeParameterTypes4 =
 			new Class[] {String.class, long.class, long.class};
-	private static final Class<?>[] _getObjectRelationshipParameterTypes4 =
-		new Class[] {long.class};
 	private static final Class<?>[] _getObjectRelationshipParameterTypes5 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getObjectRelationshipParameterTypes6 =
 		new Class[] {long.class, String.class};
-	private static final Class<?>[] _getObjectRelationshipsParameterTypes6 =
+	private static final Class<?>[] _getObjectRelationshipsParameterTypes7 =
 		new Class[] {long.class, int.class, int.class};
-	private static final Class<?>[] _updateObjectRelationshipParameterTypes7 =
+	private static final Class<?>[] _updateObjectRelationshipParameterTypes8 =
 		new Class[] {
 			String.class, long.class, long.class, String.class,
 			java.util.Map.class, boolean.class, java.util.Map.class,
@@ -424,4 +465,4 @@ public class ObjectRelationshipServiceHttp {
 		};
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1860049716
+// LIFERAY-SERVICE-BUILDER-HASH:623908792
