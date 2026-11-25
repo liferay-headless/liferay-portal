@@ -7,7 +7,7 @@ import {ClayCheckbox} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import React from 'react';
 
-import FieldDatePicker from '../../../../../components/forms/FieldDatePicker';
+import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
 import {ScheduleValues} from '../types';
 
 export default function EndDateFields({

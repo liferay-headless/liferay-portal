@@ -6,11 +6,11 @@
 import {
 	IntervalUnit,
 	ScheduleValues,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/types';
 import {
 	getInitialScheduleValues,
 	getScheduleValuesErrors,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/utils';
 
 const EARLIER_END_DATE_TIME = '2099-06-14 08:00';
 

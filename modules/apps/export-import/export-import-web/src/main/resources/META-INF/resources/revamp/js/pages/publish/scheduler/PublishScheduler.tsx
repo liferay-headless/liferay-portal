@@ -8,15 +8,15 @@ import ClayForm from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import React from 'react';
 
-import '../../../../../css/utilities.scss';
-import SectionHeader from '../../../../components/SectionHeader';
-import FieldDatePicker from '../../../../components/forms/FieldDatePicker';
-import {FieldRadio} from '../../../../components/forms/FieldRadio';
-import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
+import '../../../../css/utilities.scss';
+import SectionHeader from '../../../components/SectionHeader';
+import FieldDatePicker from '../../../components/forms/FieldDatePicker';
+import {FieldRadio} from '../../../components/forms/FieldRadio';
+import FieldSelectWithOption from '../../../components/forms/FieldSelectWithOption';
 import {
 	getCurrentWallClockDateTime,
 	toTimeParts,
-} from '../../../../utils/dateTime';
+} from '../../../utils/dateTime';
 import {toCustomCronExpression} from './cron';
 import {
 	CustomCronFields,

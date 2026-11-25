@@ -12,7 +12,7 @@ import {
 	toTimeText,
 	toWallClockDate,
 	toZonedDate,
-} from '../../../../utils/dateTime';
+} from '../../../utils/dateTime';
 import {
 	IntervalUnit,
 	LAST_WEEKDAY_ORDINAL,

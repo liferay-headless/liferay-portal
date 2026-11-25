@@ -7,7 +7,7 @@ import ClayLayout from '@clayui/layout';
 import {sub} from 'frontend-js-web';
 import React from 'react';
 
-import FieldSelectWithOption from '../../../../../components/forms/FieldSelectWithOption';
+import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
 import {
 	IntervalUnit,
 	MONTH_DAYS,

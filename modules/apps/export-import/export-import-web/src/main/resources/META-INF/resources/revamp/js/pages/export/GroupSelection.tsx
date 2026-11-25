@@ -5,9 +5,9 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {FormikFieldGroups} from '../../../components/forms/formik';
-import {getExportPreviewGroupsCount} from '../../../services/getExportPreviewGroupsCount';
-import {GroupType} from '../../../types/exportImportPreview';
+import {FormikFieldGroups} from '../../components/forms/formik';
+import {getExportPreviewGroupsCount} from '../../services/getExportPreviewGroupsCount';
+import {GroupType} from '../../types/exportImportPreview';
 
 export default function GroupSelection({
 	apiURL,

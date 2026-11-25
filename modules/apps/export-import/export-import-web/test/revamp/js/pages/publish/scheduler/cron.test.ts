@@ -7,14 +7,14 @@ import {
 	fromCronExpression,
 	toCronExpression,
 	toCustomCronExpression,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/cron';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/cron';
 import {
 	IntervalUnit,
 	LAST_WEEKDAY_ORDINAL,
 	RepeatType,
 	ScheduleValues,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
-import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/types';
+import {getInitialScheduleValues} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/utils';
 
 const START_DATE_TIME = '2026-07-20 15:30';
 

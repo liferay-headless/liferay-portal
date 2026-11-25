@@ -6,7 +6,7 @@
 import ClayLayout from '@clayui/layout';
 import React from 'react';
 
-import FieldSelectWithOption from '../../../../../components/forms/FieldSelectWithOption';
+import FieldSelectWithOption from '../../../../components/forms/FieldSelectWithOption';
 import {ScheduleValues, WEEKDAYS} from '../types';
 import {WEEKDAY_ORDINAL_OPTIONS, getWeekdayName} from '../utils';
 

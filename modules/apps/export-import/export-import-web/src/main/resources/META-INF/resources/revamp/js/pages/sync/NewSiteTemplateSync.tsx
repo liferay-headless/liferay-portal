@@ -22,7 +22,7 @@ import {
 } from '../../utils/contentSelection';
 import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toPortletDataHandlers} from '../../utils/toPortletDataHandlers';
-import SyncConfirmationModal from './components/SyncConfirmationModal';
+import SyncConfirmationModal from './SyncConfirmationModal';
 
 type SyncFormValues = {
 	contentSelection: ContentSelection | null | undefined;

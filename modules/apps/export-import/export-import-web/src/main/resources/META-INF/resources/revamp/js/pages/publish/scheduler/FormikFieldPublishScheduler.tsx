@@ -6,7 +6,7 @@
 import {getIn, useField, useFormikContext} from 'formik';
 import React from 'react';
 
-import {isCompleteDateTime} from '../../../../utils/dateTime';
+import {isCompleteDateTime} from '../../../utils/dateTime';
 import PublishScheduler from './PublishScheduler';
 import {ScheduleValues, TimeZoneOption} from './types';
 import {getScheduleValuesErrors} from './utils';

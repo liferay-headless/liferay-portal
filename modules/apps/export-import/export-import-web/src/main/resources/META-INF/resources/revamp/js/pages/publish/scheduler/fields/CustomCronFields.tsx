@@ -7,7 +7,7 @@ import ClayLayout from '@clayui/layout';
 import {sub} from 'frontend-js-web';
 import React from 'react';
 
-import FieldText from '../../../../../components/forms/FieldText';
+import FieldText from '../../../../components/forms/FieldText';
 import {ScheduleValues} from '../types';
 
 export default function CustomCronFields({

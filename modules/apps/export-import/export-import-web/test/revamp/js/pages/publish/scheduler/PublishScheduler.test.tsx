@@ -17,13 +17,13 @@ import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import PublishScheduler from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/PublishScheduler';
+import PublishScheduler from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/PublishScheduler';
 import {
 	IntervalUnit,
 	ScheduleValues,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
-import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
-import {toWallClockDateTime} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/types';
+import {getInitialScheduleValues} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/utils';
+import {toWallClockDateTime} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
 
 const user = userEvent.setup({delay: null});
 

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {getScheduleSummary} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/summary';
+import {getScheduleSummary} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/summary';
 import {
 	IntervalUnit,
 	RepeatType,
 	ScheduleValues,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
-import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/types';
+import {getInitialScheduleValues} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/utils';
 
 const END_DATE_TIME = '2099-08-23 18:30';
 

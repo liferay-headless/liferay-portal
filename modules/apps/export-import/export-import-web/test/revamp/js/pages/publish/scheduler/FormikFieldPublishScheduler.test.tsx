@@ -9,13 +9,13 @@ import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import {FormikFieldPublishScheduler} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/FormikFieldPublishScheduler';
+import {FormikFieldPublishScheduler} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/FormikFieldPublishScheduler';
 import {
 	IntervalUnit,
 	ScheduleValues,
-} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/types';
-import {getInitialScheduleValues} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/components/scheduler/utils';
-import {toWallClockDateTime} from '../../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
+} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/types';
+import {getInitialScheduleValues} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/pages/publish/scheduler/utils';
+import {toWallClockDateTime} from '../../../../../../src/main/resources/META-INF/resources/revamp/js/utils/dateTime';
 
 const DAY = 24 * 60 * 60 * 1000;
 

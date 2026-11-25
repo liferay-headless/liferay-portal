@@ -41,17 +41,14 @@ import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toContentSelection} from '../../utils/toContentSelection';
 import {toDateFilterValues} from '../../utils/toDateFilterValues';
 import {toPortletDataHandlers} from '../../utils/toPortletDataHandlers';
-import {FormikFieldPublishScheduler} from './components/scheduler/FormikFieldPublishScheduler';
-import {
-	fromCronExpression,
-	toCronExpression,
-} from './components/scheduler/cron';
-import {ScheduleValues, TimeZoneOption} from './components/scheduler/types';
+import {FormikFieldPublishScheduler} from './scheduler/FormikFieldPublishScheduler';
+import {fromCronExpression, toCronExpression} from './scheduler/cron';
+import {ScheduleValues, TimeZoneOption} from './scheduler/types';
 import {
 	getInitialScheduleValues,
 	getScheduleValuesErrors,
 	hasEndDate,
-} from './components/scheduler/utils';
+} from './scheduler/utils';
 
 type PublishFormValues = {
 	contentSelection: ContentSelection | null | undefined;

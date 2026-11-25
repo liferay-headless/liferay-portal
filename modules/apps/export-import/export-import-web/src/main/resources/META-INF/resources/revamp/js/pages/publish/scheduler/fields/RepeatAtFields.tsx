@@ -7,8 +7,8 @@ import {ClayCheckbox} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import React from 'react';
 
-import FieldTimePicker from '../../../../../components/forms/FieldTimePicker';
-import {isCompleteDateTime} from '../../../../../utils/dateTime';
+import FieldTimePicker from '../../../../components/forms/FieldTimePicker';
+import {isCompleteDateTime} from '../../../../utils/dateTime';
 import {ScheduleValues} from '../types';
 
 export default function RepeatAtFields({
