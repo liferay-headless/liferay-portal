@@ -84,6 +84,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlParserUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -315,6 +316,29 @@ public class ObjectEntryDTOConverter
 					return contentObjectEntry.getFriendlyUrlPath();
 				}
 
+				Map<String, String> urlTitleMap = _getBulkAttribute(
+					dtoConverterContext, "friendlyURLTitleMaps",
+					serviceBuilderObjectEntry);
+
+				if (urlTitleMap != null) {
+					String urlTitle = urlTitleMap.get(
+						LocaleUtil.toLanguageId(
+							dtoConverterContext.getLocale()));
+
+					if (urlTitle == null) {
+						urlTitle = urlTitleMap.get(
+							serviceBuilderObjectEntry.getDefaultLanguageId());
+					}
+
+					return HttpComponentsUtil.decodePath(urlTitle);
+				}
+
+				if (dtoConverterContext.getAttribute("friendlyURLTitleMaps") !=
+						null) {
+
+					return null;
+				}
+
 				return HttpComponentsUtil.decodePath(
 					serviceBuilderObjectEntry.getURLTitle(
 						dtoConverterContext.getLocale()));
@@ -325,8 +349,22 @@ public class ObjectEntryDTOConverter
 					return contentObjectEntry.getFriendlyUrlPath_i18n();
 				}
 
-				Map<String, String> urlTitleMap =
-					serviceBuilderObjectEntry.getURLTitleMap();
+				Map<String, String> urlTitleMap = null;
+
+				if (dtoConverterContext.getAttribute("friendlyURLTitleMaps") !=
+						null) {
+
+					urlTitleMap = _getBulkAttribute(
+						dtoConverterContext, "friendlyURLTitleMaps",
+						serviceBuilderObjectEntry);
+
+					if (urlTitleMap != null) {
+						urlTitleMap = new HashMap<>(urlTitleMap);
+					}
+				}
+				else {
+					urlTitleMap = serviceBuilderObjectEntry.getURLTitleMap();
+				}
 
 				if (MapUtil.isEmpty(urlTitleMap)) {
 					return urlTitleMap;
@@ -716,6 +754,19 @@ public class ObjectEntryDTOConverter
 
 		return serviceBuilderObjectEntryGetterFunction.apply(
 			serviceBuilderObjectEntry);
+	}
+
+	private <T> T _getBulkAttribute(
+		DTOConverterContext dtoConverterContext, String name,
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry) {
+
+		Map<Long, T> map = (Map<Long, T>)dtoConverterContext.getAttribute(name);
+
+		if (map == null) {
+			return null;
+		}
+
+		return map.get(serviceBuilderObjectEntry.getObjectEntryId());
 	}
 
 	private DTOConverterContext _getDTOConverterContext(
