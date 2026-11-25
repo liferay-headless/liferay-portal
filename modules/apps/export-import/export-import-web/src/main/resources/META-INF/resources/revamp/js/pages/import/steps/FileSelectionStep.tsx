@@ -9,7 +9,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import SectionHeader from '../../../components/SectionHeader';
 import {FormikFieldText} from '../../../components/forms/formik';
 import {FormikFieldFileSelector} from '../../../components/forms/formik/FormikFieldFileSelector';
-import {postImportPreview} from '../../../services/postImportPreview';
+import ImportProcessService from '../../../services/ImportProcessService';
 import {ImportPreview} from '../../../types/exportImportPreview';
 
 export default function FileSelectionStep({
@@ -58,7 +58,7 @@ export default function FileSelectionStep({
 	]);
 
 	const handleUpload = async (file: File, signal?: AbortSignal) => {
-		const result = await postImportPreview({
+		const result = await ImportProcessService.postImportPreview({
 			file,
 			onProgress: setProgress,
 			signal,

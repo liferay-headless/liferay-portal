@@ -4,16 +4,26 @@
  */
 
 import {ImportPreview} from '../types/exportImportPreview';
+import {
+	ImportProcess,
+	ImportProcessRequest,
+	InstanceImportProcessRequest,
+} from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
 
-export interface ImportPreviewParams {
+interface ImportPreviewParams {
 	file: File;
 	onProgress: (percent: number) => void;
 	signal?: AbortSignal;
 	url: string;
 }
 
-export function postImportPreview({
+interface ImportProcessParams {
+	importProcessRequest: ImportProcessRequest | InstanceImportProcessRequest;
+	url: string;
+}
+
+function postImportPreview({
 	file,
 	onProgress,
 	signal,
@@ -26,3 +36,12 @@ export function postImportPreview({
 		signal
 	);
 }
+
+function postImportProcess({importProcessRequest, url}: ImportProcessParams) {
+	return ApiHelper.post<ImportProcess>(url, importProcessRequest);
+}
+
+export default {
+	postImportPreview,
+	postImportProcess,
+};

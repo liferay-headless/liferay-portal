@@ -20,10 +20,8 @@ import {
 	FormikFieldText,
 } from '../../components/forms/formik';
 import {usePreview} from '../../hooks/usePreview';
-import {deleteScheduledPublishProcess} from '../../services/deleteScheduledPublishProcess';
-import {getScheduledPublishProcess} from '../../services/getScheduledPublishProcess';
-import {postPublishProcess} from '../../services/postPublishProcess';
-import {postScheduledPublishProcess} from '../../services/postScheduledPublishProcess';
+import PublishProcessService from '../../services/PublishProcessService';
+import ScheduledPublishProcessService from '../../services/ScheduledPublishProcessService';
 import {
 	PublishProcessRequest,
 	RemoteConnection,
@@ -136,7 +134,7 @@ export function NewPublish({
 
 		seededRef.current = true;
 
-		getScheduledPublishProcess({
+		ScheduledPublishProcessService.getScheduledPublishProcess({
 			url: `${scheduledPublishProcessAPIURL}/${editedScheduledPublishProcessId}`,
 		}).then((scheduledPublishProcessResponse) => {
 			if (scheduledPublishProcessResponse.error !== null) {
@@ -261,26 +259,28 @@ export function NewPublish({
 				};
 
 				const result = scheduled
-					? await postScheduledPublishProcess({
-							scheduledPublishProcessRequest: {
-								cronExpression:
-									toCronExpression(scheduleValues),
-								publishProcessRequest,
-								scheduleEndDate: hasEndDate(scheduleValues)
-									? toZonedDate(
-											scheduleValues.endDateTime,
-											scheduleValues.timeZoneId
-										).toISOString()
-									: undefined,
-								scheduleStartDate: toZonedDate(
-									scheduleValues.startDateTime,
-									scheduleValues.timeZoneId
-								).toISOString(),
-								timeZoneId: scheduleValues.timeZoneId,
-							},
-							url: scheduledPublishProcessAPIURL,
-						})
-					: await postPublishProcess({
+					? await ScheduledPublishProcessService.postScheduledPublishProcess(
+							{
+								scheduledPublishProcessRequest: {
+									cronExpression:
+										toCronExpression(scheduleValues),
+									publishProcessRequest,
+									scheduleEndDate: hasEndDate(scheduleValues)
+										? toZonedDate(
+												scheduleValues.endDateTime,
+												scheduleValues.timeZoneId
+											).toISOString()
+										: undefined,
+									scheduleStartDate: toZonedDate(
+										scheduleValues.startDateTime,
+										scheduleValues.timeZoneId
+									).toISOString(),
+									timeZoneId: scheduleValues.timeZoneId,
+								},
+								url: scheduledPublishProcessAPIURL,
+							}
+						)
+					: await PublishProcessService.postPublishProcess({
 							publishProcessRequest,
 							url: publishProcessAPIURL,
 						});
@@ -295,9 +295,12 @@ export function NewPublish({
 				}
 
 				if (editedScheduledPublishProcessId) {
-					const deleteResult = await deleteScheduledPublishProcess({
-						url: `${scheduledPublishProcessAPIURL}/${editedScheduledPublishProcessId}`,
-					});
+					const deleteResult =
+						await ScheduledPublishProcessService.deleteScheduledPublishProcess(
+							{
+								url: `${scheduledPublishProcessAPIURL}/${editedScheduledPublishProcessId}`,
+							}
+						);
 
 					if (deleteResult.error && deleteResult.status !== '404') {
 						Liferay.Util.openToast({

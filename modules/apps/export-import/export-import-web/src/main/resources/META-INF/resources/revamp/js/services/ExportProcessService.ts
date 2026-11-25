@@ -10,14 +10,15 @@ import {
 } from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
 
-export interface ExportProcessParams {
+interface ExportProcessParams {
 	exportProcessRequest: ExportProcessRequest | InstanceExportProcessRequest;
 	url: string;
 }
 
-export function postExportProcess({
-	exportProcessRequest,
-	url,
-}: ExportProcessParams) {
+function postExportProcess({exportProcessRequest, url}: ExportProcessParams) {
 	return ApiHelper.post<ExportProcess>(url, exportProcessRequest);
 }
+
+export default {
+	postExportProcess,
+};

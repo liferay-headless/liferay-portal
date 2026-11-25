@@ -6,7 +6,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {FormikFieldGroups} from '../../components/forms/formik';
-import {getExportPreviewGroupsCount} from '../../services/getExportPreviewGroupsCount';
+import PreviewService from '../../services/PreviewService';
 import {GroupType} from '../../types/exportImportPreview';
 
 export default function GroupSelection({
@@ -21,7 +21,7 @@ export default function GroupSelection({
 	const [totalCount, setTotalCount] = useState<number | undefined>();
 
 	useEffect(() => {
-		getExportPreviewGroupsCount(apiURL).then((response) => {
+		PreviewService.getExportPreviewGroupsCount(apiURL).then((response) => {
 			if (response.data) {
 				setTotalCount(response.data.totalCount);
 			}

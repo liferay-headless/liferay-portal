@@ -6,11 +6,15 @@
 import {SyncProcessRequest} from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
 
-export interface SyncProcessParams {
+interface SyncProcessParams {
 	syncProcessRequest: SyncProcessRequest;
 	url: string;
 }
 
-export function postSyncProcess({syncProcessRequest, url}: SyncProcessParams) {
+function postSyncProcess({syncProcessRequest, url}: SyncProcessParams) {
 	return ApiHelper.post<void>(url, syncProcessRequest);
 }
+
+export default {
+	postSyncProcess,
+};

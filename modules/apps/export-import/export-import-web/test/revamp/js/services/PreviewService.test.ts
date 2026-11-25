@@ -5,19 +5,19 @@
 
 import fetch from 'jest-fetch-mock';
 
-import {getPreview} from '../../../../src/main/resources/META-INF/resources/revamp/js/services/getPreview';
+import PreviewService from '../../../../src/main/resources/META-INF/resources/revamp/js/services/PreviewService';
 
 const getRequestedURL = () =>
 	new URL(String(fetch.mock.calls[0][0]), 'http://localhost');
 
-describe('getPreview', () => {
+describe('PreviewService', () => {
 	beforeEach(() => {
 		fetch.resetMocks();
 		fetch.mockResponse(JSON.stringify({}));
 	});
 
 	it('appends the date filter to a scoped url that already has a query string', async () => {
-		await getPreview({
+		await PreviewService.getPreview({
 			dateFilter: {
 				endDate: '2026-06-26T12:00:00.000Z',
 				startDate: '2026-06-26T00:00:00.000Z',
@@ -44,7 +44,7 @@ describe('getPreview', () => {
 	});
 
 	it('appends the date filter to a url without a query string', async () => {
-		await getPreview({
+		await PreviewService.getPreview({
 			dateFilter: {hours: 12, type: 'LastHours'},
 			url: '/o/export-import/v1.0/sites/L_GUEST/export-preview',
 		});
@@ -56,7 +56,7 @@ describe('getPreview', () => {
 	});
 
 	it('keeps the url untouched when there is no date filter', async () => {
-		await getPreview({
+		await PreviewService.getPreview({
 			url: '/o/export-import/v1.0/sites/L_GUEST/export-preview?portletId=com_liferay_document_library_web_portlet_DLAdminPortlet',
 		});
 

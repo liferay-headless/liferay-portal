@@ -9,14 +9,18 @@ import {
 } from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
 
-export interface PublishProcessParams {
+interface PublishProcessParams {
 	publishProcessRequest: PublishProcessRequest;
 	url: string;
 }
 
-export function postPublishProcess({
+function postPublishProcess({
 	publishProcessRequest,
 	url,
 }: PublishProcessParams) {
 	return ApiHelper.post<PublishProcess>(url, publishProcessRequest);
 }
+
+export default {
+	postPublishProcess,
+};

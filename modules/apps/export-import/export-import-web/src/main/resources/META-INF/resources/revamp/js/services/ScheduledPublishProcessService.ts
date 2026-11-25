@@ -9,12 +9,24 @@ import {
 } from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
 
-export interface ScheduledPublishProcessRequestParams {
+interface ScheduledPublishProcessParams {
+	url: string;
+}
+
+interface ScheduledPublishProcessRequestParams {
 	scheduledPublishProcessRequest: ScheduledPublishProcessRequest;
 	url: string;
 }
 
-export function postScheduledPublishProcess({
+function deleteScheduledPublishProcess({url}: ScheduledPublishProcessParams) {
+	return ApiHelper.delete(url);
+}
+
+function getScheduledPublishProcess({url}: ScheduledPublishProcessParams) {
+	return ApiHelper.get<ScheduledPublishProcess>(url);
+}
+
+function postScheduledPublishProcess({
 	scheduledPublishProcessRequest,
 	url,
 }: ScheduledPublishProcessRequestParams) {
@@ -23,3 +35,9 @@ export function postScheduledPublishProcess({
 		scheduledPublishProcessRequest
 	);
 }
+
+export default {
+	deleteScheduledPublishProcess,
+	getScheduledPublishProcess,
+	postScheduledPublishProcess,
+};

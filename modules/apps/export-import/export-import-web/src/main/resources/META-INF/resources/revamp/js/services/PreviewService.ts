@@ -5,16 +5,30 @@
 
 import {addParams} from 'frontend-js-web';
 
-import {Preview} from '../types/exportImportPreview';
+import {Group, Preview} from '../types/exportImportPreview';
 import {DateFilter} from '../types/exportImportProcess';
 import ApiHelper from './ApiHelper';
+
+interface GroupsPage {
+	items: Group[];
+	lastPage: number;
+	page: number;
+	pageSize: number;
+	totalCount: number;
+}
 
 export interface PreviewParams {
 	dateFilter?: DateFilter;
 	url: string;
 }
 
-export function getPreview({dateFilter, url}: PreviewParams) {
+function getExportPreviewGroupsCount(url: string) {
+	return ApiHelper.get<GroupsPage>(
+		addParams({page: '1', pageSize: '1'}, url)
+	);
+}
+
+function getPreview({dateFilter, url}: PreviewParams) {
 	if (!dateFilter) {
 		return ApiHelper.get<Preview>(url);
 	}
@@ -31,3 +45,8 @@ export function getPreview({dateFilter, url}: PreviewParams) {
 
 	return ApiHelper.get<Preview>(addParams(params, url));
 }
+
+export default {
+	getExportPreviewGroupsCount,
+	getPreview,
+};

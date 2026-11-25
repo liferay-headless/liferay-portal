@@ -13,7 +13,7 @@ import Footer from '../../components/Footer';
 import {PageTreeModalConfiguration} from '../../components/PageTreeModal';
 import {ContentSelection} from '../../components/forms/content_selector/ContentSelector';
 import {usePreview} from '../../hooks/usePreview';
-import {postSyncProcess} from '../../services/postSyncProcess';
+import SyncProcessService from '../../services/SyncProcessService';
 import {Preview} from '../../types/exportImportPreview';
 import {
 	toPortletDataHandlerSections,
@@ -71,7 +71,7 @@ export function NewSiteTemplateSync({
 		<Formik
 			initialValues={initialFormValues}
 			onSubmit={async (values, {setStatus}) => {
-				const result = await postSyncProcess({
+				const result = await SyncProcessService.postSyncProcess({
 					syncProcessRequest: {
 						...toProcessRequestFlags(values.contentSelection),
 						portletDataHandlers: toPortletDataHandlers(
