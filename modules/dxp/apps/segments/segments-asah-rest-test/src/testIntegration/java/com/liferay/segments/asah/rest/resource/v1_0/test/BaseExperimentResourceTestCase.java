@@ -1507,4 +1507,4 @@ public abstract class BaseExperimentResourceTestCase {
 		_experimentResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1951874977
+// LIFERAY-REST-BUILDER-HASH:-1248596390

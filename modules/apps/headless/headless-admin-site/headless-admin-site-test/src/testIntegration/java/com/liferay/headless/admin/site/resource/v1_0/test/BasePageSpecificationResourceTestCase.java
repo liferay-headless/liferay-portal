@@ -2314,4 +2314,4 @@ public abstract class BasePageSpecificationResourceTestCase {
 			_pageSpecificationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:497217390
+// LIFERAY-REST-BUILDER-HASH:683562773

@@ -1713,4 +1713,4 @@ public abstract class BaseOAuthClientASLocalMetadataResourceTestCase {
 		OAuthClientASLocalMetadataResource _oAuthClientASLocalMetadataResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1416362184
+// LIFERAY-REST-BUILDER-HASH:1777251825

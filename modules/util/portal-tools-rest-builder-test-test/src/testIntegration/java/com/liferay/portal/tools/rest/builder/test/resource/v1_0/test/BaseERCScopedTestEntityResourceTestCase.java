@@ -3621,4 +3621,4 @@ public abstract class BaseERCScopedTestEntityResourceTestCase {
 		ERCScopedTestEntityResource _ercScopedTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-833940637
+// LIFERAY-REST-BUILDER-HASH:-1510878326

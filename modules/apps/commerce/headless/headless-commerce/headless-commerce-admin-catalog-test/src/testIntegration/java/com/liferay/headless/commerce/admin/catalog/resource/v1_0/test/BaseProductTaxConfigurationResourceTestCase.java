@@ -1303,4 +1303,4 @@ public abstract class BaseProductTaxConfigurationResourceTestCase {
 		ProductTaxConfigurationResource _productTaxConfigurationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-487847265
+// LIFERAY-REST-BUILDER-HASH:732289926

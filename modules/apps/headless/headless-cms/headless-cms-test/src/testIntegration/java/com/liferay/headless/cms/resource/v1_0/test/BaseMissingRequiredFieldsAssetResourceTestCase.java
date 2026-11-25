@@ -1443,4 +1443,4 @@ public abstract class BaseMissingRequiredFieldsAssetResourceTestCase {
 				_missingRequiredFieldsAssetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:2098530500
+// LIFERAY-REST-BUILDER-HASH:-120735701

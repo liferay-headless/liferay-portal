@@ -1426,4 +1426,4 @@ public abstract class BaseSubscriptionResourceTestCase {
 		_subscriptionResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-515872710
+// LIFERAY-REST-BUILDER-HASH:-458517343

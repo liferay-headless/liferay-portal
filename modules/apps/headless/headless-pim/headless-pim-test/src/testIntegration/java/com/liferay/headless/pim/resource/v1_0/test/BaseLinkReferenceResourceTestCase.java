@@ -1447,4 +1447,4 @@ public abstract class BaseLinkReferenceResourceTestCase {
 		_linkReferenceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-306152976
+// LIFERAY-REST-BUILDER-HASH:1687282089

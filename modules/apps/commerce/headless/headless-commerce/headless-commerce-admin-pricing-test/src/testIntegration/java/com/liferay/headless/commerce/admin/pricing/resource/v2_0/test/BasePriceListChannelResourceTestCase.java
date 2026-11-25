@@ -2003,4 +2003,4 @@ public abstract class BasePriceListChannelResourceTestCase {
 		PriceListChannelResource _priceListChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:500742818
+// LIFERAY-REST-BUILDER-HASH:-502012197

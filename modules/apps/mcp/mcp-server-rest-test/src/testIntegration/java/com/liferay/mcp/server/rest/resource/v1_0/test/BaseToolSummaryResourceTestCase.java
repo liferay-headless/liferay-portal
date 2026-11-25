@@ -969,4 +969,4 @@ public abstract class BaseToolSummaryResourceTestCase {
 		_toolSummaryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-110779709
+// LIFERAY-REST-BUILDER-HASH:-448455446

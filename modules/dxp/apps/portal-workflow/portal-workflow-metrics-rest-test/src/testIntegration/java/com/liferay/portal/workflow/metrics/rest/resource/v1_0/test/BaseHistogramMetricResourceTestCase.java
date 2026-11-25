@@ -850,4 +850,4 @@ public abstract class BaseHistogramMetricResourceTestCase {
 		HistogramMetricResource _histogramMetricResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-341322714
+// LIFERAY-REST-BUILDER-HASH:1716113567

@@ -910,4 +910,4 @@ public abstract class BaseToolSetResourceTestCase {
 		_toolSetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1838648977
+// LIFERAY-REST-BUILDER-HASH:1991817976

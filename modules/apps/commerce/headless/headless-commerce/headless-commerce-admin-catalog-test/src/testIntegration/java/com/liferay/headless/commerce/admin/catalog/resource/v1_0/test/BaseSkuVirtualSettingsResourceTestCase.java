@@ -1959,4 +1959,4 @@ public abstract class BaseSkuVirtualSettingsResourceTestCase {
 		SkuVirtualSettingsResource _skuVirtualSettingsResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1995442238
+// LIFERAY-REST-BUILDER-HASH:-722081627

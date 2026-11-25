@@ -2073,4 +2073,4 @@ public abstract class BaseAccountAddressChannelResourceTestCase {
 		AccountAddressChannelResource _accountAddressChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:575968942
+// LIFERAY-REST-BUILDER-HASH:-1087926745

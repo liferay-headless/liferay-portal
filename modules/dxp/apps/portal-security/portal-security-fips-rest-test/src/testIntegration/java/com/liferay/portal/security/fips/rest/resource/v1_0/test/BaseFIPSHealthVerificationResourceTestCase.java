@@ -951,4 +951,4 @@ public abstract class BaseFIPSHealthVerificationResourceTestCase {
 		FIPSHealthVerificationResource _fipsHealthVerificationResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1282906327
+// LIFERAY-REST-BUILDER-HASH:412425232

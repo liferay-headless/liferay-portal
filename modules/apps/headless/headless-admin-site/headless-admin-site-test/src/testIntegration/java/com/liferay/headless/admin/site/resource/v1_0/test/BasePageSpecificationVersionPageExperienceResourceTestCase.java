@@ -1184,4 +1184,4 @@ public abstract class
 			_pageSpecificationVersionPageExperienceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-538815696
+// LIFERAY-REST-BUILDER-HASH:1931476777

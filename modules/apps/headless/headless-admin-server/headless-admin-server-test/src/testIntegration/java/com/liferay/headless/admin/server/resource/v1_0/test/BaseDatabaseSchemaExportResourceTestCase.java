@@ -965,4 +965,4 @@ public abstract class BaseDatabaseSchemaExportResourceTestCase {
 			DatabaseSchemaExportResource _databaseSchemaExportResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-884731311
+// LIFERAY-REST-BUILDER-HASH:1250239288

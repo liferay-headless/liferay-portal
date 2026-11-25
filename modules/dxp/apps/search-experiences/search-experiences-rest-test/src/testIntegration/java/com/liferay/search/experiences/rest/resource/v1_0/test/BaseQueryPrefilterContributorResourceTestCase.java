@@ -925,4 +925,4 @@ public abstract class BaseQueryPrefilterContributorResourceTestCase {
 		QueryPrefilterContributorResource _queryPrefilterContributorResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-184284482
+// LIFERAY-REST-BUILDER-HASH:1140787575

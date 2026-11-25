@@ -922,4 +922,4 @@ public abstract class BaseSiteVisitorBehaviorMetricResourceTestCase {
 		SiteVisitorBehaviorMetricResource _siteVisitorBehaviorMetricResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1309612329
+// LIFERAY-REST-BUILDER-HASH:-1310057840

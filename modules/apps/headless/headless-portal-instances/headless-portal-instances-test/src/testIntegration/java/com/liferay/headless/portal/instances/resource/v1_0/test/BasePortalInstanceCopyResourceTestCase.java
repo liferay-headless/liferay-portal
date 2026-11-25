@@ -1306,4 +1306,4 @@ public abstract class BasePortalInstanceCopyResourceTestCase {
 		PortalInstanceCopyResource _portalInstanceCopyResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-628478709
+// LIFERAY-REST-BUILDER-HASH:-1287709308

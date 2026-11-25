@@ -2030,4 +2030,4 @@ public abstract class BaseBillingAddressResourceTestCase {
 		BillingAddressResource _billingAddressResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:407808778
+// LIFERAY-REST-BUILDER-HASH:-1104464125

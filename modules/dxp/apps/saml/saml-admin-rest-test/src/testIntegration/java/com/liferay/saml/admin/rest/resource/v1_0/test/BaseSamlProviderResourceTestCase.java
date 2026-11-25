@@ -1085,4 +1085,4 @@ public abstract class BaseSamlProviderResourceTestCase {
 		_samlProviderResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:620039223
+// LIFERAY-REST-BUILDER-HASH:-1174107106

@@ -2514,4 +2514,4 @@ public abstract class BaseContentTemplateResourceTestCase {
 		_contentTemplateResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:617226286
+// LIFERAY-REST-BUILDER-HASH:1906733013

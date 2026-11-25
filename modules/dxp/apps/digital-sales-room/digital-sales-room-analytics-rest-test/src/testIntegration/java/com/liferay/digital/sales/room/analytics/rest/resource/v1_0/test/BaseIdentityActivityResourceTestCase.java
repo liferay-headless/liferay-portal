@@ -863,4 +863,4 @@ public abstract class BaseIdentityActivityResourceTestCase {
 		IdentityActivityResource _identityActivityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1348767968
+// LIFERAY-REST-BUILDER-HASH:-2033482297

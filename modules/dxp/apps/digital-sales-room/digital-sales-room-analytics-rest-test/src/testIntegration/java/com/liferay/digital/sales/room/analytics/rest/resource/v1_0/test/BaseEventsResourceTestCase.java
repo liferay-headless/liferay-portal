@@ -766,4 +766,4 @@ public abstract class BaseEventsResourceTestCase {
 			EventsResource _eventsResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-396101488
+// LIFERAY-REST-BUILDER-HASH:-217820105
