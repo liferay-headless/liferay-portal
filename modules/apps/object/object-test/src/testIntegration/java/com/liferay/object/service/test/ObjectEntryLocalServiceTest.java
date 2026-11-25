@@ -80,6 +80,7 @@ import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectEntryGroupIdException;
 import com.liferay.object.exception.ObjectEntryStatusException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.exception.ObjectFieldReadOnlyException;
 import com.liferay.object.exception.ObjectValidationRuleEngineException;
 import com.liferay.object.field.attachment.AttachmentManager;
 import com.liferay.object.field.builder.AggregationObjectFieldBuilder;
@@ -9811,6 +9812,7 @@ public class ObjectEntryLocalServiceTest {
 
 		_testUpdateObjectEntryExternalReferenceCode();
 		_testUpdateObjectEntryObjectStateTransitions();
+		_testUpdateObjectEntryWithAddOnlyObjectField();
 		_testUpdateObjectEntryWithDraftObjectEntry();
 		_testUpdateObjectEntryWithObjectRelationship();
 	}
@@ -14326,6 +14328,105 @@ public class ObjectEntryLocalServiceTest {
 
 		_objectEntryLocalService.deleteObjectEntry(
 			objectEntry.getObjectEntryId());
+	}
+
+	private void _testUpdateObjectEntryWithAddOnlyObjectField()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Arrays.asList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"addOnly"
+					).readOnly(
+						ObjectFieldConstants.READ_ONLY_TRUE
+					).required(
+						true
+					).build(),
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"notes"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		String addOnly = RandomTestUtil.randomString();
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"addOnly", addOnly
+			).build());
+
+		Assert.assertEquals(
+			addOnly, MapUtil.getString(objectEntry.getValues(), "addOnly"));
+
+		String notes = RandomTestUtil.randomString();
+
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(),
+			HashMapBuilder.<String, Serializable>put(
+				"addOnly", addOnly
+			).put(
+				"notes", notes
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			notes, MapUtil.getString(objectEntry.getValues(), "notes"));
+
+		long objectEntryId = objectEntry.getObjectEntryId();
+		long objectEntryFolderId = objectEntry.getObjectEntryFolderId();
+
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Object field addOnly is read only",
+			() -> _objectEntryLocalService.updateObjectEntry(
+				TestPropsValues.getUserId(), objectEntryId, objectEntryFolderId,
+				HashMapBuilder.<String, Serializable>put(
+					"addOnly", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext()));
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Object field addOnly is read only",
+			() -> _objectEntryLocalService.partialUpdateObjectEntry(
+				TestPropsValues.getUserId(), objectEntryId, objectEntryFolderId,
+				HashMapBuilder.<String, Serializable>put(
+					"addOnly", RandomTestUtil.randomString()
+				).build(),
+				ServiceContextTestUtil.getServiceContext()));
+
+		notes = RandomTestUtil.randomString();
+
+		objectEntry = _objectEntryLocalService.partialUpdateObjectEntry(
+			TestPropsValues.getUserId(), objectEntryId, objectEntryFolderId,
+			HashMapBuilder.<String, Serializable>put(
+				"notes", notes
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		Assert.assertEquals(addOnly, MapUtil.getString(values, "addOnly"));
+		Assert.assertEquals(notes, MapUtil.getString(values, "notes"));
+
+		ObjectEntry copyObjectEntry = _objectEntryLocalService.copyObjectEntry(
+			TestPropsValues.getUserId(), objectEntryId, objectEntryFolderId,
+			objectEntry.getValues(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Assert.assertEquals(
+			addOnly, MapUtil.getString(copyObjectEntry.getValues(), "addOnly"));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 	}
 
 	private void _testUpdateObjectEntryWithDraftObjectEntry() throws Exception {

@@ -3751,6 +3751,17 @@ public class ObjectFieldLocalServiceTest {
 				Arrays.asList(
 					_getReadOnlyTextObjectField(0, invalidReadOnly, null))));
 
+		ObjectField requiredObjectField = _getReadOnlyTextObjectField(
+			0, ObjectFieldConstants.READ_ONLY_CONDITIONAL, "isEmpty(able)");
+
+		requiredObjectField.setRequired(true);
+
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Required object field cannot be conditionally read only",
+			() -> ObjectDefinitionTestUtil.addCustomObjectDefinition(
+				Arrays.asList(requiredObjectField)));
+
 		ObjectDefinition objectDefinition1 =
 			ObjectDefinitionTestUtil.addCustomObjectDefinition();
 
@@ -3799,6 +3810,18 @@ public class ObjectFieldLocalServiceTest {
 				_getReadOnlyTextObjectField(
 					objectDefinition1.getObjectDefinitionId(),
 					ObjectFieldConstants.READ_ONLY_TRUE, null)));
+
+		requiredObjectField.setObjectDefinitionId(
+			objectDefinition1.getObjectDefinitionId());
+		requiredObjectField.setReadOnly(ObjectFieldConstants.READ_ONLY_TRUE);
+		requiredObjectField.setReadOnlyConditionExpression(null);
+
+		objectField = _addCustomObjectField(requiredObjectField);
+
+		_assertReadOnlyTrue(objectField);
+
+		Assert.assertTrue(objectField.isRequired());
+
 		_assertReadOnlyTrue(
 			_addReadOnlyFormulaObjectField(
 				objectDefinition1.getObjectDefinitionId(),

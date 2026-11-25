@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,6 +49,90 @@ public class ObjectFieldUtilTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
+
+	@Test
+	public void testValidateAddOnlyObjectFields() throws Exception {
+		ObjectField objectField = new TextObjectFieldBuilder(
+		).labelMap(
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+		).name(
+			"textObjectField"
+		).readOnly(
+			ObjectFieldConstants.READ_ONLY_TRUE
+		).required(
+			true
+		).build();
+
+		Assert.assertTrue(ObjectFieldUtil.isAddOnly(objectField));
+		Assert.assertFalse(
+			ObjectFieldUtil.isReadOnly(
+				_ddmExpressionFactory, null, objectField,
+				RandomTestUtil.randomLong()));
+
+		String value = RandomTestUtil.randomString();
+
+		ObjectFieldUtil.validateReadOnlyObjectFields(
+			_ddmExpressionFactory, Collections.singletonList(objectField),
+			HashMapBuilder.<String, Object>put(
+				objectField.getName(), value
+			).build());
+
+		Map<String, Object> existingValues = HashMapBuilder.<String, Object>put(
+			objectField.getName(), value
+		).build();
+
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Object field textObjectField is read only",
+			() -> ObjectFieldUtil.validateAddOnlyObjectFields(
+				existingValues, Collections.singletonList(objectField),
+				HashMapBuilder.<String, Object>put(
+					objectField.getName(), RandomTestUtil.randomString()
+				).build()));
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Object field textObjectField is read only",
+			() -> ObjectFieldUtil.validateReadOnlyObjectFields(
+				_ddmExpressionFactory, existingValues,
+				Collections.singletonList(objectField),
+				HashMapBuilder.<String, Object>put(
+					objectField.getName(), RandomTestUtil.randomString()
+				).build()));
+
+		ObjectFieldUtil.validateAddOnlyObjectFields(
+			existingValues, Collections.singletonList(objectField),
+			Collections.emptyMap());
+		ObjectFieldUtil.validateAddOnlyObjectFields(
+			existingValues, Collections.singletonList(objectField),
+			HashMapBuilder.<String, Object>put(
+				objectField.getName(), value
+			).build());
+
+		// Read only object field that is not required
+
+		objectField.setRequired(false);
+
+		Assert.assertFalse(ObjectFieldUtil.isAddOnly(objectField));
+		Assert.assertTrue(
+			ObjectFieldUtil.isReadOnly(
+				_ddmExpressionFactory, null, objectField,
+				RandomTestUtil.randomLong()));
+
+		AssertUtils.assertFailure(
+			ObjectFieldReadOnlyException.class,
+			"Object field textObjectField is read only",
+			() -> ObjectFieldUtil.validateReadOnlyObjectFields(
+				_ddmExpressionFactory, Collections.singletonList(objectField),
+				HashMapBuilder.<String, Object>put(
+					objectField.getName(), value
+				).build()));
+
+		ObjectFieldUtil.validateAddOnlyObjectFields(
+			existingValues, Collections.singletonList(objectField),
+			HashMapBuilder.<String, Object>put(
+				objectField.getName(), RandomTestUtil.randomString()
+			).build());
+	}
 
 	@Test
 	public void testValidateReadOnlyObjectFields() throws PortalException {
