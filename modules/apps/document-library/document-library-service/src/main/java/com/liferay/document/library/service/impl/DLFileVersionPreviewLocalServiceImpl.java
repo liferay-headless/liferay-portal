@@ -6,9 +6,19 @@
 package com.liferay.document.library.service.impl;
 
 import com.liferay.document.library.model.DLFileVersionPreview;
+import com.liferay.document.library.model.DLFileVersionPreviewTable;
 import com.liferay.document.library.service.base.DLFileVersionPreviewLocalServiceBaseImpl;
+import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ArrayUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -37,6 +47,11 @@ public class DLFileVersionPreviewLocalServiceImpl
 		dlFileVersionPreview.setPreviewStatus(previewStatus);
 
 		dlFileVersionPreviewPersistence.update(dlFileVersionPreview);
+
+		Map<String, Boolean> dlFileVersionPreviews =
+			_dlFileVersionPreviews.get();
+
+		dlFileVersionPreviews.clear();
 	}
 
 	@Override
@@ -56,6 +71,16 @@ public class DLFileVersionPreviewLocalServiceImpl
 	public boolean hasDLFileVersionPreview(
 		long fileEntryId, long fileVersionId, int previewStatus) {
 
+		Map<String, Boolean> dlFileVersionPreviews =
+			_dlFileVersionPreviews.get();
+
+		if (Boolean.FALSE.equals(
+				dlFileVersionPreviews.get(
+					_getKey(fileVersionId, previewStatus)))) {
+
+			return false;
+		}
+
 		DLFileVersionPreview dlFileVersionPreview =
 			dlFileVersionPreviewPersistence.fetchByF_F_P(
 				fileEntryId, fileVersionId, previewStatus);
@@ -65,6 +90,39 @@ public class DLFileVersionPreviewLocalServiceImpl
 		}
 
 		return true;
+	}
+
+	@Override
+	public void loadDLFileVersionPreviews(
+		long[] fileVersionIds, int previewStatus) {
+
+		if (fileVersionIds.length == 0) {
+			return;
+		}
+
+		List<Long> existingFileVersionIds =
+			dlFileVersionPreviewPersistence.dslQuery(
+				DSLQueryFactoryUtil.select(
+					DLFileVersionPreviewTable.INSTANCE.fileVersionId
+				).from(
+					DLFileVersionPreviewTable.INSTANCE
+				).where(
+					DLFileVersionPreviewTable.INSTANCE.fileVersionId.in(
+						ArrayUtil.toArray(fileVersionIds)
+					).and(
+						DLFileVersionPreviewTable.INSTANCE.previewStatus.eq(
+							previewStatus)
+					)
+				));
+
+		Map<String, Boolean> dlFileVersionPreviews =
+			_dlFileVersionPreviews.get();
+
+		for (long fileVersionId : fileVersionIds) {
+			dlFileVersionPreviews.put(
+				_getKey(fileVersionId, previewStatus),
+				existingFileVersionIds.contains(fileVersionId));
+		}
 	}
 
 	@Override
@@ -79,6 +137,22 @@ public class DLFileVersionPreviewLocalServiceImpl
 		dlFileVersionPreview.setPreviewStatus(previewStatus);
 
 		dlFileVersionPreviewPersistence.update(dlFileVersionPreview);
+
+		Map<String, Boolean> dlFileVersionPreviews =
+			_dlFileVersionPreviews.get();
+
+		dlFileVersionPreviews.clear();
 	}
+
+	private String _getKey(long fileVersionId, int previewStatus) {
+		return StringBundler.concat(
+			fileVersionId, StringPool.UNDERLINE, previewStatus);
+	}
+
+	private static final ThreadLocal<Map<String, Boolean>>
+		_dlFileVersionPreviews = new CentralizedThreadLocal<>(
+			DLFileVersionPreviewLocalServiceImpl.class.getName() +
+				"._dlFileVersionPreviews",
+			HashMap::new);
 
 }
