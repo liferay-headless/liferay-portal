@@ -9,6 +9,7 @@ import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectEntryValidationException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -659,6 +660,9 @@ public class ObjectEntryResourceImpl
 			String targetLanguageIds, String version)
 		throws Exception {
 
+		_checkObjectEntryObjectDefinitionId(
+			_objectEntryService.getObjectEntry(objectEntryId));
+
 		String className = _objectDefinition.getClassName();
 
 		String xliffMimeType = null;
@@ -688,6 +692,9 @@ public class ObjectEntryResourceImpl
 	public Response getObjectEntryTranslationLanguage(
 			Long objectEntryId, String languageId, String targetLanguageId)
 		throws Exception {
+
+		_checkObjectEntryObjectDefinitionId(
+			_objectEntryService.getObjectEntry(objectEntryId));
 
 		File xliffFile = _translationManager.getXLIFFFile(
 			_objectDefinition.getClassName(), objectEntryId,
@@ -1577,6 +1584,17 @@ public class ObjectEntryResourceImpl
 			for (ObjectEntry objectEntry : objectEntries) {
 				unsafeFunction.apply(objectEntry);
 			}
+		}
+	}
+
+	private void _checkObjectEntryObjectDefinitionId(
+			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
+		throws Exception {
+
+		if (_objectDefinition.getObjectDefinitionId() !=
+				serviceBuilderObjectEntry.getObjectDefinitionId()) {
+
+			throw new NoSuchObjectEntryException();
 		}
 	}
 
