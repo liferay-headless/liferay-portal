@@ -9,7 +9,7 @@ import {
 	getLiveProcess,
 	publishLiveProcess,
 	useLiveProcess,
-} from '../../../../src/main/resources/META-INF/resources/revamp/js/fds/liveProcesses';
+} from '../../../../src/main/resources/META-INF/resources/revamp/js/props_transformer/liveProcesses';
 
 function createProcess(id: number, label = 'Successful') {
 	return {

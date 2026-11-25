@@ -9,8 +9,8 @@ import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import ProcessCompletionDateRenderer from '../../../../../src/main/resources/META-INF/resources/revamp/js/fds/cell_renderers/ProcessCompletionDateRenderer';
-import {publishLiveProcess} from '../../../../../src/main/resources/META-INF/resources/revamp/js/fds/liveProcesses';
+import ProcessCompletionDateRenderer from '../../../../../src/main/resources/META-INF/resources/revamp/js/props_transformer/cell_renderers/ProcessCompletionDateRenderer';
+import {publishLiveProcess} from '../../../../../src/main/resources/META-INF/resources/revamp/js/props_transformer/liveProcesses';
 
 jest.mock('@liferay/frontend-data-set-web', () => ({
 	DateTimeRenderer: jest.fn(() => 'date-time'),

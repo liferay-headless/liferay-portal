@@ -9,7 +9,7 @@ import React from 'react';
 
 import '@testing-library/jest-dom';
 
-import ProcessEndDateRenderer from '../../../../../src/main/resources/META-INF/resources/revamp/js/fds/cell_renderers/ProcessEndDateRenderer';
+import ProcessEndDateRenderer from '../../../../../src/main/resources/META-INF/resources/revamp/js/props_transformer/cell_renderers/ProcessEndDateRenderer';
 
 jest.mock('@liferay/frontend-data-set-web', () => ({
 	DateTimeRenderer: jest.fn(() => 'date-time'),
