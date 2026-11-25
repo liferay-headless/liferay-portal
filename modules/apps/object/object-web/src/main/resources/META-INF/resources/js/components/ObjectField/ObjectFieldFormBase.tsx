@@ -340,7 +340,7 @@ export default function ObjectFieldFormBase({
 			return true;
 		}
 
-		if (values.readOnly === 'true' || values.readOnly === 'conditional') {
+		if (values.readOnly === 'conditional') {
 			return true;
 		}
 

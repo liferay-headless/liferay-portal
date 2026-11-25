@@ -872,11 +872,12 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		if (required &&
-			!Objects.equals(readOnly, ObjectFieldConstants.READ_ONLY_FALSE)) {
+			Objects.equals(
+				readOnly, ObjectFieldConstants.READ_ONLY_CONDITIONAL)) {
 
 			_handleException(
 				new ObjectFieldReadOnlyException(
-					"Required object field cannot be read only"),
+					"Required object field cannot be conditionally read only"),
 				"readOnly", readOnly);
 		}
 	}

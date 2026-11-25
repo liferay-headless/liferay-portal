@@ -273,8 +273,7 @@ public class SystemObjectDefinitionManagerModelListener<T extends BaseModel<T>>
 
 		if (originalModel == null) {
 			ObjectFieldUtil.validateReadOnlyObjectFields(
-				_ddmExpressionFactory, new HashMap<>(), objectFields,
-				extendedProperties);
+				_ddmExpressionFactory, objectFields, extendedProperties);
 
 			ObjectEntryThreadLocal.setSkipReadOnlyObjectFieldsValidation(true);
 

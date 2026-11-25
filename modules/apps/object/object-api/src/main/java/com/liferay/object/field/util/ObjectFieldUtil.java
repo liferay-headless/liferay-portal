@@ -55,8 +55,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -298,6 +300,18 @@ public class ObjectFieldUtil {
 		return JSONUtil.putAll(_metadataObjectFieldNames.toArray());
 	}
 
+	public static boolean isAddOnly(ObjectField objectField) {
+		if (objectField.isRequired() &&
+			Objects.equals(
+				objectField.getReadOnly(),
+				ObjectFieldConstants.READ_ONLY_TRUE)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isMetadata(String objectFieldName) {
 		return _metadataObjectFieldNames.contains(objectFieldName);
 	}
@@ -306,6 +320,10 @@ public class ObjectFieldUtil {
 			DDMExpressionFactory ddmExpressionFactory, ObjectEntry objectEntry,
 			ObjectField objectField, long userId)
 		throws PortalException {
+
+		if ((objectEntry == null) && isAddOnly(objectField)) {
+			return false;
+		}
 
 		if (!Objects.equals(
 				objectField.getReadOnly(),
@@ -377,6 +395,52 @@ public class ObjectFieldUtil {
 		}
 
 		return objectFieldsMap;
+	}
+
+	public static void validateAddOnlyObjectFields(
+			Map<String, ? extends Object> existingValues,
+			List<ObjectField> objectFields,
+			Map<String, ? extends Object> values)
+		throws PortalException {
+
+		if (ObjectEntryThreadLocal.isSkipReadOnlyObjectFieldsValidation()) {
+			return;
+		}
+
+		for (ObjectField objectField : objectFields) {
+			if (!isAddOnly(objectField) || objectField.isLocalized()) {
+				continue;
+			}
+
+			Object existingValue = existingValues.get(objectField.getName());
+			Object value = values.get(objectField.getName());
+
+			if (Validator.isNull(existingValue) || Validator.isNull(value)) {
+				continue;
+			}
+
+			_validateNewValue(existingValue, objectField, value);
+		}
+	}
+
+	public static void validateReadOnlyObjectFields(
+			DDMExpressionFactory ddmExpressionFactory,
+			List<ObjectField> objectFields, Map<String, Object> values)
+		throws PortalException {
+
+		List<ObjectField> notAddOnlyObjectFields = new ArrayList<>();
+
+		for (ObjectField objectField : objectFields) {
+			if (isAddOnly(objectField)) {
+				continue;
+			}
+
+			notAddOnlyObjectFields.add(objectField);
+		}
+
+		validateReadOnlyObjectFields(
+			ddmExpressionFactory, new HashMap<>(), notAddOnlyObjectFields,
+			values);
 	}
 
 	public static void validateReadOnlyObjectFields(
@@ -588,6 +652,15 @@ public class ObjectFieldUtil {
 			Timestamp timestamp = (Timestamp)existingValue;
 
 			Date existingValueDate = new Date(timestamp.getTime());
+
+			if (value instanceof Date) {
+				if (DateUtil.equals(existingValueDate, (Date)value)) {
+					return;
+				}
+
+				throw new ObjectFieldReadOnlyException(
+					"Object field " + objectField.getName() + " is read only");
+			}
 
 			DateFormat dateFormat = new SimpleDateFormat(
 				getDateTimePattern((String)value));
