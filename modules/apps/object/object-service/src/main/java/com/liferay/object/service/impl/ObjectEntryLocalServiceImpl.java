@@ -213,6 +213,9 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.OrganizationTable;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.ResourcePermissionTable;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -3690,6 +3693,37 @@ public class ObjectEntryLocalServiceImpl
 				).where(
 					DLFileEntryTable.INSTANCE.fileEntryId.in(
 						fileEntryIds.toArray(new Long[0]))
+				)));
+
+		BasePersistence<ResourcePermission> resourcePermissionBasePersistence =
+			(BasePersistence<ResourcePermission>)
+				_resourcePermissionLocalService.getBasePersistence();
+		Role role = _roleLocalService.getRole(
+			objectDefinition.getCompanyId(), RoleConstants.OWNER);
+
+		resourcePermissionBasePersistence.cacheResult(
+			_resourcePermissionLocalService.<List<ResourcePermission>>dslQuery(
+				DSLQueryFactoryUtil.select(
+					ResourcePermissionTable.INSTANCE
+				).from(
+					ResourcePermissionTable.INSTANCE
+				).where(
+					ResourcePermissionTable.INSTANCE.companyId.eq(
+						objectDefinition.getCompanyId()
+					).and(
+						ResourcePermissionTable.INSTANCE.name.eq(
+							DLFileEntry.class.getName())
+					).and(
+						ResourcePermissionTable.INSTANCE.scope.eq(
+							ResourceConstants.SCOPE_INDIVIDUAL)
+					).and(
+						ResourcePermissionTable.INSTANCE.primKey.in(
+							TransformUtil.transformToArray(
+								fileEntryIds, String::valueOf, String.class))
+					).and(
+						ResourcePermissionTable.INSTANCE.roleId.eq(
+							role.getRoleId())
+					)
 				)));
 	}
 
