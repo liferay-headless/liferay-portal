@@ -26,29 +26,31 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.ObjectRelatedModelsProvider;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
-import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.web.internal.model.ProxyObjectEntry;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
 import java.io.Serializable;
 
@@ -60,10 +62,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -163,7 +167,8 @@ public class ObjectEntryUtil {
 	public static void relateNestedObjectEntries(
 			long companyId, long groupId,
 			InfoItemFieldValues infoItemFieldValues,
-			ObjectEntryManagerRegistry objectEntryManagerRegistry,
+			ObjectRelatedModelsProviderRegistry
+				objectRelatedModelsProviderRegistry,
 			ServiceContext serviceContext, long userId)
 		throws Exception {
 
@@ -251,11 +256,7 @@ public class ObjectEntryUtil {
 						groupId, objectDefinition.getObjectDefinitionId());
 
 				_relateObjectEntries(
-					DefaultObjectEntryManagerProvider.provide(
-						objectEntryManagerRegistry.getObjectEntryManager(
-							objectDefinition.getCompanyId(),
-							objectDefinition.getStorageType())),
-					objectDefinition,
+					objectDefinition, objectRelatedModelsProviderRegistry,
 					ObjectRelationshipLocalServiceUtil.getObjectRelationship(
 						objectDefinition.getObjectDefinitionId(),
 						StringUtil.removeSubstring(
@@ -269,10 +270,11 @@ public class ObjectEntryUtil {
 	}
 
 	public static void relateObjectEntries(
-			DefaultObjectEntryManager defaultObjectEntryManager,
 			InfoItemFieldValues infoItemFieldValues,
-			ObjectDefinition objectDefinition, long primaryKey,
-			ServiceContext serviceContext, long userId)
+			ObjectDefinition objectDefinition,
+			ObjectRelatedModelsProviderRegistry
+				objectRelatedModelsProviderRegistry,
+			long primaryKey, ServiceContext serviceContext, long userId)
 		throws Exception {
 
 		for (ObjectRelationship objectRelationship :
@@ -304,8 +306,9 @@ public class ObjectEntryUtil {
 			}
 
 			_relateObjectEntries(
-				defaultObjectEntryManager, objectDefinition, objectRelationship,
-				primaryKey, (List<String>)value, serviceContext, userId);
+				objectDefinition, objectRelatedModelsProviderRegistry,
+				objectRelationship, primaryKey, (List<String>)value,
+				serviceContext, userId);
 		}
 	}
 
@@ -670,8 +673,9 @@ public class ObjectEntryUtil {
 	}
 
 	private static void _relateObjectEntries(
-			DefaultObjectEntryManager defaultObjectEntryManager,
 			ObjectDefinition objectDefinition,
+			ObjectRelatedModelsProviderRegistry
+				objectRelatedModelsProviderRegistry,
 			ObjectRelationship objectRelationship, long primaryKey,
 			List<String> relatedObjectEntryIds, ServiceContext serviceContext,
 			long userId)
@@ -681,14 +685,33 @@ public class ObjectEntryUtil {
 			ObjectRelationshipUtil.getRelatedObjectDefinition(
 				objectDefinition, objectRelationship);
 
-		defaultObjectEntryManager.disassociateRelatedModels(
-			new DefaultDTOConverterContext(
-				false, null, null, null,
-				LocaleUtil.fromLanguageId(
-					objectDefinition.getDefaultLanguageId(), true, false),
-				null, null),
-			objectDefinition, objectRelationship, primaryKey,
-			relatedObjectDefinition, userId);
+		ObjectRelatedModelsProvider<?> objectRelatedModelsProvider =
+			objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
+				relatedObjectDefinition.getClassName(),
+				relatedObjectDefinition.getCompanyId(),
+				objectRelationship.getType());
+
+		Set<Long> relatedObjectEntryIdsSet = new HashSet<>(
+			TransformUtil.transform(
+				relatedObjectEntryIds, GetterUtil::getLong));
+
+		for (BaseModel<?> baseModel :
+				objectRelatedModelsProvider.getRelatedModels(
+					GroupThreadLocal.getGroupId(),
+					objectRelationship.getObjectRelationshipId(), null, false,
+					primaryKey, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
+			long relatedPrimaryKey = (Long)baseModel.getPrimaryKeyObj();
+
+			if (relatedObjectEntryIdsSet.contains(relatedPrimaryKey)) {
+				continue;
+			}
+
+			objectRelatedModelsProvider.disassociateRelatedModels(
+				userId, objectRelationship.getObjectRelationshipId(),
+				primaryKey, relatedPrimaryKey);
+		}
 
 		for (String relatedObjectEntryId : relatedObjectEntryIds) {
 			try {

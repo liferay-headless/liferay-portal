@@ -15,6 +15,7 @@ import com.liferay.info.item.updater.InfoItemFieldValuesUpdater;
 import com.liferay.object.info.item.util.ObjectEntryInfoItemUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
@@ -55,10 +56,13 @@ public class ObjectEntryInfoItemFieldValuesUpdater
 	public ObjectEntryInfoItemFieldValuesUpdater(
 		InfoItemFormProvider<ObjectEntry> infoItemFormProvider,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
+		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
 
 		_infoItemFormProvider = infoItemFormProvider;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
+		_objectRelatedModelsProviderRegistry =
+			objectRelatedModelsProviderRegistry;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 	}
 
@@ -223,16 +227,15 @@ public class ObjectEntryInfoItemFieldValuesUpdater
 
 			if (objectDefinition.isDefaultStorageType()) {
 				ObjectEntryUtil.relateObjectEntries(
-					DefaultObjectEntryManagerProvider.provide(
-						objectEntryManager),
 					infoItemFieldValues, objectDefinition,
+					_objectRelatedModelsProviderRegistry,
 					updatedObjectEntry.getPrimaryKey(), serviceContext,
 					themeDisplay.getUserId());
 
 				ObjectEntryUtil.relateNestedObjectEntries(
 					themeDisplay.getCompanyId(),
 					updatedObjectEntry.getGroupId(), infoItemFieldValues,
-					_objectEntryManagerRegistry, serviceContext,
+					_objectRelatedModelsProviderRegistry, serviceContext,
 					themeDisplay.getUserId());
 			}
 
@@ -315,6 +318,8 @@ public class ObjectEntryInfoItemFieldValuesUpdater
 
 	private final InfoItemFormProvider<ObjectEntry> _infoItemFormProvider;
 	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+	private final ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 }
