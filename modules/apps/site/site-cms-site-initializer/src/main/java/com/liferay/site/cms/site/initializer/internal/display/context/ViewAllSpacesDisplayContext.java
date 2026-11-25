@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
+import com.liferay.site.cms.site.initializer.internal.util.ExportImportUtil;
 import com.liferay.site.cms.site.initializer.internal.util.PermissionUtil;
 
 import jakarta.portlet.ActionRequest;
@@ -92,12 +93,16 @@ public class ViewAllSpacesDisplayContext {
 				_httpServletRequest, _themeDisplay)
 		).put(
 			"exportURL",
-			ActionUtil.getControlPanelPortletURL(
-				_themeDisplay, ExportImportPortletKeys.EXPORT)
+			ExportImportUtil.getGroupExportURL(
+				ActionUtil.getControlPanelPortletURL(
+					_themeDisplay, ExportImportPortletKeys.EXPORT),
+				"{siteId}", _httpServletRequest, _themeDisplay)
 		).put(
 			"importURL",
-			ActionUtil.getControlPanelPortletURL(
-				_themeDisplay, ExportImportPortletKeys.IMPORT)
+			ExportImportUtil.getGroupImportURL(
+				ActionUtil.getControlPanelPortletURL(
+					_themeDisplay, ExportImportPortletKeys.IMPORT),
+				"{siteId}", _httpServletRequest, _themeDisplay)
 		).put(
 			"pinnedAssetLibraryIds",
 			TransformUtil.transformToArray(

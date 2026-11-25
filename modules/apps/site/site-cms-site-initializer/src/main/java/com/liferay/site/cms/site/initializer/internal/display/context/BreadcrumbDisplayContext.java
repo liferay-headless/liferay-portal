@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.cms.site.initializer.internal.constants.CMSSpaceConstants;
 import com.liferay.site.cms.site.initializer.internal.util.ActionUtil;
+import com.liferay.site.cms.site.initializer.internal.util.ExportImportUtil;
 import com.liferay.site.cms.site.initializer.internal.util.PermissionUtil;
 import com.liferay.taglib.security.PermissionsURLTag;
 
@@ -158,8 +159,11 @@ public class BreadcrumbDisplayContext {
 						_hasUpdatePermission(),
 						JSONUtil.put(
 							"href",
-							_getControlPanelPortletURL(
-								ExportImportPortletKeys.EXPORT)
+							ExportImportUtil.getGroupExportURL(
+								_getControlPanelPortletURL(
+									ExportImportPortletKeys.EXPORT),
+								String.valueOf(_groupId), _httpServletRequest,
+								_themeDisplay)
 						).put(
 							"label",
 							LanguageUtil.get(_httpServletRequest, "export")
@@ -170,8 +174,11 @@ public class BreadcrumbDisplayContext {
 						_hasUpdatePermission(),
 						JSONUtil.put(
 							"href",
-							_getControlPanelPortletURL(
-								ExportImportPortletKeys.IMPORT)
+							ExportImportUtil.getGroupImportURL(
+								_getControlPanelPortletURL(
+									ExportImportPortletKeys.IMPORT),
+								String.valueOf(_groupId), _httpServletRequest,
+								_themeDisplay)
 						).put(
 							"label",
 							LanguageUtil.get(_httpServletRequest, "import")

@@ -133,9 +133,7 @@ test(
 			await expect(
 				page.getByRole('heading', {name: action})
 			).toBeVisible();
-			await expect(
-				page.getByText(space.name, {exact: true})
-			).toBeVisible();
+			await expect(page.getByText(space.name).first()).toBeVisible();
 		}
 	}
 );

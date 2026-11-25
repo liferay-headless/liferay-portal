@@ -28,20 +28,20 @@ test(
 		await expect(
 			page.getByRole('menuitem', {
 				exact: true,
-				name: 'Export Vocabularies',
+				name: 'Vocabularies Export',
 			})
 		).toBeVisible();
 		await expect(
 			page.getByRole('menuitem', {
 				exact: true,
-				name: 'Import Vocabularies',
+				name: 'Vocabularies Import',
 			})
 		).toBeVisible();
 		await expect(
-			page.getByRole('menuitem', {exact: true, name: 'Export Tags'})
+			page.getByRole('menuitem', {exact: true, name: 'Tags Export'})
 		).toBeVisible();
 		await expect(
-			page.getByRole('menuitem', {exact: true, name: 'Import Tags'})
+			page.getByRole('menuitem', {exact: true, name: 'Tags Import'})
 		).toBeVisible();
 
 		await expect(
@@ -70,33 +70,33 @@ test(
 		await expect(
 			page.getByRole('menuitem', {
 				exact: true,
-				name: 'Export Vocabularies',
+				name: 'Vocabularies Export',
 			})
 		).toBeVisible();
 		await expect(
 			page.getByRole('menuitem', {
 				exact: true,
-				name: 'Import Vocabularies',
+				name: 'Vocabularies Import',
 			})
 		).toBeVisible();
 		await expect(
-			page.getByRole('menuitem', {exact: true, name: 'Export Tags'})
+			page.getByRole('menuitem', {exact: true, name: 'Tags Export'})
 		).toBeVisible();
 		await expect(
-			page.getByRole('menuitem', {exact: true, name: 'Import Tags'})
+			page.getByRole('menuitem', {exact: true, name: 'Tags Import'})
 		).toBeVisible();
 	}
 );
 
 test(
-	'Clicking Export Vocabularies navigates to the dedicated CMS Export/Import page without opening a modal',
+	'Clicking Vocabularies Export navigates to the dedicated CMS Export/Import page without opening a modal',
 	{tag: '@LPD-88927'},
 	async ({page, vocabulariesPage}) => {
 		await vocabulariesPage.goto();
 
 		await page.getByRole('button', {name: 'More Actions'}).click();
 		await page
-			.getByRole('menuitem', {exact: true, name: 'Export Vocabularies'})
+			.getByRole('menuitem', {exact: true, name: 'Vocabularies Export'})
 			.click();
 
 		await expect(page).toHaveURL(/\/export-import/);
@@ -105,14 +105,48 @@ test(
 );
 
 test(
-	'Clicking Import Tags from the Tags view navigates to the dedicated CMS Export/Import page',
+	'The CMS Export/Import page shows its title next to the back link',
+	{tag: '@LPD-115187'},
+	async ({page, vocabulariesPage}) => {
+		await vocabulariesPage.goto();
+
+		await page.getByRole('button', {name: 'More Actions'}).click();
+		await page
+			.getByRole('menuitem', {exact: true, name: 'Vocabularies Export'})
+			.click();
+
+		await expect(page.getByRole('link', {name: 'Back'})).toBeVisible();
+		await expect(
+			page.getByRole('heading', {level: 1, name: 'Vocabularies Export'})
+		).toBeVisible();
+		await expect(
+			page.locator('.sidebar-body .nav-link.active', {
+				hasText: 'Categorization',
+			})
+		).toBeVisible();
+
+		await page.getByRole('link', {name: 'Back'}).click();
+
+		await page.getByRole('button', {name: 'More Actions'}).click();
+		await page
+			.getByRole('menuitem', {exact: true, name: 'Tags Import'})
+			.click();
+
+		await expect(
+			page.getByRole('heading', {level: 1, name: 'Tags Import'})
+		).toBeVisible();
+	}
+);
+
+test(
+	'Clicking Tags Import from the Tags view navigates to the dedicated CMS Export/Import page',
 	{tag: '@LPD-88927'},
 	async ({page, tagsPage}) => {
 		await tagsPage.goto();
 
 		await page.getByRole('button', {name: 'More Actions'}).click();
 		await page
-			.getByRole('menuitem', {exact: true, name: 'Import Tags'})
+			.getByRole('menuitem', {exact: true, name: 'Tags Import'})
 			.click();
 
 		await expect(page).toHaveURL(/\/export-import/);

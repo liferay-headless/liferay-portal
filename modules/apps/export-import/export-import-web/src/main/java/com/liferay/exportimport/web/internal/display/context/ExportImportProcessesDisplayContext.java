@@ -8,11 +8,11 @@ package com.liferay.exportimport.web.internal.display.context;
 import com.liferay.exportimport.util.ScopeUtil;
 import com.liferay.exportimport.web.internal.constants.ExportImportFDSNames;
 import com.liferay.exportimport.web.internal.util.ExportImportAPIURLUtil;
+import com.liferay.exportimport.web.internal.util.ExportImportTitleUtil;
 import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.staticexport.background.task.StaticSiteExportBackgroundTaskExecutorNames;
@@ -101,7 +100,7 @@ public class ExportImportProcessesDisplayContext {
 	}
 
 	public String getExportTitle() {
-		return _getTitle("export");
+		return _getTitle("x-export");
 	}
 
 	public CreationMenu getImportCreationMenu() {
@@ -157,7 +156,7 @@ public class ExportImportProcessesDisplayContext {
 	}
 
 	public String getImportTitle() {
-		return _getTitle("import");
+		return _getTitle("x-import");
 	}
 
 	public long[] getStaticSiteExportBackgroundTaskIds() {
@@ -209,7 +208,9 @@ public class ExportImportProcessesDisplayContext {
 					String.valueOf(_groupId), "privateLayout",
 					String.valueOf(_privateLayout), "plid",
 					String.valueOf(_themeDisplay.getPlid()), "portletId",
-					_getPortletId(), "backURL", _themeDisplay.getURLCurrent());
+					_getPortletId(), "subjectKey",
+					ParamUtil.getString(_httpServletRequest, "subjectKey"),
+					"backURL", _themeDisplay.getURLCurrent());
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "new"));
 			}
@@ -271,15 +272,15 @@ public class ExportImportProcessesDisplayContext {
 	}
 
 	private String _getTitle(String key) {
-		String portletId = _getPortletId();
+		String subject = ExportImportTitleUtil.getSubject(
+			_group, _httpServletRequest, _themeDisplay.getLocale(),
+			_getPortletId());
 
-		if (Validator.isBlank(portletId)) {
+		if (subject == null) {
 			return null;
 		}
 
-		return StringBundler.concat(
-			LanguageUtil.get(_httpServletRequest, key), " ",
-			PortalUtil.getPortletTitle(portletId, _themeDisplay.getLocale()));
+		return LanguageUtil.format(_httpServletRequest, key, subject, false);
 	}
 
 	private boolean _isStaticSiteEnabled() {

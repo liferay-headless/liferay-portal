@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {Form, Formik} from 'formik';
 import React from 'react';
@@ -54,6 +54,32 @@ describe('Footer', () => {
 		await userEvent.click(button);
 
 		expect(button).toBeDisabled();
+	});
+
+	it('renders the actions in the portlet header when it offers a place for them', async () => {
+		const headerActionsElement = document.createElement('div');
+
+		headerActionsElement.className = 'export-import-header-actions';
+
+		document.body.appendChild(headerActionsElement);
+
+		const onSubmit = jest.fn();
+
+		renderFooter({onSubmit});
+
+		const button = within(headerActionsElement).getByRole('button', {
+			name: 'continue',
+		});
+
+		expect(
+			within(headerActionsElement).getByRole('link', {name: 'cancel'})
+		).toHaveAttribute('href', '/back');
+
+		await userEvent.click(button);
+
+		await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+
+		headerActionsElement.remove();
 	});
 
 	it('keeps the action button disabled once the form has been submitted', () => {

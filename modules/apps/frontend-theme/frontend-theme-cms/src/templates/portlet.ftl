@@ -30,7 +30,7 @@
 							</li>
 						</#if>
 
-						<#if portlet_display.isShowPortletTitle()>
+						<#if portlet_display.isShowBackIcon() || portlet_display.isShowPortletTitle()>
 							<li class="tbar-item tbar-item-expand text-left">
 								<div class="tbar-section">
 									<h1 class="font-weight-semi-bold m-0 tbar-section text-5 text-dark">${portlet_title}</h1>
