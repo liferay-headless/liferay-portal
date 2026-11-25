@@ -7,10 +7,7 @@ import React from 'react';
 
 import {Launch, isPublished} from '../api/launches';
 import StatusLabel from '../components/StatusLabel';
-import {
-	WORKFLOW_STATUS_DRAFT,
-	WORKFLOW_STATUS_SCHEDULED,
-} from '../components/WorkflowStatusLabel';
+import {WORKFLOW_STATUS} from '../util/constants';
 
 export default function LaunchStatusCell({itemData}: {itemData: Launch}) {
 	if (isPublished(itemData)) {
@@ -23,7 +20,7 @@ export default function LaunchStatusCell({itemData}: {itemData: Launch}) {
 
 	if (
 		itemData.scheduledDate &&
-		itemData.status?.code === WORKFLOW_STATUS_DRAFT
+		itemData.status?.code === WORKFLOW_STATUS.DRAFT
 	) {
 		return (
 			<StatusLabel displayType="danger">
@@ -32,7 +29,7 @@ export default function LaunchStatusCell({itemData}: {itemData: Launch}) {
 		);
 	}
 
-	if (itemData.status?.code === WORKFLOW_STATUS_SCHEDULED) {
+	if (itemData.status?.code === WORKFLOW_STATUS.SCHEDULED) {
 		return (
 			<StatusLabel displayType="info">
 				{Liferay.Language.get('scheduled')}

@@ -5,13 +5,10 @@
 
 import confirmAndUnscheduleLaunchAction from '../actions/confirmAndUnscheduleLaunchAction';
 import {Launch} from '../api/launches';
-import {
-	WORKFLOW_STATUS_DRAFT,
-	WORKFLOW_STATUS_SCHEDULED,
-} from '../components/WorkflowStatusLabel';
 import openNewLaunchModal from '../modals/openNewLaunchModal';
 import openScheduleLaunchModal from '../modals/openScheduleLaunchModal';
 import LaunchStatusCell from '../renderers/LaunchStatusCell';
+import {WORKFLOW_STATUS} from '../util/constants';
 import fillViewLaunchURL from '../util/fillViewLaunchURL';
 import {openSuccessToast} from '../util/toasts';
 
@@ -73,7 +70,7 @@ export default function LaunchesFDSPropsTransformer({
 				return {
 					...action,
 					isVisible: (launch: Launch) =>
-						launch.status?.code === WORKFLOW_STATUS_DRAFT,
+						launch.status?.code === WORKFLOW_STATUS.DRAFT,
 				};
 			}
 
@@ -81,7 +78,7 @@ export default function LaunchesFDSPropsTransformer({
 				return {
 					...action,
 					isVisible: (launch: Launch) =>
-						launch.status?.code === WORKFLOW_STATUS_SCHEDULED,
+						launch.status?.code === WORKFLOW_STATUS.SCHEDULED,
 				};
 			}
 
