@@ -27,7 +27,7 @@ import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.tools.rest.builder.test.client.dto.v1_0.BatchTestEntity;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.fields.NestedFieldsContext;
 import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
@@ -138,35 +138,36 @@ public class BatchTestEntityResourceTest
 		BatchTestEntity postBatchTestEntity =
 			batchTestEntityResource.postBatchTestEntity(batchTestEntity);
 
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-			_buildVulcanCRUDItemDelegate();
+		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_buildVulcanCRUDItemDelegate()) {
 
-		com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
-			batchTestEntity1 =
-				(com.liferay.portal.tools.rest.builder.test.dto.v1_0.
-					BatchTestEntity)vulcanCRUDItemDelegate.fetchItem(
-						postBatchTestEntity.getId());
+			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
+				batchTestEntity1 =
+					(com.liferay.portal.tools.rest.builder.test.dto.v1_0.
+						BatchTestEntity)vulcanCRUDItemDelegate.fetchItem(
+							postBatchTestEntity.getId());
 
-		Assert.assertNull(batchTestEntity1.getNestedField1());
-		Assert.assertNull(batchTestEntity1.getNestedField2());
+			Assert.assertNull(batchTestEntity1.getNestedField1());
+			Assert.assertNull(batchTestEntity1.getNestedField2());
 
-		com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
-			batchTestEntity2 =
-				(com.liferay.portal.tools.rest.builder.test.dto.v1_0.
-					BatchTestEntity)vulcanCRUDItemDelegate.getItem(
-						postBatchTestEntity.getId());
+			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
+				batchTestEntity2 =
+					(com.liferay.portal.tools.rest.builder.test.dto.v1_0.
+						BatchTestEntity)vulcanCRUDItemDelegate.getItem(
+							postBatchTestEntity.getId());
 
-		Assert.assertNull(batchTestEntity2.getNestedField1());
-		Assert.assertNull(batchTestEntity2.getNestedField2());
+			Assert.assertNull(batchTestEntity2.getNestedField1());
+			Assert.assertNull(batchTestEntity2.getNestedField2());
+		}
 
 		try (SafeCloseable safeCloseable =
 				NestedFieldsContextThreadLocal.
 					setNestedFieldsContextWithSafeCloseable(
 						new NestedFieldsContext(
 							1, Arrays.asList("nestedField1", "nestedField2"),
-							"v1.0"))) {
-
-			vulcanCRUDItemDelegate = _buildVulcanCRUDItemDelegate();
+							"v1.0"));
+			SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_buildVulcanCRUDItemDelegate()) {
 
 			com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity
 				batchTestEntity3 =
@@ -258,7 +259,8 @@ public class BatchTestEntityResourceTest
 			randomBatchTestEntity());
 	}
 
-	private VulcanCRUDItemDelegate _buildVulcanCRUDItemDelegate()
+	private SafeCloseableVulcanCRUDItemDelegate<?>
+			_buildVulcanCRUDItemDelegate()
 		throws Exception {
 
 		return _vulcanCRUDItemDelegateBuilderRegistry.builder(

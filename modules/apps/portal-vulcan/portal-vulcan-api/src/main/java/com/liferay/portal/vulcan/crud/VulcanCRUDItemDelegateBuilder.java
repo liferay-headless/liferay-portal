@@ -5,6 +5,7 @@
 
 package com.liferay.portal.vulcan.crud;
 
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -31,7 +32,7 @@ public interface VulcanCRUDItemDelegateBuilder {
 	@ProviderType
 	public interface BuildStepVulcanCRUDItemDelegateBuilder {
 
-		public VulcanCRUDItemDelegate build() throws Exception;
+		public SafeCloseableVulcanCRUDItemDelegate<?> build() throws Exception;
 
 	}
 
@@ -85,6 +86,11 @@ public interface VulcanCRUDItemDelegateBuilder {
 		public ScopeCheckerStepVulcanCRUDItemDelegateBuilder roleLocalService(
 			RoleLocalService roleLocalService);
 
+	}
+
+	@ProviderType
+	public interface SafeCloseableVulcanCRUDItemDelegate<T>
+		extends SafeCloseable, VulcanCRUDItemDelegate<T> {
 	}
 
 	@ProviderType

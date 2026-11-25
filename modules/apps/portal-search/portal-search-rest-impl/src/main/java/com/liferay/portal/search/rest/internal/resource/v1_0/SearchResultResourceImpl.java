@@ -53,8 +53,8 @@ import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
@@ -516,30 +516,34 @@ public class SearchResultResourceImpl extends BaseSearchResultResourceImpl {
 				NestedFieldsSupplier.supplyScopedUnsafeSupplier(
 					"embedded",
 					() -> {
-						VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-							vulcanCRUDItemDelegateBuilder.acceptLanguage(
-								contextAcceptLanguage
-							).groupLocalService(
-								groupLocalService
-							).httpServletRequest(
-								contextHttpServletRequest
-							).httpServletResponse(
-								contextHttpServletResponse
-							).resourceActionLocalService(
-								resourceActionLocalService
-							).resourcePermissionLocalService(
-								resourcePermissionLocalService
-							).roleLocalService(
-								roleLocalService
-							).scopeChecker(
-								contextScopeChecker
-							).uriInfo(
-								contextUriInfo
-							).user(
-								contextUser
-							).build();
+						try (SafeCloseableVulcanCRUDItemDelegate<?>
+								vulcanCRUDItemDelegate =
+									vulcanCRUDItemDelegateBuilder.
+										acceptLanguage(
+											contextAcceptLanguage
+										).groupLocalService(
+											groupLocalService
+										).httpServletRequest(
+											contextHttpServletRequest
+										).httpServletResponse(
+											contextHttpServletResponse
+										).resourceActionLocalService(
+											resourceActionLocalService
+										).resourcePermissionLocalService(
+											resourcePermissionLocalService
+										).roleLocalService(
+											roleLocalService
+										).scopeChecker(
+											contextScopeChecker
+										).uriInfo(
+											contextUriInfo
+										).user(
+											contextUser
+										).build()) {
 
-						return vulcanCRUDItemDelegate.fetchItem(entryClassPK);
+							return vulcanCRUDItemDelegate.fetchItem(
+								entryClassPK);
+						}
 					}));
 		}
 	}
