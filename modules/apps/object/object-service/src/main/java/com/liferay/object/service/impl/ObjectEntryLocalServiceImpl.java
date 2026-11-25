@@ -25,6 +25,7 @@ import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.util.DepotRoleUtil;
+import com.liferay.document.library.constants.DLFileVersionPreviewConstants;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryTable;
 import com.liferay.document.library.kernel.model.DLFileVersion;
@@ -34,6 +35,7 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.document.library.service.DLFileVersionPreviewLocalService;
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
@@ -3676,8 +3678,8 @@ public class ObjectEntryLocalServiceImpl
 			(BasePersistence<DLFileVersion>)
 				_dlFileVersionLocalService.getBasePersistence();
 
-		dlFileVersionBasePersistence.cacheResult(
-			_dlFileVersionLocalService.<List<DLFileVersion>>dslQuery(
+		List<DLFileVersion> dlFileVersions =
+			_dlFileVersionLocalService.dslQuery(
 				DSLQueryFactoryUtil.select(
 					DLFileVersionTable.INSTANCE
 				).from(
@@ -3693,7 +3695,14 @@ public class ObjectEntryLocalServiceImpl
 				).where(
 					DLFileEntryTable.INSTANCE.fileEntryId.in(
 						fileEntryIds.toArray(new Long[0]))
-				)));
+				));
+
+		dlFileVersionBasePersistence.cacheResult(dlFileVersions);
+
+		_dlFileVersionPreviewLocalService.loadDLFileVersionPreviews(
+			ListUtil.toLongArray(
+				dlFileVersions, DLFileVersion::getFileVersionId),
+			DLFileVersionPreviewConstants.STATUS_FAILURE);
 
 		BasePersistence<ResourcePermission> resourcePermissionBasePersistence =
 			(BasePersistence<ResourcePermission>)
@@ -10231,6 +10240,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private DLFileVersionLocalService _dlFileVersionLocalService;
+
+	@Reference
+	private DLFileVersionPreviewLocalService _dlFileVersionPreviewLocalService;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
