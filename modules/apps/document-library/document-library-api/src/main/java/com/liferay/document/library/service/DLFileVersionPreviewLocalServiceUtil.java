@@ -307,6 +307,12 @@ public class DLFileVersionPreviewLocalServiceUtil {
 			fileEntryId, fileVersionId, previewStatus);
 	}
 
+	public static void loadDLFileVersionPreviews(
+		long[] fileVersionIds, int previewStatus) {
+
+		getService().loadDLFileVersionPreviews(fileVersionIds, previewStatus);
+	}
+
 	/**
 	 * Updates the dl file version preview in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -341,4 +347,4 @@ public class DLFileVersionPreviewLocalServiceUtil {
 			DLFileVersionPreviewLocalService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1985113166
+// LIFERAY-SERVICE-BUILDER-HASH:-271908016
