@@ -138,10 +138,10 @@ public class CMSSpaceAdministratorRoleContributorTest {
 
 		Assert.assertTrue(_hasView("/broken-links", user));
 		Assert.assertTrue(_hasView("/dashboard", user));
+		Assert.assertTrue(_hasView("/export-import", user));
 		Assert.assertTrue(_hasView("/missing-required-data", user));
 
 		Assert.assertFalse(_hasView("/admin", user));
-		Assert.assertFalse(_hasView("/export-import", user));
 
 		_userLocalService.deleteUser(user);
 
