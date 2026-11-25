@@ -1991,6 +1991,88 @@ public class ObjectEntryRelatedObjectsResourceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116207")
+	public void testPostByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCodeDisassociateWithoutUpdatePermission()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			password, RandomTestUtil.randomString() + "@liferay.com",
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			ServiceContextTestUtil.getServiceContext());
+
+		user.setEmailAddressVerified(true);
+
+		user = UserLocalServiceUtil.updateUser(user);
+
+		UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
+
+		_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+		_setResourcePermissions(_objectEntry2, role, ActionKeys.VIEW);
+
+		ObjectRelationship objectRelationship = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		String endpoint = StringBundler.concat(
+			_objectDefinition1.getRESTContextPath(),
+			"/by-external-reference-code/",
+			_objectEntry1.getExternalReferenceCode(), StringPool.SLASH,
+			objectRelationship.getName(), StringPool.SLASH,
+			_objectEntry2.getExternalReferenceCode(), "/disassociate");
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user.getEmailAddress(), password
+		).apply(
+			() -> {
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+				_setResourcePermissions(
+					_objectEntry2, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					204,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+			}
+		);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _getEndpoint(objectRelationship.getName()), Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
+	}
+
+	@Test
 	public void testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries()
 		throws Exception {
 
