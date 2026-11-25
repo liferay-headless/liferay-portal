@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
@@ -260,30 +261,35 @@ public class PerformanceTopAssetResourceImpl
 		performanceTopAsset.setEmbedded(
 			NestedFieldsSupplier.supplyScopedUnsafeSupplier(
 				"embedded",
-				() -> vulcanCRUDItemDelegateBuilder.acceptLanguage(
-					contextAcceptLanguage
-				).groupLocalService(
-					groupLocalService
-				).httpServletRequest(
-					contextHttpServletRequest
-				).httpServletResponse(
-					contextHttpServletResponse
-				).resourceActionLocalService(
-					resourceActionLocalService
-				).resourcePermissionLocalService(
-					resourcePermissionLocalService
-				).roleLocalService(
-					roleLocalService
-				).scopeChecker(
-					contextScopeChecker
-				).uriInfo(
-					contextUriInfo
-				).user(
-					contextUser
-				).build(
-				).fetchItem(
-					objectEntry.getObjectEntryId()
-				)));
+				() -> {
+					try (SafeCloseableVulcanCRUDItemDelegate<?>
+							vulcanCRUDItemDelegate =
+								vulcanCRUDItemDelegateBuilder.acceptLanguage(
+									contextAcceptLanguage
+								).groupLocalService(
+									groupLocalService
+								).httpServletRequest(
+									contextHttpServletRequest
+								).httpServletResponse(
+									contextHttpServletResponse
+								).resourceActionLocalService(
+									resourceActionLocalService
+								).resourcePermissionLocalService(
+									resourcePermissionLocalService
+								).roleLocalService(
+									roleLocalService
+								).scopeChecker(
+									contextScopeChecker
+								).uriInfo(
+									contextUriInfo
+								).user(
+									contextUser
+								).build()) {
+
+						return vulcanCRUDItemDelegate.fetchItem(
+							objectEntry.getObjectEntryId());
+					}
+				}));
 	}
 
 	@Reference

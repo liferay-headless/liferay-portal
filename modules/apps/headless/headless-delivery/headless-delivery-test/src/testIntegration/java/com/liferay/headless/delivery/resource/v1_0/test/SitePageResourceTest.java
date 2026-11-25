@@ -143,7 +143,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -532,15 +532,16 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		SitePage postSitePage = testPostSiteSitePage_addSitePage(
 			randomSitePage());
 
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-			_getVulcanCRUDItemDelegate(LocaleUtil.getDefault());
+		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_getVulcanCRUDItemDelegate(LocaleUtil.getDefault())) {
 
-		assertEquals(
-			sitePageResource.getSiteSitePage(
-				testGroup.getGroupId(), postSitePage.getFriendlyUrlPath()),
-			SitePageSerDes.toDTO(
-				String.valueOf(
-					vulcanCRUDItemDelegate.getItem(postSitePage.getId()))));
+			assertEquals(
+				sitePageResource.getSiteSitePage(
+					testGroup.getGroupId(), postSitePage.getFriendlyUrlPath()),
+				SitePageSerDes.toDTO(
+					String.valueOf(
+						vulcanCRUDItemDelegate.getItem(postSitePage.getId()))));
+		}
 
 		// Different locale
 
@@ -565,14 +566,16 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			LocaleUtil.SPAIN
 		).build();
 
-		vulcanCRUDItemDelegate = _getVulcanCRUDItemDelegate(LocaleUtil.SPAIN);
+		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+				_getVulcanCRUDItemDelegate(LocaleUtil.SPAIN)) {
 
-		assertEquals(
-			spainSitePageResource.getSiteSitePage(
-				testGroup.getGroupId(), postSitePage.getFriendlyUrlPath()),
-			SitePageSerDes.toDTO(
-				String.valueOf(
-					vulcanCRUDItemDelegate.getItem(postSitePage.getId()))));
+			assertEquals(
+				spainSitePageResource.getSiteSitePage(
+					testGroup.getGroupId(), postSitePage.getFriendlyUrlPath()),
+				SitePageSerDes.toDTO(
+					String.valueOf(
+						vulcanCRUDItemDelegate.getItem(postSitePage.getId()))));
+		}
 	}
 
 	@Override
@@ -717,7 +720,8 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		).build();
 	}
 
-	private VulcanCRUDItemDelegate _getVulcanCRUDItemDelegate(Locale locale)
+	private SafeCloseableVulcanCRUDItemDelegate<?> _getVulcanCRUDItemDelegate(
+			Locale locale)
 		throws Exception {
 
 		return _vulcanCRUDItemDelegateBuilderRegistry.builder(
