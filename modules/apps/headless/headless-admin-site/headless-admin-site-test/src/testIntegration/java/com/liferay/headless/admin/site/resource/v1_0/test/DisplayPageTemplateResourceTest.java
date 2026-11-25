@@ -229,7 +229,7 @@ public class DisplayPageTemplateResourceTest
 			"NOT_FOUND",
 			"No entity with the external reference code " +
 				postDisplayPageTemplate.getExternalReferenceCode() +
-					" could be found.",
+					" could be found",
 			() -> displayPageTemplateResource.deleteSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
 				postDisplayPageTemplate.getExternalReferenceCode()));
@@ -328,7 +328,7 @@ public class DisplayPageTemplateResourceTest
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				displayPageTemplateExternalReferenceCode + " could be found.",
+				displayPageTemplateExternalReferenceCode + " could be found",
 			() -> displayPageTemplateResource.getSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
 				displayPageTemplateExternalReferenceCode));
@@ -554,7 +554,7 @@ public class DisplayPageTemplateResourceTest
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				displayPageTemplateExternalReferenceCode + " could be found.",
+				displayPageTemplateExternalReferenceCode + " could be found",
 			() -> displayPageTemplateResource.patchSiteDisplayPageTemplate(
 				testGroup.getExternalReferenceCode(),
 				displayPageTemplateExternalReferenceCode,

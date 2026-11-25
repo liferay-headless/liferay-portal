@@ -163,7 +163,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				pageSpecificationResource.
 					getSiteDisplayPageTemplatePageSpecificationsPage(
@@ -213,7 +213,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				pageSpecificationResource.
 					getSiteMasterPagePageSpecificationsPage(
@@ -282,7 +282,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				pageSpecificationResource.
 					getSitePageTemplatePageSpecificationsPage(
@@ -337,7 +337,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				pageSpecificationResource.getSiteSitePagePageSpecificationsPage(
 					testGroup.getExternalReferenceCode(),
@@ -384,7 +384,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				pageSpecificationResource.
 					getSiteUtilityPagePageSpecificationsPage(
@@ -436,7 +436,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() -> pageSpecificationResource.patchSitePageSpecification(
 				testGroup.getExternalReferenceCode(), externalReferenceCode,
 				contentPageSpecification));
@@ -1129,7 +1129,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				layout.getExternalReferenceCode() + " could be found.",
+				layout.getExternalReferenceCode() + " could be found",
 			() -> pageSpecificationResource.deleteSitePageSpecification(
 				testGroup.getExternalReferenceCode(),
 				layout.getExternalReferenceCode()));
@@ -1290,7 +1290,7 @@ public class PageSpecificationResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() -> pageSpecificationResource.getSitePageSpecification(
 				testGroup.getExternalReferenceCode(), externalReferenceCode));
 	}

@@ -46,7 +46,7 @@ public class NoSuchModelExceptionMapper
 			Response.Status.NOT_FOUND,
 			"No entity with the external reference code " +
 				noSuchModelException.getExternalReferenceCode() +
-					" could be found.");
+					" could be found");
 	}
 
 	@Context

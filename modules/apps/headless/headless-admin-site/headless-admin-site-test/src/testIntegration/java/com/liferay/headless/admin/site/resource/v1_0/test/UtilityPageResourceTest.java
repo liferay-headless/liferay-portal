@@ -161,7 +161,7 @@ public class UtilityPageResourceTest extends BaseUtilityPageResourceTestCase {
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				postUtilityPage.getExternalReferenceCode() + " could be found.",
+				postUtilityPage.getExternalReferenceCode() + " could be found",
 			() -> utilityPageResource.deleteSiteUtilityPage(
 				testGroup.getExternalReferenceCode(),
 				postUtilityPage.getExternalReferenceCode()));
@@ -189,7 +189,7 @@ public class UtilityPageResourceTest extends BaseUtilityPageResourceTestCase {
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				utilityPageExternalReferenceCode + " could be found.",
+				utilityPageExternalReferenceCode + " could be found",
 			() -> utilityPageResource.getSiteUtilityPage(
 				testGroup.getExternalReferenceCode(),
 				utilityPageExternalReferenceCode));
@@ -342,7 +342,7 @@ public class UtilityPageResourceTest extends BaseUtilityPageResourceTestCase {
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				utilityPageExternalReferenceCode + " could be found.",
+				utilityPageExternalReferenceCode + " could be found",
 			() -> utilityPageResource.patchSiteUtilityPage(
 				testGroup.getExternalReferenceCode(),
 				utilityPageExternalReferenceCode, randomUtilityPage()));

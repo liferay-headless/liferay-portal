@@ -142,7 +142,7 @@ public class PageTemplateSetResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				pageTemplateSet.getExternalReferenceCode() + " could be found.",
+				pageTemplateSet.getExternalReferenceCode() + " could be found",
 			() -> pageTemplateSetResource.deleteSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
 				pageTemplateSet.getExternalReferenceCode()));
@@ -222,7 +222,7 @@ public class PageTemplateSetResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				pageTemplateSetExternalReferenceCode + " could be found.",
+				pageTemplateSetExternalReferenceCode + " could be found",
 			() -> pageTemplateSetResource.getSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
 				pageTemplateSetExternalReferenceCode));
@@ -352,7 +352,7 @@ public class PageTemplateSetResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				pageTemplateSetExternalReferenceCode + " could be found.",
+				pageTemplateSetExternalReferenceCode + " could be found",
 			() -> pageTemplateSetResource.patchSitePageTemplateSet(
 				testGroup.getExternalReferenceCode(),
 				pageTemplateSetExternalReferenceCode, randomPageTemplateSet()));

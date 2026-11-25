@@ -144,11 +144,11 @@ public class ExceptionMapperTest {
 			externalReferenceCode, Http.Method.GET,
 			"/test-vulcan/testPrincipalException3/" + externalReferenceCode);
 		_assertNotFoundWithExternalReferenceCode(
-			externalReferenceCode, Http.Method.POST,
-			"/test-vulcan/testPrincipalException4/" + externalReferenceCode);
-		_assertNotFoundWithExternalReferenceCode(
 			externalReferenceCode, Http.Method.GET,
 			"/test-vulcan/testPrincipalException7/" + externalReferenceCode);
+		_assertNotFoundWithExternalReferenceCode(
+			externalReferenceCode, Http.Method.POST,
+			"/test-vulcan/testPrincipalException4/" + externalReferenceCode);
 	}
 
 	@Test
@@ -209,10 +209,10 @@ public class ExceptionMapperTest {
 			HTTPTestUtil.invokeToHttpCode(
 				null, "/test-vulcan/testPrincipalException5", Http.Method.GET));
 
-		JSONObject expectedJSONObject = JSONUtil.put("status", "NOT_FOUND");
-
 		Assert.assertEquals(
-			expectedJSONObject.toString(),
+			JSONUtil.put(
+				"status", "NOT_FOUND"
+			).toString(),
 			HTTPTestUtil.invokeToJSONObject(
 				null, "/test-vulcan/testPrincipalException5", Http.Method.GET
 			).toString());
@@ -383,7 +383,7 @@ public class ExceptionMapperTest {
 		Assert.assertEquals("NOT_FOUND", jsonObject.getString("status"));
 		Assert.assertEquals(
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			jsonObject.getString("title"));
 	}
 

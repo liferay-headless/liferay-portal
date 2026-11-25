@@ -563,7 +563,7 @@ public class StyleBookResourceTest extends BaseStyleBookResourceTestCase {
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				styleBookExternalReferenceCode + " could be found.",
+				styleBookExternalReferenceCode + " could be found",
 			() -> styleBookResource.deleteSiteStyleBook(
 				testGroup.getExternalReferenceCode(),
 				styleBookExternalReferenceCode));
@@ -926,7 +926,7 @@ public class StyleBookResourceTest extends BaseStyleBookResourceTestCase {
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				layout.getExternalReferenceCode() + " could be found.",
+				layout.getExternalReferenceCode() + " could be found",
 			() -> styleBookResource.getSitePageSpecificationStyleBooksPage(
 				testGroup.getExternalReferenceCode(),
 				layout.getExternalReferenceCode(), null, Pagination.of(1, 10)));

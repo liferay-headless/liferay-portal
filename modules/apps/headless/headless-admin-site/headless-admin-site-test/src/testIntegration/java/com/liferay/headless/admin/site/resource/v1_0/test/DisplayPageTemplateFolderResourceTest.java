@@ -333,7 +333,7 @@ public class DisplayPageTemplateFolderResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				externalReferenceCode + " could be found.",
+				externalReferenceCode + " could be found",
 			() ->
 				displayPageTemplateFolderResource.
 					patchSiteDisplayPageTemplateFolder(

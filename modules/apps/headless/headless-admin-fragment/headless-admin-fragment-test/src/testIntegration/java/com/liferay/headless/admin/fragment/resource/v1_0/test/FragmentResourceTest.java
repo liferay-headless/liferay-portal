@@ -2932,7 +2932,7 @@ public class FragmentResourceTest extends BaseFragmentResourceTestCase {
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
 			Assert.assertEquals(
 				"No entity with the external reference code " +
-					fragmentSetExternalReferenceCode + " could be found.",
+					fragmentSetExternalReferenceCode + " could be found",
 				problem.getTitle());
 		}
 	}

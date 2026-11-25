@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +154,7 @@ public abstract class BasePersistenceFinder
 			}
 
 			noSuchModelException.setExternalReferenceCode(
-				String.valueOf(values[i]));
+				GetterUtil.getString(values[i]));
 		}
 
 		return noSuchModelException;

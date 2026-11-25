@@ -138,7 +138,7 @@ public class FriendlyUrlHistoryResourceTest
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				privateLayout.getExternalReferenceCode() + " could be found.",
+				privateLayout.getExternalReferenceCode() + " could be found",
 			_getUserWithoutPermissionsFriendlyUrlHistoryResource(),
 			privateLayout);
 

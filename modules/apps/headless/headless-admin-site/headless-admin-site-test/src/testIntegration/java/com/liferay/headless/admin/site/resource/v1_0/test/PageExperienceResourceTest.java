@@ -383,7 +383,7 @@ public class PageExperienceResourceTest
 			"NOT_FOUND",
 			"No entity with the external reference code " +
 				postPageExperience.getExternalReferenceCode() +
-					" could be found.",
+					" could be found",
 			() -> pageExperienceResource.deleteSitePageExperience(
 				testGroup.getExternalReferenceCode(),
 				postPageExperience.getExternalReferenceCode()));
@@ -442,7 +442,7 @@ public class PageExperienceResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				pageExperienceExternalReferenceCode + " could be found.",
+				pageExperienceExternalReferenceCode + " could be found",
 			() -> pageExperienceResource.getSitePageExperience(
 				testGroup.getExternalReferenceCode(),
 				pageExperienceExternalReferenceCode));
@@ -499,7 +499,7 @@ public class PageExperienceResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				_layout.getExternalReferenceCode() + " could be found.",
+				_layout.getExternalReferenceCode() + " could be found",
 			() ->
 				pageExperienceResource.
 					getSitePageSpecificationPageExperiencesPage(
@@ -534,7 +534,7 @@ public class PageExperienceResourceTest
 		ProblemExceptionTestUtil.assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				pageExperienceExternalReferenceCode + " could be found.",
+				pageExperienceExternalReferenceCode + " could be found",
 			() -> pageExperienceResource.patchSitePageExperience(
 				testGroup.getExternalReferenceCode(),
 				pageExperienceExternalReferenceCode, randomPageExperience()));

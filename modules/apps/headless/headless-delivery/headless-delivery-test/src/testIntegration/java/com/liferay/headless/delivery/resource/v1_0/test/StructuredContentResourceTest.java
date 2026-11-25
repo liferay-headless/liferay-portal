@@ -273,7 +273,7 @@ public class StructuredContentResourceTest
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
 			Assert.assertEquals(
 				"No entity with the external reference code " +
-					externalReferenceCode + " could be found.",
+					externalReferenceCode + " could be found",
 				problem.getTitle());
 		}
 	}
@@ -374,7 +374,7 @@ public class StructuredContentResourceTest
 			Assert.assertEquals("NOT_FOUND", problem.getStatus());
 			Assert.assertEquals(
 				"No entity with the external reference code " +
-					externalReferenceCode + " could be found.",
+					externalReferenceCode + " could be found",
 				problem.getTitle());
 		}
 	}

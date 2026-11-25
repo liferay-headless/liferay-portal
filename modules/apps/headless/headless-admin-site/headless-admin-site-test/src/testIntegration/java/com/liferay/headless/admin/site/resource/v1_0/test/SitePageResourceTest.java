@@ -527,7 +527,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				taxonomyCategoryExternalReferenceCode + " could be found.",
+				taxonomyCategoryExternalReferenceCode + " could be found",
 			() -> _testPutSiteSitePageWithMissingTaxonomyCategories(
 				taxonomyCategoryExternalReferenceCode));
 
@@ -2816,7 +2816,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				sitePageExternalReferenceCode + " could be found.",
+				sitePageExternalReferenceCode + " could be found",
 			() -> sitePageResource.getSiteSitePage(
 				testGroup.getExternalReferenceCode(),
 				sitePageExternalReferenceCode));
@@ -2883,7 +2883,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_assertProblemException(
 			"NOT_FOUND",
 			"No entity with the external reference code " +
-				sitePage.getExternalReferenceCode() + " could be found.",
+				sitePage.getExternalReferenceCode() + " could be found",
 			() -> userSitePageResource.getSiteSitePage(
 				testGroup.getExternalReferenceCode(),
 				sitePage.getExternalReferenceCode()));
