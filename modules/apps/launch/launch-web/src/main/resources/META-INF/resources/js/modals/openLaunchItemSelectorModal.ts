@@ -11,6 +11,7 @@ import {openItemSelectorModal} from '@liferay/frontend-js-item-selector-web';
 
 import {Launch} from '../api/launches';
 import LaunchStatusCell from '../renderers/LaunchStatusCell';
+import {WORKFLOW_STATUS} from '../util/constants';
 
 const LAUNCH_ITEM_SELECTOR_VIEWS: IFrontendDataSetProps['views'] = [
 	{
@@ -46,7 +47,7 @@ const LAUNCH_ITEM_SELECTOR_VIEWS: IFrontendDataSetProps['views'] = [
 const LAUNCH_SETS_API_URL = '/o/launch-sets';
 
 function getAPIURL(excludeLaunchIds: number[]): string {
-	let filter = 'status in (2, 7)';
+	let filter = `status in (${WORKFLOW_STATUS.DRAFT}, ${WORKFLOW_STATUS.SCHEDULED})`;
 
 	if (excludeLaunchIds.length) {
 		filter += ` and not (id in (${excludeLaunchIds
