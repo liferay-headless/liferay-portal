@@ -4,17 +4,21 @@
  */
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
+import {useField} from 'formik';
 import React from 'react';
 
 import {PortletDataHandlerSection} from '../types/portletDataHandler';
+import {selectAllLayouts} from '../utils/contentSelection';
 import {PageTreeModalConfiguration} from './PageTreeModal';
 import SectionHeader from './SectionHeader';
-import {DateFilterValues} from './date_filter';
+import {DateFilterValues, toDateFilter} from './date_filter';
 import {
 	FormikFieldCheckbox,
 	FormikFieldContentSelector,
 	FormikFieldDateFilter,
 } from './forms/formik';
+
+import type {ContentSelection} from './forms/content_selector/ContentSelector';
 
 const LABEL_ID = 'dataSelection-label';
 
@@ -63,6 +67,12 @@ export default function DataSelection(props: Props) {
 		title = Liferay.Language.get('data-selection'),
 	} = props;
 
+	const [{value: contentSelection}, , contentSelectionHelpers] = useField<
+		ContentSelection | null | undefined
+	>('contentSelection');
+	const [{value: dateFilterValues}] =
+		useField<DateFilterValues>('dateFilterValues');
+
 	return (
 		<>
 			<SectionHeader id={LABEL_ID} subtitle={subtitle} title={title} />
@@ -87,7 +97,13 @@ export default function DataSelection(props: Props) {
 						itemsCount={props.itemsCount}
 						lastPublishDate={props.lastPublishDate}
 						name="dateFilterValues"
-						onApplyFilter={props.onApplyFilter}
+						onApplyFilter={(dateFilterValues) => {
+							contentSelectionHelpers.setValue(
+								selectAllLayouts(contentSelection)
+							);
+
+							props.onApplyFilter(dateFilterValues);
+						}}
 						timeZoneId={timeZoneId}
 					/>
 				</>
@@ -107,7 +123,16 @@ export default function DataSelection(props: Props) {
 						aria-labelledby={LABEL_ID}
 						commentsAndRatingsEnabled={commentsAndRatingsEnabled}
 						name="contentSelection"
-						pageTreeModalConfiguration={pageTreeModalConfiguration}
+						pageTreeModalConfiguration={{
+							...pageTreeModalConfiguration,
+							dateFilter:
+								props.process === 'sync'
+									? undefined
+									: toDateFilter(
+											dateFilterValues,
+											timeZoneId
+										),
+						}}
 						portletDataHandlerSections={portletDataHandlerSections}
 						process={process}
 					/>

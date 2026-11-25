@@ -12,7 +12,19 @@ import {
 	PageTreePickerSelectionEntry,
 } from '../../types/PageTreePicker';
 
+interface ChildrenScan {
+	complete: boolean;
+	items: Array<PageTreePickerItem<SitePage | null>>;
+	nextPage: number;
+}
+
+export interface DateModifiedRange {
+	endDate?: string;
+	startDate?: string;
+}
+
 export interface SitePage {
+	dateModified?: string;
 	externalReferenceCode: string;
 	name_i18n?: Record<string, string>;
 	parentSitePageExternalReferenceCode?: string | null;
@@ -29,7 +41,7 @@ export interface SitePageTreeSelection {
 }
 
 const FIELDS =
-	'externalReferenceCode,name_i18n,parentSitePageExternalReferenceCode,type';
+	'dateModified,externalReferenceCode,name_i18n,parentSitePageExternalReferenceCode,type';
 
 export const ROOT_ITEM_ID = 'liferay-page-tree-picker-root';
 
@@ -78,6 +90,26 @@ function getChildSitePagesPath(externalReferenceCode: string): string {
 	return `site-pages/${encodeURIComponent(externalReferenceCode)}/site-pages`;
 }
 
+function getDateModifiedFilter(
+	dateModifiedRange: DateModifiedRange | undefined
+): string | null {
+	const filters: string[] = [];
+
+	if (dateModifiedRange?.endDate) {
+		filters.push(`dateModified le ${dateModifiedRange.endDate}`);
+	}
+
+	if (dateModifiedRange?.startDate) {
+		filters.push(`dateModified ge ${dateModifiedRange.startDate}`);
+	}
+
+	if (!filters.length) {
+		return null;
+	}
+
+	return filters.join(' and ');
+}
+
 function getIcon(sitePage: SitePage): string {
 	if (sitePage.type === 'ContentPage') {
 		return 'page';
@@ -103,8 +135,31 @@ function getName(sitePage: SitePage): string {
 	);
 }
 
+function isInDateModifiedRange(
+	sitePage: SitePage,
+	dateModifiedRange: DateModifiedRange | undefined
+): boolean {
+	const {endDate, startDate} = dateModifiedRange ?? {};
+
+	if (!endDate && !startDate) {
+		return true;
+	}
+
+	if (!sitePage.dateModified) {
+		return false;
+	}
+
+	const dateModified = Date.parse(sitePage.dateModified);
+
+	return (
+		(!endDate || dateModified <= Date.parse(endDate)) &&
+		(!startDate || dateModified >= Date.parse(startDate))
+	);
+}
+
 function toAncestorItems(
-	ancestorSitePagesList: SitePage[][]
+	ancestorSitePagesList: SitePage[][],
+	dateModifiedRange: DateModifiedRange | undefined
 ): Array<PageTreePickerItem<SitePage | null>> {
 	const ancestorItems = new Map<
 		string,
@@ -115,7 +170,11 @@ function toAncestorItems(
 		ancestorSitePages.forEach((ancestorSitePage) =>
 			ancestorItems.set(
 				ancestorSitePage.externalReferenceCode,
-				toItem(ancestorSitePage, true)
+				toItem(
+					ancestorSitePage,
+					true,
+					!isInDateModifiedRange(ancestorSitePage, dateModifiedRange)
+				)
 			)
 		)
 	);
@@ -125,9 +184,16 @@ function toAncestorItems(
 
 function toItem(
 	sitePage: SitePage,
-	hasChildren: boolean
+	hasChildren: boolean,
+	disabled: boolean
 ): PageTreePickerItem<SitePage | null> {
 	return {
+		...(disabled && {
+			disabled,
+			title: Liferay.Language.get(
+				'this-page-was-not-modified-in-the-selected-date-range'
+			),
+		}),
 		hasChildren,
 		icon: getIcon(sitePage),
 		id: sitePage.externalReferenceCode,
@@ -166,17 +232,24 @@ export type SitePageDataSource = PageTreePickerDataSource<SitePage | null> & {
 };
 
 export default function createSitePageDataSource({
+	dateModifiedRange,
 	pageSize,
 	privateLayout,
 	rootLabel,
 	siteExternalReferenceCode,
 }: {
+	dateModifiedRange?: DateModifiedRange;
 	pageSize: number;
 	privateLayout: boolean;
 	rootLabel?: string;
 	siteExternalReferenceCode: string;
 }): SitePageDataSource {
+	const childrenScanPromises = new Map<string, Promise<ChildrenScan>>();
+	const dateModifiedFilter = getDateModifiedFilter(dateModifiedRange);
 	const descendantCountPromises = new Map<string, Promise<number>>();
+	const filterSearchParams: Record<string, string> = dateModifiedFilter
+		? {filter: dateModifiedFilter}
+		: {};
 	const hasChildrenPromises = new Map<string, Promise<boolean>>();
 	const sitePagePromises = new Map<string, Promise<SitePage | null>>();
 
@@ -256,6 +329,43 @@ export default function createSitePageDataSource({
 		return ancestorSitePages;
 	}
 
+	function getChildrenURL(
+		parentItem: PageTreePickerItem<SitePage | null>,
+		page: number
+	): URL {
+		const searchParams = {
+			fields: FIELDS,
+			page: String(page),
+			pageSize: String(pageSize),
+		};
+
+		return parentItem.id === ROOT_ITEM_ID
+			? getURL('site-pages', {
+					...searchParams,
+					privateLayout: String(privateLayout),
+					sort: 'pageSettings/priority:asc',
+				})
+			: getURL(getChildSitePagesPath(parentItem.id), searchParams);
+	}
+
+	function getDescendantCount(
+		externalReferenceCode: string
+	): Promise<number> {
+		return getCachedPromise(
+			descendantCountPromises,
+			externalReferenceCode,
+			() =>
+				fetchPage(
+					getURL(getChildSitePagesPath(externalReferenceCode), {
+						fields: 'externalReferenceCode',
+						flatten: 'true',
+						pageSize: '1',
+						...filterSearchParams,
+					})
+				).then(({totalCount}) => totalCount)
+		);
+	}
+
 	function getSitePagesCount(): Promise<number> {
 		if (!sitePagesCountPromise) {
 			sitePagesCountPromise = fetchPage(
@@ -264,6 +374,7 @@ export default function createSitePageDataSource({
 					flatten: 'true',
 					pageSize: '1',
 					privateLayout: String(privateLayout),
+					...filterSearchParams,
 				})
 			).then(({totalCount}) => totalCount);
 
@@ -278,6 +389,12 @@ export default function createSitePageDataSource({
 	function hasChildSitePages(
 		externalReferenceCode: string
 	): Promise<boolean> {
+		if (dateModifiedFilter) {
+			return getDescendantCount(externalReferenceCode).then(
+				(descendantCount) => descendantCount > 0
+			);
+		}
+
 		return getCachedPromise(
 			hasChildrenPromises,
 			externalReferenceCode,
@@ -298,6 +415,48 @@ export default function createSitePageDataSource({
 		);
 	}
 
+	function scanChildren(
+		parentItem: PageTreePickerItem<SitePage | null>,
+		itemsCount: number
+	): Promise<ChildrenScan> {
+		const childrenScanPromise = (
+			childrenScanPromises.get(parentItem.id) ??
+			Promise.resolve({complete: false, items: [], nextPage: 1})
+		).then(async (childrenScan) => {
+			let {complete, items, nextPage} = childrenScan;
+
+			while (!complete && items.length < itemsCount) {
+				const {items: sitePages, totalCount} = await fetchPage(
+					getChildrenURL(parentItem, nextPage)
+				);
+
+				sitePages.forEach((sitePage) => registerSitePage(sitePage));
+
+				const childItems = await toItems(sitePages);
+
+				complete = nextPage * pageSize >= totalCount;
+				items = [
+					...items,
+					...childItems.filter(
+						(childItem) =>
+							!childItem.disabled || childItem.hasChildren
+					),
+				];
+				nextPage++;
+			}
+
+			return {complete, items, nextPage};
+		});
+
+		childrenScanPromises.set(parentItem.id, childrenScanPromise);
+
+		childrenScanPromise.catch(() =>
+			childrenScanPromises.delete(parentItem.id)
+		);
+
+		return childrenScanPromise;
+	}
+
 	function toItems(
 		sitePages: SitePage[]
 	): Promise<Array<PageTreePickerItem<SitePage | null>>> {
@@ -305,7 +464,8 @@ export default function createSitePageDataSource({
 			sitePages.map(async (sitePage) =>
 				toItem(
 					sitePage,
-					await hasChildSitePages(sitePage.externalReferenceCode)
+					await hasChildSitePages(sitePage.externalReferenceCode),
+					!isInDateModifiedRange(sitePage, dateModifiedRange)
 				)
 			)
 		);
@@ -335,22 +495,18 @@ export default function createSitePageDataSource({
 			return {items: [getRootItem()], totalCount: 1};
 		}
 
-		const searchParams = {
-			fields: FIELDS,
-			page: String(page),
-			pageSize: String(pageSize),
-		};
+		if (dateModifiedFilter) {
+			const {items} = await scanChildren(parentItem, page * pageSize + 1);
 
-		const requestURL =
-			parentItem.id === ROOT_ITEM_ID
-				? getURL('site-pages', {
-						...searchParams,
-						privateLayout: String(privateLayout),
-						sort: 'pageSettings/priority:asc',
-					})
-				: getURL(getChildSitePagesPath(parentItem.id), searchParams);
+			return {
+				items: items.slice((page - 1) * pageSize, page * pageSize),
+				totalCount: items.length,
+			};
+		}
 
-		const {items, totalCount} = await fetchPage(requestURL);
+		const {items, totalCount} = await fetchPage(
+			getChildrenURL(parentItem, page)
+		);
 
 		items.forEach((sitePage) => registerSitePage(sitePage));
 
@@ -364,15 +520,7 @@ export default function createSitePageDataSource({
 			return getSitePagesCount();
 		}
 
-		return getCachedPromise(descendantCountPromises, item.id, () =>
-			fetchPage(
-				getURL(getChildSitePagesPath(item.id), {
-					fields: 'externalReferenceCode',
-					flatten: 'true',
-					pageSize: '1',
-				})
-			).then(({totalCount}) => totalCount)
-		);
+		return getDescendantCount(item.id);
 	}
 
 	async function resolveItems(
@@ -399,7 +547,10 @@ export default function createSitePageDataSource({
 			toItems(sitePages),
 		]);
 
-		return [...toAncestorItems(ancestorSitePagesList), ...resolvedItems];
+		return [
+			...toAncestorItems(ancestorSitePagesList, dateModifiedRange),
+			...resolvedItems,
+		];
 	}
 
 	async function search(
@@ -414,6 +565,7 @@ export default function createSitePageDataSource({
 				pageSize: String(pageSize),
 				privateLayout: String(privateLayout),
 				search: query,
+				...filterSearchParams,
 			})
 		);
 
@@ -427,7 +579,10 @@ export default function createSitePageDataSource({
 		]);
 
 		return {
-			ancestors: toAncestorItems(ancestorSitePagesList),
+			ancestors: toAncestorItems(
+				ancestorSitePagesList,
+				dateModifiedRange
+			),
 			items: items.map((item, index) => ({
 				...item,
 				path: ancestorSitePagesList[index].map(getName),
