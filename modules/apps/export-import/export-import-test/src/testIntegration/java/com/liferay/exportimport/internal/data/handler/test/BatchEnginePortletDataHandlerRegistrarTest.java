@@ -13,6 +13,9 @@ import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.portlet.data.handler.provider.PortletDataHandlerProvider;
 import com.liferay.exportimport.test.util.vulcan.batch.engine.TestExportImportVulcanBatchEngineTaskItemDelegate;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
@@ -316,6 +319,44 @@ public class BatchEnginePortletDataHandlerRegistrarTest {
 	}
 
 	@Test
+	@TestInfo("LPD-117586")
+	public void testExcludedObjectDefinitions() throws Exception {
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition();
+
+		try {
+			Assert.assertEquals(
+				1,
+				_getRegisteredPortletDataHandlersCount(
+					objectDefinition.getPortletId()));
+		}
+		finally {
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition);
+		}
+
+		objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_REMOTE_IMPORT_PROCESS", TestPropsValues.getCompanyId());
+
+		Assert.assertEquals(
+			0,
+			_getRegisteredPortletDataHandlersCount(
+				objectDefinition.getPortletId()));
+
+		objectDefinition =
+			_objectDefinitionLocalService.
+				getObjectDefinitionByExternalReferenceCode(
+					"L_REMOTE_INSTANCE", TestPropsValues.getCompanyId());
+
+		Assert.assertEquals(
+			0,
+			_getRegisteredPortletDataHandlersCount(
+				objectDefinition.getPortletId()));
+	}
+
+	@Test
 	@TestInfo("LPD-80308")
 	public void testSystemEventExtraDataContributor() throws Exception {
 		String className = RandomTestUtil.randomString();
@@ -584,6 +625,9 @@ public class BatchEnginePortletDataHandlerRegistrarTest {
 			serviceRegistration.unregister();
 		};
 	}
+
+	@Inject
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
 	private PortletDataHandlerProvider _portletDataHandlerProvider;
