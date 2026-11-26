@@ -16,7 +16,7 @@ import com.liferay.portal.tools.rest.builder.test.dto.v1_0.BatchTestEntity;
 import com.liferay.portal.tools.rest.builder.test.dto.v1_0.CompanyTestEntity;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.BatchTestEntityResource;
 import com.liferay.portal.tools.rest.builder.test.resource.v1_0.CompanyTestEntityResource;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
+import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.custom.field.CustomField;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -364,37 +364,34 @@ public class BatchTestEntityResourceImpl
 					NestedFieldsSupplier.supplyScopedUnsafeSupplier(
 						"embeddedNestedField",
 						() -> {
-							try (SafeCloseableVulcanCRUDItemDelegate<?>
-									vulcanCRUDItemDelegate =
-										_vulcanCRUDItemDelegateBuilderRegistry.
-											builder(
-												contextCompany,
-												BatchTestEntity.class.getName()
-											).acceptLanguage(
-												contextAcceptLanguage
-											).groupLocalService(
-												groupLocalService
-											).httpServletRequest(
-												contextHttpServletRequest
-											).httpServletResponse(
-												contextHttpServletResponse
-											).resourceActionLocalService(
-												resourceActionLocalService
-											).resourcePermissionLocalService(
-												resourcePermissionLocalService
-											).roleLocalService(
-												roleLocalService
-											).scopeChecker(
-												contextScopeChecker
-											).uriInfo(
-												contextUriInfo
-											).user(
-												contextUser
-											).build()) {
+							VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
+								_vulcanCRUDItemDelegateBuilderRegistry.builder(
+									contextCompany,
+									BatchTestEntity.class.getName()
+								).acceptLanguage(
+									contextAcceptLanguage
+								).groupLocalService(
+									groupLocalService
+								).httpServletRequest(
+									contextHttpServletRequest
+								).httpServletResponse(
+									contextHttpServletResponse
+								).resourceActionLocalService(
+									resourceActionLocalService
+								).resourcePermissionLocalService(
+									resourcePermissionLocalService
+								).roleLocalService(
+									roleLocalService
+								).scopeChecker(
+									contextScopeChecker
+								).uriInfo(
+									contextUriInfo
+								).user(
+									contextUser
+								).build();
 
-								return vulcanCRUDItemDelegate.fetchItem(
-									originalBatchTestEntity.getId());
-							}
+							return vulcanCRUDItemDelegate.fetchItem(
+								originalBatchTestEntity.getId());
 						}));
 				setExternalReferenceCode(
 					originalBatchTestEntity.getExternalReferenceCode());

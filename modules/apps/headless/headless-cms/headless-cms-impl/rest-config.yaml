@@ -7,7 +7,7 @@ application:
 author: Crescenzo Rega
 changeTrackingEnabled: true
 clientDir: ../headless-cms-client/src/main/java
-compatibilityVersion: 17
+compatibilityVersion: 16
 forcePredictableOperationId: true
 generateBatch: false
 generatePermissions: true

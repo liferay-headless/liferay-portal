@@ -153,11 +153,6 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder;
-
-<#if freeMarkerTool.isVersionCompatible(configYAML, 17)>
-	import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
-</#if>
-
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -1344,12 +1339,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 						</#list>
 					);
 
-					<#if freeMarkerTool.isVersionCompatible(configYAML, 17)>
-						try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate = _vulcanCRUDItemDelegateBuilderRegistry.builder(
-					<#else>
-						VulcanCRUDItemDelegate vulcanCRUDItemDelegate = _vulcanCRUDItemDelegateBuilderRegistry.builder(
-					</#if>
-
+					VulcanCRUDItemDelegate vulcanCRUDItemDelegate = _vulcanCRUDItemDelegateBuilderRegistry.builder(
 						testCompany,
 						"${schemaJavaType}"
 					).acceptLanguage(
@@ -1390,20 +1380,11 @@ public abstract class Base${schemaName}ResourceTestCase {
 						testVulcanCRUDItemDelegate_getUriInfo()
 					).user(
 						testVulcanCRUDItemDelegate_getUser()
-					<#if freeMarkerTool.isVersionCompatible(configYAML, 17)>
-						).build()) {
+					).build();
 
-							Object item = vulcanCRUDItemDelegate.getItem(post${schemaName}.${getIdMethodName}());
+					Object item = vulcanCRUDItemDelegate.getItem(post${schemaName}.${getIdMethodName}());
 
-							assertEquals(get${schemaName}, ${schemaName}SerDes.toDTO(item.toString()));
-						}
-					<#else>
-						).build();
-
-						Object item = vulcanCRUDItemDelegate.getItem(post${schemaName}.${getIdMethodName}());
-
-						assertEquals(get${schemaName}, ${schemaName}SerDes.toDTO(item.toString()));
-					</#if>
+					assertEquals(get${schemaName}, ${schemaName}SerDes.toDTO(item.toString()));
 				}
 
 				protected HttpServletRequest testVulcanCRUDItemDelegate_getHttpServletRequest() {

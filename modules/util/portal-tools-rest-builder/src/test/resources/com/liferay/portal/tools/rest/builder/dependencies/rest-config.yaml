@@ -6,6 +6,6 @@ application:
     name: Liferay.Test.REST
 author: Test Author
 clientDir: ../test-client/src/main/java
-compatibilityVersion: 17
+compatibilityVersion: 16
 generateClientJS: true
 javaEEPackage: jakarta

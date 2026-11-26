@@ -14,7 +14,6 @@ import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegate;
-import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilder.SafeCloseableVulcanCRUDItemDelegate;
 import com.liferay.portal.vulcan.crud.VulcanCRUDItemDelegateBuilderRegistry;
 
 import jakarta.ws.rs.core.UriInfo;
@@ -94,23 +93,22 @@ public class VulcanCRUDItemDelegateBuilderRegistryTest {
 	@Test
 	public void testBuild() throws Exception {
 		UriInfo uriInfo1 = ProxyFactory.newDummyInstance(UriInfo.class);
+
+		VulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate1 = _build(uriInfo1);
+
 		UriInfo uriInfo2 = ProxyFactory.newDummyInstance(UriInfo.class);
 
-		try (SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate1 =
-				_build(uriInfo1);
-			SafeCloseableVulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate2 =
-				_build(uriInfo2)) {
+		VulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate2 = _build(uriInfo2);
 
-			long id = RandomTestUtil.randomLong();
+		long id = RandomTestUtil.randomLong();
 
-			Assert.assertSame(uriInfo1, vulcanCRUDItemDelegate1.fetchItem(id));
-			Assert.assertSame(uriInfo1, vulcanCRUDItemDelegate1.getItem(id));
-			Assert.assertSame(uriInfo2, vulcanCRUDItemDelegate2.fetchItem(id));
-			Assert.assertSame(uriInfo2, vulcanCRUDItemDelegate2.getItem(id));
-		}
+		Assert.assertSame(uriInfo1, vulcanCRUDItemDelegate1.fetchItem(id));
+		Assert.assertSame(uriInfo1, vulcanCRUDItemDelegate1.getItem(id));
+		Assert.assertSame(uriInfo2, vulcanCRUDItemDelegate2.fetchItem(id));
+		Assert.assertSame(uriInfo2, vulcanCRUDItemDelegate2.getItem(id));
 
-		Assert.assertEquals(2, _instancesCount.get());
-		Assert.assertEquals(2, _releasedInstancesCount.get());
+		Assert.assertEquals(
+			_instancesCount.get(), _releasedInstancesCount.get());
 	}
 
 	public class TestVulcanCRUDItemDelegate
@@ -125,9 +123,7 @@ public class VulcanCRUDItemDelegateBuilderRegistryTest {
 
 	}
 
-	private SafeCloseableVulcanCRUDItemDelegate<?> _build(UriInfo uriInfo)
-		throws Exception {
-
+	private VulcanCRUDItemDelegate<?> _build(UriInfo uriInfo) throws Exception {
 		return _vulcanCRUDItemDelegateBuilderRegistry.builder(
 			_companyLocalService.getCompany(TestPropsValues.getCompanyId()),
 			_ENTITY_CLASS_NAME

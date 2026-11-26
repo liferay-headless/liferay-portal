@@ -1,5 +1,5 @@
 apiDir: ../external-api/src/main/java
 apiPackagePath: com.liferay.test.external
 author: Test Author
-compatibilityVersion: 17
+compatibilityVersion: 16
 javaEEPackage: jakarta

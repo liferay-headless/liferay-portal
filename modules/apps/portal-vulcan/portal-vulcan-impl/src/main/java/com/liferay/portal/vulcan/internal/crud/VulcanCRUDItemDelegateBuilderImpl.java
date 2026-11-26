@@ -27,8 +27,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import jakarta.ws.rs.core.UriInfo;
 
-import org.osgi.framework.ServiceObjects;
-
 /**
  * @author Carlos Correa
  */
@@ -65,7 +63,7 @@ public class VulcanCRUDItemDelegateBuilderImpl
 	}
 
 	@Override
-	public SafeCloseableVulcanCRUDItemDelegate build() throws Exception {
+	public VulcanCRUDItemDelegate build() throws Exception {
 		NestedFieldsContext nestedFieldsContext =
 			NestedFieldsContextThreadLocal.getNestedFieldsContext();
 
@@ -108,31 +106,14 @@ public class VulcanCRUDItemDelegateBuilderImpl
 
 		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
 			(VulcanCRUDItemDelegate)contextDataInjector.inject(
-				_serviceObjects.getService());
+				_vulcanCRUDItemDelegate);
 
 		if (nestedFieldsContext != null) {
 			return _withNestedFields(
 				contextDataInjector, vulcanCRUDItemDelegate);
 		}
 
-		return new SafeCloseableVulcanCRUDItemDelegate() {
-
-			@Override
-			public void close() {
-				_serviceObjects.ungetService(vulcanCRUDItemDelegate);
-			}
-
-			@Override
-			public Object fetchItem(Long id) {
-				return vulcanCRUDItemDelegate.fetchItem(id);
-			}
-
-			@Override
-			public Object getItem(Long id) throws Exception {
-				return vulcanCRUDItemDelegate.getItem(id);
-			}
-
-		};
+		return vulcanCRUDItemDelegate;
 	}
 
 	@Override
@@ -216,23 +197,18 @@ public class VulcanCRUDItemDelegateBuilderImpl
 
 	protected VulcanCRUDItemDelegateBuilderImpl(
 		Company company, ContextDataInjectorBuilder contextDataInjectorBuilder,
-		ServiceObjects<VulcanCRUDItemDelegate<?>> serviceObjects) {
+		VulcanCRUDItemDelegate vulcanCRUDItemDelegate) {
 
 		_company = company;
 		_contextDataInjectorBuilder = contextDataInjectorBuilder;
-		_serviceObjects = serviceObjects;
+		_vulcanCRUDItemDelegate = vulcanCRUDItemDelegate;
 	}
 
-	private SafeCloseableVulcanCRUDItemDelegate _withNestedFields(
+	private VulcanCRUDItemDelegate _withNestedFields(
 		ContextDataInjector contextDataInjector,
 		VulcanCRUDItemDelegate vulcanCRUDItemDelegate) {
 
-		return new SafeCloseableVulcanCRUDItemDelegate() {
-
-			@Override
-			public void close() {
-				_serviceObjects.ungetService(vulcanCRUDItemDelegate);
-			}
+		return new VulcanCRUDItemDelegate() {
 
 			@Override
 			public Object fetchItem(Long id) {
@@ -273,8 +249,8 @@ public class VulcanCRUDItemDelegateBuilderImpl
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
 	private RoleLocalService _roleLocalService;
 	private Object _scopeChecker;
-	private final ServiceObjects<VulcanCRUDItemDelegate<?>> _serviceObjects;
 	private UriInfo _uriInfo;
 	private User _user;
+	private final VulcanCRUDItemDelegate _vulcanCRUDItemDelegate;
 
 }
