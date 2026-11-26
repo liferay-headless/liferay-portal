@@ -13,11 +13,10 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.service.ObjectRelationshipService;
+import com.liferay.object.service.ObjectRelationshipServiceUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.module.service.Snapshot;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -91,11 +90,9 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
-		ObjectRelationshipService objectRelationshipService =
-			_objectRelationshipServiceSnapshot.get();
-
-		objectRelationshipService.deleteObjectRelationshipMappingTableValues(
-			objectRelationshipId, primaryKey1, primaryKey2);
+		ObjectRelationshipServiceUtil.
+			deleteObjectRelationshipMappingTableValues(
+				objectRelationshipId, primaryKey1, primaryKey2);
 	}
 
 	@Override
@@ -244,11 +241,6 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 				objectEntry, new ServiceContext());
 		}
 	}
-
-	private static final Snapshot<ObjectRelationshipService>
-		_objectRelationshipServiceSnapshot = new Snapshot<>(
-			ObjectEntryMtoMObjectRelatedModelsProviderImpl.class,
-			ObjectRelationshipService.class);
 
 	private final String _className;
 	private final long _companyId;
