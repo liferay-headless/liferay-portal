@@ -5,6 +5,7 @@
 
 package com.liferay.portal.vulcan.internal.crud;
 
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -26,6 +27,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import jakarta.ws.rs.core.UriInfo;
+
+import org.osgi.framework.ServiceObjects;
 
 /**
  * @author Carlos Correa
@@ -104,16 +107,53 @@ public class VulcanCRUDItemDelegateBuilderImpl
 				_user
 			).build();
 
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate =
-			(VulcanCRUDItemDelegate)contextDataInjector.inject(
-				_vulcanCRUDItemDelegate);
+		return new VulcanCRUDItemDelegate() {
 
-		if (nestedFieldsContext != null) {
-			return _withNestedFields(
-				contextDataInjector, vulcanCRUDItemDelegate);
-		}
+			@Override
+			public Object fetchItem(Long id) {
+				try {
+					return _apply(
+						vulcanCRUDItemDelegate ->
+							vulcanCRUDItemDelegate.fetchItem(id));
+				}
+				catch (Exception exception) {
+					return ReflectionUtil.throwException(exception);
+				}
+			}
 
-		return vulcanCRUDItemDelegate;
+			@Override
+			public Object getItem(Long id) throws Exception {
+				return _apply(
+					vulcanCRUDItemDelegate -> vulcanCRUDItemDelegate.getItem(
+						id));
+			}
+
+			private Object _apply(
+					UnsafeFunction<VulcanCRUDItemDelegate<?>, Object, Exception>
+						unsafeFunction)
+				throws Exception {
+
+				VulcanCRUDItemDelegate<?> vulcanCRUDItemDelegate =
+					_serviceObjects.getService();
+
+				try {
+					contextDataInjector.inject(vulcanCRUDItemDelegate);
+
+					Object item = unsafeFunction.apply(vulcanCRUDItemDelegate);
+
+					if ((item != null) && (nestedFieldsContext != null)) {
+						NestedFieldsSetterUtil.setNestedFields(
+							item, contextDataInjector);
+					}
+
+					return item;
+				}
+				finally {
+					_serviceObjects.ungetService(vulcanCRUDItemDelegate);
+				}
+			}
+
+		};
 	}
 
 	@Override
@@ -197,46 +237,11 @@ public class VulcanCRUDItemDelegateBuilderImpl
 
 	protected VulcanCRUDItemDelegateBuilderImpl(
 		Company company, ContextDataInjectorBuilder contextDataInjectorBuilder,
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate) {
+		ServiceObjects<VulcanCRUDItemDelegate<?>> serviceObjects) {
 
 		_company = company;
 		_contextDataInjectorBuilder = contextDataInjectorBuilder;
-		_vulcanCRUDItemDelegate = vulcanCRUDItemDelegate;
-	}
-
-	private VulcanCRUDItemDelegate _withNestedFields(
-		ContextDataInjector contextDataInjector,
-		VulcanCRUDItemDelegate vulcanCRUDItemDelegate) {
-
-		return new VulcanCRUDItemDelegate() {
-
-			@Override
-			public Object fetchItem(Long id) {
-				return _setNestedFields(vulcanCRUDItemDelegate.fetchItem(id));
-			}
-
-			@Override
-			public Object getItem(Long id) throws Exception {
-				return _setNestedFields(vulcanCRUDItemDelegate.getItem(id));
-			}
-
-			private Object _setNestedFields(Object item) {
-				if (item == null) {
-					return null;
-				}
-
-				try {
-					NestedFieldsSetterUtil.setNestedFields(
-						item, contextDataInjector);
-				}
-				catch (Exception exception) {
-					return ReflectionUtil.throwException(exception);
-				}
-
-				return item;
-			}
-
-		};
+		_serviceObjects = serviceObjects;
 	}
 
 	private AcceptLanguage _acceptLanguage;
@@ -249,8 +254,8 @@ public class VulcanCRUDItemDelegateBuilderImpl
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
 	private RoleLocalService _roleLocalService;
 	private Object _scopeChecker;
+	private final ServiceObjects<VulcanCRUDItemDelegate<?>> _serviceObjects;
 	private UriInfo _uriInfo;
 	private User _user;
-	private final VulcanCRUDItemDelegate _vulcanCRUDItemDelegate;
 
 }
