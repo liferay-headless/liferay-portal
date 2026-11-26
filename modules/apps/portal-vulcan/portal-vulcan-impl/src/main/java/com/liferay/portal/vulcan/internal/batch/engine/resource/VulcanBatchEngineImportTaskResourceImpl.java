@@ -40,8 +40,9 @@ public class VulcanBatchEngineImportTaskResourceImpl
 		ImportTaskResource importTaskResource = _getImportTaskResource();
 
 		return importTaskResource.deleteImportTaskObject(
-			name, callbackURL, _getExternalReferenceCode(),
-			_getImportStrategy(), _getTaskItemDelegateName(), object);
+			name, callbackURL, _getQueryParameterValue("deleteStrategy"),
+			_getExternalReferenceCode(), _getImportStrategy(),
+			_getTaskItemDelegateName(), object);
 	}
 
 	@Override
