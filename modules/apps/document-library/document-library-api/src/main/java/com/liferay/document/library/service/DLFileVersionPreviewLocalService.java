@@ -272,6 +272,10 @@ public interface DLFileVersionPreviewLocalService
 	public boolean hasDLFileVersionPreview(
 		long fileEntryId, long fileVersionId, int previewStatus);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public void loadDLFileVersionPreviews(
+		long[] fileVersionIds, int previewStatus);
+
 	/**
 	 * Updates the dl file version preview in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
@@ -306,4 +310,4 @@ public interface DLFileVersionPreviewLocalService
 		throws E;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:789865400
+// LIFERAY-SERVICE-BUILDER-HASH:193275027
