@@ -1903,6 +1903,18 @@ public class DefaultObjectEntryManagerImpl
 			SystemObjectDefinitionManager systemObjectDefinitionManager)
 		throws Exception {
 
+		BaseModel<?> existingBaseModel =
+			systemObjectDefinitionManager.fetchBaseModelByExternalReferenceCode(
+				String.valueOf(nestedObjectEntry.get("externalReferenceCode")),
+				relatedObjectDefinition.getCompanyId());
+
+		if (existingBaseModel != null) {
+			systemObjectDefinitionManager.checkModelResourcePermission(
+				relatedObjectDefinition.getObjectDefinitionId(),
+				PermissionThreadLocal.getPermissionChecker(),
+				(long)existingBaseModel.getPrimaryKeyObj(), ActionKeys.UPDATE);
+		}
+
 		try {
 			return systemObjectDefinitionManager.upsertBaseModel(
 				String.valueOf(nestedObjectEntry.get("externalReferenceCode")),

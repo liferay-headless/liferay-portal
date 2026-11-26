@@ -3580,6 +3580,62 @@ public class DefaultObjectEntryManagerImplTest
 	}
 
 	@Test
+	@TestInfo("LPD-115719")
+	public void testAddObjectEntryWithSystemObjectRelationship()
+		throws Exception {
+
+		ObjectDefinition userObjectDefinition =
+			objectDefinitionLocalService.fetchSystemObjectDefinition(
+				companyId, "User");
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+				_objectDefinition1, userObjectDefinition,
+				TestPropsValues.getUserId(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		User user = _addUser();
+
+		_addRoleUser(
+			new String[] {ObjectActionKeys.ADD_OBJECT_ENTRY},
+			_objectDefinition1, user);
+
+		User relatedUser = UserTestUtil.addUser();
+
+		Assert.assertThrows(
+			PrincipalException.class,
+			() -> _defaultObjectEntryManager.addObjectEntry(
+				_createDTOConverterContext(user), _objectDefinition1,
+				new ObjectEntry() {
+					{
+						properties = HashMapBuilder.<String, Object>put(
+							objectRelationship.getName(),
+							Collections.singletonList(
+								HashMapBuilder.<String, Object>put(
+									"emailAddress",
+									RandomTestUtil.randomString() +
+										"@liferay.com"
+								).put(
+									"externalReferenceCode",
+									relatedUser.getExternalReferenceCode()
+								).build())
+						).build();
+					}
+				},
+				ObjectDefinitionConstants.SCOPE_COMPANY));
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(adminUser));
+		PrincipalThreadLocal.setName(adminUser.getUserId());
+
+		User updatedUser = _userLocalService.getUser(relatedUser.getUserId());
+
+		Assert.assertEquals(
+			relatedUser.getEmailAddress(), updatedUser.getEmailAddress());
+	}
+
+	@Test
 	public void testAddOrUpdateObjectEntryWithFriendlyURL() throws Exception {
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.publishObjectDefinition();
