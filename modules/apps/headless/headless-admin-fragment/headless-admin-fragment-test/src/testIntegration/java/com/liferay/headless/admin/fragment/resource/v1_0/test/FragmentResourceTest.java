@@ -1670,7 +1670,7 @@ public class FragmentResourceTest extends BaseFragmentResourceTestCase {
 		HttpInvoker.HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.fragment.dto.v1_0.Fragment", null,
-				null, null, null, JSONUtil.putAll((Object[])jsonObjects));
+				null, null, null, null, JSONUtil.putAll((Object[])jsonObjects));
 
 		Assert.assertEquals(expectedStatusCode, httpResponse.getStatusCode());
 
@@ -1733,7 +1733,7 @@ public class FragmentResourceTest extends BaseFragmentResourceTestCase {
 			HttpInvoker.HttpResponse httpResponse =
 				importTaskResource.deleteImportTaskHttpResponse(
 					"com.liferay.headless.admin.fragment.dto.v1_0.Fragment",
-					null, null, "ON_ERROR_CONTINUE", null,
+					null, null, null, "ON_ERROR_CONTINUE", null,
 					JSONUtil.putAll(
 						JSONUtil.put(
 							"externalReferenceCode",

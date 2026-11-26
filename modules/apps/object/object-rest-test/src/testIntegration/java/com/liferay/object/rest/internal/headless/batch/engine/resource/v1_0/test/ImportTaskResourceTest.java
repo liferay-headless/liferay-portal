@@ -630,7 +630,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 		HttpInvoker.HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null,
-				null, objectDefinition.getName(),
+				null, null, objectDefinition.getName(),
 				JSONUtil.putAll(
 					JSONUtil.put("id", objectEntry1.getObjectEntryId())
 				).toString());
@@ -643,7 +643,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 
 		httpResponse = importTaskResource.deleteImportTaskHttpResponse(
 			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null, null,
-			objectDefinition.getName(),
+			null, objectDefinition.getName(),
 			JSONUtil.putAll(
 				JSONUtil.put(
 					"externalReferenceCode",
@@ -670,7 +670,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 
 		httpResponse = importTaskResource.deleteImportTaskHttpResponse(
 			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null, null,
-			objectDefinition.getName(),
+			null, objectDefinition.getName(),
 			JSONUtil.putAll(
 				JSONUtil.put(
 					"externalReferenceCode",
