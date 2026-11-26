@@ -785,11 +785,25 @@ public abstract class BaseSXPElementResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<SXPElement, SXPElement, Exception>
 			sxpElementUnsafeFunction = sxpElement -> {
-				deleteSXPElement(sxpElement.getId());
+				try {
+					deleteSXPElement(sxpElement.getId());
 
-				return sxpElement;
+					return sxpElement;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return sxpElement;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -809,6 +823,10 @@ public abstract class BaseSXPElementResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1486,4 +1504,4 @@ public abstract class BaseSXPElementResourceImpl
 		LogFactoryUtil.getLog(BaseSXPElementResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-366887473
+// LIFERAY-REST-BUILDER-HASH:1116398904

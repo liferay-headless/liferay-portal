@@ -352,6 +352,10 @@ public abstract class BaseUserNotificationResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -993,4 +997,4 @@ public abstract class BaseUserNotificationResourceImpl
 		LogFactoryUtil.getLog(BaseUserNotificationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:843784977
+// LIFERAY-REST-BUILDER-HASH:695460595

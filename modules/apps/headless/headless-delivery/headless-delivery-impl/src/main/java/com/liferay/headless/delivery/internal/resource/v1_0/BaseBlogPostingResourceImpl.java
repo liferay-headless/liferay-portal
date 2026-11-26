@@ -1501,36 +1501,54 @@ public abstract class BaseBlogPostingResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<BlogPosting, BlogPosting, Exception>
 			blogPostingUnsafeFunction = blogPosting -> {
-				if (blogPosting.getId() != null) {
-					try {
-						deleteBlogPosting(blogPosting.getId());
+				try {
+					if (blogPosting.getId() != null) {
+						try {
+							deleteBlogPosting(blogPosting.getId());
+
+							return blogPosting;
+						}
+						catch (Exception exception) {
+							if (blogPosting.getExternalReferenceCode() !=
+									null) {
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteBlogPostingByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										blogPosting.getExternalReferenceCode());
+
+									return blogPosting;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteBlogPostingByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							blogPosting.getExternalReferenceCode());
 
 						return blogPosting;
 					}
-					catch (Exception exception) {
-						if (blogPosting.getExternalReferenceCode() != null) {
-							if (parameters.containsKey("siteId")) {
-								deleteSiteBlogPostingByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									blogPosting.getExternalReferenceCode());
 
-								return blogPosting;
-							}
-						}
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return blogPosting;
 					}
-				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteBlogPostingByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						blogPosting.getExternalReferenceCode());
 
-					return blogPosting;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1550,6 +1568,10 @@ public abstract class BaseBlogPostingResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2404,4 +2426,4 @@ public abstract class BaseBlogPostingResourceImpl
 		LogFactoryUtil.getLog(BaseBlogPostingResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1508414269
+// LIFERAY-REST-BUILDER-HASH:-2140823354

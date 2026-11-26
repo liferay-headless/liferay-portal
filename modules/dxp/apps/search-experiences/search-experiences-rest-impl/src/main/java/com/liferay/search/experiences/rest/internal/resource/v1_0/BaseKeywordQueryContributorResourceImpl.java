@@ -180,6 +180,10 @@ public abstract class BaseKeywordQueryContributorResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -817,4 +821,4 @@ public abstract class BaseKeywordQueryContributorResourceImpl
 		LogFactoryUtil.getLog(BaseKeywordQueryContributorResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1007850707
+// LIFERAY-REST-BUILDER-HASH:1670944143

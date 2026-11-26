@@ -956,32 +956,48 @@ public abstract class BaseOptionResourceImpl
 			Collection<Option> options, Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Option, Option, Exception> optionUnsafeFunction =
 			option -> {
-				if (option.getId() != null) {
-					try {
-						deleteOption(option.getId());
-
-						return option;
-					}
-					catch (Exception exception) {
-						if (option.getExternalReferenceCode() != null) {
-							deleteOptionByExternalReferenceCode(
-								option.getExternalReferenceCode());
+				try {
+					if (option.getId() != null) {
+						try {
+							deleteOption(option.getId());
 
 							return option;
 						}
+						catch (Exception exception) {
+							if (option.getExternalReferenceCode() != null) {
+								deleteOptionByExternalReferenceCode(
+									option.getExternalReferenceCode());
+
+								return option;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (option.getExternalReferenceCode() != null) {
-					deleteOptionByExternalReferenceCode(
-						option.getExternalReferenceCode());
+					else if (option.getExternalReferenceCode() != null) {
+						deleteOptionByExternalReferenceCode(
+							option.getExternalReferenceCode());
 
-					return option;
-				}
+						return option;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return option;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1000,6 +1016,10 @@ public abstract class BaseOptionResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1835,4 +1855,4 @@ public abstract class BaseOptionResourceImpl
 		LogFactoryUtil.getLog(BaseOptionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1219708571
+// LIFERAY-REST-BUILDER-HASH:-430457806

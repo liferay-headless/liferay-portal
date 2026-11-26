@@ -10,6 +10,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1890,36 +1891,52 @@ public abstract class BaseERCScopedTestEntityResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ERCScopedTestEntity, ERCScopedTestEntity, Exception>
 			ercScopedTestEntityUnsafeFunction = ercScopedTestEntity -> {
-				if (parameters.containsKey(
-						"assetLibraryExternalReferenceCode")) {
+				try {
+					if (parameters.containsKey(
+							"assetLibraryExternalReferenceCode")) {
 
-					deleteAssetLibraryERCScopedTestEntity(
-						(String)parameters.get(
-							"assetLibraryExternalReferenceCode"),
-						ercScopedTestEntity.getExternalReferenceCode());
+						deleteAssetLibraryERCScopedTestEntity(
+							(String)parameters.get(
+								"assetLibraryExternalReferenceCode"),
+							ercScopedTestEntity.getExternalReferenceCode());
 
-					return ercScopedTestEntity;
+						return ercScopedTestEntity;
+					}
+					else if (ercScopedTestEntity.getExternalReferenceCode() !=
+								null) {
+
+						deleteERCScopedTestEntity(
+							ercScopedTestEntity.getExternalReferenceCode());
+
+						return ercScopedTestEntity;
+					}
+					else if (parameters.containsKey(
+								"siteExternalReferenceCode")) {
+
+						deleteSiteERCScopedTestEntity(
+							(String)parameters.get("siteExternalReferenceCode"),
+							ercScopedTestEntity.getExternalReferenceCode());
+
+						return ercScopedTestEntity;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (ercScopedTestEntity.getExternalReferenceCode() !=
-							null) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					deleteERCScopedTestEntity(
-						ercScopedTestEntity.getExternalReferenceCode());
+						return ercScopedTestEntity;
+					}
 
-					return ercScopedTestEntity;
+					throw noSuchModelException;
 				}
-				else if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSiteERCScopedTestEntity(
-						(String)parameters.get("siteExternalReferenceCode"),
-						ercScopedTestEntity.getExternalReferenceCode());
-
-					return ercScopedTestEntity;
-				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1942,6 +1959,10 @@ public abstract class BaseERCScopedTestEntityResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2773,4 +2794,4 @@ public abstract class BaseERCScopedTestEntityResourceImpl
 		LogFactoryUtil.getLog(BaseERCScopedTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:389808788
+// LIFERAY-REST-BUILDER-HASH:700509752

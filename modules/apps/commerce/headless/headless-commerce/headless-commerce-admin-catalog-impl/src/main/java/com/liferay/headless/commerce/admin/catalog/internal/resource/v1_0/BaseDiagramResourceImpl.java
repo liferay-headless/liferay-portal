@@ -352,6 +352,10 @@ public abstract class BaseDiagramResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("PARTIAL_UPDATE");
 	}
@@ -1011,4 +1015,4 @@ public abstract class BaseDiagramResourceImpl
 		LogFactoryUtil.getLog(BaseDiagramResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-778835936
+// LIFERAY-REST-BUILDER-HASH:1853707134

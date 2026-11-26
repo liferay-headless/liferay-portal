@@ -698,32 +698,52 @@ public abstract class BaseOptionCategoryResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<OptionCategory, OptionCategory, Exception>
 			optionCategoryUnsafeFunction = optionCategory -> {
-				if (optionCategory.getId() != null) {
-					try {
-						deleteOptionCategory(optionCategory.getId());
-
-						return optionCategory;
-					}
-					catch (Exception exception) {
-						if (optionCategory.getExternalReferenceCode() != null) {
-							deleteOptionCategoryByExternalReferenceCode(
-								optionCategory.getExternalReferenceCode());
+				try {
+					if (optionCategory.getId() != null) {
+						try {
+							deleteOptionCategory(optionCategory.getId());
 
 							return optionCategory;
 						}
+						catch (Exception exception) {
+							if (optionCategory.getExternalReferenceCode() !=
+									null) {
+
+								deleteOptionCategoryByExternalReferenceCode(
+									optionCategory.getExternalReferenceCode());
+
+								return optionCategory;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (optionCategory.getExternalReferenceCode() != null) {
-					deleteOptionCategoryByExternalReferenceCode(
-						optionCategory.getExternalReferenceCode());
+					else if (optionCategory.getExternalReferenceCode() !=
+								null) {
 
-					return optionCategory;
-				}
+						deleteOptionCategoryByExternalReferenceCode(
+							optionCategory.getExternalReferenceCode());
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return optionCategory;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return optionCategory;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -743,6 +763,10 @@ public abstract class BaseOptionCategoryResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1419,4 +1443,4 @@ public abstract class BaseOptionCategoryResourceImpl
 		LogFactoryUtil.getLog(BaseOptionCategoryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1811331659
+// LIFERAY-REST-BUILDER-HASH:-688669900

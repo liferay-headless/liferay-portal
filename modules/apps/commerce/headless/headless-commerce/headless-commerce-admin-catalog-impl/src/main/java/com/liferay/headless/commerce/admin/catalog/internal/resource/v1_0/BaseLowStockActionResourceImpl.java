@@ -176,6 +176,10 @@ public abstract class BaseLowStockActionResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -810,4 +814,4 @@ public abstract class BaseLowStockActionResourceImpl
 		LogFactoryUtil.getLog(BaseLowStockActionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1279991543
+// LIFERAY-REST-BUILDER-HASH:1390945643

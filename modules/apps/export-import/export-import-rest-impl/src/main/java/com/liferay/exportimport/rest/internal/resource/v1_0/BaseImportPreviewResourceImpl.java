@@ -476,6 +476,10 @@ public abstract class BaseImportPreviewResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1138,4 +1142,4 @@ public abstract class BaseImportPreviewResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1985711980
+// LIFERAY-REST-BUILDER-HASH:1196998514

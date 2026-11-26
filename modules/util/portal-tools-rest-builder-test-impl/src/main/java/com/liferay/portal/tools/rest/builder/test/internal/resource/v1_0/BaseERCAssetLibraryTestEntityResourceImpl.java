@@ -10,6 +10,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -858,24 +859,38 @@ public abstract class BaseERCAssetLibraryTestEntityResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<ERCAssetLibraryTestEntity, ERCAssetLibraryTestEntity, Exception>
 				ercAssetLibraryTestEntityUnsafeFunction =
 					ercAssetLibraryTestEntity -> {
-						if (parameters.containsKey(
-								"assetLibraryExternalReferenceCode")) {
+						try {
+							if (parameters.containsKey(
+									"assetLibraryExternalReferenceCode")) {
 
-							deleteAssetLibraryERCAssetLibraryTestEntity(
-								(String)parameters.get(
-									"assetLibraryExternalReferenceCode"),
-								ercAssetLibraryTestEntity.
-									getExternalReferenceCode());
+								deleteAssetLibraryERCAssetLibraryTestEntity(
+									(String)parameters.get(
+										"assetLibraryExternalReferenceCode"),
+									ercAssetLibraryTestEntity.
+										getExternalReferenceCode());
 
-							return ercAssetLibraryTestEntity;
+								return ercAssetLibraryTestEntity;
+							}
+
+							throw new UnsupportedOperationException(
+								"Unable to delete by external reference code or ID");
 						}
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
 
-						throw new UnsupportedOperationException(
-							"Unable to delete by external reference code or ID");
+								return ercAssetLibraryTestEntity;
+							}
+
+							throw noSuchModelException;
+						}
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -900,6 +915,10 @@ public abstract class BaseERCAssetLibraryTestEntityResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1714,4 +1733,4 @@ public abstract class BaseERCAssetLibraryTestEntityResourceImpl
 		LogFactoryUtil.getLog(BaseERCAssetLibraryTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:785929112
+// LIFERAY-REST-BUILDER-HASH:220249296

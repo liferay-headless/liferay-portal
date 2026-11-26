@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -668,31 +669,47 @@ public abstract class BaseSiteResourceImpl
 			Collection<Site> sites, Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeFunction<Site, Site, Exception> siteUnsafeFunction = site -> {
-			if (site.getId() != null) {
-				try {
-					deleteSite(site.getId());
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
 
-					return site;
-				}
-				catch (Exception exception) {
-					if (site.getExternalReferenceCode() != null) {
-						deleteSiteByExternalReferenceCode(
-							site.getExternalReferenceCode());
+		UnsafeFunction<Site, Site, Exception> siteUnsafeFunction = site -> {
+			try {
+				if (site.getId() != null) {
+					try {
+						deleteSite(site.getId());
 
 						return site;
 					}
+					catch (Exception exception) {
+						if (site.getExternalReferenceCode() != null) {
+							deleteSiteByExternalReferenceCode(
+								site.getExternalReferenceCode());
+
+							return site;
+						}
+
+						throw exception;
+					}
 				}
-			}
-			else if (site.getExternalReferenceCode() != null) {
-				deleteSiteByExternalReferenceCode(
-					site.getExternalReferenceCode());
+				else if (site.getExternalReferenceCode() != null) {
+					deleteSiteByExternalReferenceCode(
+						site.getExternalReferenceCode());
 
-				return site;
-			}
+					return site;
+				}
 
-			throw new UnsupportedOperationException(
-				"Unable to delete by external reference code or ID");
+				throw new UnsupportedOperationException(
+					"Unable to delete by external reference code or ID");
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				if (StringUtil.equalsIgnoreCase(
+						deleteStrategy, "DELETE_IF_EXISTS")) {
+
+					return site;
+				}
+
+				throw noSuchModelException;
+			}
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -710,6 +727,10 @@ public abstract class BaseSiteResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1401,4 +1422,4 @@ public abstract class BaseSiteResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:2085508867
+// LIFERAY-REST-BUILDER-HASH:-713362920

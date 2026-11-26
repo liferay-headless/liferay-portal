@@ -832,34 +832,52 @@ public abstract class BaseMeasurementUnitResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<MeasurementUnit, MeasurementUnit, Exception>
 			measurementUnitUnsafeFunction = measurementUnit -> {
-				if (measurementUnit.getId() != null) {
-					try {
-						deleteMeasurementUnit(measurementUnit.getId());
-
-						return measurementUnit;
-					}
-					catch (Exception exception) {
-						if (measurementUnit.getExternalReferenceCode() !=
-								null) {
-
-							deleteMeasurementUnitByExternalReferenceCode(
-								measurementUnit.getExternalReferenceCode());
+				try {
+					if (measurementUnit.getId() != null) {
+						try {
+							deleteMeasurementUnit(measurementUnit.getId());
 
 							return measurementUnit;
 						}
+						catch (Exception exception) {
+							if (measurementUnit.getExternalReferenceCode() !=
+									null) {
+
+								deleteMeasurementUnitByExternalReferenceCode(
+									measurementUnit.getExternalReferenceCode());
+
+								return measurementUnit;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (measurementUnit.getExternalReferenceCode() != null) {
-					deleteMeasurementUnitByExternalReferenceCode(
-						measurementUnit.getExternalReferenceCode());
+					else if (measurementUnit.getExternalReferenceCode() !=
+								null) {
 
-					return measurementUnit;
-				}
+						deleteMeasurementUnitByExternalReferenceCode(
+							measurementUnit.getExternalReferenceCode());
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return measurementUnit;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return measurementUnit;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -879,6 +897,10 @@ public abstract class BaseMeasurementUnitResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1552,4 +1574,4 @@ public abstract class BaseMeasurementUnitResourceImpl
 		LogFactoryUtil.getLog(BaseMeasurementUnitResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:596617135
+// LIFERAY-REST-BUILDER-HASH:1536190859

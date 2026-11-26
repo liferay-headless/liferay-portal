@@ -848,32 +848,52 @@ public abstract class BaseAccountAddressResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<AccountAddress, AccountAddress, Exception>
 			accountAddressUnsafeFunction = accountAddress -> {
-				if (accountAddress.getId() != null) {
-					try {
-						deleteAccountAddress(accountAddress.getId());
-
-						return accountAddress;
-					}
-					catch (Exception exception) {
-						if (accountAddress.getExternalReferenceCode() != null) {
-							deleteAccountAddressByExternalReferenceCode(
-								accountAddress.getExternalReferenceCode());
+				try {
+					if (accountAddress.getId() != null) {
+						try {
+							deleteAccountAddress(accountAddress.getId());
 
 							return accountAddress;
 						}
+						catch (Exception exception) {
+							if (accountAddress.getExternalReferenceCode() !=
+									null) {
+
+								deleteAccountAddressByExternalReferenceCode(
+									accountAddress.getExternalReferenceCode());
+
+								return accountAddress;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (accountAddress.getExternalReferenceCode() != null) {
-					deleteAccountAddressByExternalReferenceCode(
-						accountAddress.getExternalReferenceCode());
+					else if (accountAddress.getExternalReferenceCode() !=
+								null) {
 
-					return accountAddress;
-				}
+						deleteAccountAddressByExternalReferenceCode(
+							accountAddress.getExternalReferenceCode());
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return accountAddress;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return accountAddress;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -893,6 +913,10 @@ public abstract class BaseAccountAddressResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1573,4 +1597,4 @@ public abstract class BaseAccountAddressResourceImpl
 		LogFactoryUtil.getLog(BaseAccountAddressResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1507650634
+// LIFERAY-REST-BUILDER-HASH:25241735

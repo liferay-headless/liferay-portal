@@ -168,6 +168,10 @@ public abstract class BaseTimeRangeResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -800,4 +804,4 @@ public abstract class BaseTimeRangeResourceImpl
 		LogFactoryUtil.getLog(BaseTimeRangeResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1055084303
+// LIFERAY-REST-BUILDER-HASH:347373651

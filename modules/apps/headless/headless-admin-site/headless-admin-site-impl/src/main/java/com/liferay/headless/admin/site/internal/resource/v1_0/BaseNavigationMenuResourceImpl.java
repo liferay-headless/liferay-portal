@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -863,18 +864,32 @@ public abstract class BaseNavigationMenuResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<NavigationMenu, NavigationMenu, Exception>
 			navigationMenuUnsafeFunction = navigationMenu -> {
-				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSiteNavigationMenu(
-						(String)parameters.get("siteExternalReferenceCode"),
-						navigationMenu.getExternalReferenceCode());
+				try {
+					if (parameters.containsKey("siteExternalReferenceCode")) {
+						deleteSiteNavigationMenu(
+							(String)parameters.get("siteExternalReferenceCode"),
+							navigationMenu.getExternalReferenceCode());
 
-					return navigationMenu;
+						return navigationMenu;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return navigationMenu;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -894,6 +909,10 @@ public abstract class BaseNavigationMenuResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1705,4 +1724,4 @@ public abstract class BaseNavigationMenuResourceImpl
 		LogFactoryUtil.getLog(BaseNavigationMenuResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-233033141
+// LIFERAY-REST-BUILDER-HASH:1518902738

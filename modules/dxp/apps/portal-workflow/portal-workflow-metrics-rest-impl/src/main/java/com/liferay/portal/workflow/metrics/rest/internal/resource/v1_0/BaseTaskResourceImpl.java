@@ -489,6 +489,10 @@ public abstract class BaseTaskResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1134,4 +1138,4 @@ public abstract class BaseTaskResourceImpl
 		LogFactoryUtil.getLog(BaseTaskResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:572303607
+// LIFERAY-REST-BUILDER-HASH:-763195559

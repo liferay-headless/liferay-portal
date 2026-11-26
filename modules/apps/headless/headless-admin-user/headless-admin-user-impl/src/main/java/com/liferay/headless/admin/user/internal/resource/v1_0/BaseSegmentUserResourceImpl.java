@@ -133,6 +133,10 @@ public abstract class BaseSegmentUserResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -767,4 +771,4 @@ public abstract class BaseSegmentUserResourceImpl
 		LogFactoryUtil.getLog(BaseSegmentUserResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1618735374
+// LIFERAY-REST-BUILDER-HASH:-11772180

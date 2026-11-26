@@ -196,6 +196,10 @@ public abstract class BaseProcessVersionResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -845,4 +849,4 @@ public abstract class BaseProcessVersionResourceImpl
 		LogFactoryUtil.getLog(BaseProcessVersionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:153749532
+// LIFERAY-REST-BUILDER-HASH:1187138174

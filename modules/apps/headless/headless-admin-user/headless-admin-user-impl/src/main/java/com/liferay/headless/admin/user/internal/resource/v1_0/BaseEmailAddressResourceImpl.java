@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -754,32 +755,50 @@ public abstract class BaseEmailAddressResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<EmailAddress, EmailAddress, Exception>
 			emailAddressUnsafeFunction = emailAddress -> {
-				if (emailAddress.getId() != null) {
-					try {
-						deleteEmailAddress(emailAddress.getId());
-
-						return emailAddress;
-					}
-					catch (Exception exception) {
-						if (emailAddress.getExternalReferenceCode() != null) {
-							deleteEmailAddressByExternalReferenceCode(
-								emailAddress.getExternalReferenceCode());
+				try {
+					if (emailAddress.getId() != null) {
+						try {
+							deleteEmailAddress(emailAddress.getId());
 
 							return emailAddress;
 						}
+						catch (Exception exception) {
+							if (emailAddress.getExternalReferenceCode() !=
+									null) {
+
+								deleteEmailAddressByExternalReferenceCode(
+									emailAddress.getExternalReferenceCode());
+
+								return emailAddress;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (emailAddress.getExternalReferenceCode() != null) {
-					deleteEmailAddressByExternalReferenceCode(
-						emailAddress.getExternalReferenceCode());
+					else if (emailAddress.getExternalReferenceCode() != null) {
+						deleteEmailAddressByExternalReferenceCode(
+							emailAddress.getExternalReferenceCode());
 
-					return emailAddress;
-				}
+						return emailAddress;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return emailAddress;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -799,6 +818,10 @@ public abstract class BaseEmailAddressResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1490,4 +1513,4 @@ public abstract class BaseEmailAddressResourceImpl
 		LogFactoryUtil.getLog(BaseEmailAddressResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1443469043
+// LIFERAY-REST-BUILDER-HASH:1282137573

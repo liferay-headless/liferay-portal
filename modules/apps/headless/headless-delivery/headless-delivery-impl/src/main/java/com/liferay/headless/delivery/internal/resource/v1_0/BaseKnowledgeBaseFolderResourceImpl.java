@@ -1317,39 +1317,56 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<KnowledgeBaseFolder, KnowledgeBaseFolder, Exception>
 			knowledgeBaseFolderUnsafeFunction = knowledgeBaseFolder -> {
-				if (knowledgeBaseFolder.getId() != null) {
-					try {
-						deleteKnowledgeBaseFolder(knowledgeBaseFolder.getId());
+				try {
+					if (knowledgeBaseFolder.getId() != null) {
+						try {
+							deleteKnowledgeBaseFolder(
+								knowledgeBaseFolder.getId());
+
+							return knowledgeBaseFolder;
+						}
+						catch (Exception exception) {
+							if (knowledgeBaseFolder.
+									getExternalReferenceCode() != null) {
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										knowledgeBaseFolder.
+											getExternalReferenceCode());
+
+									return knowledgeBaseFolder;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							knowledgeBaseFolder.getExternalReferenceCode());
 
 						return knowledgeBaseFolder;
 					}
-					catch (Exception exception) {
-						if (knowledgeBaseFolder.getExternalReferenceCode() !=
-								null) {
 
-							if (parameters.containsKey("siteId")) {
-								deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									knowledgeBaseFolder.
-										getExternalReferenceCode());
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-								return knowledgeBaseFolder;
-							}
-						}
+						return knowledgeBaseFolder;
 					}
-				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteKnowledgeBaseFolderByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						knowledgeBaseFolder.getExternalReferenceCode());
 
-					return knowledgeBaseFolder;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1371,6 +1388,10 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2232,4 +2253,4 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 		LogFactoryUtil.getLog(BaseKnowledgeBaseFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-833377438
+// LIFERAY-REST-BUILDER-HASH:-1468150174

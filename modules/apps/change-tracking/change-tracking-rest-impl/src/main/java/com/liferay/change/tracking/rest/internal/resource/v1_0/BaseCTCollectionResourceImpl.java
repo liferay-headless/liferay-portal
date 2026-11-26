@@ -895,32 +895,50 @@ public abstract class BaseCTCollectionResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<CTCollection, CTCollection, Exception>
 			ctCollectionUnsafeFunction = ctCollection -> {
-				if (ctCollection.getId() != null) {
-					try {
-						deleteCTCollection(ctCollection.getId());
-
-						return ctCollection;
-					}
-					catch (Exception exception) {
-						if (ctCollection.getExternalReferenceCode() != null) {
-							deleteCTCollectionByExternalReferenceCode(
-								ctCollection.getExternalReferenceCode());
+				try {
+					if (ctCollection.getId() != null) {
+						try {
+							deleteCTCollection(ctCollection.getId());
 
 							return ctCollection;
 						}
+						catch (Exception exception) {
+							if (ctCollection.getExternalReferenceCode() !=
+									null) {
+
+								deleteCTCollectionByExternalReferenceCode(
+									ctCollection.getExternalReferenceCode());
+
+								return ctCollection;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (ctCollection.getExternalReferenceCode() != null) {
-					deleteCTCollectionByExternalReferenceCode(
-						ctCollection.getExternalReferenceCode());
+					else if (ctCollection.getExternalReferenceCode() != null) {
+						deleteCTCollectionByExternalReferenceCode(
+							ctCollection.getExternalReferenceCode());
 
-					return ctCollection;
-				}
+						return ctCollection;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return ctCollection;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -940,6 +958,10 @@ public abstract class BaseCTCollectionResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1619,4 +1641,4 @@ public abstract class BaseCTCollectionResourceImpl
 		LogFactoryUtil.getLog(BaseCTCollectionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-794321488
+// LIFERAY-REST-BUILDER-HASH:2108113523

@@ -172,6 +172,10 @@ public abstract class BaseNodeMetricResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -806,4 +810,4 @@ public abstract class BaseNodeMetricResourceImpl
 		LogFactoryUtil.getLog(BaseNodeMetricResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-280814908
+// LIFERAY-REST-BUILDER-HASH:-908499802

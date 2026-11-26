@@ -202,6 +202,10 @@ public abstract class BaseBatchTestEntityActionResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -840,4 +844,4 @@ public abstract class BaseBatchTestEntityActionResourceImpl
 		LogFactoryUtil.getLog(BaseBatchTestEntityActionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-331302429
+// LIFERAY-REST-BUILDER-HASH:1791378117

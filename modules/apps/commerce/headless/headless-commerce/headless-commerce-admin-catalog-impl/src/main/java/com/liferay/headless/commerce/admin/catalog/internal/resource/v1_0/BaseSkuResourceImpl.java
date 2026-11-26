@@ -1026,31 +1026,47 @@ public abstract class BaseSkuResourceImpl
 			Collection<Sku> skus, Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeFunction<Sku, Sku, Exception> skuUnsafeFunction = sku -> {
-			if (sku.getId() != null) {
-				try {
-					deleteSku(sku.getId());
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
 
-					return sku;
-				}
-				catch (Exception exception) {
-					if (sku.getExternalReferenceCode() != null) {
-						deleteSkuByExternalReferenceCode(
-							sku.getExternalReferenceCode());
+		UnsafeFunction<Sku, Sku, Exception> skuUnsafeFunction = sku -> {
+			try {
+				if (sku.getId() != null) {
+					try {
+						deleteSku(sku.getId());
 
 						return sku;
 					}
+					catch (Exception exception) {
+						if (sku.getExternalReferenceCode() != null) {
+							deleteSkuByExternalReferenceCode(
+								sku.getExternalReferenceCode());
+
+							return sku;
+						}
+
+						throw exception;
+					}
 				}
-			}
-			else if (sku.getExternalReferenceCode() != null) {
-				deleteSkuByExternalReferenceCode(
-					sku.getExternalReferenceCode());
+				else if (sku.getExternalReferenceCode() != null) {
+					deleteSkuByExternalReferenceCode(
+						sku.getExternalReferenceCode());
 
-				return sku;
-			}
+					return sku;
+				}
 
-			throw new UnsupportedOperationException(
-				"Unable to delete by external reference code or ID");
+				throw new UnsupportedOperationException(
+					"Unable to delete by external reference code or ID");
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				if (StringUtil.equalsIgnoreCase(
+						deleteStrategy, "DELETE_IF_EXISTS")) {
+
+					return sku;
+				}
+
+				throw noSuchModelException;
+			}
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1068,6 +1084,10 @@ public abstract class BaseSkuResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1732,4 +1752,4 @@ public abstract class BaseSkuResourceImpl
 		LogFactoryUtil.getLog(BaseSkuResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-782160249
+// LIFERAY-REST-BUILDER-HASH:-1432130570

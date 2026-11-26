@@ -335,6 +335,10 @@ public abstract class BaseOrderTransitionResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -985,4 +989,4 @@ public abstract class BaseOrderTransitionResourceImpl
 		LogFactoryUtil.getLog(BaseOrderTransitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1665346940
+// LIFERAY-REST-BUILDER-HASH:1017909594

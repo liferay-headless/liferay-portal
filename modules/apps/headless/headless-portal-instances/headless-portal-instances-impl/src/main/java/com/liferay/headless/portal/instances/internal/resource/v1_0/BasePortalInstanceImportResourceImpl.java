@@ -204,6 +204,10 @@ public abstract class BasePortalInstanceImportResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -841,4 +845,4 @@ public abstract class BasePortalInstanceImportResourceImpl
 		LogFactoryUtil.getLog(BasePortalInstanceImportResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-172032796
+// LIFERAY-REST-BUILDER-HASH:-1997132346

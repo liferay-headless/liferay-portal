@@ -180,6 +180,10 @@ public abstract class BaseSearchableAssetNameResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -816,4 +820,4 @@ public abstract class BaseSearchableAssetNameResourceImpl
 		LogFactoryUtil.getLog(BaseSearchableAssetNameResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2030919722
+// LIFERAY-REST-BUILDER-HASH:1494953528

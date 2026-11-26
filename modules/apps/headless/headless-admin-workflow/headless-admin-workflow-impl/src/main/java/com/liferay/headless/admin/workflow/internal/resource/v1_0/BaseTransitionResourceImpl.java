@@ -171,6 +171,10 @@ public abstract class BaseTransitionResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -805,4 +809,4 @@ public abstract class BaseTransitionResourceImpl
 		LogFactoryUtil.getLog(BaseTransitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1827464606
+// LIFERAY-REST-BUILDER-HASH:1440109380

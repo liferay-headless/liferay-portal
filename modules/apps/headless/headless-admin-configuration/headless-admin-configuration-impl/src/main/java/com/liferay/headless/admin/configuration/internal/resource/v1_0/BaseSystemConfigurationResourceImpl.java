@@ -463,6 +463,10 @@ public abstract class BaseSystemConfigurationResourceImpl
 		return createStrategies;
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1105,4 +1109,4 @@ public abstract class BaseSystemConfigurationResourceImpl
 		LogFactoryUtil.getLog(BaseSystemConfigurationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1931429061
+// LIFERAY-REST-BUILDER-HASH:-2140452957

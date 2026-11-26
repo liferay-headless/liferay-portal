@@ -466,6 +466,10 @@ public abstract class BaseSignatureRequestResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1113,4 +1117,4 @@ public abstract class BaseSignatureRequestResourceImpl
 		LogFactoryUtil.getLog(BaseSignatureRequestResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:314953557
+// LIFERAY-REST-BUILDER-HASH:-1159348169

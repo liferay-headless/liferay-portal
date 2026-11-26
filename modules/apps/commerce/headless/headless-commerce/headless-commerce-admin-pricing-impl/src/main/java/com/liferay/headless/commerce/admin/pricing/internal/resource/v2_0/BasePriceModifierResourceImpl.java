@@ -696,32 +696,50 @@ public abstract class BasePriceModifierResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<PriceModifier, PriceModifier, Exception>
 			priceModifierUnsafeFunction = priceModifier -> {
-				if (priceModifier.getId() != null) {
-					try {
-						deletePriceModifier(priceModifier.getId());
-
-						return priceModifier;
-					}
-					catch (Exception exception) {
-						if (priceModifier.getExternalReferenceCode() != null) {
-							deletePriceModifierByExternalReferenceCode(
-								priceModifier.getExternalReferenceCode());
+				try {
+					if (priceModifier.getId() != null) {
+						try {
+							deletePriceModifier(priceModifier.getId());
 
 							return priceModifier;
 						}
+						catch (Exception exception) {
+							if (priceModifier.getExternalReferenceCode() !=
+									null) {
+
+								deletePriceModifierByExternalReferenceCode(
+									priceModifier.getExternalReferenceCode());
+
+								return priceModifier;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (priceModifier.getExternalReferenceCode() != null) {
-					deletePriceModifierByExternalReferenceCode(
-						priceModifier.getExternalReferenceCode());
+					else if (priceModifier.getExternalReferenceCode() != null) {
+						deletePriceModifierByExternalReferenceCode(
+							priceModifier.getExternalReferenceCode());
 
-					return priceModifier;
-				}
+						return priceModifier;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return priceModifier;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -741,6 +759,10 @@ public abstract class BasePriceModifierResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1414,4 +1436,4 @@ public abstract class BasePriceModifierResourceImpl
 		LogFactoryUtil.getLog(BasePriceModifierResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1937136389
+// LIFERAY-REST-BUILDER-HASH:-1611066265

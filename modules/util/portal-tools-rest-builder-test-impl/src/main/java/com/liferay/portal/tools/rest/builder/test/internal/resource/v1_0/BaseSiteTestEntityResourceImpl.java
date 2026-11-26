@@ -999,18 +999,32 @@ public abstract class BaseSiteTestEntityResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<SiteTestEntity, SiteTestEntity, Exception>
 			siteTestEntityUnsafeFunction = siteTestEntity -> {
-				if (parameters.containsKey("siteId")) {
-					deleteSiteSiteTestEntityByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						siteTestEntity.getExternalReferenceCode());
+				try {
+					if (parameters.containsKey("siteId")) {
+						deleteSiteSiteTestEntityByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							siteTestEntity.getExternalReferenceCode());
 
-					return siteTestEntity;
+						return siteTestEntity;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return siteTestEntity;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1030,6 +1044,10 @@ public abstract class BaseSiteTestEntityResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1884,4 +1902,4 @@ public abstract class BaseSiteTestEntityResourceImpl
 		LogFactoryUtil.getLog(BaseSiteTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-246254197
+// LIFERAY-REST-BUILDER-HASH:961100533

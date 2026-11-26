@@ -782,32 +782,50 @@ public abstract class BaseWarehouseItemResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<WarehouseItem, WarehouseItem, Exception>
 			warehouseItemUnsafeFunction = warehouseItem -> {
-				if (warehouseItem.getId() != null) {
-					try {
-						deleteWarehouseItem(warehouseItem.getId());
-
-						return warehouseItem;
-					}
-					catch (Exception exception) {
-						if (warehouseItem.getExternalReferenceCode() != null) {
-							deleteWarehouseItemByExternalReferenceCode(
-								warehouseItem.getExternalReferenceCode());
+				try {
+					if (warehouseItem.getId() != null) {
+						try {
+							deleteWarehouseItem(warehouseItem.getId());
 
 							return warehouseItem;
 						}
+						catch (Exception exception) {
+							if (warehouseItem.getExternalReferenceCode() !=
+									null) {
+
+								deleteWarehouseItemByExternalReferenceCode(
+									warehouseItem.getExternalReferenceCode());
+
+								return warehouseItem;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (warehouseItem.getExternalReferenceCode() != null) {
-					deleteWarehouseItemByExternalReferenceCode(
-						warehouseItem.getExternalReferenceCode());
+					else if (warehouseItem.getExternalReferenceCode() != null) {
+						deleteWarehouseItemByExternalReferenceCode(
+							warehouseItem.getExternalReferenceCode());
 
-					return warehouseItem;
-				}
+						return warehouseItem;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return warehouseItem;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -827,6 +845,10 @@ public abstract class BaseWarehouseItemResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1500,4 +1522,4 @@ public abstract class BaseWarehouseItemResourceImpl
 		LogFactoryUtil.getLog(BaseWarehouseItemResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1650959610
+// LIFERAY-REST-BUILDER-HASH:389963546

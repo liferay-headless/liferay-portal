@@ -204,6 +204,10 @@ public abstract class BaseAuthorizationTokenResourceImpl
 		return createStrategies;
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -840,4 +844,4 @@ public abstract class BaseAuthorizationTokenResourceImpl
 		LogFactoryUtil.getLog(BaseAuthorizationTokenResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1911942585
+// LIFERAY-REST-BUILDER-HASH:-828461783

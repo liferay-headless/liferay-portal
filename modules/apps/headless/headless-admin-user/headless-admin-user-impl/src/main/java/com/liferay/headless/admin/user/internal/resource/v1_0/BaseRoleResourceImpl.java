@@ -1342,31 +1342,47 @@ public abstract class BaseRoleResourceImpl
 			Collection<Role> roles, Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeFunction<Role, Role, Exception> roleUnsafeFunction = role -> {
-			if (role.getId() != null) {
-				try {
-					deleteRole(role.getId());
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
 
-					return role;
-				}
-				catch (Exception exception) {
-					if (role.getExternalReferenceCode() != null) {
-						deleteRoleByExternalReferenceCode(
-							role.getExternalReferenceCode());
+		UnsafeFunction<Role, Role, Exception> roleUnsafeFunction = role -> {
+			try {
+				if (role.getId() != null) {
+					try {
+						deleteRole(role.getId());
 
 						return role;
 					}
+					catch (Exception exception) {
+						if (role.getExternalReferenceCode() != null) {
+							deleteRoleByExternalReferenceCode(
+								role.getExternalReferenceCode());
+
+							return role;
+						}
+
+						throw exception;
+					}
 				}
-			}
-			else if (role.getExternalReferenceCode() != null) {
-				deleteRoleByExternalReferenceCode(
-					role.getExternalReferenceCode());
+				else if (role.getExternalReferenceCode() != null) {
+					deleteRoleByExternalReferenceCode(
+						role.getExternalReferenceCode());
 
-				return role;
-			}
+					return role;
+				}
 
-			throw new UnsupportedOperationException(
-				"Unable to delete by external reference code or ID");
+				throw new UnsupportedOperationException(
+					"Unable to delete by external reference code or ID");
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				if (StringUtil.equalsIgnoreCase(
+						deleteStrategy, "DELETE_IF_EXISTS")) {
+
+					return role;
+				}
+
+				throw noSuchModelException;
+			}
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1384,6 +1400,10 @@ public abstract class BaseRoleResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2053,4 +2073,4 @@ public abstract class BaseRoleResourceImpl
 		LogFactoryUtil.getLog(BaseRoleResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:487274760
+// LIFERAY-REST-BUILDER-HASH:-147517402

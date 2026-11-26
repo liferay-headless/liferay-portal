@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1673,51 +1674,67 @@ public abstract class BaseKeywordResourceImpl
 			Collection<Keyword> keywords, Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Keyword, Keyword, Exception> keywordUnsafeFunction =
 			keyword -> {
-				if (keyword.getId() != null) {
-					try {
-						deleteKeyword(keyword.getId());
+				try {
+					if (keyword.getId() != null) {
+						try {
+							deleteKeyword(keyword.getId());
+
+							return keyword;
+						}
+						catch (Exception exception) {
+							if (keyword.getExternalReferenceCode() != null) {
+								if (parameters.containsKey("assetLibraryId")) {
+									deleteAssetLibraryKeywordByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										keyword.getExternalReferenceCode());
+
+									return keyword;
+								}
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteKeywordByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										keyword.getExternalReferenceCode());
+
+									return keyword;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("assetLibraryId")) {
+						deleteAssetLibraryKeywordByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							keyword.getExternalReferenceCode());
 
 						return keyword;
 					}
-					catch (Exception exception) {
-						if (keyword.getExternalReferenceCode() != null) {
-							if (parameters.containsKey("assetLibraryId")) {
-								deleteAssetLibraryKeywordByExternalReferenceCode(
-									(Long)parameters.get("assetLibraryId"),
-									keyword.getExternalReferenceCode());
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteKeywordByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							keyword.getExternalReferenceCode());
 
-								return keyword;
-							}
-
-							if (parameters.containsKey("siteId")) {
-								deleteSiteKeywordByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									keyword.getExternalReferenceCode());
-
-								return keyword;
-							}
-						}
+						return keyword;
 					}
-				}
-				else if (parameters.containsKey("assetLibraryId")) {
-					deleteAssetLibraryKeywordByExternalReferenceCode(
-						(Long)parameters.get("assetLibraryId"),
-						keyword.getExternalReferenceCode());
 
-					return keyword;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteKeywordByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						keyword.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return keyword;
+						return keyword;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1737,6 +1754,10 @@ public abstract class BaseKeywordResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2587,4 +2608,4 @@ public abstract class BaseKeywordResourceImpl
 		LogFactoryUtil.getLog(BaseKeywordResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1086254432
+// LIFERAY-REST-BUILDER-HASH:-574018437

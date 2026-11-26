@@ -15,6 +15,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -1302,11 +1303,25 @@ public abstract class BaseExportProcessResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ExportProcess, ExportProcess, Exception>
 			exportProcessUnsafeFunction = exportProcess -> {
-				deleteExportProcess(exportProcess.getId());
+				try {
+					deleteExportProcess(exportProcess.getId());
 
-				return exportProcess;
+					return exportProcess;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return exportProcess;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1326,6 +1341,10 @@ public abstract class BaseExportProcessResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2006,4 +2025,4 @@ public abstract class BaseExportProcessResourceImpl
 		LogFactoryUtil.getLog(BaseExportProcessResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1392175836
+// LIFERAY-REST-BUILDER-HASH:-1056506187

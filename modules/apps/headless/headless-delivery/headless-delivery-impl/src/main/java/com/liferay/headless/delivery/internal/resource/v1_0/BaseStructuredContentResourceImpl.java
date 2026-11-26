@@ -2802,55 +2802,71 @@ public abstract class BaseStructuredContentResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<StructuredContent, StructuredContent, Exception>
 			structuredContentUnsafeFunction = structuredContent -> {
-				if (structuredContent.getId() != null) {
-					try {
-						deleteStructuredContent(structuredContent.getId());
+				try {
+					if (structuredContent.getId() != null) {
+						try {
+							deleteStructuredContent(structuredContent.getId());
+
+							return structuredContent;
+						}
+						catch (Exception exception) {
+							if (structuredContent.getExternalReferenceCode() !=
+									null) {
+
+								if (parameters.containsKey("assetLibraryId")) {
+									deleteAssetLibraryStructuredContentByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										structuredContent.
+											getExternalReferenceCode());
+
+									return structuredContent;
+								}
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteStructuredContentByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										structuredContent.
+											getExternalReferenceCode());
+
+									return structuredContent;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("assetLibraryId")) {
+						deleteAssetLibraryStructuredContentByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							structuredContent.getExternalReferenceCode());
 
 						return structuredContent;
 					}
-					catch (Exception exception) {
-						if (structuredContent.getExternalReferenceCode() !=
-								null) {
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteStructuredContentByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							structuredContent.getExternalReferenceCode());
 
-							if (parameters.containsKey("assetLibraryId")) {
-								deleteAssetLibraryStructuredContentByExternalReferenceCode(
-									(Long)parameters.get("assetLibraryId"),
-									structuredContent.
-										getExternalReferenceCode());
-
-								return structuredContent;
-							}
-
-							if (parameters.containsKey("siteId")) {
-								deleteSiteStructuredContentByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									structuredContent.
-										getExternalReferenceCode());
-
-								return structuredContent;
-							}
-						}
+						return structuredContent;
 					}
-				}
-				else if (parameters.containsKey("assetLibraryId")) {
-					deleteAssetLibraryStructuredContentByExternalReferenceCode(
-						(Long)parameters.get("assetLibraryId"),
-						structuredContent.getExternalReferenceCode());
 
-					return structuredContent;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteStructuredContentByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						structuredContent.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return structuredContent;
+						return structuredContent;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2870,6 +2886,10 @@ public abstract class BaseStructuredContentResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3763,4 +3783,4 @@ public abstract class BaseStructuredContentResourceImpl
 		LogFactoryUtil.getLog(BaseStructuredContentResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-21693463
+// LIFERAY-REST-BUILDER-HASH:-1528240471

@@ -268,6 +268,10 @@ public abstract class BaseProcessMetricResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -903,4 +907,4 @@ public abstract class BaseProcessMetricResourceImpl
 		LogFactoryUtil.getLog(BaseProcessMetricResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-500501021
+// LIFERAY-REST-BUILDER-HASH:889787713

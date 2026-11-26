@@ -255,6 +255,10 @@ public abstract class BaseDSRecipientViewDefinitionResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -894,4 +898,4 @@ public abstract class BaseDSRecipientViewDefinitionResourceImpl
 		LogFactoryUtil.getLog(BaseDSRecipientViewDefinitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:59783141
+// LIFERAY-REST-BUILDER-HASH:2137128903

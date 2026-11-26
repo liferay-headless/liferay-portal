@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1279,11 +1280,25 @@ public abstract class BaseObjectEntryFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ObjectEntryFolder, ObjectEntryFolder, Exception>
 			objectEntryFolderUnsafeFunction = objectEntryFolder -> {
-				deleteObjectEntryFolder(objectEntryFolder.getId());
+				try {
+					deleteObjectEntryFolder(objectEntryFolder.getId());
 
-				return objectEntryFolder;
+					return objectEntryFolder;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return objectEntryFolder;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1303,6 +1318,10 @@ public abstract class BaseObjectEntryFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2155,4 +2174,4 @@ public abstract class BaseObjectEntryFolderResourceImpl
 		LogFactoryUtil.getLog(BaseObjectEntryFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-517962537
+// LIFERAY-REST-BUILDER-HASH:1197193080

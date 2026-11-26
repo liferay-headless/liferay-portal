@@ -184,6 +184,10 @@ public abstract class BaseSXPParameterContributorDefinitionResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -825,4 +829,4 @@ public abstract class BaseSXPParameterContributorDefinitionResourceImpl
 			BaseSXPParameterContributorDefinitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:123722877
+// LIFERAY-REST-BUILDER-HASH:498605791

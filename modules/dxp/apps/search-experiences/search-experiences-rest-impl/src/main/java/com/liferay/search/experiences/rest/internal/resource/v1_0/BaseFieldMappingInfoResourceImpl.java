@@ -222,6 +222,10 @@ public abstract class BaseFieldMappingInfoResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -868,4 +872,4 @@ public abstract class BaseFieldMappingInfoResourceImpl
 		LogFactoryUtil.getLog(BaseFieldMappingInfoResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2112377312
+// LIFERAY-REST-BUILDER-HASH:-842633726

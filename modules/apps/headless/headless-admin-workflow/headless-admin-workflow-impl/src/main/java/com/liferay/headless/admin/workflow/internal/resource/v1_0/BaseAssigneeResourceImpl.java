@@ -130,6 +130,10 @@ public abstract class BaseAssigneeResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -763,4 +767,4 @@ public abstract class BaseAssigneeResourceImpl
 		LogFactoryUtil.getLog(BaseAssigneeResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1072505448
+// LIFERAY-REST-BUILDER-HASH:-99574278

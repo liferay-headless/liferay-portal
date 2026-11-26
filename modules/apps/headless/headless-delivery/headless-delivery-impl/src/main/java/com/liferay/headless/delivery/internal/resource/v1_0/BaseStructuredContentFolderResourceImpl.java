@@ -2122,63 +2122,80 @@ public abstract class BaseStructuredContentFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<StructuredContentFolder, StructuredContentFolder, Exception>
 				structuredContentFolderUnsafeFunction =
 					structuredContentFolder -> {
-						if (structuredContentFolder.getId() != null) {
-							try {
-								deleteStructuredContentFolder(
-									structuredContentFolder.getId());
+						try {
+							if (structuredContentFolder.getId() != null) {
+								try {
+									deleteStructuredContentFolder(
+										structuredContentFolder.getId());
+
+									return structuredContentFolder;
+								}
+								catch (Exception exception) {
+									if (structuredContentFolder.
+											getExternalReferenceCode() !=
+												null) {
+
+										if (parameters.containsKey(
+												"assetLibraryId")) {
+
+											deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
+												(Long)parameters.get(
+													"assetLibraryId"),
+												structuredContentFolder.
+													getExternalReferenceCode());
+
+											return structuredContentFolder;
+										}
+
+										if (parameters.containsKey("siteId")) {
+											deleteSiteStructuredContentFolderByExternalReferenceCode(
+												(Long)parameters.get("siteId"),
+												structuredContentFolder.
+													getExternalReferenceCode());
+
+											return structuredContentFolder;
+										}
+									}
+
+									throw exception;
+								}
+							}
+							else if (parameters.containsKey("assetLibraryId")) {
+								deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
+									(Long)parameters.get("assetLibraryId"),
+									structuredContentFolder.
+										getExternalReferenceCode());
 
 								return structuredContentFolder;
 							}
-							catch (Exception exception) {
-								if (structuredContentFolder.
-										getExternalReferenceCode() != null) {
+							else if (parameters.containsKey("siteId")) {
+								deleteSiteStructuredContentFolderByExternalReferenceCode(
+									(Long)parameters.get("siteId"),
+									structuredContentFolder.
+										getExternalReferenceCode());
 
-									if (parameters.containsKey(
-											"assetLibraryId")) {
-
-										deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
-											(Long)parameters.get(
-												"assetLibraryId"),
-											structuredContentFolder.
-												getExternalReferenceCode());
-
-										return structuredContentFolder;
-									}
-
-									if (parameters.containsKey("siteId")) {
-										deleteSiteStructuredContentFolderByExternalReferenceCode(
-											(Long)parameters.get("siteId"),
-											structuredContentFolder.
-												getExternalReferenceCode());
-
-										return structuredContentFolder;
-									}
-								}
+								return structuredContentFolder;
 							}
-						}
-						else if (parameters.containsKey("assetLibraryId")) {
-							deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
-								(Long)parameters.get("assetLibraryId"),
-								structuredContentFolder.
-									getExternalReferenceCode());
 
-							return structuredContentFolder;
+							throw new UnsupportedOperationException(
+								"Unable to delete by external reference code or ID");
 						}
-						else if (parameters.containsKey("siteId")) {
-							deleteSiteStructuredContentFolderByExternalReferenceCode(
-								(Long)parameters.get("siteId"),
-								structuredContentFolder.
-									getExternalReferenceCode());
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
 
-							return structuredContentFolder;
+								return structuredContentFolder;
+							}
+
+							throw noSuchModelException;
 						}
-
-						throw new UnsupportedOperationException(
-							"Unable to delete by external reference code or ID");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2203,6 +2220,10 @@ public abstract class BaseStructuredContentFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3085,4 +3106,4 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		LogFactoryUtil.getLog(BaseStructuredContentFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1708720677
+// LIFERAY-REST-BUILDER-HASH:101269281

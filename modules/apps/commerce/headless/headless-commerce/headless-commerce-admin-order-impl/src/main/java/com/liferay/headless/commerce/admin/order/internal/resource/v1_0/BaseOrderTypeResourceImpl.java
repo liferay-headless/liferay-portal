@@ -786,32 +786,48 @@ public abstract class BaseOrderTypeResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<OrderType, OrderType, Exception>
 			orderTypeUnsafeFunction = orderType -> {
-				if (orderType.getId() != null) {
-					try {
-						deleteOrderType(orderType.getId());
-
-						return orderType;
-					}
-					catch (Exception exception) {
-						if (orderType.getExternalReferenceCode() != null) {
-							deleteOrderTypeByExternalReferenceCode(
-								orderType.getExternalReferenceCode());
+				try {
+					if (orderType.getId() != null) {
+						try {
+							deleteOrderType(orderType.getId());
 
 							return orderType;
 						}
+						catch (Exception exception) {
+							if (orderType.getExternalReferenceCode() != null) {
+								deleteOrderTypeByExternalReferenceCode(
+									orderType.getExternalReferenceCode());
+
+								return orderType;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (orderType.getExternalReferenceCode() != null) {
-					deleteOrderTypeByExternalReferenceCode(
-						orderType.getExternalReferenceCode());
+					else if (orderType.getExternalReferenceCode() != null) {
+						deleteOrderTypeByExternalReferenceCode(
+							orderType.getExternalReferenceCode());
 
-					return orderType;
-				}
+						return orderType;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return orderType;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -831,6 +847,10 @@ public abstract class BaseOrderTypeResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1502,4 +1522,4 @@ public abstract class BaseOrderTypeResourceImpl
 		LogFactoryUtil.getLog(BaseOrderTypeResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-233841902
+// LIFERAY-REST-BUILDER-HASH:1739027320

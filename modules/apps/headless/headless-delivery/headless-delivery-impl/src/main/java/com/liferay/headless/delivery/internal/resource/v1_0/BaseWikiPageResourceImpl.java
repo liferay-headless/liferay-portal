@@ -13,6 +13,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1046,36 +1047,52 @@ public abstract class BaseWikiPageResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<WikiPage, WikiPage, Exception> wikiPageUnsafeFunction =
 			wikiPage -> {
-				if (wikiPage.getId() != null) {
-					try {
-						deleteWikiPage(wikiPage.getId());
+				try {
+					if (wikiPage.getId() != null) {
+						try {
+							deleteWikiPage(wikiPage.getId());
+
+							return wikiPage;
+						}
+						catch (Exception exception) {
+							if (wikiPage.getExternalReferenceCode() != null) {
+								if (parameters.containsKey("siteId")) {
+									deleteSiteWikiPageByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										wikiPage.getExternalReferenceCode());
+
+									return wikiPage;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteWikiPageByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							wikiPage.getExternalReferenceCode());
 
 						return wikiPage;
 					}
-					catch (Exception exception) {
-						if (wikiPage.getExternalReferenceCode() != null) {
-							if (parameters.containsKey("siteId")) {
-								deleteSiteWikiPageByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									wikiPage.getExternalReferenceCode());
 
-								return wikiPage;
-							}
-						}
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return wikiPage;
 					}
-				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteWikiPageByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						wikiPage.getExternalReferenceCode());
 
-					return wikiPage;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1095,6 +1112,10 @@ public abstract class BaseWikiPageResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1947,4 +1968,4 @@ public abstract class BaseWikiPageResourceImpl
 		LogFactoryUtil.getLog(BaseWikiPageResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-929483580
+// LIFERAY-REST-BUILDER-HASH:-2353406

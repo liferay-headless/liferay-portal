@@ -180,6 +180,10 @@ public abstract class BaseMappedProductResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -815,4 +819,4 @@ public abstract class BaseMappedProductResourceImpl
 		LogFactoryUtil.getLog(BaseMappedProductResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1085846348
+// LIFERAY-REST-BUILDER-HASH:-1305696978

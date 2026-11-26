@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -424,12 +425,26 @@ public abstract class BasePriceListDiscountResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<PriceListDiscount, PriceListDiscount, Exception>
 			priceListDiscountUnsafeFunction = priceListDiscount -> {
-				deletePriceListDiscount(
-					priceListDiscount.getPriceListDiscountId());
+				try {
+					deletePriceListDiscount(
+						priceListDiscount.getPriceListDiscountId());
 
-				return priceListDiscount;
+					return priceListDiscount;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return priceListDiscount;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -449,6 +464,10 @@ public abstract class BasePriceListDiscountResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1087,4 +1106,4 @@ public abstract class BasePriceListDiscountResourceImpl
 		LogFactoryUtil.getLog(BasePriceListDiscountResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2130493783
+// LIFERAY-REST-BUILDER-HASH:-1126087331

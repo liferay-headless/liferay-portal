@@ -466,6 +466,10 @@ public abstract class BaseReportEntryResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1125,4 +1129,4 @@ public abstract class BaseReportEntryResourceImpl
 		LogFactoryUtil.getLog(BaseReportEntryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1073639142
+// LIFERAY-REST-BUILDER-HASH:-65498884

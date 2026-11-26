@@ -480,6 +480,10 @@ public abstract class BaseScheduledPublishProcessResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1125,4 +1129,4 @@ public abstract class BaseScheduledPublishProcessResourceImpl
 		LogFactoryUtil.getLog(BaseScheduledPublishProcessResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:701666384
+// LIFERAY-REST-BUILDER-HASH:-1694224462

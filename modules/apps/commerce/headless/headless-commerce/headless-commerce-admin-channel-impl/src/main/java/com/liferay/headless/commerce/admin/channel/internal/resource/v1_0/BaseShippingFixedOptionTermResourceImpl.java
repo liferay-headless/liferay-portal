@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -20,6 +21,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -292,15 +294,29 @@ public abstract class BaseShippingFixedOptionTermResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<ShippingFixedOptionTerm, ShippingFixedOptionTerm, Exception>
 				shippingFixedOptionTermUnsafeFunction =
 					shippingFixedOptionTerm -> {
-						deleteShippingFixedOptionTerm(
-							shippingFixedOptionTerm.
-								getShippingFixedOptionTermId());
+						try {
+							deleteShippingFixedOptionTerm(
+								shippingFixedOptionTerm.
+									getShippingFixedOptionTermId());
 
-						return shippingFixedOptionTerm;
+							return shippingFixedOptionTerm;
+						}
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
+
+								return shippingFixedOptionTerm;
+							}
+
+							throw noSuchModelException;
+						}
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -325,6 +341,10 @@ public abstract class BaseShippingFixedOptionTermResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -965,4 +985,4 @@ public abstract class BaseShippingFixedOptionTermResourceImpl
 		LogFactoryUtil.getLog(BaseShippingFixedOptionTermResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-713652140
+// LIFERAY-REST-BUILDER-HASH:158344109

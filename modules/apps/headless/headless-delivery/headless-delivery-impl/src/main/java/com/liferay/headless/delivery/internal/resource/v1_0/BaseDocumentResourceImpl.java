@@ -2292,51 +2292,67 @@ public abstract class BaseDocumentResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Document, Document, Exception> documentUnsafeFunction =
 			document -> {
-				if (document.getId() != null) {
-					try {
-						deleteDocument(document.getId());
+				try {
+					if (document.getId() != null) {
+						try {
+							deleteDocument(document.getId());
+
+							return document;
+						}
+						catch (Exception exception) {
+							if (document.getExternalReferenceCode() != null) {
+								if (parameters.containsKey("assetLibraryId")) {
+									deleteAssetLibraryDocumentByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										document.getExternalReferenceCode());
+
+									return document;
+								}
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteDocumentByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										document.getExternalReferenceCode());
+
+									return document;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("assetLibraryId")) {
+						deleteAssetLibraryDocumentByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							document.getExternalReferenceCode());
 
 						return document;
 					}
-					catch (Exception exception) {
-						if (document.getExternalReferenceCode() != null) {
-							if (parameters.containsKey("assetLibraryId")) {
-								deleteAssetLibraryDocumentByExternalReferenceCode(
-									(Long)parameters.get("assetLibraryId"),
-									document.getExternalReferenceCode());
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteDocumentByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							document.getExternalReferenceCode());
 
-								return document;
-							}
-
-							if (parameters.containsKey("siteId")) {
-								deleteSiteDocumentByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									document.getExternalReferenceCode());
-
-								return document;
-							}
-						}
+						return document;
 					}
-				}
-				else if (parameters.containsKey("assetLibraryId")) {
-					deleteAssetLibraryDocumentByExternalReferenceCode(
-						(Long)parameters.get("assetLibraryId"),
-						document.getExternalReferenceCode());
 
-					return document;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteDocumentByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						document.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return document;
+						return document;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2356,6 +2372,10 @@ public abstract class BaseDocumentResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3311,4 +3331,4 @@ public abstract class BaseDocumentResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2013497367
+// LIFERAY-REST-BUILDER-HASH:-2107734738

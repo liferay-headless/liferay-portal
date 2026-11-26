@@ -2511,55 +2511,71 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<TaxonomyCategory, TaxonomyCategory, Exception>
 			taxonomyCategoryUnsafeFunction = taxonomyCategory -> {
-				if (taxonomyCategory.getId() != null) {
-					try {
-						deleteTaxonomyCategory(taxonomyCategory.getId());
+				try {
+					if (taxonomyCategory.getId() != null) {
+						try {
+							deleteTaxonomyCategory(taxonomyCategory.getId());
+
+							return taxonomyCategory;
+						}
+						catch (Exception exception) {
+							if (taxonomyCategory.getExternalReferenceCode() !=
+									null) {
+
+								if (parameters.containsKey("assetLibraryId")) {
+									deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										taxonomyCategory.
+											getExternalReferenceCode());
+
+									return taxonomyCategory;
+								}
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteTaxonomyCategoryByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										taxonomyCategory.
+											getExternalReferenceCode());
+
+									return taxonomyCategory;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("assetLibraryId")) {
+						deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							taxonomyCategory.getExternalReferenceCode());
 
 						return taxonomyCategory;
 					}
-					catch (Exception exception) {
-						if (taxonomyCategory.getExternalReferenceCode() !=
-								null) {
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteTaxonomyCategoryByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							taxonomyCategory.getExternalReferenceCode());
 
-							if (parameters.containsKey("assetLibraryId")) {
-								deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
-									(Long)parameters.get("assetLibraryId"),
-									taxonomyCategory.
-										getExternalReferenceCode());
-
-								return taxonomyCategory;
-							}
-
-							if (parameters.containsKey("siteId")) {
-								deleteSiteTaxonomyCategoryByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									taxonomyCategory.
-										getExternalReferenceCode());
-
-								return taxonomyCategory;
-							}
-						}
+						return taxonomyCategory;
 					}
-				}
-				else if (parameters.containsKey("assetLibraryId")) {
-					deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
-						(Long)parameters.get("assetLibraryId"),
-						taxonomyCategory.getExternalReferenceCode());
 
-					return taxonomyCategory;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteTaxonomyCategoryByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						taxonomyCategory.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return taxonomyCategory;
+						return taxonomyCategory;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2579,6 +2595,10 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3460,4 +3480,4 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		LogFactoryUtil.getLog(BaseTaxonomyCategoryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1185828885
+// LIFERAY-REST-BUILDER-HASH:-448569784

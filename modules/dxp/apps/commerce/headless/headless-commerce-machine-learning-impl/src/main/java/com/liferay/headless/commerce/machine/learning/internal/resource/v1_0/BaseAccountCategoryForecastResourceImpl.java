@@ -173,6 +173,10 @@ public abstract class BaseAccountCategoryForecastResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -811,4 +815,4 @@ public abstract class BaseAccountCategoryForecastResourceImpl
 		LogFactoryUtil.getLog(BaseAccountCategoryForecastResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:100371221
+// LIFERAY-REST-BUILDER-HASH:-304094345

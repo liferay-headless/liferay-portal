@@ -200,6 +200,10 @@ public abstract class BaseChannelSiteResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -834,4 +838,4 @@ public abstract class BaseChannelSiteResourceImpl
 		LogFactoryUtil.getLog(BaseChannelSiteResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:42923868
+// LIFERAY-REST-BUILDER-HASH:456332346

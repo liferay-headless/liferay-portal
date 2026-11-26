@@ -848,64 +848,81 @@ public abstract class BaseFeatureFlagMethodTestEntityResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<FeatureFlagMethodTestEntity, FeatureFlagMethodTestEntity,
 			 Exception> featureFlagMethodTestEntityUnsafeFunction =
 				featureFlagMethodTestEntity -> {
-					if (featureFlagMethodTestEntity.getId() != null) {
-						if (!FeatureFlagManagerUtil.isEnabled(
-								CompanyThreadLocal.getCompanyId(),
-								"METHOD-123")) {
+					try {
+						if (featureFlagMethodTestEntity.getId() != null) {
+							if (!FeatureFlagManagerUtil.isEnabled(
+									CompanyThreadLocal.getCompanyId(),
+									"METHOD-123")) {
 
-							throw new NotFoundException();
+								throw new NotFoundException();
+							}
+
+							try {
+								deleteFeatureFlagMethodTestEntity(
+									featureFlagMethodTestEntity.getId());
+
+								return featureFlagMethodTestEntity;
+							}
+							catch (Exception exception) {
+								if (featureFlagMethodTestEntity.
+										getExternalReferenceCode() != null) {
+
+									if (parameters.containsKey("siteId")) {
+										if (!FeatureFlagManagerUtil.isEnabled(
+												CompanyThreadLocal.
+													getCompanyId(),
+												"METHOD-126")) {
+
+											throw new NotFoundException();
+										}
+
+										deleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode(
+											(Long)parameters.get("siteId"),
+											featureFlagMethodTestEntity.
+												getExternalReferenceCode());
+
+										return featureFlagMethodTestEntity;
+									}
+								}
+
+								throw exception;
+							}
 						}
+						else if (parameters.containsKey("siteId")) {
+							if (!FeatureFlagManagerUtil.isEnabled(
+									CompanyThreadLocal.getCompanyId(),
+									"METHOD-126")) {
 
-						try {
-							deleteFeatureFlagMethodTestEntity(
-								featureFlagMethodTestEntity.getId());
+								throw new NotFoundException();
+							}
+
+							deleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode(
+								(Long)parameters.get("siteId"),
+								featureFlagMethodTestEntity.
+									getExternalReferenceCode());
 
 							return featureFlagMethodTestEntity;
 						}
-						catch (Exception exception) {
-							if (featureFlagMethodTestEntity.
-									getExternalReferenceCode() != null) {
 
-								if (parameters.containsKey("siteId")) {
-									if (!FeatureFlagManagerUtil.isEnabled(
-											CompanyThreadLocal.getCompanyId(),
-											"METHOD-126")) {
-
-										throw new NotFoundException();
-									}
-
-									deleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode(
-										(Long)parameters.get("siteId"),
-										featureFlagMethodTestEntity.
-											getExternalReferenceCode());
-
-									return featureFlagMethodTestEntity;
-								}
-							}
-						}
+						throw new UnsupportedOperationException(
+							"Unable to delete by external reference code or ID");
 					}
-					else if (parameters.containsKey("siteId")) {
-						if (!FeatureFlagManagerUtil.isEnabled(
-								CompanyThreadLocal.getCompanyId(),
-								"METHOD-126")) {
+					catch (NoSuchModelException noSuchModelException) {
+						if (StringUtil.equalsIgnoreCase(
+								deleteStrategy, "DELETE_IF_EXISTS")) {
 
-							throw new NotFoundException();
+							return featureFlagMethodTestEntity;
 						}
 
-						deleteSiteFeatureFlagMethodTestEntityByExternalReferenceCode(
-							(Long)parameters.get("siteId"),
-							featureFlagMethodTestEntity.
-								getExternalReferenceCode());
-
-						return featureFlagMethodTestEntity;
+						throw noSuchModelException;
 					}
-
-					throw new UnsupportedOperationException(
-						"Unable to delete by external reference code or ID");
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -946,6 +963,21 @@ public abstract class BaseFeatureFlagMethodTestEntityResourceImpl
 		}
 
 		return createStrategies;
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		Set<String> deleteStrategies = SetUtil.fromArray();
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "METHOD-123") ||
+			FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "METHOD-126")) {
+
+			deleteStrategies.add("DELETE");
+			deleteStrategies.add("DELETE_IF_EXISTS");
+		}
+
+		return deleteStrategies;
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1657,4 +1689,4 @@ public abstract class BaseFeatureFlagMethodTestEntityResourceImpl
 			BaseFeatureFlagMethodTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1682054598
+// LIFERAY-REST-BUILDER-HASH:-571586780

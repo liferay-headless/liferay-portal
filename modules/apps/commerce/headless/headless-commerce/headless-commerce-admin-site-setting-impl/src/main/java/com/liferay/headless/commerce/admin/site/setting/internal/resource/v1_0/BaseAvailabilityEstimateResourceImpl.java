@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1089,38 +1090,54 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<AvailabilityEstimate, AvailabilityEstimate, Exception>
 			availabilityEstimateUnsafeFunction = availabilityEstimate -> {
-				if (availabilityEstimate.getId() != null) {
-					try {
-						deleteAvailabilityEstimate(
-							availabilityEstimate.getId());
-
-						return availabilityEstimate;
-					}
-					catch (Exception exception) {
-						if (availabilityEstimate.getExternalReferenceCode() !=
-								null) {
-
-							deleteAvailabilityEstimateByExternalReferenceCode(
-								availabilityEstimate.
-									getExternalReferenceCode());
+				try {
+					if (availabilityEstimate.getId() != null) {
+						try {
+							deleteAvailabilityEstimate(
+								availabilityEstimate.getId());
 
 							return availabilityEstimate;
 						}
+						catch (Exception exception) {
+							if (availabilityEstimate.
+									getExternalReferenceCode() != null) {
+
+								deleteAvailabilityEstimateByExternalReferenceCode(
+									availabilityEstimate.
+										getExternalReferenceCode());
+
+								return availabilityEstimate;
+							}
+
+							throw exception;
+						}
 					}
+					else if (availabilityEstimate.getExternalReferenceCode() !=
+								null) {
+
+						deleteAvailabilityEstimateByExternalReferenceCode(
+							availabilityEstimate.getExternalReferenceCode());
+
+						return availabilityEstimate;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (availabilityEstimate.getExternalReferenceCode() !=
-							null) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					deleteAvailabilityEstimateByExternalReferenceCode(
-						availabilityEstimate.getExternalReferenceCode());
+						return availabilityEstimate;
+					}
 
-					return availabilityEstimate;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1143,6 +1160,10 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1992,4 +2013,4 @@ public abstract class BaseAvailabilityEstimateResourceImpl
 		LogFactoryUtil.getLog(BaseAvailabilityEstimateResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-167076107
+// LIFERAY-REST-BUILDER-HASH:1308271512

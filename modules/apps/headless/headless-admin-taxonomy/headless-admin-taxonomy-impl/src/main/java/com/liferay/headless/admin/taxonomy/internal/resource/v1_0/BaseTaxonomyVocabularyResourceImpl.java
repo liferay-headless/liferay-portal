@@ -2090,55 +2090,72 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<TaxonomyVocabulary, TaxonomyVocabulary, Exception>
 			taxonomyVocabularyUnsafeFunction = taxonomyVocabulary -> {
-				if (taxonomyVocabulary.getId() != null) {
-					try {
-						deleteTaxonomyVocabulary(taxonomyVocabulary.getId());
+				try {
+					if (taxonomyVocabulary.getId() != null) {
+						try {
+							deleteTaxonomyVocabulary(
+								taxonomyVocabulary.getId());
+
+							return taxonomyVocabulary;
+						}
+						catch (Exception exception) {
+							if (taxonomyVocabulary.getExternalReferenceCode() !=
+									null) {
+
+								if (parameters.containsKey("assetLibraryId")) {
+									deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
+										(Long)parameters.get("assetLibraryId"),
+										taxonomyVocabulary.
+											getExternalReferenceCode());
+
+									return taxonomyVocabulary;
+								}
+
+								if (parameters.containsKey("siteId")) {
+									deleteSiteTaxonomyVocabularyByExternalReferenceCode(
+										(Long)parameters.get("siteId"),
+										taxonomyVocabulary.
+											getExternalReferenceCode());
+
+									return taxonomyVocabulary;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (parameters.containsKey("assetLibraryId")) {
+						deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
+							(Long)parameters.get("assetLibraryId"),
+							taxonomyVocabulary.getExternalReferenceCode());
 
 						return taxonomyVocabulary;
 					}
-					catch (Exception exception) {
-						if (taxonomyVocabulary.getExternalReferenceCode() !=
-								null) {
+					else if (parameters.containsKey("siteId")) {
+						deleteSiteTaxonomyVocabularyByExternalReferenceCode(
+							(Long)parameters.get("siteId"),
+							taxonomyVocabulary.getExternalReferenceCode());
 
-							if (parameters.containsKey("assetLibraryId")) {
-								deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
-									(Long)parameters.get("assetLibraryId"),
-									taxonomyVocabulary.
-										getExternalReferenceCode());
-
-								return taxonomyVocabulary;
-							}
-
-							if (parameters.containsKey("siteId")) {
-								deleteSiteTaxonomyVocabularyByExternalReferenceCode(
-									(Long)parameters.get("siteId"),
-									taxonomyVocabulary.
-										getExternalReferenceCode());
-
-								return taxonomyVocabulary;
-							}
-						}
+						return taxonomyVocabulary;
 					}
-				}
-				else if (parameters.containsKey("assetLibraryId")) {
-					deleteAssetLibraryTaxonomyVocabularyByExternalReferenceCode(
-						(Long)parameters.get("assetLibraryId"),
-						taxonomyVocabulary.getExternalReferenceCode());
 
-					return taxonomyVocabulary;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (parameters.containsKey("siteId")) {
-					deleteSiteTaxonomyVocabularyByExternalReferenceCode(
-						(Long)parameters.get("siteId"),
-						taxonomyVocabulary.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return taxonomyVocabulary;
+						return taxonomyVocabulary;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2158,6 +2175,10 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3022,4 +3043,4 @@ public abstract class BaseTaxonomyVocabularyResourceImpl
 		LogFactoryUtil.getLog(BaseTaxonomyVocabularyResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1277837676
+// LIFERAY-REST-BUILDER-HASH:1850004705

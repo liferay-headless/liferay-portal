@@ -314,6 +314,10 @@ public abstract class BaseLanguageResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -956,4 +960,4 @@ public abstract class BaseLanguageResourceImpl
 		LogFactoryUtil.getLog(BaseLanguageResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:8605013
+// LIFERAY-REST-BUILDER-HASH:593990071

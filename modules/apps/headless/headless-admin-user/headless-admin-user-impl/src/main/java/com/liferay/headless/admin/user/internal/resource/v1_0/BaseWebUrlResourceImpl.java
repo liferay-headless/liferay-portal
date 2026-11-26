@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -741,32 +742,48 @@ public abstract class BaseWebUrlResourceImpl
 			Collection<WebUrl> webUrls, Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<WebUrl, WebUrl, Exception> webUrlUnsafeFunction =
 			webUrl -> {
-				if (webUrl.getId() != null) {
-					try {
-						deleteWebUrl(webUrl.getId());
-
-						return webUrl;
-					}
-					catch (Exception exception) {
-						if (webUrl.getExternalReferenceCode() != null) {
-							deleteWebUrlByExternalReferenceCode(
-								webUrl.getExternalReferenceCode());
+				try {
+					if (webUrl.getId() != null) {
+						try {
+							deleteWebUrl(webUrl.getId());
 
 							return webUrl;
 						}
+						catch (Exception exception) {
+							if (webUrl.getExternalReferenceCode() != null) {
+								deleteWebUrlByExternalReferenceCode(
+									webUrl.getExternalReferenceCode());
+
+								return webUrl;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (webUrl.getExternalReferenceCode() != null) {
-					deleteWebUrlByExternalReferenceCode(
-						webUrl.getExternalReferenceCode());
+					else if (webUrl.getExternalReferenceCode() != null) {
+						deleteWebUrlByExternalReferenceCode(
+							webUrl.getExternalReferenceCode());
 
-					return webUrl;
-				}
+						return webUrl;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return webUrl;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -785,6 +802,10 @@ public abstract class BaseWebUrlResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1471,4 +1492,4 @@ public abstract class BaseWebUrlResourceImpl
 		LogFactoryUtil.getLog(BaseWebUrlResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:110500827
+// LIFERAY-REST-BUILDER-HASH:218534306

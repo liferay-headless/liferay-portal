@@ -239,6 +239,10 @@ public abstract class BasePaymentMethodResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -888,4 +892,4 @@ public abstract class BasePaymentMethodResourceImpl
 		LogFactoryUtil.getLog(BasePaymentMethodResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-515671167
+// LIFERAY-REST-BUILDER-HASH:2025953763

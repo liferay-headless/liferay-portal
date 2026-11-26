@@ -13,6 +13,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1146,18 +1147,32 @@ public abstract class BasePageTemplateResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<PageTemplate, PageTemplate, Exception>
 			pageTemplateUnsafeFunction = pageTemplate -> {
-				if (parameters.containsKey("siteExternalReferenceCode")) {
-					deleteSitePageTemplate(
-						(String)parameters.get("siteExternalReferenceCode"),
-						pageTemplate.getExternalReferenceCode());
+				try {
+					if (parameters.containsKey("siteExternalReferenceCode")) {
+						deleteSitePageTemplate(
+							(String)parameters.get("siteExternalReferenceCode"),
+							pageTemplate.getExternalReferenceCode());
 
-					return pageTemplate;
+						return pageTemplate;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return pageTemplate;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1177,6 +1192,10 @@ public abstract class BasePageTemplateResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1991,4 +2010,4 @@ public abstract class BasePageTemplateResourceImpl
 		LogFactoryUtil.getLog(BasePageTemplateResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2088026888
+// LIFERAY-REST-BUILDER-HASH:512985645

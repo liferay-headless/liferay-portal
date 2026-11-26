@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -742,31 +743,47 @@ public abstract class BasePhoneResourceImpl
 			Collection<Phone> phones, Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeFunction<Phone, Phone, Exception> phoneUnsafeFunction = phone -> {
-			if (phone.getId() != null) {
-				try {
-					deletePhone(phone.getId());
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
 
-					return phone;
-				}
-				catch (Exception exception) {
-					if (phone.getExternalReferenceCode() != null) {
-						deletePhoneByExternalReferenceCode(
-							phone.getExternalReferenceCode());
+		UnsafeFunction<Phone, Phone, Exception> phoneUnsafeFunction = phone -> {
+			try {
+				if (phone.getId() != null) {
+					try {
+						deletePhone(phone.getId());
 
 						return phone;
 					}
+					catch (Exception exception) {
+						if (phone.getExternalReferenceCode() != null) {
+							deletePhoneByExternalReferenceCode(
+								phone.getExternalReferenceCode());
+
+							return phone;
+						}
+
+						throw exception;
+					}
 				}
-			}
-			else if (phone.getExternalReferenceCode() != null) {
-				deletePhoneByExternalReferenceCode(
-					phone.getExternalReferenceCode());
+				else if (phone.getExternalReferenceCode() != null) {
+					deletePhoneByExternalReferenceCode(
+						phone.getExternalReferenceCode());
 
-				return phone;
-			}
+					return phone;
+				}
 
-			throw new UnsupportedOperationException(
-				"Unable to delete by external reference code or ID");
+				throw new UnsupportedOperationException(
+					"Unable to delete by external reference code or ID");
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				if (StringUtil.equalsIgnoreCase(
+						deleteStrategy, "DELETE_IF_EXISTS")) {
+
+					return phone;
+				}
+
+				throw noSuchModelException;
+			}
 		};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -785,6 +802,10 @@ public abstract class BasePhoneResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1470,4 +1491,4 @@ public abstract class BasePhoneResourceImpl
 		LogFactoryUtil.getLog(BasePhoneResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1809019616
+// LIFERAY-REST-BUILDER-HASH:-1610115420

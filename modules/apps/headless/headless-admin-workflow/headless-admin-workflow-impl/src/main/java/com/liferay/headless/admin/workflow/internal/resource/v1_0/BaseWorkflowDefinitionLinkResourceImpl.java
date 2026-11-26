@@ -507,6 +507,10 @@ public abstract class BaseWorkflowDefinitionLinkResourceImpl
 		return SetUtil.fromArray("INSERT", "UPSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1160,4 +1164,4 @@ public abstract class BaseWorkflowDefinitionLinkResourceImpl
 		LogFactoryUtil.getLog(BaseWorkflowDefinitionLinkResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1573452834
+// LIFERAY-REST-BUILDER-HASH:-1292026492

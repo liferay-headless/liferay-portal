@@ -424,6 +424,10 @@ public abstract class BaseContentElementResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1071,4 +1075,4 @@ public abstract class BaseContentElementResourceImpl
 		LogFactoryUtil.getLog(BaseContentElementResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1893881413
+// LIFERAY-REST-BUILDER-HASH:486909981

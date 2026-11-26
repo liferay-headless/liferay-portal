@@ -167,6 +167,10 @@ public abstract class BaseSortResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -797,4 +801,4 @@ public abstract class BaseSortResourceImpl
 		LogFactoryUtil.getLog(BaseSortResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1354025898
+// LIFERAY-REST-BUILDER-HASH:-1453664076

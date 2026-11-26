@@ -375,6 +375,10 @@ public abstract class BaseWorkflowLogResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1034,4 +1038,4 @@ public abstract class BaseWorkflowLogResourceImpl
 		LogFactoryUtil.getLog(BaseWorkflowLogResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2130560936
+// LIFERAY-REST-BUILDER-HASH:1201008262
