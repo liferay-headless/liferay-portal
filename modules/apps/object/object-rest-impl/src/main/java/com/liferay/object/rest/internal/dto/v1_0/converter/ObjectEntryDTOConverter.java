@@ -6,7 +6,7 @@
 package com.liferay.object.rest.internal.dto.v1_0.converter;
 
 import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.headless.delivery.dto.v1_0.Comment;
@@ -489,7 +489,7 @@ public class ObjectEntryDTOConverter
 				}
 
 				return TransformUtil.transformToArray(
-					_assetCategoryLocalService.getCategories(
+					_assetCategoryService.getCategories(
 						objectDefinition.getClassName(),
 						serviceBuilderObjectEntry.getObjectEntryId()),
 					assetCategory ->
@@ -1395,7 +1395,7 @@ public class ObjectEntryDTOConverter
 		ObjectEntryDTOConverter.class);
 
 	@Reference
-	private AssetCategoryLocalService _assetCategoryLocalService;
+	private AssetCategoryService _assetCategoryService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
