@@ -16,6 +16,10 @@ public class RemoteInstanceConstants {
 		OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE_REMOTE_IMPORT_PROCESS =
 			"L_REMOTE_IMPORT_PROCESS";
 
+	public static final String
+		OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE_REMOTE_INSTANCE =
+			"L_REMOTE_INSTANCE";
+
 	public static final String OBJECT_FIELD_NAME_REMOTE_INSTANCE_ID =
 		"r_remoteInstanceToRemoteImportProcesses_c_remoteInstanceId";
 

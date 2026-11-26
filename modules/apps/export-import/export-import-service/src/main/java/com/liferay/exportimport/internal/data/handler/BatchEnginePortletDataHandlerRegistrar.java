@@ -11,9 +11,11 @@ import com.liferay.batch.engine.ItemClassRegistry;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskService;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
+import com.liferay.exportimport.internal.constants.RemoteInstanceConstants;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
+import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.osgi.service.tracker.collections.EagerServiceTrackerCustomizer;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
@@ -28,6 +30,7 @@ import com.liferay.staging.StagingGroupHelper;
 
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.BundleContext;
@@ -143,6 +146,24 @@ public class BatchEnginePortletDataHandlerRegistrar {
 				exportImportDescriptor =
 					exportImportVulcanBatchEngineTaskItemDelegate.
 						getExportImportDescriptor();
+
+			if (Objects.equals(
+					serviceReference.getProperty(
+						"batch.engine.task.item.delegate.class.name"),
+					ObjectEntry.class.getName()) &&
+				(Objects.equals(
+					exportImportDescriptor.getKey(),
+					RemoteInstanceConstants.
+						OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE_REMOTE_IMPORT_PROCESS) ||
+				 Objects.equals(
+					 exportImportDescriptor.getKey(),
+					 RemoteInstanceConstants.
+						 OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE_REMOTE_INSTANCE))) {
+
+				_bundleContext.ungetService(serviceReference);
+
+				return null;
+			}
 
 			String portletId = exportImportDescriptor.getPortletId();
 
