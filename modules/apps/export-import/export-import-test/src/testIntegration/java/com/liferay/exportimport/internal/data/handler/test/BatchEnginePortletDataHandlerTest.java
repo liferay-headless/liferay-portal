@@ -3441,6 +3441,36 @@ public class BatchEnginePortletDataHandlerTest {
 			objectDefinition.getObjectDefinitionId(), objectEntries[0],
 			objectEntries[1]);
 
+		ExportImportConfiguration exportImportConfiguration =
+			new ExportImportExecutor(
+			).withDeletions(
+			).withGroupId(
+				group.getGroupId()
+			).withLARFile(
+				larFile2
+			).withObjectEntries(
+				objectDefinition
+			).executeImport();
+
+		for (ExportImportReportEntry exportImportReportEntry :
+				_exportImportReportEntryLocalService.
+					getExportImportReportEntries(
+						TestPropsValues.getCompanyId(),
+						exportImportConfiguration.
+							getExportImportConfigurationId())) {
+
+			Assert.assertNotEquals(
+				objectEntries[0].getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+			Assert.assertNotEquals(
+				objectEntries[1].getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+		}
+
+		_assertObjectEntries(
+			bytes, false, objectDefinition.getObjectDefinitionId(),
+			objectEntries[2]);
+
 		_testExportImportObjectEntriesWithIndividualDeletionsAndMissingPortlet(
 			GroupTestUtil.addGroup(), ObjectDefinitionConstants.SCOPE_SITE);
 	}
