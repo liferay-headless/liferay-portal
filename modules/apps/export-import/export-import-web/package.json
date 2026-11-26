@@ -18,6 +18,7 @@
 		"@clayui/sticker": "^3.167.0",
 		"@clayui/time-picker": "^3.167.0",
 		"@liferay/frontend-data-set-web": "*",
+		"@liferay/frontend-js-react-web": "*",
 		"@liferay/layout-js-components-web": "*",
 		"classnames": "2.3.1",
 		"formik": "2.1.4",

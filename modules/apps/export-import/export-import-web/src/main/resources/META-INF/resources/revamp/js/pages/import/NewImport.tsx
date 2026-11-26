@@ -7,7 +7,7 @@ import React, {useState} from 'react';
 
 import {Wizard, WizardStep} from '../../components/Wizard';
 import {ContentSelection} from '../../components/forms/content_selector/ContentSelector';
-import {postImportProcess} from '../../services/postImportProcess';
+import ImportProcessService from '../../services/ImportProcessService';
 import {ImportPreview} from '../../types/exportImportPreview';
 import {DataStrategy, UserIdStrategy} from '../../types/exportImportProcess';
 import {Scope} from '../../types/scope';
@@ -106,34 +106,37 @@ export function NewImport({
 						| ContentSelection
 						| undefined;
 
-					const result = await postImportProcess({
-						importProcessRequest: {
-							...toProcessRequestFlags(contentSelection),
-							...(spaceSelectionEnabled && {
-								assetLibraries: toGroupReferences(
-									values.spaceExternalReferenceCodes as string[]
+					const result = await ImportProcessService.postImportProcess(
+						{
+							importProcessRequest: {
+								...toProcessRequestFlags(contentSelection),
+								...(spaceSelectionEnabled && {
+									assetLibraries: toGroupReferences(
+										values.spaceExternalReferenceCodes as string[]
+									),
+								}),
+								dataStrategy:
+									values.dataStrategy as DataStrategy,
+								deletions: !!values.deletions,
+								name: values.name,
+								permissions: !!values.permissions,
+								portletDataHandlers: toPortletDataHandlers(
+									toPortletDataHandlerSections(
+										importPreview.portletDataHandlers ?? []
+									),
+									contentSelection
 								),
-							}),
-							dataStrategy: values.dataStrategy as DataStrategy,
-							deletions: !!values.deletions,
-							name: values.name,
-							permissions: !!values.permissions,
-							portletDataHandlers: toPortletDataHandlers(
-								toPortletDataHandlerSections(
-									importPreview.portletDataHandlers ?? []
-								),
-								contentSelection
-							),
-							...(siteSelectionEnabled && {
-								sites: toGroupReferences(
-									values.siteExternalReferenceCodes as string[]
-								),
-							}),
-							userIdStrategy:
-								values.userIdStrategy as UserIdStrategy,
-						},
-						url: importProcessAPIURL,
-					});
+								...(siteSelectionEnabled && {
+									sites: toGroupReferences(
+										values.siteExternalReferenceCodes as string[]
+									),
+								}),
+								userIdStrategy:
+									values.userIdStrategy as UserIdStrategy,
+							},
+							url: importProcessAPIURL,
+						}
+					);
 
 					if (result.error) {
 						Liferay.Util.openToast({

@@ -16,7 +16,7 @@ import Setup from '../../components/Setup';
 import {DateFilterValues, Range} from '../../components/date_filter';
 import {ContentSelection} from '../../components/forms/content_selector/ContentSelector';
 import {usePreview} from '../../hooks/usePreview';
-import {postExportProcess} from '../../services/postExportProcess';
+import ExportProcessService from '../../services/ExportProcessService';
 import {Preview} from '../../types/exportImportPreview';
 import {
 	getSelectedDeletionCount,
@@ -30,7 +30,7 @@ import {getScopeSubtitle} from '../../utils/getScopeSubtitle';
 import {navigateToProcesses} from '../../utils/navigateToProcesses';
 import {toGroupReferences} from '../../utils/toGroupReferences';
 import {toPortletDataHandlers} from '../../utils/toPortletDataHandlers';
-import GroupSelection from './components/GroupSelection';
+import GroupSelection from './GroupSelection';
 
 type ExportFormValues = {
 	contentSelection: ContentSelection | null | undefined;
@@ -99,7 +99,7 @@ export function NewExport({
 		<Formik
 			initialValues={initialFormValues}
 			onSubmit={async (values, {setStatus}) => {
-				const result = await postExportProcess({
+				const result = await ExportProcessService.postExportProcess({
 					exportProcessRequest: {
 						...toProcessRequestFlags(values.contentSelection),
 						...(spaceSelectionEnabled && {

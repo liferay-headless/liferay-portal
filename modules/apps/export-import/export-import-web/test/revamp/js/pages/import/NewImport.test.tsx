@@ -18,22 +18,13 @@ import fetch from 'jest-fetch-mock';
 import React from 'react';
 
 import {NewImport} from '../../../../../src/main/resources/META-INF/resources/revamp/js/pages/import/NewImport';
-import {postImportPreview} from '../../../../../src/main/resources/META-INF/resources/revamp/js/services/postImportPreview';
+import ImportProcessService from '../../../../../src/main/resources/META-INF/resources/revamp/js/services/ImportProcessService';
 import {ImportPreview} from '../../../../../src/main/resources/META-INF/resources/revamp/js/types/exportImportPreview';
 import {SCOPES} from '../../../../../src/main/resources/META-INF/resources/revamp/js/types/scope';
 import formatDate from '../../../../../src/main/resources/META-INF/resources/revamp/js/utils/formatDate';
 import {mockImportPreview} from '../../mocks/mockImportPreview';
 import {toMockPortletDataHandlers} from '../../mocks/mockPortletDataHandlerSections';
 import {mockPortletDataHandlerSectionsForFilterTest} from '../../mocks/mockSectionsForFilterTest';
-
-jest.mock(
-	'../../../../../src/main/resources/META-INF/resources/revamp/js/services/postImportPreview',
-	() => ({
-		postImportPreview: jest.fn(() =>
-			Promise.resolve({data: mockImportPreview, error: null})
-		),
-	})
-);
 
 const renderComponent = ({
 	commentsAndRatingsEnabled,
@@ -102,7 +93,9 @@ const goToDataSelectionStep = async (
 };
 
 const mockPreviewWith = (overrides: Partial<ImportPreview>) =>
-	(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+	(
+		ImportProcessService.postImportPreview as jest.Mock
+	).mockImplementationOnce(() =>
 		Promise.resolve({
 			data: {...mockImportPreview, ...overrides},
 			error: null,
@@ -148,7 +141,15 @@ describe('NewImport', () => {
 	});
 
 	beforeEach(() => {
+		jest.spyOn(ImportProcessService, 'postImportPreview').mockResolvedValue(
+			{data: mockImportPreview, error: null}
+		);
+
 		user = userEvent.setup();
+	});
+
+	afterEach(() => {
+		jest.restoreAllMocks();
 	});
 
 	it('renders the FileSelectionStep with the Name field', async () => {
@@ -209,7 +210,9 @@ describe('NewImport', () => {
 	});
 
 	it('shows the import preview error and keeps Continue disabled when the lar is invalid', async () => {
-		(postImportPreview as jest.Mock).mockImplementationOnce(() =>
+		(
+			ImportProcessService.postImportPreview as jest.Mock
+		).mockImplementationOnce(() =>
 			Promise.resolve({
 				data: null,
 				error: 'Uploaded LAR file type Portlet does not match layout-prototype, layout-set, layout-set-prototype.',

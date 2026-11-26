@@ -6,7 +6,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {DateFilterValues, Range, toDateFilter} from '../components/date_filter';
-import {PreviewParams, getPreview} from '../services/getPreview';
+import PreviewService, {PreviewParams} from '../services/PreviewService';
 import {Preview} from '../types/exportImportPreview';
 import {DateFilter} from '../types/exportImportProcess';
 
@@ -28,7 +28,7 @@ export function usePreview(
 		setLoading(true);
 		setError(null);
 
-		getPreview(previewParams).then((previewResponse) => {
+		PreviewService.getPreview(previewParams).then((previewResponse) => {
 			if (requestId !== requestIdRef.current) {
 				return;
 			}
