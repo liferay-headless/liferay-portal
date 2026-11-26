@@ -242,40 +242,59 @@ public class ObjectEntryResourceImpl
 				_objectDefinition.getScope());
 
 		if (objectScopeProvider.isGroupAware()) {
+			String deleteStrategy = (String)parameters.getOrDefault(
+				"deleteStrategy", "DELETE");
+
 			UnsafeFunction<ObjectEntry, ObjectEntry, Exception> unsafeFunction =
 				objectEntry -> {
-					if (objectEntry.getId() != null) {
-						try {
-							deleteObjectEntry(objectEntry.getId());
-
-							return objectEntry;
-						}
-						catch (Exception exception) {
-							if (_log.isDebugEnabled()) {
-								_log.debug(exception);
-							}
-
-							if (objectEntry.getExternalReferenceCode() !=
-									null) {
-
-								deleteScopeScopeKeyByExternalReferenceCode(
-									GroupUtil.getScopeKey(parameters),
-									objectEntry.getExternalReferenceCode());
+					try {
+						if (objectEntry.getId() != null) {
+							try {
+								deleteObjectEntry(objectEntry.getId());
 
 								return objectEntry;
 							}
+							catch (Exception exception) {
+								if (_log.isDebugEnabled()) {
+									_log.debug(exception);
+								}
+
+								if (objectEntry.getExternalReferenceCode() !=
+										null) {
+
+									deleteScopeScopeKeyByExternalReferenceCode(
+										GroupUtil.getScopeKey(parameters),
+										objectEntry.getExternalReferenceCode());
+
+									return objectEntry;
+								}
+
+								throw exception;
+							}
 						}
-					}
-					else if (objectEntry.getExternalReferenceCode() != null) {
-						deleteScopeScopeKeyByExternalReferenceCode(
-							GroupUtil.getScopeKey(parameters),
-							objectEntry.getExternalReferenceCode());
+						else if (objectEntry.getExternalReferenceCode() !=
+									null) {
 
-						return objectEntry;
-					}
+							deleteScopeScopeKeyByExternalReferenceCode(
+								GroupUtil.getScopeKey(parameters),
+								objectEntry.getExternalReferenceCode());
 
-					throw new UnsupportedOperationException(
-						"Unable to delete by external reference code or ID");
+							return objectEntry;
+						}
+
+						throw new UnsupportedOperationException(
+							"Unable to delete by external reference code or " +
+								"ID");
+					}
+					catch (NoSuchModelException noSuchModelException) {
+						if (StringUtil.equalsIgnoreCase(
+								deleteStrategy, "DELETE_IF_EXISTS")) {
+
+							return objectEntry;
+						}
+
+						throw noSuchModelException;
+					}
 				};
 
 			_applyUnsafeFunction(objectEntries, unsafeFunction);
