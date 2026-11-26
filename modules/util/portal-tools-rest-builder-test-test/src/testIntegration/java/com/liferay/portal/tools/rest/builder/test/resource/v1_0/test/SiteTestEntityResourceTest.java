@@ -6,6 +6,8 @@
 package com.liferay.portal.tools.rest.builder.test.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.headless.batch.engine.client.http.HttpInvoker;
+import com.liferay.headless.batch.engine.client.resource.v1_0.ImportTaskResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -38,6 +40,16 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class SiteTestEntityResourceTest
 	extends BaseSiteTestEntityResourceTestCase {
+
+	@Override
+	@Test
+	public void testDeleteSiteSiteTestEntityByExternalReferenceCode()
+		throws Exception {
+
+		super.testDeleteSiteSiteTestEntityByExternalReferenceCode();
+
+		_testDeleteSiteSiteTestEntityByExternalReferenceCodeBatch();
+	}
 
 	@Override
 	@Test
@@ -253,6 +265,58 @@ public class SiteTestEntityResourceTest
 		).parameters(
 			parameters
 		).build();
+	}
+
+	private void _testDeleteSiteSiteTestEntityByExternalReferenceCodeBatch()
+		throws Exception {
+
+		User testCompanyAdminUser = UserTestUtil.getAdminUser(
+			testCompany.getCompanyId());
+
+		ImportTaskResource importTaskResource = ImportTaskResource.builder(
+		).authentication(
+			testCompanyAdminUser.getEmailAddress(),
+			PropsValues.DEFAULT_ADMIN_PASSWORD
+		).endpoint(
+			testCompany.getVirtualHostname(),
+			PortalUtil.getPortalServerPort(false), "http"
+		).parameters(
+			"siteId", String.valueOf(testGroup.getGroupId())
+		).build();
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.batch.engine.internal." +
+					"BatchEngineImportTaskExecutorImpl",
+				LoggerTestUtil.ERROR)) {
+
+			HttpInvoker.HttpResponse httpResponse =
+				importTaskResource.deleteImportTaskHttpResponse(
+					"com.liferay.portal.tools.rest.builder.test.dto.v1_0." +
+						"SiteTestEntity",
+					null, "DELETE", null, "ON_ERROR_FAIL", null,
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"externalReferenceCode", externalReferenceCode)));
+
+			_waitForFinish(
+				"FAILED", true,
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+		}
+
+		HttpInvoker.HttpResponse httpResponse =
+			importTaskResource.deleteImportTaskHttpResponse(
+				"com.liferay.portal.tools.rest.builder.test.dto.v1_0." +
+					"SiteTestEntity",
+				null, "DELETE_IF_EXISTS", null, "ON_ERROR_FAIL", null,
+				JSONUtil.putAll(
+					JSONUtil.put(
+						"externalReferenceCode", externalReferenceCode)));
+
+		_waitForFinish(
+			"COMPLETED", true,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
 	}
 
 	private void _testPostSiteTestEntityBatch() throws Exception {
