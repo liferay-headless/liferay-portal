@@ -1977,6 +1977,32 @@ public class BatchEnginePortletDataHandlerTest {
 		Assert.assertNotNull(
 			_fetchNotificationTemplate(
 				notificationTemplate2.getExternalReferenceCode()));
+
+		ExportImportConfiguration exportImportConfiguration =
+			new ExportImportExecutor(
+			).withDeletions(
+			).withGroupId(
+				_getCompanyGroupId()
+			).withIncludeNotificationTemplates(
+			).withLARFile(
+				larFile2
+			).executeImport();
+
+		for (ExportImportReportEntry exportImportReportEntry :
+				_exportImportReportEntryLocalService.
+					getExportImportReportEntries(
+						TestPropsValues.getCompanyId(),
+						exportImportConfiguration.
+							getExportImportConfigurationId())) {
+
+			Assert.assertNotEquals(
+				notificationTemplate1.getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+		}
+
+		Assert.assertNotNull(
+			_fetchNotificationTemplate(
+				notificationTemplate2.getExternalReferenceCode()));
 	}
 
 	@Test
@@ -3979,6 +4005,36 @@ public class BatchEnginePortletDataHandlerTest {
 		_assertNull(
 			objectDefinition.getObjectDefinitionId(), objectEntries[0],
 			objectEntries[1]);
+
+		ExportImportConfiguration exportImportConfiguration =
+			new ExportImportExecutor(
+			).withDeletions(
+			).withGroupId(
+				group.getGroupId()
+			).withLARFile(
+				larFile2
+			).withObjectEntries(
+				objectDefinition
+			).executeImport();
+
+		for (ExportImportReportEntry exportImportReportEntry :
+				_exportImportReportEntryLocalService.
+					getExportImportReportEntries(
+						TestPropsValues.getCompanyId(),
+						exportImportConfiguration.
+							getExportImportConfigurationId())) {
+
+			Assert.assertNotEquals(
+				objectEntries[0].getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+			Assert.assertNotEquals(
+				objectEntries[1].getExternalReferenceCode(),
+				exportImportReportEntry.getClassExternalReferenceCode());
+		}
+
+		_assertObjectEntries(
+			bytes, false, objectDefinition.getObjectDefinitionId(),
+			objectEntries[2]);
 
 		_testExportImportObjectEntriesWithIndividualDeletionsAndMissingPortlet(
 			GroupTestUtil.addGroup(), ObjectDefinitionConstants.SCOPE_SITE);
