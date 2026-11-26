@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -491,16 +492,30 @@ public abstract class BaseProductConfigurationListAccountGroupResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<ProductConfigurationListAccountGroup,
 			 ProductConfigurationListAccountGroup, Exception>
 				productConfigurationListAccountGroupUnsafeFunction =
 					productConfigurationListAccountGroup -> {
-						deleteProductConfigurationListAccountGroup(
-							productConfigurationListAccountGroup.
-								getProductConfigurationListAccountGroupId());
+						try {
+							deleteProductConfigurationListAccountGroup(
+								productConfigurationListAccountGroup.
+									getProductConfigurationListAccountGroupId());
 
-						return productConfigurationListAccountGroup;
+							return productConfigurationListAccountGroup;
+						}
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
+
+								return productConfigurationListAccountGroup;
+							}
+
+							throw noSuchModelException;
+						}
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -526,6 +541,10 @@ public abstract class BaseProductConfigurationListAccountGroupResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1170,4 +1189,4 @@ public abstract class BaseProductConfigurationListAccountGroupResourceImpl
 			BaseProductConfigurationListAccountGroupResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1568166074
+// LIFERAY-REST-BUILDER-HASH:150403561

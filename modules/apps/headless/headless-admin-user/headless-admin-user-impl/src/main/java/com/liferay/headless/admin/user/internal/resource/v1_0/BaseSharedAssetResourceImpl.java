@@ -211,6 +211,10 @@ public abstract class BaseSharedAssetResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -845,4 +849,4 @@ public abstract class BaseSharedAssetResourceImpl
 		LogFactoryUtil.getLog(BaseSharedAssetResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1850114254
+// LIFERAY-REST-BUILDER-HASH:1629016336

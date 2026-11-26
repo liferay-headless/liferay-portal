@@ -918,38 +918,54 @@ public abstract class BaseProductConfigurationResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ProductConfiguration, ProductConfiguration, Exception>
 			productConfigurationUnsafeFunction = productConfiguration -> {
-				if (productConfiguration.getId() != null) {
-					try {
-						deleteProductConfiguration(
-							productConfiguration.getId());
-
-						return productConfiguration;
-					}
-					catch (Exception exception) {
-						if (productConfiguration.getExternalReferenceCode() !=
-								null) {
-
-							deleteProductConfigurationByExternalReferenceCode(
-								productConfiguration.
-									getExternalReferenceCode());
+				try {
+					if (productConfiguration.getId() != null) {
+						try {
+							deleteProductConfiguration(
+								productConfiguration.getId());
 
 							return productConfiguration;
 						}
+						catch (Exception exception) {
+							if (productConfiguration.
+									getExternalReferenceCode() != null) {
+
+								deleteProductConfigurationByExternalReferenceCode(
+									productConfiguration.
+										getExternalReferenceCode());
+
+								return productConfiguration;
+							}
+
+							throw exception;
+						}
 					}
+					else if (productConfiguration.getExternalReferenceCode() !=
+								null) {
+
+						deleteProductConfigurationByExternalReferenceCode(
+							productConfiguration.getExternalReferenceCode());
+
+						return productConfiguration;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (productConfiguration.getExternalReferenceCode() !=
-							null) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					deleteProductConfigurationByExternalReferenceCode(
-						productConfiguration.getExternalReferenceCode());
+						return productConfiguration;
+					}
 
-					return productConfiguration;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -972,6 +988,10 @@ public abstract class BaseProductConfigurationResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1648,4 +1668,4 @@ public abstract class BaseProductConfigurationResourceImpl
 		LogFactoryUtil.getLog(BaseProductConfigurationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2106729498
+// LIFERAY-REST-BUILDER-HASH:-36566495

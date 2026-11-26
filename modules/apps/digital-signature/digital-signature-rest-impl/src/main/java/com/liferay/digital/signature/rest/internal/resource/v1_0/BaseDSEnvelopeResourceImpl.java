@@ -416,6 +416,10 @@ public abstract class BaseDSEnvelopeResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1061,4 +1065,4 @@ public abstract class BaseDSEnvelopeResourceImpl
 		LogFactoryUtil.getLog(BaseDSEnvelopeResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-509963243
+// LIFERAY-REST-BUILDER-HASH:-1507082253

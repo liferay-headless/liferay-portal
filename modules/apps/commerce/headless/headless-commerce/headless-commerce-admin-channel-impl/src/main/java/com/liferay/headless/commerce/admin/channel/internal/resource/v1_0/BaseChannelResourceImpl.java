@@ -1169,32 +1169,48 @@ public abstract class BaseChannelResourceImpl
 			Collection<Channel> channels, Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Channel, Channel, Exception> channelUnsafeFunction =
 			channel -> {
-				if (channel.getId() != null) {
-					try {
-						deleteChannel(channel.getId());
-
-						return channel;
-					}
-					catch (Exception exception) {
-						if (channel.getExternalReferenceCode() != null) {
-							deleteChannelByExternalReferenceCode(
-								channel.getExternalReferenceCode());
+				try {
+					if (channel.getId() != null) {
+						try {
+							deleteChannel(channel.getId());
 
 							return channel;
 						}
+						catch (Exception exception) {
+							if (channel.getExternalReferenceCode() != null) {
+								deleteChannelByExternalReferenceCode(
+									channel.getExternalReferenceCode());
+
+								return channel;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (channel.getExternalReferenceCode() != null) {
-					deleteChannelByExternalReferenceCode(
-						channel.getExternalReferenceCode());
+					else if (channel.getExternalReferenceCode() != null) {
+						deleteChannelByExternalReferenceCode(
+							channel.getExternalReferenceCode());
 
-					return channel;
-				}
+						return channel;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return channel;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1214,6 +1230,10 @@ public abstract class BaseChannelResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2056,4 +2076,4 @@ public abstract class BaseChannelResourceImpl
 		LogFactoryUtil.getLog(BaseChannelResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1632590674
+// LIFERAY-REST-BUILDER-HASH:1892199197

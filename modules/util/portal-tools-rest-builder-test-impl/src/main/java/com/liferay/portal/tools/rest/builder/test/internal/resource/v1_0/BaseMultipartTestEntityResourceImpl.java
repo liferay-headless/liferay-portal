@@ -462,6 +462,10 @@ public abstract class BaseMultipartTestEntityResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("PARTIAL_UPDATE", "UPDATE");
 	}
@@ -1151,4 +1155,4 @@ public abstract class BaseMultipartTestEntityResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:467257681
+// LIFERAY-REST-BUILDER-HASH:-2144671441

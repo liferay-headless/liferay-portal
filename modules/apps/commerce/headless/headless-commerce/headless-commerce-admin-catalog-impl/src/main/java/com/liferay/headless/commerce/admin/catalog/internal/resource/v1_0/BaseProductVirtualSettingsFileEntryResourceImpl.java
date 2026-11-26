@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -352,14 +353,28 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<ProductVirtualSettingsFileEntry, ProductVirtualSettingsFileEntry,
 			 Exception> productVirtualSettingsFileEntryUnsafeFunction =
 				productVirtualSettingsFileEntry -> {
-					deleteProductVirtualSettingsFileEntry(
-						productVirtualSettingsFileEntry.getId());
+					try {
+						deleteProductVirtualSettingsFileEntry(
+							productVirtualSettingsFileEntry.getId());
 
-					return productVirtualSettingsFileEntry;
+						return productVirtualSettingsFileEntry;
+					}
+					catch (NoSuchModelException noSuchModelException) {
+						if (StringUtil.equalsIgnoreCase(
+								deleteStrategy, "DELETE_IF_EXISTS")) {
+
+							return productVirtualSettingsFileEntry;
+						}
+
+						throw noSuchModelException;
+					}
 				};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -385,6 +400,10 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1095,4 +1114,4 @@ public abstract class BaseProductVirtualSettingsFileEntryResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:1721882495
+// LIFERAY-REST-BUILDER-HASH:908544692

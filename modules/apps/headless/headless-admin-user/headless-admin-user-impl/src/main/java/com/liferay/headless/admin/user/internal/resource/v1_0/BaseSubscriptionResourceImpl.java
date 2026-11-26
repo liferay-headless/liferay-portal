@@ -187,6 +187,10 @@ public abstract class BaseSubscriptionResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -821,4 +825,4 @@ public abstract class BaseSubscriptionResourceImpl
 		LogFactoryUtil.getLog(BaseSubscriptionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1525460705
+// LIFERAY-REST-BUILDER-HASH:625686851

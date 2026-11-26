@@ -668,32 +668,50 @@ public abstract class BaseOptionValueResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<OptionValue, OptionValue, Exception>
 			optionValueUnsafeFunction = optionValue -> {
-				if (optionValue.getId() != null) {
-					try {
-						deleteOptionValue(optionValue.getId());
-
-						return optionValue;
-					}
-					catch (Exception exception) {
-						if (optionValue.getExternalReferenceCode() != null) {
-							deleteOptionValueByExternalReferenceCode(
-								optionValue.getExternalReferenceCode());
+				try {
+					if (optionValue.getId() != null) {
+						try {
+							deleteOptionValue(optionValue.getId());
 
 							return optionValue;
 						}
+						catch (Exception exception) {
+							if (optionValue.getExternalReferenceCode() !=
+									null) {
+
+								deleteOptionValueByExternalReferenceCode(
+									optionValue.getExternalReferenceCode());
+
+								return optionValue;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (optionValue.getExternalReferenceCode() != null) {
-					deleteOptionValueByExternalReferenceCode(
-						optionValue.getExternalReferenceCode());
+					else if (optionValue.getExternalReferenceCode() != null) {
+						deleteOptionValueByExternalReferenceCode(
+							optionValue.getExternalReferenceCode());
 
-					return optionValue;
-				}
+						return optionValue;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return optionValue;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -713,6 +731,10 @@ public abstract class BaseOptionValueResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1385,4 +1407,4 @@ public abstract class BaseOptionValueResourceImpl
 		LogFactoryUtil.getLog(BaseOptionValueResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1497494258
+// LIFERAY-REST-BUILDER-HASH:368116122

@@ -167,6 +167,10 @@ public abstract class BasePageSpecificationVersionPageExperienceResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -809,4 +813,4 @@ public abstract class BasePageSpecificationVersionPageExperienceResourceImpl
 			BasePageSpecificationVersionPageExperienceResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-869139477
+// LIFERAY-REST-BUILDER-HASH:664431821

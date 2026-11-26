@@ -173,6 +173,10 @@ public abstract class BaseReindexStatusResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -807,4 +811,4 @@ public abstract class BaseReindexStatusResourceImpl
 		LogFactoryUtil.getLog(BaseReindexStatusResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1823147536
+// LIFERAY-REST-BUILDER-HASH:2076125298

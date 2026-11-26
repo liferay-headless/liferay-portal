@@ -659,32 +659,50 @@ public abstract class BaseProductGroupResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ProductGroup, ProductGroup, Exception>
 			productGroupUnsafeFunction = productGroup -> {
-				if (productGroup.getId() != null) {
-					try {
-						deleteProductGroup(productGroup.getId());
-
-						return productGroup;
-					}
-					catch (Exception exception) {
-						if (productGroup.getExternalReferenceCode() != null) {
-							deleteProductGroupByExternalReferenceCode(
-								productGroup.getExternalReferenceCode());
+				try {
+					if (productGroup.getId() != null) {
+						try {
+							deleteProductGroup(productGroup.getId());
 
 							return productGroup;
 						}
+						catch (Exception exception) {
+							if (productGroup.getExternalReferenceCode() !=
+									null) {
+
+								deleteProductGroupByExternalReferenceCode(
+									productGroup.getExternalReferenceCode());
+
+								return productGroup;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (productGroup.getExternalReferenceCode() != null) {
-					deleteProductGroupByExternalReferenceCode(
-						productGroup.getExternalReferenceCode());
+					else if (productGroup.getExternalReferenceCode() != null) {
+						deleteProductGroupByExternalReferenceCode(
+							productGroup.getExternalReferenceCode());
 
-					return productGroup;
-				}
+						return productGroup;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return productGroup;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -704,6 +722,10 @@ public abstract class BaseProductGroupResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1375,4 +1397,4 @@ public abstract class BaseProductGroupResourceImpl
 		LogFactoryUtil.getLog(BaseProductGroupResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1471730560
+// LIFERAY-REST-BUILDER-HASH:274136474

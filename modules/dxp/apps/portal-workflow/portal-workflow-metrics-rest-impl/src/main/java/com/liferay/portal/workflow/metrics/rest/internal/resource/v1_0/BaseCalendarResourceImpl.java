@@ -168,6 +168,10 @@ public abstract class BaseCalendarResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -800,4 +804,4 @@ public abstract class BaseCalendarResourceImpl
 		LogFactoryUtil.getLog(BaseCalendarResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:664591487
+// LIFERAY-REST-BUILDER-HASH:-1000528031

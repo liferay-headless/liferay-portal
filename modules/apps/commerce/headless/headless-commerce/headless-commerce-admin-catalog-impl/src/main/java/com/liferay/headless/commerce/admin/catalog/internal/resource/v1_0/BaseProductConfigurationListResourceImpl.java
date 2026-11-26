@@ -683,41 +683,58 @@ public abstract class BaseProductConfigurationListResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<ProductConfigurationList, ProductConfigurationList, Exception>
 				productConfigurationListUnsafeFunction =
 					productConfigurationList -> {
-						if (productConfigurationList.getId() != null) {
-							try {
-								deleteProductConfigurationList(
-									productConfigurationList.getId());
-
-								return productConfigurationList;
-							}
-							catch (Exception exception) {
-								if (productConfigurationList.
-										getExternalReferenceCode() != null) {
-
-									deleteProductConfigurationListByExternalReferenceCode(
-										productConfigurationList.
-											getExternalReferenceCode());
+						try {
+							if (productConfigurationList.getId() != null) {
+								try {
+									deleteProductConfigurationList(
+										productConfigurationList.getId());
 
 									return productConfigurationList;
 								}
+								catch (Exception exception) {
+									if (productConfigurationList.
+											getExternalReferenceCode() !=
+												null) {
+
+										deleteProductConfigurationListByExternalReferenceCode(
+											productConfigurationList.
+												getExternalReferenceCode());
+
+										return productConfigurationList;
+									}
+
+									throw exception;
+								}
 							}
+							else if (productConfigurationList.
+										getExternalReferenceCode() != null) {
+
+								deleteProductConfigurationListByExternalReferenceCode(
+									productConfigurationList.
+										getExternalReferenceCode());
+
+								return productConfigurationList;
+							}
+
+							throw new UnsupportedOperationException(
+								"Unable to delete by external reference code or ID");
 						}
-						else if (productConfigurationList.
-									getExternalReferenceCode() != null) {
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
 
-							deleteProductConfigurationListByExternalReferenceCode(
-								productConfigurationList.
-									getExternalReferenceCode());
+								return productConfigurationList;
+							}
 
-							return productConfigurationList;
+							throw noSuchModelException;
 						}
-
-						throw new UnsupportedOperationException(
-							"Unable to delete by external reference code or ID");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -742,6 +759,10 @@ public abstract class BaseProductConfigurationListResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1432,4 +1453,4 @@ public abstract class BaseProductConfigurationListResourceImpl
 		LogFactoryUtil.getLog(BaseProductConfigurationListResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1723407100
+// LIFERAY-REST-BUILDER-HASH:20611743

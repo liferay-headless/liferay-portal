@@ -141,6 +141,10 @@ public abstract class BaseAssigneeMetricResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -776,4 +780,4 @@ public abstract class BaseAssigneeMetricResourceImpl
 		LogFactoryUtil.getLog(BaseAssigneeMetricResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:207848293
+// LIFERAY-REST-BUILDER-HASH:2084240967

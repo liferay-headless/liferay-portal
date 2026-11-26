@@ -725,36 +725,54 @@ public abstract class BaseListTypeDefinitionResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ListTypeDefinition, ListTypeDefinition, Exception>
 			listTypeDefinitionUnsafeFunction = listTypeDefinition -> {
-				if (listTypeDefinition.getId() != null) {
-					try {
-						deleteListTypeDefinition(listTypeDefinition.getId());
-
-						return listTypeDefinition;
-					}
-					catch (Exception exception) {
-						if (listTypeDefinition.getExternalReferenceCode() !=
-								null) {
-
-							deleteListTypeDefinitionByExternalReferenceCode(
-								listTypeDefinition.getExternalReferenceCode());
+				try {
+					if (listTypeDefinition.getId() != null) {
+						try {
+							deleteListTypeDefinition(
+								listTypeDefinition.getId());
 
 							return listTypeDefinition;
 						}
+						catch (Exception exception) {
+							if (listTypeDefinition.getExternalReferenceCode() !=
+									null) {
+
+								deleteListTypeDefinitionByExternalReferenceCode(
+									listTypeDefinition.
+										getExternalReferenceCode());
+
+								return listTypeDefinition;
+							}
+
+							throw exception;
+						}
 					}
+					else if (listTypeDefinition.getExternalReferenceCode() !=
+								null) {
+
+						deleteListTypeDefinitionByExternalReferenceCode(
+							listTypeDefinition.getExternalReferenceCode());
+
+						return listTypeDefinition;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (listTypeDefinition.getExternalReferenceCode() !=
-							null) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					deleteListTypeDefinitionByExternalReferenceCode(
-						listTypeDefinition.getExternalReferenceCode());
+						return listTypeDefinition;
+					}
 
-					return listTypeDefinition;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -774,6 +792,10 @@ public abstract class BaseListTypeDefinitionResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1457,4 +1479,4 @@ public abstract class BaseListTypeDefinitionResourceImpl
 		LogFactoryUtil.getLog(BaseListTypeDefinitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-179148897
+// LIFERAY-REST-BUILDER-HASH:174025236

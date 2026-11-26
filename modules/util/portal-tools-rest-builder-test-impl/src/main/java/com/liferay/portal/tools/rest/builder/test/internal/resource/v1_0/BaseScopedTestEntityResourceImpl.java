@@ -10,6 +10,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -965,29 +966,43 @@ public abstract class BaseScopedTestEntityResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable assetLibraryId = parameters.get("assetLibraryId");
 
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<ScopedTestEntity, ScopedTestEntity, Exception>
 			scopedTestEntityUnsafeFunction = scopedTestEntity -> {
-				if (assetLibraryId != null) {
-					deleteAssetLibraryScopedTestEntityByExternalReferenceCode(
-						(Long)assetLibraryId,
-						scopedTestEntity.getExternalReferenceCode());
+				try {
+					if (assetLibraryId != null) {
+						deleteAssetLibraryScopedTestEntityByExternalReferenceCode(
+							(Long)assetLibraryId,
+							scopedTestEntity.getExternalReferenceCode());
 
-					return scopedTestEntity;
+						return scopedTestEntity;
+					}
+					else if (siteId != null) {
+						deleteSiteScopedTestEntityByExternalReferenceCode(
+							(Long)siteId,
+							scopedTestEntity.getExternalReferenceCode());
+
+						return scopedTestEntity;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (siteId != null) {
-					deleteSiteScopedTestEntityByExternalReferenceCode(
-						(Long)siteId,
-						scopedTestEntity.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return scopedTestEntity;
+						return scopedTestEntity;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1007,6 +1022,10 @@ public abstract class BaseScopedTestEntityResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1662,4 +1681,4 @@ public abstract class BaseScopedTestEntityResourceImpl
 		LogFactoryUtil.getLog(BaseScopedTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1061630651
+// LIFERAY-REST-BUILDER-HASH:-2032231194

@@ -878,34 +878,53 @@ public abstract class BaseObjectDefinitionResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ObjectDefinition, ObjectDefinition, Exception>
 			objectDefinitionUnsafeFunction = objectDefinition -> {
-				if (objectDefinition.getId() != null) {
-					try {
-						deleteObjectDefinition(objectDefinition.getId());
-
-						return objectDefinition;
-					}
-					catch (Exception exception) {
-						if (objectDefinition.getExternalReferenceCode() !=
-								null) {
-
-							deleteObjectDefinitionByExternalReferenceCode(
-								objectDefinition.getExternalReferenceCode());
+				try {
+					if (objectDefinition.getId() != null) {
+						try {
+							deleteObjectDefinition(objectDefinition.getId());
 
 							return objectDefinition;
 						}
+						catch (Exception exception) {
+							if (objectDefinition.getExternalReferenceCode() !=
+									null) {
+
+								deleteObjectDefinitionByExternalReferenceCode(
+									objectDefinition.
+										getExternalReferenceCode());
+
+								return objectDefinition;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (objectDefinition.getExternalReferenceCode() != null) {
-					deleteObjectDefinitionByExternalReferenceCode(
-						objectDefinition.getExternalReferenceCode());
+					else if (objectDefinition.getExternalReferenceCode() !=
+								null) {
 
-					return objectDefinition;
-				}
+						deleteObjectDefinitionByExternalReferenceCode(
+							objectDefinition.getExternalReferenceCode());
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return objectDefinition;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return objectDefinition;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -925,6 +944,10 @@ public abstract class BaseObjectDefinitionResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1608,4 +1631,4 @@ public abstract class BaseObjectDefinitionResourceImpl
 		LogFactoryUtil.getLog(BaseObjectDefinitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1447985404
+// LIFERAY-REST-BUILDER-HASH:1298118004

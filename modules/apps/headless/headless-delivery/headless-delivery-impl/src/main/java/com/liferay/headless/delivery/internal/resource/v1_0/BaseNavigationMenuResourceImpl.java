@@ -13,6 +13,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -1128,38 +1129,57 @@ public abstract class BaseNavigationMenuResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<NavigationMenu, NavigationMenu, Exception>
 			navigationMenuUnsafeFunction = navigationMenu -> {
-				if (navigationMenu.getId() != null) {
-					try {
-						deleteNavigationMenu(navigationMenu.getId());
+				try {
+					if (navigationMenu.getId() != null) {
+						try {
+							deleteNavigationMenu(navigationMenu.getId());
+
+							return navigationMenu;
+						}
+						catch (Exception exception) {
+							if (navigationMenu.getExternalReferenceCode() !=
+									null) {
+
+								if (siteId != null) {
+									deleteSiteNavigationMenuByExternalReferenceCode(
+										(Long)siteId,
+										navigationMenu.
+											getExternalReferenceCode());
+
+									return navigationMenu;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (siteId != null) {
+						deleteSiteNavigationMenuByExternalReferenceCode(
+							(Long)siteId,
+							navigationMenu.getExternalReferenceCode());
 
 						return navigationMenu;
 					}
-					catch (Exception exception) {
-						if (navigationMenu.getExternalReferenceCode() != null) {
-							if (siteId != null) {
-								deleteSiteNavigationMenuByExternalReferenceCode(
-									(Long)siteId,
-									navigationMenu.getExternalReferenceCode());
 
-								return navigationMenu;
-							}
-						}
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return navigationMenu;
 					}
-				}
-				else if (siteId != null) {
-					deleteSiteNavigationMenuByExternalReferenceCode(
-						(Long)siteId,
-						navigationMenu.getExternalReferenceCode());
 
-					return navigationMenu;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1179,6 +1199,10 @@ public abstract class BaseNavigationMenuResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2026,4 +2050,4 @@ public abstract class BaseNavigationMenuResourceImpl
 		LogFactoryUtil.getLog(BaseNavigationMenuResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1504147039
+// LIFERAY-REST-BUILDER-HASH:1477435393

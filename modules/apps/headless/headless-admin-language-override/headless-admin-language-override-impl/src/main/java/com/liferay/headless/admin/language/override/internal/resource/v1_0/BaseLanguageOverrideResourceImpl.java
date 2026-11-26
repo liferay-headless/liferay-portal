@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -452,23 +453,38 @@ public abstract class BaseLanguageOverrideResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<LanguageOverride, LanguageOverride, Exception>
 			languageOverrideUnsafeFunction = languageOverride -> {
-				if (languageOverride.getExternalReferenceCode() != null) {
-					if (!FeatureFlagManagerUtil.isEnabled(
-							CompanyThreadLocal.getCompanyId(), "LPD-49852")) {
+				try {
+					if (languageOverride.getExternalReferenceCode() != null) {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								CompanyThreadLocal.getCompanyId(),
+								"LPD-49852")) {
 
-						throw new NotFoundException();
+							throw new NotFoundException();
+						}
+
+						deleteLanguageOverrideByExternalReferenceCode(
+							languageOverride.getExternalReferenceCode());
+
+						return languageOverride;
 					}
 
-					deleteLanguageOverrideByExternalReferenceCode(
-						languageOverride.getExternalReferenceCode());
-
-					return languageOverride;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return languageOverride;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -497,6 +513,19 @@ public abstract class BaseLanguageOverrideResourceImpl
 		}
 
 		return createStrategies;
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		Set<String> deleteStrategies = SetUtil.fromArray();
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "LPD-49852")) {
+
+			deleteStrategies.add("DELETE");
+			deleteStrategies.add("DELETE_IF_EXISTS");
+		}
+
+		return deleteStrategies;
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1140,4 +1169,4 @@ public abstract class BaseLanguageOverrideResourceImpl
 		LogFactoryUtil.getLog(BaseLanguageOverrideResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-695575187
+// LIFERAY-REST-BUILDER-HASH:-1072710089

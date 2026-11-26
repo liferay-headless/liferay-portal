@@ -582,6 +582,10 @@ public abstract class BaseAccountOrganizationResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1219,4 +1223,4 @@ public abstract class BaseAccountOrganizationResourceImpl
 		LogFactoryUtil.getLog(BaseAccountOrganizationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2077996414
+// LIFERAY-REST-BUILDER-HASH:296274012

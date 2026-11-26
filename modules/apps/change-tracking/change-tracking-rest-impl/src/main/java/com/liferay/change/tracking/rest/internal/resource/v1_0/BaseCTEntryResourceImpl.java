@@ -307,6 +307,10 @@ public abstract class BaseCTEntryResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -943,4 +947,4 @@ public abstract class BaseCTEntryResourceImpl
 		LogFactoryUtil.getLog(BaseCTEntryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:898050296
+// LIFERAY-REST-BUILDER-HASH:1613626970

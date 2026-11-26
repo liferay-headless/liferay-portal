@@ -2518,59 +2518,75 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable assetLibraryId = parameters.get("assetLibraryId");
 
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<TaxonomyCategory, TaxonomyCategory, Exception>
 			taxonomyCategoryUnsafeFunction = taxonomyCategory -> {
-				if (taxonomyCategory.getId() != null) {
-					try {
-						deleteTaxonomyCategory(taxonomyCategory.getId());
+				try {
+					if (taxonomyCategory.getId() != null) {
+						try {
+							deleteTaxonomyCategory(taxonomyCategory.getId());
+
+							return taxonomyCategory;
+						}
+						catch (Exception exception) {
+							if (taxonomyCategory.getExternalReferenceCode() !=
+									null) {
+
+								if (assetLibraryId != null) {
+									deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
+										(Long)assetLibraryId,
+										taxonomyCategory.
+											getExternalReferenceCode());
+
+									return taxonomyCategory;
+								}
+
+								if (siteId != null) {
+									deleteSiteTaxonomyCategoryByExternalReferenceCode(
+										(Long)siteId,
+										taxonomyCategory.
+											getExternalReferenceCode());
+
+									return taxonomyCategory;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (assetLibraryId != null) {
+						deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
+							(Long)assetLibraryId,
+							taxonomyCategory.getExternalReferenceCode());
 
 						return taxonomyCategory;
 					}
-					catch (Exception exception) {
-						if (taxonomyCategory.getExternalReferenceCode() !=
-								null) {
+					else if (siteId != null) {
+						deleteSiteTaxonomyCategoryByExternalReferenceCode(
+							(Long)siteId,
+							taxonomyCategory.getExternalReferenceCode());
 
-							if (assetLibraryId != null) {
-								deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
-									(Long)assetLibraryId,
-									taxonomyCategory.
-										getExternalReferenceCode());
-
-								return taxonomyCategory;
-							}
-
-							if (siteId != null) {
-								deleteSiteTaxonomyCategoryByExternalReferenceCode(
-									(Long)siteId,
-									taxonomyCategory.
-										getExternalReferenceCode());
-
-								return taxonomyCategory;
-							}
-						}
+						return taxonomyCategory;
 					}
-				}
-				else if (assetLibraryId != null) {
-					deleteAssetLibraryTaxonomyCategoryByExternalReferenceCode(
-						(Long)assetLibraryId,
-						taxonomyCategory.getExternalReferenceCode());
 
-					return taxonomyCategory;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (siteId != null) {
-					deleteSiteTaxonomyCategoryByExternalReferenceCode(
-						(Long)siteId,
-						taxonomyCategory.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return taxonomyCategory;
+						return taxonomyCategory;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2590,6 +2606,10 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3476,4 +3496,4 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		LogFactoryUtil.getLog(BaseTaxonomyCategoryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:832264732
+// LIFERAY-REST-BUILDER-HASH:-697092709

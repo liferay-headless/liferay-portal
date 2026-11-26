@@ -14,6 +14,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -1119,32 +1120,48 @@ public abstract class BaseAttachmentResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Attachment, Attachment, Exception>
 			attachmentUnsafeFunction = attachment -> {
-				if (attachment.getId() != null) {
-					try {
-						deleteAttachment(attachment.getId());
-
-						return attachment;
-					}
-					catch (Exception exception) {
-						if (attachment.getExternalReferenceCode() != null) {
-							deleteAttachmentByExternalReferenceCode(
-								attachment.getExternalReferenceCode());
+				try {
+					if (attachment.getId() != null) {
+						try {
+							deleteAttachment(attachment.getId());
 
 							return attachment;
 						}
+						catch (Exception exception) {
+							if (attachment.getExternalReferenceCode() != null) {
+								deleteAttachmentByExternalReferenceCode(
+									attachment.getExternalReferenceCode());
+
+								return attachment;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (attachment.getExternalReferenceCode() != null) {
-					deleteAttachmentByExternalReferenceCode(
-						attachment.getExternalReferenceCode());
+					else if (attachment.getExternalReferenceCode() != null) {
+						deleteAttachmentByExternalReferenceCode(
+							attachment.getExternalReferenceCode());
 
-					return attachment;
-				}
+						return attachment;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return attachment;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1164,6 +1181,10 @@ public abstract class BaseAttachmentResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1804,4 +1825,4 @@ public abstract class BaseAttachmentResourceImpl
 		LogFactoryUtil.getLog(BaseAttachmentResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-644208589
+// LIFERAY-REST-BUILDER-HASH:407718618

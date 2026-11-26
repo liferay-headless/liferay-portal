@@ -1240,32 +1240,50 @@ public abstract class BasePostalAddressResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<PostalAddress, PostalAddress, Exception>
 			postalAddressUnsafeFunction = postalAddress -> {
-				if (postalAddress.getId() != null) {
-					try {
-						deletePostalAddress(postalAddress.getId());
-
-						return postalAddress;
-					}
-					catch (Exception exception) {
-						if (postalAddress.getExternalReferenceCode() != null) {
-							deletePostalAddressByExternalReferenceCode(
-								postalAddress.getExternalReferenceCode());
+				try {
+					if (postalAddress.getId() != null) {
+						try {
+							deletePostalAddress(postalAddress.getId());
 
 							return postalAddress;
 						}
+						catch (Exception exception) {
+							if (postalAddress.getExternalReferenceCode() !=
+									null) {
+
+								deletePostalAddressByExternalReferenceCode(
+									postalAddress.getExternalReferenceCode());
+
+								return postalAddress;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (postalAddress.getExternalReferenceCode() != null) {
-					deletePostalAddressByExternalReferenceCode(
-						postalAddress.getExternalReferenceCode());
+					else if (postalAddress.getExternalReferenceCode() != null) {
+						deletePostalAddressByExternalReferenceCode(
+							postalAddress.getExternalReferenceCode());
 
-					return postalAddress;
-				}
+						return postalAddress;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return postalAddress;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1285,6 +1303,10 @@ public abstract class BasePostalAddressResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1990,4 +2012,4 @@ public abstract class BasePostalAddressResourceImpl
 		LogFactoryUtil.getLog(BasePostalAddressResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:110670538
+// LIFERAY-REST-BUILDER-HASH:-262120715

@@ -733,32 +733,50 @@ public abstract class BaseSpecificationResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Specification, Specification, Exception>
 			specificationUnsafeFunction = specification -> {
-				if (specification.getId() != null) {
-					try {
-						deleteSpecification(specification.getId());
-
-						return specification;
-					}
-					catch (Exception exception) {
-						if (specification.getExternalReferenceCode() != null) {
-							deleteSpecificationByExternalReferenceCode(
-								specification.getExternalReferenceCode());
+				try {
+					if (specification.getId() != null) {
+						try {
+							deleteSpecification(specification.getId());
 
 							return specification;
 						}
+						catch (Exception exception) {
+							if (specification.getExternalReferenceCode() !=
+									null) {
+
+								deleteSpecificationByExternalReferenceCode(
+									specification.getExternalReferenceCode());
+
+								return specification;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (specification.getExternalReferenceCode() != null) {
-					deleteSpecificationByExternalReferenceCode(
-						specification.getExternalReferenceCode());
+					else if (specification.getExternalReferenceCode() != null) {
+						deleteSpecificationByExternalReferenceCode(
+							specification.getExternalReferenceCode());
 
-					return specification;
-				}
+						return specification;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return specification;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -778,6 +796,10 @@ public abstract class BaseSpecificationResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1451,4 +1473,4 @@ public abstract class BaseSpecificationResourceImpl
 		LogFactoryUtil.getLog(BaseSpecificationResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:964798339
+// LIFERAY-REST-BUILDER-HASH:-1795017576

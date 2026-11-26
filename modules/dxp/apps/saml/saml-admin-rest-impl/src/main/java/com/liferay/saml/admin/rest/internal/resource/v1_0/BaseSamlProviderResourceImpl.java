@@ -229,6 +229,10 @@ public abstract class BaseSamlProviderResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("PARTIAL_UPDATE");
 	}
@@ -891,4 +895,4 @@ public abstract class BaseSamlProviderResourceImpl
 		LogFactoryUtil.getLog(BaseSamlProviderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1627861481
+// LIFERAY-REST-BUILDER-HASH:1038922443

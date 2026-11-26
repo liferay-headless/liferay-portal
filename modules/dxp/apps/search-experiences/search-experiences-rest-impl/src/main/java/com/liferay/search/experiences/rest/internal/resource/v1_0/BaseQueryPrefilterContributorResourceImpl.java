@@ -180,6 +180,10 @@ public abstract class BaseQueryPrefilterContributorResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -818,4 +822,4 @@ public abstract class BaseQueryPrefilterContributorResourceImpl
 		LogFactoryUtil.getLog(BaseQueryPrefilterContributorResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1362325047
+// LIFERAY-REST-BUILDER-HASH:-1937189973

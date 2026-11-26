@@ -850,38 +850,54 @@ public abstract class BaseNotificationTemplateResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<NotificationTemplate, NotificationTemplate, Exception>
 			notificationTemplateUnsafeFunction = notificationTemplate -> {
-				if (notificationTemplate.getId() != null) {
-					try {
-						deleteNotificationTemplate(
-							notificationTemplate.getId());
-
-						return notificationTemplate;
-					}
-					catch (Exception exception) {
-						if (notificationTemplate.getExternalReferenceCode() !=
-								null) {
-
-							deleteNotificationTemplateByExternalReferenceCode(
-								notificationTemplate.
-									getExternalReferenceCode());
+				try {
+					if (notificationTemplate.getId() != null) {
+						try {
+							deleteNotificationTemplate(
+								notificationTemplate.getId());
 
 							return notificationTemplate;
 						}
+						catch (Exception exception) {
+							if (notificationTemplate.
+									getExternalReferenceCode() != null) {
+
+								deleteNotificationTemplateByExternalReferenceCode(
+									notificationTemplate.
+										getExternalReferenceCode());
+
+								return notificationTemplate;
+							}
+
+							throw exception;
+						}
 					}
+					else if (notificationTemplate.getExternalReferenceCode() !=
+								null) {
+
+						deleteNotificationTemplateByExternalReferenceCode(
+							notificationTemplate.getExternalReferenceCode());
+
+						return notificationTemplate;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (notificationTemplate.getExternalReferenceCode() !=
-							null) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					deleteNotificationTemplateByExternalReferenceCode(
-						notificationTemplate.getExternalReferenceCode());
+						return notificationTemplate;
+					}
 
-					return notificationTemplate;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -904,6 +920,10 @@ public abstract class BaseNotificationTemplateResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1591,4 +1611,4 @@ public abstract class BaseNotificationTemplateResourceImpl
 		LogFactoryUtil.getLog(BaseNotificationTemplateResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:739757238
+// LIFERAY-REST-BUILDER-HASH:1137997113

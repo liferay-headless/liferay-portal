@@ -2131,6 +2131,9 @@ public abstract class BaseStructuredContentFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable assetLibraryId = parameters.get("assetLibraryId");
 
 		Serializable siteId = parameters.get("siteId");
@@ -2139,56 +2142,70 @@ public abstract class BaseStructuredContentFolderResourceImpl
 			<StructuredContentFolder, StructuredContentFolder, Exception>
 				structuredContentFolderUnsafeFunction =
 					structuredContentFolder -> {
-						if (structuredContentFolder.getId() != null) {
-							try {
-								deleteStructuredContentFolder(
-									structuredContentFolder.getId());
+						try {
+							if (structuredContentFolder.getId() != null) {
+								try {
+									deleteStructuredContentFolder(
+										structuredContentFolder.getId());
+
+									return structuredContentFolder;
+								}
+								catch (Exception exception) {
+									if (structuredContentFolder.
+											getExternalReferenceCode() !=
+												null) {
+
+										if (assetLibraryId != null) {
+											deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
+												(Long)assetLibraryId,
+												structuredContentFolder.
+													getExternalReferenceCode());
+
+											return structuredContentFolder;
+										}
+
+										if (siteId != null) {
+											deleteSiteStructuredContentFolderByExternalReferenceCode(
+												(Long)siteId,
+												structuredContentFolder.
+													getExternalReferenceCode());
+
+											return structuredContentFolder;
+										}
+									}
+
+									throw exception;
+								}
+							}
+							else if (assetLibraryId != null) {
+								deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
+									(Long)assetLibraryId,
+									structuredContentFolder.
+										getExternalReferenceCode());
 
 								return structuredContentFolder;
 							}
-							catch (Exception exception) {
-								if (structuredContentFolder.
-										getExternalReferenceCode() != null) {
+							else if (siteId != null) {
+								deleteSiteStructuredContentFolderByExternalReferenceCode(
+									(Long)siteId,
+									structuredContentFolder.
+										getExternalReferenceCode());
 
-									if (assetLibraryId != null) {
-										deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
-											(Long)assetLibraryId,
-											structuredContentFolder.
-												getExternalReferenceCode());
-
-										return structuredContentFolder;
-									}
-
-									if (siteId != null) {
-										deleteSiteStructuredContentFolderByExternalReferenceCode(
-											(Long)siteId,
-											structuredContentFolder.
-												getExternalReferenceCode());
-
-										return structuredContentFolder;
-									}
-								}
+								return structuredContentFolder;
 							}
-						}
-						else if (assetLibraryId != null) {
-							deleteAssetLibraryStructuredContentFolderByExternalReferenceCode(
-								(Long)assetLibraryId,
-								structuredContentFolder.
-									getExternalReferenceCode());
 
-							return structuredContentFolder;
+							throw new UnsupportedOperationException(
+								"Unable to delete by external reference code or ID");
 						}
-						else if (siteId != null) {
-							deleteSiteStructuredContentFolderByExternalReferenceCode(
-								(Long)siteId,
-								structuredContentFolder.
-									getExternalReferenceCode());
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
 
-							return structuredContentFolder;
+								return structuredContentFolder;
+							}
+
+							throw noSuchModelException;
 						}
-
-						throw new UnsupportedOperationException(
-							"Unable to delete by external reference code or ID");
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2213,6 +2230,10 @@ public abstract class BaseStructuredContentFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3098,4 +3119,4 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		LogFactoryUtil.getLog(BaseStructuredContentFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1446341523
+// LIFERAY-REST-BUILDER-HASH:1271099999

@@ -2812,59 +2812,75 @@ public abstract class BaseStructuredContentResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable assetLibraryId = parameters.get("assetLibraryId");
 
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<StructuredContent, StructuredContent, Exception>
 			structuredContentUnsafeFunction = structuredContent -> {
-				if (structuredContent.getId() != null) {
-					try {
-						deleteStructuredContent(structuredContent.getId());
+				try {
+					if (structuredContent.getId() != null) {
+						try {
+							deleteStructuredContent(structuredContent.getId());
+
+							return structuredContent;
+						}
+						catch (Exception exception) {
+							if (structuredContent.getExternalReferenceCode() !=
+									null) {
+
+								if (assetLibraryId != null) {
+									deleteAssetLibraryStructuredContentByExternalReferenceCode(
+										(Long)assetLibraryId,
+										structuredContent.
+											getExternalReferenceCode());
+
+									return structuredContent;
+								}
+
+								if (siteId != null) {
+									deleteSiteStructuredContentByExternalReferenceCode(
+										(Long)siteId,
+										structuredContent.
+											getExternalReferenceCode());
+
+									return structuredContent;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (assetLibraryId != null) {
+						deleteAssetLibraryStructuredContentByExternalReferenceCode(
+							(Long)assetLibraryId,
+							structuredContent.getExternalReferenceCode());
 
 						return structuredContent;
 					}
-					catch (Exception exception) {
-						if (structuredContent.getExternalReferenceCode() !=
-								null) {
+					else if (siteId != null) {
+						deleteSiteStructuredContentByExternalReferenceCode(
+							(Long)siteId,
+							structuredContent.getExternalReferenceCode());
 
-							if (assetLibraryId != null) {
-								deleteAssetLibraryStructuredContentByExternalReferenceCode(
-									(Long)assetLibraryId,
-									structuredContent.
-										getExternalReferenceCode());
-
-								return structuredContent;
-							}
-
-							if (siteId != null) {
-								deleteSiteStructuredContentByExternalReferenceCode(
-									(Long)siteId,
-									structuredContent.
-										getExternalReferenceCode());
-
-								return structuredContent;
-							}
-						}
+						return structuredContent;
 					}
-				}
-				else if (assetLibraryId != null) {
-					deleteAssetLibraryStructuredContentByExternalReferenceCode(
-						(Long)assetLibraryId,
-						structuredContent.getExternalReferenceCode());
 
-					return structuredContent;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
-				else if (siteId != null) {
-					deleteSiteStructuredContentByExternalReferenceCode(
-						(Long)siteId,
-						structuredContent.getExternalReferenceCode());
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-					return structuredContent;
+						return structuredContent;
+					}
+
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2884,6 +2900,10 @@ public abstract class BaseStructuredContentResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3785,4 +3805,4 @@ public abstract class BaseStructuredContentResourceImpl
 		LogFactoryUtil.getLog(BaseStructuredContentResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-25250657
+// LIFERAY-REST-BUILDER-HASH:-1623675527

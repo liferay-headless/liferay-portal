@@ -187,6 +187,10 @@ public abstract class BaseFeatureFlagApplicationTestEntityResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -834,4 +838,4 @@ public abstract class BaseFeatureFlagApplicationTestEntityResourceImpl
 			BaseFeatureFlagApplicationTestEntityResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:485785985
+// LIFERAY-REST-BUILDER-HASH:1982956767
