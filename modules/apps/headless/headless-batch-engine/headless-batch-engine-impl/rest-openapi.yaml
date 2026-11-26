@@ -370,6 +370,11 @@ paths:
                     schema:
                         type: string
                 -   in: query
+                    name: deleteStrategy
+                    schema:
+                        enum: [DELETE, DELETE_IF_EXISTS]
+                        type: string
+                -   in: query
                     name: externalReferenceCode
                     schema:
                         type: string
