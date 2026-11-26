@@ -272,36 +272,52 @@ public class ProductResourceImpl
 			Collection<Product> products, Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<Product, Product, Exception> unsafeFunction =
 			product -> {
-				if (product.getProductId() != null) {
-					try {
-						deleteProduct(product.getProductId());
-
-						return product;
-					}
-					catch (Exception exception) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(exception);
-						}
-
-						if (product.getExternalReferenceCode() != null) {
-							deleteProductByExternalReferenceCode(
-								product.getExternalReferenceCode());
+				try {
+					if (product.getProductId() != null) {
+						try {
+							deleteProduct(product.getProductId());
 
 							return product;
 						}
+						catch (Exception exception) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(exception);
+							}
+
+							if (product.getExternalReferenceCode() != null) {
+								deleteProductByExternalReferenceCode(
+									product.getExternalReferenceCode());
+
+								return product;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (product.getExternalReferenceCode() != null) {
-					deleteProductByExternalReferenceCode(
-						product.getExternalReferenceCode());
+					else if (product.getExternalReferenceCode() != null) {
+						deleteProductByExternalReferenceCode(
+							product.getExternalReferenceCode());
 
-					return product;
-				}
+						return product;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return product;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
