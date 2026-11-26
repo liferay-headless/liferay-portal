@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
+import com.liferay.batch.engine.BatchEngineTaskItemDelegateRegistry;
 import com.liferay.batch.engine.BatchEngineTaskOperation;
 import com.liferay.batch.engine.ItemClassRegistry;
 import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
@@ -64,6 +65,7 @@ import com.liferay.staging.StagingGroupHelper;
 import jakarta.portlet.PortletPreferences;
 
 import java.io.InputStream;
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +98,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		BatchEngineExportTaskLocalService batchEngineExportTaskLocalService,
 		BatchEngineImportTaskExecutor batchEngineImportTaskExecutor,
 		BatchEngineImportTaskService batchEngineImportTaskService,
+		BatchEngineTaskItemDelegateRegistry batchEngineTaskItemDelegateRegistry,
 		ChangesetEntryLocalService changesetEntryLocalService,
 		ClassNameLocalService classNameLocalService,
 		ExportImportHelper exportImportHelper,
@@ -107,6 +110,8 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		_batchEngineExportTaskLocalService = batchEngineExportTaskLocalService;
 		_batchEngineImportTaskExecutor = batchEngineImportTaskExecutor;
 		_batchEngineImportTaskService = batchEngineImportTaskService;
+		_batchEngineTaskItemDelegateRegistry =
+			batchEngineTaskItemDelegateRegistry;
 		_changesetEntryLocalService = changesetEntryLocalService;
 		_classNameLocalService = classNameLocalService;
 		_exportImportHelper = exportImportHelper;
@@ -498,6 +503,26 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 				continue;
 			}
 
+			Map<String, Serializable> deleteParameters = null;
+
+			try (BatchEngineTaskItemDelegateRegistry.
+					BatchEngineTaskItemDelegateSafeCloseable
+						batchEngineTaskItemDelegateSafeCloseable =
+							_batchEngineTaskItemDelegateRegistry.
+								getBatchEngineTaskItemDelegateWithSafeCloseable(
+									portletDataContext.getCompanyId(),
+									registration.getBatchEngineClassName(),
+									registration.getTaskItemDelegateName())) {
+
+				deleteParameters =
+					BatchEnginePortletDataHandlerUtil.buildDeleteParameters(
+						batchEngineTaskItemDelegateSafeCloseable.
+							getBatchEngineTaskItemDelegate(),
+						registration.getExportImportDescriptor(),
+						_groupLocalService, portletDataContext,
+						_stagingGroupHelper);
+			}
+
 			BatchEngineImportTask batchEngineDeleteTask =
 				_batchEngineImportTaskService.addBatchEngineImportTask(
 					null, portletDataContext.getCompanyId(), _getUserId(), 100,
@@ -511,11 +536,7 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 					Collections.emptyMap(),
 					BatchEngineImportTaskConstants.
 						IMPORT_STRATEGY_ON_ERROR_CONTINUE,
-					BatchEngineTaskOperation.DELETE.name(),
-					BatchEnginePortletDataHandlerUtil.buildDeleteParameters(
-						registration.getExportImportDescriptor(),
-						_groupLocalService, portletDataContext,
-						_stagingGroupHelper),
+					BatchEngineTaskOperation.DELETE.name(), deleteParameters,
 					registration.getTaskItemDelegateName());
 
 			_batchEngineImportTaskExecutor.execute(batchEngineDeleteTask);
@@ -1144,6 +1165,8 @@ public class BatchEnginePortletDataHandler extends BasePortletDataHandler {
 		_batchEngineExportTaskLocalService;
 	private final BatchEngineImportTaskExecutor _batchEngineImportTaskExecutor;
 	private final BatchEngineImportTaskService _batchEngineImportTaskService;
+	private final BatchEngineTaskItemDelegateRegistry
+		_batchEngineTaskItemDelegateRegistry;
 	private final ChangesetEntryLocalService _changesetEntryLocalService;
 	private final ClassNameLocalService _classNameLocalService;
 	private final ExportImportHelper _exportImportHelper;

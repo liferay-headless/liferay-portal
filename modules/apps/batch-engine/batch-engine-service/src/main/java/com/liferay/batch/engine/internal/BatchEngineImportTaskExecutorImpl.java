@@ -51,7 +51,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageSender;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
-import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -63,7 +62,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.Validator;
@@ -607,20 +605,6 @@ public class BatchEngineImportTaskExecutorImpl
 			LastSessionRecorderHelperUtil.syncLastSessionState();
 		}
 		catch (Throwable throwable) {
-			if ((throwable instanceof NoSuchModelException) &&
-				GetterUtil.getBoolean(
-					batchEngineImportTask.getParameterValue(
-						"ignoreMissingItems"))) {
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Skipping item " + PasswordFieldUtil.toString(item),
-						throwable);
-				}
-
-				return;
-			}
-
 			Exception exception =
 				throwable instanceof Exception ? (Exception)throwable :
 					new Exception(throwable.getMessage(), throwable);

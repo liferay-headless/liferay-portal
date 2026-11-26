@@ -5,8 +5,10 @@
 
 package com.liferay.exportimport.internal.data.handler;
 
+import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
 import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
 import com.liferay.batch.engine.constants.CreateStrategy;
+import com.liferay.batch.engine.constants.DeleteStrategy;
 import com.liferay.changeset.model.ChangesetEntry;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
@@ -52,6 +54,7 @@ import java.util.Set;
 public class BatchEnginePortletDataHandlerUtil {
 
 	public static Map<String, Serializable> buildDeleteParameters(
+		BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate,
 		ExportImportVulcanBatchEngineTaskItemDelegate.ExportImportDescriptor
 			exportImportDescriptor,
 		GroupLocalService groupLocalService,
@@ -62,7 +65,19 @@ public class BatchEnginePortletDataHandlerUtil {
 			HashMapBuilder.<String, Serializable>putAll(
 				exportImportDescriptor.getParameters(portletDataContext)
 			).put(
-				"ignoreMissingItems", true
+				"deleteStrategy",
+				() -> {
+					String deleteStrategy =
+						DeleteStrategy.DELETE_IF_EXISTS.getDBOperation();
+
+					if (batchEngineTaskItemDelegate.hasDeleteStrategy(
+							deleteStrategy)) {
+
+						return deleteStrategy;
+					}
+
+					return null;
+				}
 			).build();
 
 		Group group = groupLocalService.fetchGroup(

@@ -627,7 +627,7 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 	private static final Set<String> _ignoredParameters = new HashSet<>(
 		Arrays.asList(
-			"callbackURL", "fieldNameMapping", "ignoreMissingItems",
+			"callbackURL", "deleteStrategy", "fieldNameMapping",
 			"taskItemDelegateName"));
 	private static final Map<String, Integer> _itemClassBatchSizeMap =
 		_getItemClassBatchSizeMap();
