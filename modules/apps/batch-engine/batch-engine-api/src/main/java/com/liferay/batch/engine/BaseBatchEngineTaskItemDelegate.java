@@ -72,6 +72,11 @@ public abstract class BaseBatchEngineTaskItemDelegate<T>
 	}
 
 	@Override
+	public Set<String> getAvailableDeleteStrategies() {
+		return _availableDeleteStrategies;
+	}
+
+	@Override
 	public Set<String> getAvailableUpdateStrategies() {
 		return _availableUpdateStrategies;
 	}
@@ -86,6 +91,11 @@ public abstract class BaseBatchEngineTaskItemDelegate<T>
 	@Override
 	public boolean hasCreateStrategy(String createStrategy) {
 		return _availableCreateStrategies.contains(createStrategy);
+	}
+
+	@Override
+	public boolean hasDeleteStrategy(String deleteStrategy) {
+		return _availableDeleteStrategies.contains(deleteStrategy);
 	}
 
 	@Override
@@ -150,6 +160,8 @@ public abstract class BaseBatchEngineTaskItemDelegate<T>
 
 	private final Set<String> _availableCreateStrategies =
 		Collections.unmodifiableSet(SetUtil.fromArray("INSERT"));
+	private final Set<String> _availableDeleteStrategies =
+		Collections.unmodifiableSet(SetUtil.fromArray("DELETE"));
 	private final Set<String> _availableUpdateStrategies =
 		Collections.unmodifiableSet(SetUtil.fromArray("UPDATE"));
 

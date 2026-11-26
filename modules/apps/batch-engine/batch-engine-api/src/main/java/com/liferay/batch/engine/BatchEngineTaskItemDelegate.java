@@ -42,6 +42,8 @@ public interface BatchEngineTaskItemDelegate<T> {
 
 	public Set<String> getAvailableCreateStrategies();
 
+	public Set<String> getAvailableDeleteStrategies();
+
 	public Set<String> getAvailableUpdateStrategies();
 
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
@@ -56,6 +58,8 @@ public interface BatchEngineTaskItemDelegate<T> {
 	}
 
 	public boolean hasCreateStrategy(String createStrategy);
+
+	public boolean hasDeleteStrategy(String deleteStrategy);
 
 	public boolean hasUpdateStrategy(String updateStrategy);
 

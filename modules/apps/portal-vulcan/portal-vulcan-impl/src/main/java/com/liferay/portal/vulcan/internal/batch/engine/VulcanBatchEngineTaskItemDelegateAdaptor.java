@@ -91,6 +91,12 @@ public class VulcanBatchEngineTaskItemDelegateAdaptor<T>
 	}
 
 	@Override
+	public Set<String> getAvailableDeleteStrategies() {
+		return _vulcanBatchEngineTaskItemDelegate.
+			getAvailableDeleteStrategies();
+	}
+
+	@Override
 	public Set<String> getAvailableUpdateStrategies() {
 		return _vulcanBatchEngineTaskItemDelegate.
 			getAvailableUpdateStrategies();
@@ -133,6 +139,14 @@ public class VulcanBatchEngineTaskItemDelegateAdaptor<T>
 			_vulcanBatchEngineTaskItemDelegate.getAvailableCreateStrategies();
 
 		return createStrategies.contains(createStrategy);
+	}
+
+	@Override
+	public boolean hasDeleteStrategy(String deleteStrategy) {
+		Set<String> deleteStrategies =
+			_vulcanBatchEngineTaskItemDelegate.getAvailableDeleteStrategies();
+
+		return deleteStrategies.contains(deleteStrategy);
 	}
 
 	@Override
