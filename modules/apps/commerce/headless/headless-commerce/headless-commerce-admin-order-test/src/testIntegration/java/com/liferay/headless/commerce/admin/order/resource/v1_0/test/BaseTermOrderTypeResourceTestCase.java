@@ -777,7 +777,7 @@ public abstract class BaseTermOrderTypeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.order.dto.v1_0.TermOrderType",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1670,4 +1670,4 @@ public abstract class BaseTermOrderTypeResourceTestCase {
 		TermOrderTypeResource _termOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1117305183
+// LIFERAY-REST-BUILDER-HASH:-38276092

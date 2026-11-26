@@ -1060,7 +1060,7 @@ public abstract class BaseCTProcessResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.change.tracking.rest.dto.v1_0.CTProcess", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2037,4 +2037,4 @@ public abstract class BaseCTProcessResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-674099792
+// LIFERAY-REST-BUILDER-HASH:-624962603

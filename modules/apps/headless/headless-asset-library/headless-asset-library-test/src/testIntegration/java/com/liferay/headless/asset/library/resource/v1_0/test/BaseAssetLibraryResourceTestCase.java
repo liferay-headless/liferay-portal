@@ -1137,7 +1137,7 @@ public abstract class BaseAssetLibraryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.asset.library.dto.v1_0.AssetLibrary",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2590,4 +2590,4 @@ public abstract class BaseAssetLibraryResourceTestCase {
 			_assetLibraryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:483980998
+// LIFERAY-REST-BUILDER-HASH:917723649

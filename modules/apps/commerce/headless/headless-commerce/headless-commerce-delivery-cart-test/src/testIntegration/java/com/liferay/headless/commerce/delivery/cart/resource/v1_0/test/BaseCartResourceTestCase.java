@@ -2552,7 +2552,7 @@ public abstract class BaseCartResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.delivery.cart.dto.v1_0.Cart",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -5556,4 +5556,4 @@ public abstract class BaseCartResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1693009787
+// LIFERAY-REST-BUILDER-HASH:-1027758336

@@ -1812,7 +1812,7 @@ public abstract class BaseWikiNodeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.WikiNode", null, null,
-				null, null,
+				null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3067,4 +3067,4 @@ public abstract class BaseWikiNodeResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:103535602
+// LIFERAY-REST-BUILDER-HASH:1973206573

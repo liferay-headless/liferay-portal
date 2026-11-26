@@ -922,7 +922,7 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.channel.dto.v1_0.PaymentMethodGroupRelOrderType",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1851,4 +1851,4 @@ public abstract class BasePaymentMethodGroupRelOrderTypeResourceTestCase {
 			_paymentMethodGroupRelOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2034807256
+// LIFERAY-REST-BUILDER-HASH:-1787846515

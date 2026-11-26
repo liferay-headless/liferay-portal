@@ -694,7 +694,7 @@ public abstract class BaseUserGroupResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.asset.library.dto.v1_0.UserGroup", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1545,4 +1545,4 @@ public abstract class BaseUserGroupResourceTestCase {
 		_userGroupResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-984323621
+// LIFERAY-REST-BUILDER-HASH:2134529024

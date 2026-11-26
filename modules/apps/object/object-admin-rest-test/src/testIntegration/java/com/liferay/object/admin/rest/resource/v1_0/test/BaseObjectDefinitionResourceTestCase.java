@@ -1770,7 +1770,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -4505,4 +4505,4 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:391015130
+// LIFERAY-REST-BUILDER-HASH:1382465663

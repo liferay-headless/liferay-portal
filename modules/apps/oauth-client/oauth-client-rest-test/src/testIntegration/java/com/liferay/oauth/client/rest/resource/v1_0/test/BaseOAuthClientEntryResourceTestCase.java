@@ -433,7 +433,7 @@ public abstract class BaseOAuthClientEntryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.oauth.client.rest.dto.v1_0.OAuthClientEntry", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1907,4 +1907,4 @@ public abstract class BaseOAuthClientEntryResourceTestCase {
 		_oAuthClientEntryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:674444241
+// LIFERAY-REST-BUILDER-HASH:-1839321396

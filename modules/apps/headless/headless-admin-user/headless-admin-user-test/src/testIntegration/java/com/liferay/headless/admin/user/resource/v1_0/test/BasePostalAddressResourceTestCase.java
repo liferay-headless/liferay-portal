@@ -2040,7 +2040,7 @@ public abstract class BasePostalAddressResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.user.dto.v1_0.PostalAddress", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3864,4 +3864,4 @@ public abstract class BasePostalAddressResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-143634137
+// LIFERAY-REST-BUILDER-HASH:-435342644

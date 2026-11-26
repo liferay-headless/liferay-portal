@@ -1819,7 +1819,7 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.notification.rest.dto.v1_0.NotificationTemplate",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3520,4 +3520,4 @@ public abstract class BaseNotificationTemplateResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-686810126
+// LIFERAY-REST-BUILDER-HASH:1569365421

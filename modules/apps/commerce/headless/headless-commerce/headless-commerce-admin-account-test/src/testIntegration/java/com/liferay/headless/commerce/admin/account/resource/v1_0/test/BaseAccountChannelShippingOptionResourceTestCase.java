@@ -1318,7 +1318,7 @@ public abstract class BaseAccountChannelShippingOptionResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.account.dto.v1_0.AccountChannelShippingOption",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2458,4 +2458,4 @@ public abstract class BaseAccountChannelShippingOptionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:2146386553
+// LIFERAY-REST-BUILDER-HASH:-106671458

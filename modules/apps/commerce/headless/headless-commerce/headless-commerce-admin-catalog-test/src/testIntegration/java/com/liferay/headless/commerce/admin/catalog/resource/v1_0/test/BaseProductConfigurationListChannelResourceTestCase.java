@@ -1187,7 +1187,7 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductConfigurationListChannel",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2202,4 +2202,4 @@ public abstract class BaseProductConfigurationListChannelResourceTestCase {
 			_productConfigurationListChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1917632920
+// LIFERAY-REST-BUILDER-HASH:1200213731

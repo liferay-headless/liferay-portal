@@ -1424,7 +1424,7 @@ public abstract class BaseMappedProductResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.MappedProduct",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2579,4 +2579,4 @@ public abstract class BaseMappedProductResourceTestCase {
 		MappedProductResource _mappedProductResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1238502745
+// LIFERAY-REST-BUILDER-HASH:-1860229620

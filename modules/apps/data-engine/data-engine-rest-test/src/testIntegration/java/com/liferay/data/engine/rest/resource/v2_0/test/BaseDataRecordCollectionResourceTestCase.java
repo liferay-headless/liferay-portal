@@ -1551,7 +1551,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.data.engine.rest.dto.v2_0.DataRecordCollection",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2556,4 +2556,4 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1582735863
+// LIFERAY-REST-BUILDER-HASH:-923378148

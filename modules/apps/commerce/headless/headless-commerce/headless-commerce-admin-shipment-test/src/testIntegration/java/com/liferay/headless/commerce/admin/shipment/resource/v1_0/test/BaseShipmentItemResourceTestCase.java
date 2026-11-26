@@ -1513,7 +1513,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.shipment.dto.v1_0.ShipmentItem",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2974,4 +2974,4 @@ public abstract class BaseShipmentItemResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2088247656
+// LIFERAY-REST-BUILDER-HASH:621266301

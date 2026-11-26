@@ -1469,7 +1469,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.data.engine.rest.dto.v2_0.DataLayout", null, null,
-				null, null,
+				null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2745,4 +2745,4 @@ public abstract class BaseDataLayoutResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1082803305
+// LIFERAY-REST-BUILDER-HASH:-2056364274

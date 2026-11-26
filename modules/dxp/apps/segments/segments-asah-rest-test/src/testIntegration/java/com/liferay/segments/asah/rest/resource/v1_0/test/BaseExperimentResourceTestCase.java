@@ -500,7 +500,7 @@ public abstract class BaseExperimentResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.segments.asah.rest.dto.v1_0.Experiment", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1507,4 +1507,4 @@ public abstract class BaseExperimentResourceTestCase {
 		_experimentResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1951874977
+// LIFERAY-REST-BUILDER-HASH:850348486

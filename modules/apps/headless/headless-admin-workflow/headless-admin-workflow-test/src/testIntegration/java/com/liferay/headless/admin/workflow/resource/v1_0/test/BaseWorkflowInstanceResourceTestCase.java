@@ -968,7 +968,7 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.workflow.dto.v1_0.WorkflowInstance",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2003,4 +2003,4 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1449713701
+// LIFERAY-REST-BUILDER-HASH:-328974432

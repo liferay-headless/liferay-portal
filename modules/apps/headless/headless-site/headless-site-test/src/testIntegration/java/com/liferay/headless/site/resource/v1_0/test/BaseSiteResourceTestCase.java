@@ -854,7 +854,7 @@ public abstract class BaseSiteResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.site.dto.v1_0.Site", null, null, null,
-				null,
+				null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2264,4 +2264,4 @@ public abstract class BaseSiteResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1680003006
+// LIFERAY-REST-BUILDER-HASH:816091171

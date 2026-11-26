@@ -1043,7 +1043,7 @@ public abstract class BaseChannelAccountResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.channel.dto.v1_0.ChannelAccount",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1942,4 +1942,4 @@ public abstract class BaseChannelAccountResourceTestCase {
 		ChannelAccountResource _channelAccountResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:254200743
+// LIFERAY-REST-BUILDER-HASH:177877516

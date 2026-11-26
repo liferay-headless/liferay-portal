@@ -744,7 +744,7 @@ public abstract class BaseProcessResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1905,4 +1905,4 @@ public abstract class BaseProcessResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1205617699
+// LIFERAY-REST-BUILDER-HASH:218758808

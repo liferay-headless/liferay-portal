@@ -785,7 +785,7 @@ public abstract class BaseDiscountProductResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountProduct",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1634,4 +1634,4 @@ public abstract class BaseDiscountProductResourceTestCase {
 		DiscountProductResource _discountProductResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1400190089
+// LIFERAY-REST-BUILDER-HASH:-1995706062

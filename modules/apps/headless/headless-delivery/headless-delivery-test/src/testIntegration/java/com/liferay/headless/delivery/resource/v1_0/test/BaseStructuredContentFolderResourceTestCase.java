@@ -4116,7 +4116,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.StructuredContentFolder",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -5660,4 +5660,4 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-117075989
+// LIFERAY-REST-BUILDER-HASH:-1224705904

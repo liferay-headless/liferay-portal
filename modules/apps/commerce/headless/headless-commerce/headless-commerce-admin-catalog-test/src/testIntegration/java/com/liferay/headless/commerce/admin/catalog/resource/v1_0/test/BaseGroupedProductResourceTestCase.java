@@ -788,7 +788,7 @@ public abstract class BaseGroupedProductResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.GroupedProduct",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1798,4 +1798,4 @@ public abstract class BaseGroupedProductResourceTestCase {
 		GroupedProductResource _groupedProductResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1912904511
+// LIFERAY-REST-BUILDER-HASH:1784481660

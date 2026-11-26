@@ -2323,7 +2323,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.site.setting.dto.v1_0.MeasurementUnit",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3446,4 +3446,4 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1503941057
+// LIFERAY-REST-BUILDER-HASH:-1950540828

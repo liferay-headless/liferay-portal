@@ -4002,7 +4002,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.DocumentFolder", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -5740,4 +5740,4 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-891028281
+// LIFERAY-REST-BUILDER-HASH:1124341676
