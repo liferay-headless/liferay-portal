@@ -925,51 +925,6 @@ public class BatchEngineImportTaskExecutorTest
 			blogsEntryLocalService.getGroupEntriesCount(
 				TestPropsValues.getGroupId(),
 				new QueryDefinition<>(WorkflowConstants.STATUS_ANY)));
-
-		blogsEntries = addBlogsEntries();
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				_CLASS_NAME_BATCH_ENGINE_IMPORT_TASK_EXECUTOR_IMPL,
-				LoggerTestUtil.ERROR)) {
-
-			_batchEngineImportTask = _addBatchEngineImportTask(
-				BatchEngineTaskOperation.DELETE, null,
-				_getBlogPostingsCSVDeleteContent(blogsEntries, true), "CSV",
-				null,
-				BatchEngineImportTaskConstants.IMPORT_STRATEGY_ON_ERROR_FAIL,
-				HashMapBuilder.<String, Serializable>put(
-					"ignoreMissingItems", true
-				).build());
-
-			_batchEngineImportTaskExecutor.execute(_batchEngineImportTask);
-
-			_batchEngineImportTask =
-				_batchEngineImportTaskLocalService.getBatchEngineImportTask(
-					_batchEngineImportTask.getBatchEngineImportTaskId());
-
-			List<LogEntry> logEntries = logCapture.getLogEntries();
-
-			Assert.assertTrue(logEntries.toString(), logEntries.isEmpty());
-		}
-
-		Assert.assertEquals(
-			BatchEngineTaskExecuteStatus.COMPLETED.toString(),
-			_batchEngineImportTask.getExecuteStatus());
-
-		List<BatchEngineImportTaskError> batchEngineImportTaskErrors =
-			_batchEngineImportTaskErrorLocalService.
-				getBatchEngineImportTaskErrors(
-					_batchEngineImportTask.getBatchEngineImportTaskId());
-
-		Assert.assertTrue(
-			batchEngineImportTaskErrors.toString(),
-			batchEngineImportTaskErrors.isEmpty());
-
-		Assert.assertEquals(
-			initialCount,
-			blogsEntryLocalService.getGroupEntriesCount(
-				TestPropsValues.getGroupId(),
-				new QueryDefinition<>(WorkflowConstants.STATUS_ANY)));
 	}
 
 	@Test
@@ -1317,7 +1272,7 @@ public class BatchEngineImportTaskExecutorTest
 	}
 
 	@Test
-	public void testImportTaskInvalidCreateAndUpdateStrategies() {
+	public void testImportTaskInvalidStrategies() {
 		BatchEngineTaskOperation batchEngineTaskOperation =
 			BatchEngineTaskOperation.CREATE;
 		Map<String, Serializable> parameters =
@@ -1347,6 +1302,34 @@ public class BatchEngineImportTaskExecutorTest
 
 			Assert.assertTrue(
 				exceptionMessage.contains("INVALID CREATE STRATEGY"));
+		}
+
+		parameters = HashMapBuilder.<String, Serializable>put(
+			"deleteStrategy", "INVALID DELETE STRATEGY"
+		).build();
+
+		try {
+			_batchEngineImportTask =
+				_batchEngineImportTaskLocalService.addBatchEngineImportTask(
+					null, TestPropsValues.getCompanyId(), user.getUserId(),
+					_BATCH_SIZE, null, BlogPosting.class.getName(), null, "CSV",
+					BatchEngineTaskExecuteStatus.INITIAL.name(),
+					Collections.emptyMap(),
+					BatchEngineImportTaskConstants.
+						IMPORT_STRATEGY_ON_ERROR_FAIL,
+					batchEngineTaskOperation.name(), parameters, null);
+
+			Assert.fail();
+		}
+		catch (Exception exception) {
+			Assert.assertEquals(
+				exception.getClass(),
+				BatchEngineImportTaskParametersException.class);
+
+			String exceptionMessage = exception.getMessage();
+
+			Assert.assertTrue(
+				exceptionMessage.contains("INVALID DELETE STRATEGY"));
 		}
 
 		parameters = HashMapBuilder.<String, Serializable>put(
@@ -1466,18 +1449,6 @@ public class BatchEngineImportTaskExecutorTest
 				(Serializable)String.valueOf(TestPropsValues.getGroupId())
 			).build();
 		}
-
-		return _addBatchEngineImportTask(
-			batchEngineTaskOperation, callbackURL, content, contentType,
-			fieldNameMappingMap, importStrategy, parameters);
-	}
-
-	private BatchEngineImportTask _addBatchEngineImportTask(
-			BatchEngineTaskOperation batchEngineTaskOperation,
-			String callbackURL, byte[] content, String contentType,
-			Map<String, String> fieldNameMappingMap, int importStrategy,
-			Map<String, Serializable> parameters)
-		throws Exception {
 
 		return _batchEngineImportTaskLocalService.addBatchEngineImportTask(
 			null, TestPropsValues.getCompanyId(), user.getUserId(), _BATCH_SIZE,
