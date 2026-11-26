@@ -110,6 +110,7 @@ public class BatchEngineImportTaskLocalServiceImpl
 			_validateStrategies(
 				batchEngineTaskItemDelegate,
 				(String)parameters.getOrDefault("createStrategy", null),
+				(String)parameters.getOrDefault("deleteStrategy", null),
 				(String)parameters.getOrDefault("updateStrategy", null));
 		}
 
@@ -343,7 +344,7 @@ public class BatchEngineImportTaskLocalServiceImpl
 
 	private void _validateStrategies(
 			BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate,
-			String createStrategy, String updateStrategy)
+			String createStrategy, String deleteStrategy, String updateStrategy)
 		throws BatchEngineImportTaskParametersException {
 
 		if (Validator.isNotNull(createStrategy) &&
@@ -351,6 +352,13 @@ public class BatchEngineImportTaskLocalServiceImpl
 
 			throw new BatchEngineImportTaskParametersException(
 				"Illegal create strategy " + createStrategy);
+		}
+
+		if (Validator.isNotNull(deleteStrategy) &&
+			!batchEngineTaskItemDelegate.hasDeleteStrategy(deleteStrategy)) {
+
+			throw new BatchEngineImportTaskParametersException(
+				"Illegal delete strategy " + deleteStrategy);
 		}
 
 		if (Validator.isNotNull(updateStrategy) &&
