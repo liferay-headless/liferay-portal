@@ -6,6 +6,10 @@
 package com.liferay.object.rest.internal.dto.v1_0.converter.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
@@ -15,6 +19,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryVersion;
@@ -30,13 +35,19 @@ import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -57,6 +68,7 @@ import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -167,6 +179,78 @@ public class ObjectEntryDTOConverterTest {
 		Assert.assertEquals(
 			group.getExternalReferenceCode(), scope.getExternalReferenceCode());
 		Assert.assertEquals(Scope.Type.SITE, scope.getType());
+	}
+
+	@Test
+	@TestInfo("LPD-116074")
+	public void testToDTOWithCategoryWithoutViewPermission() throws Exception {
+		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
+			false, false, false,
+			ListUtil.fromArray(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					"text"
+				).build()),
+			ObjectDefinitionConstants.SCOPE_SITE);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
+		serviceContext.setAddGroupPermissions(false);
+		serviceContext.setAddGuestPermissions(false);
+
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.addVocabulary(
+				TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
+				RandomTestUtil.randomString(), serviceContext);
+
+		AssetCategory assetCategory = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.addObjectEntry(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
+				_objectDefinition.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null, new HashMap<String, Serializable>(), serviceContext);
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		try {
+			User user = UserTestUtil.addUser();
+
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(user));
+
+			ObjectEntry objectEntry = _toDTO(
+				_objectDefinition, serviceBuilderObjectEntry);
+
+			Assert.assertEquals(
+				Arrays.toString(objectEntry.getTaxonomyCategoryBriefs()), 0,
+				objectEntry.getTaxonomyCategoryBriefs().length);
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
+		}
+
+		ObjectEntry objectEntry = _toDTO(
+			_objectDefinition, serviceBuilderObjectEntry);
+
+		Assert.assertEquals(
+			Arrays.toString(objectEntry.getTaxonomyCategoryBriefs()), 1,
+			objectEntry.getTaxonomyCategoryBriefs().length);
 	}
 
 	@FeatureFlag("LPD-108620")
@@ -286,6 +370,12 @@ public class ObjectEntryDTOConverterTest {
 		return dtoConverter.toDTO(
 			dtoConverterContext, serviceBuilderObjectEntry);
 	}
+
+	@Inject
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Inject
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	@Inject
 	private DTOConverterRegistry _dtoConverterRegistry;
