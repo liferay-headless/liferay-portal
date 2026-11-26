@@ -30,11 +30,15 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.PropsValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -49,7 +53,13 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import java.nio.charset.StandardCharsets;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -340,6 +350,41 @@ public class ExportImportTestUtil {
 		StagingUtil.publishLayouts(
 			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
 			liveGroup.getGroupId(), false, parameterMap);
+	}
+
+	public static int putImportUploadChunk(
+			byte[] bytes, String emailAddress, String password,
+			String urlString)
+		throws Exception {
+
+		URL url = new URL(urlString);
+
+		HttpURLConnection httpURLConnection =
+			(HttpURLConnection)url.openConnection();
+
+		httpURLConnection.setDoOutput(true);
+		httpURLConnection.setFixedLengthStreamingMode(bytes.length);
+		httpURLConnection.setRequestMethod(HttpMethods.PUT);
+
+		String credentials = emailAddress + ":" + password;
+
+		httpURLConnection.setRequestProperty(
+			HttpHeaders.AUTHORIZATION,
+			"Basic " +
+				Base64.encode(credentials.getBytes(StandardCharsets.UTF_8)));
+
+		httpURLConnection.setRequestProperty(
+			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_OCTET_STREAM);
+
+		try (OutputStream outputStream = httpURLConnection.getOutputStream()) {
+			outputStream.write(bytes);
+		}
+
+		int responseCode = httpURLConnection.getResponseCode();
+
+		httpURLConnection.disconnect();
+
+		return responseCode;
 	}
 
 	public static void retryAssert(
