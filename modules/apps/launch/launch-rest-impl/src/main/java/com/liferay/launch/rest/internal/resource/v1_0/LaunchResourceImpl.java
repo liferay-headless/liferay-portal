@@ -47,7 +47,7 @@ public class LaunchResourceImpl extends BaseLaunchResourceImpl {
 				objectDefinition.getExternalReferenceCode(), "L_LAUNCH_SET")) {
 
 			throw new NoSuchObjectEntryException(
-				"No launch set exists with ID " + launchId);
+				"No launch exists with ID " + launchId);
 		}
 
 		if (objectEntry.getStatus() == WorkflowConstants.STATUS_SCHEDULED) {

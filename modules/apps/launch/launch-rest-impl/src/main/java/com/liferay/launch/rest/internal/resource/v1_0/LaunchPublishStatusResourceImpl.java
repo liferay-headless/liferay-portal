@@ -49,7 +49,7 @@ public class LaunchPublishStatusResourceImpl
 				objectDefinition.getExternalReferenceCode(), "L_LAUNCH_SET")) {
 
 			throw new NoSuchObjectEntryException(
-				"No launch set exists with ID " + launchId);
+				"No launch exists with ID " + launchId);
 		}
 
 		BackgroundTask backgroundTask =
