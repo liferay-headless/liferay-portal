@@ -11,6 +11,7 @@ import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.controller.PortletImportController;
 import com.liferay.exportimport.internal.lar.GroupImporter;
 import com.liferay.exportimport.internal.lar.PortletLayoutListenerHelper;
+import com.liferay.exportimport.internal.util.GroupExportImportParameterUtil;
 import com.liferay.exportimport.internal.util.ManifestXMLFilePathUtil;
 import com.liferay.exportimport.kernel.controller.ExportImportController;
 import com.liferay.exportimport.kernel.controller.ImportController;
@@ -941,6 +942,14 @@ public class LayoutImportController implements ImportController {
 		for (Element groupElement : groupsElement.elements()) {
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, groupElement);
+		}
+
+		if (permissions &&
+			GroupExportImportParameterUtil.isGroupScoped(portletDataContext)) {
+
+			portletDataContext.importPermissions(
+				Group.class, portletDataContext.getSourceGroupId(),
+				portletDataContext.getGroupId());
 		}
 
 		// Portlet layout listeners

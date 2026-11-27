@@ -12,6 +12,7 @@ import com.liferay.exportimport.controller.PortletExportController;
 import com.liferay.exportimport.internal.lar.GroupExporter;
 import com.liferay.exportimport.internal.lar.PermissionExporter;
 import com.liferay.exportimport.internal.lar.RemoteStagingGroupExporter;
+import com.liferay.exportimport.internal.util.GroupExportImportParameterUtil;
 import com.liferay.exportimport.internal.util.ManifestXMLFilePathUtil;
 import com.liferay.exportimport.kernel.controller.ExportController;
 import com.liferay.exportimport.kernel.controller.ExportImportController;
@@ -358,6 +359,13 @@ public class LayoutExportController implements ExportController {
 			portletDataContext);
 
 		if (permissions) {
+			if (GroupExportImportParameterUtil.isGroupScoped(
+					portletDataContext)) {
+
+				portletDataContext.addPermissions(
+					Group.class, group.getGroupId());
+			}
+
 			_permissionExporter.exportPortletDataPermissions(
 				portletDataContext);
 		}
