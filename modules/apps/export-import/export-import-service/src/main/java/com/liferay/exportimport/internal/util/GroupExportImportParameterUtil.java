@@ -140,7 +140,7 @@ public class GroupExportImportParameterUtil {
 			PortletDataHandlerKeys.LOGO, new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PERMISSIONS,
-			new String[] {Boolean.FALSE.toString()}
+			new String[] {Boolean.TRUE.toString()}
 		).put(
 			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
 			new String[] {Boolean.TRUE.toString()}
