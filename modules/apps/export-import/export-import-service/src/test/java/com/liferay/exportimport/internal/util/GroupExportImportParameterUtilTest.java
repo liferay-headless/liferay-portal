@@ -58,6 +58,21 @@ public class GroupExportImportParameterUtilTest {
 	}
 
 	@Test
+	public void testGetGroupExportParameterMapForcesPermissionsEnabled() {
+		Map<String, String[]> groupParameterMap =
+			GroupExportImportParameterUtil.getGroupExportParameterMap(
+				RandomTestUtil.randomString(),
+				HashMapBuilder.put(
+					PortletDataHandlerKeys.PERMISSIONS,
+					new String[] {Boolean.FALSE.toString()}
+				).build());
+
+		Assert.assertTrue(
+			MapUtil.getBoolean(
+				groupParameterMap, PortletDataHandlerKeys.PERMISSIONS));
+	}
+
+	@Test
 	public void testGetGroupExportParameterMapRemovesGroupExternalReferenceCodes() {
 		String externalReferenceCode = RandomTestUtil.randomString();
 
@@ -105,7 +120,7 @@ public class GroupExportImportParameterUtilTest {
 	}
 
 	@Test
-	public void testGetGroupExportParameterMapWithDeletionsAndPermissionsEnabled() {
+	public void testGetGroupExportParameterMapWithDeletionsEnabled() {
 		Map<String, String[]> groupParameterMap =
 			GroupExportImportParameterUtil.getGroupExportParameterMap(
 				RandomTestUtil.randomString(),
@@ -117,9 +132,6 @@ public class GroupExportImportParameterUtilTest {
 					new String[] {Boolean.TRUE.toString()}
 				).put(
 					PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS,
-					new String[] {Boolean.TRUE.toString()}
-				).put(
-					PortletDataHandlerKeys.PERMISSIONS,
 					new String[] {Boolean.TRUE.toString()}
 				).build());
 
@@ -134,9 +146,6 @@ public class GroupExportImportParameterUtilTest {
 			MapUtil.getBoolean(
 				groupParameterMap,
 				PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_SETTINGS));
-		Assert.assertFalse(
-			MapUtil.getBoolean(
-				groupParameterMap, PortletDataHandlerKeys.PERMISSIONS));
 	}
 
 	@Test
@@ -168,6 +177,21 @@ public class GroupExportImportParameterUtilTest {
 		Assert.assertTrue(
 			MapUtil.getBoolean(
 				groupParameterMap, PortletDataHandlerKeys.LAYOUT_SET_SETTINGS));
+	}
+
+	@Test
+	public void testGetGroupImportParameterMapForcesPermissionsEnabled() {
+		Map<String, String[]> groupParameterMap =
+			GroupExportImportParameterUtil.getGroupImportParameterMap(
+				RandomTestUtil.randomString(),
+				HashMapBuilder.put(
+					PortletDataHandlerKeys.PERMISSIONS,
+					new String[] {Boolean.FALSE.toString()}
+				).build());
+
+		Assert.assertTrue(
+			MapUtil.getBoolean(
+				groupParameterMap, PortletDataHandlerKeys.PERMISSIONS));
 	}
 
 	@Test
