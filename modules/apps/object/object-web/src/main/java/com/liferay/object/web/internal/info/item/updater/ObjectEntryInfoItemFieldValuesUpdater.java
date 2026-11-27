@@ -19,7 +19,6 @@ import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.rest.manager.v1_0.util.ObjectEntryManagerUtil;
