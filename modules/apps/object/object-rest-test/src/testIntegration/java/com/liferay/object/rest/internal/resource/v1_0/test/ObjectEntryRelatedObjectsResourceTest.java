@@ -306,17 +306,8 @@ public class ObjectEntryRelatedObjectsResourceTest {
 			}
 		);
 
-		for (ObjectRelationship objectRelationship :
-				List.of(objectRelationship1, objectRelationship2)) {
-
-			JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
-				null, _getEndpoint(objectRelationship.getName()),
-				Http.Method.GET);
-
-			JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
-
-			Assert.assertEquals(0, itemsJSONArray.length());
-		}
+		_assertNoRelatedObjectEntries(objectRelationship1);
+		_assertNoRelatedObjectEntries(objectRelationship2);
 	}
 
 	@Test
@@ -2912,6 +2903,18 @@ public class ObjectEntryRelatedObjectsResourceTest {
 
 		Assert.assertEquals(
 			baseModel.getPrimaryKeyObj(), jsonObject.getLong("id"));
+	}
+
+	private void _assertNoRelatedObjectEntries(
+			ObjectRelationship objectRelationship)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _getEndpoint(objectRelationship.getName()), Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
 	}
 
 	private void _assertPagination(
