@@ -57,7 +57,7 @@ public class AddToLaunchPropsProviderTest {
 				"classVersion", "1.1"
 			).build(),
 			_addToLaunchPropsProvider.getProps(
-				JournalArticle.class.getName(), 1001L, "1.1"));
+				JournalArticle.class.getName(), 1001, "1.1"));
 	}
 
 	@Test
