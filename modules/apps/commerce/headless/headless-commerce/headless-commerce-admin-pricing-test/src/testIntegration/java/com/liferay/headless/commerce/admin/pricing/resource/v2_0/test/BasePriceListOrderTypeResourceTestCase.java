@@ -827,7 +827,7 @@ public abstract class BasePriceListOrderTypeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListOrderType",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1781,4 +1781,4 @@ public abstract class BasePriceListOrderTypeResourceTestCase {
 		PriceListOrderTypeResource _priceListOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-153287307
+// LIFERAY-REST-BUILDER-HASH:-1505601616

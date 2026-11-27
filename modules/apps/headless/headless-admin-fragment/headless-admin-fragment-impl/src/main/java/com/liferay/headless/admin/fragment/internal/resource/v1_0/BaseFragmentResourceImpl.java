@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -643,27 +644,42 @@ public abstract class BaseFragmentResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable siteExternalReferenceCode = parameters.get(
 			"siteExternalReferenceCode");
 
 		UnsafeFunction<Fragment, Fragment, Exception> fragmentUnsafeFunction =
 			fragment -> {
-				if (siteExternalReferenceCode != null) {
-					if (!FeatureFlagManagerUtil.isEnabled(
-							CompanyThreadLocal.getCompanyId(), "LPD-39244")) {
+				try {
+					if (siteExternalReferenceCode != null) {
+						if (!FeatureFlagManagerUtil.isEnabled(
+								CompanyThreadLocal.getCompanyId(),
+								"LPD-39244")) {
 
-						throw new NotFoundException();
+							throw new NotFoundException();
+						}
+
+						deleteSiteFragment(
+							(String)siteExternalReferenceCode,
+							fragment.getExternalReferenceCode());
+
+						return fragment;
 					}
 
-					deleteSiteFragment(
-						(String)siteExternalReferenceCode,
-						fragment.getExternalReferenceCode());
-
-					return fragment;
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
 				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return fragment;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -692,6 +708,19 @@ public abstract class BaseFragmentResourceImpl
 		}
 
 		return createStrategies;
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		Set<String> deleteStrategies = SetUtil.fromArray();
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "LPD-39244")) {
+
+			deleteStrategies.add("DELETE");
+			deleteStrategies.add("DELETE_IF_EXISTS");
+		}
+
+		return deleteStrategies;
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1342,4 +1371,4 @@ public abstract class BaseFragmentResourceImpl
 		LogFactoryUtil.getLog(BaseFragmentResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1353935688
+// LIFERAY-REST-BUILDER-HASH:-2013710933

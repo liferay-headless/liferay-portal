@@ -227,6 +227,10 @@ public abstract class BaseCurrencyResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -860,4 +864,4 @@ public abstract class BaseCurrencyResourceImpl
 		LogFactoryUtil.getLog(BaseCurrencyResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1109735459
+// LIFERAY-REST-BUILDER-HASH:-1778286459

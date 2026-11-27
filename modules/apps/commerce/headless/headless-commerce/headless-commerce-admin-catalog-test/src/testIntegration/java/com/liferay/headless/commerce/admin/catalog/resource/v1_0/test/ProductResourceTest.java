@@ -922,7 +922,7 @@ public class ProductResourceTest extends BaseProductResourceTestCase {
 		HttpInvoker.HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode",

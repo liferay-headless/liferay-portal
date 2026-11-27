@@ -1588,7 +1588,7 @@ public abstract class BaseStyleBookResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.site.dto.v1_0.StyleBook", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2845,4 +2845,4 @@ public abstract class BaseStyleBookResourceTestCase {
 		_styleBookResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1479594835
+// LIFERAY-REST-BUILDER-HASH:530579960

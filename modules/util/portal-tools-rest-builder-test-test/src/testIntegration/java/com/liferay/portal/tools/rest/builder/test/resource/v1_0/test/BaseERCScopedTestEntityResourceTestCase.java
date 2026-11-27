@@ -2283,7 +2283,7 @@ public abstract class BaseERCScopedTestEntityResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.portal.tools.rest.builder.test.dto.v1_0.ERCScopedTestEntity",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -3621,4 +3621,4 @@ public abstract class BaseERCScopedTestEntityResourceTestCase {
 		ERCScopedTestEntityResource _ercScopedTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-833940637
+// LIFERAY-REST-BUILDER-HASH:1422265054

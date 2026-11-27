@@ -618,11 +618,25 @@ public abstract class BaseObjectFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ObjectFolder, ObjectFolder, Exception>
 			objectFolderUnsafeFunction = objectFolder -> {
-				deleteObjectFolder(objectFolder.getId());
+				try {
+					deleteObjectFolder(objectFolder.getId());
 
-				return objectFolder;
+					return objectFolder;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return objectFolder;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -642,6 +656,10 @@ public abstract class BaseObjectFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1319,4 +1337,4 @@ public abstract class BaseObjectFolderResourceImpl
 		LogFactoryUtil.getLog(BaseObjectFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1871518488
+// LIFERAY-REST-BUILDER-HASH:-1930075835

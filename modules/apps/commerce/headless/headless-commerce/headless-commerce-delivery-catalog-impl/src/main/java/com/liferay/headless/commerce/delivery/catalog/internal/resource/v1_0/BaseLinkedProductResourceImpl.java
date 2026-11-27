@@ -157,6 +157,10 @@ public abstract class BaseLinkedProductResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -792,4 +796,4 @@ public abstract class BaseLinkedProductResourceImpl
 		LogFactoryUtil.getLog(BaseLinkedProductResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-722910187
+// LIFERAY-REST-BUILDER-HASH:-991313417

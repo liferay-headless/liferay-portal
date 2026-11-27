@@ -439,6 +439,10 @@ public abstract class BaseMessageResourceImpl
 		return SetUtil.fromArray("INSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("UPDATE");
 	}
@@ -1106,4 +1110,4 @@ public abstract class BaseMessageResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-225994230
+// LIFERAY-REST-BUILDER-HASH:568480620

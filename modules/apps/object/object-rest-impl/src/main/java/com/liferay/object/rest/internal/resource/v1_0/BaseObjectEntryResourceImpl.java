@@ -2827,32 +2827,50 @@ public abstract class BaseObjectEntryResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ObjectEntry, ObjectEntry, Exception>
 			objectEntryUnsafeFunction = objectEntry -> {
-				if (objectEntry.getId() != null) {
-					try {
-						deleteObjectEntry(objectEntry.getId());
-
-						return objectEntry;
-					}
-					catch (Exception exception) {
-						if (objectEntry.getExternalReferenceCode() != null) {
-							deleteByExternalReferenceCode(
-								objectEntry.getExternalReferenceCode());
+				try {
+					if (objectEntry.getId() != null) {
+						try {
+							deleteObjectEntry(objectEntry.getId());
 
 							return objectEntry;
 						}
+						catch (Exception exception) {
+							if (objectEntry.getExternalReferenceCode() !=
+									null) {
+
+								deleteByExternalReferenceCode(
+									objectEntry.getExternalReferenceCode());
+
+								return objectEntry;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (objectEntry.getExternalReferenceCode() != null) {
-					deleteByExternalReferenceCode(
-						objectEntry.getExternalReferenceCode());
+					else if (objectEntry.getExternalReferenceCode() != null) {
+						deleteByExternalReferenceCode(
+							objectEntry.getExternalReferenceCode());
 
-					return objectEntry;
-				}
+						return objectEntry;
+					}
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return objectEntry;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2872,6 +2890,10 @@ public abstract class BaseObjectEntryResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -3737,4 +3759,4 @@ public abstract class BaseObjectEntryResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-863618370
+// LIFERAY-REST-BUILDER-HASH:-63986169

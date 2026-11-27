@@ -212,6 +212,10 @@ public abstract class BaseShippingMethodResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -863,4 +867,4 @@ public abstract class BaseShippingMethodResourceImpl
 		LogFactoryUtil.getLog(BaseShippingMethodResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2064370477
+// LIFERAY-REST-BUILDER-HASH:966551307

@@ -1679,7 +1679,7 @@ public abstract class BaseEmailAddressResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.user.dto.v1_0.EmailAddress", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2574,4 +2574,4 @@ public abstract class BaseEmailAddressResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-562246833
+// LIFERAY-REST-BUILDER-HASH:1270188042

@@ -951,7 +951,7 @@ public abstract class BasePinResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.Pin",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1711,4 +1711,4 @@ public abstract class BasePinResourceTestCase {
 			_pinResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1820267270
+// LIFERAY-REST-BUILDER-HASH:528073247

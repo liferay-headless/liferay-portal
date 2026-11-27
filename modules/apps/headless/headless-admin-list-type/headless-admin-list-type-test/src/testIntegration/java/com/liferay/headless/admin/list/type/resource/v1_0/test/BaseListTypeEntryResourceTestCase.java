@@ -2012,7 +2012,7 @@ public abstract class BaseListTypeEntryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3298,4 +3298,4 @@ public abstract class BaseListTypeEntryResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1083116375
+// LIFERAY-REST-BUILDER-HASH:-1855868018

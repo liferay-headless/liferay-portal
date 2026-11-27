@@ -772,6 +772,10 @@ public abstract class BaseTaxCategoryResourceImpl
 		return SetUtil.fromArray("INSERT", "UPSERT");
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("PARTIAL_UPDATE");
 	}
@@ -1607,4 +1611,4 @@ public abstract class BaseTaxCategoryResourceImpl
 		LogFactoryUtil.getLog(BaseTaxCategoryResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:2081531161
+// LIFERAY-REST-BUILDER-HASH:-740519813

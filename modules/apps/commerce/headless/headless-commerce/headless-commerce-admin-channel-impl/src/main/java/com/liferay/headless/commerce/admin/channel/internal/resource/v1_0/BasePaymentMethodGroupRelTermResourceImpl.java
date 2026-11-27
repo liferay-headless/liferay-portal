@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -20,6 +21,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
@@ -292,15 +294,29 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<PaymentMethodGroupRelTerm, PaymentMethodGroupRelTerm, Exception>
 				paymentMethodGroupRelTermUnsafeFunction =
 					paymentMethodGroupRelTerm -> {
-						deletePaymentMethodGroupRelTerm(
-							paymentMethodGroupRelTerm.
-								getPaymentMethodGroupRelTermId());
+						try {
+							deletePaymentMethodGroupRelTerm(
+								paymentMethodGroupRelTerm.
+									getPaymentMethodGroupRelTermId());
 
-						return paymentMethodGroupRelTerm;
+							return paymentMethodGroupRelTerm;
+						}
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
+
+								return paymentMethodGroupRelTerm;
+							}
+
+							throw noSuchModelException;
+						}
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -325,6 +341,10 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -966,4 +986,4 @@ public abstract class BasePaymentMethodGroupRelTermResourceImpl
 		LogFactoryUtil.getLog(BasePaymentMethodGroupRelTermResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1843587584
+// LIFERAY-REST-BUILDER-HASH:-849666837

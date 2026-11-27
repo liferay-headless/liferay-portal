@@ -1108,7 +1108,7 @@ public abstract class BaseWishListResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.delivery.catalog.dto.v1_0.WishList",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1872,4 +1872,4 @@ public abstract class BaseWishListResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:143514494
+// LIFERAY-REST-BUILDER-HASH:-1961137735

@@ -1335,7 +1335,7 @@ public abstract class BaseDataListViewResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.data.engine.rest.dto.v2_0.DataListView", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2430,4 +2430,4 @@ public abstract class BaseDataListViewResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-2129177568
+// LIFERAY-REST-BUILDER-HASH:-1293475365

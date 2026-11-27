@@ -575,7 +575,7 @@ public abstract class BaseConnectedSiteResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.asset.library.dto.v1_0.ConnectedSite",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1642,4 +1642,4 @@ public abstract class BaseConnectedSiteResourceTestCase {
 			_connectedSiteResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-704166221
+// LIFERAY-REST-BUILDER-HASH:733183000

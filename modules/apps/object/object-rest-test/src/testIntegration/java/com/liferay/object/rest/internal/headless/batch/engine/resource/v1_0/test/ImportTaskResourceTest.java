@@ -630,7 +630,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 		HttpInvoker.HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null,
-				null, objectDefinition.getName(),
+				null, null, objectDefinition.getName(),
 				JSONUtil.putAll(
 					JSONUtil.put("id", objectEntry1.getObjectEntryId())
 				).toString());
@@ -643,7 +643,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 
 		httpResponse = importTaskResource.deleteImportTaskHttpResponse(
 			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null, null,
-			objectDefinition.getName(),
+			null, objectDefinition.getName(),
 			JSONUtil.putAll(
 				JSONUtil.put(
 					"externalReferenceCode",
@@ -670,7 +670,7 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 
 		httpResponse = importTaskResource.deleteImportTaskHttpResponse(
 			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null, null, null,
-			objectDefinition.getName(),
+			null, objectDefinition.getName(),
 			JSONUtil.putAll(
 				JSONUtil.put(
 					"externalReferenceCode",
@@ -687,6 +687,24 @@ public class ImportTaskResourceTest extends BaseTaskResourceTestCase {
 		Assert.assertEquals(404, _getHttpCode(objectEntry1));
 
 		Assert.assertEquals(200, _getHttpCode(objectEntry2));
+
+		httpResponse = importTaskResource.deleteImportTaskHttpResponse(
+			"com.liferay.object.rest.dto.v1_0.ObjectEntry", null,
+			"DELETE_IF_EXISTS", null, null, objectDefinition.getName(),
+			JSONUtil.putAll(
+				JSONUtil.put("id", objectEntry1.getObjectEntryId()),
+				JSONUtil.put(
+					"externalReferenceCode", RandomTestUtil.randomString()),
+				JSONUtil.put(
+					"externalReferenceCode",
+					objectEntry2.getExternalReferenceCode())
+			).toString());
+
+		waitForFinish(
+			"COMPLETED", true,
+			JSONFactoryUtil.createJSONObject(httpResponse.getContent()));
+
+		Assert.assertEquals(404, _getHttpCode(objectEntry2));
 	}
 
 	@Inject

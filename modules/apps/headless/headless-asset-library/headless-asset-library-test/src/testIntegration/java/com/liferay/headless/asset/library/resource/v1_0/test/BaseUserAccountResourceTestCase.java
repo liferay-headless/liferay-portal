@@ -717,7 +717,7 @@ public abstract class BaseUserAccountResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.asset.library.dto.v1_0.UserAccount", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1583,4 +1583,4 @@ public abstract class BaseUserAccountResourceTestCase {
 		_userAccountResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1987242996
+// LIFERAY-REST-BUILDER-HASH:594332569

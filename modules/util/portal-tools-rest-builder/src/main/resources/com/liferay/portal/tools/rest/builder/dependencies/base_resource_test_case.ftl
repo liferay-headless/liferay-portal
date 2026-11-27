@@ -2978,7 +2978,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 
 					HttpResponse httpResponse = importTaskResource.deleteImportTaskHttpResponse(
 						"${configYAML.apiPackagePath}.dto.${escapedVersion}.${schemaName}",
-						null, null, null, null,
+						null, null, null, null, null,
 						JSONUtil.putAll(
 							JSONUtil.put(
 								"externalReferenceCode", () -> externalReferenceCode

@@ -44,28 +44,30 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ImportTaskResource {
 
 	public ImportTask deleteImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			MultipartBody multipartBody)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, MultipartBody multipartBody)
 		throws Exception;
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #deleteImportTaskObject(String, String, String, String, String, Object)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #deleteImportTaskObject(String, String, String, String, String, String, Object)}
 	 */
 	@Deprecated
 	public default ImportTask deleteImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, Object object)
 		throws Exception {
 
 		return deleteImportTaskObject(
-			className, callbackURL, externalReferenceCode, importStrategy,
-			taskItemDelegateName, object);
+			className, callbackURL, deleteStrategy, externalReferenceCode,
+			importStrategy, taskItemDelegateName, object);
 	}
 
 	public ImportTask deleteImportTaskObject(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, Object object)
 		throws Exception;
 
 	public ImportTask getImportTask(Long importTaskId) throws Exception;
@@ -236,4 +238,4 @@ public interface ImportTaskResource {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1204532753
+// LIFERAY-REST-BUILDER-HASH:675702911

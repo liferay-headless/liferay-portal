@@ -930,7 +930,7 @@ public abstract class BaseTaxCategoryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.site.setting.dto.v1_0.TaxCategory",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1663,4 +1663,4 @@ public abstract class BaseTaxCategoryResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:137147779
+// LIFERAY-REST-BUILDER-HASH:-2116795672

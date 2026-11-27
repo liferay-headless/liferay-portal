@@ -1091,7 +1091,7 @@ public abstract class BaseCTRemoteResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.change.tracking.rest.dto.v1_0.CTRemote", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2365,4 +2365,4 @@ public abstract class BaseCTRemoteResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1369078473
+// LIFERAY-REST-BUILDER-HASH:613490674

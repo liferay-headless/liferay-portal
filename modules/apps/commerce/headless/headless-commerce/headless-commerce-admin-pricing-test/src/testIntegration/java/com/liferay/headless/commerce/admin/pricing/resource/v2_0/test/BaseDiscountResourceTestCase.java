@@ -1719,7 +1719,7 @@ public abstract class BaseDiscountResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3936,4 +3936,4 @@ public abstract class BaseDiscountResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:133278362
+// LIFERAY-REST-BUILDER-HASH:-1365798315

@@ -1145,7 +1145,7 @@ public abstract class BaseFeatureFlagMethodTestEntityResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.portal.tools.rest.builder.test.dto.v1_0.FeatureFlagMethodTestEntity",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2156,4 +2156,4 @@ public abstract class BaseFeatureFlagMethodTestEntityResourceTestCase {
 			_featureFlagMethodTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1217205956
+// LIFERAY-REST-BUILDER-HASH:1660045673

@@ -1144,7 +1144,7 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifierProductGroup",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2103,4 +2103,4 @@ public abstract class BasePriceModifierProductGroupResourceTestCase {
 		PriceModifierProductGroupResource _priceModifierProductGroupResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:647030183
+// LIFERAY-REST-BUILDER-HASH:-309688670

@@ -726,7 +726,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.form.dto.v1_0.FormDocument", null, null,
-				null, null,
+				null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1790,4 +1790,4 @@ public abstract class BaseFormDocumentResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1666247483
+// LIFERAY-REST-BUILDER-HASH:1633786410

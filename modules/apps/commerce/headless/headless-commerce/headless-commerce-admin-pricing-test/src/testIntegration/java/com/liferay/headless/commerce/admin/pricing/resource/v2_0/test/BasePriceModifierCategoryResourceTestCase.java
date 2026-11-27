@@ -1126,7 +1126,7 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifierCategory",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2145,4 +2145,4 @@ public abstract class BasePriceModifierCategoryResourceTestCase {
 		PriceModifierCategoryResource _priceModifierCategoryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1163103280
+// LIFERAY-REST-BUILDER-HASH:-932640715

@@ -953,6 +953,10 @@ public abstract class BaseCollaboratorResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1612,4 +1616,4 @@ public abstract class BaseCollaboratorResourceImpl
 		LogFactoryUtil.getLog(BaseCollaboratorResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:489006261
+// LIFERAY-REST-BUILDER-HASH:-1165654505

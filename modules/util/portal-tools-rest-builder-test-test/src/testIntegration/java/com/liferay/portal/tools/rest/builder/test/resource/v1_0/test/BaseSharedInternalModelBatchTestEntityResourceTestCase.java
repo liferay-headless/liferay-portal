@@ -806,7 +806,7 @@ public abstract class BaseSharedInternalModelBatchTestEntityResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.portal.tools.rest.builder.test.dto.v1_0.SharedInternalModelBatchTestEntity",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1755,4 +1755,4 @@ public abstract class BaseSharedInternalModelBatchTestEntityResourceTestCase {
 			_sharedInternalModelBatchTestEntityResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1233778903
+// LIFERAY-REST-BUILDER-HASH:-2007018350

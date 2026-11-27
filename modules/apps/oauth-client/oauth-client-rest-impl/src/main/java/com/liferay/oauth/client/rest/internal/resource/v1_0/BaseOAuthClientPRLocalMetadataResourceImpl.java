@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -435,29 +436,43 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction
 			<OAuthClientPRLocalMetadata, OAuthClientPRLocalMetadata, Exception>
 				oAuthClientPRLocalMetadataUnsafeFunction =
 					oAuthClientPRLocalMetadata -> {
-						if (oAuthClientPRLocalMetadata.
-								getExternalReferenceCode() != null) {
+						try {
+							if (oAuthClientPRLocalMetadata.
+									getExternalReferenceCode() != null) {
 
-							if (!FeatureFlagManagerUtil.isEnabled(
-									CompanyThreadLocal.getCompanyId(),
-									"LPD-63415")) {
+								if (!FeatureFlagManagerUtil.isEnabled(
+										CompanyThreadLocal.getCompanyId(),
+										"LPD-63415")) {
 
-								throw new NotFoundException();
+									throw new NotFoundException();
+								}
+
+								deleteOAuthClientPRLocalMetadataByExternalReferenceCode(
+									oAuthClientPRLocalMetadata.
+										getExternalReferenceCode());
+
+								return oAuthClientPRLocalMetadata;
 							}
 
-							deleteOAuthClientPRLocalMetadataByExternalReferenceCode(
-								oAuthClientPRLocalMetadata.
-									getExternalReferenceCode());
-
-							return oAuthClientPRLocalMetadata;
+							throw new UnsupportedOperationException(
+								"Unable to delete by external reference code or ID");
 						}
+						catch (NoSuchModelException noSuchModelException) {
+							if (StringUtil.equalsIgnoreCase(
+									deleteStrategy, "DELETE_IF_EXISTS")) {
 
-						throw new UnsupportedOperationException(
-							"Unable to delete by external reference code or ID");
+								return oAuthClientPRLocalMetadata;
+							}
+
+							throw noSuchModelException;
+						}
 					};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -491,6 +506,19 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 		}
 
 		return createStrategies;
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		Set<String> deleteStrategies = SetUtil.fromArray();
+
+		if (FeatureFlagManagerUtil.isEnabled(
+				CompanyThreadLocal.getCompanyId(), "LPD-63415")) {
+
+			deleteStrategies.add("DELETE");
+			deleteStrategies.add("DELETE_IF_EXISTS");
+		}
+
+		return deleteStrategies;
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1138,4 +1166,4 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceImpl
 		LogFactoryUtil.getLog(BaseOAuthClientPRLocalMetadataResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1966451074
+// LIFERAY-REST-BUILDER-HASH:313732817

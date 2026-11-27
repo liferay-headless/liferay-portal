@@ -1558,7 +1558,7 @@ public abstract class BaseAccountResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.account.dto.v1_0.Account",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2975,4 +2975,4 @@ public abstract class BaseAccountResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:528439064
+// LIFERAY-REST-BUILDER-HASH:404770173

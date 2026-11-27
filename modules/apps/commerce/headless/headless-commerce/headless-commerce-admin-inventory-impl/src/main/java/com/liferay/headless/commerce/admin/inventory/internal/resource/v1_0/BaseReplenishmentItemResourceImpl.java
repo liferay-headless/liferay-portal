@@ -766,34 +766,53 @@ public abstract class BaseReplenishmentItemResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<ReplenishmentItem, ReplenishmentItem, Exception>
 			replenishmentItemUnsafeFunction = replenishmentItem -> {
-				if (replenishmentItem.getId() != null) {
-					try {
-						deleteReplenishmentItem(replenishmentItem.getId());
-
-						return replenishmentItem;
-					}
-					catch (Exception exception) {
-						if (replenishmentItem.getExternalReferenceCode() !=
-								null) {
-
-							deleteReplenishmentItemByExternalReferenceCode(
-								replenishmentItem.getExternalReferenceCode());
+				try {
+					if (replenishmentItem.getId() != null) {
+						try {
+							deleteReplenishmentItem(replenishmentItem.getId());
 
 							return replenishmentItem;
 						}
+						catch (Exception exception) {
+							if (replenishmentItem.getExternalReferenceCode() !=
+									null) {
+
+								deleteReplenishmentItemByExternalReferenceCode(
+									replenishmentItem.
+										getExternalReferenceCode());
+
+								return replenishmentItem;
+							}
+
+							throw exception;
+						}
 					}
-				}
-				else if (replenishmentItem.getExternalReferenceCode() != null) {
-					deleteReplenishmentItemByExternalReferenceCode(
-						replenishmentItem.getExternalReferenceCode());
+					else if (replenishmentItem.getExternalReferenceCode() !=
+								null) {
 
-					return replenishmentItem;
-				}
+						deleteReplenishmentItemByExternalReferenceCode(
+							replenishmentItem.getExternalReferenceCode());
 
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
+						return replenishmentItem;
+					}
+
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return replenishmentItem;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -813,6 +832,10 @@ public abstract class BaseReplenishmentItemResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1498,4 +1521,4 @@ public abstract class BaseReplenishmentItemResourceImpl
 		LogFactoryUtil.getLog(BaseReplenishmentItemResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1427238680
+// LIFERAY-REST-BUILDER-HASH:-1369293129

@@ -13,6 +13,7 @@ import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -993,11 +994,25 @@ public abstract class BaseDataDefinitionResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<DataDefinition, DataDefinition, Exception>
 			dataDefinitionUnsafeFunction = dataDefinition -> {
-				deleteDataDefinition(dataDefinition.getId());
+				try {
+					deleteDataDefinition(dataDefinition.getId());
 
-				return dataDefinition;
+					return dataDefinition;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return dataDefinition;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1017,6 +1032,10 @@ public abstract class BaseDataDefinitionResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray();
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1866,4 +1885,4 @@ public abstract class BaseDataDefinitionResourceImpl
 		LogFactoryUtil.getLog(BaseDataDefinitionResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1602028182
+// LIFERAY-REST-BUILDER-HASH:-1235035791

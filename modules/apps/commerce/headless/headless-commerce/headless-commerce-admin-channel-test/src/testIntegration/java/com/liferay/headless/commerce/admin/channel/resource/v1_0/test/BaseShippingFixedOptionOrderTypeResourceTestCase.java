@@ -907,7 +907,7 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.channel.dto.v1_0.ShippingFixedOptionOrderType",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1830,4 +1830,4 @@ public abstract class BaseShippingFixedOptionOrderTypeResourceTestCase {
 			_shippingFixedOptionOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1169854316
+// LIFERAY-REST-BUILDER-HASH:1503761977

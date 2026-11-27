@@ -1633,7 +1633,7 @@ public abstract class BasePageTemplateSetResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.site.dto.v1_0.PageTemplateSet",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2784,4 +2784,4 @@ public abstract class BasePageTemplateSetResourceTestCase {
 			_pageTemplateSetResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-828535300
+// LIFERAY-REST-BUILDER-HASH:-1720297439

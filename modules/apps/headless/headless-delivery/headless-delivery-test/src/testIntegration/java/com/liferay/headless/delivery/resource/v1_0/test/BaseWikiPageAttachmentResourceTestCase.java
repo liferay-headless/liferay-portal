@@ -1400,7 +1400,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.WikiPageAttachment",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2701,4 +2701,4 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:581103386
+// LIFERAY-REST-BUILDER-HASH:1565184469

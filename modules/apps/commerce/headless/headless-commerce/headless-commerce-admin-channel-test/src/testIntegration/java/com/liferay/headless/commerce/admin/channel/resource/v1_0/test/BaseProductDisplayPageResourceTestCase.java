@@ -1776,7 +1776,7 @@ public abstract class BaseProductDisplayPageResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.channel.dto.v1_0.ProductDisplayPage",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2725,4 +2725,4 @@ public abstract class BaseProductDisplayPageResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:430881437
+// LIFERAY-REST-BUILDER-HASH:678163288

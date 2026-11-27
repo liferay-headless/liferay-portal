@@ -653,6 +653,10 @@ public abstract class BasePlacedOrderResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray("PARTIAL_UPDATE");
 	}
@@ -1320,4 +1324,4 @@ public abstract class BasePlacedOrderResourceImpl
 		LogFactoryUtil.getLog(BasePlacedOrderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1392938546
+// LIFERAY-REST-BUILDER-HASH:1154869908

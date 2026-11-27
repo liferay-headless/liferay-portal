@@ -35,25 +35,29 @@ public interface ImportTaskResource {
 	}
 
 	public ImportTask deleteFormDataImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			ImportTask importTask, Map<String, File> multipartFiles)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, ImportTask importTask,
+			Map<String, File> multipartFiles)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteFormDataImportTaskHttpResponse(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			ImportTask importTask, Map<String, File> multipartFiles)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, ImportTask importTask,
+			Map<String, File> multipartFiles)
 		throws Exception;
 
 	public ImportTask deleteImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, Object object)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteImportTaskHttpResponse(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String className, String callbackURL, String deleteStrategy,
+			String externalReferenceCode, String importStrategy,
+			String taskItemDelegateName, Object object)
 		throws Exception;
 
 	public ImportTask getImportTask(Long importTaskId) throws Exception;
@@ -270,7 +274,7 @@ public interface ImportTaskResource {
 	public static class ImportTaskResourceImpl implements ImportTaskResource {
 
 		public ImportTask deleteFormDataImportTask(
-				String className, String callbackURL,
+				String className, String callbackURL, String deleteStrategy,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, ImportTask importTask,
 				Map<String, File> multipartFiles)
@@ -278,9 +282,9 @@ public interface ImportTaskResource {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteFormDataImportTaskHttpResponse(
-					className, callbackURL, externalReferenceCode,
-					importStrategy, taskItemDelegateName, importTask,
-					multipartFiles);
+					className, callbackURL, deleteStrategy,
+					externalReferenceCode, importStrategy, taskItemDelegateName,
+					importTask, multipartFiles);
 
 			String content = httpResponse.getContent();
 
@@ -342,7 +346,7 @@ public interface ImportTaskResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteFormDataImportTaskHttpResponse(
-				String className, String callbackURL,
+				String className, String callbackURL, String deleteStrategy,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, ImportTask importTask,
 				Map<String, File> multipartFiles)
@@ -382,6 +386,11 @@ public interface ImportTaskResource {
 					"callbackURL", String.valueOf(callbackURL));
 			}
 
+			if (deleteStrategy != null) {
+				httpInvoker.parameter(
+					"deleteStrategy", String.valueOf(deleteStrategy));
+			}
+
 			if (externalReferenceCode != null) {
 				httpInvoker.parameter(
 					"externalReferenceCode",
@@ -415,15 +424,16 @@ public interface ImportTaskResource {
 		}
 
 		public ImportTask deleteImportTask(
-				String className, String callbackURL,
+				String className, String callbackURL, String deleteStrategy,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, Object object)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				deleteImportTaskHttpResponse(
-					className, callbackURL, externalReferenceCode,
-					importStrategy, taskItemDelegateName, object);
+					className, callbackURL, deleteStrategy,
+					externalReferenceCode, importStrategy, taskItemDelegateName,
+					object);
 
 			String content = httpResponse.getContent();
 
@@ -485,7 +495,7 @@ public interface ImportTaskResource {
 		}
 
 		public HttpInvoker.HttpResponse deleteImportTaskHttpResponse(
-				String className, String callbackURL,
+				String className, String callbackURL, String deleteStrategy,
 				String externalReferenceCode, String importStrategy,
 				String taskItemDelegateName, Object object)
 			throws Exception {
@@ -516,6 +526,11 @@ public interface ImportTaskResource {
 			if (callbackURL != null) {
 				httpInvoker.parameter(
 					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			if (deleteStrategy != null) {
+				httpInvoker.parameter(
+					"deleteStrategy", String.valueOf(deleteStrategy));
 			}
 
 			if (externalReferenceCode != null) {
@@ -1777,4 +1792,4 @@ public interface ImportTaskResource {
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:695419205
+// LIFERAY-REST-BUILDER-HASH:1815922733

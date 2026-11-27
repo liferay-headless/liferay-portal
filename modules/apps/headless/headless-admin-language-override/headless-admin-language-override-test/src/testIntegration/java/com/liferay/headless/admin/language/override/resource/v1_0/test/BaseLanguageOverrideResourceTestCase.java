@@ -1064,7 +1064,7 @@ public abstract class BaseLanguageOverrideResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.language.override.dto.v1_0.LanguageOverride",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2222,4 +2222,4 @@ public abstract class BaseLanguageOverrideResourceTestCase {
 		LanguageOverrideResource _languageOverrideResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1496612149
+// LIFERAY-REST-BUILDER-HASH:-624515878

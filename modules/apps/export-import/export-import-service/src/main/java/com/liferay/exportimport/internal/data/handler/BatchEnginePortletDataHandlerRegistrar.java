@@ -7,6 +7,7 @@ package com.liferay.exportimport.internal.data.handler;
 
 import com.liferay.batch.engine.BatchEngineExportTaskExecutor;
 import com.liferay.batch.engine.BatchEngineImportTaskExecutor;
+import com.liferay.batch.engine.BatchEngineTaskItemDelegateRegistry;
 import com.liferay.batch.engine.ItemClassRegistry;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskService;
@@ -92,6 +93,10 @@ public class BatchEnginePortletDataHandlerRegistrar {
 	private BatchEngineImportTaskService _batchEngineImportTaskService;
 
 	@Reference
+	private BatchEngineTaskItemDelegateRegistry
+		_batchEngineTaskItemDelegateRegistry;
+
+	@Reference
 	private ChangesetEntryLocalService _changesetEntryLocalService;
 
 	@Reference
@@ -157,6 +162,7 @@ public class BatchEnginePortletDataHandlerRegistrar {
 						_batchEngineExportTaskLocalService,
 						_batchEngineImportTaskExecutor,
 						_batchEngineImportTaskService,
+						_batchEngineTaskItemDelegateRegistry,
 						_changesetEntryLocalService, _classNameLocalService,
 						_exportImportHelper, _groupLocalService,
 						_itemClassRegistry, _stagingGroupHelper);

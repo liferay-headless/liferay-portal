@@ -896,7 +896,7 @@ public abstract class BasePaymentMethodGroupRelTermResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.channel.dto.v1_0.PaymentMethodGroupRelTerm",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1780,4 +1780,4 @@ public abstract class BasePaymentMethodGroupRelTermResourceTestCase {
 		PaymentMethodGroupRelTermResource _paymentMethodGroupRelTermResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1207903945
+// LIFERAY-REST-BUILDER-HASH:696340018

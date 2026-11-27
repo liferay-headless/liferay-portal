@@ -307,6 +307,10 @@ public abstract class BaseFormResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -961,4 +965,4 @@ public abstract class BaseFormResourceImpl
 	}
 
 }
-// LIFERAY-REST-BUILDER-HASH:-441481258
+// LIFERAY-REST-BUILDER-HASH:-1418225100

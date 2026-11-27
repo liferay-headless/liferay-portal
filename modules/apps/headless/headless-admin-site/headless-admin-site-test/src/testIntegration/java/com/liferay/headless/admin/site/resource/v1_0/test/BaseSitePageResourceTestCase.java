@@ -1150,7 +1150,7 @@ public abstract class BaseSitePageResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.site.dto.v1_0.SitePage", null, null,
-				null, null,
+				null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2594,4 +2594,4 @@ public abstract class BaseSitePageResourceTestCase {
 		_sitePageResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-203616901
+// LIFERAY-REST-BUILDER-HASH:430294048

@@ -1272,7 +1272,7 @@ public class BatchEngineImportTaskExecutorTest
 	}
 
 	@Test
-	public void testImportTaskInvalidCreateAndUpdateStrategies() {
+	public void testImportTaskInvalidStrategies() {
 		BatchEngineTaskOperation batchEngineTaskOperation =
 			BatchEngineTaskOperation.CREATE;
 		Map<String, Serializable> parameters =
@@ -1302,6 +1302,34 @@ public class BatchEngineImportTaskExecutorTest
 
 			Assert.assertTrue(
 				exceptionMessage.contains("INVALID CREATE STRATEGY"));
+		}
+
+		parameters = HashMapBuilder.<String, Serializable>put(
+			"deleteStrategy", "INVALID DELETE STRATEGY"
+		).build();
+
+		try {
+			_batchEngineImportTask =
+				_batchEngineImportTaskLocalService.addBatchEngineImportTask(
+					null, TestPropsValues.getCompanyId(), user.getUserId(),
+					_BATCH_SIZE, null, BlogPosting.class.getName(), null, "CSV",
+					BatchEngineTaskExecuteStatus.INITIAL.name(),
+					Collections.emptyMap(),
+					BatchEngineImportTaskConstants.
+						IMPORT_STRATEGY_ON_ERROR_FAIL,
+					batchEngineTaskOperation.name(), parameters, null);
+
+			Assert.fail();
+		}
+		catch (Exception exception) {
+			Assert.assertEquals(
+				exception.getClass(),
+				BatchEngineImportTaskParametersException.class);
+
+			String exceptionMessage = exception.getMessage();
+
+			Assert.assertTrue(
+				exceptionMessage.contains("INVALID DELETE STRATEGY"));
 		}
 
 		parameters = HashMapBuilder.<String, Serializable>put(

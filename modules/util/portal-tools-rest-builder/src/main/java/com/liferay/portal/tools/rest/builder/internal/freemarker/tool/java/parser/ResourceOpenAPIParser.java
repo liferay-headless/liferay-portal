@@ -532,6 +532,33 @@ public class ResourceOpenAPIParser {
 		return createStrategies;
 	}
 
+	public static Set<String> getVulcanBatchImplementationDeleteStrategies(
+		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures,
+		Map<String, String> properties, String schemaName) {
+
+		Set<String> deleteStrategies = new TreeSet<>();
+
+		Set<String> resourceMethodTypes = _getResourceMethodTypes(
+			configYAML, javaMethodSignatures);
+
+		if ((properties.containsKey("externalReferenceCode") &&
+			 !Collections.disjoint(
+				 resourceMethodTypes,
+				 SetUtil.fromArray(
+					 "deleteAssetLibrary", "deleteByExternalReferenceCode",
+					 "deleteSite"))) ||
+			(resourceMethodTypes.contains("deleteById") &&
+			 (properties.containsKey("id") ||
+			  properties.containsKey(
+				  OpenAPIParserUtil.getSchemaVarName(schemaName) + "Id")))) {
+
+			deleteStrategies.add("DELETE");
+			deleteStrategies.add("DELETE_IF_EXISTS");
+		}
+
+		return deleteStrategies;
+	}
+
 	public static Set<String> getVulcanBatchImplementationUpdateStrategies(
 		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures) {
 

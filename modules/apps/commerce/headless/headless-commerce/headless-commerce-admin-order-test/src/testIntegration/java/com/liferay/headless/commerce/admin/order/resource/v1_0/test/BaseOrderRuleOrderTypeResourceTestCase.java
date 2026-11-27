@@ -826,7 +826,7 @@ public abstract class BaseOrderRuleOrderTypeResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.order.dto.v1_0.OrderRuleOrderType",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1754,4 +1754,4 @@ public abstract class BaseOrderRuleOrderTypeResourceTestCase {
 		OrderRuleOrderTypeResource _orderRuleOrderTypeResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:285724189
+// LIFERAY-REST-BUILDER-HASH:-1193352744

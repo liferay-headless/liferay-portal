@@ -529,6 +529,10 @@ public abstract class BaseAdminAccountGroupResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -1165,4 +1169,4 @@ public abstract class BaseAdminAccountGroupResourceImpl
 		LogFactoryUtil.getLog(BaseAdminAccountGroupResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1987973607
+// LIFERAY-REST-BUILDER-HASH:2042403191

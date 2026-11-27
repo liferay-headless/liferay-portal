@@ -1689,7 +1689,7 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.MessageBoardAttachment",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3065,4 +3065,4 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1253159879
+// LIFERAY-REST-BUILDER-HASH:1787919390

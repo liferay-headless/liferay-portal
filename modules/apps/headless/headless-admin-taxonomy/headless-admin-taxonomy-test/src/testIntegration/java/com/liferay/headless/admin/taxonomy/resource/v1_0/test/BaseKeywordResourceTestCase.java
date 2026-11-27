@@ -3094,7 +3094,7 @@ public abstract class BaseKeywordResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.taxonomy.dto.v1_0.Keyword", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -4488,4 +4488,4 @@ public abstract class BaseKeywordResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1450231351
+// LIFERAY-REST-BUILDER-HASH:1332750574

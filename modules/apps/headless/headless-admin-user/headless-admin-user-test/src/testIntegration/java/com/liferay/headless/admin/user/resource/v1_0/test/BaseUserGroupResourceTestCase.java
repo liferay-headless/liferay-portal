@@ -1867,7 +1867,7 @@ public abstract class BaseUserGroupResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.user.dto.v1_0.UserGroup", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3083,4 +3083,4 @@ public abstract class BaseUserGroupResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:391646870
+// LIFERAY-REST-BUILDER-HASH:1999764625

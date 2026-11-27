@@ -289,7 +289,7 @@ public class PortalInstanceResourceTest
 		HttpInvoker.HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.portal.instances.dto.v1_0.PortalInstance",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode

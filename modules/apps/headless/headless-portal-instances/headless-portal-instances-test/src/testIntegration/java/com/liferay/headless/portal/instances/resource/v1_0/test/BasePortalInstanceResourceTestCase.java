@@ -473,7 +473,7 @@ public abstract class BasePortalInstanceResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.portal.instances.dto.v1_0.PortalInstance",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1465,4 +1465,4 @@ public abstract class BasePortalInstanceResourceTestCase {
 			PortalInstanceResource _portalInstanceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1453752637
+// LIFERAY-REST-BUILDER-HASH:1830837176

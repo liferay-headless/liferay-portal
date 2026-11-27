@@ -5018,7 +5018,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -7083,4 +7083,4 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			TaxonomyCategoryResource _taxonomyCategoryResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:395872311
+// LIFERAY-REST-BUILDER-HASH:528086386

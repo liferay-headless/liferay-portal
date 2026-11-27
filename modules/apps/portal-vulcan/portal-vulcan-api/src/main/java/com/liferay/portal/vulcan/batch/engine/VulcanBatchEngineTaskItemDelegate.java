@@ -55,6 +55,10 @@ public interface VulcanBatchEngineTaskItemDelegate<T> {
 		return null;
 	}
 
+	public default Set<String> getAvailableDeleteStrategies() {
+		return null;
+	}
+
 	public default Set<String> getAvailableUpdateStrategies() {
 		return null;
 	}

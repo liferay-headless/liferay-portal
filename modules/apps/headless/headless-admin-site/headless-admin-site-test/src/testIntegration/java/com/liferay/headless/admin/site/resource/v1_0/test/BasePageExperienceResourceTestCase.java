@@ -524,7 +524,7 @@ public abstract class BasePageExperienceResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.site.dto.v1_0.PageExperience", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1527,4 +1527,4 @@ public abstract class BasePageExperienceResourceTestCase {
 		_pageExperienceResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:846984412
+// LIFERAY-REST-BUILDER-HASH:342099991

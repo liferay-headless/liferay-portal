@@ -14,6 +14,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Resource;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -2021,11 +2022,25 @@ public abstract class BaseDocumentFolderResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<DocumentFolder, DocumentFolder, Exception>
 			documentFolderUnsafeFunction = documentFolder -> {
-				deleteDocumentFolder(documentFolder.getId());
+				try {
+					deleteDocumentFolder(documentFolder.getId());
 
-				return documentFolder;
+					return documentFolder;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return documentFolder;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2045,6 +2060,10 @@ public abstract class BaseDocumentFolderResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2919,4 +2938,4 @@ public abstract class BaseDocumentFolderResourceImpl
 		LogFactoryUtil.getLog(BaseDocumentFolderResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1703471749
+// LIFERAY-REST-BUILDER-HASH:-1227646832

@@ -3608,7 +3608,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseArticle",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -5762,4 +5762,4 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:1875384139
+// LIFERAY-REST-BUILDER-HASH:-1600187408

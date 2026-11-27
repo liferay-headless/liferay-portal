@@ -1041,6 +1041,15 @@ public class FreeMarkerTool {
 				configYAML, javaMethodSignatures, properties);
 	}
 
+	public Set<String> getVulcanBatchImplementationDeleteStrategies(
+		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures,
+		Map<String, String> properties, String schemaName) {
+
+		return ResourceOpenAPIParser.
+			getVulcanBatchImplementationDeleteStrategies(
+				configYAML, javaMethodSignatures, properties, schemaName);
+	}
+
 	public Set<String> getVulcanBatchImplementationUpdateStrategies(
 		ConfigYAML configYAML, List<JavaMethodSignature> javaMethodSignatures) {
 

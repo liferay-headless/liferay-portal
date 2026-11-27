@@ -1674,7 +1674,7 @@ public abstract class BaseAttachmentResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.Attachment",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3140,4 +3140,4 @@ public abstract class BaseAttachmentResourceTestCase {
 			AttachmentResource _attachmentResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-778216684
+// LIFERAY-REST-BUILDER-HASH:-869913585

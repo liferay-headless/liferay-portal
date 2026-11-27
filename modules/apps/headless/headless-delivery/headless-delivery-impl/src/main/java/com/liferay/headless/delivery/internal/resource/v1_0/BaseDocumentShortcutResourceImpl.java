@@ -1031,41 +1031,57 @@ public abstract class BaseDocumentShortcutResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<DocumentShortcut, DocumentShortcut, Exception>
 			documentShortcutUnsafeFunction = documentShortcut -> {
-				if (documentShortcut.getId() != null) {
-					try {
-						deleteDocumentShortcut(documentShortcut.getId());
+				try {
+					if (documentShortcut.getId() != null) {
+						try {
+							deleteDocumentShortcut(documentShortcut.getId());
+
+							return documentShortcut;
+						}
+						catch (Exception exception) {
+							if (documentShortcut.getExternalReferenceCode() !=
+									null) {
+
+								if (siteId != null) {
+									deleteSiteDocumentShortcutByExternalReferenceCode(
+										(Long)siteId,
+										documentShortcut.
+											getExternalReferenceCode());
+
+									return documentShortcut;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (siteId != null) {
+						deleteSiteDocumentShortcutByExternalReferenceCode(
+							(Long)siteId,
+							documentShortcut.getExternalReferenceCode());
 
 						return documentShortcut;
 					}
-					catch (Exception exception) {
-						if (documentShortcut.getExternalReferenceCode() !=
-								null) {
 
-							if (siteId != null) {
-								deleteSiteDocumentShortcutByExternalReferenceCode(
-									(Long)siteId,
-									documentShortcut.
-										getExternalReferenceCode());
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-								return documentShortcut;
-							}
-						}
+						return documentShortcut;
 					}
-				}
-				else if (siteId != null) {
-					deleteSiteDocumentShortcutByExternalReferenceCode(
-						(Long)siteId,
-						documentShortcut.getExternalReferenceCode());
 
-					return documentShortcut;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -1085,6 +1101,10 @@ public abstract class BaseDocumentShortcutResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1781,4 +1801,4 @@ public abstract class BaseDocumentShortcutResourceImpl
 		LogFactoryUtil.getLog(BaseDocumentShortcutResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1024375720
+// LIFERAY-REST-BUILDER-HASH:-1209755664

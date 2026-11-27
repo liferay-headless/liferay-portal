@@ -1056,7 +1056,7 @@ public abstract class BaseWarehouseChannelResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.inventory.dto.v1_0.WarehouseChannel",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -1977,4 +1977,4 @@ public abstract class BaseWarehouseChannelResourceTestCase {
 		WarehouseChannelResource _warehouseChannelResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-340345488
+// LIFERAY-REST-BUILDER-HASH:-1107897259

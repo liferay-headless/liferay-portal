@@ -1063,7 +1063,7 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.commerce.admin.catalog.dto.v1_0.SkuVirtualSettingsFileEntry",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2073,4 +2073,4 @@ public abstract class BaseSkuVirtualSettingsFileEntryResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-471438989
+// LIFERAY-REST-BUILDER-HASH:198777262

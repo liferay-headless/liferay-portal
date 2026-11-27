@@ -1936,7 +1936,7 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.delivery.dto.v1_0.NavigationMenu", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3146,4 +3146,4 @@ public abstract class BaseNavigationMenuResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-1607625964
+// LIFERAY-REST-BUILDER-HASH:288464655

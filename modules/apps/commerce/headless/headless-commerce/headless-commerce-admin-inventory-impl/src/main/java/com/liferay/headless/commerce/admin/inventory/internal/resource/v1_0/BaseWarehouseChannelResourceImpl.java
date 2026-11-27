@@ -12,6 +12,7 @@ import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -445,12 +446,26 @@ public abstract class BaseWarehouseChannelResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		UnsafeFunction<WarehouseChannel, WarehouseChannel, Exception>
 			warehouseChannelUnsafeFunction = warehouseChannel -> {
-				deleteWarehouseChannel(
-					warehouseChannel.getWarehouseChannelId());
+				try {
+					deleteWarehouseChannel(
+						warehouseChannel.getWarehouseChannelId());
 
-				return warehouseChannel;
+					return warehouseChannel;
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
+
+						return warehouseChannel;
+					}
+
+					throw noSuchModelException;
+				}
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -470,6 +485,10 @@ public abstract class BaseWarehouseChannelResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -1108,4 +1127,4 @@ public abstract class BaseWarehouseChannelResourceImpl
 		LogFactoryUtil.getLog(BaseWarehouseChannelResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:-85674991
+// LIFERAY-REST-BUILDER-HASH:-136671059

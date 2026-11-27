@@ -2054,41 +2054,58 @@ public abstract class BaseMessageBoardMessageResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
+		String deleteStrategy = (String)parameters.getOrDefault(
+			"deleteStrategy", "DELETE");
+
 		Serializable siteId = parameters.get("siteId");
 
 		UnsafeFunction<MessageBoardMessage, MessageBoardMessage, Exception>
 			messageBoardMessageUnsafeFunction = messageBoardMessage -> {
-				if (messageBoardMessage.getId() != null) {
-					try {
-						deleteMessageBoardMessage(messageBoardMessage.getId());
+				try {
+					if (messageBoardMessage.getId() != null) {
+						try {
+							deleteMessageBoardMessage(
+								messageBoardMessage.getId());
+
+							return messageBoardMessage;
+						}
+						catch (Exception exception) {
+							if (messageBoardMessage.
+									getExternalReferenceCode() != null) {
+
+								if (siteId != null) {
+									deleteSiteMessageBoardMessageByExternalReferenceCode(
+										(Long)siteId,
+										messageBoardMessage.
+											getExternalReferenceCode());
+
+									return messageBoardMessage;
+								}
+							}
+
+							throw exception;
+						}
+					}
+					else if (siteId != null) {
+						deleteSiteMessageBoardMessageByExternalReferenceCode(
+							(Long)siteId,
+							messageBoardMessage.getExternalReferenceCode());
 
 						return messageBoardMessage;
 					}
-					catch (Exception exception) {
-						if (messageBoardMessage.getExternalReferenceCode() !=
-								null) {
 
-							if (siteId != null) {
-								deleteSiteMessageBoardMessageByExternalReferenceCode(
-									(Long)siteId,
-									messageBoardMessage.
-										getExternalReferenceCode());
+					throw new UnsupportedOperationException(
+						"Unable to delete by external reference code or ID");
+				}
+				catch (NoSuchModelException noSuchModelException) {
+					if (StringUtil.equalsIgnoreCase(
+							deleteStrategy, "DELETE_IF_EXISTS")) {
 
-								return messageBoardMessage;
-							}
-						}
+						return messageBoardMessage;
 					}
-				}
-				else if (siteId != null) {
-					deleteSiteMessageBoardMessageByExternalReferenceCode(
-						(Long)siteId,
-						messageBoardMessage.getExternalReferenceCode());
 
-					return messageBoardMessage;
+					throw noSuchModelException;
 				}
-
-				throw new UnsupportedOperationException(
-					"Unable to delete by external reference code or ID");
 			};
 
 		if (contextBatchUnsafeBiConsumer != null) {
@@ -2110,6 +2127,10 @@ public abstract class BaseMessageBoardMessageResourceImpl
 
 	public Set<String> getAvailableCreateStrategies() {
 		return SetUtil.fromArray("INSERT", "UPSERT");
+	}
+
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS");
 	}
 
 	public Set<String> getAvailableUpdateStrategies() {
@@ -2998,4 +3019,4 @@ public abstract class BaseMessageBoardMessageResourceImpl
 		LogFactoryUtil.getLog(BaseMessageBoardMessageResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1449363552
+// LIFERAY-REST-BUILDER-HASH:867742849

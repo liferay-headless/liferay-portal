@@ -1382,7 +1382,7 @@ public abstract class BasePublishProcessResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.exportimport.rest.dto.v1_0.PublishProcess", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -2482,4 +2482,4 @@ public abstract class BasePublishProcessResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:274094886
+// LIFERAY-REST-BUILDER-HASH:2130805473

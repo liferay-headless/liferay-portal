@@ -1492,7 +1492,7 @@ public abstract class BaseSXPElementResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.search.experiences.rest.dto.v1_0.SXPElement", null,
-				null, null, null,
+				null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -3082,4 +3082,4 @@ public abstract class BaseSXPElementResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-283542985
+// LIFERAY-REST-BUILDER-HASH:-1465233380

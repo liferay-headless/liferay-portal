@@ -188,6 +188,32 @@ public class FeatureFlagMethodTestEntityVulcanBatchEngineTaskItemDelegateTest {
 			_batchEngineTaskItemDelegate.getAvailableCreateStrategies());
 	}
 
+	@FeatureFlags(
+		featureFlags = {
+			@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY),
+			@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY_SITE)
+		}
+	)
+	@Test
+	public void testGetAvailableDeleteStrategies() throws Exception {
+		Assert.assertEquals(
+			Collections.emptySet(),
+			_batchEngineTaskItemDelegate.getAvailableDeleteStrategies());
+
+		_setFeatureFlagEnabled(true, _FEATURE_FLAG_KEY_SITE);
+
+		Assert.assertEquals(
+			SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS"),
+			_batchEngineTaskItemDelegate.getAvailableDeleteStrategies());
+
+		_setFeatureFlagEnabled(false, _FEATURE_FLAG_KEY_SITE);
+		_setFeatureFlagEnabled(true, _FEATURE_FLAG_KEY);
+
+		Assert.assertEquals(
+			SetUtil.fromArray("DELETE", "DELETE_IF_EXISTS"),
+			_batchEngineTaskItemDelegate.getAvailableDeleteStrategies());
+	}
+
 	@FeatureFlag(enable = false, value = _FEATURE_FLAG_KEY)
 	@Test
 	public void testGetAvailableUpdateStrategies() throws Exception {

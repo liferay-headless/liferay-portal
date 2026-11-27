@@ -456,7 +456,7 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.oauth.client.rest.dto.v1_0.OAuthClientPRLocalMetadata",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -1544,4 +1544,4 @@ public abstract class BaseOAuthClientPRLocalMetadataResourceTestCase {
 		OAuthClientPRLocalMetadataResource _oAuthClientPRLocalMetadataResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:367353136
+// LIFERAY-REST-BUILDER-HASH:-2071909333

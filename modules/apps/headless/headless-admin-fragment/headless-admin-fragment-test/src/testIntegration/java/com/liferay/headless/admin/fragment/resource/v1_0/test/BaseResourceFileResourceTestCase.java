@@ -1124,7 +1124,7 @@ public abstract class BaseResourceFileResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.fragment.dto.v1_0.ResourceFile",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode)));
@@ -2219,4 +2219,4 @@ public abstract class BaseResourceFileResourceTestCase {
 			_resourceFileResource;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-134485573
+// LIFERAY-REST-BUILDER-HASH:-489250506

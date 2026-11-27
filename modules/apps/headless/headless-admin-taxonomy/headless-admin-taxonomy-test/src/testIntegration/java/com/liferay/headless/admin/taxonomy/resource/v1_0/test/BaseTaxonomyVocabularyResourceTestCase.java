@@ -3510,7 +3510,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		HttpResponse httpResponse =
 			importTaskResource.deleteImportTaskHttpResponse(
 				"com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyVocabulary",
-				null, null, null, null,
+				null, null, null, null, null,
 				JSONUtil.putAll(
 					JSONUtil.put(
 						"externalReferenceCode", () -> externalReferenceCode
@@ -5319,4 +5319,4 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		_vulcanCRUDItemDelegateBuilderRegistry;
 
 }
-// LIFERAY-REST-BUILDER-HASH:-256627596
+// LIFERAY-REST-BUILDER-HASH:819587823

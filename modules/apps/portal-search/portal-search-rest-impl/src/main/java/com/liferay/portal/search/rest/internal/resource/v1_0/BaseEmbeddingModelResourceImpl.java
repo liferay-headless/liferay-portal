@@ -138,6 +138,10 @@ public abstract class BaseEmbeddingModelResourceImpl
 		return SetUtil.fromArray();
 	}
 
+	public Set<String> getAvailableDeleteStrategies() {
+		return SetUtil.fromArray();
+	}
+
 	public Set<String> getAvailableUpdateStrategies() {
 		return SetUtil.fromArray();
 	}
@@ -773,4 +777,4 @@ public abstract class BaseEmbeddingModelResourceImpl
 		LogFactoryUtil.getLog(BaseEmbeddingModelResourceImpl.class);
 
 }
-// LIFERAY-REST-BUILDER-HASH:1468195220
+// LIFERAY-REST-BUILDER-HASH:-506318734
