@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsValues;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.FeatureFlag;
@@ -57,6 +58,8 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.sharing.model.SharingEntry;
 import com.liferay.sharing.security.permission.SharingEntryAction;
 import com.liferay.sharing.service.SharingEntryLocalService;
+
+import jakarta.ws.rs.core.HttpHeaders;
 
 import java.io.Serializable;
 
@@ -332,6 +335,101 @@ public class ObjectEntryResourcePermissionTest
 			objectDefinition, objectEntry, password, user);
 
 		Assert.assertFalse(actionsJSONObject.has("share"));
+	}
+
+	@Test
+	@TestInfo("LPD-117365")
+	public void testGetObjectEntryTranslation() throws Exception {
+
+		// With view permission
+
+		ObjectDefinition objectDefinition = getObjectDefinition4();
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		addResourcePermission(
+			ActionKeys.VIEW, objectDefinition.getClassName(), role);
+
+		String password = RandomTestUtil.randomString();
+
+		User user = addUser(
+			RandomTestUtil.randomString(UniqueStringRandomizerBumper.INSTANCE),
+			password);
+
+		roleLocalService.addUserRole(user.getUserId(), role.getRoleId());
+
+		ObjectEntry objectEntry = getLocalizedObjectEntry();
+
+		Assert.assertEquals(
+			404,
+			_getObjectEntryTranslationHTTPCode(
+				getObjectDefinition1(), objectEntry.getObjectEntryId(),
+				password, user));
+
+		Assert.assertEquals(
+			404,
+			_getObjectEntryTranslationHTTPCode(
+				objectDefinition, RandomTestUtil.randomLong(), password, user));
+		Assert.assertEquals(
+			200,
+			_getObjectEntryTranslationHTTPCode(
+				objectDefinition, objectEntry.getObjectEntryId(), password,
+				user));
+
+		// Without view permission
+
+		roleLocalService.deleteUserRole(user.getUserId(), role.getRoleId());
+
+		Assert.assertEquals(
+			404,
+			_getObjectEntryTranslationHTTPCode(
+				objectDefinition, objectEntry.getObjectEntryId(), password,
+				user));
+	}
+
+	@Test
+	@TestInfo("LPD-117365")
+	public void testGetObjectEntryTranslationLanguage() throws Exception {
+
+		// With view permission
+
+		ObjectDefinition objectDefinition = getObjectDefinition4();
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		addResourcePermission(
+			ActionKeys.VIEW, objectDefinition.getClassName(), role);
+
+		String password = RandomTestUtil.randomString();
+
+		User user = addUser(
+			RandomTestUtil.randomString(UniqueStringRandomizerBumper.INSTANCE),
+			password);
+
+		roleLocalService.addUserRole(user.getUserId(), role.getRoleId());
+
+		ObjectEntry objectEntry = getLocalizedObjectEntry();
+
+		assertNotFound(
+			JSONFactoryUtil.createJSONObject(
+				_getObjectEntryTranslationLanguageString(
+					getObjectDefinition1(), objectEntry.getObjectEntryId(),
+					password, user)));
+		Assert.assertEquals(
+			_getObjectEntryTranslationLanguageString(
+				objectDefinition, objectEntry.getObjectEntryId(),
+				PropsValues.DEFAULT_ADMIN_PASSWORD, TestPropsValues.getUser()),
+			_getObjectEntryTranslationLanguageString(
+				objectDefinition, objectEntry.getObjectEntryId(), password,
+				user));
+
+		// Without view permission
+
+		roleLocalService.deleteUserRole(user.getUserId(), role.getRoleId());
+
+		assertNotFound(
+			JSONFactoryUtil.createJSONObject(
+				_getObjectEntryTranslationLanguageString(
+					objectDefinition, objectEntry.getObjectEntryId(), password,
+					user)));
 	}
 
 	@Test
@@ -915,6 +1013,58 @@ public class ObjectEntryResourcePermissionTest
 
 				atomicReference.set(jsonObject.getJSONObject("actions"));
 			}
+		);
+
+		return atomicReference.get();
+	}
+
+	private int _getObjectEntryTranslationHTTPCode(
+			ObjectDefinition objectDefinition, long objectEntryId,
+			String password, User user)
+		throws Exception {
+
+		AtomicReference<Integer> atomicReference = new AtomicReference<>();
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user.getEmailAddress(), password
+		).apply(
+			() -> atomicReference.set(
+				HTTPTestUtil.invokeToHttpCode(
+					null,
+					StringBundler.concat(
+						objectDefinition.getRESTContextPath(), StringPool.SLASH,
+						objectEntryId, "/translations?sourceLanguageId=en_US&",
+						"targetLanguageIds=es_ES"),
+					Http.Method.GET))
+		);
+
+		return atomicReference.get();
+	}
+
+	private String _getObjectEntryTranslationLanguageString(
+			ObjectDefinition objectDefinition, long objectEntryId,
+			String password, User user)
+		throws Exception {
+
+		AtomicReference<String> atomicReference = new AtomicReference<>();
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user.getEmailAddress(), password
+		).apply(
+			() -> atomicReference.set(
+				HTTPTestUtil.invokeToString(
+					null,
+					StringBundler.concat(
+						objectDefinition.getRESTContextPath(), StringPool.SLASH,
+						objectEntryId,
+						"/translations/en_US?targetLanguageId=es_ES"),
+					HashMapBuilder.put(
+						HttpHeaders.ACCEPT,
+						"application/json, application/xliff+xml"
+					).build(),
+					Http.Method.GET))
 		);
 
 		return atomicReference.get();
