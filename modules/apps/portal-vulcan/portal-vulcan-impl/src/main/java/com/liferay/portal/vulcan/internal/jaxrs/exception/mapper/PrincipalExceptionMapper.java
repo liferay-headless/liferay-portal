@@ -5,12 +5,18 @@
 
 package com.liferay.portal.vulcan.internal.jaxrs.exception.mapper;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionRegistryUtil;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
@@ -26,9 +32,10 @@ import java.util.Arrays;
 
 /**
  * Converts any {@code PrincipalException} to a {@code 404} error in case it is
- * a GET request or the failed check was {@code VIEW}, so that an entity the
- * caller may not view is indistinguishable from a missing one. Converts any
- * other {@code PrincipalException} to a {@code 403} error.
+ * a GET request, the failed check was {@code VIEW}, or the caller may not view
+ * the entity the failed check names, so that an entity the caller may not view
+ * is indistinguishable from a missing one. Converts any other
+ * {@code PrincipalException} to a {@code 403} error.
  *
  * @author Brian Wing Shun Chan
  * @review
@@ -80,7 +87,39 @@ public class PrincipalExceptionMapper
 			return false;
 		}
 
-		return true;
+		if ((mustHavePermission.resourceId == 0) ||
+			Validator.isNull(mustHavePermission.resourceName)) {
+
+			return true;
+		}
+
+		ModelResourcePermission<?> modelResourcePermission =
+			ModelResourcePermissionRegistryUtil.getModelResourcePermission(
+				mustHavePermission.resourceName);
+
+		if (modelResourcePermission == null) {
+			return true;
+		}
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker == null) {
+			return false;
+		}
+
+		try {
+			return modelResourcePermission.contains(
+				permissionChecker, mustHavePermission.resourceId,
+				ActionKeys.VIEW);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+
+			return true;
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
