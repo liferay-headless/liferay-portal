@@ -10,7 +10,9 @@ import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -169,6 +171,37 @@ public class ExceptionMapperTest {
 	}
 
 	@Test
+	@TestInfo("LPD-107137")
+	public void testPrincipalExceptionWithViewActionReturnNotFound()
+		throws Exception {
+
+		Assert.assertEquals(
+			404,
+			HTTPTestUtil.invokeToHttpCode(
+				null, "/test-vulcan/testPrincipalException4",
+				Http.Method.POST));
+		Assert.assertEquals(
+			JSONUtil.put(
+				"status", "NOT_FOUND"
+			).toString(),
+			HTTPTestUtil.invokeToJSONObject(
+				null, "/test-vulcan/testPrincipalException4", Http.Method.POST
+			).toString());
+	}
+
+	@Test
+	@TestInfo("LPD-107137")
+	public void testPrincipalExceptionWithoutViewActionReturnForbidden()
+		throws Exception {
+
+		Assert.assertEquals(
+			403,
+			HTTPTestUtil.invokeToHttpCode(
+				null, "/test-vulcan/testPrincipalException3",
+				Http.Method.POST));
+	}
+
+	@Test
 	public void testProblemMapperReturnBadRequestProblem() throws Exception {
 		Assert.assertEquals(
 			400,
@@ -219,6 +252,24 @@ public class ExceptionMapperTest {
 		@Produces("application/json")
 		public void principalException2() throws PrincipalException {
 			throw new PrincipalException();
+		}
+
+		@Path("/testPrincipalException3")
+		@POST
+		@Produces("application/json")
+		public void principalException3() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), RandomTestUtil.randomLong(),
+				ActionKeys.UPDATE);
+		}
+
+		@Path("/testPrincipalException4")
+		@POST
+		@Produces("application/json")
+		public void principalException4() throws PrincipalException {
+			throw new PrincipalException.MustHavePermission(
+				0, Group.class.getName(), RandomTestUtil.randomLong(),
+				ActionKeys.VIEW);
 		}
 
 		@GET

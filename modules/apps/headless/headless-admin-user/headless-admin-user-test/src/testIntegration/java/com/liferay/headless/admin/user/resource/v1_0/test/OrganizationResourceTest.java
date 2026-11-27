@@ -2024,7 +2024,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			organizationResource.postOrganizationHttpResponse(organization);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		organization = randomOrganization();
@@ -2035,7 +2035,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			organization);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		_resourcePermissionLocalService.setResourcePermissions(

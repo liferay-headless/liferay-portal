@@ -3052,7 +3052,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 				_regularUserAccount.getId(), userAccount);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		userAccount = new UserAccount() {
@@ -3065,7 +3065,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			_regularUserAccount.getId(), userAccount);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);

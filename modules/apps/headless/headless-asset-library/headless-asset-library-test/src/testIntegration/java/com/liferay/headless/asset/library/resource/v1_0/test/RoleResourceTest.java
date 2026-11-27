@@ -532,7 +532,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 					DepotRolesConstants.ASSET_LIBRARY_CONTENT_REVIEWER);
 
 		_assertProblemStatus(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			() -> assignMembersRoleResource.putAssetLibraryUserAccountRolesPage(
 				testDepotEntryGroup.getExternalReferenceCode(),
 				user.getExternalReferenceCode(),
@@ -548,7 +548,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		User user = UserTestUtil.addUser(testDepotEntry.getGroupId());
 
 		_assertProblemStatus(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			() -> assignMembersRoleResource.putAssetLibraryUserAccountRolesPage(
 				testDepotEntryGroup.getExternalReferenceCode(),
 				user.getExternalReferenceCode(),
@@ -617,7 +617,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			ActionKeys.ASSIGN_USER_ROLES);
 
 		_assertProblemStatus(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			() ->
 				assignUserRolesRoleResource.putAssetLibraryUserAccountRolesPage(
 					testDepotEntryGroup.getExternalReferenceCode(),

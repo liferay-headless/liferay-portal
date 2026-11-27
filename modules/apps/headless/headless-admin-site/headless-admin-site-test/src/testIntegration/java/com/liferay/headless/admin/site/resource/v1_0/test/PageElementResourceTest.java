@@ -3353,7 +3353,7 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 		PageElementResource pageElementResource = _getPageElementResource();
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"FORBIDDEN", "Forbidden",
+			"NOT_FOUND", null,
 			() ->
 				pageElementResource.
 					postSitePageSpecificationPageExperiencePageElement(
@@ -3367,7 +3367,7 @@ public class PageElementResourceTest extends BasePageElementResourceTestCase {
 				_layout.getPlid());
 
 		ProblemExceptionTestUtil.assertProblemException(
-			"FORBIDDEN", "Forbidden",
+			"NOT_FOUND", null,
 			() ->
 				pageElementResource.
 					postSitePageSpecificationPageExperiencePageElement(

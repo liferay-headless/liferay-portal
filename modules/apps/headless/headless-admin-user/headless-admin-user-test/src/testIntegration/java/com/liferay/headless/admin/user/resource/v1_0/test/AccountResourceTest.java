@@ -2683,7 +2683,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 			accountResource.postAccountHttpResponse(account);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		account = randomAccount();
@@ -2693,7 +2693,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		httpResponse = accountResource.postAccountHttpResponse(account);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		_resourcePermissionLocalService.setResourcePermissions(

@@ -137,7 +137,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 			_addGuestCommerceOrder(), null);
 
 		_assertProblemException(
-			postCartItem, "FORBIDDEN",
+			postCartItem, "NOT_FOUND",
 			cartItem -> cartItemResource2.deleteCartItem(cartItem.getId()));
 
 		assertEquals(
@@ -731,7 +731,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 			_addGuestCommerceOrder(), null);
 
 		_assertProblemException(
-			randomCartItem(), "FORBIDDEN",
+			randomCartItem(), "NOT_FOUND",
 			patchCartItem -> cartItemResource2.patchCartItem(
 				postCartItem.getId(), patchCartItem));
 
@@ -946,7 +946,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 		CommerceOrder commerceOrder3 = _addGuestCommerceOrder();
 
 		_assertProblemException(
-			randomCartItem(), "FORBIDDEN",
+			randomCartItem(), "NOT_FOUND",
 			postCartItem -> cartItemResource1.postCartItem(
 				commerceOrder3.getCommerceOrderId(), postCartItem));
 	}
