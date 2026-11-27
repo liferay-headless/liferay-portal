@@ -2970,7 +2970,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			role.getRoleId(), _regularUserAccount.getId());
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			_regularUserAccountResource.
 				patchSiteAccountUserAccountSelectedHttpResponse(
 					testGroup.getGroupId(), accountEntry.getAccountEntryId(),

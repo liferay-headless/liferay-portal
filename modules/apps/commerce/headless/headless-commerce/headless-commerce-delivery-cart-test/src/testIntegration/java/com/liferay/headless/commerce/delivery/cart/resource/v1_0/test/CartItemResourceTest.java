@@ -760,7 +760,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 					skuId = cpInstance.getCPInstanceId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCartItem -> cartItemResource.patchCartItem(
 				postCartItem.getId(), patchCartItem));
 		_assertProblemException(
@@ -773,7 +773,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 					skuId = cpInstance.getCPInstanceId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCartItem -> cartItemResource.patchCartItem(
 				postCartItem.getId(), patchCartItem));
 
@@ -970,7 +970,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 					skuId = cpInstance.getCPInstanceId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCartItem -> cartItemResource.putCartItem(
 				postCartItem.getId(), putCartItem));
 		_assertProblemException(
@@ -983,7 +983,7 @@ public class CartItemResourceTest extends BaseCartItemResourceTestCase {
 					skuId = cpInstance.getCPInstanceId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCartItem -> cartItemResource.putCartItem(
 				postCartItem.getId(), putCartItem));
 

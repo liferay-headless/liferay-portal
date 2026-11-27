@@ -627,7 +627,7 @@ public class OrderItemResourceTest extends BaseOrderItemResourceTestCase {
 		OrderItem randomOrderItem = randomOrderItem();
 
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new OrderItem() {
 				{
 					quantity = randomOrderItem.getQuantity();
@@ -638,7 +638,7 @@ public class OrderItemResourceTest extends BaseOrderItemResourceTestCase {
 			postOrderItem -> orderItemResource.postOrderIdOrderItem(
 				_commerceOrder.getCommerceOrderId(), postOrderItem));
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new OrderItem() {
 				{
 					quantity = randomOrderItem.getQuantity();

@@ -67,7 +67,7 @@ public class KnowledgeBaseAttachmentResourceTest
 				_getUserWithoutPermissionsKnowledgeBaseAttachmentResource();
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			userWithoutPermissionsKnowledgeBaseAttachmentResource.
 				deleteKnowledgeBaseAttachmentHttpResponse(
 					knowledgeBaseAttachment.getId()));

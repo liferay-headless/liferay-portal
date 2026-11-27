@@ -430,7 +430,7 @@ public class MessageBoardAttachmentResourceTest
 				_getUserWithoutPermissionsMessageBoardAttachmentResource();
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			userWithoutPermissionsMessageBoardAttachmentResource.
 				deleteMessageBoardAttachmentHttpResponse(
 					messageBoardAttachment.getId()));

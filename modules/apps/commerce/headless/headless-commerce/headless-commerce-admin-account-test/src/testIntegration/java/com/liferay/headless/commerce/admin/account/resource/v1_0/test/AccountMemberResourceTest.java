@@ -500,7 +500,7 @@ public class AccountMemberResourceTest
 	}
 
 	private void _assertProblemException(
-			UnsafeRunnable<Exception> unsafeRunnable)
+			String expectedStatus, UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -511,7 +511,7 @@ public class AccountMemberResourceTest
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals(expectedStatus, problem.getStatus());
 		}
 	}
 
@@ -606,6 +606,7 @@ public class AccountMemberResourceTest
 		User user2 = UserTestUtil.addUser(testCompany);
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() ->
 				accountMemberResource.
 					patchAccountByExternalReferenceCodeAccountMember(
@@ -673,6 +674,7 @@ public class AccountMemberResourceTest
 		User user2 = UserTestUtil.addUser(testCompany);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> accountMemberResource.patchAccountIdAccountMember(
 				_accountEntry.getAccountEntryId(), user2.getUserId(),
 				_getAccountMember(serviceBuilderAccountRole.getRoleId())));
@@ -692,6 +694,7 @@ public class AccountMemberResourceTest
 				serviceBuilderAccountRole.getRoleId()));
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> accountMemberResource.patchAccountIdAccountMember(
 				_accountEntry.getAccountEntryId(), user2.getUserId(),
 				_getAccountMember()));

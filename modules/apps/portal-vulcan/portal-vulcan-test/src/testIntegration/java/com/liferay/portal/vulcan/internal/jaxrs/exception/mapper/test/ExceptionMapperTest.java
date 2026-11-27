@@ -6,16 +6,28 @@
 package com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.TestInfo;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Http;
@@ -27,6 +39,7 @@ import com.liferay.portal.vulcan.problem.ProblemMapper;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Application;
 
@@ -191,6 +204,60 @@ public class ExceptionMapperTest {
 
 	@Test
 	@TestInfo("LPD-107137")
+	public void testPrincipalExceptionWithViewDeniedReturnNotFound()
+		throws Exception {
+
+		_group = GroupTestUtil.addGroup();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		Folder folder1 = DLAppLocalServiceUtil.addFolder(
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
+
+		serviceContext.setAddGroupPermissions(false);
+		serviceContext.setAddGuestPermissions(false);
+
+		Folder folder2 = DLAppLocalServiceUtil.addFolder(
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
+
+		String password = RandomTestUtil.randomString();
+
+		_user = UserTestUtil.addUser(
+			CompanyLocalServiceUtil.getCompany(_group.getCompanyId()),
+			password);
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			_user.getEmailAddress(), password
+		).apply(
+			() -> {
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						"/test-vulcan/testPrincipalException5/" +
+							folder1.getFolderId(),
+						Http.Method.POST));
+				Assert.assertEquals(
+					404,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						"/test-vulcan/testPrincipalException5/" +
+							folder2.getFolderId(),
+						Http.Method.POST));
+			}
+		);
+	}
+
+	@Test
+	@TestInfo("LPD-107137")
 	public void testPrincipalExceptionWithoutViewActionReturnForbidden()
 		throws Exception {
 
@@ -272,6 +339,16 @@ public class ExceptionMapperTest {
 				ActionKeys.VIEW);
 		}
 
+		@Path("/testPrincipalException5/{folderId}")
+		@POST
+		@Produces("application/json")
+		public void principalException5(@PathParam("folderId") long folderId)
+			throws PrincipalException {
+
+			throw new PrincipalException.MustHavePermission(
+				0, DLFolder.class.getName(), folderId, ActionKeys.UPDATE);
+		}
+
 		@GET
 		@Path("/testNoSuchModelException")
 		@Produces("application/json")
@@ -302,7 +379,13 @@ public class ExceptionMapperTest {
 
 	private static final String _TYPE = RandomTestUtil.randomString();
 
+	@DeleteAfterTestRun
+	private Group _group;
+
 	private List<ServiceRegistration<?>> _serviceRegistrations;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 	private static class TestException extends Exception {
 

@@ -2546,7 +2546,7 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals("NOT_FOUND", problem.getStatus());
 		}
 	}
 
