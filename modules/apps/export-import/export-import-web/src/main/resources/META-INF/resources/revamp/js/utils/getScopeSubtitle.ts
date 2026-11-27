@@ -14,24 +14,24 @@ const SUBTITLES: Record<
 > = {
 	export: {
 		sites: Liferay.Language.get(
-			'export-complete-sites,-including-all-their-pages,-content,-and-settings'
+			'export-complete-sites,-including-all-their-pages,-content,-settings,-and-permissions'
 		),
 		sitesAndSpaces: Liferay.Language.get(
-			'export-complete-sites-and-spaces,-including-all-their-pages,-content,-and-settings'
+			'export-complete-sites-and-spaces,-including-all-their-pages,-content,-settings,-and-permissions'
 		),
 		spaces: Liferay.Language.get(
-			'export-complete-spaces,-including-all-their-content'
+			'export-complete-spaces,-including-all-their-content,-and-permissions'
 		),
 	},
 	import: {
 		sites: Liferay.Language.get(
-			'import-complete-sites-from-your-file,-including-all-their-pages,-content,-and-settings'
+			'import-complete-sites-from-your-file,-including-all-their-pages,-content,-settings,-and-permissions'
 		),
 		sitesAndSpaces: Liferay.Language.get(
-			'import-complete-sites-and-spaces-from-your-file,-including-all-their-pages,-content,-and-settings'
+			'import-complete-sites-and-spaces-from-your-file,-including-all-their-pages,-content,-settings,-and-permissions'
 		),
 		spaces: Liferay.Language.get(
-			'import-complete-spaces-from-your-file,-including-all-their-content'
+			'import-complete-spaces-from-your-file,-including-all-their-content,-and-permissions'
 		),
 	},
 };
