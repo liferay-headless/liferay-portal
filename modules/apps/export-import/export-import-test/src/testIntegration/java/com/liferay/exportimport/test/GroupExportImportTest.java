@@ -512,6 +512,66 @@ public class GroupExportImportTest {
 	}
 
 	@Test
+	public void testImportGroupsWithGroupPermissions() throws Exception {
+		Role role = RoleTestUtil.addRole(
+			RandomTestUtil.randomString(), RoleConstants.TYPE_SITE);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), Group.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(_group.getGroupId()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		File file = _exportLayouts(_group);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), Group.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(_group.getGroupId()), role.getRoleId(),
+			new String[0]);
+
+		Assert.assertFalse(
+			_resourcePermissionLocalService.hasResourcePermission(
+				TestPropsValues.getCompanyId(), Group.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(_group.getGroupId()), role.getRoleId(),
+				ActionKeys.VIEW));
+
+		_importLayouts(file, _group.getExternalReferenceCode());
+
+		Assert.assertTrue(
+			_resourcePermissionLocalService.hasResourcePermission(
+				TestPropsValues.getCompanyId(), Group.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(_group.getGroupId()), role.getRoleId(),
+				ActionKeys.VIEW));
+	}
+
+	@Test
+	public void testImportGroupsWithGroupPermissionsWhenRoleIsMissing()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(
+			RandomTestUtil.randomString(), RoleConstants.TYPE_SITE);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), Group.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(_group.getGroupId()), role.getRoleId(),
+			new String[] {ActionKeys.VIEW});
+
+		File file = _exportLayouts(_group);
+
+		_roleLocalService.deleteRole(role);
+
+		_importLayouts(file, _group.getExternalReferenceCode());
+
+		Assert.assertNull(
+			_roleLocalService.fetchRole(
+				TestPropsValues.getCompanyId(), role.getName()));
+	}
+
+	@Test
 	public void testImportGroupsWithMismatchedGroup() throws Exception {
 		Group depotGroup = _addSpaceDepotGroup();
 
