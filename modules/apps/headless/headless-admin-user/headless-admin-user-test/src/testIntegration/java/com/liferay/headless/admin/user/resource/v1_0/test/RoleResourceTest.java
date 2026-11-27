@@ -1605,7 +1605,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		role1.setPermissions(
 			new Permission[] {_toPermission(serviceBuilderRole2)});
 
-		_assertProblemException("NOT_FOUND", () -> roleResource1.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource1.postRole(role1));
 
 		RoleResource roleResource2 = _getRoleResource(
 			_PASSWORD,
@@ -1613,14 +1614,16 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				serviceBuilderRole1, ActionKeys.DEFINE_PERMISSIONS,
 				ActionKeys.VIEW));
 
-		_assertProblemException("NOT_FOUND", () -> roleResource2.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource2.postRole(role1));
 
 		RoleResource roleResource3 = _getRoleResource(
 			_PASSWORD,
 			_addUser(
 				serviceBuilderRole1, ActionKeys.PERMISSIONS, ActionKeys.VIEW));
 
-		_assertProblemException("NOT_FOUND", () -> roleResource3.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource3.postRole(role1));
 
 		Role role2 = roleResource.postRole(role1);
 
@@ -1647,7 +1650,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				_toRolePermission(ActionKeys.VIEW, Layout.class.getName())
 			});
 
-		_assertProblemException("NOT_FOUND", () -> roleResource1.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource1.postRole(role1));
 
 		RoleResource roleResource2 = _getRoleResource(
 			_PASSWORD,
@@ -1655,14 +1659,16 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				serviceBuilderRole, ActionKeys.DEFINE_PERMISSIONS,
 				ActionKeys.VIEW));
 
-		_assertProblemException("NOT_FOUND", () -> roleResource2.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource2.postRole(role1));
 
 		RoleResource roleResource3 = _getRoleResource(
 			_PASSWORD,
 			_addUser(
 				serviceBuilderRole, ActionKeys.PERMISSIONS, ActionKeys.VIEW));
 
-		_assertProblemException("NOT_FOUND", () -> roleResource3.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource3.postRole(role1));
 
 		Role role2 = roleResource.postRole(role1);
 
