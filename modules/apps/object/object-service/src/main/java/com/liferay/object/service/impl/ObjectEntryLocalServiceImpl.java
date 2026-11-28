@@ -26,9 +26,13 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.util.DepotRoleUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryTable;
+import com.liferay.document.library.kernel.model.DLFileVersion;
+import com.liferay.document.library.kernel.model.DLFileVersionTable;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
@@ -209,6 +213,9 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.OrganizationTable;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.ResourcePermissionTable;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -241,6 +248,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -2199,6 +2207,8 @@ public class ObjectEntryLocalServiceImpl
 
 			_loadValues(entry.getKey(), entry.getValue());
 		}
+
+		_cacheAttachments(objectDefinition, objectEntries);
 	}
 
 	@Override
@@ -3750,6 +3760,97 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return dslQuery;
+	}
+
+	private void _cacheAttachments(
+			ObjectDefinition objectDefinition, List<ObjectEntry> objectEntries)
+		throws PortalException {
+
+		Set<Serializable> fileEntryIds = new HashSet<>();
+
+		ObjectFieldBag objectFieldBag = objectDefinition.getObjectFieldBag();
+
+		for (ObjectField objectField : objectFieldBag.getObjectFields()) {
+			if (!Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
+				continue;
+			}
+
+			for (ObjectEntry objectEntry : objectEntries) {
+				Map<String, Serializable> values = objectEntry.getValues();
+
+				long fileEntryId = GetterUtil.getLong(
+					values.get(objectField.getName()));
+
+				if (fileEntryId <= 0) {
+					continue;
+				}
+
+				fileEntryIds.add(fileEntryId);
+			}
+		}
+
+		if (fileEntryIds.isEmpty()) {
+			return;
+		}
+
+		_dlFileEntryLocalService.fetchPersistedModels(fileEntryIds);
+
+		BasePersistence<DLFileVersion> dlFileVersionBasePersistence =
+			(BasePersistence<DLFileVersion>)
+				_dlFileVersionLocalService.getBasePersistence();
+
+		dlFileVersionBasePersistence.cacheResult(
+			_dlFileVersionLocalService.<List<DLFileVersion>>dslQuery(
+				DSLQueryFactoryUtil.select(
+					DLFileVersionTable.INSTANCE
+				).from(
+					DLFileVersionTable.INSTANCE
+				).innerJoinON(
+					DLFileEntryTable.INSTANCE,
+					DLFileEntryTable.INSTANCE.fileEntryId.eq(
+						DLFileVersionTable.INSTANCE.fileEntryId
+					).and(
+						DLFileEntryTable.INSTANCE.version.eq(
+							DLFileVersionTable.INSTANCE.version)
+					)
+				).where(
+					DLFileEntryTable.INSTANCE.fileEntryId.in(
+						fileEntryIds.toArray(new Long[0]))
+				)));
+
+		BasePersistence<ResourcePermission> resourcePermissionBasePersistence =
+			(BasePersistence<ResourcePermission>)
+				_resourcePermissionLocalService.getBasePersistence();
+		Role role = _roleLocalService.getRole(
+			objectDefinition.getCompanyId(), RoleConstants.OWNER);
+
+		resourcePermissionBasePersistence.cacheResult(
+			_resourcePermissionLocalService.<List<ResourcePermission>>dslQuery(
+				DSLQueryFactoryUtil.select(
+					ResourcePermissionTable.INSTANCE
+				).from(
+					ResourcePermissionTable.INSTANCE
+				).where(
+					ResourcePermissionTable.INSTANCE.companyId.eq(
+						objectDefinition.getCompanyId()
+					).and(
+						ResourcePermissionTable.INSTANCE.name.eq(
+							DLFileEntry.class.getName())
+					).and(
+						ResourcePermissionTable.INSTANCE.scope.eq(
+							ResourceConstants.SCOPE_INDIVIDUAL)
+					).and(
+						ResourcePermissionTable.INSTANCE.primKey.in(
+							TransformUtil.transformToArray(
+								fileEntryIds, String::valueOf, String.class))
+					).and(
+						ResourcePermissionTable.INSTANCE.roleId.eq(
+							role.getRoleId())
+					)
+				)));
 	}
 
 	private void _checkObjectDefinitionScope(
@@ -10270,6 +10371,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+
+	@Reference
+	private DLFileVersionLocalService _dlFileVersionLocalService;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
