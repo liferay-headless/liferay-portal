@@ -5,9 +5,13 @@
 
 package com.liferay.headless.admin.configuration.internal.resource.v1_0;
 
+import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.configuration.admin.exportimport.ConfigurationExportImportProcessor;
 import com.liferay.configuration.admin.util.ConfigurationFilterStringUtil;
+import com.liferay.exportimport.constants.ExportImportConstants;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.headless.admin.configuration.dto.v1_0.SiteConfiguration;
 import com.liferay.headless.admin.configuration.internal.util.ConfigurationScreenUtil;
 import com.liferay.headless.admin.configuration.internal.util.ConfigurationUtil;
@@ -16,6 +20,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -57,10 +62,61 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/site-configuration.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = SiteConfigurationResource.class
 )
 public class SiteConfigurationResourceImpl
-	extends BaseSiteConfigurationResourceImpl {
+	extends BaseSiteConfigurationResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate
+		<SiteConfiguration> {
+
+	@Override
+	public ExportImportDescriptor getExportImportDescriptor() {
+		return new ExportImportDescriptor() {
+
+			@Override
+			public String getKey() {
+				return SiteConfigurationResourceImpl.class.getName();
+			}
+
+			@Override
+			public String getLabelLanguageKey() {
+				return "site-settings";
+			}
+
+			@Override
+			public Class<?> getModelClass() {
+				return null;
+			}
+
+			@Override
+			public String getModelClassName() {
+				return SiteConfiguration.class.getName();
+			}
+
+			@Override
+			public String getPortletId() {
+				return ConfigurationAdminPortletKeys.SITE_SETTINGS;
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.SITE;
+			}
+
+			@Override
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_CONFIGURATION;
+			}
+
+			@Override
+			public boolean isActive(PortletDataContext portletDataContext) {
+				return FeatureFlagManagerUtil.isEnabled(
+					portletDataContext.getCompanyId(), "LPD-65399");
+			}
+
+		};
+	}
 
 	@Override
 	public SiteConfiguration getSiteSiteConfiguration(
