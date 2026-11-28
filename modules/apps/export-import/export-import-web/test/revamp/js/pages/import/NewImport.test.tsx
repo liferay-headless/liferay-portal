@@ -528,7 +528,7 @@ describe('NewImport', () => {
 
 		expect(
 			await screen.findByText(
-				'import-complete-spaces-from-your-file,-including-all-their-content'
+				'import-complete-spaces-from-your-file,-including-all-their-content,-and-permissions'
 			)
 		).toBeInTheDocument();
 

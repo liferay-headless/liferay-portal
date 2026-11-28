@@ -411,7 +411,7 @@ describe('NewExport', () => {
 
 		expect(
 			await screen.findByText(
-				'export-complete-sites,-including-all-their-pages,-content,-and-settings'
+				'export-complete-sites,-including-all-their-pages,-content,-settings,-and-permissions'
 			)
 		).toBeInTheDocument();
 
@@ -419,7 +419,7 @@ describe('NewExport', () => {
 
 		expect(
 			screen.getByText(
-				'export-complete-spaces,-including-all-their-content'
+				'export-complete-spaces,-including-all-their-content-and-permissions'
 			)
 		).toBeInTheDocument();
 		expect(
@@ -436,7 +436,7 @@ describe('NewExport', () => {
 
 		expect(
 			screen.getByText(
-				'export-complete-sites-and-spaces,-including-all-their-pages,-content,-and-settings'
+				'export-complete-sites-and-spaces,-including-all-their-pages,-content,-settings,-and-permissions'
 			)
 		).toBeInTheDocument();
 		expect(
