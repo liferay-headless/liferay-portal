@@ -6,6 +6,10 @@
 package com.liferay.object.rest.internal.dto.v1_0.converter.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
@@ -15,6 +19,7 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.MultiselectPicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryVersion;
@@ -29,19 +34,27 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryVersionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.test.util.ObjectDefinitionTestUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.FeatureFlagTestUtil;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.FeatureFlag;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -55,8 +68,10 @@ import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +95,100 @@ public class ObjectEntryDTOConverterTest {
 			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Test
+	@TestInfo("LPD-116074")
 	public void testToDTO() throws Exception {
+		_testToDTOWithObjectRelationship(
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+		_testToDTOWithObjectRelationship(
+			ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
+		_testToDTOWithPicklistObjectFields();
+		_testToDTOWithTaxonomyCategoryWithoutViewPermission();
+	}
+
+	private void _testToDTOWithObjectRelationship(String type)
+		throws Exception {
+
+		try (SafeCloseable safeCloseable =
+				FeatureFlagTestUtil.setFeatureFlagsWithSafeCloseable(
+					true, "LPD-108620")) {
+
+			ObjectDefinition parentObjectDefinition =
+				ObjectDefinitionTestUtil.publishObjectDefinition();
+
+			com.liferay.object.model.ObjectEntry
+				parentServiceBuilderObjectEntry =
+					ObjectEntryTestUtil.addObjectEntry(
+						parentObjectDefinition, Collections.emptyMap());
+
+			ObjectDefinition childObjectDefinition =
+				ObjectDefinitionTestUtil.publishObjectDefinition();
+
+			ObjectRelationship objectRelationship =
+				ObjectRelationshipTestUtil.addObjectRelationship(
+					parentObjectDefinition, childObjectDefinition,
+					TestPropsValues.getUserId(), type);
+
+			ObjectField objectField = _objectFieldLocalService.getObjectField(
+				objectRelationship.getObjectFieldId2());
+
+			com.liferay.object.model.ObjectEntry
+				childServiceBuilderObjectEntry =
+					ObjectEntryTestUtil.addObjectEntry(
+						childObjectDefinition,
+						HashMapBuilder.<String, Serializable>put(
+							objectField.getName(),
+							parentServiceBuilderObjectEntry.getObjectEntryId()
+						).build());
+
+			NestedFieldsContext originalNestedFieldsContext =
+				NestedFieldsContextThreadLocal.getNestedFieldsContext();
+
+			try {
+				NestedFieldsContextThreadLocal.setNestedFieldsContext(null);
+
+				ObjectEntry childObjectEntry = _toDTO(
+					childObjectDefinition, childServiceBuilderObjectEntry);
+
+				Map<String, Object> properties =
+					childObjectEntry.getProperties();
+
+				Assert.assertEquals(
+					parentServiceBuilderObjectEntry.getExternalReferenceCode(),
+					properties.get(
+						ObjectFieldSettingUtil.getValue(
+							ObjectFieldSettingConstants.
+								NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+							objectField)));
+				Assert.assertEquals(
+					parentServiceBuilderObjectEntry.getObjectEntryId(),
+					GetterUtil.getLong(properties.get(objectField.getName())));
+
+				NestedFieldsContextThreadLocal.setNestedFieldsContext(
+					new NestedFieldsContext(
+						1, null,
+						Collections.singletonList(objectRelationship.getName()),
+						null, null, null));
+
+				childObjectEntry = _toDTO(
+					childObjectDefinition, childServiceBuilderObjectEntry);
+
+				properties = childObjectEntry.getProperties();
+
+				ObjectEntry parentObjectEntry = (ObjectEntry)properties.get(
+					objectRelationship.getName());
+
+				Assert.assertEquals(
+					parentServiceBuilderObjectEntry.getExternalReferenceCode(),
+					parentObjectEntry.getExternalReferenceCode());
+			}
+			finally {
+				NestedFieldsContextThreadLocal.setNestedFieldsContext(
+					originalNestedFieldsContext);
+			}
+		}
+	}
+
+	private void _testToDTOWithPicklistObjectFields() throws Exception {
 		ListTypeDefinition listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
 				null, TestPropsValues.getUserId(),
@@ -90,33 +198,36 @@ public class ObjectEntryDTOConverterTest {
 					ListTypeEntryUtil.createListTypeEntry("listTypeEntryKey2")),
 				new ServiceContext());
 
-		_objectDefinition = ObjectDefinitionTestUtil.publishObjectDefinition(
-			false, false, true,
-			ListUtil.fromArray(
-				new MultiselectPicklistObjectFieldBuilder(
-				).labelMap(
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString())
-				).listTypeDefinitionId(
-					listTypeDefinition.getListTypeDefinitionId()
-				).name(
-					"multiselectPicklist"
-				).build(),
-				new PicklistObjectFieldBuilder(
-				).labelMap(
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString())
-				).listTypeDefinitionId(
-					listTypeDefinition.getListTypeDefinitionId()
-				).name(
-					"picklist"
-				).build()),
-			ObjectDefinitionConstants.SCOPE_SITE);
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				false, false, true,
+				ListUtil.fromArray(
+					new MultiselectPicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"multiselectPicklist"
+					).build(),
+					new PicklistObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).listTypeDefinitionId(
+						listTypeDefinition.getListTypeDefinitionId()
+					).name(
+						"picklist"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE);
+
+		_objectDefinitions.add(objectDefinition);
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryLocalService.addObjectEntry(
 				TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
-				_objectDefinition.getObjectDefinitionId(),
+				objectDefinition.getObjectDefinitionId(),
 				ObjectEntryFolderConstants.
 					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
 				null,
@@ -130,7 +241,7 @@ public class ObjectEntryDTOConverterTest {
 					TestPropsValues.getGroupId()));
 
 		ObjectEntry objectEntry = _toDTO(
-			_objectDefinition, serviceBuilderObjectEntry);
+			objectDefinition, serviceBuilderObjectEntry);
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
@@ -169,88 +280,80 @@ public class ObjectEntryDTOConverterTest {
 		Assert.assertEquals(Scope.Type.SITE, scope.getType());
 	}
 
-	@FeatureFlag("LPD-108620")
-	@Test
-	public void testToDTOWithObjectRelationship() throws Exception {
-		_testToDTOWithObjectRelationship(
-			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
-		_testToDTOWithObjectRelationship(
-			ObjectRelationshipConstants.TYPE_ONE_TO_ONE);
-	}
-
-	private void _testToDTOWithObjectRelationship(String type)
+	private void _testToDTOWithTaxonomyCategoryWithoutViewPermission()
 		throws Exception {
 
-		ObjectDefinition parentObjectDefinition =
-			ObjectDefinitionTestUtil.publishObjectDefinition();
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				false, false, false,
+				ListUtil.fromArray(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						LocalizedMapUtil.getLocalizedMap(
+							RandomTestUtil.randomString())
+					).name(
+						"text"
+					).build()),
+				ObjectDefinitionConstants.SCOPE_SITE);
 
-		com.liferay.object.model.ObjectEntry parentServiceBuilderObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				parentObjectDefinition, Collections.emptyMap());
+		_objectDefinitions.add(objectDefinition);
 
-		ObjectDefinition childObjectDefinition =
-			ObjectDefinitionTestUtil.publishObjectDefinition();
+		_group = GroupTestUtil.addGroup();
 
-		ObjectRelationship objectRelationship =
-			ObjectRelationshipTestUtil.addObjectRelationship(
-				parentObjectDefinition, childObjectDefinition,
-				TestPropsValues.getUserId(), type);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectRelationship.getObjectFieldId2());
+		serviceContext.setAddGroupPermissions(false);
+		serviceContext.setAddGuestPermissions(false);
 
-		com.liferay.object.model.ObjectEntry childServiceBuilderObjectEntry =
-			ObjectEntryTestUtil.addObjectEntry(
-				childObjectDefinition,
-				HashMapBuilder.<String, Serializable>put(
-					objectField.getName(),
-					parentServiceBuilderObjectEntry.getObjectEntryId()
-				).build());
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.addVocabulary(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				RandomTestUtil.randomString(), serviceContext);
 
-		NestedFieldsContext originalNestedFieldsContext =
-			NestedFieldsContextThreadLocal.getNestedFieldsContext();
+		AssetCategory assetCategory = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			serviceContext);
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+
+		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
+			_objectEntryLocalService.addObjectEntry(
+				_group.getGroupId(), TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId(),
+				ObjectEntryFolderConstants.
+					PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+				null, new HashMap<String, Serializable>(), serviceContext);
+
+		PermissionChecker originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
 
 		try {
-			NestedFieldsContextThreadLocal.setNestedFieldsContext(null);
+			_user = UserTestUtil.addUser();
 
-			ObjectEntry childObjectEntry = _toDTO(
-				childObjectDefinition, childServiceBuilderObjectEntry);
+			PermissionThreadLocal.setPermissionChecker(
+				PermissionCheckerFactoryUtil.create(_user));
 
-			Map<String, Object> properties = childObjectEntry.getProperties();
-
-			Assert.assertEquals(
-				parentServiceBuilderObjectEntry.getExternalReferenceCode(),
-				properties.get(
-					ObjectFieldSettingUtil.getValue(
-						ObjectFieldSettingConstants.
-							NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
-						objectField)));
-			Assert.assertEquals(
-				parentServiceBuilderObjectEntry.getObjectEntryId(),
-				GetterUtil.getLong(properties.get(objectField.getName())));
-
-			NestedFieldsContextThreadLocal.setNestedFieldsContext(
-				new NestedFieldsContext(
-					1, null,
-					Collections.singletonList(objectRelationship.getName()),
-					null, null, null));
-
-			childObjectEntry = _toDTO(
-				childObjectDefinition, childServiceBuilderObjectEntry);
-
-			properties = childObjectEntry.getProperties();
-
-			ObjectEntry parentObjectEntry = (ObjectEntry)properties.get(
-				objectRelationship.getName());
+			ObjectEntry objectEntry = _toDTO(
+				objectDefinition, serviceBuilderObjectEntry);
 
 			Assert.assertEquals(
-				parentServiceBuilderObjectEntry.getExternalReferenceCode(),
-				parentObjectEntry.getExternalReferenceCode());
+				Arrays.toString(objectEntry.getTaxonomyCategoryBriefs()), 0,
+				objectEntry.getTaxonomyCategoryBriefs().length);
 		}
 		finally {
-			NestedFieldsContextThreadLocal.setNestedFieldsContext(
-				originalNestedFieldsContext);
+			PermissionThreadLocal.setPermissionChecker(
+				originalPermissionChecker);
 		}
+
+		ObjectEntry objectEntry = _toDTO(
+			objectDefinition, serviceBuilderObjectEntry);
+
+		Assert.assertEquals(
+			Arrays.toString(objectEntry.getTaxonomyCategoryBriefs()), 1,
+			objectEntry.getTaxonomyCategoryBriefs().length);
 	}
 
 	private ObjectEntry _toDTO(
@@ -288,7 +391,16 @@ public class ObjectEntryDTOConverterTest {
 	}
 
 	@Inject
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Inject
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Inject
 	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@DeleteAfterTestRun
+	private Group _group;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
@@ -297,7 +409,7 @@ public class ObjectEntryDTOConverterTest {
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
 
 	@DeleteAfterTestRun
-	private ObjectDefinition _objectDefinition;
+	private final List<ObjectDefinition> _objectDefinitions = new ArrayList<>();
 
 	@Inject
 	private ObjectEntryLocalService _objectEntryLocalService;
@@ -307,5 +419,8 @@ public class ObjectEntryDTOConverterTest {
 
 	@Inject
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 }
