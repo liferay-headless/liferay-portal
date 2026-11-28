@@ -6,6 +6,10 @@
 package com.liferay.object.rest.internal.manager.v1_0;
 
 import com.liferay.account.exception.NoSuchGroupException;
+import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRelTable;
+import com.liferay.asset.kernel.model.AssetEntries_AssetTagsTable;
+import com.liferay.asset.kernel.model.AssetEntryTable;
+import com.liferay.asset.kernel.model.AssetTagTable;
 import com.liferay.depot.constants.DepotConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.model.DepotEntryModel;
@@ -13,6 +17,8 @@ import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.exportimport.attachment.ExportImportAttachmentManager;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.friendly.url.model.FriendlyURLEntryLocalizationTable;
+import com.liferay.friendly.url.model.FriendlyURLEntryMappingTable;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.comment.ObjectEntryComment;
 import com.liferay.object.configuration.ObjectConfiguration;
@@ -89,6 +95,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
@@ -3236,6 +3243,9 @@ public class DefaultObjectEntryManagerImpl
 		objectEntryLocalService.loadValues(
 			objectDefinition, serviceBuilderObjectEntries);
 
+		_setBulkAttributes(
+			dtoConverterContext, objectDefinition, serviceBuilderObjectEntries);
+
 		return Page.of(
 			serviceBuilderObjectEntries, pagination, objectEntriesCount);
 	}
@@ -3768,6 +3778,123 @@ public class DefaultObjectEntryManagerImpl
 				objectField.getName(),
 				_getNewValue(groupId, objectDefinition, objectField, value));
 		}
+	}
+
+	private void _setBulkAttributes(
+		DTOConverterContext dtoConverterContext,
+		ObjectDefinition objectDefinition,
+		List<com.liferay.object.model.ObjectEntry>
+			serviceBuilderObjectEntries) {
+
+		if (serviceBuilderObjectEntries.isEmpty()) {
+			return;
+		}
+
+		long classNameId = _portal.getClassNameId(
+			objectDefinition.getClassName());
+		Long[] classPKs = TransformUtil.transformToArray(
+			serviceBuilderObjectEntries,
+			com.liferay.object.model.ObjectEntry::getObjectEntryId, Long.class);
+
+		Map<Long, Map<String, String>> friendlyURLTitleMaps = new HashMap<>();
+
+		List<Object[]> rows = objectEntryLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				FriendlyURLEntryMappingTable.INSTANCE.classPK,
+				FriendlyURLEntryLocalizationTable.INSTANCE.languageId,
+				FriendlyURLEntryLocalizationTable.INSTANCE.urlTitle
+			).from(
+				FriendlyURLEntryMappingTable.INSTANCE
+			).innerJoinON(
+				FriendlyURLEntryLocalizationTable.INSTANCE,
+				FriendlyURLEntryLocalizationTable.INSTANCE.friendlyURLEntryId.
+					eq(FriendlyURLEntryMappingTable.INSTANCE.friendlyURLEntryId)
+			).where(
+				FriendlyURLEntryMappingTable.INSTANCE.classNameId.eq(
+					classNameId
+				).and(
+					FriendlyURLEntryMappingTable.INSTANCE.classPK.in(classPKs)
+				)
+			));
+
+		for (Object[] row : rows) {
+			Map<String, String> friendlyURLTitleMap =
+				friendlyURLTitleMaps.computeIfAbsent(
+					(Long)row[0], key -> new HashMap<>());
+
+			friendlyURLTitleMap.put((String)row[1], (String)row[2]);
+		}
+
+		dtoConverterContext.setAttribute(
+			"friendlyURLTitleMaps", friendlyURLTitleMaps);
+
+		if (!objectDefinition.isEnableCategorization()) {
+			return;
+		}
+
+		Map<Long, List<String>> keywordsMap = new HashMap<>();
+
+		rows = objectEntryLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				AssetEntryTable.INSTANCE.classPK, AssetTagTable.INSTANCE.name
+			).from(
+				AssetEntryTable.INSTANCE
+			).innerJoinON(
+				AssetEntries_AssetTagsTable.INSTANCE,
+				AssetEntries_AssetTagsTable.INSTANCE.entryId.eq(
+					AssetEntryTable.INSTANCE.entryId)
+			).innerJoinON(
+				AssetTagTable.INSTANCE,
+				AssetTagTable.INSTANCE.tagId.eq(
+					AssetEntries_AssetTagsTable.INSTANCE.tagId)
+			).where(
+				AssetEntryTable.INSTANCE.classNameId.eq(
+					classNameId
+				).and(
+					AssetEntryTable.INSTANCE.classPK.in(classPKs)
+				)
+			).orderBy(
+				AssetTagTable.INSTANCE.tagId.ascending()
+			));
+
+		for (Object[] row : rows) {
+			List<String> keywords = keywordsMap.computeIfAbsent(
+				(Long)row[0], key -> new ArrayList<>());
+
+			keywords.add((String)row[1]);
+		}
+
+		dtoConverterContext.setAttribute("keywordsMap", keywordsMap);
+
+		Map<Long, List<Long>> assetCategoryIdsMap = new HashMap<>();
+
+		rows = objectEntryLocalService.dslQuery(
+			DSLQueryFactoryUtil.select(
+				AssetEntryTable.INSTANCE.classPK,
+				AssetEntryAssetCategoryRelTable.INSTANCE.assetCategoryId
+			).from(
+				AssetEntryTable.INSTANCE
+			).innerJoinON(
+				AssetEntryAssetCategoryRelTable.INSTANCE,
+				AssetEntryAssetCategoryRelTable.INSTANCE.assetEntryId.eq(
+					AssetEntryTable.INSTANCE.entryId)
+			).where(
+				AssetEntryTable.INSTANCE.classNameId.eq(
+					classNameId
+				).and(
+					AssetEntryTable.INSTANCE.classPK.in(classPKs)
+				)
+			));
+
+		for (Object[] row : rows) {
+			List<Long> assetCategoryIds = assetCategoryIdsMap.computeIfAbsent(
+				(Long)row[0], key -> new ArrayList<>());
+
+			assetCategoryIds.add((Long)row[1]);
+		}
+
+		dtoConverterContext.setAttribute(
+			"assetCategoryIdsMap", assetCategoryIdsMap);
 	}
 
 	private void _setLatestApprovedObjectEntryVersionAttribute(
