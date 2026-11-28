@@ -16,8 +16,6 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLTrashLocalService;
 import com.liferay.layout.seo.model.LayoutSEOSite;
 import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -36,17 +34,11 @@ import java.util.Dictionary;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jürgen Kappler
@@ -60,28 +52,6 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
-
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			OpenGraphSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
 
 	@Test
 	public void testExportImportProperties() throws Exception {
@@ -135,11 +105,8 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			sourceGroup.getGroupId(), false, openGraphImageAltMap,
 			fileEntry.getFileEntryId());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals(Boolean.FALSE, properties.get("openGraphEnabled"));
 		Assert.assertEquals(
@@ -151,7 +118,7 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 
 		Group targetGroup = GroupTestUtil.addGroup();
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		LayoutSEOSite layoutSEOSite =
@@ -191,11 +158,8 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			RandomTestUtil.randomLocaleStringMap(),
 			sourceFileEntry.getFileEntryId());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals(
 			externalReferenceCode,
@@ -207,7 +171,7 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 		FileEntry targetFileEntry = _addFileEntry(
 			externalReferenceCode, targetGroup.getGroupId());
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		LayoutSEOSite layoutSEOSite =
@@ -233,18 +197,15 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			TestPropsValues.getUserId(), group.getGroupId(),
 			fileEntry.getFileEntryId());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals(properties.toString(), 1, properties.size());
 		Assert.assertEquals(Boolean.FALSE, properties.get("openGraphEnabled"));
 
 		_dlAppLocalService.deleteFileEntry(fileEntry.getFileEntryId());
 
-		properties = configurationScreen.exportProperties(group.getGroupId());
+		properties = _configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals(properties.toString(), 1, properties.size());
 		Assert.assertEquals(Boolean.FALSE, properties.get("openGraphEnabled"));
@@ -253,11 +214,8 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 	private void _testExportPropertiesWithoutLayoutSEOSite() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -275,13 +233,10 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			group.getGroupId(), true, openGraphImageAltMap,
 			fileEntry.getFileEntryId());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"openGraphEnabled", false
 				).put(
@@ -304,7 +259,7 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 		String scopeExternalReferenceCode = RandomTestUtil.randomString();
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"openGraphEnabled", false
 				).put(
@@ -335,7 +290,7 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			trashedFileEntry.getFileEntryId());
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"openGraphEnabled", false
 				).put(
@@ -381,10 +336,7 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			group.getGroupId(), true, openGraphImageAltMap,
 			fileEntry.getFileEntryId());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-open-graph");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"openGraphEnabled", false
 			).build(),
@@ -414,6 +366,11 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 			ServiceContextTestUtil.getServiceContext(groupId));
 	}
 
+	@Inject(
+		filter = "component.name=com.liferay.layout.seo.web.internal.configuration.admin.display.OpenGraphSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private DepotEntryLocalService _depotEntryLocalService;
 
@@ -425,7 +382,5 @@ public class OpenGraphSiteSettingsConfigurationScreenWrapperTest {
 
 	@Inject
 	private LayoutSEOSiteLocalService _layoutSEOSiteLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 }

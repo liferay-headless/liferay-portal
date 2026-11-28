@@ -7,8 +7,6 @@ package com.liferay.site.admin.web.internal.configuration.admin.display.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -23,17 +21,11 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Dictionary;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jürgen Kappler
@@ -48,28 +40,6 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
-
 	@Test
 	public void testExportImportProperties() throws Exception {
 		Group sourceGroup = GroupTestUtil.addGroup();
@@ -82,17 +52,14 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 		_groupLocalService.updateGroup(
 			sourceGroup.getGroupId(), typeSettingsUnicodeProperties.toString());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-documents-and-media");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals("true", properties.get("directoryIndexingEnabled"));
 
 		Group targetGroup = GroupTestUtil.addGroup();
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		targetGroup = _groupLocalService.getGroup(targetGroup.getGroupId());
@@ -101,7 +68,7 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 			"true",
 			targetGroup.getTypeSettingsProperty("directoryIndexingEnabled"));
 
-		properties = configurationScreen.exportProperties(
+		properties = _configurationScreen.exportProperties(
 			sourceGroup.getGroupId());
 
 		Assert.assertEquals("true", properties.get("directoryIndexingEnabled"));
@@ -111,11 +78,8 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-documents-and-media");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -124,25 +88,22 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 	public void testImportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-documents-and-media");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"directoryIndexingEnabled", RandomTestUtil.randomString()
 			).build(),
 			group.getGroupId());
 
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals(
 			"false", properties.get("directoryIndexingEnabled"));
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
-		properties = configurationScreen.exportProperties(group.getGroupId());
+		properties = _configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals(
 			"false", properties.get("directoryIndexingEnabled"));
@@ -154,10 +115,7 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 
 		GroupTestUtil.enableLocalStaging(group);
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-documents-and-media");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"directoryIndexingEnabled", "true"
 			).build(),
@@ -175,9 +133,12 @@ public class DocumentsAndMediaSiteSettingsConfigurationScreenWrapperTest {
 			stagingGroup.getTypeSettingsProperty("directoryIndexingEnabled"));
 	}
 
+	@Inject(
+		filter = "component.name=com.liferay.site.admin.web.internal.configuration.admin.display.DocumentsAndMediaSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 }

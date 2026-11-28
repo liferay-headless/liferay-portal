@@ -7,8 +7,6 @@ package com.liferay.site.admin.web.internal.configuration.admin.display.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchTeamException;
 import com.liferay.portal.kernel.model.Group;
@@ -34,17 +32,11 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.Dictionary;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jonathan McCann
@@ -59,29 +51,6 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest.
-				class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
-
 	@Test
 	public void testExportImportProperties() throws Exception {
 		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
@@ -94,11 +63,8 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 			new long[] {role.getRoleId()}, new long[] {sourceTeam.getTeamId()},
 			sourceGroup);
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-default-user-associations");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals(
 			ListUtil.fromArray(role.getExternalReferenceCode()),
@@ -112,7 +78,7 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 
 		Team targetTeam = _addTeam(targetGroup, sourceTeam.getName());
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		_assertDefaultSiteRoleIds(targetGroup, role.getRoleId());
@@ -123,11 +89,8 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-default-user-associations");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -146,10 +109,7 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 
 		_updateTypeSettings(defaultSiteRoleIds, defaultTeamIds, group);
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-default-user-associations");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
 		_assertDefaultSiteRoleIds(group, defaultSiteRoleIds);
@@ -159,7 +119,7 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 
 		defaultTeamIds = new long[] {team.getTeamId()};
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"defaultTeamNames", ListUtil.fromArray(team.getName())
 			).build(),
@@ -169,7 +129,7 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 		_assertDefaultTeamIds(group, defaultTeamIds);
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"defaultSiteRoleExternalReferenceCodes",
 					ListUtil.fromArray(RandomTestUtil.randomString())
@@ -186,7 +146,7 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 		}
 
 		try {
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				HashMapDictionaryBuilder.<String, Object>put(
 					"defaultSiteRoleExternalReferenceCodes",
 					ListUtil.fromArray(role.getExternalReferenceCode())
@@ -249,10 +209,13 @@ public class DefaultUserAssociationsSiteSettingsConfigurationScreenWrapperTest {
 			group.getGroupId(), typeSettingsUnicodeProperties.toString());
 	}
 
+	@Inject(
+		filter = "component.name=com.liferay.site.admin.web.internal.configuration.admin.display.DefaultUserAssociationsSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 	@Inject
 	private TeamLocalService _teamLocalService;

@@ -8,8 +8,6 @@ package com.liferay.mentions.web.internal.configuration.admin.display.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.mentions.util.MentionsUtil;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -22,17 +20,11 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Dictionary;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Jürgen Kappler
@@ -44,28 +36,6 @@ public class MentionsSiteSettingsConfigurationScreenWrapperTest {
 	@Rule
 	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
 		new LiferayIntegrationTestRule();
-
-	@Before
-	public void setUp() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			MentionsSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, ConfigurationScreen.class, null,
-			(serviceReference, emitter) -> {
-				ConfigurationScreen configurationScreen =
-					bundleContext.getService(serviceReference);
-
-				emitter.emit(configurationScreen.getKey());
-			});
-	}
-
-	@After
-	public void tearDown() {
-		_serviceTrackerMap.close();
-	}
 
 	@Test
 	public void testExportImportProperties() throws Exception {
@@ -79,11 +49,8 @@ public class MentionsSiteSettingsConfigurationScreenWrapperTest {
 		_groupLocalService.updateGroup(
 			sourceGroup.getGroupId(), typeSettingsUnicodeProperties.toString());
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-mentions");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(sourceGroup.getGroupId());
+			_configurationScreen.exportProperties(sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("mentionsEnabled"));
 
@@ -92,13 +59,13 @@ public class MentionsSiteSettingsConfigurationScreenWrapperTest {
 		Assert.assertTrue(
 			MentionsUtil.isMentionsEnabled(targetGroup.getGroupId()));
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			properties, targetGroup.getGroupId());
 
 		Assert.assertFalse(
 			MentionsUtil.isMentionsEnabled(targetGroup.getGroupId()));
 
-		properties = configurationScreen.exportProperties(
+		properties = _configurationScreen.exportProperties(
 			sourceGroup.getGroupId());
 
 		Assert.assertEquals("false", properties.get("mentionsEnabled"));
@@ -108,11 +75,8 @@ public class MentionsSiteSettingsConfigurationScreenWrapperTest {
 	public void testExportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-mentions");
-
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertTrue(properties.isEmpty());
 	}
@@ -121,31 +85,31 @@ public class MentionsSiteSettingsConfigurationScreenWrapperTest {
 	public void testImportProperties() throws Exception {
 		Group group = GroupTestUtil.addGroup();
 
-		ConfigurationScreen configurationScreen = _serviceTrackerMap.getService(
-			"site-configuration-mentions");
-
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			HashMapDictionaryBuilder.<String, Object>put(
 				"mentionsEnabled", RandomTestUtil.randomString()
 			).build(),
 			group.getGroupId());
 
 		Dictionary<String, Object> properties =
-			configurationScreen.exportProperties(group.getGroupId());
+			_configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("mentionsEnabled"));
 
-		configurationScreen.importProperties(
+		_configurationScreen.importProperties(
 			new HashMapDictionary<>(), group.getGroupId());
 
-		properties = configurationScreen.exportProperties(group.getGroupId());
+		properties = _configurationScreen.exportProperties(group.getGroupId());
 
 		Assert.assertEquals("false", properties.get("mentionsEnabled"));
 	}
 
+	@Inject(
+		filter = "component.name=com.liferay.mentions.web.internal.configuration.admin.display.MentionsSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
+
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private ServiceTrackerMap<String, ConfigurationScreen> _serviceTrackerMap;
 
 }

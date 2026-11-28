@@ -7,30 +7,29 @@ package com.liferay.site.admin.web.internal.configuration.admin.display.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Dictionary;
 import java.util.Locale;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Thiago Buarque
@@ -38,23 +37,14 @@ import org.osgi.framework.FrameworkUtil;
 @RunWith(Arquillian.class)
 public class LanguagesSiteSettingsConfigurationScreenWrapperTest {
 
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
+
 	@Test
 	public void testExportImportProperties() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			LanguagesSiteSettingsConfigurationScreenWrapperTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		try (ServiceTrackerMap<String, ConfigurationScreen> serviceTrackerMap =
-				ServiceTrackerMapFactory.openSingleValueMap(
-					bundleContext, ConfigurationScreen.class, null,
-					(serviceReference, emitter) -> {
-						ConfigurationScreen configurationScreen =
-							bundleContext.getService(serviceReference);
-
-						emitter.emit(configurationScreen.getKey());
-					})) {
-
+		try {
 			Group group = GroupTestUtil.addGroup();
 
 			String locales = StringUtil.merge(
@@ -69,13 +59,10 @@ public class LanguagesSiteSettingsConfigurationScreenWrapperTest {
 					"languageId", "en_US"
 				).build();
 
-			ConfigurationScreen configurationScreen =
-				serviceTrackerMap.getService("site-configuration-languages");
-
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				properties, group.getGroupId());
 
-			properties = configurationScreen.exportProperties(
+			properties = _configurationScreen.exportProperties(
 				group.getGroupId());
 
 			Assert.assertEquals(
@@ -87,7 +74,7 @@ public class LanguagesSiteSettingsConfigurationScreenWrapperTest {
 
 			properties.put("languageId", "invalid_language");
 
-			configurationScreen.importProperties(
+			_configurationScreen.importProperties(
 				properties, group.getGroupId());
 		}
 		catch (Exception exception) {
@@ -105,5 +92,10 @@ public class LanguagesSiteSettingsConfigurationScreenWrapperTest {
 				ArrayUtil.toStringArray(sourceAvailableLocales.toArray()));
 		}
 	}
+
+	@Inject(
+		filter = "component.name=com.liferay.site.admin.web.internal.configuration.admin.display.LanguagesSiteSettingsConfigurationScreenWrapper"
+	)
+	private ConfigurationScreen _configurationScreen;
 
 }
