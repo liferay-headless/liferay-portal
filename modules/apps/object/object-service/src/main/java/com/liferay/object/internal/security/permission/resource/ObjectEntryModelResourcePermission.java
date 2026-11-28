@@ -178,7 +178,8 @@ public class ObjectEntryModelResourcePermission
 				actionId, objectDefinition, objectEntry, permissionChecker);
 		}
 
-		if (permissionChecker.hasOwnerPermission(
+		if (permissionChecker.isCompanyAdmin(objectEntry.getCompanyId()) ||
+			permissionChecker.hasOwnerPermission(
 				permissionChecker.getCompanyId(),
 				objectDefinition.getClassName(),
 				objectEntry.getHeadObjectEntryId(), objectEntry.getUserId(),
