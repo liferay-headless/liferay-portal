@@ -1008,7 +1008,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 	}
 
 	private void _assertProblemException(
-			UnsafeRunnable<Exception> unsafeRunnable)
+			String expectedStatus, UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -1019,7 +1019,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals(expectedStatus, problem.getStatus());
 		}
 	}
 
@@ -1301,6 +1301,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		AccountResource accountResource = _getAccountResource(_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountResource.
 					deleteOrganizationAccountsByExternalReferenceCode(
@@ -1332,6 +1333,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		AccountResource accountResource = _getAccountResource(_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> accountResource.deleteOrganizationAccounts(
 				organization.getOrganizationId(),
 				new Long[] {accountEntry.getAccountEntryId()}));
@@ -2132,6 +2134,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		Organization organization2 = OrganizationTestUtil.addOrganization();
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> accountResource.patchOrganizationMoveAccounts(
 				organization1.getOrganizationId(),
 				organization2.getOrganizationId(),
@@ -2683,7 +2686,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 			accountResource.postAccountHttpResponse(account);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		account = randomAccount();
@@ -2693,7 +2696,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		httpResponse = accountResource.postAccountHttpResponse(account);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		_resourcePermissionLocalService.setResourcePermissions(
@@ -2890,6 +2893,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		Organization organization = OrganizationTestUtil.addOrganization();
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountResource.postOrganizationAccountsByExternalReferenceCode(
 					organization.getOrganizationId(),
@@ -2915,6 +2919,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 		AccountResource accountResource = _getAccountResource(_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> accountResource.postOrganizationAccounts(
 				organization.getOrganizationId(),
 				new Long[] {accountEntry.getAccountEntryId()}));
@@ -3220,6 +3225,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 			new Long[] {organization.getOrganizationId()});
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> accountResource.putAccount(
 				accountEntry.getAccountEntryId(), account));
 

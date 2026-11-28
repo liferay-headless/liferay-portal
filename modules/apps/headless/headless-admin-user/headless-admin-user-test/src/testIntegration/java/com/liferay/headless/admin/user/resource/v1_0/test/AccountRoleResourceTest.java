@@ -1078,7 +1078,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 	}
 
 	private void _assertProblemException(
-			UnsafeRunnable<Exception> unsafeRunnable)
+			String expectedStatus, UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -1089,7 +1089,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals(expectedStatus, problem.getStatus());
 		}
 	}
 
@@ -1298,6 +1298,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountRoleResource.
 					deleteAccountAccountRoleUserAccountAssociation(
@@ -1325,6 +1326,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountRoleResource.
 					deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
@@ -1501,6 +1503,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountRoleResource.
 					postAccountAccountRoleByExternalReferenceCode(
@@ -1560,7 +1563,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			accountRoleResource.
 				postAccountAccountRoleUserAccountAssociationHttpResponse(
 					_account.getId(), accountRole.getId(),
@@ -1601,12 +1604,14 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		_assertProblemException(
-			() -> accountRoleResource.postAccountAccountRole(
-				_account.getId(), randomAccountRole()));
-		_assertProblemException(
+			"FORBIDDEN",
 			() -> accountRoleResource.postAccountAccountRole(
 				AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
 				randomAccountRole()));
+		_assertProblemException(
+			"NOT_FOUND",
+			() -> accountRoleResource.postAccountAccountRole(
+				_account.getId(), randomAccountRole()));
 
 		_addRoleUsers(user, AccountActionKeys.ADD_ACCOUNT_ROLE);
 
@@ -1655,6 +1660,7 @@ public class AccountRoleResourceTest extends BaseAccountRoleResourceTestCase {
 			_PASSWORD, user);
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() ->
 				accountRoleResource.
 					postAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(

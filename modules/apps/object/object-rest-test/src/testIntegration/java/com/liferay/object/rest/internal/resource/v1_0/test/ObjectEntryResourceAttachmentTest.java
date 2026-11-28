@@ -792,7 +792,7 @@ public class ObjectEntryResourceAttachmentTest
 						Http.Method.POST);
 
 					Assert.assertEquals(
-						"FORBIDDEN", jsonObject.getString("status"));
+						"NOT_FOUND", jsonObject.getString("status"));
 				}
 			);
 		}

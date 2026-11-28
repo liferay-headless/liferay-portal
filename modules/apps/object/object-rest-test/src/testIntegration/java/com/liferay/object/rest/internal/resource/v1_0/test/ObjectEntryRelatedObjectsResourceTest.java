@@ -379,7 +379,7 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		).apply(
 			() -> {
 				Assert.assertEquals(
-					403,
+					404,
 					HTTPTestUtil.invokeToHttpCode(
 						null,
 						StringBundler.concat(
@@ -1647,7 +1647,7 @@ public class ObjectEntryRelatedObjectsResourceTest {
 			user.getEmailAddress(), password
 		).apply(
 			() -> Assert.assertEquals(
-				403,
+				404,
 				HTTPTestUtil.invokeToHttpCode(
 					body, endpoint, Http.Method.PATCH))
 		);

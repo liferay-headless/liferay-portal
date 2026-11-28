@@ -147,7 +147,7 @@ public class SubscriptionResourceTest extends BaseSubscriptionResourceTestCase {
 		Subscription subscription = _addSubscription(_adminUser.getUserId());
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			_userSubscriptionResource.
 				deleteMyUserAccountSubscriptionHttpResponse(
 					subscription.getId()));

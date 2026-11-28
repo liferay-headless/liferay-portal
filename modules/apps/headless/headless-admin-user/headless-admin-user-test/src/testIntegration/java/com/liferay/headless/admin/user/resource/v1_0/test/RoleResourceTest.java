@@ -850,7 +850,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 	}
 
 	private void _assertProblemException(
-			UnsafeRunnable<Exception> unsafeRunnable)
+			String expectedStatus, UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -861,7 +861,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals(expectedStatus, problem.getStatus());
 		}
 	}
 
@@ -1348,6 +1348,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			new Permission[] {_toPermission(serviceBuilderRole2)});
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource1.patchRole(
 				serviceBuilderRole1.getRoleId(), role));
 
@@ -1358,6 +1359,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				ActionKeys.UPDATE, ActionKeys.VIEW));
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource2.patchRole(
 				serviceBuilderRole1.getRoleId(), role));
 
@@ -1402,6 +1404,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			});
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource1.patchRole(
 				serviceBuilderRole.getRoleId(), role));
 
@@ -1412,6 +1415,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				ActionKeys.UPDATE, ActionKeys.VIEW));
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource2.patchRole(
 				serviceBuilderRole.getRoleId(), role));
 
@@ -1601,7 +1605,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 		role1.setPermissions(
 			new Permission[] {_toPermission(serviceBuilderRole2)});
 
-		_assertProblemException(() -> roleResource1.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource1.postRole(role1));
 
 		RoleResource roleResource2 = _getRoleResource(
 			_PASSWORD,
@@ -1609,14 +1614,16 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				serviceBuilderRole1, ActionKeys.DEFINE_PERMISSIONS,
 				ActionKeys.VIEW));
 
-		_assertProblemException(() -> roleResource2.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource2.postRole(role1));
 
 		RoleResource roleResource3 = _getRoleResource(
 			_PASSWORD,
 			_addUser(
 				serviceBuilderRole1, ActionKeys.PERMISSIONS, ActionKeys.VIEW));
 
-		_assertProblemException(() -> roleResource3.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource3.postRole(role1));
 
 		Role role2 = roleResource.postRole(role1);
 
@@ -1643,7 +1650,8 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				_toRolePermission(ActionKeys.VIEW, Layout.class.getName())
 			});
 
-		_assertProblemException(() -> roleResource1.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource1.postRole(role1));
 
 		RoleResource roleResource2 = _getRoleResource(
 			_PASSWORD,
@@ -1651,14 +1659,16 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				serviceBuilderRole, ActionKeys.DEFINE_PERMISSIONS,
 				ActionKeys.VIEW));
 
-		_assertProblemException(() -> roleResource2.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource2.postRole(role1));
 
 		RoleResource roleResource3 = _getRoleResource(
 			_PASSWORD,
 			_addUser(
 				serviceBuilderRole, ActionKeys.PERMISSIONS, ActionKeys.VIEW));
 
-		_assertProblemException(() -> roleResource3.postRole(role1));
+		_assertProblemException(
+			"NOT_FOUND", () -> roleResource3.postRole(role1));
 
 		Role role2 = roleResource.postRole(role1);
 
@@ -1804,6 +1814,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			new Permission[] {_toPermission(serviceBuilderRole2)});
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource1.putRole(serviceBuilderRole1.getRoleId(), role));
 
 		RoleResource roleResource2 = _getRoleResource(
@@ -1813,6 +1824,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				ActionKeys.UPDATE, ActionKeys.VIEW));
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource2.putRole(serviceBuilderRole1.getRoleId(), role));
 
 		Assert.assertFalse(
@@ -1856,6 +1868,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			});
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource1.putRole(serviceBuilderRole.getRoleId(), role));
 
 		RoleResource roleResource2 = _getRoleResource(
@@ -1865,6 +1878,7 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 				ActionKeys.UPDATE, ActionKeys.VIEW));
 
 		_assertProblemException(
+			"FORBIDDEN",
 			() -> roleResource2.putRole(serviceBuilderRole.getRoleId(), role));
 
 		Assert.assertFalse(

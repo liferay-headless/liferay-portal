@@ -333,7 +333,7 @@ public class AccountResourceTest extends BaseAccountResourceTestCase {
 				_commerceChannel.getCommerceChannelId(), account);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		_resourcePermissionLocalService.setResourcePermissions(

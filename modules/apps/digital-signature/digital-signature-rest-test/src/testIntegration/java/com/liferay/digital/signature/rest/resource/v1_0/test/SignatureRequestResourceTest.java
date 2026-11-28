@@ -1179,7 +1179,7 @@ public class SignatureRequestResourceTest
 			_getSignatureRequestResource(user);
 
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			() -> userSignatureRequestResource.postSiteSignatureRequest(
 				testGroup.getGroupId(), signatureRequest));
 	}
@@ -1245,7 +1245,7 @@ public class SignatureRequestResourceTest
 			_getSignatureRequestResource(user);
 
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			() -> userSignatureRequestResource.postSiteSignatureRequest(
 				group.getGroupId(), signatureRequest));
 	}

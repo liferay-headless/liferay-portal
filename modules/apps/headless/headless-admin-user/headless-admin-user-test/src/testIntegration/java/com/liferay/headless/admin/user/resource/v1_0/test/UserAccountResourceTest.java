@@ -2970,7 +2970,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			role.getRoleId(), _regularUserAccount.getId());
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			_regularUserAccountResource.
 				patchSiteAccountUserAccountSelectedHttpResponse(
 					testGroup.getGroupId(), accountEntry.getAccountEntryId(),
@@ -3052,7 +3052,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 				_regularUserAccount.getId(), userAccount);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		userAccount = new UserAccount() {
@@ -3065,7 +3065,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			_regularUserAccount.getId(), userAccount);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);

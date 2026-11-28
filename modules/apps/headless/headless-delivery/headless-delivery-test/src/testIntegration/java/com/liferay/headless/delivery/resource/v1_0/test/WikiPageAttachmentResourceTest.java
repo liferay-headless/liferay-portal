@@ -192,7 +192,7 @@ public class WikiPageAttachmentResourceTest
 				_getUserWithoutPermissionsWikiPageAttachmentResource();
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			userWithoutPermissionsWikiPageAttachmentResource.
 				deleteWikiPageAttachmentHttpResponse(
 					wikiPageAttachment.getId()));

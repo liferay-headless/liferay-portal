@@ -909,7 +909,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 		Order postOrder = orderResource.postOrder(randomOrder());
 
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					billingAddressId = commerceAddress1.getCommerceAddressId();
@@ -918,7 +918,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			patchOrder -> orderResource.patchOrder(
 				postOrder.getId(), patchOrder));
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					billingAddressExternalReferenceCode =
@@ -928,7 +928,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			patchOrder -> orderResource.patchOrder(
 				postOrder.getId(), patchOrder));
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					shippingAddressId = commerceAddress1.getCommerceAddressId();
@@ -937,7 +937,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			patchOrder -> orderResource.patchOrder(
 				postOrder.getId(), patchOrder));
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					shippingAddressExternalReferenceCode =
@@ -952,7 +952,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			BigDecimal.valueOf(RandomTestUtil.randomDouble()));
 
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					orderItems = new OrderItem[] {
@@ -971,7 +971,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			patchOrder -> orderResource.patchOrder(
 				postOrder.getId(), patchOrder));
 		_assertProblemException(
-			"FORBIDDEN",
+			"NOT_FOUND",
 			new Order() {
 				{
 					orderItems = new OrderItem[] {
@@ -1286,7 +1286,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 
 		order.setBillingAddressId(commerceAddress1.getCommerceAddressId());
 
-		_assertProblemException("FORBIDDEN", order, orderResource::postOrder);
+		_assertProblemException("NOT_FOUND", order, orderResource::postOrder);
 
 		order = randomOrder();
 
@@ -1294,13 +1294,13 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			commerceAddress1.getExternalReferenceCode());
 		order.setBillingAddressId(0L);
 
-		_assertProblemException("FORBIDDEN", order, orderResource::postOrder);
+		_assertProblemException("NOT_FOUND", order, orderResource::postOrder);
 
 		order = randomOrder();
 
 		order.setShippingAddressId(commerceAddress1.getCommerceAddressId());
 
-		_assertProblemException("FORBIDDEN", order, orderResource::postOrder);
+		_assertProblemException("NOT_FOUND", order, orderResource::postOrder);
 
 		order = randomOrder();
 
@@ -1308,7 +1308,7 @@ public class OrderResourceTest extends BaseOrderResourceTestCase {
 			commerceAddress1.getExternalReferenceCode());
 		order.setShippingAddressId(0L);
 
-		_assertProblemException("FORBIDDEN", order, orderResource::postOrder);
+		_assertProblemException("NOT_FOUND", order, orderResource::postOrder);
 
 		CommerceAddress commerceAddress2 = _addCommerceAddress(
 			_accountEntry.getAccountEntryId());

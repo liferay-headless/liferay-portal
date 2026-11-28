@@ -1255,7 +1255,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					billingAddressId = commerceAddress1.getCommerceAddressId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 		_assertProblemException(
 			new Cart() {
@@ -1264,7 +1264,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 						commerceAddress1.getExternalReferenceCode();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 		_assertProblemException(
 			new Cart() {
@@ -1272,7 +1272,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					shippingAddressId = commerceAddress1.getCommerceAddressId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 		_assertProblemException(
 			new Cart() {
@@ -1281,7 +1281,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 						commerceAddress1.getExternalReferenceCode();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 
 		CPInstance cpInstance = CPTestUtil.addCPInstanceWithRandomSku(
@@ -1308,7 +1308,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					};
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 		_assertProblemException(
 			new Cart() {
@@ -1326,7 +1326,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					};
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			patchCart -> cartResource.patchCart(postCart.getId(), patchCart));
 
 		CommerceAddress commerceAddress2 = _addCommerceAddress(
@@ -1691,7 +1691,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					billingAddressId = commerceAddress1.getCommerceAddressId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 		_assertProblemException(
 			new Cart() {
@@ -1700,7 +1700,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 						commerceAddress1.getExternalReferenceCode();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 		_assertProblemException(
 			new Cart() {
@@ -1708,7 +1708,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					shippingAddressId = commerceAddress1.getCommerceAddressId();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 		_assertProblemException(
 			new Cart() {
@@ -1717,7 +1717,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 						commerceAddress1.getExternalReferenceCode();
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 
 		CPInstance cpInstance = CPTestUtil.addCPInstanceWithRandomSku(
@@ -1744,7 +1744,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					};
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 		_assertProblemException(
 			new Cart() {
@@ -1762,7 +1762,7 @@ public class CartResourceTest extends BaseCartResourceTestCase {
 					};
 				}
 			},
-			"FORBIDDEN",
+			"NOT_FOUND",
 			putCart -> cartResource.putCart(postCart.getId(), putCart));
 
 		CommerceAddress commerceAddress2 = _addCommerceAddress(

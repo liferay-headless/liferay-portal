@@ -1050,7 +1050,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 	}
 
 	private void _assertProblemException(
-			UnsafeRunnable<Exception> unsafeRunnable)
+			String expectedStatus, UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
 		try {
@@ -1061,7 +1061,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("FORBIDDEN", problem.getStatus());
+			Assert.assertEquals(expectedStatus, problem.getStatus());
 		}
 	}
 
@@ -1213,6 +1213,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			serviceBuilderOrganization.getOrganizationId());
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> organizationResource.deleteAccountOrganization(
 				_accountEntry.getAccountEntryId(),
 				String.valueOf(
@@ -1586,6 +1587,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			testPostAccountOrganization_addOrganization();
 
 		_assertProblemException(
+			"NOT_FOUND",
 			() -> organizationResource.postAccountOrganization(
 				_accountEntry.getAccountEntryId(), organization.getId()));
 
@@ -2024,7 +2026,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			organizationResource.postOrganizationHttpResponse(organization);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		organization = randomOrganization();
@@ -2035,7 +2037,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 			organization);
 
 		Assert.assertEquals(
-			Response.Status.FORBIDDEN.getStatusCode(),
+			Response.Status.NOT_FOUND.getStatusCode(),
 			httpResponse.getStatusCode());
 
 		_resourcePermissionLocalService.setResourcePermissions(

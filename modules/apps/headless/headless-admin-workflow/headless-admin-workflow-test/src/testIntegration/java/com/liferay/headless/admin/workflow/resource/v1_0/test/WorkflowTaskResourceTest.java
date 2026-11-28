@@ -785,7 +785,7 @@ public class WorkflowTaskResourceTest extends BaseWorkflowTaskResourceTestCase {
 		WorkflowTask workflowTask1 = _workflowTasks.pop();
 
 		assertHttpResponseStatusCode(
-			403,
+			404,
 			workflowTaskResource.patchWorkflowTaskChangeTransitionHttpResponse(
 				new ChangeTransition[] {
 					new ChangeTransition() {
