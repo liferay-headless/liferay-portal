@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.HTTPTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -189,6 +190,124 @@ public class ObjectEntryRelatedObjectsResourceTest {
 			_objectDefinitionLocalService.deleteObjectDefinition(
 				objectDefinition);
 		}
+	}
+
+	@Test
+	@TestInfo("LPD-116207")
+	public void testDeleteCurrentObjectEntryWithoutUpdatePermission()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			password, RandomTestUtil.randomString() + "@liferay.com",
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			ServiceContextTestUtil.getServiceContext());
+
+		user.setEmailAddressVerified(true);
+
+		user = UserLocalServiceUtil.updateUser(user);
+
+		UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
+
+		_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+		_setResourcePermissions(_objectEntry2, role, ActionKeys.VIEW);
+		_setResourcePermissions(_objectEntry3, role, ActionKeys.VIEW);
+
+		ObjectRelationship objectRelationship1 = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+		ObjectRelationship objectRelationship2 = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry3.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user.getEmailAddress(), password
+		).apply(
+			() -> {
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship1.getName(),
+							_objectEntry2.getPrimaryKey()),
+						Http.Method.DELETE));
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship2.getName(),
+							_objectEntry3.getPrimaryKey()),
+						Http.Method.DELETE));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship1.getName(),
+							_objectEntry2.getPrimaryKey()),
+						Http.Method.DELETE));
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship2.getName(),
+							_objectEntry3.getPrimaryKey()),
+						Http.Method.DELETE));
+
+				_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+				_setResourcePermissions(
+					_objectEntry2, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+				_setResourcePermissions(
+					_objectEntry3, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship1.getName(),
+							_objectEntry2.getPrimaryKey()),
+						Http.Method.DELETE));
+				Assert.assertEquals(
+					204,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship2.getName(),
+							_objectEntry3.getPrimaryKey()),
+						Http.Method.DELETE));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					204,
+					HTTPTestUtil.invokeToHttpCode(
+						null,
+						_getEndpoint(
+							objectRelationship1.getName(),
+							_objectEntry2.getPrimaryKey()),
+						Http.Method.DELETE));
+			}
+		);
+
+		_assertNoRelatedObjectEntries(objectRelationship1);
+		_assertNoRelatedObjectEntries(objectRelationship2);
 	}
 
 	@Test
@@ -1863,6 +1982,88 @@ public class ObjectEntryRelatedObjectsResourceTest {
 	}
 
 	@Test
+	@TestInfo("LPD-116207")
+	public void testPostByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCodeDisassociateWithoutUpdatePermission()
+		throws Exception {
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		String password = RandomTestUtil.randomString();
+
+		User user = UserTestUtil.addUser(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			password, RandomTestUtil.randomString() + "@liferay.com",
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			ServiceContextTestUtil.getServiceContext());
+
+		user.setEmailAddressVerified(true);
+
+		user = UserLocalServiceUtil.updateUser(user);
+
+		UserLocalServiceUtil.addRoleUser(role.getRoleId(), user.getUserId());
+
+		_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+		_setResourcePermissions(_objectEntry2, role, ActionKeys.VIEW);
+
+		ObjectRelationship objectRelationship = _addObjectRelationship(
+			_objectDefinition1, _objectDefinition2,
+			_objectEntry1.getPrimaryKey(), _objectEntry2.getPrimaryKey(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		String endpoint = StringBundler.concat(
+			_objectDefinition1.getRESTContextPath(),
+			"/by-external-reference-code/",
+			_objectEntry1.getExternalReferenceCode(), StringPool.SLASH,
+			objectRelationship.getName(), StringPool.SLASH,
+			_objectEntry2.getExternalReferenceCode(), "/disassociate");
+
+		HTTPTestUtil.customize(
+		).withCredentials(
+			user.getEmailAddress(), password
+		).apply(
+			() -> {
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(_objectEntry1, role, ActionKeys.VIEW);
+				_setResourcePermissions(
+					_objectEntry2, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					403,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+
+				_setResourcePermissions(
+					_objectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+				Assert.assertEquals(
+					204,
+					HTTPTestUtil.invokeToHttpCode(
+						null, endpoint, Http.Method.POST));
+			}
+		);
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _getEndpoint(objectRelationship.getName()), Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
+	}
+
+	@Test
 	public void testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries()
 		throws Exception {
 
@@ -2702,6 +2903,18 @@ public class ObjectEntryRelatedObjectsResourceTest {
 
 		Assert.assertEquals(
 			baseModel.getPrimaryKeyObj(), jsonObject.getLong("id"));
+	}
+
+	private void _assertNoRelatedObjectEntries(
+			ObjectRelationship objectRelationship)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invokeToJSONObject(
+			null, _getEndpoint(objectRelationship.getName()), Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(0, itemsJSONArray.length());
 	}
 
 	private void _assertPagination(

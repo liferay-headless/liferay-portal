@@ -66,15 +66,26 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.InfoFormException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.AssertUtils;
+import com.liferay.portal.kernel.test.TestInfo;
+import com.liferay.portal.kernel.test.context.ContextUserReplace;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -582,6 +593,110 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 	}
 
 	@Test
+	@TestInfo("LPD-116207")
+	public void testUpdateFromInfoItemFieldValuesWithManyToManyObjectRelationshipWithoutUpdatePermission()
+		throws Exception {
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.publishObjectDefinition(
+				Collections.singletonList(
+					new TextObjectFieldBuilder(
+					).labelMap(
+						RandomTestUtil.randomLocaleStringMap()
+					).name(
+						"name"
+					).build()));
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipTestUtil.addObjectRelationship(
+				_objectRelationshipLocalService, objectDefinition2,
+				objectDefinition,
+				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE,
+				StringUtil.randomId(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		ObjectEntry relatedObjectEntry1 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+		ObjectEntry relatedObjectEntry2 = ObjectEntryTestUtil.addObjectEntry(
+			0, objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"name", RandomTestUtil.randomString()
+			).build());
+
+		_objectRelationshipLocalService.addObjectRelationshipMappingTableValues(
+			TestPropsValues.getUserId(),
+			objectRelationship.getObjectRelationshipId(),
+			objectEntry2.getObjectEntryId(),
+			relatedObjectEntry1.getObjectEntryId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		Role role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_setResourcePermissions(
+			objectEntry2, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+		_setResourcePermissions(relatedObjectEntry1, role, ActionKeys.VIEW);
+		_setResourcePermissions(relatedObjectEntry2, role, ActionKeys.VIEW);
+
+		User user = UserTestUtil.addUser();
+
+		_userLocalService.addRoleUser(role.getRoleId(), user.getUserId());
+
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user)) {
+
+			_updateFromInfoItemFieldValues(
+				_getInfoItemFieldValues(
+					objectRelationship,
+					Arrays.asList(
+						String.valueOf(relatedObjectEntry1.getObjectEntryId()),
+						String.valueOf(
+							relatedObjectEntry2.getObjectEntryId()))),
+				objectDefinition2, objectEntry2);
+
+			_assertManyToManyObjectEntries(
+				objectRelationship, relatedObjectEntry1.getObjectEntryId(),
+				relatedObjectEntry2.getObjectEntryId());
+
+			AssertUtils.assertFailure(
+				InfoFormException.class, null,
+				() -> _updateFromInfoItemFieldValues(
+					_getInfoItemFieldValues(
+						objectRelationship,
+						Collections.singletonList(
+							String.valueOf(
+								relatedObjectEntry2.getObjectEntryId()))),
+					objectDefinition2, objectEntry2));
+
+			_assertManyToManyObjectEntries(
+				objectRelationship, relatedObjectEntry1.getObjectEntryId(),
+				relatedObjectEntry2.getObjectEntryId());
+
+			_setResourcePermissions(
+				relatedObjectEntry1, role, ActionKeys.UPDATE, ActionKeys.VIEW);
+
+			_updateFromInfoItemFieldValues(
+				_getInfoItemFieldValues(
+					objectRelationship,
+					Collections.singletonList(
+						String.valueOf(
+							relatedObjectEntry2.getObjectEntryId()))),
+				objectDefinition2, objectEntry2);
+
+			_assertManyToManyObjectEntries(
+				objectRelationship, relatedObjectEntry2.getObjectEntryId());
+		}
+		finally {
+			_userLocalService.deleteUser(user);
+
+			_objectDefinitionLocalService.deleteObjectDefinition(
+				objectDefinition);
+		}
+	}
+
+	@Test
 	public void testUpdateFromInfoItemFieldValuesWithNestedManyToManyObjectRelationship()
 		throws Exception {
 
@@ -1065,6 +1180,17 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 			ObjectEntryManager.class, objectEntryManager, null);
 	}
 
+	private void _setResourcePermissions(
+			ObjectEntry objectEntry, Role role, String... actionIds)
+		throws Exception {
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), objectEntry.getModelClassName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(objectEntry.getPrimaryKey()), role.getRoleId(),
+			actionIds);
+	}
+
 	private void _testUpdateFromInfoItemFieldValuesWithAttachmentObjectField(
 			boolean showFilesInLibrary, String storageDLFolderPath)
 		throws Exception {
@@ -1481,6 +1607,12 @@ public class ObjectEntryInfoItemFieldValuesUpdaterTest
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 	private static class TestObjectEntryManager implements ObjectEntryManager {
 

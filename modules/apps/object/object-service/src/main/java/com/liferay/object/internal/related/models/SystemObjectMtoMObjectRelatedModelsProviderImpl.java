@@ -20,6 +20,7 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.ObjectRelationshipServiceUtil;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.sql.dsl.Column;
@@ -122,7 +123,7 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
-		_objectRelationshipLocalService.
+		ObjectRelationshipServiceUtil.
 			deleteObjectRelationshipMappingTableValues(
 				objectRelationshipId, primaryKey1, primaryKey2);
 	}

@@ -349,7 +349,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					infoItemFormProvider,
 					objectDefinition.getObjectDefinitionId(),
 					_objectDefinitionLocalService, _objectEntryLocalService,
-					_objectEntryManagerRegistry, _objectScopeProviderRegistry),
+					_objectEntryManagerRegistry,
+					_objectRelatedModelsProviderRegistry,
+					_objectScopeProviderRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"company.id", objectDefinition.getCompanyId()
 				).put(
@@ -390,6 +392,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				InfoItemFieldValuesUpdater.class,
 				new ObjectEntryInfoItemFieldValuesUpdater(
 					infoItemFormProvider, _objectEntryManagerRegistry,
+					_objectRelatedModelsProviderRegistry,
 					_objectScopeProviderRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"company.id", objectDefinition.getCompanyId()

@@ -13,6 +13,7 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.service.ObjectRelationshipServiceUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -89,7 +90,7 @@ public class ObjectEntryMtoMObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
-		_objectRelationshipLocalService.
+		ObjectRelationshipServiceUtil.
 			deleteObjectRelationshipMappingTableValues(
 				objectRelationshipId, primaryKey1, primaryKey2);
 	}

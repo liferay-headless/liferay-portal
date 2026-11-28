@@ -13,8 +13,8 @@ import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.object.info.item.util.ObjectEntryInfoItemUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.Status;
-import com.liferay.object.rest.manager.v1_0.DefaultObjectEntryManagerProvider;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
@@ -48,6 +48,7 @@ public class ObjectEntryInfoItemCreator
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
+		ObjectRelatedModelsProviderRegistry objectRelatedModelsProviderRegistry,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry) {
 
 		_infoItemFormProvider = infoItemFormProvider;
@@ -55,6 +56,8 @@ public class ObjectEntryInfoItemCreator
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
+		_objectRelatedModelsProviderRegistry =
+			objectRelatedModelsProviderRegistry;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 	}
 
@@ -138,15 +141,14 @@ public class ObjectEntryInfoItemCreator
 					objectDefinition, objectEntry);
 
 				ObjectEntryUtil.relateObjectEntries(
-					DefaultObjectEntryManagerProvider.provide(
-						objectEntryManager),
 					infoItemFieldValues, objectDefinition,
+					_objectRelatedModelsProviderRegistry,
 					addedObjectEntry.getPrimaryKey(), serviceContext,
 					themeDisplay.getUserId());
 
 				ObjectEntryUtil.relateNestedObjectEntries(
 					themeDisplay.getCompanyId(), addedObjectEntry.getGroupId(),
-					infoItemFieldValues, _objectEntryManagerRegistry,
+					infoItemFieldValues, _objectRelatedModelsProviderRegistry,
 					serviceContext, themeDisplay.getUserId());
 			}
 
@@ -191,6 +193,8 @@ public class ObjectEntryInfoItemCreator
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+	private final ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 }

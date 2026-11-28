@@ -62,6 +62,14 @@ public class ObjectRelationshipServiceUtil {
 		return getService().deleteObjectRelationship(objectRelationshipId);
 	}
 
+	public static void deleteObjectRelationshipMappingTableValues(
+			long objectRelationshipId, long primaryKey1, long primaryKey2)
+		throws PortalException {
+
+		getService().deleteObjectRelationshipMappingTableValues(
+			objectRelationshipId, primaryKey1, primaryKey2);
+	}
+
 	public static ObjectRelationship
 			fetchObjectRelationshipByExternalReferenceCode(
 				String externalReferenceCode, long companyId,
@@ -126,4 +134,4 @@ public class ObjectRelationshipServiceUtil {
 			ObjectRelationshipService.class);
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1776371229
+// LIFERAY-SERVICE-BUILDER-HASH:987946358

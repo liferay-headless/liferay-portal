@@ -65,6 +65,15 @@ public class ObjectRelationshipServiceWrapper
 	}
 
 	@Override
+	public void deleteObjectRelationshipMappingTableValues(
+			long objectRelationshipId, long primaryKey1, long primaryKey2)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_objectRelationshipService.deleteObjectRelationshipMappingTableValues(
+			objectRelationshipId, primaryKey1, primaryKey2);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectRelationship
 			fetchObjectRelationshipByExternalReferenceCode(
 				String externalReferenceCode, long companyId,
@@ -142,4 +151,4 @@ public class ObjectRelationshipServiceWrapper
 	private ObjectRelationshipService _objectRelationshipService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-282406461
+// LIFERAY-SERVICE-BUILDER-HASH:1764837426
