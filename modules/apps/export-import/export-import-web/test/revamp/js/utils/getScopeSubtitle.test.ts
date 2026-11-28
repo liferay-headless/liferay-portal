@@ -17,7 +17,7 @@ describe('getScopeSubtitle', () => {
 			'export',
 			false,
 			true,
-			'export-complete-spaces,-including-all-their-content,-and-permissions',
+			'export-complete-spaces,-including-all-their-content-and-permissions',
 		],
 		[
 			'export',

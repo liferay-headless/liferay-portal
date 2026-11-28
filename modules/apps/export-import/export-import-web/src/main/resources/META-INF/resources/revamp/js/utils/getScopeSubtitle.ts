@@ -20,7 +20,7 @@ const SUBTITLES: Record<
 			'export-complete-sites-and-spaces,-including-all-their-pages,-content,-settings,-and-permissions'
 		),
 		spaces: Liferay.Language.get(
-			'export-complete-spaces,-including-all-their-content,-and-permissions'
+			'export-complete-spaces,-including-all-their-content-and-permissions'
 		),
 	},
 	import: {
