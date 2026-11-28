@@ -18,7 +18,11 @@ import type {ContentSelection} from '../components/forms/content_selector/Conten
 
 export type PortletDataHandlerSelection =
 	| {
-			[key: string]: PortletDataHandlerSelection | boolean | string[];
+			[key: string]:
+				| PortletDataHandlerSelection
+				| boolean
+				| number
+				| string[];
 	  }
 	| string
 	| true;
@@ -26,7 +30,11 @@ export type PortletDataHandlerSelection =
 export type LayoutSetVisibility = 'private' | 'public';
 
 export type LayoutSetSelection = Omit<SitePageTreeSelection, 'privateLayout'> &
-	Partial<Pick<SitePageTreeSelection, 'privateLayout'>>;
+	Partial<Pick<SitePageTreeSelection, 'privateLayout'>> & {
+		selectionCount?: number;
+	};
+
+export type CountKey = 'additionCount' | 'deletionCount';
 
 export const CHOICE_NAME_PRIVATE_PAGES = 'private-pages';
 
@@ -278,6 +286,95 @@ export function updateSelection<V>(
 	const next: Record<string, V> = value ? {...rest, [key]: value} : rest;
 
 	return Object.keys(next).length ? next : undefined;
+}
+
+export function getSelectedCount(
+	portletDataHandlerControl: PortletDataHandlerControl,
+	portletDataHandlerSelection: PortletDataHandlerSelection | undefined,
+	key: CountKey,
+	{
+		dateFiltered = false,
+		nested = false,
+	}: {dateFiltered?: boolean; nested?: boolean} = {}
+): number | undefined {
+	const count = getCount(portletDataHandlerControl, key);
+
+	if (count === undefined) {
+		return undefined;
+	}
+
+	if (!portletDataHandlerSelection) {
+		return 0;
+	}
+
+	if (
+		portletDataHandlerControl.name === PORTLET_DATA_KEY_LAYOUT_SET_LAYOUTS
+	) {
+		return getSelectedLayoutSetCount(
+			count,
+			portletDataHandlerSelection,
+			key,
+			dateFiltered
+		);
+	}
+
+	if (nested || typeof portletDataHandlerSelection !== 'object') {
+		return count;
+	}
+
+	const nestedPortletDataHandlerControls =
+		getNestedPortletDataHandlerControls(portletDataHandlerControl);
+
+	const deselectedCount = getDeselectedCount(
+		nestedPortletDataHandlerControls,
+		portletDataHandlerSelection as Record<
+			string,
+			PortletDataHandlerSelection
+		>,
+		key
+	);
+
+	if (!deselectedCount) {
+		return count;
+	}
+
+	if (getTotalCount(nestedPortletDataHandlerControls, key) !== count) {
+		return undefined;
+	}
+
+	return count - deselectedCount;
+}
+
+export function getSelectedSectionCount(
+	portletDataHandlerSection: PortletDataHandlerSection,
+	sectionSelection: Record<string, PortletDataHandlerSelection>,
+	key: CountKey,
+	{dateFiltered = false}: {dateFiltered?: boolean} = {}
+): number | undefined {
+	let selectedCount = 0;
+
+	for (const portletDataHandlerBoolean of toPortletDataHandlerBooleans(
+		portletDataHandlerSection
+	)) {
+		if (portletDataHandlerBoolean[key] === undefined) {
+			continue;
+		}
+
+		const portletDataHandlerSelectedCount = getSelectedCount(
+			portletDataHandlerBoolean,
+			sectionSelection[portletDataHandlerBoolean.name],
+			key,
+			{dateFiltered}
+		);
+
+		if (portletDataHandlerSelectedCount === undefined) {
+			return undefined;
+		}
+
+		selectedCount += portletDataHandlerSelectedCount;
+	}
+
+	return selectedCount;
 }
 
 export function getSelectionSummary(
@@ -547,4 +644,96 @@ export function withSelectedLayoutSetCount(
 				),
 		};
 	});
+}
+
+function getCount(
+	portletDataHandlerControl: PortletDataHandlerControl,
+	key: CountKey
+): number | undefined {
+	if (portletDataHandlerControl.type === 'Choice') {
+		return undefined;
+	}
+
+	return portletDataHandlerControl[key];
+}
+
+function getDeselectedCount(
+	portletDataHandlerControls: PortletDataHandlerControl[],
+	portletDataHandlerSelections: Record<string, PortletDataHandlerSelection>,
+	key: CountKey
+): number {
+	return portletDataHandlerControls.reduce(
+		(deselectedCount, portletDataHandlerControl) => {
+			const portletDataHandlerSelection =
+				portletDataHandlerSelections[portletDataHandlerControl.name];
+
+			if (!portletDataHandlerSelection) {
+				return (
+					deselectedCount +
+					getTotalCount([portletDataHandlerControl], key)
+				);
+			}
+
+			if (typeof portletDataHandlerSelection !== 'object') {
+				return deselectedCount;
+			}
+
+			return (
+				deselectedCount +
+				getDeselectedCount(
+					getNestedPortletDataHandlerControls(
+						portletDataHandlerControl
+					),
+					portletDataHandlerSelection as Record<
+						string,
+						PortletDataHandlerSelection
+					>,
+					key
+				)
+			);
+		},
+		0
+	);
+}
+
+function getSelectedLayoutSetCount(
+	count: number,
+	portletDataHandlerSelection: PortletDataHandlerSelection,
+	key: CountKey,
+	dateFiltered: boolean
+): number | undefined {
+	if (
+		typeof portletDataHandlerSelection !== 'object' ||
+		isAllLayoutsSelected(portletDataHandlerSelection)
+	) {
+		return count;
+	}
+
+	const {selectionCount} = portletDataHandlerSelection as LayoutSetSelection;
+
+	if (
+		dateFiltered ||
+		key === 'deletionCount' ||
+		selectionCount === undefined
+	) {
+		return undefined;
+	}
+
+	return Math.min(selectionCount, count);
+}
+
+function getTotalCount(
+	portletDataHandlerControls: PortletDataHandlerControl[],
+	key: CountKey
+): number {
+	return portletDataHandlerControls.reduce(
+		(totalCount, portletDataHandlerControl) =>
+			totalCount +
+			(getCount(portletDataHandlerControl, key) ?? 0) +
+			getTotalCount(
+				getNestedPortletDataHandlerControls(portletDataHandlerControl),
+				key
+			),
+		0
+	);
 }

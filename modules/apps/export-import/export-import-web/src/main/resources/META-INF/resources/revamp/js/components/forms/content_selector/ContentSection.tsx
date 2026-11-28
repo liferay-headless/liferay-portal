@@ -19,6 +19,7 @@ import {
 	SECTION_KEY_CONTENT,
 	SECTION_KEY_CONTENT_AND_DATA,
 	getSectionSelection,
+	getSelectedSectionCount,
 	getSelectionSummary,
 	isSelected,
 	toPortletDataHandlerBooleans,
@@ -49,6 +50,7 @@ export type SectionSelection = Record<string, PortletDataHandlerSelection>;
 
 interface ContentSectionProps {
 	commentsAndRatingsEnabled?: boolean;
+	dateFiltered?: boolean;
 	onChange: (value: SectionSelection | undefined) => void;
 	pageTreeModalConfiguration?: PageTreeModalConfiguration;
 	portletDataHandlerSection: PortletDataHandlerSectionType;
@@ -59,6 +61,7 @@ interface ContentSectionProps {
 
 export default function ContentSection({
 	commentsAndRatingsEnabled = false,
+	dateFiltered = false,
 	onChange,
 	pageTreeModalConfiguration,
 	portletDataHandlerSection,
@@ -185,12 +188,25 @@ export default function ContentSection({
 								? portletDataHandlerSection.deletionCount
 								: undefined
 						}
+						selectedAdditionCount={getSelectedSectionCount(
+							portletDataHandlerSection,
+							sectionSelection,
+							'additionCount',
+							{dateFiltered}
+						)}
+						selectedDeletionCount={getSelectedSectionCount(
+							portletDataHandlerSection,
+							sectionSelection,
+							'deletionCount',
+							{dateFiltered}
+						)}
 					/>
 				}
 			>
 				{portletDataHandlerBooleans.map((portletDataHandlerBoolean) => (
 					<PortletDataControl
 						compact={compact}
+						dateFiltered={dateFiltered}
 						key={portletDataHandlerBoolean.name}
 						onChange={(portletDataHandlerSelection) =>
 							onChange(

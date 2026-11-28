@@ -59,6 +59,7 @@ interface Props<T> {
 		entries: Array<PageTreePickerSelectionEntry<T>>,
 		items: Array<PageTreePickerItem<T>>
 	) => void;
+	onSelectionCountChange?: (selectionCount: number | null) => void;
 	selectionMode?: PageTreePickerSelectionMode;
 }
 
@@ -70,6 +71,7 @@ export default function PageTreePickerPanel<T>({
 	onError,
 	onItemSelect,
 	onSelectionChange,
+	onSelectionCountChange,
 	selectionMode = 'multiple',
 }: Props<T>) {
 	const [entries, setEntries] = useState<
@@ -216,6 +218,15 @@ export default function PageTreePickerPanel<T>({
 		selectedKeys,
 		singleSelection,
 	]);
+
+	const handleSelectionCountChange = useStableCallback(
+		(selectionCount: number | null) =>
+			onSelectionCountChange?.(selectionCount)
+	);
+
+	useEffect(() => {
+		handleSelectionCountChange(resolvingCount ? null : exactCount);
+	}, [exactCount, handleSelectionCountChange, resolvingCount]);
 
 	const selectedItemsCount =
 		exactCount ??

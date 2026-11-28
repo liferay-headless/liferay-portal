@@ -10,42 +10,73 @@ import React from 'react';
 export default function SectionTags({
 	additionCount,
 	deletionCount,
+	selectedAdditionCount,
+	selectedDeletionCount,
 	tag,
 }: {
 	additionCount?: number;
 	deletionCount?: number;
+	selectedAdditionCount?: number;
+	selectedDeletionCount?: number;
 	tag?: string;
 }) {
-	const hasItems = !!additionCount;
-	const hasDeletions = !!deletionCount;
-	const hasTag = !!tag;
-
-	if (!hasItems && !hasDeletions && !hasTag) {
+	if (!additionCount && !deletionCount && !tag) {
 		return null;
 	}
 
 	return (
 		<div className="align-items-center c-gap-2 d-inline-flex ml-2">
-			{hasTag && <ClayLabel displayType="info">{tag}</ClayLabel>}
+			{tag && <ClayLabel displayType="info">{tag}</ClayLabel>}
 
-			{hasItems && (
+			{!!additionCount && (
 				<ClayLabel displayType="secondary">
-					{additionCount === 1
-						? sub(Liferay.Language.get('x-item'), additionCount)
-						: sub(Liferay.Language.get('x-items'), additionCount)}
+					{getAdditionLabel(additionCount, selectedAdditionCount)}
 				</ClayLabel>
 			)}
 
-			{hasDeletions && (
+			{!!deletionCount && (
 				<ClayLabel displayType="warning">
-					{deletionCount === 1
-						? sub(Liferay.Language.get('x-deletion'), deletionCount)
-						: sub(
-								Liferay.Language.get('x-deletions'),
-								deletionCount
-							)}
+					{getDeletionLabel(deletionCount, selectedDeletionCount)}
 				</ClayLabel>
 			)}
 		</div>
 	);
+}
+
+function getAdditionLabel(
+	additionCount: number,
+	selectedAdditionCount: number | undefined
+) {
+	if (selectedAdditionCount !== undefined) {
+		return sub(
+			Liferay.Language.get('x-of-x-items-selected'),
+			selectedAdditionCount,
+			additionCount
+		);
+	}
+
+	if (additionCount === 1) {
+		return sub(Liferay.Language.get('x-item'), additionCount);
+	}
+
+	return sub(Liferay.Language.get('x-items'), additionCount);
+}
+
+function getDeletionLabel(
+	deletionCount: number,
+	selectedDeletionCount: number | undefined
+) {
+	if (selectedDeletionCount !== undefined) {
+		return sub(
+			Liferay.Language.get('x-of-x-deletions-selected'),
+			selectedDeletionCount,
+			deletionCount
+		);
+	}
+
+	if (deletionCount === 1) {
+		return sub(Liferay.Language.get('x-deletion'), deletionCount);
+	}
+
+	return sub(Liferay.Language.get('x-deletions'), deletionCount);
 }

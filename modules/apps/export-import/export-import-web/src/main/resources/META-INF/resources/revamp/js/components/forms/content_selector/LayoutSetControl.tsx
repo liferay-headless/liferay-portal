@@ -27,6 +27,8 @@ interface Props {
 	onChange: (value: PortletDataHandlerSelection | undefined) => void;
 	pageTreeModalConfiguration: PageTreeModalConfiguration;
 	portletDataHandlerSelection: PortletDataHandlerSelection | undefined;
+	selectedAdditionCount?: number;
+	selectedDeletionCount?: number;
 }
 
 function SelectPagesButton({
@@ -102,6 +104,8 @@ export default function LayoutSetControl({
 	onChange,
 	pageTreeModalConfiguration,
 	portletDataHandlerSelection,
+	selectedAdditionCount,
+	selectedDeletionCount,
 }: Props) {
 	const {pageSize, siteExternalReferenceCode, title} =
 		pageTreeModalConfiguration;
@@ -157,6 +161,8 @@ export default function LayoutSetControl({
 							<SectionTags
 								additionCount={additionCount}
 								deletionCount={deletionCount}
+								selectedAdditionCount={selectedAdditionCount}
+								selectedDeletionCount={selectedDeletionCount}
 							/>
 						</div>
 
@@ -188,11 +194,18 @@ export default function LayoutSetControl({
 						selected ? {...layoutSetSelection, privateLayout} : null
 					}
 					onClose={() => setShowModal(false)}
-					onSubmit={(sitePageTreeSelection) => {
+					onSubmit={(sitePageTreeSelection, selectionCount) => {
 						setShowModal(false);
 
 						onChange(
-							(sitePageTreeSelection ?? undefined) as
+							(sitePageTreeSelection
+								? {
+										...sitePageTreeSelection,
+										...(selectionCount !== null && {
+											selectionCount,
+										}),
+									}
+								: undefined) as
 								| PortletDataHandlerSelection
 								| undefined
 						);

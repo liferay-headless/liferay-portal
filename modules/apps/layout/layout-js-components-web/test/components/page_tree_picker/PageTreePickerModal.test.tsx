@@ -334,11 +334,14 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith({
-			all: true,
-			excludedItems: ['Phones-ERC'],
-			privateLayout: false,
-		});
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
+				all: true,
+				excludedItems: ['Phones-ERC'],
+				privateLayout: false,
+			},
+			2
+		);
 	});
 
 	it('counts a reopened selection whose external reference codes are not lowercase', async () => {
@@ -385,12 +388,17 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('checkbox', {name: 'Home'}));
 
+		expect(await screen.findByText('1 item-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith({
-			items: ['home-erc'],
-			privateLayout: false,
-		});
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
+				items: ['home-erc'],
+				privateLayout: false,
+			},
+			1
+		);
 	});
 
 	it('submits all pages when the root is shift selected', async () => {
@@ -402,13 +410,16 @@ describe('PageTreePickerModal', () => {
 			shiftKey: true,
 		});
 
+		expect(await screen.findByText('4 items-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		await waitFor(() =>
-			expect(onSubmit).toHaveBeenCalledWith({
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
 				all: true,
 				privateLayout: false,
-			})
+			},
+			4
 		);
 	});
 
@@ -419,7 +430,7 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith(null);
+		expect(onSubmit).toHaveBeenCalledWith(null, 0);
 	});
 
 	it('toggles the page selection when its row is clicked', async () => {
@@ -523,9 +534,11 @@ describe('PageTreePickerModal', () => {
 
 		expect(screen.getByRole('checkbox', {name: 'Home'})).not.toBeChecked();
 
+		expect(await screen.findByText('nothing-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith(null);
+		expect(onSubmit).toHaveBeenCalledWith(null, 0);
 	});
 
 	it('clears the loaded subtree when its parent is shift deselected', async () => {
@@ -550,14 +563,17 @@ describe('PageTreePickerModal', () => {
 			screen.getByRole('checkbox', {name: 'Phones'})
 		).not.toBeChecked();
 
+		expect(await screen.findByText('2 items-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		await waitFor(() =>
-			expect(onSubmit).toHaveBeenCalledWith({
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
 				all: true,
 				excludedSubtrees: ['products-erc'],
 				privateLayout: false,
-			})
+			},
+			2
 		);
 	});
 
@@ -640,11 +656,14 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith({
-			excludedItems: ['products-erc'],
-			privateLayout: false,
-			subtrees: ['products-erc'],
-		});
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
+				excludedItems: ['products-erc'],
+				privateLayout: false,
+				subtrees: ['products-erc'],
+			},
+			1
+		);
 	});
 
 	it('submits a shift selected subtree as a page tree', async () => {
@@ -656,12 +675,17 @@ describe('PageTreePickerModal', () => {
 			shiftKey: true,
 		});
 
+		expect(await screen.findByText('2 items-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith({
-			privateLayout: false,
-			subtrees: ['products-erc'],
-		});
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
+				privateLayout: false,
+				subtrees: ['products-erc'],
+			},
+			2
+		);
 	});
 
 	it('searches the pages at any depth and resolves their ancestors', async () => {
@@ -812,14 +836,17 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('checkbox', {name: 'Home'}));
 
+		expect(await screen.findByText('3 items-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		await waitFor(() =>
-			expect(onSubmit).toHaveBeenCalledWith({
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
 				all: true,
 				excludedItems: ['home-erc'],
 				privateLayout: false,
-			})
+			},
+			3
 		);
 	});
 
@@ -841,14 +868,17 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(searchResultCheckbox);
 
+		expect(await screen.findByText('3 items-selected')).toBeInTheDocument();
+
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		await waitFor(() =>
-			expect(onSubmit).toHaveBeenCalledWith({
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
 				all: true,
 				excludedItems: ['phones-erc'],
 				privateLayout: false,
-			})
+			},
+			3
 		);
 	});
 
@@ -879,12 +909,15 @@ describe('PageTreePickerModal', () => {
 
 		await userEvent.click(screen.getByRole('button', {name: 'select'}));
 
-		expect(onSubmit).toHaveBeenCalledWith({
-			all: true,
-			excludedSubtrees: ['products-erc'],
-			items: ['phones-erc'],
-			privateLayout: false,
-		});
+		expect(onSubmit).toHaveBeenCalledWith(
+			{
+				all: true,
+				excludedSubtrees: ['products-erc'],
+				items: ['phones-erc'],
+				privateLayout: false,
+			},
+			3
+		);
 	});
 
 	it('counts a deselected tree below pages that are not loaded when reopened', async () => {

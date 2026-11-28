@@ -16,6 +16,7 @@ import {
 	getAvailableLayoutSetVisibilities,
 	getNestedPortletDataHandlerControls,
 	getPortletDataHandlerSelection,
+	getSelectedCount,
 	getSelectionSummary,
 	isSelected,
 	updateSelection,
@@ -29,6 +30,7 @@ import SectionTags from './SectionTags';
 
 export default function PortletDataControl({
 	compact = false,
+	dateFiltered = false,
 	onChange,
 	pageTreeModalConfiguration,
 	portletDataHandlerControl,
@@ -37,6 +39,7 @@ export default function PortletDataControl({
 	topLevel = false,
 }: {
 	compact?: boolean;
+	dateFiltered?: boolean;
 	onChange: (value: PortletDataHandlerSelection | undefined) => void;
 	pageTreeModalConfiguration?: PageTreeModalConfiguration;
 	portletDataHandlerControl: PortletDataHandlerControl;
@@ -71,6 +74,18 @@ export default function PortletDataControl({
 				onChange={onChange}
 				pageTreeModalConfiguration={pageTreeModalConfiguration}
 				portletDataHandlerSelection={portletDataHandlerSelection}
+				selectedAdditionCount={getSelectedCount(
+					portletDataHandlerControl,
+					portletDataHandlerSelection,
+					'additionCount',
+					{dateFiltered}
+				)}
+				selectedDeletionCount={getSelectedCount(
+					portletDataHandlerControl,
+					portletDataHandlerSelection,
+					'deletionCount',
+					{dateFiltered}
+				)}
 			/>
 		);
 	}
@@ -140,6 +155,18 @@ export default function PortletDataControl({
 			<SectionTags
 				additionCount={additionCount}
 				deletionCount={deletionCount}
+				selectedAdditionCount={getSelectedCount(
+					portletDataHandlerControl,
+					portletDataHandlerSelection,
+					'additionCount',
+					{dateFiltered, nested: !topLevel}
+				)}
+				selectedDeletionCount={getSelectedCount(
+					portletDataHandlerControl,
+					portletDataHandlerSelection,
+					'deletionCount',
+					{dateFiltered, nested: !topLevel}
+				)}
 				tag={tag}
 			/>
 		),
@@ -153,6 +180,7 @@ export default function PortletDataControl({
 		)
 		.map((nestedPortletDataHandlerControl) => (
 			<PortletDataControl
+				dateFiltered={dateFiltered}
 				key={nestedPortletDataHandlerControl.name}
 				onChange={(nestedPortletDataHandlerSelection) =>
 					onChange(
