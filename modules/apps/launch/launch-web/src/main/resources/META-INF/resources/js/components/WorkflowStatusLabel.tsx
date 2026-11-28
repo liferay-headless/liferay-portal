@@ -3,67 +3,70 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayLabel from '@clayui/label';
 import React from 'react';
 
-type DisplayType = 'danger' | 'info' | 'secondary' | 'success' | 'warning';
+import {WORKFLOW_STATUS} from '../util/constants';
+import StatusLabel from './StatusLabel';
 
-export const WORKFLOW_STATUS_APPROVED = 0;
-export const WORKFLOW_STATUS_DENIED = 4;
-export const WORKFLOW_STATUS_DRAFT = 2;
-export const WORKFLOW_STATUS_EXPIRED = 3;
-export const WORKFLOW_STATUS_IN_TRASH = 8;
-export const WORKFLOW_STATUS_INACTIVE = 5;
-export const WORKFLOW_STATUS_INCOMPLETE = 6;
-export const WORKFLOW_STATUS_PENDING = 1;
-export const WORKFLOW_STATUS_SCHEDULED = 7;
+const WORKFLOW_STATUS_LABELS: Record<
+	number,
+	{
+		displayType: React.ComponentProps<typeof StatusLabel>['displayType'];
+		label: string;
+	}
+> = {
+	[WORKFLOW_STATUS.APPROVED]: {
+		displayType: 'success',
+		label: Liferay.Language.get('approved'),
+	},
+	[WORKFLOW_STATUS.DENIED]: {
+		displayType: 'danger',
+		label: Liferay.Language.get('denied'),
+	},
+	[WORKFLOW_STATUS.DRAFT]: {
+		displayType: 'secondary',
+		label: Liferay.Language.get('draft'),
+	},
+	[WORKFLOW_STATUS.EXPIRED]: {
+		displayType: 'warning',
+		label: Liferay.Language.get('expired'),
+	},
+	[WORKFLOW_STATUS.IN_TRASH]: {
+		displayType: 'secondary',
+		label: Liferay.Language.get('in-trash'),
+	},
+	[WORKFLOW_STATUS.INACTIVE]: {
+		displayType: 'secondary',
+		label: Liferay.Language.get('inactive'),
+	},
+	[WORKFLOW_STATUS.INCOMPLETE]: {
+		displayType: 'secondary',
+		label: Liferay.Language.get('pending-approval'),
+	},
+	[WORKFLOW_STATUS.PENDING]: {
+		displayType: 'info',
+		label: Liferay.Language.get('pending'),
+	},
+	[WORKFLOW_STATUS.SCHEDULED]: {
+		displayType: 'info',
+		label: Liferay.Language.get('scheduled'),
+	},
+};
 
 export default function WorkflowStatusLabel({
 	workflowStatus,
 }: {
 	workflowStatus: number;
 }) {
-	let displayType: DisplayType | null = null;
-	let label: string | null = null;
+	const workflowStatusLabel = WORKFLOW_STATUS_LABELS[workflowStatus];
 
-	if (workflowStatus === WORKFLOW_STATUS_APPROVED) {
-		displayType = 'success';
-		label = Liferay.Language.get('approved');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_DENIED) {
-		displayType = 'danger';
-		label = Liferay.Language.get('denied');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_DRAFT) {
-		displayType = 'secondary';
-		label = Liferay.Language.get('draft');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_EXPIRED) {
-		displayType = 'warning';
-		label = Liferay.Language.get('expired');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_IN_TRASH) {
-		displayType = 'secondary';
-		label = Liferay.Language.get('in-trash');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_INACTIVE) {
-		displayType = 'secondary';
-		label = Liferay.Language.get('inactive');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_INCOMPLETE) {
-		displayType = 'secondary';
-		label = Liferay.Language.get('pending-approval');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_PENDING) {
-		displayType = 'info';
-		label = Liferay.Language.get('pending');
-	}
-	else if (workflowStatus === WORKFLOW_STATUS_SCHEDULED) {
-		displayType = 'info';
-		label = Liferay.Language.get('scheduled');
+	if (!workflowStatusLabel) {
+		return null;
 	}
 
-	return displayType && label ? (
-		<ClayLabel displayType={displayType}>{label}</ClayLabel>
-	) : null;
+	return (
+		<StatusLabel displayType={workflowStatusLabel.displayType}>
+			{workflowStatusLabel.label}
+		</StatusLabel>
+	);
 }

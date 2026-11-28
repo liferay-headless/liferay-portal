@@ -11,6 +11,7 @@ import {
 	replaceTokens,
 } from '@liferay/frontend-data-set-web';
 import {getCMSItemSelectorGroupedFilters} from '@liferay/frontend-js-item-selector-web';
+import {openAddToLaunchModal} from '@liferay/launch-web';
 import {sub} from 'frontend-js-web';
 import React from 'react';
 
@@ -562,7 +563,7 @@ export default function AssetsFDSPropsTransformer({
 					return;
 				}
 
-				Liferay.fire('addToLaunch', {
+				openAddToLaunchModal({
 					className: OBJECT_ENTRY_CLASS_NAME,
 					classPK: itemData.embedded.id,
 					classVersion: String(

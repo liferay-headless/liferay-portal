@@ -3,17 +3,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import ClayLabel from '@clayui/label';
-import React from 'react';
-
 import confirmAndUnscheduleLaunchAction from '../actions/confirmAndUnscheduleLaunchAction';
-import {Launch, isPublished} from '../api/launches';
-import {
-	WORKFLOW_STATUS_DRAFT,
-	WORKFLOW_STATUS_SCHEDULED,
-} from '../components/WorkflowStatusLabel';
+import {Launch} from '../api/launches';
 import openNewLaunchModal from '../modals/openNewLaunchModal';
 import openScheduleLaunchModal from '../modals/openScheduleLaunchModal';
+import LaunchStatusCell from '../renderers/LaunchStatusCell';
+import {WORKFLOW_STATUS} from '../util/constants';
 import fillViewLaunchURL from '../util/fillViewLaunchURL';
 import {openSuccessToast} from '../util/toasts';
 
@@ -64,42 +59,7 @@ export default function LaunchesFDSPropsTransformer({
 		customRenderers: {
 			tableCell: [
 				{
-					component: ({itemData}: {itemData: Launch}) => {
-						if (isPublished(itemData)) {
-							return (
-								<ClayLabel displayType="success">
-									{Liferay.Language.get('published')}
-								</ClayLabel>
-							);
-						}
-
-						if (
-							itemData.scheduledDate &&
-							itemData.status?.code === WORKFLOW_STATUS_DRAFT
-						) {
-							return (
-								<ClayLabel displayType="danger">
-									{Liferay.Language.get('failed')}
-								</ClayLabel>
-							);
-						}
-
-						if (
-							itemData.status?.code === WORKFLOW_STATUS_SCHEDULED
-						) {
-							return (
-								<ClayLabel displayType="info">
-									{Liferay.Language.get('scheduled')}
-								</ClayLabel>
-							);
-						}
-
-						return (
-							<ClayLabel displayType="info">
-								{Liferay.Language.get('in-progress')}
-							</ClayLabel>
-						);
-					},
+					component: LaunchStatusCell,
 					name: 'launchStatus',
 					type: 'internal',
 				},
@@ -110,7 +70,7 @@ export default function LaunchesFDSPropsTransformer({
 				return {
 					...action,
 					isVisible: (launch: Launch) =>
-						launch.status?.code === WORKFLOW_STATUS_DRAFT,
+						launch.status?.code === WORKFLOW_STATUS.DRAFT,
 				};
 			}
 
@@ -118,7 +78,7 @@ export default function LaunchesFDSPropsTransformer({
 				return {
 					...action,
 					isVisible: (launch: Launch) =>
-						launch.status?.code === WORKFLOW_STATUS_SCHEDULED,
+						launch.status?.code === WORKFLOW_STATUS.SCHEDULED,
 				};
 			}
 

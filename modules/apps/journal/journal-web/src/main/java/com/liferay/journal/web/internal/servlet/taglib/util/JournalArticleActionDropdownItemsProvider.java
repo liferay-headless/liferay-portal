@@ -34,6 +34,7 @@ import com.liferay.journal.web.internal.security.permission.resource.JournalArti
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
 import com.liferay.journal.web.internal.util.JournalPortletUtil;
 import com.liferay.journal.web.internal.util.JournalUtil;
+import com.liferay.launch.display.context.AddToLaunchPropsProvider;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -149,9 +150,8 @@ public class JournalArticleActionDropdownItemsProvider {
 						_getDiscardDraftActionUnsafeConsumer()
 					).add(
 						() ->
-							FeatureFlagManagerUtil.isEnabled(
-								_article.getCompanyId(), "LPD-72278") &&
-							hasUpdatePermission && _article.isDraft(),
+							hasUpdatePermission && _article.isDraft() &&
+							_isAddToLaunchEnabled(),
 						_getAddToLaunchArticleActionUnsafeConsumer()
 					).add(
 						() ->
@@ -309,13 +309,12 @@ public class JournalArticleActionDropdownItemsProvider {
 							_themeDisplay.getURLCurrent())
 					).add(
 						() ->
-							FeatureFlagManagerUtil.isEnabled(
-								_article.getCompanyId(), "LPD-72278") &&
 							JournalArticlePermission.contains(
 								_themeDisplay.getPermissionChecker(), _article,
 								ActionKeys.UPDATE) &&
 							(_article.getStatus() ==
-								WorkflowConstants.STATUS_APPROVED),
+								WorkflowConstants.STATUS_APPROVED) &&
+							_isAddToLaunchEnabled(),
 						_getAddToLaunchArticleActionUnsafeConsumer()
 					).build());
 				dropdownGroupItem.setSeparator(true);
@@ -407,11 +406,16 @@ public class JournalArticleActionDropdownItemsProvider {
 		_getAddToLaunchArticleActionUnsafeConsumer() {
 
 		return dropdownItem -> {
+			AddToLaunchPropsProvider addToLaunchPropsProvider =
+				_addToLaunchPropsProviderSnapshot.get();
+
+			dropdownItem.setData(
+				addToLaunchPropsProvider.getProps(
+					JournalArticle.class.getName(),
+					_article.getResourcePrimKey(),
+					String.valueOf(_article.getVersion())));
+
 			dropdownItem.putData("action", "addToLaunch");
-			dropdownItem.putData("className", JournalArticle.class.getName());
-			dropdownItem.putData("classPK", _article.getResourcePrimKey());
-			dropdownItem.putData(
-				"classVersion", String.valueOf(_article.getVersion()));
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "add-to-launch"));
 		};
@@ -1130,6 +1134,19 @@ public class JournalArticleActionDropdownItemsProvider {
 		return false;
 	}
 
+	private boolean _isAddToLaunchEnabled() {
+		AddToLaunchPropsProvider addToLaunchPropsProvider =
+			_addToLaunchPropsProviderSnapshot.get();
+
+		if (addToLaunchPropsProvider == null) {
+			return false;
+		}
+
+		return addToLaunchPropsProvider.isEnabled(
+			JournalArticle.class.getName(),
+			_themeDisplay.getPermissionChecker());
+	}
+
 	private boolean _isRevertToVersionActionAvailable() throws PortalException {
 		if (((_article.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
 			 (_article.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) ||
@@ -1278,6 +1295,10 @@ public class JournalArticleActionDropdownItemsProvider {
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleActionDropdownItemsProvider.class);
 
+	private static final Snapshot<AddToLaunchPropsProvider>
+		_addToLaunchPropsProviderSnapshot = new Snapshot<>(
+			JournalArticleActionDropdownItemsProvider.class,
+			AddToLaunchPropsProvider.class);
 	private static final Snapshot<DDMFormValuesValidator>
 		_ddmFormValuesValidatorSnapshot = new Snapshot<>(
 			JournalArticleActionDropdownItemsProvider.class,

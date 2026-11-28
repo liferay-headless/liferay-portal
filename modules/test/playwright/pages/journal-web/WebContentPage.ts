@@ -75,6 +75,10 @@ export class WebContentPage {
 		await waitForAlert(this.page, MOVED_TO_RECYCLE_BIN(title));
 	}
 
+	async openAddToLaunch(title: string) {
+		await this._openRowAction(title, 'Add to Launch');
+	}
+
 	async undoMoveToRecycleBin() {
 		await this.page
 			.locator('[id$="recycleBinAlert"]')
